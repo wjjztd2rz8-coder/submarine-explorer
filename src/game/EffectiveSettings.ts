@@ -1,6 +1,6 @@
 import { DEFAULT_CONFIG, type GameConfig, type GameplayOptions } from '../core/Config.js';
 import type { CurrentMode } from '../core/config/modes.js';
-import { PROGRESS_CONFIG, EQUIPMENT } from '../core/config/progress.js';
+import { EQUIPMENT } from '../core/config/progress.js';
 import type { GameplayMode, SettingsData } from '../core/Save.js';
 import type { DailyDive } from './Daily.js';
 
@@ -39,7 +39,6 @@ export function resolveEffective(
   ] as const)
     power[key] *= EQUIPMENT.battery;
   power.oxygenHours *= EQUIPMENT.oxygen;
-  power.boostCostMultiplier /= EQUIPMENT.boostEfficiency;
   const currentMode: CurrentMode = daily
     ? daily.modifier === 'strong-currents'
       ? 'strong'
@@ -53,6 +52,7 @@ export function resolveEffective(
     camera: { ...base.camera, lookAheadPerSpeed: speed.cameraLookAheadPerSpeed },
     scan: {
       ...base.scan,
+      radiusFloorM: preset === 'realistic' ? 0 : 100,
       hintRangeFactor:
         base.scan.hintRangeFactor * sensor.hintRangeMultiplier * EQUIPMENT.scanDetail,
     },
@@ -68,7 +68,6 @@ export function resolveEffective(
       scanRadiusMultiplier: sensor.scanRadiusMultiplier * EQUIPMENT.scanDetail,
       hintRangeMultiplier: sensor.hintRangeMultiplier * EQUIPMENT.scanDetail,
     },
-    boostSeconds: PROGRESS_CONFIG.boostSeconds,
   };
 }
 export type EffectiveSettings = ReturnType<typeof resolveEffective>;

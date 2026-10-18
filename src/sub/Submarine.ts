@@ -94,7 +94,6 @@ const LOCKED_INPUT: InputState = Object.freeze({
   lookDy: 0,
   toggleCamera: false,
   toggleSonar: false,
-  boost: false,
   toggleLights: false,
   scan: false,
   cycleSimSpeed: false,
@@ -316,8 +315,7 @@ export class Submarine {
 
     // --- accelerations ------------------------------------------------------
     const throttle = curve(clamp(cmd.throttle, -1, 1), c.thrustCurve);
-    const boost = cmd.boost ? c.boostMultiplier : 1;
-    const accelMag = (throttle >= 0 ? throttle * c.thrustAccel : throttle * c.reverseAccel) * boost;
+    const accelMag = throttle >= 0 ? throttle * c.thrustAccel : throttle * c.reverseAccel;
     const a = this.tmp.copy(fwd).multiplyScalar(accelMag);
 
     // Ballast lags the stick (the tanks take time to flood or blow).
@@ -347,7 +345,7 @@ export class Submarine {
     // Semi-implicit Euler: update velocity first, then integrate position with
     // the new velocity. Stable for this kind of damped system.
     v.addScaledVector(a, dt);
-    // Horizontal and ballast limits are independent: pitch/boost cannot turn
+    // Horizontal and ballast limits are independent: pitch cannot turn
     // the forward cap into an unsafe descent rate.
     v.y = clamp(v.y, -c.maxVerticalSpeed, c.maxVerticalSpeed);
     const horizontalSpeed = Math.hypot(v.x, v.z);

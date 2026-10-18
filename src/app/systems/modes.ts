@@ -1,4 +1,5 @@
 import { resolveEffective } from '../../game/EffectiveSettings.js';
+import { resolveScanRadius } from '../../game/Scanner.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
@@ -19,7 +20,10 @@ export const modesSystem: GameSystem = {
       if (disposed) return;
       for (const poi of ctx.discovery.pois) {
         baseScanRadii.set(poi.id, poi.radius);
-        poi.radius *= ctx.effective.sensor.scanRadiusMultiplier;
+        poi.radius = resolveScanRadius(
+          poi.radius * ctx.effective.sensor.scanRadiusMultiplier,
+          ctx.effective.scan,
+        );
       }
     });
   },
@@ -39,7 +43,11 @@ export const modesSystem: GameSystem = {
       ctx.hud.setCurrentMode(effective.currentMode);
       for (const poi of ctx.discovery.pois) {
         const radius = ctx.baseScanRadii.get(poi.id);
-        if (radius !== undefined) poi.radius = radius * effective.sensor.scanRadiusMultiplier;
+        if (radius !== undefined)
+          poi.radius = resolveScanRadius(
+            radius * effective.sensor.scanRadiusMultiplier,
+            effective.scan,
+          );
       }
     };
     cleanup.add(

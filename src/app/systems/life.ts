@@ -122,6 +122,7 @@ export function createLifeSystem(): GameSystem {
           ctx.rig.camera,
           ctx.renderer.domElement.height,
           f.fog.density,
+          ctx.effective.scan.radiusFloorM,
         );
       },
     },

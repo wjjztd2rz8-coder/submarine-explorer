@@ -140,19 +140,19 @@ describe('save schema soak', () => {
         keys: {
           thrustForward: ['KeyI'],
           toggleRov: ['KeyE'],
-          boost: [],
+          toggleLights: [],
           [version === 1 ? 'toggleGuide' : 'toggleJournal']: ['KeyH'],
         },
       });
       storage.setItem(key, original);
       const input = new Input({ storage });
       expect(input.getAction('thrustForward')?.keys).toEqual(['KeyI']);
-      expect(input.getAction('boost')?.keys).toEqual([]);
+      expect(input.getAction('toggleLights')?.keys).toEqual([]);
       expect(input.getAction('toggleJournal')?.keys).toEqual(['KeyH']);
       const migrated = JSON.parse(storage.getItem(BINDINGS_STORAGE_KEY)!);
       expect(migrated.keys).not.toHaveProperty('toggleRov');
       expect(migrated.keys.thrustForward).toEqual(['KeyI']);
-      expect(migrated.keys.boost).toEqual([]);
+      expect(migrated.keys.toggleLights).toEqual([]);
       expect(input.actions.some((a) => a.keys.includes('KeyE'))).toBe(false);
       input.rebind('toggleLights', ['KeyO']);
       // Retiring an action must leave its old key available for a player's remap.
@@ -380,7 +380,10 @@ describe('damaged localStorage recovery', () => {
     (text) => {
       const storage = new MemoryStorage();
       const settings = JSON.stringify({ version: 1, captions: true, graphicsTier: 'low' });
-      const bindings = JSON.stringify({ version: 1, keys: { thrustForward: ['KeyI'], boost: [] } });
+      const bindings = JSON.stringify({
+        version: 1,
+        keys: { thrustForward: ['KeyI'], toggleLights: [] },
+      });
       storage.setItem(legacySettingsKey, settings);
       storage.setItem(LEGACY_BINDINGS_STORAGE_KEY, bindings);
       storage.setItem(SETTINGS_STORAGE_KEY, text!);
@@ -392,7 +395,7 @@ describe('damaged localStorage recovery', () => {
       });
       const input = new Input({ storage });
       expect(input.getAction('thrustForward')?.keys).toEqual(['KeyI']);
-      expect(input.getAction('boost')?.keys).toEqual([]);
+      expect(input.getAction('toggleLights')?.keys).toEqual([]);
       expect(storage.getItem(legacySettingsKey)).toBe(settings);
       expect(storage.getItem(LEGACY_BINDINGS_STORAGE_KEY)).toBe(bindings);
       expect(new Save({ config: DEFAULT_CONFIG, storage }).get().captions).toBe(true);

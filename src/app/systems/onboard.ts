@@ -164,6 +164,11 @@ export function createOnboardSystem(): GameSystem {
 
         const guidance = ctx.guidance;
         const step = tutorial.step;
+        const scanView = ctx.discovery.scanner.view;
+        const scanDistance = scanView.nearestId
+          ? scanView.nearestDistance
+          : scanView.objectiveDistance;
+        const scanRadius = scanView.nearestId ? scanView.nearestRadius : scanView.objectiveRadius;
         const objectiveTitle = ctx.missionRouter?.mission.objectives.find(
           (o) => o.primary && !o.complete,
         )?.title;
@@ -183,6 +188,9 @@ export function createOnboardSystem(): GameSystem {
                   tutorialKeys(device),
                   tutorial.scanning ? tutorial.scanProgress : null,
                   objectiveTitle?.startsWith('Head to ') ? objectiveTitle.slice(8) : undefined,
+                  Number.isFinite(scanDistance) && scanDistance > scanRadius
+                    ? scanDistance
+                    : undefined,
                 ),
                 tone: 'cyan',
                 step: step.id,
