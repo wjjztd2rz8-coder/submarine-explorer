@@ -56,7 +56,7 @@ Reviewers send work back if it breaks one of these:
 | Five hero sites look beautiful (4 of 5) in opening, approach and detail views. The set is `HERO_SITES` (Cosmetics.ts): Titanic, Lost City, Blue Hole, Beebe and Monterey; Endurance is a polish site covered by the eight-site acceptance | V-bluehole, V-beebe, V-titanic, V-lostcity, V-monterey-floor, V-endurance |
 | The other eight sites are coherent with no major visual defect                                                                                                                                                                            | V-eight-sites                                                             |
 | A new player understands the first five minutes on desktop and phone                                                                                                                                                                      | V-journeys, S-guidance (done), S-hud                                      |
-| Acceptable Low-tier performance on a real phone                                                                                                                                                                                           | Owner check; S-boot helps                                                 |
+| Acceptable Low-tier performance on a real phone (owner 2026-10-18, iPhone 17 Pro: Low great, High stutters at Lost City; weaker phones untested)                                                                                          | P2-lostcity-perf                                                          |
 | Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
 | No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
@@ -66,7 +66,7 @@ Stage (review 2026-10-18, joint with Sol): about 82% to 1.0, four weeks targeted
 
 The newest items go first.
 
-- A five-minute play on a real phone on the newest build (Low-tier performance and readability, first five minutes). Still open since 2026-10-11; it is the largest unverified 1.0 requirement.
+- A short phone retest once the P2 items below land (boost gone, scan range, anchored events, Your sub screen).
 
 ## In flight
 
@@ -77,6 +77,20 @@ The newest items go first.
 One list, ordered by player impact and dependencies. Lane is in brackets. Evidence: review 2026-10-16 (third) in `plan/REVIEWS.md`. DONE items were removed at that review (history in git and `plan/progress/`). Per-package art gains are now ~0.1-0.2: each V-* brief below names a target composition (what the frame should look like), not a geometry list.
 
 Evidence: review 2026-10-18 (joint with Sol) in `plan/REVIEWS.md`. DONE items removed at that review. Art plateau: each V-* names a target composition.
+
+Owner phone test 2026-10-18: decisions and file ownership in [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md). P2 items go first (playability first); the numbered V/S/R list follows.
+
+- **P2-boost-cut [Codex]:** cut boost on every input (touch button, X, RT), along with its meter, power cost and config; update How to play and CHANGELOG (Removed). The touch dock loses the button.
+- **P2-scan-range [Codex]:** Arcade scan radius floor of 100 m for every target (Titanic bow/stern are 30 m now); Realistic keeps the data radii. Out of range, the scan tutorial step and guidance say "Get closer to scan" with the distance. Guard nearest-target selection between adjacent POIs.
+- **P2-copy [Haiku]:** Home primary reads "Dive: <site>"; the discovery confirmation reads "New Journal entry"; touch Settings hides the Controls key-bindings button and section; the graphics row says "Auto (<tier> on this device)".
+- **P2-hull-a [Sonnet]:** Class A (Lost City, Blue Hole) has a propeller inside the vertical stabiliser and thrusters clipping the hull. Target: every propeller and thruster sits clear on all three hulls and every tier; add a geometry test.
+- **P2-events-anchored [Codex, Claude visual review]:** replace the random scheduler with anchored spots in the six event sites' data, each shown as an optional contact ("Vent plume", "Silt flow", "Whale route") that plays its event on arrival. Cut any event that still doesn't read on Low.
+- **P2-sub-screen [Sonnet]:** move the cosmetic picker out of the Journal into a "Your sub" screen reached from Pause and Home, with large swatches and a live sub preview. This is a move, not an addition.
+- **P2-ambience [Codex]:** lower the default ambient bed and low-pass its harsh band; leave saved volumes alone.
+- **P2-globe-bright [Sonnet]:** the globe is a touch dark. Target: a brighter Google Earth feel (lighter ocean, saturated land, brighter day side) with pins still contrasting.
+- **P2-beebe-low [Sonnet, small]:** Low-tier Beebe chimney glow caps float off the orifice; seat them.
+- **P2-lostcity-perf [Codex]:** High stutters at Lost City among particles and effects on an iPhone 17 Pro. Measure overdraw and cap the High particle/effect fill; Low unchanged; update the perf budget.
+- **P2-text-size [Sonnet, small]:** an "Aa" button on the briefing and Journal headers that steps the existing UI scale (no new setting).
 
 1. **V-lostcity-slice3 [Sonnet]** (~3.8-4.1, Sol 3): the detail tower (`lost-city-3.png`) still reads as thin broken sheets with stair-step facets, and the mid-slope banding repeats. Target: the tower is a thick eroded carbonate mass with rounded chimneys, rubble at its foot in frame, and slope bands broken by terrace ledges.
 2. **V-titanic-opening [Sonnet] DONE 2026-10-18 (4527352)** (~4.0; hull ~25% of height, sky dark, portrait small; further slices only with cropped framing) (~3.5-4): the opening frame is small and dark and plating still regular with flat peach light. Target: the hull fills a third of the opening frame with a rim-lit bow, plating panel colour varied by lanes. Any prop addition must also update f-perf-budget.spec.ts.
