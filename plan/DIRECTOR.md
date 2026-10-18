@@ -70,7 +70,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running.
+- V-bluehole-hood-2 (Sonnet, 2026-10-18) in ../subexp-wt/V-bluehole-hood-2.
 
 ## Backlog
 
