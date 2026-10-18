@@ -2,6 +2,30 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-18 comprehensive review, joint with Codex Sol (golden 2026-10-18-104523)
+
+Sol ran; one reconcile round, claims checked against the images and files.
+
+**Changed since the last review (8 merges):** Claude V-closeup-artifacts, V-lostcity-slice2, V-lostcity-rim, V-bluehole-hood-2; Codex S-verify-closeup-artifacts, S-bughunt-20/21/22 and picker/contact verification. Tags f59, f60. CI on the latest main (run 59) is green; run 58 failed one f2-modes touch-Advanced tap (re-run green).
+
+**Scores, readable / beautiful (bands):** Titanic 4 / 3.5-4; Lost City 3.5-4 / 3-4.1 (disputed: Claude 4.1, Sol 3); Blue Hole 3.5-4 / 3-3.5; Beebe 3.5 / 3.5-3.8; Monterey 4 / 3.5-3.7; Challenger 3.5 / 3.5-3.6; Endurance 3.5-4 / 3.5-3.8. Improved: Titanic plating and trail, Lost City rims, Endurance lobsters now read as animals. No hero is consistently at 4.
+
+**Biggest gaps:** Lost City detail tower reads as thin sheets (Sol); Titanic opening small and flat-lit; Beebe flank; Monterey banding; Blue Hole east hood sheet facets.
+
+**Disputes settled on evidence:** Sol's Titanic beauty cap holds ("no pink" was too absolute); Lost City stays disputed (`lost-city-3.png` shows stair-step shard facets, so I lowered my read toward 3.8-4); my "hud-touch/f2-modes flake" conflated a deterministic stale expectation (fixed) with a timing flake (accepted Sol's correction).
+
+**Sol's additional findings (credited to Sol):** Blue Hole retains ~0.45 m hull overlap with a loosened 0.43 to 0.46 bound (queued as V-bluehole-overlap); Lost City Low triangles +15%; screenshot persistence is conditional so fresh manifests need not mean fresh screenshots (V-spawn-capture); Pages deploys independently of CI (R-deploy-gate).
+
+**Play:** no new flow captures this review (goldens are High desktop free-dive and cannot certify journeys); current unaided journeys and eight-site spawn acceptance remain unverified.
+
+**Process:** efficiency: weekly pacing gates both lanes (Claude 41% left, ~12%/day; Codex 75%, ~18%/day); 0 failed timer runs; Codex queue now 2550-2600 (six briefs).
+
+**Stage:** about 82% to 1.0, four weeks targeted, 4-6 for planning (agreed with Sol).
+
+**New priorities:** V-lostcity-slice3, V-titanic-opening, V-beebe-flank, V-monterey-bands, V-challenger-seabed (Claude); V-bluehole-overlap, V-spawn-capture, R-deploy-gate (Codex).
+
+**Needs owner:** real-phone Low-tier play on the newest build.
+
 ## 2026-10-17 night targeted review (red CI on main x3)
 
 **Diagnosis (hosted shards, reproduced locally):** two causes. (1) `hud-touch` "catalog tutorial and reload" at 1280x720-keyboard failed deterministically for titanic, bismarck and challenger-deep: J-desktop-repetition (run 51) intentionally stopped desktop from showing a scan card for a side contact, so the "return to scanned contact" expectation was stale. Spec now requires the card on touch only. Local gates missed it because smoke runs no full e2e. (2) `d-shell` "home, site grid" hung 240 s in `click` on "Quit to home" (scroll-into-view waits for a rendered frame; hosted software GL stalls). Third recurrence of the CI-only hang class; that click now uses `dispatchEvent('click')`. Both pass locally; gates green.

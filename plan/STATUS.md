@@ -1,27 +1,25 @@
-# Status (2026-10-17 evening, Claude-alone review; Sol skipped for budget)
+# Status (2026-10-18, joint review with Codex Sol)
 
-**Stage:** about 82% to 1.0. Four weeks targeted, 4-6 allowed.
+**Stage:** about 82% to 1.0. Four weeks targeted, 4-6 for planning.
 
 ## 1.0 table
 
-| Requirement                               | State                                                                                                              |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Five heroes beautiful (4 of 5)            | None consistently at 4 (bands): Titanic 3.5-3.9, Monterey 3.5-3.8, Beebe 3.5-3.8, Lost City 3-3.8, Blue Hole 3-3.6 |
-| Other eight sites coherent                | Challenger 3.5-3.7, Endurance 3.5-3.7; current spawn acceptance for all eight not yet certified                    |
-| New player understands first five minutes | Journeys repeated; P2s open (J-contact-choice, J-journal-preview)                                                  |
-| Acceptable Low-tier phone performance     | Unverified: needs owner phone play; record raw stall tails                                                         |
-| Hosted CI green, releases tagged          | f58 tagged; run 41 main failed one perf-budget spec, fixed and pushed, rerun pending                               |
-| Code simple enough                        | S-manifest: 2 site-id expressions left (WreckPreset)                                                               |
+| Requirement                               | State                                                                                                                       |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.5-4, Lost City 3-4.1 (disputed), Blue Hole 3-3.5, Beebe 3.5-3.8, Monterey 3.5-3.7          |
+| Other eight sites coherent                | Challenger 3.5-3.6, Endurance 3.5-3.8; spawn acceptance for all eight not certified (V-spawn-capture queued)                |
+| New player understands first five minutes | Journeys repeated earlier, P2s merged; current unaided journeys unverified                                                  |
+| Acceptable Low-tier phone performance     | Unverified: needs owner phone play                                                                                          |
+| Hosted CI green, releases tagged          | CI green on run 59; f60 tagged; deploy not gated on CI (R-deploy-gate queued)                                               |
+| Code simple enough                        | S-manifest closed; standing S-verify / S-bughunt                                                                            |
 
 ## Done recently
 
-Titanic seabed slice 2 (scour moat, debris trail), Blue Hole hood, Lost City slope terraces, Beebe close lighting, Monterey pose, Endurance wreck policy in site data, verification and bug-hunt tests.
+Close-up artifacts fix (Endurance lobsters, Titanic tint), Lost City carbonate mottle and notched rims, Blue Hole ragged hood, Titanic seabed slice 3, journey P2s, S-manifest closed.
 
 ## Left
 
-New: V-closeup-artifacts (Blue Hole fish/shard, Endurance blown-out whites, Titanic pink cast), V-lostcity-slice2.
-
-Titanic plating and light, Beebe close flanks, Lost City rims, Blue Hole hood and underside, Monterey framing, journey P2s, last S-manifest slice, legacy-save retry star award (queued), nightly capture failure allowed to pass.
+Lost City tower thickness, Titanic opening frame, Beebe flank, Monterey banding, Challenger seabed, Blue Hole hood facets and 0.45 m overlap, eight-site acceptance, deploy gating.
 
 ## Needs owner
 
