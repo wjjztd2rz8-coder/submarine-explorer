@@ -53,14 +53,14 @@ Choosing Arcade or Realistic applies its preset. Advanced has exactly four
 switches; changing one enters Custom, preserving the other switches and the
 last preset's speed, lights and sensors (`gameplayBaseMode`).
 
-| Setting                  | Arcade (default)                                      | Realistic                                                 | Custom                              |
-| ------------------------ | ----------------------------------------------------- | --------------------------------------------------------- | ----------------------------------- |
-| Speed, including descent | Fast: ~12 m/s cruise, 20.6 m/s boosted; 8 m/s descent | Research: ~1 m/s cruise, 1.4 m/s boosted; 0.5 m/s descent | Inherits the last selected preset   |
-| Lights / sensors         | Enhanced lights / extended sensors                    | Realistic lights / sensors                                | Inherits the last selected preset   |
-| Battery / oxygen         | Off                                                   | On                                                        | Switch                              |
-| Currents                 | Off                                                   | Full sampled strength                                     | Switch: off / full sampled strength |
-| Visual waypoints         | On                                                    | Off                                                       | Switch                              |
-| Start at surface         | Off (near site)                                       | Off (near site)                                           | Switch                              |
+| Setting                  | Arcade (default)                    | Realistic                                | Custom                              |
+| ------------------------ | ----------------------------------- | ---------------------------------------- | ----------------------------------- |
+| Speed, including descent | Fast: ~12 m/s cruise; 8 m/s descent | Research: ~1 m/s cruise; 0.5 m/s descent | Inherits the last selected preset   |
+| Lights / sensors         | Enhanced lights / extended sensors  | Realistic lights / sensors               | Inherits the last selected preset   |
+| Battery / oxygen         | Off                                 | On                                       | Switch                              |
+| Currents                 | Off                                 | Full sampled strength                    | Switch: off / full sampled strength |
+| Visual waypoints         | On                                  | Off                                      | Switch                              |
+| Start at surface         | Off (near site)                     | Off (near site)                          | Switch                              |
 
 The briefing previews the start immediately. Realistic near-site dives use
 reserves reduced by the simulated descent; surface starts begin full.
@@ -85,7 +85,7 @@ regain its default, which another action may now own). Escape cancels a
 capture; Escape and Tab cannot be bound. **Reset key bindings** restores the
 shipped map (`defaultActions()` in `src/core/Input.ts` — see the README's
 controls table for the current defaults: W/S, A/D, R/F pitch, Space rise,
-Ctrl-or-C sink, Shift boost, hold G to scan, L lights, M sonar, Q camera,
+Ctrl-or-C sink, hold G to scan, L lights, M sonar, Q camera,
 X reset camera, T sim speed, J Journal, P photo, Enter capture photo). The pane also has a note that dragging the
 dive view orbits the camera and the wheel zooms it, an **Enable pointer
 look** button (closes Settings and locks the dive view; menus release it, and

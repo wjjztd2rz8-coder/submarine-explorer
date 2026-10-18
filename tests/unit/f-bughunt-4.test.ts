@@ -75,7 +75,6 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
           ballast: 0,
           lookDx: 0,
           lookDy: 0,
-          boost: false,
         } as InputState,
         1 / 60,
       );

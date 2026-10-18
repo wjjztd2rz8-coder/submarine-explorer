@@ -16,7 +16,6 @@ export interface PowerState {
 interface PowerLoad {
   throttle: number;
   ballast: number;
-  boost: boolean;
   lights: boolean;
   sensors: boolean;
 }
@@ -73,7 +72,7 @@ export class Power {
     const thrust = Math.max(clamp01(Math.abs(load.throttle)), clamp01(Math.abs(load.ballast)));
     const batteryRate =
       1 / (c.batteryIdleHours * 3600) +
-      (thrust * (load.boost ? c.boostCostMultiplier : 1)) / (c.batteryThrustHours * 3600) +
+      thrust / (c.batteryThrustHours * 3600) +
       (load.lights ? 1 / (c.batteryLightsHours * 3600) : 0) +
       (load.sensors ? 1 / (c.batterySensorsHours * 3600) : 0);
     this.battery = clamp01(this.battery - dt * batteryRate);
