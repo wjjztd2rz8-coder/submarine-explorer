@@ -30,6 +30,64 @@ function researcher(points = 0) {
 }
 
 describe('research rewards and save migration', () => {
+  it.each([
+    { site: 'old' },
+    { site: 'old', keys: null, bonus: false },
+    { site: 'old', keys: ['old/a'], bonus: 'false' },
+  ])('retains intact pending evidence after a corrupt same-site record %j', (damaged) => {
+    const store = storage();
+    const evidence = { site: 'old', keys: ['old/a'], bonus: false };
+    store.setItem(
+      PROGRESS_STORAGE_KEY,
+      JSON.stringify({ version: 2, legacyPending: [damaged, evidence] }),
+    );
+    for (let reload = 0; reload < 3; reload++) {
+      const save = new ProgressSave(store);
+      expect(save.get().legacyPending).toEqual([evidence]);
+      save.save(save.get());
+    }
+  });
+
+  it('round-trips mixed pending shapes without merging later or foreign evidence', () => {
+    const store = storage();
+    store.setItem(
+      PROGRESS_STORAGE_KEY,
+      JSON.stringify({
+        version: 2,
+        legacyPending: [
+          null,
+          false,
+          3,
+          [],
+          {},
+          'bad/site',
+          'retired',
+          'retired',
+          { site: 'old', keys: ['old/a', 'other/b', 42, null, 'old/a'], bonus: true },
+          { site: 'old', keys: ['old/b'], bonus: false },
+          { site: 'empty', keys: [], bonus: false },
+        ],
+        ratings: { retired: 1 },
+        cosmeticGrants: ['paint:orange'],
+      }),
+    );
+    for (let reload = 0; reload < 3; reload++) {
+      const save = new ProgressSave(store);
+      const snapshot = save.get();
+      expect(snapshot.legacyPending).toEqual([
+        'retired',
+        { site: 'old', keys: ['old/a'], bonus: true },
+        { site: 'empty', keys: [], bonus: false },
+      ]);
+      expect(snapshot.ratings).toEqual({ retired: 1 });
+      expect(snapshot.cosmeticGrants).toEqual(['paint:orange']);
+      const copy = save.get();
+      copy.legacyPending!.length = 0;
+      expect(save.get()).toEqual(snapshot);
+      save.save(snapshot);
+    }
+  });
+
   it('credits old discoveries once across reloads without changing discoveries', () => {
     const store = storage();
     const discovery = JSON.stringify({ version: 1, discovered: { 'site/poi': true } });
