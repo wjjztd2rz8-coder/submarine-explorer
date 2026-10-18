@@ -1489,3 +1489,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (smoke + project-base green; no full e2e):** Codex S-bughunt-contact-choice (ScanOverlay result card refreshes directions without renewing its lifetime), S-verify-picker-density (tests), S-bughunt-20 (corrupt legacyPending record no longer shadows intact evidence). One test-import conflict resolved by hand.
 - **Codex:** 2520-2540 queued (dispatched if pacing allowed). No Claude package started: Claude week 44% left, just under pace. No tag.
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-18 00:37 CDT headless run 56 (Claude)
+
+- **Merged and pushed (smoke + project-base green; no full e2e):** Codex S-bughunt-21 (nav panel no longer says ALL OBJECTIVES COMPLETE with unfinished optionals and no target position) and S-bughunt-22 (settings/photo-quota guards, tests only).
+- **Codex:** 2520 (verify closeup artifacts) still running; 2550-2570 queued, dispatch waits on 5h budget. No Claude package: week 44% left, on the pace line, so saved it. No tag.
+- **Needs owner:** real-phone Low-tier play.
