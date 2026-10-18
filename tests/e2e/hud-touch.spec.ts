@@ -1712,9 +1712,10 @@ freshTest.describe('catalog tutorial and reload', () => {
             g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
           }, poi);
           await page.clock.runFor(500);
-          // An unscanned contact in range outranks the logged one (Scanner), so the
-          // slot may name either; the logged-contact text itself is pinned in d-scan.
-          await expect(page.locator(GUIDANCE.any)).toBeVisible();
+          // Phones keep a standing card. Desktop's objectives panel names the next target, so
+          // a side contact gets no card until the objective itself is aimed at; the
+          // logged-contact text is pinned in d-scan.
+          if (viewport.touch) await expect(page.locator(GUIDANCE.any)).toBeVisible();
           await expect(card).toBeHidden();
           await layout(page, 'return to scanned contact');
 

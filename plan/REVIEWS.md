@@ -2,6 +2,12 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-17 night targeted review (red CI on main x3)
+
+**Diagnosis (hosted shards, reproduced locally):** two causes. (1) `hud-touch` "catalog tutorial and reload" at 1280x720-keyboard failed deterministically for titanic, bismarck and challenger-deep: J-desktop-repetition (run 51) intentionally stopped desktop from showing a scan card for a side contact, so the "return to scanned contact" expectation was stale. Spec now requires the card on touch only. Local gates missed it because smoke runs no full e2e. (2) `d-shell` "home, site grid" hung 240 s in `click` on "Quit to home" (scroll-into-view waits for a rendered frame; hosted software GL stalls). Third recurrence of the CI-only hang class; that click now uses `dispatchEvent('click')`. Both pass locally; gates green.
+
+**Next:** if another frame-wait hang appears in a different spec, apply the same pattern or have Codex sweep shell specs for frame-dependent actions.
+
 ## 2026-10-17 evening comprehensive review (Claude alone; Sol skipped, Codex 5h 12%, exit 75)
 
 **Changed since last review (8 merges):** V-titanic-seabed slice 3, J-journal-preview, J-contact-choice, J-picker-density, J-desktop-repetition; Codex S-verify 18/beebe/titanic guards, S-bughunt 19, S-manifest closed (zero site-id discriminators left). Golden 2026-10-17-231115.

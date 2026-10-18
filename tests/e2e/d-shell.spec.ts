@@ -236,7 +236,11 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await page.keyboard.press('Escape');
   await expect(page.locator('.pause-menu')).toBeHidden();
   await page.keyboard.press('Escape');
-  await page.locator('.pause-menu').getByRole('button', { name: 'Quit to home' }).click();
+  // dispatchEvent needs no rendered frame: hosted software GL can stall click's scroll-into-view for minutes.
+  await page
+    .locator('.pause-menu')
+    .getByRole('button', { name: 'Quit to home' })
+    .dispatchEvent('click');
   await expect(page.locator('.home-screen')).toBeVisible();
   await expect(page.locator('.pause-menu')).toBeHidden();
   expect(new URL(page.url()).search).toBe('');
