@@ -93,7 +93,6 @@ describe('Input action map', () => {
               pitch: 0,
               ballast: 0,
               scan: false,
-              boost: false,
               toggleCamera: false,
               toggleGuide: false,
             });
@@ -114,7 +113,6 @@ describe('Input action map', () => {
           pitch: 0.4,
           ballast: 1,
           scan: true,
-          boost: true,
           toggleCamera: false,
           toggleGuide: false,
         });
