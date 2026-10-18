@@ -36,7 +36,7 @@ import {
 import { MissionSelect } from '../../src/ui/MissionSelect.js';
 import landmarkIndex from '../../data/landmarks/index.json';
 import titanicMission from '../../data/landmarks/titanic/mission.json';
-import { MissionRouter } from '../../src/game/MissionRouter.js';
+import { MissionRouter, pickNavTarget } from '../../src/game/MissionRouter.js';
 import { createPointerSystem } from '../../src/app/systems/pointer.js';
 import { createInputSystem } from '../../src/app/systems/input.js';
 import { createControlsSystem } from '../../src/app/systems/controls.js';
@@ -330,6 +330,63 @@ it('compact shell site rows keep catalog, Tab and activation order while retaini
       );
     }
   });
+});
+
+it('keeps fresh, formerly locked and finished sites in authored order across progress refreshes', async () => {
+  // All sites now fit their hull automatically; old unlock thresholds must not reorder or disable rows.
+  const ids = ['deep', 'unknown', 'shallow'];
+  const files: Record<string, unknown> = {
+    '/data/landmarks/index.json': { version: 1, landmarks: ids },
+  };
+  for (const [index, id] of ids.entries()) {
+    files[`/data/landmarks/${id}/mission.json`] = {
+      ...titanicMission,
+      tile: id,
+      hull_class: 'B',
+      briefing: { ...titanicMission.briefing, depth_m: [10931, undefined, 125][index] },
+    };
+  }
+  vi.stubGlobal('fetch', async (url: string) => ({
+    ok: url in files,
+    text: async () => JSON.stringify(files[url]),
+  }));
+  const summaries = await loadMissionSummaries();
+  const progress = new Progress(new ProgressSave(null));
+  const select = vi.fn();
+  const picker = new MissionSelect(
+    ids.map((id) => ({ id })),
+    {
+      presentation: 'shell',
+      onSelectMission: select,
+      completion: (id, pois) => `${id === 'deep' ? pois.length : 0}/${pois.length} logged`,
+    },
+  );
+  cleanup.push(() => picker.dispose());
+  picker.setMissions(summaries);
+  const root = picker.root as unknown as Element;
+  for (const finished of [false, true]) {
+    if (finished) progress.finish('deep', [{ primary: true, complete: true }]);
+    picker.setProgress(progress);
+    const buttons = root.querySelectorAll('.is-mission');
+    expect(buttons.map((b) => b.dataset.mission)).toEqual(ids);
+    expect(buttons.every((b) => !b.disabled)).toBe(true);
+    expect(progress.canDive(10931)).toBe(true);
+    for (const button of buttons) button.dispatchEvent(new Event('click'));
+    expect(select.mock.calls.slice(-3).map(([id]) => id)).toEqual(ids);
+    await vi.waitFor(() => {
+      expect(buttons.map((b) => b.querySelector('.mission-item-meta')!.textContent)).toEqual([
+        '10,931 m · Class C hull',
+        'Class B hull',
+        '125 m · Class A hull',
+      ]);
+      expect(buttons[0].querySelector('.mission-stars')!.getAttribute('aria-label')).toBe(
+        `Best dive: ${finished ? 2 : 0} of 3 stars`,
+      );
+      expect(buttons[0].querySelector('.mission-item-progress')!.textContent).toBe(
+        `${titanicMission.objectives.length}/${titanicMission.objectives.length} logged`,
+      );
+    });
+  }
 });
 
 function overlay() {
@@ -1623,6 +1680,57 @@ describe('overlay policies across the app', () => {
       panel.setObjectives([]);
       expect(root.querySelectorAll('.obj-item')).toHaveLength(0);
       expect(root.querySelector('.obj-hint')!.hidden).toBe(true);
+    },
+  );
+
+  it.each([
+    { remaining: 'primary', text: 'NO TARGET POSITION' },
+    { remaining: 'optional', text: 'NO TARGET POSITION' },
+    { remaining: 'none', text: 'ALL OBJECTIVES COMPLETE' },
+    { remaining: 'empty', text: 'NO TARGET POSITION' },
+  ])(
+    'keeps the nav notice honest with $remaining objectives and no positions',
+    ({ remaining, text }) => {
+      // Missing coordinates must not turn primary completion into an all-objectives reward.
+      const panel = new ObjectivesPanel();
+      cleanup.push(() => panel.dispose());
+      const objectives: ObjectiveStatus[] =
+        remaining === 'empty'
+          ? []
+          : [
+              {
+                id: 'a',
+                title: 'Primary',
+                hint: '',
+                poiId: 'a',
+                primary: true,
+                resolved: true,
+                complete: remaining !== 'primary',
+              },
+              {
+                id: 'b',
+                title: 'Optional',
+                hint: '',
+                poiId: 'b',
+                primary: false,
+                resolved: true,
+                complete: remaining === 'none',
+              },
+            ];
+      panel.setObjectives(objectives);
+      // Populate all nav fields first so the null-target branch must also withdraw stale directions.
+      panel.setNav(
+        { id: 'a', name: 'Primary', primary: true, bearingDeg: 90, depthM: 100, relativeDeg: 90 },
+        false,
+      );
+      const nav = pickNavTarget(objectives, [], { x: 0, y: 0, z: 0 });
+      expect(nav).toBeNull();
+      panel.setNav(null, remaining === 'optional' || remaining === 'none');
+      const root = panel.root as unknown as Element;
+      expect(root.querySelector('.obj-nav-target')!.textContent).toBe(text);
+      for (const field of ['bearing', 'depth', 'turn']) {
+        expect(root.querySelector(`.obj-nav-${field}`)!.textContent).toBe('');
+      }
     },
   );
 

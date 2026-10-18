@@ -184,6 +184,29 @@ describe('manifest + loaders', () => {
     expect(parseMissionIndex(landmarkIndex)).toContain('titanic');
   });
 
+  it.each([undefined, null, 'unknown'])(
+    'keeps a site with depth %s in its authored position without inventing a depth',
+    async (depth) => {
+      const files = fakeFetch({
+        '/data/landmarks/index.json': { version: 1, landmarks: ['deep', 'unknown', 'shallow'] },
+        '/data/landmarks/deep/mission.json': MINIMAL,
+        '/data/landmarks/unknown/mission.json': {
+          ...MINIMAL,
+          briefing: { ...MINIMAL.briefing, depth_m: depth },
+        },
+        '/data/landmarks/shallow/mission.json': {
+          ...MINIMAL,
+          briefing: { ...MINIMAL.briefing, depth_m: 125 },
+        },
+      });
+      expect((await loadMissionSummaries(files, quiet)).map((m) => [m.id, m.depthM])).toEqual([
+        ['deep', 3800],
+        ['unknown', null],
+        ['shallow', 125],
+      ]);
+    },
+  );
+
   it('loadMission: missing file and bad ids are null, never a throw', async () => {
     const f = fakeFetch({ '/data/landmarks/site/mission.json': MINIMAL });
     expect((await loadMission('site', f, quiet))?.title).toBe('Test dive');

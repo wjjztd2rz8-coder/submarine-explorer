@@ -228,7 +228,8 @@ export class ObjectivesPanel {
     };
     this.navEl.classList.toggle('is-done', allPrimaryDone);
     if (!nav) {
-      t('target', allPrimaryDone ? 'ALL OBJECTIVES COMPLETE' : 'NO TARGET POSITION');
+      const allDone = allPrimaryDone && !this.objectives.some((o) => o.resolved && !o.complete);
+      t('target', allDone ? 'ALL OBJECTIVES COMPLETE' : 'NO TARGET POSITION');
       for (const f of ['bearing', 'depth', 'turn']) t(f, '');
       return;
     }

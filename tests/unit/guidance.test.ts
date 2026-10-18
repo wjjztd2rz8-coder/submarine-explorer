@@ -576,6 +576,63 @@ describe('guidance slot', () => {
     overlay.dispose();
   });
 
+  it.each([false, true])(
+    'discards refreshed results and their cached cues on clear or suppression (touch=%s)',
+    (touch) => {
+      for (const reset of ['clear', 'suppress']) {
+        for (const firstTime of [false, true]) {
+          const f = contactGuidance(touch);
+          f.step();
+          f.overlay.showComplete('Old result', firstTime, f.keys);
+          f.forward.set(-1, 0, 0);
+          expect(f.step(0.2).name).toBe('Old result');
+          if (reset === 'clear') f.overlay.clear();
+          else {
+            f.overlay.setSuppressed(true);
+            f.overlay.showComplete('Covered result', true, f.keys);
+            f.step(0.2);
+            f.overlay.setSuppressed(false);
+          }
+          expect(f.overlay.slot.kind).toBeNull();
+          // A new result can arrive before the next frame; it must not inherit the old direction.
+          f.overlay.showComplete('Fresh result', firstTime, f.keys);
+          expect(texts(f.overlay.slot)).toMatchObject({
+            name: 'Fresh result',
+            detail: firstTime ? (touch ? 'OPEN JOURNAL' : 'PRESS J · JOURNAL') : 'LOGGED · JOURNAL',
+          });
+          f.scanner.setTargets([]);
+          expect(f.step(DEFAULT_CONFIG.scan.completeBannerSeconds + 0.1).hidden).toBe(true);
+          expect(f.step().hidden).toBe(true);
+          f.overlay.dispose();
+        }
+      }
+    },
+  );
+
+  it.each([false, true])(
+    'expires a refreshed result while an interrupted scan owns the slot (touch=%s)',
+    (touch) => {
+      const f = contactGuidance(touch);
+      f.step();
+      f.overlay.showComplete('Whale', true, f.keys);
+      f.step(0.2, true);
+      expect(f.step(0).kicker).toBe('SCAN INTERRUPTED');
+      // Hold the interrupted view while real time elapses behind it.
+      f.overlay.update(
+        f.scanner.view,
+        f.keys,
+        null,
+        DEFAULT_CONFIG.scan.completeBannerSeconds + 0.1,
+      );
+      expect(texts(f.overlay.slot).kicker).toBe('SCAN INTERRUPTED');
+      f.scanner.cancel();
+      expect(f.step().kicker).toBe('SCAN TARGET · OPTIONAL');
+      f.scanner.setTargets([]);
+      expect(f.step().hidden).toBe(true);
+      f.overlay.dispose();
+    },
+  );
+
   it('offers a Skip button only for tutorial steps and reports the press', () => {
     const slot = new GuidanceSlot();
     const skip = (slot.root as unknown as FakeElement).children[2];
