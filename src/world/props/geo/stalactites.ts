@@ -283,7 +283,12 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const chip = (fbm3(x * 0.3, y * 0.5, seed + 83, seed + 12, 3) - 0.34) * 2.4;
     // Raised bays also draw back, so each step reads as an overhang over the one below.
     const draw = hood ? (shelfStep(x) * 0.12 - 0.09 * overhangAt(x)) * D * roofZone(y, z, x) : 0;
-    return disp(x, y, z) - lipZone * Math.max(0, chip) * 4.5 * scale + draw;
+    // The roof nose juts out past the recessed underside in blocks of uneven reach, so a dark
+    // undercut shows beneath it. The underside itself stays put for the pendants.
+    const jut = hood
+      ? 0.1 * D * noseAt(x) * smooth(0.6 * H, 0.66 * H, y) * smooth(0.5, 0.9, -z / D)
+      : 0;
+    return disp(x, y, z) - lipZone * Math.max(0, chip) * 4.5 * scale + draw - jut;
   };
 
   /**
@@ -304,7 +309,13 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
    */
   const crackAt = (x: number): number => {
     const ridge = 1 - Math.abs(2 * fbm3(x * 0.11 + 21, 6, seed + 41, seed + 19, 3) - 1);
-    return smooth(0.84, 0.95, ridge);
+    return smooth(0.8, 0.92, ridge);
+  };
+  /** Blocky nose reach 0..1 per x: some blocks project far, some hardly at all. */
+  const noseAt = (x: number): number => {
+    const q = fbm3(x * 0.16 + 33, 8, seed + 53, seed + 23, 3);
+    const block = Math.floor(q * 7) / 7 + smooth(0.6, 1, q * 7 - Math.floor(q * 7)) / 7;
+    return smooth(0.25, 0.8, block) * (1 - smooth(0.6, 1, endRatio(x, W)));
   };
   const roofZone = (y: number, z: number, x: number): number =>
     smooth(0.56 * H, 0.64 * H, y) *
@@ -316,7 +327,9 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
    */
   const NOTCHES: readonly (readonly [number, number])[] = [
     [-0.27, 0.05],
+    [-0.12, 0.022],
     [0.08, 0.04],
+    [0.19, 0.018],
     [0.31, 0.055],
   ];
   const notchAt = (x: number): number => {
@@ -346,8 +359,10 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const lip = 1 - smooth(0.63 * H, 0.68 * H, y);
     const thin = 1 - lip * (1 - lipThick(x)) * 0.85;
     const drop = H * 0.13 * notchAt(x) * smooth(0.58 * H, 0.64 * H, y);
-    const crack = H * 0.14 * crackAt(x) * smooth(0.58 * H, 0.64 * H, y);
-    return zone * (body * thin - drop - crack);
+    const crack = H * 0.15 * crackAt(x) * smooth(0.58 * H, 0.64 * H, y);
+    // Fine chipping along the nose breaks the outline between the plateau steps.
+    const chip = H * 0.05 * (fbm3(x * 0.55 + 5, 2, seed + 67, seed + 29, 3) - 0.45) * lip;
+    return zone * (body * thin - drop - crack + chip * smooth(0.58 * H, 0.64 * H, y));
   };
 
   // --- the wall
@@ -428,8 +443,8 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       const mottle = 0.62 + 0.6 * fbm3(x * 0.35, y * 0.3, z * 0.35, seed ^ 0x2f, 4);
       const under = ny < -0.3 ? 0.7 : 1;
       const crackTone =
-        1 - 0.7 * crackAt(x + 0.4 * Math.sin(y * 0.5)) * smooth(0.5 * H, 0.6 * H, y);
-      out.multiplyScalar(1 - roof * (1 - 0.58 * plateau * mottle * under * crackTone));
+        1 - 0.88 * crackAt(x + 0.4 * Math.sin(y * 0.5)) * smooth(0.5 * H, 0.6 * H, y);
+      out.multiplyScalar(1 - roof * (1 - 0.5 * plateau * mottle * under * crackTone));
       out.lerp(GREY_BROWN, 0.45 * roof * smooth(0.35, 0.65, pit));
     }
   });
@@ -445,7 +460,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   const wallMat = wallMesh.material as THREE.MeshStandardMaterial;
   wallMat.map = null;
   wallMat.bumpMap = null;
-  wallMat.color.multiplyScalar(0.8);
+  wallMat.color.multiplyScalar(hood ? 0.62 : 0.8);
   full.add(wallMesh);
 
   // --- fallen blocks and sediment blending the foot into the seabed
