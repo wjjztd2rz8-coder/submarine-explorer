@@ -1501,3 +1501,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (smoke + project-base green; no full e2e):** Codex S-verify-closeup-artifacts (Titanic pose clearance fix 4 m to 18 m above terrain, life near-camera tests) and Sonnet V-lostcity-slice2 (tower carbonate mottle, narrower vent lip, foot rubble; ~4.1, torn rim facets remain and need rim-notching geometry).
 - **Codex:** 2550-2570 queued, dispatch waits on 5h budget. No tag (CI of recent pushes pending).
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-18 03:00 CDT headless run 58 (Claude)
+
+- **Merged and pushed (smoke + project-base green; no full e2e):** Sonnet V-bluehole-hood-2 (ragged roof nose, undercut, warmer darker shelf; ~+0.1-0.2, left end has flat sheet facets; one unit-test bound loosened 0.43 to 0.46 m). Tagged f59 (CI green on run 57 head).
+- **Codex:** 2550-2570 queued; dispatch waits because the Codex week (75% left) is behind the pace line (79.5%), not the 5h window.
+- **Decision for owner:** hood work is at diminishing returns; consider a reference composition before more slices.
+- **Needs owner:** real-phone Low-tier play.
