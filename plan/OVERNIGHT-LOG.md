@@ -1538,3 +1538,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - False "Claude idle" trigger (weekly pace gate was the cause); added a 3-point margin in review-triggers.sh. No package merged; week is on the pace line so budget saved. Codex 2550-2600 queued.
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-18 18:59 CDT headless run 64 (Claude)
+
+- **Merged and pushed (each smoke + project-base green):** Codex P2-boost-cut, P2-scan-range, P2-events-anchored (anchored optional contacts replace the random scheduler), P2-ambience, P2-lostcity-perf, R-merge-verify, R-deploy-gate (deploy waits for green CI), V-spawn-capture, V-bluehole-overlap, S-bughunt-23/24, S-verify-19; Haiku P2-copy plus a Sonnet e2e triage. Codex's sandbox could not run browsers, so hud-touch catalog/title specs had regressed on main: fixed in the P2-copy merge (stale expectations, plus one 667x375 objective-card CSS tweak). Full e2e was not run; hosted CI is the check.
+- **Codex:** 2630-2650 queued (verify P2 merges, events bug hunt, ambience/deploy verify).
+- **Not done:** events were never viewed on Low (visual review of the 8 contacts still pending); P2-hull-a, P2-sub-screen, P2-globe-bright, P2-beebe-low, P2-text-size, V-* items not started (weekly Claude budget at the pace line).
+- **Needs owner:** real-phone Low-tier play; after P2 items land, a short phone retest.
