@@ -2,7 +2,7 @@ import { resolveEffective } from '../../src/game/EffectiveSettings.js';
 import { defaultSettings } from '../../src/core/Save.js';
 import { describe, expect, it } from 'vitest';
 import { makeConfig } from '../../src/core/Config.js';
-import { PROGRESS_CONFIG, EQUIPMENT } from '../../src/core/config/progress.js';
+import { EQUIPMENT } from '../../src/core/config/progress.js';
 import {
   ProgressSave,
   PROGRESS_STORAGE_KEY,
@@ -274,10 +274,6 @@ describe('fixed full equipment', () => {
     expect(fresh.power.batteryIdleHours).toBeCloseTo(
       base.power.batteryIdleHours * EQUIPMENT.battery,
     );
-    expect(fresh.power.boostCostMultiplier).toBeCloseTo(
-      base.power.boostCostMultiplier / EQUIPMENT.boostEfficiency,
-    );
-    expect(fresh.boostSeconds).toBe(PROGRESS_CONFIG.boostSeconds);
     expect(fresh.submarine.maxSpeed).toBeCloseTo(
       base.speedProfiles.fast.maxSpeed * EQUIPMENT.thrust,
     );

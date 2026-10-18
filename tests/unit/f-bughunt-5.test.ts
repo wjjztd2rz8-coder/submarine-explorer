@@ -20,7 +20,7 @@ import { makeFakeFetch, makeSyntheticTile } from './helpers.js';
 afterEach(() => vi.unstubAllGlobals());
 
 describe('F-BUGHUNT-5 input and discovery regressions', () => {
-  it('fires gamepad toggles once per press while scan/boost stay held, and rearms after disconnect', () => {
+  it('fires gamepad toggles once per press while scan stays held, and rearms after disconnect', () => {
     const buttons = Array.from({ length: 16 }, () => ({ pressed: false, value: 0 }));
     const pad = { index: 0, connected: true, axes: [0, 0, 0, 0], buttons };
     vi.stubGlobal('navigator', { getGamepads: () => (pad.connected ? [pad] : []) });
@@ -37,7 +37,6 @@ describe('F-BUGHUNT-5 input and discovery regressions', () => {
     input.endFrame();
     for (const edge of edges) expect(input.sample()[edge]).toBe(false);
     expect(input.state.scan).toBe(true);
-    expect(input.state.boost).toBe(true);
     for (const button of buttons) Object.assign(button, { pressed: false, value: 0 });
     input.sample();
     input.endFrame();

@@ -35,7 +35,6 @@ export function controlGroups(device: InputDevice, key: KeyOf, input?: Input): C
         rows: [
           ['Left stick', 'Speed and turning'],
           ['Right slider', 'Rise and sink'],
-          ['BOOST (hold)', 'Extra speed'],
         ],
       },
       {
@@ -69,7 +68,6 @@ export function controlGroups(device: InputDevice, key: KeyOf, input?: Input): C
           [pad('pitchUp', 'Right stick'), 'Nose up and down'],
           [pad('ballastBlow', 'A'), 'Blow ballast (rise)'],
           [pad('ballastFlood', 'B'), 'Flood ballast (sink)'],
-          [pad('boost', 'Right trigger'), 'Boost'],
         ],
       },
       {
@@ -97,7 +95,6 @@ export function controlGroups(device: InputDevice, key: KeyOf, input?: Input): C
         [pair('yawPort', 'yawStarboard'), 'Turn'],
         [pair('ballastBlow', 'ballastFlood'), 'Rise and sink'],
         [pair('pitchUp', 'pitchDown'), 'Nose up and down'],
-        [key('boost'), 'Boost'],
       ],
     },
     {

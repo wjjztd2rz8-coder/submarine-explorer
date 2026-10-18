@@ -46,10 +46,13 @@ test.describe('phone portrait', () => {
     await pause.getByRole('button', { name: 'How to play', exact: true }).tap();
     const card = page.getByRole('dialog', { name: 'How to play' });
     await expect(card).toBeVisible();
-    await expect(card.locator('.how-to-tile')).toHaveCount(10);
-    await expect(card.locator('.how-to-tile svg')).toHaveCount(10);
+    await expect(card.locator('.how-to-tile')).toHaveCount(9);
+    await expect(card.locator('.how-to-tile svg')).toHaveCount(9);
     await expect(card.locator('.controls-card-tabs')).toBeHidden();
-    await expect(card).toContainText('Tap for a burst of speed');
+    // Regression: retired boost must disappear while the remaining touch guidance stays intact.
+    await expect(card.locator('[data-tile=boost]')).toHaveCount(0);
+    await expect(card).toContainText('Rise and sink');
+    await expect(card).toContainText('Hold to scan what you face');
     await expect(card).not.toContainText(KEY_WORDS);
     await page.screenshot({ path: 'test-results/f-text-diet-howto.png' });
     await card.getByRole('button', { name: 'Close' }).tap();

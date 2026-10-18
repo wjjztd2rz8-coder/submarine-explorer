@@ -87,7 +87,26 @@ describe('audio settings', () => {
       muted: false,
     });
   });
-  it('round trips separate volume settings and mute', () => {
+  it.each([1, 2, 3])('fills only missing audio values in a v%s save', (version) => {
+    expect(migrate({ version }, config)).toMatchObject({
+      masterVolume: 0.6,
+      sfxVolume: 0.8,
+      musicVolume: 0.5,
+      muted: false,
+    });
+    expect(
+      migrate({ version, masterVolume: 0, sfxVolume: 0.27, muted: true }, config),
+    ).toMatchObject({
+      masterVolume: 0,
+      sfxVolume: 0.27,
+      musicVolume: 0.5,
+      muted: true,
+    });
+  });
+  it.each([
+    { musicVolume: 0.37, masterVolume: 0.7, sfxVolume: 0.2, muted: true },
+    { musicVolume: 0, masterVolume: 0, sfxVolume: 0, muted: false },
+  ])('round trips separate volume settings and mute (%j)', (volumes) => {
     const map = new Map<string, string>();
     const storage: SettingsStorage = {
       getItem: (k) => map.get(k) ?? null,
@@ -99,13 +118,8 @@ describe('audio settings', () => {
       },
     };
     const save = new Save({ config, storage });
-    save.save({ musicVolume: 0.37, masterVolume: 0.7, sfxVolume: 0.2, muted: true });
-    expect(new Save({ config, storage }).get()).toMatchObject({
-      musicVolume: 0.37,
-      masterVolume: 0.7,
-      sfxVolume: 0.2,
-      muted: true,
-    });
+    save.save(volumes);
+    expect(new Save({ config, storage }).get()).toMatchObject(volumes);
     save.reset();
     expect(save.get().musicVolume).toBe(config.audio.musicVolume);
   });
