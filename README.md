@@ -61,14 +61,14 @@ Advanced has four switches; editing one enters Custom and keeps the speed,
 lights and sensors of the last selected preset. Selecting a preset resets the
 four switches together.
 
-| Setting                  | Arcade (default)                                        | Realistic                                                   | Custom                              |
-| ------------------------ | ------------------------------------------------------- | ----------------------------------------------------------- | ----------------------------------- |
-| Speed, including descent | Fast: ~14.9 m/s cruise, 25.5 m/s boosted; 8 m/s descent | Research: ~1.2 m/s cruise, 1.7 m/s boosted; 0.5 m/s descent | Inherits the last selected preset   |
-| Lights / sensors         | Enhanced lights / extended sensors                      | Realistic lights / sensors                                  | Inherits the last selected preset   |
-| Battery / oxygen         | Off                                                     | On                                                          | Switch                              |
-| Currents                 | Off                                                     | Full sampled strength                                       | Switch: off / full sampled strength |
-| Visual waypoints         | On                                                      | Off                                                         | Switch                              |
-| Start at surface         | Off (near site)                                         | Off (near site)                                             | Switch                              |
+| Setting                  | Arcade (default)                      | Realistic                                  | Custom                              |
+| ------------------------ | ------------------------------------- | ------------------------------------------ | ----------------------------------- |
+| Speed, including descent | Fast: ~14.9 m/s cruise; 8 m/s descent | Research: ~1.2 m/s cruise; 0.5 m/s descent | Inherits the last selected preset   |
+| Lights / sensors         | Enhanced lights / extended sensors    | Realistic lights / sensors                 | Inherits the last selected preset   |
+| Battery / oxygen         | Off                                   | On                                         | Switch                              |
+| Currents                 | Off                                   | Full sampled strength                      | Switch: off / full sampled strength |
+| Visual waypoints         | On                                    | Off                                        | Switch                              |
+| Start at surface         | Off (near site)                       | Off (near site)                            | Switch                              |
 
 Sonar markers are always available. Dives start at 1×; **T** and **D-pad Up**
 still cycle 1×/2×/3×. Speed and descent use simulated time: 2×/3× plays the
@@ -221,7 +221,6 @@ stick or button is deflected, but its buttons are not rebindable yet.
 | `R` / `F`                   | pitch nose up / down                                                                                            | right stick                |
 | `Space`                     | rise (blow ballast)                                                                                             | A / cross                  |
 | `Ctrl` or `C`               | sink (flood ballast); `C` is a full alias                                                                       | B / circle                 |
-| `Shift`                     | boost                                                                                                           | right trigger              |
 | `G` (hold)                  | scan the target in range; "Already logged" once it's scanned this dive                                          | right bumper               |
 | `L`                         | headlights                                                                                                      | X                          |
 | `M`                         | sonar map; its buttons, `+`/`-`, or the wheel zoom it (250 m / 500 m / 1 km / 2 km / whole tile) while expanded | Back / view                |

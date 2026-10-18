@@ -1407,9 +1407,9 @@ describe('overlay policies across the app', () => {
     screen.open();
     screen.showControls(true);
     const root = screen.root as unknown as Element;
-    const binding = root.querySelector('[data-action="boost"]')!;
+    const binding = root.querySelector('[data-action="thrustReverse"]')!;
     binding.dispatchEvent(new Event('click'));
-    expect(screen.capturingAction).toBe('boost');
+    expect(screen.capturingAction).toBe('thrustReverse');
     expect(press('Tab').defaultPrevented).toBe(true);
     expect(screen.capturingAction).toBe(null);
     expect(root.contains(active())).toBe(true);
@@ -1417,12 +1417,12 @@ describe('overlay policies across the app', () => {
     press('Escape');
     expect(screen.capturingAction).toBe(null);
     expect(screen.isOpen).toBe(true);
-    const original = [...input.actions.find((action) => action.id === 'boost')!.keys];
+    const original = [...input.actions.find((action) => action.id === 'thrustReverse')!.keys];
     binding.dispatchEvent(new Event('click'));
     press('KeyX', { repeat: true });
-    expect(input.actions.find((action) => action.id === 'boost')!.keys).toEqual(original);
+    expect(input.actions.find((action) => action.id === 'thrustReverse')!.keys).toEqual(original);
     press('KeyX');
-    expect(input.actions.find((action) => action.id === 'boost')!.keys).toEqual([
+    expect(input.actions.find((action) => action.id === 'thrustReverse')!.keys).toEqual([
       'KeyX',
       ...original.slice(1),
     ]);

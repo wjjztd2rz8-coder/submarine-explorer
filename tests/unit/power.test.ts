@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { makeConfig } from '../../src/core/Config.js';
 import { Power } from '../../src/game/Power.js';
 
-const idle = { throttle: 0, ballast: 0, boost: false, lights: false, sensors: false };
+const idle = { throttle: 0, ballast: 0, lights: false, sensors: false };
 
 describe('Power', () => {
   it('does not drain in Arcade or with zero elapsed time, and preserves levels across toggles', () => {
@@ -22,12 +22,12 @@ describe('Power', () => {
     expect(power.state.battery).toBe(level);
   });
 
-  it('charges thrust, boost, lights and sensors separately while oxygen follows time', () => {
+  it('charges thrust, lights and sensors separately while oxygen follows time', () => {
     const config = makeConfig().power;
     const quiet = new Power(config, true);
     const loaded = new Power(config, true);
     quiet.step(3600, idle);
-    loaded.step(3600, { throttle: 1, ballast: 0, boost: true, lights: true, sensors: true });
+    loaded.step(3600, { throttle: 1, ballast: 0, lights: true, sensors: true });
     expect(quiet.state.oxygen).toBeCloseTo(loaded.state.oxygen);
     expect(loaded.state.battery).toBeLessThan(quiet.state.battery);
     expect(loaded.state.battery).toBeGreaterThan(0);

@@ -78,7 +78,6 @@ function fixture(canvasTouchAction = '', realInput?: Input) {
     touchActive: false,
     touchAxes: { throttle: 0, yaw: 0, pitch: 0, ballast: 0 },
     touchHeld: new Set<string>(),
-    touchBoost: false,
     touchEdge: vi.fn(),
     touchLook: vi.fn(),
     touchZoom: vi.fn(),
@@ -526,9 +525,6 @@ describe('touch control interruptions', () => {
         pointer(f.stick, 'pointerdown', 1);
         pointer(f.slider, 'pointerdown', 2, 60, 160);
         pointer(f.scan, 'pointerdown', 3);
-        const boost = (f.controls.root as unknown as TouchElement).children[4];
-        boost.dispatchEvent(new Event('click'));
-        expect(f.input.touchBoost).toBe(true);
         expect(f.input.touchAxes.throttle).toBeGreaterThan(0.8);
         expect(f.input.touchAxes.ballast).toBe(-1);
         expect(f.input.touchHeld.has('scan')).toBe(true);
@@ -538,7 +534,6 @@ describe('touch control interruptions', () => {
         } else f.win.dispatchEvent(new Event(interruption));
         expect(f.input.touchAxes).toEqual({ throttle: 0, yaw: 0, pitch: 0, ballast: 0 });
         expect(f.input.touchHeld.size).toBe(0);
-        expect(f.input.touchBoost).toBe(false);
         pointer(f.stick, 'pointermove', 1);
         expect(f.input.touchAxes.throttle).toBe(0);
         pointer(f.stick, 'pointerdown', 4);

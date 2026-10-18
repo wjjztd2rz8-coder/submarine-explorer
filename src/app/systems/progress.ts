@@ -1,4 +1,3 @@
-import { PROGRESS_CONFIG } from '../../core/config/progress.js';
 import { DiscoveryStore } from '../../game/DiscoveryStore.js';
 import { PhotoStore } from '../../game/PhotoStore.js';
 import { dailyRatingKey } from '../../game/Daily.js';
@@ -18,14 +17,11 @@ export async function loadSavedProgress(): Promise<Progress> {
 
 export function createProgressSystem(): GameSystem {
   const cleanup = new Disposables();
-  let boostLeft: number = PROGRESS_CONFIG.boostSeconds;
-  let boostCapacity: number = PROGRESS_CONFIG.boostSeconds;
   let lastPhotos: unknown = null;
   return {
     name: 'progress',
     init(ctx) {
       const progress = ctx.progress;
-      boostLeft = boostCapacity = ctx.effective.boostSeconds;
       if (ctx.route) {
         const fitted = progress.hullFor(
           ctx.route.def.briefing.depth_m ?? 0,
@@ -52,12 +48,7 @@ export function createProgressSystem(): GameSystem {
           progress.award('primary', ctx.daily ? dailyRatingKey(ctx.daily) : missionId),
         ),
       );
-      cleanup.add(
-        ctx.bus.on('mission:started', () => {
-          progress.beginDive();
-          boostLeft = ctx.effective.boostSeconds;
-        }),
-      );
+      cleanup.add(ctx.bus.on('mission:started', () => progress.beginDive()));
       cleanup.add(ctx.bus.on('mission:restart', () => progress.beginDive()));
       ctx.expose({ progress });
     },
@@ -67,16 +58,6 @@ export function createProgressSystem(): GameSystem {
       ctx.expose({ progressMigrationReady: () => true });
     },
     frame: {
-      'sim.vehicles': (f, ctx) => {
-        const max = ctx.effective.boostSeconds;
-        boostLeft = Math.min(max, boostLeft + Math.max(0, max - boostCapacity));
-        boostCapacity = max;
-        const dt = f.steps * f.fixedDt * ctx.sub.simSpeed;
-        if (f.state.boost) {
-          if (boostLeft <= 0) f.state = { ...f.state, boost: false };
-          boostLeft = Math.max(0, boostLeft - dt);
-        } else boostLeft = Math.min(max, boostLeft + dt * PROGRESS_CONFIG.boostRecoveryPerSecond);
-      },
       'play.mission': (_f, ctx) => {
         if (lastPhotos === ctx.photos.photos) return;
         const previous = lastPhotos as readonly { id: string }[];

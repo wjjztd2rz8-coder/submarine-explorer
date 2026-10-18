@@ -244,7 +244,6 @@ for (const { site, primary, before } of heroes) {
             lookDy: 0,
             toggleCamera: false,
             toggleSonar: false,
-            boost: false,
             toggleLights: false,
             scan: true,
             cycleSimSpeed: false,
