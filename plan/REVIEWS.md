@@ -22,7 +22,7 @@ Sol ran (no live browser: Codex browser is off since 2026-10-12); one reconcile 
 
 **Stage:** about 80% to 1.0, 4-5 weeks targeted, 4-6 for planning (agreed with Sol).
 
-**Needs owner:** Claude weekly runs out around Oct 20 (reset Oct 22; your reset expires Oct 22). Phone retest after the P2 items.
+**Needs owner:** phone retest after the P2 items. (Correction from the owner: the Claude reset was already used, so there is no reset to apply; Claude stays paced and Codex's weekly head start went from 15% to 30% to carry more work. Briefs 2541-2543 launched 11:21.)
 
 ## 2026-10-18 comprehensive review, joint with Codex Sol (golden 2026-10-18-104523)
 

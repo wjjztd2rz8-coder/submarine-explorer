@@ -248,3 +248,9 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 
 - Cause: review-triggers.sh fired "Claude idle at >=50% for 2 h" while resume.sh was correctly skipping runs on the weekly pacing gate (52% left vs 53.4% floor). Idle was deliberate, not waste; efficiency.sh's idle hours overstate it for the same reason.
 - Fix: the idle trigger now requires the same weekly pacing check as resume.sh (claude_week_ok). Codex queue 2430-2460 also waits on its weekly pacing by design (burn ~24%/day).
+
+## 2026-10-18 midday review: Codex weekly head start 15% -> 30% (owner)
+
+- The owner asked why the queue waited ~10 h for the weekly pacing gate when Codex had budget. They had also already used their one Claude reset, so Claude is the scarce lane until Oct 22 and Codex should carry more of the work early in its week.
+- Change: `codex-dispatch.sh` needs weekly left >= 8 + 92*days/7 - 30 (was -15). At 65% left with 6.2 days to go, it opened at once; 2541-2543 launched 11:21. It still throttles to about linear after roughly half a day at three tasks, so the Oct 15-16 "week gone in 29 h" failure stays guarded.
+- Merge verification gap (smoke-only gates hid a red e2e): R-merge-verify queued and launched.

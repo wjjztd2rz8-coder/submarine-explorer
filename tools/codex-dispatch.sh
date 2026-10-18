@@ -26,10 +26,12 @@ def left(k):
     if "used" not in w: return -1
     return 100 if w.get("resets_at") and w["resets_at"]<now else 100-w["used"]
 # Weekly pacing: 2026-10-15/16 spent 91% of the Codex week in ~29 h, leaving
-# the lane shut for 6 days. Allow a 15% head start, then roughly linear spend.
+# the lane shut for 6 days. Allow a head start, then roughly linear spend. The
+# head start went 15% -> 30% on 2026-10-18 (owner): Claude has no reset left,
+# so Codex should carry more of the work early in its week.
 w=c.get("seven_day") or {}
 days=max(0,min(7,((w.get("resets_at") or now)-now)/86400))
-sys.exit(0 if left("five_hour")>=20 and left("seven_day")>=max(8,8+92*days/7-15) else 1)'; }
+sys.exit(0 if left("five_hour")>=20 and left("seven_day")>=max(8,8+92*days/7-30) else 1)'; }
 # Codex readings come from its last session log, so a manual reset (or a reset
 # while idle) stays invisible until a Codex run happens. When the reading says
 # low, nothing is running and the reading is >30 min old, refresh it once.
