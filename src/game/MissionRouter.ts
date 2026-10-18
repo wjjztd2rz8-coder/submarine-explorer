@@ -204,7 +204,6 @@ export const FROZEN_INPUT: Readonly<InputState> = Object.freeze({
   lookDy: 0,
   toggleCamera: false,
   toggleSonar: false,
-  boost: false,
   toggleLights: false,
   scan: false,
   cycleSimSpeed: false,

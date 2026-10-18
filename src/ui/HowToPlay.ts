@@ -47,14 +47,6 @@ const HOW_TO_PLAY: readonly HowToGroup[] = [
           ARROW(32, 5, 0) +
           ARROW(32, 59, 180),
       },
-      {
-        id: 'boost',
-        label: 'Boost',
-        words: 'Tap for a burst of speed',
-        art:
-          '<circle cx="32" cy="32" r="25"/>' +
-          '<path class="htp-a" d="M20 21 31 32 20 43M32 21 43 32 32 43"/>',
-      },
     ],
   },
   {

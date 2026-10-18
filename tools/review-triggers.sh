@@ -26,7 +26,7 @@ def claude_week_ok():
         import json
         w=json.loads(sh('ai-limits --json')).get('claude',{}).get('seven_day') or {}
         days=max(0,min(7,((w.get('resets_at') or now)-now)/86400))
-        return 100-w['used']>=max(10,7+93*days/7-20)
+        return 100-w['used']>=max(10,7+93*days/7-20)+3  # 3-point margin: sitting on the pace line is not idle
     except Exception: return True
 log=open('plan/OVERNIGHT-LOG.md').read()
 runs=re.split(r'\n## ',log)[-3:]

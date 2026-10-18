@@ -993,6 +993,8 @@ export interface WallShape {
   liftAt?: (x: number, y?: number) => number;
   /** Downward end sink given to `extrudeProfile`. */
   sinkAt?: (x: number) => number;
+  /** Vertical deformation at the raw profile point, also given to `extrudeProfile`. */
+  rise?: (x: number, y: number, z: number) => number;
 }
 
 /** All z values where the closed profile polyline crosses height `y` (front and back faces). */
@@ -1109,8 +1111,24 @@ export function wallColliders(
         dyA += at(y0) / xs.length;
         dyB += at(y1) / xs.length;
       }
-      const lo = ya + dyA;
-      const hi = Math.min(yb + dyB, crest + dyB + 0.3);
+      // Grow the original proxy to include raised or cut roof faces. Applying
+      // rise as a lift would move the bottom too and leave gaps between slices;
+      // applying it before the crest cap would discard raised roof tops.
+      let riseMin = 0;
+      let riseMax = 0;
+      if (shape?.rise) {
+        const points: [number, number][] = solid.filter(([y]) => y >= y0 && y <= y1);
+        for (const y of [y0, (y0 + y1) / 2, y1])
+          for (const z of crossings(solid, y)) points.push([y, z]);
+        for (const x of xs)
+          for (const [y, z] of points) {
+            const rise = shape.rise(x, y, z);
+            riseMin = Math.min(riseMin, rise);
+            riseMax = Math.max(riseMax, rise);
+          }
+      }
+      const lo = ya + dyA + riseMin;
+      const hi = Math.min(yb + dyB, crest + dyB + 0.3) + riseMax;
       if (hi - lo < 0.05) continue;
       out.push(
         boxCH(cx, (lo + hi) / 2, (front + zBack) / 2, hx, (hi - lo) / 2, (zBack - front) / 2),
