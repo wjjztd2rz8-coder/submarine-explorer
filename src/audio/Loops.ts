@@ -86,7 +86,7 @@ export class AmbientBeds {
       noise.loop = true;
       const noiseFilter = ctx.createBiquadFilter();
       noiseFilter.type = 'lowpass';
-      noiseFilter.frequency.value = 300;
+      noiseFilter.frequency.value = config.ambientNoiseLowpassHz;
       const noiseGain = ctx.createGain();
       noiseGain.gain.value = band.noiseMix;
 
@@ -110,7 +110,11 @@ export class AmbientBeds {
     const weights = bandWeights(depthM, this.config.ambientBands);
     weights.forEach((w, i) => {
       // Keep the water bed beneath the score and informational cues.
-      this.layers[i].gain.gain.setTargetAtTime(w * 0.035, ctx.currentTime, 1.5);
+      this.layers[i].gain.gain.setTargetAtTime(
+        w * this.config.ambientBedGain,
+        ctx.currentTime,
+        1.5,
+      );
     });
   }
 
