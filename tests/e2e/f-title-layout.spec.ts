@@ -42,10 +42,14 @@ test('home copy, semantic order and first focus', async ({ page }) => {
   const order = await page
     .locator('.home-menu > button:not(.daily-card), .home-menu > .mode-selector')
     .evaluateAll((els) =>
-      els.map((e) => (e.classList.contains('mode-selector') ? 'MODE' : (e.textContent ?? ''))),
+      els.map((e) =>
+        e.classList.contains('mode-selector')
+          ? 'MODE'
+          : (e.textContent ?? '').replace(/^Dive: .*/, 'Dive'),
+      ),
     );
   expect(order).toEqual([
-    'Dive',
+    /^Dive(:|$)/,
     'Dive sites',
     'Free dive',
     'MODE',
@@ -54,7 +58,7 @@ test('home copy, semantic order and first focus', async ({ page }) => {
     'Controls',
   ]);
   // Fresh save: the single Dive button takes first focus.
-  await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeFocused();
+  await expect(page.getByRole('button', { name: /^Dive(:|$)/ })).toBeFocused();
 });
 
 test('both selector entry buttons restore focus on Back and Escape', async ({ page }) => {

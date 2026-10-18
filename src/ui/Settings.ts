@@ -130,6 +130,8 @@ export interface SettingsScreenOptions {
   activeDetailStrength: number;
   /** True when `?tier=` overrides the saved tier. */
   tierFromUrl?: boolean;
+  /** The tier that Auto resolves to on this device. Defaults to `activeTier`. */
+  autoTier?: GraphicsTier;
   /** False while something else owns the keyboard (e.g. the globe). */
   canOpen?: () => boolean;
   /** After any rebind / reset (the HUD help re-renders). */
@@ -205,7 +207,7 @@ export class SettingsScreen {
         'graphicsTier',
         'Graphics tier',
         [
-          ['auto', 'Auto'],
+          ['auto', `Auto (${opts.autoTier ?? opts.activeTier} on this device)`],
           ['low', 'Low'],
           ['medium', 'Medium'],
           ['high', 'High'],
@@ -471,10 +473,13 @@ export class SettingsScreen {
   }
 
   showControls(show: boolean): void {
+    // Touch devices have no key bindings: the Controls button and section stay hidden.
+    const touch = document.documentElement.classList.contains('is-touch');
+    show = show && !touch;
     this.controlsSection.hidden = !show;
     for (const section of this.normalSections) section.hidden = show;
     this.title.textContent = show ? 'Controls' : 'Settings';
-    this.controlsButton.hidden = show;
+    this.controlsButton.hidden = show || touch;
     this.backButton.hidden = !show;
     if (this.isOpen) (show ? this.backButton : this.controlsButton).focus();
   }

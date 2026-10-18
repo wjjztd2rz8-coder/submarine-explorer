@@ -91,7 +91,7 @@ seabed + hullRadius + seabedClearance + mission.spawnClearanceM]`. The
    count or block. The scan that completes the last primary emits
    `mission:primaryComplete {missionId, completed, total}` and moves to
    `primaries-complete`; nothing ends the dive on its own. After
-   `mission.completeDelayS` (3 s, so the scan's NEW ENTRY card lands first) a
+   `mission.completeDelayS` (3 s, so the scan's New Journal entry card lands first) a
    banner under the panel reads **Primary objectives complete** with **Keep
    exploring** (the default; it applies after `mission.completionBannerS`,
    20 s) and **Surface and debrief**. Secondary scans keep counting; when

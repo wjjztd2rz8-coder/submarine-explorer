@@ -23,6 +23,7 @@ export const settingsSystem: GameSystem<ShellContext, unknown> = {
       config,
       activeTier: tier,
       activeTierSetting: quality.setting,
+      autoTier: quality.detected.tier,
       activeDetailStrength: settings.detailStrength,
       tierFromUrl: quality.urlForced,
       canOpen: () => !ctx.globe.isOpen,

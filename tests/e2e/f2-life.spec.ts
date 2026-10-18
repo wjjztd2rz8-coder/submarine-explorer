@@ -160,7 +160,7 @@ test('an animal can be scanned: banner, Journal wildlife entry, persistence', as
     };
   });
   expect(done).toEqual({ id: 'life:comb-jelly', logged: true });
-  await expect(page.locator('.guidance-slot .guidance-kicker')).toHaveText('NEW ENTRY');
+  await expect(page.locator('.guidance-slot .guidance-kicker')).toHaveText('New Journal entry');
   await expect(page.locator('.guidance-slot .guidance-name')).toHaveText('Lobate comb jelly');
   await mkdir(shots, { recursive: true });
   await page.screenshot({ path: `${shots}/e2e-scan-banner.png` });

@@ -46,7 +46,7 @@ experiencedTest.describe('guidance lifecycle', () => {
           await page.keyboard.up('g');
         }
         await expect(page.locator(GUIDANCE.discovery)).toBeVisible();
-        await expect(page.locator(GUIDANCE.kicker)).toHaveText('NEW ENTRY');
+        await expect(page.locator(GUIDANCE.kicker)).toHaveText('New Journal entry');
         await expect(page.locator(GUIDANCE.scan)).toBeHidden();
         return;
       }
@@ -587,7 +587,7 @@ freshTest.describe('large UI and menu reachability', () => {
                     ? 'Daily dive'
                     : element.classList.contains('mode-selector')
                       ? 'Mode'
-                      : element.textContent,
+                      : element.textContent?.replace(/^Dive: .*/, 'Dive'),
                 ),
               ),
           ).toEqual([
@@ -1668,7 +1668,7 @@ freshTest.describe('catalog tutorial and reload', () => {
           await page.clock.runFor(34);
           // The tutorial defers while the scan card is up, and the early scan is kept for its step.
           await expect(card).toBeHidden();
-          await expect(page.locator(GUIDANCE.discovery)).toContainText('NEW ENTRY');
+          await expect(page.locator(GUIDANCE.discovery)).toContainText('New Journal entry');
           await layout(page, 'early scan reward');
           await away(page);
           await expect(page.locator(GUIDANCE.discovery)).toBeHidden();

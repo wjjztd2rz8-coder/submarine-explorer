@@ -66,7 +66,7 @@ export function titleAudit(base = '/') {
   test('title focus order, selectors and modal Escape return', async ({ page }) => {
     await boot(page, `${base}?tier=low`);
     const menu = page.locator('.home-menu');
-    await expect(menu.getByRole('button', { name: 'Dive', exact: true })).toBeFocused();
+    await expect(menu.getByRole('button', { name: /^Dive(:|$)/ })).toBeFocused();
     await trapped(page, '.home-menu');
     for (const entry of ['Dive sites', 'Free dive']) {
       for (const exit of ['Back to menu', 'Escape']) {
@@ -100,7 +100,7 @@ export function titleAudit(base = '/') {
       localStorage.setItem('subexplorer.lastSite.v1', JSON.stringify({ missionId: 'titanic' })),
     );
     await boot(page, `${base}?tier=low`);
-    const button = page.getByRole('button', { name: 'Dive', exact: true });
+    const button = page.getByRole('button', { name: /^Dive(:|$)/ });
     await expect(button).toBeEnabled();
     await expect(button).toBeFocused();
     await Promise.all([page.waitForURL(/[?&]mission=titanic\b/), page.keyboard.press('Enter')]);
@@ -124,7 +124,7 @@ export function titleAudit(base = '/') {
       route.fulfill({ json: { version: 1, landmarks: [] } }),
     );
     await boot(page, `${base}?tier=low`);
-    await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeFocused();
+    await expect(page.getByRole('button', { name: /^Dive(:|$)/ })).toBeFocused();
     await expect(page.locator('.daily-card')).toBeHidden();
     await trapped(page, '.home-menu');
   });
@@ -283,7 +283,7 @@ export function titleAudit(base = '/') {
       .getByRole('button', { name: 'Quit to home', exact: true })
       .click();
     await expect(page.locator('.home-screen')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeFocused();
+    await expect(page.getByRole('button', { name: /^Dive(:|$)/ })).toBeFocused();
     await expect
       .poll(() =>
         page.evaluate(() => (window.__game as unknown as AuditGame).titleScene.terrainReady),

@@ -102,7 +102,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   const existingActions = page.locator('.home-menu > button:not(.daily-card)');
   await expect(existingActions).toHaveCount(6);
   await expect(existingActions).toHaveText([
-    'Dive',
+    /^Dive(:|$)/,
     'Dive sites',
     'Free dive',
     'Journal',
@@ -118,7 +118,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
             ? 'Daily dive'
             : element.classList.contains('mode-selector')
               ? 'Mode'
-              : element.textContent,
+              : element.textContent?.replace(/^Dive: .*/, 'Dive'),
         ),
       ),
   ).toEqual([
@@ -144,7 +144,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
     'false',
   );
   await expect(page.locator('.home-menu .mode-advanced')).toBeHidden();
-  await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^Dive(:|$)/ })).toBeEnabled();
   await expect(page.getByRole('button', { name: 'Continue' })).toHaveCount(0);
   // F-TITLE-E: the title scene backs the menu; the embedded globe opens only in the sites view.
   await expect(page.locator('.globe.is-embedded')).toBeHidden();
@@ -244,7 +244,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await expect(page.locator('.home-screen')).toBeVisible();
   await expect(page.locator('.pause-menu')).toBeHidden();
   expect(new URL(page.url()).search).toBe('');
-  await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^Dive(:|$)/ })).toBeEnabled();
   const homeAgain = await pose(page);
   await page.keyboard.down('w');
   await waitForFrames(page, 8, 400);
@@ -314,10 +314,13 @@ test('Home needs no dive tile; selecting a site keeps loading until its first fr
     await route.continue();
   });
   await boot(page, '/?tier=low');
-  await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^Dive(:|$)/ })).toBeEnabled();
   await waitForFrames(page, 8, 400);
   expect(diveRequests).toEqual([]);
-  await page.locator('.home-menu').getByRole('button', { name: 'Dive', exact: true }).click();
+  await page
+    .locator('.home-menu')
+    .getByRole('button', { name: /^Dive(:|$)/ })
+    .click();
   await expect(page).toHaveURL(/[?&]mission=titanic/);
   await expect(page.locator('#startup-loading')).toContainText('Loading dive…');
   expect(await page.evaluate(() => window.__gameReady === true)).toBe(false);

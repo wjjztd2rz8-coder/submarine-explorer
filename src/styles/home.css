@@ -242,6 +242,9 @@
   background: var(--home-mint);
   color: var(--home-canvas);
   font-size: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .home-menu > .home-primary:hover {
   background: #8cefe0;

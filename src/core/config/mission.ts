@@ -13,7 +13,7 @@ export interface MissionConfig {
   defaultSimSpeed: number;
   /**
    * Seconds between the scan that completes the primaries and the "Primary
-   * objectives complete" banner (D-FLOW), so the scan's NEW ENTRY card lands
+   * objectives complete" banner (D-FLOW), so the scan's New Journal entry card lands
    * first. Nothing ends the dive automatically any more.
    */
   completeDelayS: number;
@@ -37,7 +37,7 @@ export interface MissionConfig {
 // Mission flow. See docs/missions.md for the timeline these produce.
 export const DEFAULT_MISSION: MissionConfig = {
   defaultSimSpeed: 3, // keeps the Titanic descent under 4 min real time
-  completeDelayS: 3, // let the scan's "NEW ENTRY" banner land before the completion banner
+  completeDelayS: 3, // let the scan's "New Journal entry" banner land before the completion banner
   completionBannerS: 20, // D-FLOW: then Keep exploring (the default) applies
   spawnClearanceM: 10,
   navUpdateHz: 5,

@@ -658,7 +658,7 @@ freshTest.describe('scan persistence and fixture debrief', () => {
       // Holding past completion must not rescan.
       expect(names.filter((n) => n === 'scan:started')).toHaveLength(1);
 
-      await expect(page.locator('.guidance-slot .guidance-kicker')).toHaveText('NEW ENTRY');
+      await expect(page.locator('.guidance-slot .guidance-kicker')).toHaveText('New Journal entry');
       await expect(page.locator('.guidance-slot .guidance-name')).toHaveText(
         'Bow section (fixture)',
       );
@@ -1607,7 +1607,7 @@ freshTest.describe('Home to scan and return journey', () => {
           await homeReady(page, true);
           const home = page.locator('.home-screen');
           await expect(home).toBeVisible();
-          await expect(home.getByRole('button', { name: 'Dive', exact: true })).toBeEnabled();
+          await expect(home.getByRole('button', { name: /^Dive(:|$)/ })).toBeEnabled();
           await expect(home.getByRole('button', { name: 'Continue', exact: true })).toHaveCount(0);
           await shot('01-home');
           await act(home.getByRole('button', { name: 'Dive sites', exact: true }), touch);

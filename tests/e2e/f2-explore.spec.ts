@@ -303,7 +303,9 @@ test.describe('phone curiosity', () => {
     });
     await completeScan(page, id);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-    await expect(page.locator('.guidance-slot[data-kind="discovery"]')).toContainText('NEW ENTRY');
+    await expect(page.locator('.guidance-slot[data-kind="discovery"]')).toContainText(
+      'New Journal entry',
+    );
     await expectScanPanelFits(page);
     await shot(page, 'phone-sample');
     // The same touch session can rotate or run on a smaller phone.

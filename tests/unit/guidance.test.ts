@@ -390,7 +390,7 @@ describe('guidance slot', () => {
         expect(card.detail).toContain('Stern');
         expect(card.detail).toMatch(/TURN \d+° PORT/);
       } else expect(card.detail).toBe('HOLD G TO SCAN');
-      // On touch a NEW ENTRY card keeps the direction to the objective; elsewhere it keeps its own line.
+      // On touch a New Journal entry card keeps the direction to the objective; elsewhere it keeps its own line.
       overlay.showComplete('Memorial', true, keys);
       if (touch) expect(texts(overlay.slot).detail).toContain('Stern');
       else expect(texts(overlay.slot).detail).toBe('PRESS J · JOURNAL');
@@ -540,7 +540,7 @@ describe('guidance slot', () => {
     const f = contactGuidance(true);
     f.scanner.setObjective('memorial');
     f.step(0.2, true);
-    expect(f.step(0.9, true)).toMatchObject({ name: 'Memorial', kicker: 'NEW ENTRY' });
+    expect(f.step(0.9, true)).toMatchObject({ name: 'Memorial', kicker: 'New Journal entry' });
     f.scanner.setObjective('stern');
     expect(f.step().detail).toBe('Stern · TURN 90° PORT');
     f.scanner.setObjective(null);

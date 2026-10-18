@@ -14,11 +14,15 @@ without an entry here is not done.
 
 ### Changed
 
+- **P2-copy:** home primary reads "Dive: <site>" (the site the Dive button will start); the scan confirmation reads "New Journal entry"; Graphics "Auto" names its resolved tier, e.g. "Auto (high on this device)".
+
 - **P2-events-anchored:** replace random event timers and camera-relative spawns with named optional contacts at authored spots across the six event sites. Arrivals play the existing effects; remaining inside does not replay them. No event kind is cut pending Claude’s Low-tier visual review.
 
 - **V-endurance:** the Endurance opening is reframed so the wreck is the subject: the chase camera is closer and offset sideways so the hull fills about 37% of the frame (was about 33%) and the sub sits to one side above it, and the deep-water ground fill is brighter so the lower hull side reads. Portrait uses a matching offset.
 
 ### Removed
+
+- **P2-copy:** the Settings Controls (key bindings) button and pane are hidden on touch devices. Reason: touch has no rebindable keys, so the entry only led to a dead end.
 
 - **P2-boost-cut:** remove boost from touch, Shift and gamepad RT, including its reserve/recovery logic, thrust multiplier, power surcharge and tuning. Reason: the owner phone test found no useful perceived effect; fewer controls simplify piloting. X remains camera reset.
 

@@ -76,7 +76,8 @@ purchases and Daily overrides never mutate Config or saved preferences.
 
 The **Controls** entry (on the home screen, the pause menu, and the
 in-dialog **Controls** button/**Back to Settings** button) opens the same
-Settings dialog's bindings pane (`SettingsScreen.showControls`). Activate an
+Settings dialog's bindings pane (`SettingsScreen.showControls`). On touch
+devices the in-dialog Controls button and the bindings pane are hidden. Activate an
 action's key button, then press a key: it becomes that action's primary key
 (secondary keys such as the arrow keys are kept). If another action held that
 key, it loses it and the status line says so; an action with no keys left

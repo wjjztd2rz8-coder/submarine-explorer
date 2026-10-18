@@ -71,13 +71,14 @@ export function initializeShell(ctx: ShellContext): void {
   });
   ctx.missionSelect = missionSelect;
   ctx.missionSummaries = [];
+  // A saved mission that the catalogue no longer lists falls back to the opening one.
+  const diveSite = (): string => {
+    const known = ctx.missionSummaries.some((entry) => entry.id === app.lastSite);
+    return app.lastSite && known ? app.lastSite : FIRST_MISSION_ID;
+  };
   const home = new Home(
     {
-      dive: () => {
-        // A saved mission that the catalogue no longer lists falls back to the opening one.
-        const known = ctx.missionSummaries.some((entry) => entry.id === app.lastSite);
-        selectMission(app.lastSite && known ? app.lastSite : FIRST_MISSION_ID);
-      },
+      dive: () => selectMission(diveSite()),
       journal: () => journal.open(),
       settings: () => ctx.settingsScreen.open(),
       controls: () => ctx.controlsCard.open(),
@@ -151,6 +152,7 @@ export function initializeShell(ctx: ShellContext): void {
     ctx.missionSummaries = list;
     missionSelect.setMissions(list);
     homeSites.setMissions(list);
+    home.setDiveSite(list.find((entry) => entry.id === diveSite())?.title ?? null);
   });
   cleanup.add(
     bus.on('mission:started', ({ missionId }) => {

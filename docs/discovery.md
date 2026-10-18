@@ -109,7 +109,7 @@ The scan overlay has a corner-bracket reticle over the nearest contact, plus a
 panel showing its name and a hint: `CLOSE TO 150 M` when out of range,
 `TURN n° PORT/STARBOARD` or `PITCH TOWARD TARGET` in amber when you are not
 facing it, and `HOLD G TO SCAN` when it can be scanned. While the beam is on,
-a cyan progress ring fills. A completed scan shows `NEW ENTRY`, and pressing
+a cyan progress ring fills. A completed scan shows `New Journal entry`, and pressing
 J then opens the guide at that entry.
 
 When a scan candidate exists, the card, reticle and prompt share its identity.

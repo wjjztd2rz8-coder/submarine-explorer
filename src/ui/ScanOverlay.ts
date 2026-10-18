@@ -4,7 +4,7 @@
  * - A thin corner-bracket reticle over the nearest POI's screen position.
  * - The scan, discovery and objective messages for the guidance slot: target
  *   name and "HOLD F TO SCAN", a progress ring while the beam is on, the
- *   "NEW ENTRY" confirmation, and the "where next" objective line. Amber marks
+ *   "New Journal entry" confirmation, and the "where next" objective line. Amber marks
  *   states that need the pilot's attention (interrupted, turn to face).
  *
  * Colours follow docs/art-direction.md §5: cyan #2ED9D9 for the beam and nav
@@ -110,7 +110,7 @@ export class ScanOverlay {
     keys: ScanOverlayKeys,
   ): GuidanceMessage {
     return {
-      kicker: firstTime ? 'NEW ENTRY' : 'SCAN COMPLETE',
+      kicker: firstTime ? 'New Journal entry' : 'SCAN COMPLETE',
       text: title,
       detail:
         this.cue && isTouch()

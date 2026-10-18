@@ -33,7 +33,7 @@ export function createProgressSystem(): GameSystem {
         ctx.bus.on('scan:complete', ({ landmarkId, poiId }) => {
           // Curiosity has its own rewards; avoid also awarding a generic POI.
           if (poiId.startsWith('secret:') || poiId.startsWith('sample:')) return;
-          // The NEW ENTRY card announces the discovery; no second toast.
+          // The New Journal entry card announces the discovery; no second toast.
           if (poiId.startsWith('life:')) progress.award('species', poiId.slice('life:'.length));
           else progress.award('poi', `${landmarkId}/${poiId}`);
         }),

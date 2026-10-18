@@ -53,7 +53,7 @@ export interface ScanConfig {
   ringStrokePx: number;
   /** Size (CSS px) of the corner-bracket reticle drawn over the target. */
   reticleSizePx: number;
-  /** How long the "NEW ENTRY" confirmation stays up, seconds. */
+  /** How long the "New Journal entry" confirmation stays up, seconds. */
   completeBannerSeconds: number;
   /** `?poi=` debug spawn: horizontal distance from the POI (m), capped to 80% of its radius. */
   spawnDistanceM: number;

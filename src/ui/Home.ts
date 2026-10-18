@@ -184,6 +184,11 @@ export class Home {
     return !this.sites.hidden;
   }
 
+  /** Names the primary action's site ("Dive: Titanic"); plain "Dive" while the catalogue loads. */
+  setDiveSite(title: string | null): void {
+    this.diveButton.textContent = title ? `Dive: ${title}` : 'Dive';
+  }
+
   show(): void {
     if (this.isOpen) return;
     this.trap.show();

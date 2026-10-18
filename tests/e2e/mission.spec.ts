@@ -321,7 +321,10 @@ test.describe('B3 mission flow', () => {
       page.waitForURL((url) => url.searchParams.get('mission') === 'titanic', {
         waitUntil: 'domcontentloaded',
       }),
-      page.locator('.home-menu').getByRole('button', { name: 'Dive', exact: true }).click(),
+      page
+        .locator('.home-menu')
+        .getByRole('button', { name: /^Dive(:|$)/ })
+        .click(),
     ]);
     await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
     expect(await page.evaluate(() => (window.__game as { meta: { id: string } }).meta.id)).toBe(

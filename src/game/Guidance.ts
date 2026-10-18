@@ -5,7 +5,7 @@
  * Order, most important first:
  *   urgent     hull, supplies and seabed warnings
  *   scan       a scan in progress, or a contact ready to scan
- *   discovery  a result: NEW ENTRY, a sample, a sighting
+ *   discovery  a result: New Journal entry, a sample, a sighting
  *   hint       the tutorial step or a one-shot contextual hint
  *   objective  the standing "where next" line
  *
@@ -31,7 +31,7 @@ export const GUIDANCE_ORDER: readonly GuidanceKind[] = [
 export type GuidanceTone = 'cyan' | 'amber' | 'dim' | 'alert';
 
 export interface GuidanceMessage {
-  /** Small label above the text, e.g. "NEW ENTRY". */
+  /** Small label above the text, e.g. "New Journal entry". */
   kicker: string;
   /** The main line: a name or an instruction. */
   text: string;
