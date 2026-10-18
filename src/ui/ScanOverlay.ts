@@ -210,9 +210,9 @@ export class ScanOverlay {
     const scan = touch ? 'SCAN' : keys.scan;
     const none = { scan: null, objective: null };
     const hasTarget = view.nearestId !== null || view.activeId !== null;
-    // A card is for a contact in range or a scan under way; the objective may stand alone.
+    // Remote contacts use the same slot to explain the remaining approach.
     const inContact = hasTarget && (view.phase !== 'idle' || view.nearestInRange);
-    if (!inContact && view.objectiveId === null) return none;
+    if (!hasTarget && view.objectiveId === null) return none;
     const dist = Number.isFinite(view.nearestDistance)
       ? `${view.nearestDistance.toFixed(0)} m`
       : '';
@@ -244,9 +244,12 @@ export class ScanOverlay {
       };
     }
     if (view.phase === 'interrupted') {
+      const activeDist = Number.isFinite(view.activeDistance)
+        ? `${view.activeDistance.toFixed(0)} m`
+        : dist;
       const why =
         view.lastAbort === 'range'
-          ? 'OUT OF RANGE'
+          ? `Get closer to scan · ${activeDist}`
           : view.lastAbort === 'facing'
             ? 'BEAM OFF TARGET'
             : `HOLD ${scan} TO RESUME`;
@@ -289,19 +292,13 @@ export class ScanOverlay {
       };
     }
     const objectiveReady = view.objectiveId === view.nearestId && view.nearestInRange;
-    // Phones have no objectives panel, so the card stands. Elsewhere the panel's nav line
-    // already names the target and the turn; the card only adds the final aim once in scan range.
-    if (
-      view.objectiveId != null &&
-      view.objectiveName &&
-      !objectiveReady &&
-      (touch || (inContact && view.objectiveInRange))
-    ) {
+    // Keep the range instruction in the same slot as the ready-to-scan prompt.
+    if (view.objectiveId != null && view.objectiveName && !objectiveReady) {
       const turn = view.objectiveTurnDeg;
       const near =
         view.objectiveDistance <= view.objectiveRadius
           ? 'DIVE DEEPER'
-          : `CLOSE TO ${view.objectiveRadius.toFixed(0)} M`;
+          : `Get closer to scan · ${view.objectiveDistance.toFixed(0)} m`;
       return {
         scan: null,
         objective: {
@@ -309,11 +306,21 @@ export class ScanOverlay {
           text: view.objectiveName,
           detail: view.objectiveInRange
             ? guide(turn, view.objectiveVertDeg, 'PITCH TOWARD TARGET')
-            : Math.abs(turn) >= 10
-              ? guide(turn, 0, near)
-              : near,
+            : near,
           tone: view.objectiveInRange ? 'amber' : 'dim',
           ring: { progress: 0, label: `${view.objectiveDistance.toFixed(0)} m` },
+        },
+      };
+    }
+    if (hasTarget && !view.nearestInRange && view.nearestDistance > view.nearestRadius) {
+      return {
+        scan: null,
+        objective: {
+          kicker: 'SCAN TARGET',
+          text: view.nearestName,
+          detail: `Get closer to scan · ${dist}`,
+          tone: 'dim',
+          ring: { progress: 0, label: dist },
         },
       };
     }

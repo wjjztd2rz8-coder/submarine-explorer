@@ -191,7 +191,7 @@ test('v1 custom bindings migrate without taking new one-handed defaults', async 
         version: 1,
         keys: {
           thrustForward: ['KeyI'],
-          boost: [],
+          toggleLights: [],
           scan: ['KeyG'],
           ballastFlood: ['ShiftLeft', 'ShiftRight'],
           toggleGuide: ['KeyH'],
@@ -207,7 +207,7 @@ test('v1 custom bindings migrate without taking new one-handed defaults', async 
     ).input;
     return {
       ahead: input.getAction('thrustForward')?.keys,
-      boost: input.getAction('boost')?.keys,
+      toggleLights: input.getAction('toggleLights')?.keys,
       scan: input.getAction('scan')?.keys,
       descend: input.getAction('ballastFlood')?.keys,
       journal: input.getAction('toggleJournal')?.keys,
@@ -216,7 +216,7 @@ test('v1 custom bindings migrate without taking new one-handed defaults', async 
   });
   expect(bindings).toEqual({
     ahead: ['KeyI'],
-    boost: [],
+    toggleLights: [],
     scan: ['KeyG'],
     descend: ['ControlLeft', 'ControlRight', 'KeyC'],
     journal: ['KeyH'],

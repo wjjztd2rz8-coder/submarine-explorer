@@ -74,7 +74,11 @@ function setup(seenHints: HintId[] = ['creature']) {
     settings: { reduceMotion: true },
     save: { onChange: () => () => {} },
     guidance: views.guidance,
-    discovery: { loaded: true, guide: { isOpen: false } },
+    discovery: {
+      loaded: true,
+      guide: { isOpen: false },
+      scanner: { view: { nearestId: null, objectiveDistance: Infinity, objectiveRadius: 0 } },
+    },
     props: { loaded: true },
     app: { state: 'dive' },
     photoMode: { active: false },
@@ -118,6 +122,31 @@ function setup(seenHints: HintId[] = ['creature']) {
 }
 
 describe('onboarding completion through the system', () => {
+  it.each(['keyboard', 'touch', 'gamepad'] as const)(
+    'only asks for a scan once in range on %s',
+    (device) => {
+      const { ctx, system, tick, onboard } = setup();
+      ctx.input.touchActive = device === 'touch';
+      ctx.input.gamepadActive = device === 'gamepad';
+      const view = ctx.discovery.scanner.view;
+      Object.assign(view, { nearestId: 'bow', nearestDistance: 217, nearestRadius: 100 });
+      try {
+        onboard.tutorial.skipStep();
+        onboard.tutorial.skipStep();
+        tick();
+        expect(lastTutorial()?.text).toBe('Get closer to scan · 217 m');
+        view.nearestDistance = 101;
+        tick();
+        expect(lastTutorial()?.text).toBe('Get closer to scan · 101 m');
+        view.nearestDistance = 100;
+        tick();
+        expect(lastTutorial()?.text).toMatch(/Hold .* on a glowing target\./);
+      } finally {
+        system.dispose?.();
+      }
+    },
+  );
+
   it('disposing the previous dive again leaves the next dive handlers intact', () => {
     const { ctx, system, tick, exposed } = setup();
     system.dispose?.();

@@ -198,7 +198,6 @@ describe('Input action map', () => {
           doc.dispatchEvent(focus);
           input.touchAxes.ballast = 1;
           input.touchHeld.add('scan');
-          input.touchBoost = true;
           input.touchEdge('toggleLights');
           input.touchLook(20, 10);
           input.touchZoom(100);
@@ -210,7 +209,6 @@ describe('Input action map', () => {
             pitch: 0,
             ballast: 0,
             scan: false,
-            boost: false,
             toggleLights: false,
             toggleCamera: false,
             lookDx: 0,
@@ -224,7 +222,6 @@ describe('Input action map', () => {
             throttle: 1,
             scan: true,
             ballast: 0,
-            boost: false,
             toggleCamera: false,
             toggleLights: false,
           });
@@ -330,7 +327,6 @@ describe('Input action map', () => {
       input.injectKey('KeyQ', true);
       input.touchAxes.ballast = 1;
       input.touchHeld.add('scan');
-      input.touchBoost = true;
       input.touchLook(20, 10);
       input.touchZoom(100);
       if (event === 'dispose') input.dispose();
@@ -339,7 +335,6 @@ describe('Input action map', () => {
         throttle: 0,
         ballast: 0,
         scan: false,
-        boost: false,
         toggleCamera: false,
         lookDx: 0,
         lookDy: 0,
@@ -402,7 +397,6 @@ describe('Input action map', () => {
         const state = input.sample();
         for (const [, edge] of padEdges) expect(Boolean(state[edge])).toBe(edge === expected);
         expect(state.scan).toBe(false);
-        expect(state.boost).toBe(false);
         expect([state.throttle, state.yaw, state.pitch, state.ballast]).toEqual([0, 0, 0, 0]);
       };
       buttons[button] = { value: 1, pressed: true };
@@ -420,7 +414,7 @@ describe('Input action map', () => {
     }
   });
 
-  it('keeps existing pad axes, scan and boost alongside the new edges', () => {
+  it('keeps existing pad axes and scan alongside the new edges', () => {
     const buttons = Array.from({ length: 16 }, () => ({ value: 0, pressed: false }));
     for (const i of [0, 4, 5, 7, 13, 14]) buttons[i] = { value: 1, pressed: true };
     let connected = true;
@@ -435,7 +429,6 @@ describe('Input action map', () => {
         pitch: 0.4,
         ballast: 1,
         scan: true,
-        boost: true,
         capturePhoto: true,
         resetCamera: true,
         toggleGuide: true,
@@ -443,14 +436,13 @@ describe('Input action map', () => {
       input.endFrame();
       expect(input.sample()).toMatchObject({
         scan: true,
-        boost: true,
         capturePhoto: false,
         resetCamera: false,
         toggleGuide: false,
       });
       connected = false;
       input.endFrame();
-      expect(input.sample()).toMatchObject({ scan: false, boost: false, ballast: 0 });
+      expect(input.sample()).toMatchObject({ scan: false, ballast: 0 });
       connected = true;
       expect(input.sample()).toMatchObject({
         capturePhoto: true,
@@ -462,7 +454,7 @@ describe('Input action map', () => {
     }
   });
 
-  it('leaves N and Tab unbound and Q solely on camera view in a fresh session', () => {
+  it('leaves retired controls inert and preserves Q camera view and X camera reset', () => {
     const input = makeInput();
     expect(input.actions.filter((a) => a.keys.includes('KeyQ')).map((a) => a.id)).toEqual([
       'toggleCamera',
@@ -472,10 +464,32 @@ describe('Input action map', () => {
     );
     input.injectKey('KeyN', true);
     input.injectKey('Tab', true);
-    input.sample();
-    for (const [, edge] of padEdges) expect(Boolean(input.state[edge])).toBe(false);
-    expect(input.state).not.toHaveProperty('ping');
-    expect(input.state).not.toHaveProperty('toggleGlobe');
+    input.injectKey('ShiftLeft', true);
+    input.injectKey('ShiftRight', true);
+    // Retired keyboard/RT inputs must not activate a neighbouring control.
+    const buttons = Array.from({ length: 16 }, (_, i) => ({
+      value: i === 7 ? 1 : 0,
+      pressed: i === 7,
+    }));
+    vi.stubGlobal('navigator', {
+      getGamepads: () => [{ connected: true, index: 0, axes: [0, 0, 0, 0], buttons }],
+    });
+    try {
+      input.sample();
+      for (const [, edge] of padEdges) expect(Boolean(input.state[edge])).toBe(false);
+      expect(input.state).toMatchObject({ throttle: 0, yaw: 0, pitch: 0, ballast: 0, scan: false });
+      expect(input.actions.map((a) => a.id)).not.toContain('boost');
+      expect(input.state).not.toHaveProperty('boost');
+      expect(input.state).not.toHaveProperty('ping');
+      expect(input.state).not.toHaveProperty('toggleGlobe');
+      input.injectKey('KeyX', true);
+      expect(input.sample()).toMatchObject({ resetCamera: true, toggleCamera: false });
+      input.endFrame();
+      input.injectKey('KeyQ', true);
+      expect(input.sample()).toMatchObject({ resetCamera: false, toggleCamera: true });
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it.each([
@@ -492,9 +506,10 @@ describe('Input action map', () => {
           keys: {
             ping: ['KeyQ', 'Tab'],
             toggleGlobe: ['KeyN', 'KeyH'],
+            boost: ['KeyX', 'ShiftLeft', 'KeyI'],
             toggleSonar: ['KeyN'],
             thrustForward: ['KeyI'],
-            boost: [],
+            toggleLights: [],
             [version === 1 ? 'toggleGuide' : 'toggleJournal']: ['KeyH'],
           },
         }),
@@ -502,10 +517,12 @@ describe('Input action map', () => {
       const input = makeInput();
       expect(input.actions.map((a) => a.id)).not.toContain('ping');
       expect(input.actions.map((a) => a.id)).not.toContain('toggleGlobe');
+      expect(input.actions.map((a) => a.id)).not.toContain('boost');
+      expect(input.getAction('resetCamera')?.keys).toEqual(['KeyX']);
       expect(input.state).not.toHaveProperty('ping');
       expect(input.state).not.toHaveProperty('toggleGlobe');
       expect(input.getAction('thrustForward')?.keys).toEqual(['KeyI']);
-      expect(input.getAction('boost')?.keys).toEqual([]);
+      expect(input.getAction('toggleLights')?.keys).toEqual([]);
       expect(input.getAction('toggleSonar')?.keys).toEqual(['KeyN']);
       expect(input.getAction('toggleJournal')?.keys).toEqual(['KeyH']);
       input.injectKey('KeyN', true);
@@ -527,43 +544,11 @@ describe('Input action map', () => {
       const saved = JSON.parse(store.getItem(BINDINGS_STORAGE_KEY)!);
       expect(saved.keys).not.toHaveProperty('ping');
       expect(saved.keys).not.toHaveProperty('toggleGlobe');
+      expect(saved.keys).not.toHaveProperty('boost');
       expect(makeInput().getAction('toggleSonar')?.keys).toEqual(['KeyN']);
     },
   );
 
-  it('keeps gamepad boost held only while the trigger is down', () => {
-    const buttons = Array.from({ length: 8 }, () => ({ value: 0, pressed: false }));
-    vi.stubGlobal('navigator', {
-      getGamepads: () => [{ connected: true, index: 0, axes: [0, 0, 0, 0], buttons }],
-    });
-    try {
-      const input = makeInput();
-      buttons[7]!.value = 1;
-      expect(input.sample().boost).toBe(true);
-      input.endFrame();
-      expect(input.sample().boost).toBe(true);
-      buttons[7]!.value = 0;
-      expect(input.sample().boost).toBe(false);
-    } finally {
-      vi.unstubAllGlobals();
-    }
-  });
-  it('keeps the touch boost latch independent of keyboard hold and end-of-frame edges', () => {
-    const input = makeInput();
-    input.touchBoost = true;
-    expect(input.sample().boost).toBe(true);
-    input.endFrame();
-    expect(input.sample().boost).toBe(true);
-    input.touchBoost = false;
-    expect(input.sample().boost).toBe(false);
-    input.injectKey('ShiftLeft', true);
-    expect(input.sample().boost).toBe(true);
-    input.injectKey('ShiftLeft', false);
-    expect(input.sample().boost).toBe(false);
-    input.touchBoost = true;
-    input.dispose();
-    expect(input.sample().boost).toBe(false);
-  });
   it('exposes every action with a label and a category for a settings screen', () => {
     const input = makeInput();
     expect(input.actions.length).toBe(defaultActions().length);
@@ -631,10 +616,10 @@ describe('Input rebinding', () => {
     input.injectKey('KeyW', true);
     expect(input.sample().throttle).toBe(0);
 
-    // Stealing: give W to boost; thrustForward must not still claim it.
-    input.rebind('boost', ['KeyW']);
+    // Stealing: give W to scan; thrustForward must not still claim it.
+    input.rebind('scan', ['KeyW']);
     expect(input.getAction('thrustForward')?.keys).not.toContain('KeyW');
-    expect(input.sample().boost).toBe(true);
+    expect(input.sample().scan).toBe(true);
 
     const saved = store.getItem(BINDINGS_STORAGE_KEY);
     expect(saved).toBeTruthy();
@@ -657,39 +642,39 @@ describe('Input rebinding', () => {
 
   it('refuses an empty binding and survives a corrupt save', () => {
     const input = makeInput();
-    expect(input.rebind('boost', [])).toBe(false);
-    expect(input.getAction('boost')?.keys).toEqual(['ShiftLeft', 'ShiftRight']);
+    expect(input.rebind('scan', [])).toBe(false);
+    expect(input.getAction('scan')?.keys).toEqual(['KeyG']);
 
     store.setItem(BINDINGS_STORAGE_KEY, '{not json');
     const recovered = makeInput();
-    expect(recovered.getAction('boost')?.keys).toEqual(['ShiftLeft', 'ShiftRight']);
+    expect(recovered.getAction('scan')?.keys).toEqual(['KeyG']);
 
-    store.setItem(BINDINGS_STORAGE_KEY, JSON.stringify({ version: 99, keys: { boost: ['KeyZ'] } }));
+    store.setItem(BINDINGS_STORAGE_KEY, JSON.stringify({ version: 99, keys: { scan: ['KeyZ'] } }));
     const wrongVersion = makeInput();
-    expect(wrongVersion.getAction('boost')?.keys).toEqual(['ShiftLeft', 'ShiftRight']);
+    expect(wrongVersion.getAction('scan')?.keys).toEqual(['KeyG']);
   });
 });
 
 describe('Input bindings across reloads (C5)', () => {
   it('a binding displaced by a conflict stays unbound after reload', () => {
     const first = makeInput();
-    first.rebind('thrustForward', ['ShiftLeft', 'ShiftRight']); // takes both boost keys
-    expect(first.getAction('boost')?.keys).toEqual([]);
+    first.rebind('thrustForward', ['KeyG']); // takes the scan key
+    expect(first.getAction('scan')?.keys).toEqual([]);
 
     const second = makeInput();
-    expect(second.getAction('boost')?.keys).toEqual([]);
-    expect(second.getAction('thrustForward')?.keys).toEqual(['ShiftLeft', 'ShiftRight']);
-    second.injectKey('ShiftLeft', true);
+    expect(second.getAction('scan')?.keys).toEqual([]);
+    expect(second.getAction('thrustForward')?.keys).toEqual(['KeyG']);
+    second.injectKey('KeyG', true);
     const s = second.sample();
     expect(s.throttle).toBe(1);
-    expect(s.boost).toBe(false);
+    expect(s.scan).toBe(false);
   });
 
   it('an action missing from the save does not reclaim a key another action saved', () => {
-    const payload = { version: 3, keys: { boost: ['KeyW'] } };
+    const payload = { version: 3, keys: { scan: ['KeyW'] } };
     store.setItem(BINDINGS_STORAGE_KEY, JSON.stringify(payload));
     const input = makeInput();
-    expect(input.getAction('boost')?.keys).toEqual(['KeyW']);
+    expect(input.getAction('scan')?.keys).toEqual(['KeyW']);
     expect(input.getAction('thrustForward')?.keys).toEqual(['ArrowUp']);
   });
 
@@ -704,9 +689,9 @@ describe('Input bindings across reloads (C5)', () => {
       },
     };
     const input = new Input({ storage: hostile });
-    expect(input.rebind('boost', ['KeyZ'])).toBe(true);
+    expect(input.rebind('scan', ['KeyZ'])).toBe(true);
     expect(() => input.resetBindings()).not.toThrow();
-    expect(input.getAction('boost')?.keys).toEqual(['ShiftLeft', 'ShiftRight']);
+    expect(input.getAction('scan')?.keys).toEqual(['KeyG']);
   });
 
   it.each(['throws', 'silently fails'])(
@@ -740,7 +725,7 @@ describe('Input bindings across reloads (C5)', () => {
         removeItem: () => {},
       },
     });
-    expect(input.getAction('boost')?.keys).toEqual(['ShiftLeft', 'ShiftRight']);
+    expect(input.getAction('scan')?.keys).toEqual(['KeyG']);
   });
 });
 
@@ -766,7 +751,7 @@ describe('v1 binding migration', () => {
         keys: {
           ...Object.fromEntries(defaultActions().map((a) => [a.id, a.keys])),
           thrustForward: ['KeyI'],
-          boost: [],
+          toggleLights: [],
           toggleGuide: ['KeyH'],
           pitchDown: ['KeyF'],
           ballastFlood: ['ShiftLeft', 'ShiftRight'],
@@ -777,7 +762,7 @@ describe('v1 binding migration', () => {
     );
     const input = makeInput();
     expect(input.getAction('thrustForward')?.keys).toEqual(['KeyI']);
-    expect(input.getAction('boost')?.keys).toEqual([]);
+    expect(input.getAction('toggleLights')?.keys).toEqual([]);
     expect(input.getAction('toggleJournal')?.keys).toEqual(['KeyH']);
     expect(input.getAction('ballastFlood')?.keys).toEqual(['ControlLeft', 'ControlRight', 'KeyC']);
     expect(input.getAction('scan')?.keys).toEqual(['KeyG']);
@@ -835,7 +820,7 @@ describe('v2 binding migration', () => {
           pitchDown: ['KeyV'],
           scan: ['KeyF'],
           thrustForward: ['KeyI'],
-          boost: [],
+          toggleLights: [],
           toggleJournal: ['KeyH'],
           toggleSonar: ['KeyG'],
         },
@@ -846,7 +831,7 @@ describe('v2 binding migration', () => {
     expect(input.getAction('scan')?.keys).toEqual(['KeyG']);
     expect(input.getAction('resetCamera')?.keys).toEqual(['KeyX']);
     expect(input.getAction('thrustForward')?.keys).toEqual(['KeyI']);
-    expect(input.getAction('boost')?.keys).toEqual([]);
+    expect(input.getAction('toggleLights')?.keys).toEqual([]);
     expect(input.getAction('toggleJournal')?.keys).toEqual(['KeyH']);
     expect(input.getAction('toggleSonar')?.keys).toEqual([]);
     expect(JSON.parse(store.getItem(BINDINGS_STORAGE_KEY)!).version).toBe(3);

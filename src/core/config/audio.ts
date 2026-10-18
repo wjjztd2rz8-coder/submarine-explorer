@@ -40,6 +40,10 @@ export interface AudioConfig {
    * src/audio/DepthBands.ts and docs/audio.md.
    */
   ambientBands: Array<{ depth: number; droneHz: number; noiseMix: number }>;
+  /** Crossfaded bed gain before the saved SFX/master gains; not a player setting. */
+  ambientBedGain: number;
+  /** Bed noise only: soften speaker fatigue without muffling cues or music. */
+  ambientNoiseLowpassHz: number;
   /** Thruster loop pitch at zero / full throttle, Hz. */
   thrusterMinHz: number;
   thrusterMaxHz: number;
@@ -85,6 +89,8 @@ export const DEFAULT_AUDIO: AudioConfig = {
     { depth: -200, droneHz: 55, noiseMix: 0.4 },
     { depth: -1000, droneHz: 40, noiseMix: 0.6 },
   ],
+  ambientBedGain: 0.025,
+  ambientNoiseLowpassHz: 220,
   thrusterMinHz: 55,
   thrusterMaxHz: 140,
   hullCreakMinGapS: 0.5,

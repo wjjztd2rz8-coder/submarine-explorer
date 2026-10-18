@@ -78,7 +78,6 @@ function fixture(canvasTouchAction = '', realInput?: Input) {
     touchActive: false,
     touchAxes: { throttle: 0, yaw: 0, pitch: 0, ballast: 0 },
     touchHeld: new Set<string>(),
-    touchBoost: false,
     touchEdge: vi.fn(),
     touchLook: vi.fn(),
     touchZoom: vi.fn(),
@@ -560,9 +559,6 @@ describe('touch control interruptions', () => {
         pointer(f.stick, 'pointerdown', 1);
         pointer(f.slider, 'pointerdown', 2, 60, 160);
         pointer(f.scan, 'pointerdown', 3);
-        const boost = (f.controls.root as unknown as TouchElement).children[4];
-        boost.dispatchEvent(new Event('click'));
-        expect(f.input.touchBoost).toBe(true);
         expect(f.input.touchAxes.throttle).toBeGreaterThan(0.8);
         expect(f.input.touchAxes.ballast).toBe(-1);
         expect(f.input.touchHeld.has('scan')).toBe(true);
@@ -572,7 +568,6 @@ describe('touch control interruptions', () => {
         } else f.win.dispatchEvent(new Event(interruption));
         expect(f.input.touchAxes).toEqual({ throttle: 0, yaw: 0, pitch: 0, ballast: 0 });
         expect(f.input.touchHeld.size).toBe(0);
-        expect(f.input.touchBoost).toBe(false);
         pointer(f.stick, 'pointermove', 1);
         expect(f.input.touchAxes.throttle).toBe(0);
         pointer(f.stick, 'pointerdown', 4);
@@ -671,11 +666,13 @@ it('scan card guidance points at the mission objective, not the nearest contact'
   const card = (overlay.slot.root as unknown as TouchElement).children[1];
   const [kicker, name, hint] = [card.children[0], card.children[1], card.children[2]];
   try {
-    // Desktop: the mission panel's nav line names a distant objective, so the card stays out.
+    // Range guidance occupies the shared slot on every device.
     f.controls.setTouchMode(false);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
-    expect(kicker.textContent).not.toBe('OBJECTIVE');
-    // In scan range the card returns on desktop with the aim cue, for the same target.
+    expect(kicker.textContent).toBe('OBJECTIVE');
+    expect(name.textContent).toBe('Stern section');
+    expect(hint.textContent).toBe('Get closer to scan · 692 m');
+    // In scan range the card changes to an aim cue for the same target.
     view.objectiveInRange = true;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
@@ -685,10 +682,10 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
     expect(name.textContent).toBe('Stern section');
-    expect(hint.textContent).toBe('TURN 40° STARBOARD');
+    expect(hint.textContent).toBe('Get closer to scan · 692 m');
     view.objectiveTurnDeg = 3;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
-    expect(hint.textContent).toBe('CLOSE TO 120 M');
+    expect(hint.textContent).toBe('Get closer to scan · 692 m');
     view.objectiveInRange = true;
     f.controls.setTouchMode(true);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
@@ -748,6 +745,10 @@ it('the standing objective yields to an in-range contact and to a completion car
     overlay.update(view, keys, null, makeConfig().scan.completeBannerSeconds + 1);
     expect(overlay.slot.kind).toBe('objective');
     view.objectiveId = null;
+    overlay.update(view, keys, null, 0);
+    expect(overlay.slot.kind).toBe('objective');
+    expect(name.textContent).toBe('Bow');
+    view.nearestId = null;
     overlay.update(view, keys, null, 0);
     expect(overlay.slot.kind).toBeNull();
   } finally {
@@ -836,7 +837,8 @@ it.each(['keyboard', 'touch'] as const)(
       view.nearestInRange = false;
       view.candidateId = null;
       overlay.update(view, keys, null, 0);
-      expect(overlay.slot.kind).toBe(device === 'touch' ? 'objective' : null);
+      expect(overlay.slot.kind).toBe('objective');
+      expect(name.textContent).toBe('Stern section');
       expect(overlay.slot.showsName('Bow result')).toBe(false);
     } finally {
       overlay.dispose();

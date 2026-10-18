@@ -85,20 +85,21 @@ export class Life {
     camera: THREE.PerspectiveCamera,
     viewHeightPx: number,
     fogDensity: number,
+    scanRadiusFloorM = 0,
   ): void {
     if (!this.enabled) return;
     if (dt > 0) this.sim.update(dt, sub);
     const fov = (camera.fov * Math.PI) / 180;
     const viewScale = viewHeightPx / (2 * Math.tan(fov / 2));
     this.render.sync(this.sim, sub, camera.position, dt, viewScale, fogDensity);
-    this.updateTargets(sub);
+    this.updateTargets(sub, scanRadiusFloorM);
   }
 
   /**
    * One target per live species: keep the current individual while it stays
    * in range and in front, otherwise take the nearest one that faces the beam.
    */
-  private updateTargets(sub: SubInfo): void {
+  private updateTargets(sub: SubInfo, scanRadiusFloorM: number): void {
     const best = this.best;
     for (const entry of best.values()) {
       entry.a = null;
@@ -112,7 +113,7 @@ export class Life {
       const dy = a.y - sub.y;
       const dz = a.z - sub.z;
       const d = Math.hypot(dx, dy, dz);
-      if (d > def.scanRadius * 1.4) continue;
+      if (d > Math.max(def.scanRadius, scanRadiusFloorM) * 1.4) continue;
       const cos = d > 1e-6 ? (dx * sub.fx + dy * sub.fy + dz * sub.fz) / d : 1;
       // Prefer near and ahead; an animal behind the sub is a poor choice.
       const score = d / (0.35 + Math.max(0, cos));
@@ -153,13 +154,17 @@ export class Life {
             ? ((held.x - sub.x) * sub.fx + (held.y - sub.y) * sub.fy + (held.z - sub.z) * sub.fz) /
               d
             : 1;
-        if (d <= a.def.scanRadius * 1.4 && cos > 0.2) entry.agent = held;
+        if (d <= Math.max(a.def.scanRadius, scanRadiusFloorM) * 1.4 && cos > 0.2)
+          entry.agent = held;
         else entry.agent = a;
       } else entry.agent = a;
       const t = entry.target;
       t.position.set(entry.agent.x, entry.agent.y, entry.agent.z);
       // A big animal is scanned by its body, not its centre: shrink the range check by half its length.
-      t.radius = entry.agent.def.scanRadius + bodyLen(entry.agent) * 0.5;
+      t.radius = Math.max(
+        entry.agent.def.scanRadius + bodyLen(entry.agent) * 0.5,
+        scanRadiusFloorM,
+      );
       this.targets.push(t);
     }
   }

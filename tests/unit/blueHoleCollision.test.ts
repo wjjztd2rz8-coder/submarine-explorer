@@ -91,18 +91,28 @@ for (const tier of ['low', 'medium', 'high'] as const) {
           probes.push({ x, penetration, hit: collided, clearance, stable: repeated.distanceTo(p) });
         }
       }
+      evidence.push({ tier, roof: probes });
       expect(probes).toHaveLength(10);
-      // Wall boxes omit the roof's vertical rise. Keep the measured error bounded
-      // until they follow the roof too; the apron below still requires exact clearance.
+      // Raised roof faces must register shallow contacts too. Keep the tighter
+      // shallow-contact budget; deep contacts retain the coarse wall proxy budget.
       for (const p of probes) {
         expect(p.clearance, `roof clearance at ${p.x}/${p.penetration}`).toBeGreaterThanOrEqual(
           radius - 0.85,
         );
         expect(p.stable).toBeLessThan(1e-4);
-        if (p.penetration === 2.5) expect(p.hit).toBe(true);
-        if (!p.hit) expect(p.clearance).toBeGreaterThanOrEqual(radius - 0.46);
+        expect(p.hit, `roof contact at ${p.x}/${p.penetration}`).toBe(true);
+        if (p.penetration === 0.4) expect(p.clearance).toBeGreaterThanOrEqual(radius - 0.43);
       }
-      expect(probes.filter((p) => !p.hit).length).toBeLessThanOrEqual(1);
+      // The roof proxy must still leave independently clear water above the gallery open.
+      const top = Math.max(...triangles.flatMap((t) => [t.a.y, t.b.y, t.c.y]));
+      for (const x of [-16, -8, 0, 8, 16]) {
+        const clear = new THREE.Vector3(x, 0, -14).applyMatrix4(roof.matrixWorld);
+        clear.y = top + radius + 1;
+        expect(distance(triangles, clear)).toBeGreaterThan(radius);
+        const before = clear.clone();
+        expect(props.collide(clear, radius, new THREE.Vector3())).toBe(false);
+        expect(clear).toEqual(before);
+      }
     } finally {
       terrain.dispose();
     }
