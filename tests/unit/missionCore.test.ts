@@ -121,6 +121,61 @@ describe('parseMission', () => {
 });
 
 describe('manifest + loaders', () => {
+  it('ships every site once in increasing briefing depth with titles from mission data', async () => {
+    // Guard missing/duplicate picker rows and accidental return to the old catalog order.
+    const docs = import.meta.glob('../../data/landmarks/*/mission.json', {
+      eager: true,
+      import: 'default',
+    });
+    const files: Record<string, unknown> = { '/data/landmarks/index.json': landmarkIndex };
+    const ids = Object.keys(docs).map((path) => path.split('/').at(-2)!);
+    for (const [path, doc] of Object.entries(docs)) files[path.replace('../..', '')] = doc;
+    expect(landmarkIndex.landmarks).toHaveLength(13);
+    expect(new Set(landmarkIndex.landmarks).size).toBe(13);
+    expect([...landmarkIndex.landmarks].sort()).toEqual(ids.sort());
+
+    const list = await loadMissionSummaries(fakeFetch(files), quiet);
+    expect(list.map((m) => m.id)).toEqual(landmarkIndex.landmarks);
+    const depths = list.map((m) => m.depthM);
+    expect(depths.every((depth) => typeof depth === 'number' && depth > 0)).toBe(true);
+    expect(depths).toEqual([...depths].sort((a, b) => a! - b!));
+    for (const summary of list) {
+      const doc = files[`/data/landmarks/${summary.id}/mission.json`] as typeof MINIMAL;
+      expect(summary.title).toBe(doc.title);
+      expect(summary.depthM).toBe(doc.briefing.depth_m);
+    }
+    expect(list[0].title).toBe('Great Blue Hole: Lighthouse Reef');
+    expect(list.at(-1)?.id).toBe('challenger-deep');
+  });
+
+  it('keeps manifest order for equal depths even when requests complete in reverse', async () => {
+    // The authored manifest position is the stable tie-break, independent of network timing.
+    let release!: () => void;
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const completed: string[] = [];
+    const fetchFiles = fakeFetch({
+      '/data/landmarks/index.json': { version: 1, landmarks: ['z', 'a'] },
+      '/data/landmarks/z/mission.json': { ...MINIMAL, title: 'Z' },
+      '/data/landmarks/a/mission.json': { ...MINIMAL, title: 'A' },
+    });
+    const list = await loadMissionSummaries(async (url) => {
+      if (url.endsWith('/z/mission.json')) await held;
+      if (url.endsWith('/a/mission.json')) release();
+      completed.push(url);
+      return fetchFiles(url);
+    }, quiet);
+    expect(completed.slice(1)).toEqual([
+      '/data/landmarks/a/mission.json',
+      '/data/landmarks/z/mission.json',
+    ]);
+    expect(list.map((m) => [m.id, m.depthM, m.title])).toEqual([
+      ['z', 3800, 'Z'],
+      ['a', 3800, 'A'],
+    ]);
+  });
+
   it('parses data/landmarks/index.json', () => {
     expect(parseMissionIndex({ version: 1, landmarks: ['titanic', 'x', 'x', '../no', 3] })).toEqual(
       ['titanic', 'x'],
