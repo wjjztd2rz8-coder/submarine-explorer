@@ -321,6 +321,11 @@ describe('vent haze draw budget', () => {
     const haze = scene.getObjectByName('ventHaze') as Points;
     expect(haze.geometry.getAttribute('position').count).toBe(3);
     expect(haze.material).toMatchObject({ uniforms: { uStrength: { value: 0.5 } } });
+    // Flank glow: lights sit beside the stacks, below their tops, so the crust ledges catch them.
+    const lights = scene.children.filter((o) => o.name.startsWith('presetGlow'));
+    expect(lights.length).toBeGreaterThan(0);
+    expect(lights.length).toBeLessThanOrEqual(3);
+    expect(preset.stats.lights).toBe(lights.length);
     preset.exit();
     expect(scene.children).toHaveLength(0);
   });
