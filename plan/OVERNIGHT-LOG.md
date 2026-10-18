@@ -1526,3 +1526,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (smoke + project-base green; no full e2e):** Sonnet V-titanic-opening (closer opening framing, lane-tinted steel plates and grazing rim light in the shared plate shader, so other steel wrecks shift slightly; ~4.0; hull ~25% of frame height, portrait still small). Prettier fix on STATUS.md.
 - **Codex:** 2550-2600 queued; dispatch waits on weekly pace.
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-18 09:53 CDT headless run 62 (Claude)
+
+- **Merged and pushed (smoke + project-base green; no full e2e):** Sonnet V-beebe-flank (warmer crust, glow lights moved to graze flank ledges via two vent preset params; ~3.5 to ~4.0, still one orange-brown family).
+- **CI:** run 61 red on one shard: f-bughunt-18 "restore the global chase radius" timed out at 60 s; passes locally 8/8, treated as load flake (watch for recurrence). No tag.
+- **Codex:** 2550-2600 queued; dispatch waits on weekly pace.
+- **Needs owner:** real-phone Low-tier play.
