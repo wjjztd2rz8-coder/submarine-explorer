@@ -104,7 +104,7 @@ describe('CameraRig terrain collision', () => {
 });
 
 describe('CameraRig look-ahead and bank', () => {
-  it('keeps the boat in the lower third at both cruise and boost speeds', () => {
+  it('keeps the boat in the lower third at both low and high speeds', () => {
     const pos = new Vector3(0, -2000, 0);
     const slow = new CameraRig(cam, 16 / 9);
     const fast = new CameraRig(cam, 16 / 9);

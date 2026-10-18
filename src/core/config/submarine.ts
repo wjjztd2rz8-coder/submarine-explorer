@@ -30,7 +30,7 @@ export interface SubmarineConfig {
   buoyancyAccel: number;
   /** Speed above which we clamp, as a safety net (m/s). */
   maxSpeed: number;
-  /** Independent vertical velocity cap; a forward boost cannot increase descent speed. */
+  /** Independent vertical velocity cap; forward thrust cannot increase descent speed. */
   maxVerticalSpeed: number;
   /** Depth (negative metres) at which the hull fails. */
   crushDepth: number;
@@ -49,8 +49,6 @@ export interface SubmarineConfig {
    * fine control near centre (station-keeping) while still reaching full thrust.
    */
   thrustCurve: number;
-  /** Multiplier applied to thrust (and ballast) while the boost key is held. */
-  boostMultiplier: number;
   /**
    * Angular dynamics. Rather than snapping the rotation rate to the stick, the
    * rate is itself integrated, so the boat has rotational inertia: it takes
@@ -165,7 +163,6 @@ export const DEFAULT_SUBMARINE: SubmarineConfig = {
   collisionSpeedPenalty: 0.35,
 
   thrustCurve: 1.6,
-  boostMultiplier: 1.8,
   // damping ~2.8 => the boat settles into a turn in about a third of a second
   // and carries a little rotation after you release the stick.
   yawAccel: 2.8,

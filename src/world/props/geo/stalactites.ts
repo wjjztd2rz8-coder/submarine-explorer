@@ -624,13 +624,17 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
   }
 
   // --- stalactites: clusters of fluted pendants hung from the underside of the shelf
-  const colliders: THREE.Box3[] = wallColliders(profile, W, D, H, 12, gnd, {
-    disp: wallDisp,
-    edgeStart: EDGE_START,
-    plan,
-    liftAt,
-    sinkAt,
-  });
+  const wallBoxes = (rise?: typeof roofRise): THREE.Box3[] =>
+    wallColliders(profile, W, D, H, 12, gnd, {
+      disp: wallDisp,
+      edgeStart: EDGE_START,
+      plan,
+      liftAt,
+      sinkAt,
+      rise,
+    });
+  const colliders = wallBoxes();
+  const wallBoxCount = colliders.length;
   colliders.push(...talusColliders(talus, W));
   const parts: THREE.BufferGeometry[] = [];
   const longest: { x: number; z: number; y: number; len: number; r: number }[] = [];
@@ -721,9 +725,12 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
 
   const bounds = wall.boundingBox!.clone().union(apron.boundingBox!);
   bounds.min.y = Math.min(bounds.min.y, -0.1 * H);
+  // The distant visual proxy keeps its authored shape; only physics follows the roof rise.
+  const impostor = impostorFromBoxes(colliders, bounds, 0x8f8878);
+  if (hood) colliders.splice(0, wallBoxCount, ...wallBoxes(roofRise));
   return {
     full,
-    impostor: impostorFromBoxes(colliders, bounds, 0x8f8878),
+    impostor,
     bounds,
     colliders,
     collisionSurfaces: [apronMesh],

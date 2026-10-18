@@ -48,7 +48,15 @@ export interface ScanEmitter {
 export type ScannerConfig = Pick<
   ScanConfig,
   'coneHalfAngleDeg' | 'closeRangeM' | 'decayPerSecond' | 'progressEventHz' | 'hintRangeFactor'
->;
+> & { radiusFloorM?: number };
+
+/** Apply the mode floor after sensor scaling and any mission approach cap. */
+export function resolveScanRadius(
+  radius: number,
+  config: Pick<ScannerConfig, 'radiusFloorM'>,
+): number {
+  return Math.max(radius, config.radiusFloorM ?? 0);
+}
 
 export type ScanPhase = 'idle' | 'scanning' | 'interrupted';
 export type AbortReason = GameEvents['scan:aborted']['reason'];
@@ -59,6 +67,8 @@ export interface ScanView {
   /** The POI being scanned, or decaying after an interruption. */
   activeId: string | null;
   activeName: string;
+  /** Distance to the held or interrupted target, even when another contact is nearer. */
+  activeDistance: number;
   /** 0..1 progress on the active POI. */
   progress: number;
   /** Best scannable POI right now (in range AND facing), if any. */
@@ -119,6 +129,7 @@ export class Scanner {
     phase: 'idle',
     activeId: null,
     activeName: '',
+    activeDistance: Infinity,
     progress: 0,
     candidateId: null,
     nearestId: null,
@@ -294,7 +305,7 @@ export class Scanner {
         candidate = t;
         candidateDist = g.distance;
       }
-      const hintRange = t.radius * this.config.hintRangeFactor;
+      const hintRange = resolveScanRadius(t.radius, this.config) * this.config.hintRangeFactor;
       if (
         g.distance <= hintRange &&
         (!nearestGeo ||
@@ -364,7 +375,7 @@ export class Scanner {
     v.nearestId = nearest?.id ?? null;
     v.nearestName = nearest?.name ?? '';
     v.nearestDistance = nearestGeo?.distance ?? Infinity;
-    v.nearestRadius = nearest?.radius ?? 0;
+    v.nearestRadius = nearest ? resolveScanRadius(nearest.radius, this.config) : 0;
     v.nearestInRange = nearestGeo?.inRange ?? false;
     v.nearestFacing = nearestGeo?.facing ?? false;
     v.nearestScanned = nearest ? this.isScanned(nearest.landmarkId, nearest.id) : false;
@@ -373,6 +384,7 @@ export class Scanner {
     v.nearestVertDeg = nearestGeo?.vertDeg ?? 0;
 
     this.updateObjective(position, forward);
+    v.activeDistance = activeGeo?.distance ?? Infinity;
 
     if (held && candidate) {
       if (this.active !== candidate) {
@@ -385,6 +397,7 @@ export class Scanner {
         }
         this.clearActive();
         this.active = candidate;
+        v.activeDistance = position.distanceTo(candidate.position);
       }
       if (v.phase !== 'scanning') {
         v.phase = 'scanning';
@@ -441,7 +454,7 @@ export class Scanner {
     v.objectiveId = t.id;
     v.objectiveName = t.name;
     v.objectiveDistance = g.distance;
-    v.objectiveRadius = t.radius;
+    v.objectiveRadius = resolveScanRadius(t.radius, this.config);
     v.objectiveInRange = g.inRange;
     v.objectiveTurnDeg = g.turnDeg;
     v.objectiveVertDeg = g.vertDeg;
@@ -472,6 +485,7 @@ export class Scanner {
     v.phase = 'idle';
     v.activeId = null;
     v.activeName = '';
+    v.activeDistance = Infinity;
     v.progress = 0;
     v.lastAbort = null;
   }
@@ -481,7 +495,8 @@ export class Scanner {
     const dy = t.position.y - p.y;
     const dz = t.position.z - p.z;
     const distance = Math.hypot(dx, dy, dz);
-    const inRange = distance <= t.radius && -p.y >= (t.minDepthM ?? 0);
+    const inRange =
+      distance <= resolveScanRadius(t.radius, this.config) && -p.y >= (t.minDepthM ?? 0);
     let cos = 1;
     if (distance > 1e-6) {
       const fl = Math.hypot(f.x, f.y, f.z) || 1;

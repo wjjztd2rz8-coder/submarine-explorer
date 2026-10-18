@@ -124,6 +124,22 @@ root_e2e() {
   e2e_specs=()
   if [[ "$e2e_mode" == smoke ]]; then
     e2e_specs=(tests/e2e/smoke.spec.ts)
+    # Keep authored openings and camera reset/zoom regressions in local feedback.
+    local spawn_camera_specs=(
+      tests/e2e/opening-framing.spec.ts
+      tests/e2e/d2-camera.spec.ts
+      tests/e2e/d-input-hud.spec.ts
+      tests/e2e/f-bughunt-18.spec.ts
+    )
+    local changed_paths
+    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      changed_paths=$(git diff --name-only main...HEAD && git diff --name-only HEAD &&
+        git ls-files --others --exclude-standard) || return 1
+      if grep -Eqi '^(data/landmarks/|src/game/Spawn\.ts$|src/.*camera.*\.(ts|js)$|src/game/DeepOpeningSpawn\.ts$)' <<<"$changed_paths"; then
+        e2e_specs+=("${spawn_camera_specs[@]}")
+        echo "Smoke also runs spawn/camera specs: ${spawn_camera_specs[*]}"
+      fi
+    fi
   fi
   # Always let Playwright start/own its server; a port conflict fails early
   # instead of silently depending on another task's preview lifetime/build.
@@ -188,4 +204,11 @@ for name in python content build unit e2e e2e-base attribution prettier; do
     prettier) gate "$name" npx prettier --check . ;;
   esac
 done
+summary_e2e=none
+case "$phase" in all|e2e|e2e-base) summary_e2e="$e2e_mode" ;; esac
+if (( fail )); then
+  echo "FAIL gates (e2e=$summary_e2e)"
+else
+  echo "PASS gates (e2e=$summary_e2e)"
+fi
 exit $fail

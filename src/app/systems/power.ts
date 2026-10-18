@@ -66,7 +66,6 @@ export function createPowerSystem(): GameSystem {
         const empty = power.step(steps * f.fixedDt * sub.simSpeed, {
           throttle: state.throttle,
           ballast: state.ballast,
-          boost: state.boost,
           lights: headlights.on,
           sensors: state.scan || sonar.visible,
         });

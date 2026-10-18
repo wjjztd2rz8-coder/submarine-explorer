@@ -7,6 +7,12 @@ import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { ModelCache } from '../../src/world/PropLoader.js';
 import { Props } from '../../src/world/Props.js';
 import { validateMeta } from '../../src/world/TileLoader.js';
+import { EventBus } from '../../src/core/EventBus.js';
+import { sampleAtmosphere } from '../../src/render/Atmosphere.js';
+import { latLonToWorld } from '../../src/util/geo.js';
+import { Terrain } from '../../src/world/Terrain.js';
+import { Currents } from '../../src/world/Currents.js';
+import { PresetSystem } from '../../src/world/presets/Presets.js';
 
 /**
  * Conservative static prop cost: every prop at once, with BOTH internal LOD
@@ -132,5 +138,279 @@ describe('catalog site static prop budgets', () => {
         }
       });
     }
+  }
+});
+
+/**
+ * CPU workload estimate, not GPU time: project actual point buffers as square
+ * footprints, before texture/alpha/fog/depth rejection. All full props remain
+ * present (no LOD/frustum/occlusion discount). Plumes use their compiled uniforms
+ * and seeded clear-fluid vertex motion at fixed times; no browser is required.
+ */
+function effectFootprints(root: THREE.Object3D, camera: THREE.PerspectiveCamera, time: number) {
+  const width = 1280;
+  const height = 720;
+  const rectangles: number[][] = [];
+  const layers: Record<
+    string,
+    { draws: number; points: number; squareM2: number; pixels: number }
+  > = {};
+  root.updateMatrixWorld(true);
+  camera.updateMatrixWorld(true);
+  root.traverse((object) => {
+    // A new transparent mesh/sprite must enter the census, not silently bypass
+    // the point-sprite budget. Shipped Lost City props have neither.
+    expect(object instanceof THREE.Sprite).toBe(false);
+    if (object instanceof THREE.Mesh) {
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      expect(materials.some((material) => material.transparent)).toBe(false);
+    }
+    if (!(object instanceof THREE.Points)) return;
+    const material = object.material;
+    expect(Array.isArray(material)).toBe(false);
+    if (Array.isArray(material)) return;
+    expect(material.transparent).toBe(true);
+    expect(material.depthWrite).toBe(false);
+    const positions = object.geometry.getAttribute('position');
+    const seeds = object.geometry.getAttribute('aSeed');
+    const layer = (layers[object.name] ??= { draws: 0, points: 0, squareM2: 0, pixels: 0 });
+    layer.draws++;
+    layer.points += positions.count;
+    let uniforms: Record<string, THREE.IUniform> = {};
+    if (object.name === 'plume') {
+      expect(material).toBeInstanceOf(THREE.PointsMaterial);
+      const shader = {
+        uniforms,
+        vertexShader: THREE.ShaderLib.points.vertexShader,
+        fragmentShader: THREE.ShaderLib.points.fragmentShader,
+      };
+      material.onBeforeCompile(shader, {} as THREE.WebGLRenderer);
+      // Fail if this fixture stops representing the shipped clear-fluid shader.
+      expect(shader.vertexShader).toContain('uBase * aSeed.z + uSpread * t');
+      expect(shader.vertexShader).toContain('size * (0.35 + 1.5 * vRise)');
+    } else if (material instanceof THREE.ShaderMaterial) {
+      expect(object.name).toBe('ventShimmer');
+      expect(material.vertexShader).toContain('placePoint(position, uSize)');
+      uniforms = material.uniforms;
+    } else expect(object.name).toBe('vent-fringe');
+    for (let i = 0; i < positions.count; i++) {
+      const point = new THREE.Vector3().fromBufferAttribute(positions, i);
+      let size = material instanceof THREE.PointsMaterial ? material.size : uniforms.uSize.value;
+      if (object.name === 'plume') {
+        const phase = seeds.getX(i) + time * uniforms.uSpeed.value * (0.85 + 0.3 * seeds.getW(i));
+        const t = phase - Math.floor(phase);
+        const angle = seeds.getY(i) * 6.2831853 + t * (1.5 + seeds.getZ(i));
+        const radius =
+          uniforms.uBase.value * seeds.getZ(i) +
+          uniforms.uSpread.value * t * (0.35 + 0.65 * seeds.getW(i));
+        const drift = t * t * uniforms.uDrift.value;
+        point.set(
+          Math.cos(angle) * radius + drift,
+          t * uniforms.uHeight.value,
+          Math.sin(angle) * radius + drift * 0.3,
+        );
+        size *= 0.35 + 1.5 * t;
+      }
+      layer.squareM2 += size * size;
+      point.applyMatrix4(object.matrixWorld).applyMatrix4(camera.matrixWorldInverse);
+      const depth = -point.z;
+      if (depth < camera.near || depth > camera.far) continue;
+      // PointsMaterial uses H/2; the preset uses H/(2*tan(FOV/2)).
+      const scale =
+        material instanceof THREE.ShaderMaterial
+          ? height / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)))
+          : height / 2;
+      let pixels = (size * scale) / depth;
+      if (material instanceof THREE.ShaderMaterial) pixels = THREE.MathUtils.clamp(pixels, 1, 256);
+      pixels = Math.max(1, pixels); // Conservative minimum raster footprint.
+      point.applyMatrix4(camera.projectionMatrix);
+      const x = ((point.x + 1) * width) / 2;
+      const y = ((point.y + 1) * height) / 2;
+      const x0 = Math.max(0, x - pixels / 2),
+        x1 = Math.min(width, x + pixels / 2);
+      const y0 = Math.max(0, y - pixels / 2),
+        y1 = Math.min(height, y + pixels / 2);
+      if (x1 <= x0 || y1 <= y0) continue;
+      layer.pixels += (x1 - x0) * (y1 - y0);
+      rectangles.push([Math.floor(x0), Math.floor(y0), Math.ceil(x1), Math.ceil(y1)]);
+    }
+  });
+  // Difference grid: outward-rounded squares yield a conservative pixel overlap
+  // census without rasterizing a game frame. Alpha/soft edges are not discounted.
+  const stride = width + 1;
+  const grid = new Int32Array(stride * (height + 1));
+  for (const [x0, y0, x1, y1] of rectangles) {
+    grid[y0 * stride + x0]++;
+    grid[y0 * stride + x1]--;
+    grid[y1 * stride + x0]--;
+    grid[y1 * stride + x1]++;
+  }
+  let covered = 0,
+    peakOverlap = 0;
+  for (let y = 0; y < height; y++) {
+    let row = 0;
+    for (let x = 0; x < width; x++) {
+      const at = y * stride + x;
+      row += grid[at];
+      grid[at] = row + (y ? grid[at - stride] : 0);
+      if (grid[at]) covered++;
+      peakOverlap = Math.max(peakOverlap, grid[at]);
+    }
+  }
+  const pixels = Object.values(layers).reduce((sum, layer) => sum + layer.pixels, 0);
+  return { layers, pixels, screenLayers: pixels / (width * height), covered, peakOverlap };
+}
+
+describe('Lost City transparent effect fill budget', () => {
+  for (const tier of ['low', 'high'] as const) {
+    it(`${tier}: bounds stacked close-approach sprites; preserves Low's existing effects`, async () => {
+      const meta = validateMeta(
+        JSON.parse(readFileSync('data/tiles/lost-city/meta.json', 'utf8')),
+        'lost-city',
+      );
+      const bytes = readFileSync('data/tiles/lost-city/heightmap.bin');
+      const terrain = new Terrain(
+        { meta, heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows) },
+        DEFAULT_CONFIG.terrain,
+        tier,
+      );
+      const props = new Props(meta, terrain, DEFAULT_CONFIG.props, tier);
+      const mission = JSON.parse(readFileSync('data/landmarks/lost-city/mission.json', 'utf8'));
+      const scene = new THREE.Scene();
+      const currents = new Currents('lost-city', 'lost-city', async () => null);
+      await currents.ready;
+      let presets: PresetSystem | undefined;
+      try {
+        await props.load('props.json', 'lost-city', async () =>
+          JSON.parse(readFileSync('data/landmarks/lost-city/props.json', 'utf8')),
+        );
+        expect(props.stats.failed).toBe(0);
+        expect(props.stats.skipped).toBe(0);
+        expect(props.placed).toHaveLength(12);
+        for (const prop of props.placed) scene.add(prop.root);
+        const hero = props.placed.find((p) => p.def.id === 'poseidon-tower')!;
+        // The existing golden close/approach direction, aimed at the orifice.
+        const target = hero.root.localToWorld(new THREE.Vector3(0, 60, 0));
+        const camera = new THREE.PerspectiveCamera(
+          DEFAULT_CONFIG.camera.fovDeg,
+          1280 / 720,
+          0.1,
+          5000,
+        );
+        const measurements = [];
+        for (const baseline of [true, false]) {
+          presets = new PresetSystem({
+            scene,
+            bus: new EventBus(),
+            config: DEFAULT_CONFIG,
+            tier,
+            params: new URLSearchParams(),
+            tileId: 'lost-city',
+            landmarkId: 'lost-city',
+            missionId: null,
+            terrain,
+            props,
+            discovery: { loaded: true, pois: [] },
+            sub: {
+              position: target,
+              velocity: new THREE.Vector3(),
+              floorFor: (ground) => ground + 12,
+            },
+            currents,
+            currentMode: 'off',
+            atmosphere: { ambient: new THREE.AmbientLight(), caustics: null },
+            headlights: { on: false },
+            toWorld: (lat, lon) => latLonToWorld(meta, lat, lon),
+            fetchJson: async (url) =>
+              url.endsWith('/mission.json')
+                ? {
+                    ...mission,
+                    environment: {
+                      ...mission.environment,
+                      overrides: {
+                        ...mission.environment.overrides,
+                        ...(baseline ? { shimmerStrength: 0.03 } : {}),
+                      },
+                    },
+                  }
+                : [],
+          });
+          await presets.ready;
+          const samples = [];
+          for (const range of [70, 32, 10]) {
+            camera.position
+              .copy(target)
+              .add(new THREE.Vector3(range / Math.SQRT2, 6, range / Math.SQRT2));
+            camera.lookAt(target);
+            for (const time of [0, 5, 10]) {
+              presets.update(
+                1 / 60,
+                0,
+                sampleAtmosphere(DEFAULT_CONFIG.water, target.y),
+                camera,
+                720,
+                time,
+              );
+              expect(presets.entered).toBe(true);
+              samples.push({ range, time, ...effectFootprints(scene, camera, time) });
+            }
+          }
+          measurements.push(samples);
+          presets.dispose();
+          presets = undefined;
+        }
+        if (diagnostics) {
+          mkdirSync('.cache/perf-budget', { recursive: true });
+          writeFileSync(
+            `.cache/perf-budget/lost-city-fill-${tier}.json`,
+            JSON.stringify(measurements, null, 2),
+          );
+        }
+        if (tier === 'low') {
+          expect(measurements[1]).toEqual(measurements[0]);
+          // Freeze the pre-change Low workload too: paired equality alone
+          // would miss a shared change to both sides of the comparison.
+          for (const [range, pixels] of [
+            [70, 10_430.157406],
+            [32, 42_124.961467],
+            [10, 64_347.673987],
+          ]) {
+            expect(
+              Math.max(...measurements[1].filter((s) => s.range === range).map((s) => s.pixels)),
+            ).toBeCloseTo(pixels, 4);
+          }
+        }
+        // Guard the High stutter workload: a redundant field-wide shimmer
+        // must not return over the tower's existing clear-fluid plumes.
+        for (const sample of measurements[1]) {
+          expect(Object.keys(sample.layers).sort()).toEqual(['plume', 'vent-fringe']);
+          expect(sample.layers.plume.draws).toBe(14);
+          expect(sample.layers.plume.points).toBe(tier === 'low' ? 350 : 980);
+          expect(sample.layers['vent-fringe'].draws).toBe(12);
+          expect(sample.layers['vent-fringe'].points).toBe(392);
+          expect(sample.layers['vent-fringe'].squareM2).toBeCloseTo(250.88, 6);
+          expect(sample.pixels).toBeGreaterThan(8_000); // No blank scene can pass.
+          if (tier === 'high') {
+            expect(sample.pixels).toBeLessThanOrEqual(140_000);
+          }
+        }
+        if (tier === 'high') {
+          expect(Math.max(...measurements[0].map((s) => s.pixels))).toBeGreaterThan(200_000);
+          for (let i = 0; i < measurements[0].length; i++) {
+            expect(measurements[0][i].layers.ventShimmer.points).toBe(36);
+            expect(measurements[0][i].layers.ventShimmer.squareM2).toBe(2916);
+            expect(measurements[1][i].pixels).toBeLessThan(measurements[0][i].pixels * 0.65);
+            expect(measurements[1][i].peakOverlap).toBeLessThan(measurements[0][i].peakOverlap);
+          }
+        }
+        // Permanent marine snow is separate from site effects; preserve its
+        // existing Low count and size ceiling as well as High's bounded pool.
+        expect(DEFAULT_CONFIG.water.tiers[tier].snowCount).toBe(tier === 'low' ? 300 : 3000);
+        expect(DEFAULT_CONFIG.water.snowMaxSizePx).toBe(3);
+      } finally {
+        presets?.dispose();
+        terrain.dispose();
+      }
+    });
   }
 });

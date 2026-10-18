@@ -1,4 +1,4 @@
-import { renderReview, reviewScreenshot } from './helpers/render.js';
+import { missionSpawnShot, renderReview, reviewScreenshot } from './helpers/render.js';
 import { expect, test as freshTest, type Page } from '@playwright/test';
 import { test as experiencedTest } from './helpers/unlocked.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
@@ -30,6 +30,59 @@ import { type PerfStats } from '../../src/app/systems/quality.js';
 import { waitForFrames } from './helpers/frames.js';
 import { type GameConfig } from '../../src/core/Config.js';
 import type * as THREE from 'three';
+import catalog from '../../data/landmarks/index.json' with { type: 'json' };
+import { HERO_SITES } from '../../src/game/Cosmetics.js';
+// @ts-expect-error The existing golden URL builder is JavaScript.
+import { goldenUrl } from '../../tools/golden-options.mjs';
+
+freshTest.describe('non-hero mission spawn Low portrait capture', () => {
+  freshTest.use({
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 1,
+    isMobile: true,
+    hasTouch: true,
+    storageState: { cookies: [], origins: [] },
+    serviceWorkers: 'block',
+  });
+
+  for (const site of catalog.landmarks.filter((id) => !HERO_SITES.some((hero) => hero === id))) {
+    // Regression guard: ordinary runs omitted non-hero mission-spawn evidence and its golden entry.
+    freshTest(
+      `${site}: persists spawn PNG and golden manifest`,
+      async ({ page, baseURL }, info) => {
+        const errors: string[] = [];
+        page.on('pageerror', (error) => errors.push(error.message));
+        await pauseClockBeforeNavigation(page);
+        await page.goto(
+          goldenUrl(baseURL!, site, { mode: 'mission', tier: 'low' }, 'portrait').href,
+          {
+            waitUntil: 'domcontentloaded',
+          },
+        );
+        await clockFramesUntil(page, () => {
+          const g = window.__game as unknown as {
+            props: { loaded: boolean };
+            discovery: { loaded: boolean };
+            mission: Mission | null;
+            appState: string;
+          };
+          return !!(
+            window.__gameReady &&
+            g.props.loaded &&
+            g.discovery.loaded &&
+            g.mission &&
+            g.appState === 'dive'
+          );
+        });
+        await page.clock.runFor(34);
+        await page.evaluate(() => document.fonts.ready.then(() => {}));
+        await expect(page.locator('.briefing')).toBeHidden();
+        await missionSpawnShot(page, site, info.outputPath('golden'));
+        expect(errors).toEqual([]);
+      },
+    );
+  }
+});
 
 freshTest.describe('vent framing over real time', () => {
   const test = experiencedTest;
