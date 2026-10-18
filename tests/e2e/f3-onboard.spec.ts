@@ -257,7 +257,7 @@ test('desktop: Pause opens the controls card for the active device', async ({ pa
   const howTo = page.getByRole('dialog', { name: 'How to play', exact: true });
   await expect(howTo).toBeVisible();
   await expect(howTo).toContainText('Left stick');
-  await expect(howTo.locator('.how-to-tile svg')).toHaveCount(10);
+  await expect(howTo.locator('.how-to-tile svg')).toHaveCount(9);
   await expect(howTo.locator('.controls-card-tabs')).toBeVisible();
 });
 
@@ -371,7 +371,7 @@ test.describe('touch viewport', () => {
         await expect(dialog).toBeVisible();
         await expect(dialog).toContainText('Left stick');
         await expect(dialog).toContainText('Right slider');
-        await expect(dialog.locator('.how-to-tile svg')).toHaveCount(10);
+        await expect(dialog.locator('.how-to-tile svg')).toHaveCount(9);
         await expect(dialog.locator('.controls-card-tabs')).toBeHidden();
         await expect(dialog.getByRole('button', { name: 'Change keys' })).toHaveCount(0);
         await expect(page.locator('.settings')).toBeHidden();
@@ -449,7 +449,7 @@ test.describe('touch viewport', () => {
     const dialog = page.getByRole('dialog', { name: 'How to play', exact: true });
     await expect(dialog).toContainText('Left stick');
     await expect(dialog).toContainText('Right slider');
-    await expect(dialog.locator('.how-to-tile svg')).toHaveCount(10);
+    await expect(dialog.locator('.how-to-tile svg')).toHaveCount(9);
     await expect(dialog.locator('.controls-card-tabs')).toBeHidden();
     await shot(page, 'touch-controls-card');
   });

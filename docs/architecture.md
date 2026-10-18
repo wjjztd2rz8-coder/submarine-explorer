@@ -56,7 +56,7 @@ resolves modes and Daily conditions from pristine tuning —
 `src/core/Config.ts` `speedProfiles` (including descent) / `lightPresets` /
 `sensorPresets` hold the numeric presets. `Input`'s bindings are versioned
 `v3` (migrating v2), with defaults R/F pitch, Space rise, Ctrl-or-C sink,
-Shift boost, G scan, Q camera, X reset camera and no `ping` action. `ui/Journal.ts` (`game/JournalData.ts`)
+G scan, Q camera, X reset camera and no `ping` action. `ui/Journal.ts` (`game/JournalData.ts`)
 replaces the field guide as the `J` destination: a Civilopedia-style catalogue
 of site/POI/species entries built from existing content files, still reading
 `DiscoveryStore`'s unchanged `subexplorer.discoveries.v1` for unlocks, plus a
@@ -608,7 +608,7 @@ resolves modes and Daily conditions from pristine tuning —
 `src/core/Config.ts` `speedProfiles` (including descent) / `lightPresets` /
 `sensorPresets` hold the numeric presets. `Input`'s bindings are versioned
 `v3` (migrating v2), with defaults R/F pitch, Space rise, Ctrl-or-C sink,
-Shift boost, G scan, Q camera, X reset camera and no `ping` action. `ui/Journal.ts` (`game/JournalData.ts`)
+G scan, Q camera, X reset camera and no `ping` action. `ui/Journal.ts` (`game/JournalData.ts`)
 replaces the field guide as the `J` destination: a Civilopedia-style catalogue
 of site/POI/species entries built from existing content files, still reading
 `DiscoveryStore`'s unchanged `subexplorer.discoveries.v1` for unlocks, plus a

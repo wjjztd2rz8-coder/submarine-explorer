@@ -1,11 +1,47 @@
 import { resolveEffective } from '../../src/game/EffectiveSettings.js';
-import { EQUIPMENT, PROGRESS_CONFIG } from '../../src/core/config/progress.js';
+import { EQUIPMENT } from '../../src/core/config/progress.js';
 import { expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { Save, migrate, SETTINGS_STORAGE_KEY } from '../../src/core/Save.js';
 import { currentScale, MODES_CONFIG } from '../../src/core/config/modes.js';
 import { modesSystem } from '../../src/app/systems/modes.js';
 import type { GameContext } from '../../src/app/context.js';
+import titanicPois from '../../data/landmarks/titanic/pois.json' with { type: 'json' };
+
+it.each(['arcade', 'realistic'] as const)(
+  'resolves Titanic free-dive targets in %s from their authored data',
+  async (mode) => {
+    const save = new Save({ config: DEFAULT_CONFIG, storage: null });
+    save.setGameplayMode(mode);
+    const effective = resolveEffective(save.get(), mode, null);
+    const ready = Promise.resolve();
+    const ctx = {
+      discovery: {
+        ready,
+        pois: titanicPois.pois.map((p) => ({ id: p.id, radius: p.radius_m })),
+      },
+      effective,
+    } as unknown as GameContext;
+    try {
+      modesSystem.init!(ctx);
+      await ready;
+      for (const poi of ctx.discovery.pois) {
+        const authored = titanicPois.pois.find((p) => p.id === poi.id)!.radius_m;
+        expect(poi.radius).toBe(
+          Math.max(mode === 'arcade' ? 100 : 0, authored * effective.sensor.scanRadiusMultiplier),
+        );
+      }
+      for (const id of ['titanic-bow', 'titanic-stern']) {
+        expect(ctx.baseScanRadii.get(id)).toBe(30);
+        expect(ctx.discovery.pois.find((p) => p.id === id)!.radius).toBe(
+          mode === 'arcade' ? 100 : 36,
+        );
+      }
+    } finally {
+      modesSystem.dispose?.();
+    }
+  },
+);
 
 it('does not apply sensor radii after disposal when the previous site finishes loading', async () => {
   let ready!: () => void;
@@ -15,7 +51,7 @@ it('does not apply sensor radii after disposal when the previous site finishes l
   const context = (loaded: Promise<void>) =>
     ({
       discovery: { ready: loaded, pois: [{ id: 'target', radius: 10 }] },
-      effective: { sensor: { scanRadiusMultiplier: 2 } },
+      effective: { sensor: { scanRadiusMultiplier: 2 }, scan: { radiusFloorM: 100 } },
     }) as unknown as GameContext;
   const old = context(pending);
   const next = context(Promise.resolve());
@@ -27,7 +63,7 @@ it('does not apply sensor radii after disposal when the previous site finishes l
     await pending;
     expect(old.discovery.pois[0].radius).toBe(10);
     expect(old.baseScanRadii.size).toBe(0);
-    expect(next.discovery.pois[0].radius).toBe(20);
+    expect(next.discovery.pois[0].radius).toBe(100);
     expect(next.baseScanRadii.get('target')).toBe(10);
   } finally {
     modesSystem.dispose?.();
@@ -132,6 +168,7 @@ it('resolves modes, Custom inheritance, fixed equipment and Daily from frozen in
       expect(resolveEffective(settings, 'custom', daily, base)).toEqual(first);
       expect(first.speedName).toBe(preset === 'realistic' ? 'research' : 'fast');
       expect(first.gameplay.visualHints).toBe(true);
+      expect(first.scan.radiusFloorM).toBe(preset === 'realistic' ? 0 : 100);
       const sensor = base.sensorPresets[preset === 'realistic' ? 'realistic' : 'extended'];
       expect(first.scan.hintRangeFactor).toBeCloseTo(
         base.scan.hintRangeFactor * sensor.hintRangeMultiplier * EQUIPMENT.scanDetail,
@@ -156,7 +193,6 @@ it('resolves modes, Custom inheritance, fixed equipment and Daily from frozen in
       expect(first.camera.lookAheadPerSpeed).toBe(
         base.speedProfiles[first.speedName].cameraLookAheadPerSpeed,
       );
-      expect(first.boostSeconds).toBeCloseTo(PROGRESS_CONFIG.boostSeconds);
     }
     expect(resolveEffective(settings, 'arcade', null, base).speedName).toBe('fast');
     expect(resolveEffective(settings, 'realistic', null, base).speedName).toBe('research');

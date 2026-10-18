@@ -279,10 +279,11 @@ describe('onboard save', () => {
 });
 
 describe('controls layouts', () => {
-  const key = (id: string): string => ({ scan: 'F', boost: 'Shift' })[id] ?? id;
+  const key = (id: string): string => ({ scan: 'F' })[id] ?? id;
   it('gives every device a non-empty layout', () => {
     for (const device of ['keyboard', 'gamepad', 'touch'] as const) {
       const groups = controlGroups(device, key as never);
+      expect(JSON.stringify(groups)).not.toMatch(/boost|right trigger|Shift/i);
       expect(groups.length).toBeGreaterThan(1);
       for (const g of groups) expect(g.rows.length).toBeGreaterThan(0);
     }

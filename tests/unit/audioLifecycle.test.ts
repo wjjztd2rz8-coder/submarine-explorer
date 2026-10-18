@@ -7,6 +7,7 @@ import { AmbientScore } from '../../src/audio/Score.js';
 import { MachineLoop, Soundscape, mechanicalCue } from '../../src/audio/Soundscape.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
+import { Save } from '../../src/core/Save.js';
 import { CaptionBus, type AudioFrameInput } from '../../src/audio/events.js';
 
 class Param {
@@ -22,6 +23,7 @@ class Param {
   cancelScheduledValues = vi.fn();
 }
 class Node {
+  type = '';
   gain = new Param();
   frequency = new Param();
   detune = new Param();
@@ -125,6 +127,76 @@ afterEach(() => {
 });
 
 describe('audio lifecycle', () => {
+  it.each([
+    {
+      name: 'new player',
+      saved: {},
+      expected: { masterVolume: 0.6, sfxVolume: 0.8, musicVolume: 0.5, muted: false },
+    },
+    {
+      name: 'custom volumes',
+      saved: { masterVolume: 0.43, sfxVolume: 0.27, musicVolume: 0.19 },
+      expected: { masterVolume: 0.43, sfxVolume: 0.27, musicVolume: 0.19, muted: false },
+    },
+    {
+      name: 'master zero',
+      saved: { masterVolume: 0 },
+      expected: { masterVolume: 0, sfxVolume: 0.8, musicVolume: 0.5, muted: false },
+    },
+    {
+      name: 'effects zero',
+      saved: { sfxVolume: 0 },
+      expected: { masterVolume: 0.6, sfxVolume: 0, musicVolume: 0.5, muted: false },
+    },
+    {
+      name: 'music zero',
+      saved: { musicVolume: 0 },
+      expected: { masterVolume: 0.6, sfxVolume: 0.8, musicVolume: 0, muted: false },
+    },
+    {
+      name: 'mute',
+      saved: { masterVolume: 0.43, muted: true },
+      expected: { masterVolume: 0.43, sfxVolume: 0.8, musicVolume: 0.5, muted: true },
+    },
+  ])(
+    'keeps $name gains through saved settings, first gesture and resume',
+    async ({ saved, expected }) => {
+      const save = new Save({ config: DEFAULT_CONFIG, storage: null });
+      save.save(saved);
+      const settings = save.get();
+      expect(settings).toMatchObject(expected);
+      const gains = {
+        masterGain: expected.muted ? 0 : expected.masterVolume,
+        sfxGain: expected.sfxVolume,
+        musicGain: expected.musicVolume,
+      };
+      const unlock = AudioEngine.prototype.unlock;
+      vi.spyOn(AudioEngine.prototype, 'unlock').mockImplementation(function (this: AudioEngine) {
+        // Saved gains must apply before even the first gesture's warmup source starts.
+        expect(this.master.gain.value).toBe(gains.masterGain);
+        expect(this.effects.gain.value).toBe(gains.sfxGain);
+        expect(this.bus('music').gain.value).toBe(gains.musicGain);
+        return unlock.call(this);
+      });
+      const audio = system();
+      audio.setSettings(settings);
+      audio.unlock();
+      await flush();
+      expect(audio.diagnostics).toMatchObject(gains);
+      const nodes = [...context().nodes];
+      audio.setPaused(true);
+      visibility(true);
+      audio.setPaused(false);
+      expect(audio.diagnostics.masterGain).toBe(0);
+      visibility(false);
+      await flush();
+      expect(audio.diagnostics).toMatchObject(gains);
+      expect(context().nodes).toEqual(nodes);
+      expect(save.get()).toEqual(settings);
+      audio.dispose();
+    },
+  );
+
   it('three dive-to-Home lifetimes silence audio and release voices, timers and visibility listeners', async () => {
     vi.useFakeTimers();
     const remove = vi.spyOn(doc, 'removeEventListener');
@@ -744,6 +816,78 @@ const cueCases = [
   () => (e: AudioEngine) => mechanicalCue(e, 'servo'),
 ];
 describe('audio graph ownership and peaks', () => {
+  it('softens only bed noise and crossfaded gain, retaining routing and suspended cleanup', () => {
+    expect(config.ambientBedGain).toBe(0.025);
+    expect(config.ambientNoiseLowpassHz).toBe(220);
+    const engine = new AudioEngine(config);
+    const ctx = context();
+    const initial = ctx.nodes.length;
+    const bed = new AmbientBeds(engine, config);
+    const nodes = ctx.nodes.slice(initial);
+    const drones = nodes.filter((node) => node.type === 'sine');
+    const noises = nodes.filter((node) => node.start.mock.calls.length && node.type !== 'sine');
+    expect(drones).toHaveLength(config.ambientBands.length);
+    expect(noises).toHaveLength(config.ambientBands.length);
+    const gains = drones.map((drone, i) => {
+      const gain = drone.connections[0];
+      const filter = noises[i].connections[0];
+      const noiseGain = filter.connections[0];
+      expect(drone.frequency.value).toBe(config.ambientBands[i].droneHz);
+      expect(filter.type).toBe('lowpass');
+      expect(filter.frequency.value).toBe(220);
+      expect(noiseGain.gain.value).toBe(config.ambientBands[i].noiseMix);
+      expect(noiseGain.connections).toEqual([gain]);
+      expect(gain.connections).toEqual([engine.bus('ambient')]);
+      expect(gain.gain.value).toBe(0);
+      return gain;
+    });
+    ctx.currentTime = 7;
+    for (const [depth, weights] of [
+      [0, [1, 0, 0, 0]],
+      [-10, [0.5, 0.5, 0, 0]],
+      [-110, [0, 0.5, 0.5, 0]],
+      [-600, [0, 0, 0.5, 0.5]],
+      [-5000, [0, 0, 0, 1]],
+    ] as const) {
+      bed.update(depth);
+      gains.forEach((gain, i) => {
+        expect(gain.gain.setTargetAtTime).toHaveBeenLastCalledWith(weights[i] * 0.025, 7, 1.5);
+      });
+      expect(gains.reduce((sum, gain) => sum + gain.gain.value, 0)).toBeCloseTo(0.025);
+    }
+    expect(ctx.state).toBe('suspended');
+    bed.stop();
+    bed.stop();
+    engine.dispose();
+    for (const node of nodes) expect(node.disconnect).toHaveBeenCalledOnce();
+    for (const source of [...drones, ...noises]) {
+      expect(source.start).toHaveBeenCalledOnce();
+      expect(source.stop).toHaveBeenCalledOnce();
+      expect(source.onended).toBeNull();
+    }
+  });
+
+  it('keeps master, effects, music and shared depth filtering independent of bed tuning', () => {
+    const engine = new AudioEngine(config);
+    const effects = engine.effects as unknown as Node;
+    const depth = engine.depthFilter as unknown as Node;
+    expect(engine.master.gain.value).toBe(0.6);
+    expect(engine.effects.gain.value).toBe(0.8);
+    expect(engine.bus('music').gain.value).toBe(0.5);
+    expect((engine.bus('music') as unknown as Node).connections).toEqual([engine.master]);
+    for (const name of ['ambient', 'sub', 'ui', 'sonar'] as const) {
+      expect(engine.bus(name).gain.value).toBe(1);
+      expect((engine.bus(name) as unknown as Node).connections).toEqual([engine.effects]);
+    }
+    expect(effects.connections).toEqual([engine.depthFilter]);
+    expect(depth.connections).toEqual([engine.master]);
+    expect(depth.frequency.value).toBe(18000);
+    engine.setDepth(-1000);
+    expect(depth.frequency.value).toBe(350);
+    expect(config.scoreGain).toBe(0.055);
+    engine.dispose();
+  });
+
   it.each(cueCases)('disconnects every cue node after its last source ends (%#)', (makeCue) => {
     const engine = new AudioEngine(config);
     const ctx = context();

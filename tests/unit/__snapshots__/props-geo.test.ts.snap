@@ -319,7 +319,7 @@ exports[`authored prop geometry golden > great-blue-hole high: retains buffers, 
     },
     "buffers": "c4aa4208b695cf1b7b2ace6c8c83ac15b4df464fe6f815594674efe23ce70245",
     "id": "karst-grotto-east",
-    "placement": "f1860ed302eb29e5af6d10a02dbc817d0906c2c43e61b2565afc0baa867534ad",
+    "placement": "454c3a025dfb4b85be3aff8194552df696509cf11a2a55a8e9fd3523d807db39",
     "ventTop": undefined,
   },
 ]
@@ -344,7 +344,7 @@ exports[`authored prop geometry golden > great-blue-hole low: retains buffers, m
     },
     "buffers": "78b9177f0c70aea1980f1ba81f1cdfcade7d49cfc1da0a9bbf7b64a227da0451",
     "id": "karst-grotto-east",
-    "placement": "e85def539b3a7d7eba88981c3bfcbf471971788afd000dedfdf70e4eb1ac2148",
+    "placement": "53c0f155e2e118e70bb7b4363fb4986b08a6c3e1bbcc139b0a5a12c2491f626a",
     "ventTop": undefined,
   },
 ]
@@ -369,7 +369,7 @@ exports[`authored prop geometry golden > great-blue-hole medium: retains buffers
     },
     "buffers": "6938bf50e2c7ac4621c22f2004fa430583e1180e48b4a0c9f4a3093fc8936d97",
     "id": "karst-grotto-east",
-    "placement": "76dfb39339a7103944dd19d9aa36ef21b20d4be848525c11c400435a6246a054",
+    "placement": "590215ba01094b247ab34e6a60387e7198df1e397461fd2154cb5697354d80aa",
     "ventTop": undefined,
   },
 ]

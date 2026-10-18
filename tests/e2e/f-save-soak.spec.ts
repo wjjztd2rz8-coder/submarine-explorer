@@ -118,7 +118,7 @@ test('four dives, mode switches, restarts and reloads preserve saves without sce
     );
     localStorage.setItem(
       'subexplorer.bindings.v1',
-      JSON.stringify({ version: 1, keys: { thrustForward: ['KeyI'], boost: [] } }),
+      JSON.stringify({ version: 1, keys: { thrustForward: ['KeyI'], toggleLights: [] } }),
     );
     localStorage.setItem(
       'subexplorer.discoveries.v1',
@@ -160,7 +160,7 @@ test('four dives, mode switches, restarts and reloads preserve saves without sce
       expect(saved.captions).toBe(true);
       expect(saved.settings).toContain('"captions":true');
       expect(saved.bindings.keys.thrustForward).toEqual(['KeyI']);
-      expect(saved.bindings.keys.boost).toEqual([]);
+      expect(saved.bindings.keys.toggleLights).toEqual([]);
       // Discovery migration stays in memory until a scan; its original blob survives.
       expect(saved.discoveries['blake-plateau-corals/old-scan']).toBe('2026-09-01T00:00:00Z');
       expect(saved.progress).toMatchObject({
