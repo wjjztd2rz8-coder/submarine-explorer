@@ -8,11 +8,12 @@
     "freeDive": {
       "hero": "bow-hull",
       "bearing": 100,
-      "range": 28,
-      "altitude": 26,
+      "range": 20,
+      "altitude": 18,
       "yawOffset": 0,
+      "chaseRadius": 64,
       "chaseOffsetX": -70,
-      "chaseOffsetY": -10
+      "chaseOffsetY": -24
     }
   }
 }

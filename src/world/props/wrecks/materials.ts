@@ -82,9 +82,13 @@ float pNoise(vec2 p) {
   float h1 = pHash(cell);
   float h2 = pHash(cell + 17.3);
   float lum = dot(diffuseColor.rgb, vec3(0.3, 0.59, 0.11));
+  // Lanes: bands of plates (rows a few strakes tall, columns a few plates wide) lean
+  // cool grey-brown or warm rust, so the hull is not one tint tiled.
+  float laneMix = 0.6 * pHash(vec2(floor(g.y * 0.5), 7.0)) + 0.4 * pHash(vec2(floor(g.x * 0.34), 1.0));
+  vec3 lane = mix(vec3(0.84, 0.94, 1.06), vec3(1.14, 0.98, 0.84), smoothstep(0.25, 0.75, laneMix));
   // Per-plate brightness; some plates bleached grey-brown, a few sprung dark.
   float tone = 0.7 + 0.5 * h1 - 0.25 * smoothstep(0.82, 0.97, h2);
-  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(lum), (0.3 + 0.35 * smoothstep(0.3, 0.9, h2))) * tone * vec3(1.0, 0.95, 0.9);
+  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(lum), (0.3 + 0.35 * smoothstep(0.3, 0.9, h2))) * tone * lane;
   // Stain band below the plate's upper seam, and long thin streaks running down.
   float down = 1.0 - fract(g.y);
   float band = smoothstep(0.0, 0.5, down) * (1.0 - smoothstep(0.5, 1.0, down));
@@ -93,6 +97,15 @@ float pNoise(vec2 p) {
   diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.2, 0.09, 0.05), stain);
 }
 #endif`,
+      )
+      .replace(
+        '#include <opaque_fragment>',
+        `// Cool grazing-angle edge light separates the hull from the dark water behind it.
+  {
+    float rimFacing = 1.0 - clamp(abs(dot(normalize(normal), normalize(vViewPosition))), 0.0, 1.0);
+    outgoingLight += vec3(0.05, 0.11, 0.14) * pow(rimFacing, 3.0);
+  }
+#include <opaque_fragment>`,
       );
   };
   mat.customProgramCacheKey = () => 'wreck-steel-plates';
