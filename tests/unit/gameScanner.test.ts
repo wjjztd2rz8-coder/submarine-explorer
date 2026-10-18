@@ -114,6 +114,55 @@ it('prefers an unscanned contact in range over a closer remote hint with a small
 });
 
 describe('Scanner', () => {
+  it.each(['fixed', 'wildlife', 'curiosity'] as const)(
+    'applies the Arcade floor to %s targets and restores data reach in Realistic',
+    (pool) => {
+      const contact = target({ radius: 30 });
+      const { scanner } = setup([]);
+      if (pool === 'fixed') scanner.setTargets([contact]);
+      if (pool === 'wildlife') scanner.setExtraTargets([contact]);
+      if (pool === 'curiosity') scanner.setSupplementalTargets([contact]);
+      scanner.setObjective(contact.id);
+      scanner.setConfig({ ...cfg, radiusFloorM: 100 });
+      scanner.update(0, AT, NORTH, false);
+      expect(scanner.view.candidateId).toBe(contact.id);
+      expect(scanner.view.nearestRadius).toBe(100);
+      if (pool === 'fixed') expect(scanner.view.objectiveRadius).toBe(100);
+      scanner.update(0, AT.clone().add(new Vector3(0, 0, 1)), NORTH, true);
+      expect(scanner.view.candidateId).toBeNull();
+      expect(scanner.isScanning).toBe(false);
+      scanner.setConfig({ ...cfg, radiusFloorM: 0 });
+      scanner.update(0, AT, NORTH, true);
+      expect(scanner.view.candidateId).toBeNull();
+      scanner.update(0, contact.position.clone().add(new Vector3(0, 0, 30)), NORTH, true);
+      expect(scanner.view.candidateId).toBe(contact.id);
+      expect(scanner.view.nearestRadius).toBe(30);
+    },
+  );
+
+  it.each([false, true])(
+    'selects the nearest adjacent POI at overlapping floor radii and holds its lock (reversed=%s)',
+    (reversed) => {
+      const a = target({ id: 'a', position: new Vector3(-10, -100, -80), radius: 30 });
+      const b = target({ id: 'b', position: new Vector3(10, -100, -80), radius: 30 });
+      const { scanner } = setup(reversed ? [b, a] : [a, b]);
+      scanner.setConfig({ ...cfg, radiusFloorM: 100 });
+      for (const [x, expected] of [
+        [-1, 'a'],
+        [1, 'b'],
+      ] as const) {
+        scanner.update(0, new Vector3(x, -100, 0), NORTH, false);
+        expect(scanner.view.nearestId).toBe(expected);
+        expect(scanner.view.candidateId).toBe(expected);
+      }
+      scanner.update(0.1, new Vector3(1, -100, 0), NORTH, true);
+      scanner.update(0.1, new Vector3(-1, -100, 0), NORTH, true);
+      expect(scanner.view.activeId).toBe('b');
+      expect(scanner.view.nearestId).toBe('b');
+      expect(scanner.view.progress).toBeCloseTo(0.1);
+    },
+  );
+
   it.each(['range', 'facing', 'logged'] as const)(
     'falls back to an eligible sample when the objective is unavailable through %s',
     (reason) => {

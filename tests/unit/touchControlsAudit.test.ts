@@ -637,11 +637,13 @@ it('scan card guidance points at the mission objective, not the nearest contact'
   const card = (overlay.slot.root as unknown as TouchElement).children[1];
   const [kicker, name, hint] = [card.children[0], card.children[1], card.children[2]];
   try {
-    // Desktop: the mission panel's nav line names a distant objective, so the card stays out.
+    // Range guidance occupies the shared slot on every device.
     f.controls.setTouchMode(false);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
-    expect(kicker.textContent).not.toBe('OBJECTIVE');
-    // In scan range the card returns on desktop with the aim cue, for the same target.
+    expect(kicker.textContent).toBe('OBJECTIVE');
+    expect(name.textContent).toBe('Stern section');
+    expect(hint.textContent).toBe('Get closer to scan · 692 m');
+    // In scan range the card changes to an aim cue for the same target.
     view.objectiveInRange = true;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
@@ -651,10 +653,10 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
     expect(name.textContent).toBe('Stern section');
-    expect(hint.textContent).toBe('TURN 40° STARBOARD');
+    expect(hint.textContent).toBe('Get closer to scan · 692 m');
     view.objectiveTurnDeg = 3;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
-    expect(hint.textContent).toBe('CLOSE TO 120 M');
+    expect(hint.textContent).toBe('Get closer to scan · 692 m');
     view.objectiveInRange = true;
     f.controls.setTouchMode(true);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
@@ -714,6 +716,10 @@ it('the standing objective yields to an in-range contact and to a completion car
     overlay.update(view, keys, null, makeConfig().scan.completeBannerSeconds + 1);
     expect(overlay.slot.kind).toBe('objective');
     view.objectiveId = null;
+    overlay.update(view, keys, null, 0);
+    expect(overlay.slot.kind).toBe('objective');
+    expect(name.textContent).toBe('Bow');
+    view.nearestId = null;
     overlay.update(view, keys, null, 0);
     expect(overlay.slot.kind).toBeNull();
   } finally {
@@ -802,7 +808,8 @@ it.each(['keyboard', 'touch'] as const)(
       view.nearestInRange = false;
       view.candidateId = null;
       overlay.update(view, keys, null, 0);
-      expect(overlay.slot.kind).toBe(device === 'touch' ? 'objective' : null);
+      expect(overlay.slot.kind).toBe('objective');
+      expect(name.textContent).toBe('Stern section');
       expect(overlay.slot.showsName('Bow result')).toBe(false);
     } finally {
       overlay.dispose();

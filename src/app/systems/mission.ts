@@ -18,6 +18,7 @@ import { missionApproachScanRadius, spawnHeight, spawnSettings } from '../../gam
 import { composedMissionSpawn } from '../../game/DeepOpeningSpawn.js';
 import { siteManifest } from '../../core/SiteManifest.js';
 import { Disposables } from '../Disposables.js';
+import { resolveScanRadius } from '../../game/Scanner.js';
 
 const cleanup = new Disposables();
 let approachOpening = false;
@@ -50,7 +51,7 @@ export const missionSystem: GameSystem = {
         const radius =
           choice === 'near-site' ? missionApproachScanRadius(route.landmarkId, original) : original;
         ctx.baseScanRadii.set(poi.id, radius);
-        poi.radius = radius * sensor.scanRadiusMultiplier;
+        poi.radius = resolveScanRadius(radius * sensor.scanRadiusMultiplier, ctx.effective.scan);
       }
       const opening =
         choice === 'near-site'

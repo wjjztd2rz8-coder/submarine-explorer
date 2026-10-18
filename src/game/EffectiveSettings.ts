@@ -53,6 +53,7 @@ export function resolveEffective(
     camera: { ...base.camera, lookAheadPerSpeed: speed.cameraLookAheadPerSpeed },
     scan: {
       ...base.scan,
+      radiusFloorM: preset === 'realistic' ? 0 : 100,
       hintRangeFactor:
         base.scan.hintRangeFactor * sensor.hintRangeMultiplier * EQUIPMENT.scanDetail,
     },
