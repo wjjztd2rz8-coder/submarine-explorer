@@ -22,3 +22,10 @@ No new specs were added. No unrelated assertion was loosened.
 `PW_PORT=4460 tools/gates.sh` printed PASS for python, content, build, unit, e2e, e2e-base, attribution, prettier and the overall gate (`PASS gates (e2e=smoke)`), exit 0. `npx tsc --noEmit` is clean.
 
 Not run: the full e2e suite (`--full-e2e`) and a standalone `playwright test` run of the title and settings specs (it could not start its webServer outside the gate build). The touch-specific Settings Controls behaviour is not covered by a new assertion; the specs that click Controls in settings are keyboard-only desktop tests.
+
+## e2e triage (after 2026-10-18 Codex merges)
+
+- f-title-layout 'home copy': stale test. The order list compared a regex to a string already normalised to 'Dive'; now expects 'Dive' (primary reads 'Dive: <site>').
+- hud-touch 'standing objective line' 667x375: real regression from P2-scan-range. The new 'Get closer to scan · N m' line wrapped to a 4th line and overran the 64 px card. Fix is CSS: on touch landscape the objective card drops the ring (it repeated the distance) and tightens hint tracking. The 64 px assertion is unchanged.
+- hud-touch 'catalog tutorial and reload' (touch and keyboard): two stale expectations. (1) With the 100 m scan floor, procedural jellies are in range at any parking spot, so `away()` could not find a quiet spot; the test now boots with `life=0`, as it is about tutorial/objective guidance. (2) The standing objective line, with its range instruction, now shows on desktop too, by P2-scan-range design; the test expects it on all devices.
+- Result: hud-touch.spec.ts + f-title-layout.spec.ts 161 passed.
