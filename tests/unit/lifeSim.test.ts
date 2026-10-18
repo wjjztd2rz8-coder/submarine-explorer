@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest';
+import { MeshStandardMaterial, PerspectiveCamera, Scene, ShaderLib } from 'three';
+import lifeJson from '../../data/life/life.json';
 import type { SimEnv, SubInfo } from '../../src/world/life/agent.js';
+import { SPECIES } from '../../src/world/life/catalogue.js';
+import { Life } from '../../src/world/life/Life.js';
 import { LifeSim, TICK } from '../../src/world/life/LifeSim.js';
 import { mulberry32 } from '../../src/world/life/rng.js';
 import { bodyLen } from '../../src/world/life/steer.js';
+import { parseLifeDoc } from '../../src/world/life/tables.js';
 import { LIFE_TIERS, type SiteTable } from '../../src/world/life/types.js';
 
 /** A seabed that slopes from 500 m deep in the west to 900 m in the east, with a gentle ridge. */
@@ -388,5 +393,163 @@ describe('the rare appearance', () => {
 describe('steering tick', () => {
   it('runs decisions at a fixed rate whatever the frame rate', () => {
     expect(TICK).toBeCloseTo(1 / 15, 6);
+  });
+});
+
+describe('life camera proximity', () => {
+  it('scales continuously across both distance thresholds and the minimum scale for every species', () => {
+    const life = new Life({
+      tier: 'low',
+      table: undefined,
+      env,
+      scene: new Scene(),
+      landmarkId: 'fixture',
+      seed: 7,
+    });
+    const camera = new PerspectiveCamera();
+    const sub = makeSub();
+    try {
+      for (const def of SPECIES) {
+        life.sim.clear();
+        const a = life.sim.spawnNear(def.id, sub, 20, 1)!.members[0];
+        a.fade = 1;
+        a.yaw = a.pitch = a.roll = 0;
+        for (const variation of [0.8, 1, 1.2]) {
+          a.scale = variation;
+          const base = def.visScale * variation;
+          const len = def.size * base;
+          const inner = Math.min(1.5 * len, 5);
+          const outer = Math.min(3.5 * len, 10);
+          const scaleAt = (distance: number): number => {
+            camera.position.set(a.x + distance, a.y, a.z);
+            life.update(0, sub, camera, 800, 0);
+            const mesh = life.render.meshFor(def.id)!.mesh;
+            expect(Array.from(mesh.instanceMatrix.array).every(Number.isFinite)).toBe(true);
+            return mesh.instanceMatrix.array[0] / base;
+          };
+          expect(scaleAt(0)).toBeCloseTo(0.02, 6);
+          expect(scaleAt(inner)).toBeCloseTo(0.02, 6);
+          expect(scaleAt((inner + outer) / 2)).toBeCloseTo(0.5, 6);
+          expect(scaleAt(outer)).toBeCloseTo(1, 6);
+          // Sweep the 2% floor transition as well as the capped and uncapped edges.
+          let previous = scaleAt(0);
+          for (let i = 1; i <= 100; i++) {
+            const current = scaleAt((outer * 1.1 * i) / 100);
+            expect(current + 1e-6, def.id).toBeGreaterThanOrEqual(previous);
+            expect(current - previous, def.id).toBeLessThan(0.05);
+            previous = current;
+          }
+          for (const edge of [inner, outer])
+            expect(Math.abs(scaleAt(edge + 1e-5) - scaleAt(edge - 1e-5))).toBeLessThan(1e-5);
+          a.fade = 0.5;
+          expect(scaleAt((inner + outer) / 2)).toBeCloseTo(0.25, 6);
+          a.fade = 1;
+        }
+      }
+    } finally {
+      life.dispose();
+    }
+  });
+
+  it('uses the camera in frozen frames at every site and tier without changing instance or draw budgets', () => {
+    for (const [site, table] of Object.entries(parseLifeDoc(lifeJson).sites)) {
+      for (const tier of ['low', 'medium', 'high'] as const) {
+        const life = new Life({ tier, table, env, scene: new Scene(), landmarkId: site, seed: 7 });
+        const camera = new PerspectiveCamera();
+        const sub = makeSub();
+        try {
+          const a = life.sim.spawnNear('blue-tang', sub, 20, 1)!.members[0];
+          a.fade = 1;
+          a.yaw = a.pitch = a.roll = 0;
+          camera.position.set(a.x + 20, a.y, a.z);
+          life.update(0, sub, camera, 800, 0);
+          const mesh = life.render.meshFor(a.def.id)!.mesh;
+          const scale = mesh.instanceMatrix.array[0];
+          const before = {
+            count: mesh.count,
+            draws: life.render.drawCalls,
+            triangles: life.render.triangles,
+          };
+          camera.position.set(a.x, a.y, a.z);
+          life.update(0, sub, camera, 800, 0);
+          expect(mesh.instanceMatrix.array[0] / scale, `${site} ${tier}`).toBeCloseTo(0.02, 6);
+          expect({
+            count: mesh.count,
+            draws: life.render.drawCalls,
+            triangles: life.render.triangles,
+          }).toEqual(before);
+          expect(before.count).toBe(1);
+          expect(before.draws.species).toBe(1);
+          expect(before.triangles).toBeGreaterThan(0);
+          expect(life.sim.liveCount).toBeLessThanOrEqual(LIFE_TIERS[tier].maxAgents);
+        } finally {
+          life.dispose();
+        }
+      }
+    }
+  });
+
+  it('applies the shared matte cap to every species before output while retaining glow, fog and standard lighting', () => {
+    const life = new Life({
+      tier: 'low',
+      table: undefined,
+      env,
+      scene: new Scene(),
+      landmarkId: 'fixture',
+      seed: 7,
+    });
+    try {
+      for (const def of SPECIES) {
+        life.sim.clear();
+        const sub = makeSub();
+        life.sim.spawnNear(def.id, sub, 20, 1)!.members[0].fade = 1;
+        life.update(0, sub, new PerspectiveCamera(), 800, 0);
+        const material = life.render.meshFor(def.id)!.mesh.material as MeshStandardMaterial;
+        const shader = { ...ShaderLib.standard, uniforms: { ...ShaderLib.standard.uniforms } };
+        material.onBeforeCompile(
+          shader as Parameters<typeof material.onBeforeCompile>[0],
+          {} as never,
+        );
+        expect(material.defines!.LIT_KNEE).toBe('0.28');
+        expect(material.defines!.LIT_CEIL).toBe('0.45');
+        const source = shader.fragmentShader;
+        for (const component of ['directSpecular', 'indirectSpecular'])
+          expect(source).toContain(`reflectedLight.${component} *= 0.4;`);
+        for (const component of [
+          'directDiffuse',
+          'indirectDiffuse',
+          'directSpecular',
+          'indirectSpecular',
+        ])
+          expect(source).toContain(`reflectedLight.${component} *= k;`);
+        expect(source.indexOf('float capped =')).toBeGreaterThan(
+          source.indexOf('#include <lights_fragment_end>'),
+        );
+        expect(source.indexOf('float capped =')).toBeLessThan(
+          source.indexOf('#include <opaque_fragment>'),
+        );
+        expect(source).toContain('totalEmissiveRadiance += uGlowColor');
+        expect(source).toContain('#include <fog_fragment>');
+        // Evaluate the emitted scalar expression, rather than a second copy of the curve.
+        const expression = source
+          .match(/float capped = ([^;]+);/)![1]
+          .replaceAll('LIT_KNEE', material.defines!.LIT_KNEE as string)
+          .replaceAll('LIT_CEIL', material.defines!.LIT_CEIL as string)
+          .replaceAll('exp(', 'Math.exp(');
+        const cap = new Function('peak', `return ${expression}`) as (peak: number) => number;
+        expect(cap(0)).toBe(0);
+        expect(cap(0.1)).toBe(0.1);
+        expect(cap(0.28)).toBeCloseTo(0.28, 12);
+        expect(cap(0.28 + 1e-7) - cap(0.28 - 1e-7)).toBeCloseTo(2e-7, 12);
+        let previous = 0;
+        for (const peak of [0.1, 0.28, 0.3, 0.5, 1, 10, 100]) {
+          expect(cap(peak)).toBeGreaterThanOrEqual(previous);
+          expect(cap(peak)).toBeLessThanOrEqual(Math.min(peak, 0.45));
+          previous = cap(peak);
+        }
+      }
+    } finally {
+      life.dispose();
+    }
   });
 });

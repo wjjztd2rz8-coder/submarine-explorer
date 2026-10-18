@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { SPECIES, SPECIES_BY_ID } from '../../src/world/life/catalogue.js';
+import { def } from '../../src/world/life/defs.js';
 import {
   bandOverlap,
   buildEntries,
@@ -22,6 +23,23 @@ const sites = (
 ).landmarks;
 
 describe('catalogue', () => {
+  it('keeps the readability floor continuous at 15 cm and where real size overtakes it', () => {
+    const drawn = (size: number): number => {
+      const species = def({ ...SPECIES_BY_ID.get('blue-tang')!, size });
+      return species.size * species.visScale;
+    };
+    expect(drawn(0.03)).toBeCloseTo(0.608, 3);
+    expect(drawn(0.08)).toBeCloseTo(0.9, 6);
+    expect(drawn(0.34)).toBeCloseTo(1.157, 3);
+    expect(drawn(1)).toBeCloseTo(2.5, 6);
+    for (const threshold of [0.15, drawn(0.15) / 2.5]) {
+      const before = drawn(threshold - 1e-7);
+      const after = drawn(threshold + 1e-7);
+      expect(after).toBeGreaterThanOrEqual(before);
+      expect(after - before).toBeLessThan(1e-6);
+    }
+  });
+
   it('has 20 to 50 species with unique ids and every archetype in use', () => {
     expect(SPECIES.length).toBeGreaterThanOrEqual(20);
     expect(SPECIES.length).toBeLessThanOrEqual(50);
