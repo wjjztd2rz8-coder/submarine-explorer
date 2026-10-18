@@ -1508,3 +1508,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 2550-2570 queued; dispatch waits because the Codex week (75% left) is behind the pace line (79.5%), not the 5h window.
 - **Decision for owner:** hood work is at diminishing returns; consider a reference composition before more slices.
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-18 04:24 CDT headless run 59 (Claude)
+
+- **Merged and pushed (smoke + project-base green; no full e2e):** Sonnet V-lostcity-rim (noise-driven notched rim on carbonate towers, 26 to 40 column segments; ~4.1 to ~4.2, stair steps slightly shard-like; Low Lost City triangles +15%, inside budget).
+- **CI:** run 58 red on one shard: f2-modes "phone touch" Advanced tap timed out (passes locally; failed job re-run). Treat as flake unless it recurs.
+- **Codex:** 2550-2570 queued; dispatch waits on the Codex week pace. No tag (CI pending).
+- **Needs owner:** real-phone Low-tier play.
