@@ -140,14 +140,9 @@ for (const { site, primary, before } of heroes) {
             sub.group.updateMatrixWorld(true);
             const rig = new CameraRig(config.camera, 16 / 9, terrain);
             rig.setChaseRadiusDefault(free.chaseRadius, free.chaseOffsetX, free.chaseOffsetY);
-            const globalRadius = Math.hypot(
-              config.camera.chaseOffset.x,
-              config.camera.chaseOffset.y,
-              config.camera.chaseOffset.z,
-            );
-            expect(pose.chaseRadius, 'Titanic inherits the global reset radius').toBeUndefined();
-            expect(rig.chaseRadius).toBe(globalRadius);
-            expect(rig.chaseRadius).toBeGreaterThan(95);
+            const openingRadius = free.chaseRadius!;
+            expect(pose.chaseRadius, 'mission keeps the global reset radius').toBeUndefined();
+            expect(rig.chaseRadius).toBe(openingRadius);
             rig.snap(position, free.yaw, 0);
             rig.camera.updateMatrixWorld(true);
             const openingEye = rig.camera.position.clone();
@@ -203,9 +198,9 @@ for (const { site, primary, before } of heroes) {
               'bow scan contact clears the submarine silhouette',
             ).toBe(false);
             rig.orbit(0.2, 0.1, 0.5);
-            expect(rig.chaseRadius).toBeGreaterThan(globalRadius);
+            expect(rig.chaseRadius).toBeGreaterThan(openingRadius);
             rig.resetView();
-            expect(rig.chaseRadius).toBe(globalRadius);
+            expect(rig.chaseRadius).toBe(openingRadius);
             rig.snap(position, free.yaw, 0);
             expect(rig.camera.position).toEqual(openingEye);
           } finally {
