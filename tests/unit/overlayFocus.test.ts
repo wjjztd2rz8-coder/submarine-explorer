@@ -28,7 +28,11 @@ import * as THREE from 'three';
 import type { DebriefStats } from '../../src/game/Objectives.js';
 import type { FrameState } from '../../src/app/System.js';
 import { createPowerSystem } from '../../src/app/systems/power.js';
-import { loadMissionSummaries, parseMission } from '../../src/game/Mission.js';
+import {
+  loadMissionSummaries,
+  parseMission,
+  type ObjectiveStatus,
+} from '../../src/game/Mission.js';
 import { MissionSelect } from '../../src/ui/MissionSelect.js';
 import landmarkIndex from '../../data/landmarks/index.json';
 import titanicMission from '../../data/landmarks/titanic/mission.json';
@@ -1547,6 +1551,111 @@ describe('overlay policies across the app', () => {
     }
     expect(keep).toHaveBeenCalledOnce();
     expect(surface).toHaveBeenCalledOnce();
+  });
+
+  it.each([
+    {
+      done: [],
+      optionalOnly: false,
+      rows: ['a', 'b', 'side'],
+      current: 'a',
+      progress: '0 of 3 objectives · 0 of 2 primary',
+    },
+    {
+      done: ['a'],
+      optionalOnly: false,
+      rows: ['b', 'side'],
+      current: 'b',
+      progress: '1 of 3 objectives · 1 of 2 primary',
+    },
+    {
+      done: ['a', 'b'],
+      optionalOnly: false,
+      rows: ['side'],
+      current: 'side',
+      progress: '2 of 3 objectives · primaries done',
+    },
+    {
+      done: ['a', 'b', 'side'],
+      optionalOnly: false,
+      rows: ['a', 'b', 'side'],
+      current: 'a',
+      progress: '3 of 3 objectives · all complete',
+    },
+    {
+      done: ['a'],
+      optionalOnly: true,
+      rows: ['side', 'b'],
+      current: 'side',
+      progress: '1 of 3 objectives · 0 of 0 primary',
+    },
+  ])(
+    'keeps objective rows and the current step honest for $done (optionalOnly=$optionalOnly)',
+    (test) => {
+      // Guards completed-row filtering, stable authored order and accessible current-step handoff.
+      const panel = new ObjectivesPanel();
+      cleanup.push(() => panel.dispose());
+      const objectives: ObjectiveStatus[] = ['side', 'a', 'b'].map((id) => ({
+        id,
+        title: `Scan ${id}`,
+        hint: `Find ${id}`,
+        poiId: id,
+        primary: !test.optionalOnly && id !== 'side',
+        resolved: true,
+        complete: false,
+      }));
+      panel.setObjectives(objectives);
+      panel.setObjectives(objectives.map((o) => ({ ...o, complete: test.done.includes(o.id) })));
+      const root = panel.root as unknown as Element;
+      const rows = root.querySelectorAll('.obj-item');
+      expect(rows.map((row) => row.dataset.objective)).toEqual(test.rows);
+      expect(
+        rows
+          .filter((row) => row.getAttribute('aria-current') === 'step')
+          .map((row) => row.dataset.objective),
+      ).toEqual([test.current]);
+      expect(rows.filter((row) => row.classList.contains('is-complete'))).toHaveLength(
+        test.done.length === 3 ? 3 : 0,
+      );
+      expect(root.querySelector('.obj-progress')!.textContent).toBe(test.progress);
+      expect(root.querySelector('.obj-hint')!.textContent).toBe(`Find ${test.current}`);
+      expect(objectives.map((o) => o.id)).toEqual(['side', 'a', 'b']);
+      panel.setObjectives([]);
+      expect(root.querySelectorAll('.obj-item')).toHaveLength(0);
+      expect(root.querySelector('.obj-hint')!.hidden).toBe(true);
+    },
+  );
+
+  it('wraps a long objective list around the selected step and drops finished rows before counting more', () => {
+    const panel = new ObjectivesPanel();
+    cleanup.push(() => panel.dispose());
+    const objectives: ObjectiveStatus[] = Array.from({ length: 8 }, (_, i) => ({
+      id: `o${i}`,
+      title: `Scan ${i}`,
+      hint: '',
+      poiId: `p${i}`,
+      primary: i < 6,
+      resolved: true,
+      complete: i === 0,
+    }));
+    panel.setObjectives(objectives);
+    panel.setNav(
+      { id: 'o5', name: 'Target', primary: true, bearingDeg: 90, depthM: 100, relativeDeg: 0 },
+      false,
+    );
+    const root = panel.root as unknown as Element;
+    expect(root.querySelectorAll('.obj-item').map((row) => row.dataset.objective)).toEqual([
+      'o5',
+      'o6',
+      'o7',
+      'o1',
+    ]);
+    expect(root.querySelector('.obj-more')!.textContent).toBe('+3 more · Esc for all');
+    expect(
+      root
+        .querySelectorAll('.obj-item')
+        .filter((row) => row.getAttribute('aria-current') === 'step'),
+    ).toHaveLength(1);
   });
 
   it.each(['Settings', 'Briefing', 'Debrief', 'Journal', 'Controls', 'Pause', 'Photo'] as const)(

@@ -415,6 +415,78 @@ it('retires site-only pending retries whose original evidence is unavailable', a
   expect(restored.rating('old')).toBe(1);
 });
 
+it('retries intact mixed pending evidence after corrupt records without importing later discoveries', async () => {
+  const values = new Map<string, string>([
+    [
+      PROGRESS_STORAGE_KEY,
+      JSON.stringify({
+        version: 2,
+        legacyCredited: false,
+        legacyPending: [
+          { site: 'old', keys: null, bonus: false },
+          'retired',
+          { site: 'old', keys: ['old/a', 'foreign/b'], bonus: false },
+          { site: 'old', keys: ['old/b'], bonus: true },
+        ],
+        ratings: { retired: 1 },
+        cosmeticGrants: ['paint:orange'],
+      }),
+    ],
+  ]);
+  const storage = {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      values.set(key, value);
+    },
+    removeItem: (key: string) => {
+      values.delete(key);
+    },
+  };
+  const discoveries = new DiscoveryStore(storage);
+  discoveries.record('old', 'a');
+  discoveries.record('old', 'b'); // Discovered after the evidence was frozen.
+  const urls: string[] = [];
+  const offline: FetchJson = async (url) => {
+    urls.push(url);
+    throw new Error('offline');
+  };
+  for (let reload = 0; reload < 2; reload++) {
+    const progress = new Progress(new ProgressSave(storage));
+    await creditPreviousDives(progress, discoveries, [{ siteId: 'old', poiId: 'b' }], offline);
+    expect(progress.legacyPending).toEqual([{ site: 'old', keys: ['old/a'], bonus: false }]);
+    expect(progress.legacyCredited).toBe(false);
+  }
+  expect(urls).toHaveLength(2);
+  expect(urls.every((url) => url.includes('/old/'))).toBe(true);
+  const restored = new Progress(new ProgressSave(storage));
+  await creditPreviousDives(restored, discoveries, [{ siteId: 'old', poiId: 'b' }], async () => ({
+    ok: true,
+    text: async () =>
+      JSON.stringify({
+        version: 1,
+        landmark: 'old',
+        tile: 'old',
+        title: 'Old',
+        spawn: { lat: 0, lon: 0 },
+        objectives: [
+          { id: 'a', poi: 'a', primary: true },
+          { id: 'b', poi: 'b', primary: false },
+        ],
+        completion: 'all_primary',
+      }),
+  }));
+  expect(restored.rating('old')).toBe(1);
+  expect(restored.rating('retired')).toBe(1);
+  expect(restored.snapshot().cosmeticGrants).toEqual(['paint:orange']);
+  expect(restored.snapshot().awarded).not.toContain('objective:old/b');
+  expect(restored.legacyCredited).toBe(true);
+  const snapshot = restored.snapshot();
+  const reloaded = new Progress(new ProgressSave(storage));
+  await creditPreviousDives(reloaded, discoveries, [], offline);
+  expect(reloaded.snapshot()).toEqual(snapshot);
+  expect(urls).toHaveLength(2);
+});
+
 it.each(['constructor', '__proto__', 'toString'])(
   'migrates a valid site id %s without treating inherited properties as old routes',
   async (site) => {

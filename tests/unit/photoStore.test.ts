@@ -254,6 +254,59 @@ it('bakes only the selected cosmetic frame into a new capture and keeps stock ca
   }
 });
 
+it.each([
+  { width: 8192, height: 1, expected: [640, 1] },
+  { width: 1, height: 8192, expected: [1, 8192] },
+  { width: 390, height: 844, expected: [390, 844] },
+  { width: 844, height: 390, expected: [640, 296] },
+])(
+  'preserves extreme capture aspect ratios for the Journal: $width × $height',
+  ({ width, height, expected }) => {
+    const context = { drawImage: vi.fn() };
+    const output = {
+      width: 0,
+      height: 0,
+      getContext: () => context,
+      toDataURL: vi.fn(() => 'data:image/jpeg;base64,YQ=='),
+    };
+    vi.stubGlobal('document', { createElement: () => output });
+    try {
+      const source = { width, height } as HTMLCanvasElement;
+      expect(canvasThumbnail(source)).toBe('data:image/jpeg;base64,YQ==');
+      expect([output.width, output.height]).toEqual(expected);
+      expect(context.drawImage).toHaveBeenCalledExactlyOnceWith(source, 0, 0, ...expected);
+      expect(output.toDataURL).toHaveBeenCalledExactlyOnceWith('image/jpeg', 0.76);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  },
+);
+
+it.each(['context', 'encoder', 'empty canvas'])(
+  'reports a missing capture when the %s is unavailable',
+  (missing) => {
+    const drawImage = vi.fn();
+    const output = {
+      width: 0,
+      height: 0,
+      getContext: () => (missing === 'context' ? null : { drawImage }),
+      toDataURL: () => (missing === 'encoder' ? 'data:,' : 'data:image/jpeg;base64,YQ=='),
+    };
+    vi.stubGlobal('document', { createElement: () => output });
+    try {
+      expect(
+        canvasThumbnail({
+          width: missing === 'empty canvas' ? 0 : 1280,
+          height: 720,
+        } as HTMLCanvasElement),
+      ).toBeNull();
+      if (missing !== 'encoder') expect(drawImage).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  },
+);
+
 it.each(PHOTO_FRAMES)('captures the selected $id photo frame', (frame) => {
   const context = { drawImage: vi.fn(), strokeRect: vi.fn(), strokeStyle: '', lineWidth: 0 };
   const output = {

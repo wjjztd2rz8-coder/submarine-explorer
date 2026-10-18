@@ -464,9 +464,15 @@ export function migrateProgress(raw: unknown): ProgressRecord {
       const site = typeof entry === 'string' ? entry : entry?.site;
       if (typeof site !== 'string' || !/^[A-Za-z0-9_-]{1,64}$/.test(site) || seen.has(site))
         continue;
+      // A corrupt record must not shadow intact evidence for the same site later in the save.
+      if (
+        typeof entry !== 'string' &&
+        (!Array.isArray(entry.keys) || typeof entry.bonus !== 'boolean')
+      )
+        continue;
       seen.add(site);
       if (typeof entry === 'string') out.legacyPending.push(site);
-      else if (Array.isArray(entry.keys) && typeof entry.bonus === 'boolean')
+      else
         out.legacyPending.push({
           site,
           keys: [

@@ -6,6 +6,10 @@ import { SubMesh } from '../../src/sub/SubMesh.js';
 import { Journal } from '../../src/ui/Journal.js';
 import type { JournalEntry, JournalSite } from '../../src/game/JournalData.js';
 import { DiscoveryStore, DISCOVERY_STORAGE_KEY } from '../../src/game/DiscoveryStore.js';
+import { PhotoStore, type Photo } from '../../src/game/PhotoStore.js';
+import type { PhotoGallery } from '../../src/ui/PhotoGallery.js';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
 
 /** Lifecycle DOM double; native disclosure keys and layout are covered in e2e. */
 class Element extends EventTarget {
@@ -159,6 +163,60 @@ afterEach(() => {
   journal.dispose();
   vi.unstubAllGlobals();
 });
+
+it('retains the Journal preview height cap without forcing an aspect ratio', () => {
+  // Numeric style contract only; native CSS sizing and screenshot acceptance belong to browser QA.
+  const css = readFileSync('src/styles/photo.css', 'utf8');
+  const rule = /\.jr-hero img\s*\{([^}]+)\}/.exec(css)![1];
+  expect(rule).toMatch(/max-height:\s*min\(300px, 32vh\)/);
+  expect(rule).toMatch(/max-width:\s*100%/);
+  expect(rule).toMatch(/object-fit:\s*contain/);
+});
+
+it.each(['absent', 'empty', 'other site', 'other subject', 'untagged', 'matching'])(
+  'opens a logged entry when its capture is %s and removes a stale hero on refresh',
+  (capture) => {
+    journal.setStore({ isDiscovered: () => true });
+    if (capture !== 'absent') {
+      const photo: Photo = {
+        id: 'capture',
+        image: 'data:image/jpeg;base64,YQ==',
+        siteId: capture === 'other site' ? 'wreck' : 'reef',
+        siteName: 'Reef',
+        poiId: capture === 'untagged' ? null : capture === 'other subject' ? 'other' : 'target',
+        poiName: null,
+        at: '2026-10-17T00:00:00Z',
+        depthM: 100,
+      };
+      let saved = JSON.stringify({ version: 1, photos: capture === 'empty' ? [] : [photo] });
+      const store = new PhotoStore({
+        getItem: () => saved,
+        setItem: (_key, value) => {
+          saved = value;
+        },
+      });
+      const gallery = { render: vi.fn(), dispose: vi.fn() };
+      journal.setPhotoGallery(store, gallery as unknown as PhotoGallery);
+      journal.show('reef/poi/entry');
+      const heroes = descendants(root).filter((el) => el.classList.contains('jr-hero'));
+      expect(heroes).toHaveLength(capture === 'matching' ? 1 : 0);
+      if (capture === 'matching') {
+        const image = heroes[0].children[0] as unknown as HTMLImageElement;
+        expect(image.src).toBe(photo.image);
+        expect(image.alt).toBe('poi entry');
+        expect(store.delete(photo.id)).toBe(true);
+        journal.refresh();
+        expect(descendants(root).filter((el) => el.classList.contains('jr-hero'))).toHaveLength(0);
+      }
+      expect(gallery.render).not.toHaveBeenCalled();
+    } else {
+      journal.show('reef/poi/entry');
+      expect(descendants(root).filter((el) => el.classList.contains('jr-hero'))).toHaveLength(0);
+    }
+    expect(journal.viewKey).toBe('reef/poi/entry');
+    expect(find((el) => el.className === 'jr-title').textContent).toBe('poi entry');
+  },
+);
 
 it('removes the rotation listener before another Journal is created', () => {
   const oldRefresh = vi.spyOn(journal, 'refresh');
