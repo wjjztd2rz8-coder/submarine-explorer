@@ -1,5 +1,5 @@
 import { resolveEffective } from '../../src/game/EffectiveSettings.js';
-import { EQUIPMENT, PROGRESS_CONFIG } from '../../src/core/config/progress.js';
+import { EQUIPMENT } from '../../src/core/config/progress.js';
 import { expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { Save, migrate, SETTINGS_STORAGE_KEY } from '../../src/core/Save.js';
@@ -156,7 +156,6 @@ it('resolves modes, Custom inheritance, fixed equipment and Daily from frozen in
       expect(first.camera.lookAheadPerSpeed).toBe(
         base.speedProfiles[first.speedName].cameraLookAheadPerSpeed,
       );
-      expect(first.boostSeconds).toBeCloseTo(PROGRESS_CONFIG.boostSeconds);
     }
     expect(resolveEffective(settings, 'arcade', null, base).speedName).toBe('fast');
     expect(resolveEffective(settings, 'realistic', null, base).speedName).toBe('research');

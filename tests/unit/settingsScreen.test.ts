@@ -7,25 +7,27 @@ import { keysText, planRebind, rebindMessage } from '../../src/ui/Settings.js';
 describe('planRebind', () => {
   it('makes the key primary, keeps secondaries and lists displaced actions', () => {
     const actions = defaultActions();
-    const plan = planRebind(actions, 'thrustForward', 'ShiftLeft');
-    expect(plan?.keys).toEqual(['ShiftLeft', 'ArrowUp']);
-    expect(plan?.displaced).toEqual([{ id: 'boost', label: 'Boost', remaining: ['ShiftRight'] }]);
-    expect(rebindMessage('Ahead', 'ShiftLeft', plan!)).toBe(
-      'Ahead is now Shift. Shift was removed from Boost (still Shift).',
+    const plan = planRebind(actions, 'thrustForward', 'KeyS');
+    expect(plan?.keys).toEqual(['KeyS', 'ArrowUp']);
+    expect(plan?.displaced).toEqual([
+      { id: 'thrustReverse', label: 'Astern', remaining: ['ArrowDown'] },
+    ]);
+    expect(rebindMessage('Ahead', 'KeyS', plan!)).toBe(
+      'Ahead is now S. S was removed from Astern (still Down).',
     );
   });
 
   it('reports what a partly displaced action keeps', () => {
-    const plan = planRebind(defaultActions(), 'boost', 'ArrowUp');
+    const plan = planRebind(defaultActions(), 'thrustReverse', 'ArrowUp');
     expect(plan?.displaced).toEqual([{ id: 'thrustForward', label: 'Ahead', remaining: ['KeyW'] }]);
-    expect(rebindMessage('Boost', 'ArrowUp', plan!)).toContain('(still W)');
+    expect(rebindMessage('Astern', 'ArrowUp', plan!)).toContain('(still W)');
   });
 
   it('does not duplicate the key and refuses reserved keys or unknown actions', () => {
     const actions = defaultActions();
     expect(planRebind(actions, 'thrustForward', 'ArrowUp')?.keys).toEqual(['ArrowUp']);
-    expect(planRebind(actions, 'boost', 'Escape')).toBeNull();
-    expect(planRebind(actions, 'boost', 'Tab')).toBeNull();
+    expect(planRebind(actions, 'thrustReverse', 'Escape')).toBeNull();
+    expect(planRebind(actions, 'thrustReverse', 'Tab')).toBeNull();
     expect(planRebind(actions, 'nope' as never, 'KeyZ')).toBeNull();
   });
 

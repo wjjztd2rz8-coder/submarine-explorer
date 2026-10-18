@@ -20,8 +20,6 @@ import { type Camera, type PerspectiveCamera, type Vector3 } from 'three';
 import { type Life } from '../../src/world/life/Life.js';
 import { type ScanOverlay } from '../../src/ui/ScanOverlay.js';
 import { scanAim } from './helpers/scanAim.js';
-import { type Input } from '../../src/core/Input.js';
-import { type TouchControls } from '../../src/ui/TouchControls.js';
 import { type Journal } from '../../src/ui/Journal.js';
 import { type Props } from '../../src/world/Props.js';
 import { openBriefingAdvanced } from './helpers/briefing.js';
@@ -421,7 +419,6 @@ freshTest.describe('large UI and menu reachability', () => {
             '.tc-btn-sonar',
             '.tc-btn-photo',
             '.tc-btn-pause',
-            '.tc-btn-boost',
             '.hud-journal',
           ];
           const hud = ['.sonar', '.hud-readouts', '.guidance-slot'];
@@ -518,7 +515,6 @@ freshTest.describe('large UI and menu reachability', () => {
             '.tc-btn-sonar',
             '.tc-btn-photo',
             '.tc-btn-pause',
-            '.tc-btn-boost',
             '.hud-journal',
           ]);
           if (scale === 100)
@@ -751,7 +747,7 @@ freshTest.describe('landscape guidance and completion', () => {
       // Regression guard: landscape guidance and completion banner hid touch controls and Surface.
 
       test('completion banner clears every touch control and the telemetry', async ({ page }) => {
-        // Regression: on a phone in landscape the banner sat under Sonar/Lights/Boost, hiding Surface.
+        // Regression: on a phone in landscape the banner sat under Sonar/Lights, hiding Surface.
         await ready(page, stackUrl);
         await dismissTutorial(page, true);
         await page.evaluate(() =>
@@ -821,7 +817,6 @@ freshTest.describe('landscape guidance and completion', () => {
             '.tc-btn-sonar',
             '.tc-btn-photo',
             '.tc-btn-pause',
-            '.tc-btn-boost',
             '.hud-journal',
             '.sonar',
             '.hud-readouts',
@@ -1065,7 +1060,7 @@ freshTest.describe('portrait telemetry and small controls', () => {
   test.describe('Portrait portrait telemetry', () => {
     test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
     for (const site of ['great-blue-hole', 'monterey-canyon']) {
-      // Regression guard: portrait sonar collided with readouts or Daily objectives and thrust shared a boost target.
+      // Regression guard: portrait sonar collided with readouts or Daily objectives.
       test(`${site} Free dive sonar has space beside readouts and pause`, async ({ page }) => {
         await page.goto(`/?tile=${site}&tier=low&touch=1`);
         await diveReady(page, {});
@@ -1073,7 +1068,7 @@ freshTest.describe('portrait telemetry and small controls', () => {
         await separate(page, '.sonar', '.tc-btn-pause');
       });
     }
-    // Regression guard: portrait sonar collided with readouts or Daily objectives and thrust shared a boost target.
+    // Regression guard: portrait sonar collided with readouts or Daily objectives.
     test('Daily objectives have space beside sonar', async ({ page }) => {
       await page.goto('/?tier=low&touch=1');
       await homeReady(page);
@@ -1104,8 +1099,8 @@ freshTest.describe('portrait telemetry and small controls', () => {
         hasTouch: true,
         isMobile: true,
       });
-      // Regression guard: portrait sonar collided with readouts or Daily objectives and thrust shared a boost target.
-      test('thrust and boost have separate touch targets', async ({ page }) => {
+      // Regression guard: portrait sonar collided with readouts or Daily objectives.
+      test('piloting and utility actions have separate touch targets', async ({ page }) => {
         await page.addInitScript((scale) => {
           localStorage.setItem(
             'subexplorer.settings.v3',
@@ -1114,7 +1109,6 @@ freshTest.describe('portrait telemetry and small controls', () => {
         }, layout.scale);
         await page.goto('/?tile=great-blue-hole&tier=low&touch=1');
         await diveReady(page, {});
-        await separate(page, '.tc-stick', '.tc-btn-boost');
         await separate(page, '.tc-stick', '.tc-buttons');
         await separate(page, '.tc-slider', '.tc-buttons');
         for (const selector of ['.tc-stick', '.tc-slider', '.tc-buttons']) {
@@ -1478,7 +1472,6 @@ freshTest.describe('catalog tutorial and reload', () => {
     '.tc-btn-sonar',
     '.tc-btn-photo',
     '.tc-btn-pause',
-    '.tc-btn-boost',
     '.hud-journal',
     '.hud-reset-camera',
   ];
@@ -1729,15 +1722,12 @@ freshTest.describe('catalog tutorial and reload', () => {
   }
 });
 
-freshTest.describe('boost and Journal actions', () => {
+freshTest.describe('Journal actions', () => {
   const test = experiencedTest;
   interface Game {
-    input: Input;
-    touch: TouchControls;
     journal: Journal;
     discovery: { loaded: boolean };
     props: { loaded: boolean };
-    missionRouter: { endDive(): void };
   }
   const shots = '.cache/codex/shots/hud-touch/controls';
 
@@ -1801,138 +1791,34 @@ freshTest.describe('boost and Journal actions', () => {
   ]) {
     test.describe(v.name, () => {
       test.use({ viewport: v, hasTouch: v.touch, isMobile: v.touch });
-      // Regression guard: touch Boost/Journal targets collided and the boost latch survived pause, depletion or dive end.
-      test('separates every button, opens Journal through the action, and toggles Boost', async ({
-        page,
-      }) => {
+      // Regression guard: Journal and neighbouring touch controls must remain tappable without overlap.
+      test('separates every button and opens Journal through the action', async ({ page }) => {
         await boot(page, v.touch);
         await layout(page);
         await reviewScreenshot(page, { path: `${shots}/${v.name}.png` });
         const journal = page.locator('.hud-journal');
         await expect(journal).toHaveAttribute('title', 'Journal (J)');
-        if (v.touch) {
-          const boost = page.locator('.tc-btn-boost');
-          const slider = (await page.locator('.tc-slider').boundingBox())!;
-          const dock = (await boost.boundingBox())!;
-          if (v.width < v.height) {
-            expect(slider.x - dock.x - dock.width).toBeGreaterThanOrEqual(8);
-            expect(slider.x - dock.x - dock.width).toBeLessThanOrEqual(20);
-            expect(dock.y).toBeGreaterThanOrEqual(slider.y);
-            expect(dock.y + dock.height).toBeLessThanOrEqual(slider.y + slider.height);
-          } else {
-            expect(Math.abs(slider.x - dock.x)).toBeLessThanOrEqual(1);
-            expect(slider.y - dock.y - dock.height).toBeGreaterThanOrEqual(8);
-            expect(slider.y - dock.y - dock.height).toBeLessThanOrEqual(16);
-          }
-          await expect(boost).toHaveAttribute('aria-pressed', 'false');
-          await boost.tap();
-          await page.clock.fastForward(50);
-          await expect(boost).toHaveAttribute('aria-pressed', 'true');
-          await expect(boost).toHaveClass(/is-active/);
-          expect(
-            await page.evaluate(() => (window.__game as unknown as Game).input.state.boost),
-          ).toBe(true);
-          await reviewScreenshot(page, { path: `${shots}/${v.name}-boost-on.png` });
-          await boost.tap();
-          await page.clock.fastForward(50);
-          await expect(boost).toHaveAttribute('aria-pressed', 'false');
-          await reviewScreenshot(page, { path: `${shots}/${v.name}-boost-off.png` });
-          await boost.tap();
-          await page.clock.fastForward(50);
-          await journal.tap();
-        } else await journal.click();
+        if (v.touch) await journal.tap();
+        else await journal.click();
         await page.clock.fastForward(50);
         await page.clock.fastForward(50);
         expect(await page.evaluate(() => (window.__game as unknown as Game).journal.isOpen)).toBe(
           true,
         );
-        expect(await page.evaluate(() => (window.__game as unknown as Game).input.touchBoost)).toBe(
-          false,
-        );
         await page.evaluate(() => (window.__game as unknown as Game).journal.close());
         await page.clock.fastForward(50);
         await layout(page);
         if (v.touch) {
-          await expect(page.locator('.tc-btn-boost')).toHaveAttribute('aria-pressed', 'false');
-          await page.locator('.tc-btn-boost').tap();
-          await page.clock.fastForward(50);
           await page.locator('.tc-btn-pause').tap();
           await page.clock.fastForward(50);
-          expect(
-            await page.evaluate(() => (window.__game as unknown as Game).input.touchBoost),
-          ).toBe(false);
           await expect(page.locator('.pause-menu')).toBeVisible();
           await expect(
             page.locator('.pause-menu').getByRole('button', { name: 'Journal', exact: true }),
           ).toBeVisible();
-        } else {
-          await page.keyboard.down('Shift');
-          await page.clock.fastForward(50);
-          expect(
-            await page.evaluate(() => (window.__game as unknown as Game).input.state.boost),
-          ).toBe(true);
-          await page.keyboard.up('Shift');
-          await page.clock.fastForward(50);
-          expect(
-            await page.evaluate(() => (window.__game as unknown as Game).input.state.boost),
-          ).toBe(false);
         }
       });
     });
   }
-
-  test.describe('touch boost reset', () => {
-    test.use({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true });
-    // Regression guard: touch Boost/Journal targets collided and the boost latch survived pause, depletion or dive end.
-    test('meter depletion clears the latch and recovery requires another tap', async ({ page }) => {
-      await boot(page, true);
-      const boost = page.locator('.tc-btn-boost');
-      await boost.tap();
-      await page.clock.fastForward(50);
-      await expect(boost).toHaveAttribute('aria-pressed', 'true');
-      // Each rendered frame permits at most eight fixed steps. Advance until
-      // the real progress system rejects boost rather than counting wall time.
-      await clockFramesUntil(
-        page,
-        () => !(window.__game as unknown as Game).input.touchBoost,
-        250,
-        120_000,
-      );
-      await expect(boost).toHaveAttribute('aria-pressed', 'false');
-      expect(await page.evaluate(() => (window.__game as unknown as Game).input.touchBoost)).toBe(
-        false,
-      );
-      for (let frame = 0; frame < 12; frame++) await page.clock.fastForward(250);
-      await expect(boost).toHaveAttribute('aria-pressed', 'false');
-      await boost.tap();
-      await page.clock.fastForward(50);
-      await expect(boost).toHaveAttribute('aria-pressed', 'true');
-    });
-    // Regression guard: touch Boost/Journal targets collided and the boost latch survived pause, depletion or dive end.
-    test('hidden page and dive end clear the latch', async ({ page }) => {
-      await boot(page, true);
-      const boost = page.locator('.tc-btn-boost');
-      await boost.tap();
-      await page.clock.fastForward(50);
-      await page.evaluate(() => {
-        Object.defineProperty(document, 'hidden', { configurable: true, value: true });
-        document.dispatchEvent(new Event('visibilitychange'));
-      });
-      await expect(boost).toHaveAttribute('aria-pressed', 'false');
-      await page.evaluate(() => {
-        delete (document as unknown as { hidden?: boolean }).hidden;
-        document.dispatchEvent(new Event('visibilitychange'));
-      });
-      await boost.tap();
-      await page.clock.fastForward(50);
-      await page.evaluate(() => (window.__game as unknown as Game).missionRouter.endDive());
-      await page.clock.fastForward(50);
-      expect(await page.evaluate(() => (window.__game as unknown as Game).input.touchBoost)).toBe(
-        false,
-      );
-      await expect(page.locator('.tc-root')).toBeHidden();
-    });
-  });
 });
 
 freshTest.describe('surface mode HUD', () => {

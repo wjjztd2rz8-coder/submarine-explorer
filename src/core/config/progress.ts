@@ -5,8 +5,6 @@ export const PROGRESS_CONFIG = {
     { id: 'B', depthM: 6500 },
     { id: 'C', depthM: 11000 },
   ],
-  boostSeconds: 12.8,
-  boostRecoveryPerSecond: 0.5,
 } as const;
 
 /** Former fully equipped values, shared by every save and mode. */
@@ -17,7 +15,6 @@ export const EQUIPMENT = {
   scanDetail: 1.2,
   battery: 1.36,
   oxygen: 1.24,
-  boostEfficiency: 1.6,
   thrust: 1.24,
   turn: 1.16,
   reverse: 1.2,
