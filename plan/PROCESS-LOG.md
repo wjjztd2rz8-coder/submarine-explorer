@@ -258,3 +258,8 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - **2026-10-18 14:50 — false "Claude idle" trigger**
   - **Evidence:** the trigger fired with Claude 5h at 73-100% and the week at 36% left, exactly on the resume.sh pace line (36.0). Runs had been skipped by the weekly gate (322 skips), which is deliberate, not idle.
   - **Change:** `claude_week_ok()` in `tools/review-triggers.sh` now needs a 3-point margin above the pace line, so sitting on the line no longer counts as idle.
+
+## 2026-10-19 review
+
+- Codex queue had run dry (only hold/launched) while Codex sat below its weekly pace gate; refilled 2700-2730 so dispatch has work when the pace line reopens. Cause: briefs get consumed faster than reviews refill; next runs should top the queue up to 3 each time (already in the resume prompt).
+- Merge policy conflict (RESUME-PROMPT "merges don't wait for CI" vs R-merge-verify guard): kept the owner's rule; noted in DIRECTOR.

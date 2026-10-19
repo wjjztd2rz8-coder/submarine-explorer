@@ -2,6 +2,26 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-19 comprehensive review, joint with Codex Sol (golden 2026-10-19-000013)
+
+Sol ran read-only; one reconcile round. Scores are bands, not a forced decimal consensus.
+
+**Changed since the midday review (8+ merges, almost all non-visual):** Codex P2-boost-cut, P2-scan-range, P2-events-anchored, P2-ambience, P2-lostcity-perf, R-merge-verify, R-deploy-gate, V-spawn-capture, V-bluehole-overlap, S-bughunt-23/24, S-verify-19; Haiku P2-copy plus a Sonnet e2e triage. No new art package. Sol: P2-lostcity-perf removed Lost City's High/Medium shimmer layer, so that rendering did change slightly.
+
+**Scores, readable / beautiful (agreed):** Titanic 4 / 3.5-3.6; Lost City 3.5 / 3-3.3; Blue Hole 3.5 / 3-3.4; Beebe 3.5-4 / 3.5-3.7; Monterey 4 / 3.5; Challenger 3.5 / 3.5; Endurance 3.5 / 3.5-3.6. Beebe's approach frame (rising sparks, warm flank) is the strongest hero view; the Lost City tower is still thin stepped shards; Blue Hole folded roof and pale interior still read synthetic. Disputed and settled toward Sol: Titanic's biggest gap is close material repetition rather than empty water; Beebe opening readability is below its approach.
+
+**Process:** efficiency: Claude 34% week (~12%/day), Codex 34% (~52%/day, gated by pace). Codex queue was empty; 2700-2730 queued and three launched at once. Hosted CI: run 39173052443 red on 28 of 38 shards (46 min); the run for a814d10 was still queued at review time. Sol: the P2-copy fixes do not clearly explain every failed shard, so brief 2730 (R-ci-shard-triage) classifies them. Merge policy (Sol): RESUME-PROMPT says merges do not wait for CI, DIRECTOR/R-merge-verify imply a guard; kept the owner's 2026-10-13 rule (push after smoke + project-base, only tags wait) and noted it in DIRECTOR.
+
+**Sol's additions (credited to Sol):** the unaided journey must run at the owner's 1280x720, not 1600x900, and today's journal-debrief spec teleports for its reward check; globe brightness, sub screen and Aa shortcut have no demonstrated release-blocking defect (demoted).
+
+**Agreed blockers:** (1) unaided Titanic and Blue Hole journeys at 1280x720 and both phone orientations; (2) green hosted CI on the release SHA, tag f61; (3) Class A clipping, Beebe Low caps, Low event readability; (4) heroes consistently at 4 (Lost City tower, Titanic plating, Monterey bands); (5) eight-site spawn acceptance.
+
+**New priorities:** Claude: P2-hull-a, V-lostcity-slice3, V-titanic-plating, V-monterey-bands, P2-beebe-low, V-journeys. Codex: V-journeys-harness, P2-hull-a-geometry, S-events-low-audit, R-ci-shard-triage.
+
+**Stage:** about 80% to 1.0; 4-5 weeks targeted, 4-6 for planning (agreed with Sol).
+
+**Needs owner:** phone retest on the newest build (boost gone, scan range, anchored events); real-phone Low play.
+
 ## 2026-10-18 14:50 targeted review: "Claude idle at >=50% for 2 h"
 
 - **Finding:** false trigger. Claude's week (36% left) sat exactly on the resume.sh pace line, so the weekly gate had deliberately skipped runs; the 5h window only looked idle. Codex is at 44% week / 34% 5h with 2550-2600 queued; nothing is wrong there.

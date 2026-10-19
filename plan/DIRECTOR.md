@@ -60,7 +60,7 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
 | No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
-Stage (review 2026-10-18 midday, joint with Sol): about 80% to 1.0, 4-5 weeks targeted, 4-6 for planning. Beautiful bands: Titanic 3.5, Lost City 3-3.5, Blue Hole 3-3.5, Beebe 3.5-3.8, Monterey 3.5, Challenger 3.5, Endurance 3.5-3.7. Agreed blockers in order: (1) first-five-minute scanning, guidance and reward verified unaided on desktop and both phone orientations; (2) green hosted CI on the release SHA with deploy gated on it; (3) phone defects (Class A clipping, Beebe Low caps) and a complete Low journey; (4) heroes consistently at beauty 4, Blue Hole overlap resolved; (5) eight-site acceptance at mission spawns.
+Stage (review 2026-10-19, joint with Sol, unchanged): about 80% to 1.0, 4-5 weeks targeted, 4-6 for planning. Beautiful bands: Titanic 3.5, Lost City 3-3.5, Blue Hole 3-3.5, Beebe 3.5-3.8, Monterey 3.5, Challenger 3.5, Endurance 3.5-3.7. Agreed blockers in order: (1) first-five-minute scanning, guidance and reward verified unaided at 1280x720 and both phone orientations; (2) green hosted CI on the release SHA, deploy gate verified, tag; (3) phone defects (Class A clipping, Beebe Low caps) and a complete Low journey; (4) heroes consistently at beauty 4, Blue Hole overlap resolved; (5) eight-site acceptance at mission spawns.
 
 ## Needs owner
 
@@ -70,7 +70,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running.
+- No Claude package running. Merge policy stands as the owner set it on 2026-10-13: merges don't wait for CI (push after smoke + project-base); only tags wait. R-merge-verify's guard is advisory.
 
 ## Backlog
 
@@ -80,31 +80,25 @@ Evidence: reviews 2026-10-18 and 2026-10-18 midday (joint with Sol) in `plan/REV
 
 Owner phone test 2026-10-18: decisions and file ownership in [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md). P2 items go first (playability first); the numbered V/S/R list follows.
 
-- DONE 2026-10-18 (28a1940) **P2-boost-cut [Codex, brief 2542]:** cut boost on every input (touch button, Shift, RT; X stays camera reset), along with its meter, power cost and config; update How to play and CHANGELOG (Removed). The touch dock loses the button.
-- DONE 2026-10-18 (28a1940) **P2-scan-range [Codex, brief 2541]:** Arcade scan radius floor of 100 m for every target (Titanic bow/stern are 30 m now); Realistic keeps the data radii. Out of range, the scan tutorial step and guidance say "Get closer to scan" with the distance. Guard nearest-target selection between adjacent POIs. The mission cap `missionApproachScanRadius` (Spawn.ts:37, 80 m for a 220 m approach) must not undercut the floor: test the resolved radius in a mission, not just POI data (Sol).
-- DONE 2026-10-18 (9520e01) **P2-copy [Haiku]:** Home primary reads "Dive: <site>"; the discovery confirmation reads "New Journal entry"; touch Settings hides the Controls key-bindings button and section; the graphics row says "Auto (<tier> on this device)".
 - **P2-hull-a [Sonnet]:** Class A (Lost City, Blue Hole) has a propeller inside the vertical stabiliser and thrusters clipping the hull. Target: every propeller and thruster sits clear on all three hulls and every tier; add a geometry test.
-- DONE 2026-10-18 (28a1940) **P2-events-anchored [Codex, Claude visual review]:** replace the random scheduler with anchored spots in the six event sites' data, each shown as an optional contact ("Vent plume", "Silt flow", "Whale route") that plays its event on arrival. Cut any event that still doesn't read on Low.
-- **P2-sub-screen [Sonnet]:** move the cosmetic picker out of the Journal into a "Your sub" screen reached from Pause and Home, with large swatches and a live sub preview. This is a move, not an addition.
-- DONE 2026-10-18 (28a1940) **P2-ambience [Codex]:** lower the default ambient bed and low-pass its harsh band; leave saved volumes alone.
-- **P2-globe-bright [Sonnet]:** the globe is a touch dark. Target: a brighter Google Earth feel (lighter ocean, saturated land, brighter day side) with pins still contrasting.
+- **P2-sub-screen [Sonnet, demoted 2026-10-19; do after hull-a]:** move the cosmetic picker out of the Journal into a "Your sub" screen reached from Pause and Home, with large swatches and a live sub preview. This is a move, not an addition.
+- **P2-globe-bright [Sonnet, demoted by Sol/Claude 2026-10-19: no release-blocking defect shown]:** the globe is a touch dark. Target: a brighter Google Earth feel (lighter ocean, saturated land, brighter day side) with pins still contrasting.
 - **P2-beebe-low [Sonnet, small]:** Low-tier Beebe chimney glow caps float off the orifice; seat them.
-- DONE 2026-10-18 (28a1940) **P2-lostcity-perf [Codex]:** High stutters at Lost City among particles and effects on an iPhone 17 Pro. Measure overdraw and cap the High particle/effect fill; Low unchanged; update the perf budget.
-- **P2-text-size [Sonnet, small]:** an "Aa" button on the briefing and Journal headers that steps the existing UI scale (no new setting).
+- **P2-text-size [Sonnet, small, demoted 2026-10-19]:** an "Aa" button on the briefing and Journal headers that steps the existing UI scale (no new setting).
 
 1. **V-lostcity-slice3 [Sonnet]** (agreed 3-3.5): the detail tower (`lost-city-3.png`) still reads as thin broken sheets with stair-step facets, and the mid-slope banding repeats. Target: the tower is a thick eroded carbonate mass with rounded chimneys, rubble at its foot in frame, and slope bands broken by terrace ledges.
-2. **V-journeys [Claude, after P2-scan-range and P2-copy]:** capture Home -> Titanic and Blue Hole missions -> first scan -> Journal -> debrief unaided (no teleport) at 1600x900, 390x844 and 844x390 on Low; review against the rubric. Agreed blocker 1.
-3. DONE 2026-10-18 (28a1940) **R-merge-verify [Codex, small, brief 2543]:** local gates default to smoke e2e, yet progress notes said "e2e pass" and V-titanic-opening merged a deterministic f-bughunt-18 failure (main red for 2 runs; fixed 9b57c01). Packages that touch `data/landmarks/`, Spawn or Camera run the spawn/camera specs (or `--full-e2e`) before merge, the gate summary names the e2e mode, and merge refuses on red main CI unless the package fixes it.
-4. DONE 2026-10-18 (28a1940) **R-deploy-gate [Codex]:** Pages deploys independent of CI (deploy.yml); make deploy wait for green CI on the same SHA (workflow_run or needs), keep manual dispatch. Agreed blocker 2; brief 2544 queued. Update the comment in deploy.yml.
-5. **V-titanic-plating [Sonnet, small]** (~3.5): V-titanic-opening's lane tint reads as a rust/grey patchwork at close range and deck tops wash pale blue-grey (`titanic-2/3.png`). Target: lane variation half as strong, warm rust tops; keep the opening framing.
-6. **V-monterey-bands [Sonnet]** (~3.5-3.7): wall banding repeats and the wall-to-base transition is abrupt. Target: break banding with noise and talus at the base; keep the facing>0.98 opening spec.
-7. **V-challenger-seabed [Sonnet, small]** (~3.6): lander reads but seabed is sparse and the flag emissive sits behind the HUD card. Target: sediment ripples and a few rocks around the lander; flag away from the card.
-8. **V-bluehole-hood [Sonnet, demoted]** (~3.5): flat sheet facets on the east hood; only with a reference composition. Numeric side: see V-bluehole-overlap.
-9. **V-eight-sites [Sonnet]** acceptance: capture mission-spawn frames of the eight non-hero sites (Low tier, portrait) and review; needs V-spawn-capture first.
-10. DONE 2026-10-18 (28a1940) **V-spawn-capture [Codex]:** extend the existing golden/e2e render helper so a per-site mission-spawn Low portrait capture persists (not conditional) and manifest lists it; no art changes.
-11. DONE 2026-10-18 (28a1940) **V-bluehole-overlap [Codex]:** resolve ~0.45 m roof hull overlap (collision boxes omit `roofRise`); restore the loosened 0.43 bound or justify; tests in existing specs.
-12. **S-verify / S-bughunt [Codex, standing]:** 2550-2570 queued; after visual merges verify numerics and hunt bugs (Lost City Low triangles +15%).
-13. **R-release [Haiku]:** f60 tagged 2026-10-18. Tag the latest green-CI main after each review.
+2. **V-journeys [Claude + Codex harness, now unblocked: P2-scan-range, P2-copy and P2-events-anchored merged]:** capture Home -> Titanic and Blue Hole missions -> first scan -> Journal -> debrief unaided (no teleport; the current journal-debrief spec teleports for its reward check) at 1280x720 (the owner's size, not 1600x900), 390x844 and 844x390 on Low; review against the rubric. Agreed blocker 1 (joint review 2026-10-19). Codex side: V-journeys-harness (brief 2700).
+3. **V-titanic-plating [Sonnet, small]** (~3.5): V-titanic-opening's lane tint reads as a rust/grey patchwork at close range and deck tops wash pale blue-grey (`titanic-2/3.png`). Target: lane variation half as strong, warm rust tops; keep the opening framing.
+4. **V-monterey-bands [Sonnet]** (~3.5-3.7): wall banding repeats and the wall-to-base transition is abrupt. Target: break banding with noise and talus at the base; keep the facing>0.98 opening spec.
+5. **V-challenger-seabed [Sonnet, small]** (~3.6): lander reads but seabed is sparse and the flag emissive sits behind the HUD card. Target: sediment ripples and a few rocks around the lander; flag away from the card.
+6. **V-bluehole-hood [Sonnet, demoted]** (~3.5): flat sheet facets on the east hood; only with a reference composition. Numeric side: see V-bluehole-overlap.
+7. **V-eight-sites [Sonnet]** acceptance: capture mission-spawn frames of the eight non-hero sites (Low tier, portrait) and review; needs V-spawn-capture first.
+8. **S-verify / S-bughunt [Codex, standing]:** 2550-2570 queued; after visual merges verify numerics and hunt bugs (Lost City Low triangles +15%).
+   12b. **V-journeys-harness [Codex, brief 2700]:** make the unaided journey spec (journal-debrief) run Home -> mission -> first scan -> Journal -> debrief with no teleport at 1280x720, 390x844 and 844x390 on Low, persisting numbered screenshots; no art or UI changes.
+   12c. **P2-hull-a-geometry [Codex numeric side, brief 2710]:** audit propeller/thruster clearance against hull and fin geometry on all three hulls and tiers; report offending coordinates and add the geometry test (failing first). Sonnet P2-hull-a applies the fix.
+   12d. **S-events-low-audit [Codex, brief 2720]:** numeric audit of the six anchored contacts on Low (anchor distance to terrain, trigger radius vs scan radius, contact visibility range, event duration); fix demonstrated defects; Claude judges how they look.
+   12e. **R-ci-shard-triage [Codex, brief 2730]:** classify CI run 39173052443 (46 min, 28/38 shards red) from its logs and the P2-copy merge; list any failure not explained by the hud-touch/title fixes.
+9. **R-release [Haiku]:** f60 tagged 2026-10-18. Tag the latest green-CI main after each review.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16; work kept as tag `parked/V-endurance-aim`).
 

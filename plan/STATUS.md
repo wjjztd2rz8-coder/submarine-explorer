@@ -1,6 +1,6 @@
-# Status (2026-10-18 midday, joint review with Codex Sol)
+# Status (2026-10-19, joint review with Codex Sol)
 
-**Stage:** about 80% to 1.0 (was 82%: art moved up a little; the owner's phone test added eleven concrete playability items). 4-5 weeks targeted, 4-6 for planning.
+**Stage:** about 80% to 1.0 (unchanged: this window was playability and process work, no new art). 4-5 weeks targeted, 4-6 for planning.
 
 ## 1.0 table
 
@@ -15,11 +15,11 @@
 
 ## Done recently
 
-Titanic opening (hull fills the frame; plate tint varied by lanes), Beebe flank (crust ridges catch warm light), owner phone test written up as P2 items, red CI fixed.
+Boost cut, 100 m scan floor, anchored optional events, quieter ambience, Lost City perf cap, deploy waits for green CI, spawn captures, copy fixes (P2-copy), stale touch specs fixed. Titanic opening (hull fills the frame; plate tint varied by lanes), Beebe flank (crust ridges catch warm light), owner phone test written up as P2 items, red CI fixed.
 
 ## Left
 
-First-five-minute scanning and guidance (agreed top blocker), deploy gating, phone defects (Class A clipping, Beebe Low caps), Lost City tower, Titanic plating patchwork, Monterey bands, Challenger seabed, Blue Hole hood and overlap, eight-site acceptance.
+Unaided journeys at 1280x720 and phones (queued with Codex), CI triage (28/38 shards red on one run; latest run pending), Class A hull clipping, Beebe Low caps. First-five-minute scanning and guidance (agreed top blocker), deploy gating, phone defects (Class A clipping, Beebe Low caps), Lost City tower, Titanic plating patchwork, Monterey bands, Challenger seabed, Blue Hole hood and overlap, eight-site acceptance.
 
 ## Needs owner
 
