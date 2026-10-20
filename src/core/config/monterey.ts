@@ -11,6 +11,15 @@ export const MONTEREY_STRATA = {
   slumpFrequency: [0.055, 0.075],
   slumpDepthH: 0.06,
   dustAmount: 0.3,
+  /** Low-frequency tone drift of each bed (x, y frequency, relative swing) and how often a bed fades toward silt. */
+  toneDriftFrequency: [0.018, 0.022],
+  toneDrift: 0.9,
+  faintBedAmount: 0.45,
+  /** Height of the silt-banked wall foot (fraction of wall height) and apron silt touching the wall. */
+  footBlendH: 0.45,
+  /** Extra apron thickness at the wall foot, so talus climbs the face as a slope. */
+  talusTopScale: 1.8,
+  apronSiltAtWall: 0.85,
 } as const;
 
 /** Patchy rockfall and rolled blocks across the apron, rather than a row at its foot. */

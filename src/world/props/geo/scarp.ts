@@ -684,6 +684,11 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       // Each bed keeps its own muted albedo; resistant beds are paler than weak ones.
       const k = Math.min(P.bands - 1, Math.max(0, Math.floor(s)));
       out.copy(bedColour[k]!).multiplyScalar(0.8 + 0.4 * bedHard[k]!);
+      // Slow drift along and up the wall so one bed changes tone instead of striping evenly.
+      const [dx, dy] = MONTEREY_STRATA.toneDriftFrequency;
+      const drift = fbm3(x * dx, y * dy, seed + 41, seed + 63, 2);
+      out.multiplyScalar(1 + MONTEREY_STRATA.toneDrift * (drift - 0.5));
+      if (fidelity) out.lerp(P.drape, MONTEREY_STRATA.faintBedAmount * smooth(0.55, 0.8, drift));
     }
     out.multiplyScalar(
       (0.82 + 0.4 * tone) * (1 + 0.14 * smooth(0.8, 1, saw) - 0.28 * (1 - smooth(0, 0.14, saw))),
@@ -698,7 +703,13 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
         1 - Math.abs(2 * fbm3(x * P.gullyFreq, y * 0.03, seed + 1, seed, gullyOctaves) - 1);
       const gullyShade = 1 - 0.3 * smooth(0.55, 0.9, rill); // erosion gullies read as dark runnels
       const grain = 0.88 + 0.24 * fbm3(x * 1.7, y * 2.2, z * 1.7, seed + 66, 2);
-      out.multiplyScalar((0.84 + 0.32 * lam) * lipDark * lipLit * gullyShade * grain);
+      // Laminae fade in and out along the wall rather than ruling every bed the same way.
+      const lamFade = erodedBeds
+        ? smooth(0.25, 0.7, fbm3(x * 0.035, y * 0.05, seed + 55, seed + 19, 2))
+        : 1;
+      out.multiplyScalar(
+        (1 + (0.84 + 0.32 * lam - 1) * lamFade) * lipDark * lipLit * gullyShade * grain,
+      );
       // Alternate pale resistant beds with ochre-brown weak ones so bedding survives the teal haze.
       if (!erodedBeds) out.lerp(P.drape, 0.22 * smooth(0.5, 0.75, bed));
     }
@@ -721,7 +732,13 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       }
     }
     // The foot is buried in rubble and silt.
-    out.lerp(P.drape, (1 - smooth(joinY, joinY + 0.12 * H, y)) * 0.7);
+    // Silt banks up the lower wall in a ragged line, so the face grades into the apron.
+    const foot = erodedBeds ? MONTEREY_STRATA.footBlendH : 0.12;
+    const ragged = erodedBeds ? 0.6 + 0.8 * fbm3(x * 0.09, 4, seed + 71, seed + 2, 3) : 1;
+    out.lerp(
+      P.drape,
+      (1 - smooth(joinY, joinY + foot * ragged * H, y)) * (erodedBeds ? 0.85 : 0.7),
+    );
   });
   wall.computeBoundingBox();
 
@@ -737,7 +754,11 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     gnd,
     foot: footAt,
     reach: reachFrac,
-    top: (x) => Math.max(0.3, joinY * scaleAt(x) - sinkAt(x)),
+    top: (x) =>
+      Math.max(
+        0.3,
+        joinY * scaleAt(x) * (erodedBeds ? MONTEREY_STRATA.talusTopScale : 1) - sinkAt(x),
+      ),
     seed,
   };
   const full = new THREE.Group();
@@ -756,7 +777,11 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   const apron = buildTalusMesh(talus, W, apronCols, apronRows, TILE_M, (x, y, z, u, out) => {
     const n = fbm3(x * 0.2, z * 0.2, y * 0.1, seed ^ 0x51, 4);
     tone.copy(P.boulder).lerp(P.base, 0.4);
-    out.copy(tone).lerp(P.drape, smooth(0.05, 0.95, u) * 0.85 * (0.7 + 0.5 * n));
+    // Monterey: the apron is already silty against the wall, so wall silt and apron match.
+    const nearWall = erodedBeds ? MONTEREY_STRATA.apronSiltAtWall * (1 - smooth(0, 0.5, u)) : 0;
+    out
+      .copy(tone)
+      .lerp(P.drape, Math.max(smooth(0.05, 0.95, u) * 0.85 * (0.7 + 0.5 * n), nearWall));
     out.multiplyScalar(0.78 + 0.5 * n);
     // Contact shading hugging the foot of the wall.
     out.multiplyScalar(0.82 + 0.18 * smooth(0, 0.25, u));
