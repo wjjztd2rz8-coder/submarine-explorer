@@ -27,6 +27,10 @@ export const missionSystem: GameSystem = {
   name: 'mission',
   dispose: () => cleanup.dispose(),
   init(ctx) {
+    let disposed = false;
+    cleanup.add(() => {
+      disposed = true;
+    });
     approachOpening = false;
     const { route, params, discovery, meta, terrain, config, sub, rig, headlights, bus } = ctx;
     const { save } = ctx;
@@ -36,6 +40,7 @@ export const missionSystem: GameSystem = {
     // Also used to preview the start behind the briefing, so Begin
     // resolves the same pose and the dive starts without a teleport.
     const applyMissionStart = (choice: MissionStartPosition): void => {
+      if (disposed || ctx.app?.state === 'home') return;
       if (!route || params.has('poi') || params.has('at') || params.has('depth')) return;
       // Cap only mission primaries: Extended sensors must still leave a transit.
       approachOpening = choice === 'near-site';
@@ -153,7 +158,15 @@ export const missionSystem: GameSystem = {
         })
       : null;
     ctx.missionRouter = missionRouter;
-    if (missionRouter) cleanup.add(() => missionRouter.dispose());
+    if (missionRouter) {
+      cleanup.add(() => missionRouter.dispose());
+      // Home leaves this mission; selections navigate to a fresh dive page.
+      cleanup.add(
+        bus.on('app:state', ({ state }) => {
+          if (state === 'home') missionRouter.dispose();
+        }),
+      );
+    }
     // Optional models may finish after discovery. Reframe a waiting pilot once,
     // while preserving surface choices, URL probes and anyone already moving.
     cleanup.add(

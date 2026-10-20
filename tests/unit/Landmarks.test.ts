@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import {
   Landmarks,
@@ -167,4 +167,33 @@ describe('Landmarks markers', () => {
     lm.setVisible(true);
     expect(lm.group.visible).toBe(true);
   });
+});
+
+it('late landmark content cannot attach markers or touch terrain after teardown', async () => {
+  let finish!: (value: Response) => void;
+  vi.stubGlobal(
+    'fetch',
+    () =>
+      new Promise<Response>((resolve) => {
+        finish = resolve;
+      }),
+  );
+  const lm = new Landmarks(tile.meta);
+  const scene = new THREE.Scene();
+  scene.add(lm.group);
+  const sample = vi.spyOn(terrain, 'sampleHeight');
+  try {
+    const loading = lm.load(terrain);
+    lm.dispose();
+    sample.mockClear();
+    finish(new Response(JSON.stringify({ landmarks: [{ id: 'a', ...tile.meta.center }] })));
+    await loading;
+    expect(sample).not.toHaveBeenCalled();
+    expect(lm.placed).toHaveLength(0);
+    expect(lm.group.children).toHaveLength(0);
+    expect(scene.children).toHaveLength(0);
+  } finally {
+    sample.mockRestore();
+    vi.unstubAllGlobals();
+  }
 });

@@ -45,6 +45,8 @@ export interface PropsHeightField {
 export type PropLod = 'full' | 'impostor' | 'hidden';
 
 export interface PlacedProp {
+  /** Builder-owned textures, excluding shared asset and generated-map caches. */
+  ownedTextures?: readonly THREE.Texture[];
   def: PropDef;
   /** Carries the placement transform (position, orientation, scale). */
   root: THREE.Group;
@@ -180,6 +182,7 @@ export class Props {
   /** True once `load()` has finished (with or without props). */
   loaded = false;
 
+  private disposed = false;
   private readonly models = new ModelCache();
   private readonly colliders: Collider[] = [];
   private readonly local = new THREE.Vector3();
@@ -213,15 +216,18 @@ export class Props {
     landmarkId: string,
     fetchJson: (url: string) => Promise<unknown> = fetchContentJson,
   ): Promise<PropsStats> {
+    if (this.disposed) return this.stats;
     this.stats = emptyStats(landmarkId);
     const doc = await fetchJson(url);
+    if (this.disposed) return this.stats;
     if (doc !== null && doc !== undefined) await this.placeAll(doc, landmarkId);
-    this.loaded = true;
+    if (!this.disposed) this.loaded = true;
     return this.stats;
   }
 
   /** Validate and place an already-parsed props.json document. */
   async placeAll(doc: unknown, landmarkId: string): Promise<PropsStats> {
+    if (this.disposed) return this.stats;
     this.stats = emptyStats(landmarkId);
     const parsed = parsePropsDoc(doc, this.cfg);
     for (const w of parsed.warnings) console.warn(`[props] ${w}`);
@@ -243,6 +249,10 @@ export class Props {
       jobs.push(
         this.build(def).then(
           (built) => {
+            if (this.disposed) {
+              this.release(def, built);
+              return;
+            }
             this.add(def, built);
             if (def.procedural) this.stats.procedural++;
             else this.stats.models++;
@@ -340,6 +350,7 @@ export class Props {
     built.impostor.visible = false;
     const prop: PlacedProp = {
       def,
+      ownedTextures: built.ownedTextures,
       root,
       full: built.full,
       impostor: built.impostor,
@@ -424,7 +435,9 @@ export class Props {
   async replace(prop: PlacedProp): Promise<void> {
     if (followsTerrain(prop.def)) {
       const built = await this.build(prop.def);
+      this.release(prop.def, prop);
       prop.root.remove(prop.full, prop.impostor);
+      prop.ownedTextures = built.ownedTextures;
       prop.full = built.full;
       prop.impostor = built.impostor;
       prop.localBounds = built.bounds;
@@ -490,6 +503,39 @@ export class Props {
       if (o) return this.placed.find((p) => p.def.id === o!.userData.propId) ?? null;
     }
     return null;
+  }
+
+  /** Release only prop-owned resources; GLB meshes and generated textures are shared caches. */
+  private release(
+    def: PropDef,
+    built: Pick<BuiltProp, 'full' | 'impostor' | 'ownedTextures'>,
+  ): void {
+    const geometries = new Set<THREE.BufferGeometry>();
+    const materials = new Set<THREE.Material>();
+    for (const root of def.procedural ? [built.full, built.impostor] : [built.impostor]) {
+      root.traverse((object) => {
+        const mesh = object as THREE.Mesh;
+        if (mesh.geometry) geometries.add(mesh.geometry);
+        if (mesh.material)
+          for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material])
+            materials.add(material);
+        if ((mesh as THREE.InstancedMesh).isInstancedMesh) (mesh as THREE.InstancedMesh).dispose();
+      });
+    }
+    for (const texture of built.ownedTextures ?? []) texture.dispose();
+    for (const geometry of geometries) geometry.dispose();
+    for (const material of materials) material.dispose();
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    for (const prop of this.placed) this.release(prop.def, prop);
+    this.placed.length = 0;
+    this.colliders.length = 0;
+    this.stats = emptyStats(this.stats.landmarkId);
+    this.group.clear();
+    this.group.removeFromParent();
   }
 
   debugString(): string {

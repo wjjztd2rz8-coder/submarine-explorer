@@ -7,11 +7,10 @@ import { CameraRig } from '../../src/sub/CameraRig.js';
 let ctx: GameContext;
 afterEach(() => {
   renderSystem.dispose?.();
-  ctx?.post.dispose();
   vi.unstubAllGlobals();
 });
 
-function fixture() {
+function fixture(tier: GameContext['tier'] = 'low') {
   const win = Object.assign(new EventTarget(), { innerWidth: 390, innerHeight: 844 });
   const setProperty = vi.fn();
   let touch = true;
@@ -44,7 +43,7 @@ function fixture() {
     renderer,
     rig,
     config: DEFAULT_CONFIG,
-    tier: 'low',
+    tier,
     save: { get: () => ({ uiScale: 150 }) },
   } as unknown as GameContext;
   renderSystem.init?.(ctx);
@@ -106,4 +105,17 @@ it('keeps the landscape projection aligned when touch mode changes without a res
   expect(ctx.post.target.height).toBe(293);
   expect(f.rig.camera.aspect).toBeCloseTo(844 / 390);
   expect(f.rig.camera.view?.enabled).toBe(true);
+});
+
+// The render system owns this pass even on Low, where the draw path skips it.
+it.each(['low', 'high'] as const)('%s: teardown releases the post pass once', (tier) => {
+  fixture(tier);
+  const target = vi.spyOn(ctx.post.target, 'dispose');
+  const depth = vi.spyOn(ctx.post.target.depthTexture!, 'dispose');
+  const material = vi.spyOn(ctx.post.material, 'dispose');
+  renderSystem.dispose?.();
+  renderSystem.dispose?.();
+  expect(target).toHaveBeenCalledOnce();
+  expect(depth).toHaveBeenCalledOnce();
+  expect(material).toHaveBeenCalledOnce();
 });

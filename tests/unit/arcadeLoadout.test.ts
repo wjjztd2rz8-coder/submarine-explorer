@@ -802,3 +802,38 @@ describe('fresh-player mission routing and vehicle loadout', () => {
     }
   });
 });
+
+it.each([false, true])(
+  'Home cancels pending mission starts (skipBriefing=%s)',
+  async (skipBriefing) => {
+    const ctx = context('titanic', 'arcade');
+    stubShell(ctx);
+    ctx.app = { state: 'dive', lastSite: null };
+    ctx.route!.skipBriefing = skipBriefing;
+    let finish!: () => void;
+    const ready = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    ctx.discovery = { ready, pois: [] } as unknown as GameContext['discovery'];
+    const submarine = createSubmarineSystem();
+    try {
+      submarine.init!(ctx);
+      missionSystem.init!(ctx);
+      const dispose = vi.spyOn(ctx.missionRouter!, 'dispose');
+      if (!skipBriefing) ctx.missionRouter!.begin();
+      ctx.app.state = 'home';
+      ctx.bus.emit('app:state', { state: 'home' });
+      finish();
+      await ready;
+      await Promise.resolve();
+      expect(dispose).toHaveBeenCalledOnce();
+      expect(ctx.rig.snap).not.toHaveBeenCalled();
+      expect(
+        ctx.missionRouter!.mission.emitted.filter((e) => e.name === 'mission:started'),
+      ).toHaveLength(skipBriefing ? 1 : 0);
+    } finally {
+      missionSystem.dispose?.();
+      submarine.dispose!();
+    }
+  },
+);

@@ -387,3 +387,41 @@ it.each([false, true])(
     }
   },
 );
+
+it('late POIs and guide cannot repopulate a disposed discovery or apply a stale probe spawn', async () => {
+  const { discovery: first, meta } = setup('titanic');
+  await first.ready;
+  first.dispose();
+  let finish!: () => void;
+  const pending = new Promise<void>((resolve) => {
+    finish = resolve;
+  });
+  vi.stubGlobal('fetch', async (url: string) => {
+    await pending;
+    return new Response(readFileSync(`.${url}`, 'utf8'));
+  });
+  const teleport = vi.fn();
+  const sampleHeight = vi.fn(() => -3800);
+  const discovery = new Discovery({
+    bus: new EventBus(),
+    config: makeConfig(),
+    meta,
+    landmarkId: 'titanic',
+    seabed: { sampleHeight },
+    storage: null,
+    teleport,
+    params: new URLSearchParams('poi=titanic-bow'),
+  });
+  discovery.dispose();
+  finish();
+  await discovery.ready;
+  await Promise.resolve();
+  expect(discovery.loaded).toBe(false);
+  expect(discovery.pois).toHaveLength(0);
+  expect(discovery.scanner.getTargets()).toHaveLength(0);
+  expect(sampleHeight).not.toHaveBeenCalled();
+  expect(discovery.guide.setContent).not.toHaveBeenCalled();
+  expect(teleport).not.toHaveBeenCalled();
+  discovery.dispose();
+  expect(discovery.guide.dispose).toHaveBeenCalledOnce();
+});

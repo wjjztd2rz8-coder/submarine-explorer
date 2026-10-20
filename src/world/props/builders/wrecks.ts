@@ -605,7 +605,12 @@ export function buildHullBlock(
   );
   imp.name = 'hull-block-impostor';
 
-  return { full, impostor: imp, bounds: merged.boundingBox!.clone() };
+  return {
+    full,
+    impostor: imp,
+    bounds: merged.boundingBox!.clone(),
+    ownedTextures: map ? [map] : [],
+  };
 }
 
 /** Registry entries for this family (`builders/index.ts`). */

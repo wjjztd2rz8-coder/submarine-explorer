@@ -7,10 +7,14 @@
 import { fetchContentJson } from '../../game/ContentPath.js';
 import { latLonToWorld } from '../../util/geo.js';
 import { PresetSystem } from '../../world/presets/Presets.js';
+import { Disposables } from '../Disposables.js';
 import type { GameSystem } from '../System.js';
+
+const cleanup = new Disposables();
 
 export const presetsSystem: GameSystem = {
   name: 'presets',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { scene, bus, config, tier, params, meta, contentLandmark, route, terrain, sub } = ctx;
     const presets = new PresetSystem({
@@ -33,6 +37,7 @@ export const presetsSystem: GameSystem = {
       toWorld: (lat, lon) => latLonToWorld(meta, lat, lon),
       fetchJson: fetchContentJson,
     });
+    cleanup.add(() => presets.dispose());
     ctx.presets = presets;
     ctx.expose({ presets });
   },

@@ -6,6 +6,7 @@ import * as manifests from '../../src/core/SiteManifest.js';
 import { DEFAULT_CONFIG, makeConfig } from '../../src/core/Config.js';
 import { latLonToWorld } from '../../src/util/geo.js';
 import {
+  ModelCache,
   parseModel,
   modelLoadUrl,
   parsePropsDoc,
@@ -515,3 +516,153 @@ describe('loaded prop scatter policy', () => {
     },
   );
 });
+
+describe('prop resource lifetime', () => {
+  it('teardown releases procedural geometry/materials and removes collision and scene ownership', async () => {
+    const props = new Props(meta, slope, cfg, 'low');
+    const scene = new THREE.Scene();
+    scene.add(props.group);
+    await props.placeAll({ props: [{ ...base, snap_to_seabed: true }] }, 'test');
+    const geometries = new Set<THREE.BufferGeometry>();
+    const materials = new Set<THREE.Material>();
+    props.group.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (mesh.geometry) geometries.add(mesh.geometry);
+      if (mesh.material)
+        for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material])
+          materials.add(m);
+    });
+    const disposals = [...geometries, ...materials].map((o) => vi.spyOn(o, 'dispose'));
+    const position = props.placed[0].sphere.center.clone();
+    expect(props.collide(position.clone(), 6, new THREE.Vector3())).toBe(true);
+    props.dispose();
+    props.dispose();
+    for (const dispose of disposals) expect(dispose).toHaveBeenCalledOnce();
+    expect(scene.children).toHaveLength(0);
+    expect(props.placed).toHaveLength(0);
+    expect(props.collide(position, 6, new THREE.Vector3())).toBe(false);
+  });
+
+  it.each(['content', 'model'] as const)(
+    'late %s cannot recreate a disposed prop scene',
+    async (stage) => {
+      const props = new Props(meta, slope, cfg, 'low');
+      let finish!: (value: unknown) => void;
+      const pending = new Promise<unknown>((resolve) => {
+        finish = resolve;
+      });
+      const shared = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial());
+      const geometry = vi.spyOn(shared.geometry, 'dispose');
+      const material = vi.spyOn(shared.material, 'dispose');
+      const models = vi.spyOn(ModelCache.prototype, 'get').mockImplementation(async () => {
+        await pending;
+        return shared.clone();
+      });
+      try {
+        const loading =
+          stage === 'content'
+            ? props.load('props.json', 'test', () => pending)
+            : props.placeAll(
+                { props: [{ ...base, model: '/assets/models/rock.glb', snap_to_seabed: true }] },
+                'test',
+              );
+        props.dispose();
+        finish(stage === 'content' ? { props: [{ ...base, snap_to_seabed: true }] } : null);
+        await loading;
+        expect(props.placed).toHaveLength(0);
+        expect(props.group.children).toHaveLength(0);
+        // GLB clones borrow their full-detail resources from the shared asset cache.
+        expect(geometry).not.toHaveBeenCalled();
+        expect(material).not.toHaveBeenCalled();
+      } finally {
+        models.mockRestore();
+        shared.geometry.dispose();
+        shared.material.dispose();
+      }
+    },
+  );
+});
+
+it('a disposed prop system drops late load events and scatter/spawn callbacks', async () => {
+  let finish!: (doc: unknown) => void;
+  const pending = new Promise<unknown>((resolve) => {
+    finish = resolve;
+  });
+  const original = Props.prototype.load;
+  const load = vi.spyOn(Props.prototype, 'load').mockImplementationOnce(function (
+    this: Props,
+    url,
+    id,
+  ) {
+    return original.call(this, url, id, () => pending);
+  });
+  const keepout = vi.fn();
+  const emit = vi.fn();
+  const ctx = {
+    meta,
+    config: DEFAULT_CONFIG,
+    tier: 'low',
+    route: null,
+    terrain: { ...slope, scatter: { setGroundKeepout: keepout, setBoulderKeepout: keepout } },
+    scene: new THREE.Scene(),
+    params: new URLSearchParams('depth=3800'),
+    sub: { position: new THREE.Vector3() },
+    bus: { emit },
+    expose() {},
+  } as unknown as GameContext;
+  try {
+    propsSystem.init!(ctx);
+    propsSystem.dispose?.();
+    finish({ props: [{ ...base, snap_to_seabed: true, clear_ground: true }] });
+    await load.mock.results[0].value;
+    await Promise.resolve();
+    expect(ctx.scene.children).toHaveLength(0);
+    expect(ctx.props.placed).toHaveLength(0);
+    expect(keepout).not.toHaveBeenCalled();
+    expect(emit).not.toHaveBeenCalled();
+  } finally {
+    load.mockRestore();
+    propsSystem.dispose?.();
+  }
+});
+
+it.each(['hull-block', 'debris'])(
+  '%s releases its private rust texture during teardown',
+  async (kind) => {
+    const pixels = new Uint8ClampedArray(4 * 4 * 4).fill(128);
+    const context = new Proxy(
+      {
+        getImageData: () => ({ data: pixels }),
+        createLinearGradient: () => ({ addColorStop() {} }),
+        createRadialGradient: () => ({ addColorStop() {} }),
+      },
+      { get: (target, key) => Reflect.get(target, key) ?? (() => {}) },
+    );
+    vi.stubGlobal('document', { createElement: () => ({ getContext: () => context }) });
+    const props = new Props(meta, slope, { ...cfg, textureSize: 4 }, 'low');
+    try {
+      await props.placeAll(
+        { props: [{ ...base, model: `procedural:${kind}`, snap_to_seabed: true }] },
+        'test',
+      );
+      expect(props.stats.failed).toBe(0);
+      const maps: THREE.Texture[] = [];
+      props.placed[0].full.traverse((o) => {
+        const mesh = o as THREE.Mesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>;
+        if (mesh.material?.map) maps.push(mesh.material.map);
+      });
+      expect(maps[0]).toBeInstanceOf(THREE.Texture);
+      const dispose = vi.spyOn(maps[0], 'dispose');
+      if (kind === 'debris') {
+        await props.replace(props.placed[0]);
+        expect(dispose).toHaveBeenCalledOnce();
+      }
+      props.dispose();
+      props.dispose();
+      expect(dispose).toHaveBeenCalledOnce();
+    } finally {
+      props.dispose();
+      vi.unstubAllGlobals();
+    }
+  },
+);

@@ -148,7 +148,7 @@ export function buildDebris(
     imp.boundingSphere = boxes.boundingSphere;
     impostor.add(imp);
   }
-  return { full, impostor, bounds };
+  return { full, impostor, bounds, ownedTextures: map ? [map] : [] };
 }
 
 /** Registry entries for this family (`builders/index.ts`). */

@@ -9,14 +9,18 @@ import { Atmosphere, atmosphereTier } from '../../render/Atmosphere.js';
 import { Headlights } from '../../render/Headlights.js';
 import { MarineSnow } from '../../render/MarineSnow.js';
 import { Water } from '../../world/Water.js';
+import { Disposables } from '../Disposables.js';
 import type { GameSystem } from '../System.js';
 import { deepOpeningFor, deepSiteWater } from '../../core/Config.js';
 import { siteManifest } from '../../core/SiteManifest.js';
 import { HemisphereLight } from 'three';
 import { siteLightWater } from '../../core/config/atmosphere.js';
 
+const cleanup = new Disposables();
+
 export const atmosphereSystem: GameSystem = {
   name: 'atmosphere',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { config, tier, scene, bus, terrain } = ctx;
     const atmoTier = atmosphereTier(config.water, tier);
@@ -26,6 +30,7 @@ export const atmosphereSystem: GameSystem = {
       atmoTier,
       bus,
     );
+    cleanup.add(() => atmosphere.dispose());
     const policy = siteManifest(ctx.meta.id)?.atmosphere;
     const deep = deepOpeningFor(ctx.meta.id);
     if (deep) {
@@ -41,10 +46,12 @@ export const atmosphereSystem: GameSystem = {
       atmosphere.group.add(hemisphere);
     }
     const headlights = new Headlights(config.water, atmoTier, deep?.lamps ?? policy?.lamps);
+    cleanup.add(() => headlights.dispose());
     // D-MODES: the lights preset from the gameplay options.
     headlights.setPreset(ctx.effective.light);
     scene.add(headlights.group);
     const snow = new MarineSnow(config.water, atmoTier);
+    cleanup.add(() => snow.dispose());
     if (snow.points) scene.add(snow.points);
     const water = new Water(
       scene,
@@ -52,6 +59,7 @@ export const atmosphereSystem: GameSystem = {
       Math.max(terrain.widthM, terrain.depthM),
       atmoTier.beamDetail,
     );
+    cleanup.add(() => water.dispose());
     Object.assign(ctx, { atmoTier, atmosphere, headlights, snow, water });
     ctx.expose({ water, atmosphere, headlights });
   },

@@ -36,6 +36,7 @@ export const renderSystem: GameSystem = {
     const post = new UnderwaterPass(window.innerWidth, window.innerHeight, {
       tier: ctx.config.water.tiers[ctx.tier],
     });
+    cleanup.add(() => post.dispose());
     baseExposure = renderer.toneMappingExposure;
     ctx.post = post;
     ctx.renderStats = { calls: 0, triangles: 0 };

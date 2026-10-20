@@ -54,6 +54,7 @@ for (const mode of ['arcade', 'realistic'] as const) {
         gameplay: { ...config.settings.gameplayPresets[mode], startPosition: 'near-site' },
       };
       const ctx = {
+        app: { state: 'dive' },
         route: { landmarkId: 'titanic', missionId: 'titanic', tileId: 'titanic', def },
         params: new URLSearchParams(),
         discovery: { pois: [target] },
@@ -103,6 +104,14 @@ for (const mode of ['arcade', 'realistic'] as const) {
       const surface = missionStartPose(def, 'surface', [target], ctx.meta, terrain, config);
       expect(sub.position.toArray()).toEqual([surface.x, surface.y, surface.z]);
       expect(sub.yaw).toBeCloseTo(surface.yaw, 6);
+      sub.position.x += 1;
+      const homePosition = sub.position.clone();
+      const homeRadius = target.radius;
+      ctx.app.state = 'home';
+      ctx.bus.emit('props:loaded', { landmarkId: 'titanic', count: 1, models: 0, procedural: 1 });
+      expect(sub.position).toEqual(homePosition);
+      expect(target.radius).toBe(homeRadius);
+      expect(ctx.rig.snap).toHaveBeenCalledTimes(2);
       missionSystem.dispose?.();
       expect(ctx.missionRouter!.dispose).toHaveBeenCalledOnce();
     });
