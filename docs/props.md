@@ -220,3 +220,13 @@ The validator applies the same rules as `PropLoader`, plus: coordinates inside t
 (`--tile`), GLB exists under `public/` and is at most `--max-model-mb` (2), and the GLB has an
 `ATTRIBUTION.md` row (a warning). Exit codes: 0 = valid (warnings allowed unless `--strict`),
 1 = errors, 2 = unreadable file. Python 3.9, standard library only.
+
+## Resource lifetime
+
+The dive's prop system calls `Props.dispose()` on teardown. Disposal is idempotent:
+it detaches the scene root, clears placed props and collisions, and releases procedural
+geometry, materials, instance buffers and builder-owned textures plus each GLB's private
+impostor. Builders list private maps in `BuiltProp.ownedTextures`; replacement releases
+the retired prop resources too. Full GLB
+geometry/materials and generated textures remain owned by their shared caches.
+Content or models arriving after disposal cannot attach props or emit `props:loaded`.

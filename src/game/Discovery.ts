@@ -74,6 +74,7 @@ export class Discovery {
   /** Set once a `?poi=` spawn has been applied. */
   spawnedAt: string | null = null;
 
+  private disposed = false;
   private landmarkName: string;
   private unlocked = new Set<string>();
   private readonly projected = new Vector3();
@@ -115,6 +116,7 @@ export class Discovery {
     const poiParam = params?.get('poi');
     if (poiParam) {
       void this.ready.then(() => {
+        if (this.disposed) return;
         const pose = this.spawnPose(poiParam);
         if (!pose) {
           console.warn(`[discovery] ?poi=${poiParam}: no such POI at landmark "${landmarkId}"`);
@@ -131,6 +133,7 @@ export class Discovery {
   private async load(): Promise<void> {
     const { meta, seabed, config, landmarkId } = this.opts;
     const [defs, guide] = await Promise.all([loadPois(landmarkId), loadGuide(landmarkId)]);
+    if (this.disposed) return;
     this.pois = placePois(defs, meta, seabed, config.scan, landmarkId);
     this.guideDoc = guide;
     this.entries = buildGuideEntries(guide, this.pois);
@@ -291,6 +294,8 @@ export class Discovery {
   }
 
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
     for (const d of this.disposers) d();
     this.overlay.dispose();
     this.guide.dispose();

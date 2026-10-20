@@ -13,6 +13,8 @@ import type { ProceduralPropKind, PropsConfig } from '../../../core/Config.js';
 import type { PropDef } from '../../PropLoader.js';
 
 export interface BuiltProp {
+  /** Textures created for this prop; shared cached maps are excluded. */
+  ownedTextures?: readonly THREE.Texture[];
   /** Full-detail object. */
   full: THREE.Object3D;
   /** Cheap stand-in shown between the LOD distance and the cull distance. */

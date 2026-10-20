@@ -94,6 +94,7 @@ export function createSubmarineSystem(): GameSystem {
         rimStrength: config.submarine.hullRimStrength,
         emissive: config.submarine.hullEmissive,
       });
+      cleanup.add(() => subMesh.dispose());
       ctx.subMesh = subMesh;
 
       scene.add(subMesh.group);

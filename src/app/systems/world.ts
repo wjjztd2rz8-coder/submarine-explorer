@@ -6,10 +6,15 @@
 
 import { Landmarks } from '../../world/Landmarks.js';
 import { Terrain } from '../../world/Terrain.js';
+import { Disposables } from '../Disposables.js';
 import type { GameSystem } from '../System.js';
+
+const terrainCleanup = new Disposables();
+const landmarksCleanup = new Disposables();
 
 export const terrainSystem: GameSystem = {
   name: 'terrain',
+  dispose: () => terrainCleanup.dispose(),
   init(ctx) {
     const { tile, meta, config, tier, scene, bus } = ctx;
     const terrain = new Terrain(
@@ -17,6 +22,10 @@ export const terrainSystem: GameSystem = {
       { ...config.terrain, detailStrength: ctx.settings.detailStrength },
       tier,
     );
+    terrainCleanup.add(() => {
+      terrain.dispose();
+      terrain.group.removeFromParent();
+    });
     ctx.terrain = terrain;
     scene.add(terrain.group);
     bus.emit('terrain:built', {
@@ -39,9 +48,11 @@ export const terrainSystem: GameSystem = {
 
 export const landmarksSystem: GameSystem = {
   name: 'landmarks',
+  dispose: () => landmarksCleanup.dispose(),
   init(ctx) {
     const { meta, config, route, scene, terrain, bus } = ctx;
     const landmarks = new Landmarks(meta, config.landmarks);
+    landmarksCleanup.add(() => landmarks.dispose());
     ctx.landmarks = landmarks;
     // In a mission the POI reticle and objectives guide you; the
     // free-dive markers would only clutter the wreck. Sonar blips stay.

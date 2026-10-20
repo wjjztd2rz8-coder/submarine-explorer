@@ -23,6 +23,11 @@ export const propsSystem: GameSystem = {
     const { meta, terrain, config, scene, params, rig, canvas, route, contentLandmark, bus } = ctx;
     const { sub, spawnDepth } = ctx;
     const props = new Props(meta, terrain, config.props, ctx.tier);
+    let disposed = false;
+    cleanup.add(() => {
+      disposed = true;
+      props.dispose();
+    });
     ctx.props = props;
     scene.add(props.group);
     const propsDebug =
@@ -34,6 +39,7 @@ export const propsSystem: GameSystem = {
     const propsLandmark = route ? contentLandmark : landmarkIdFor(params, meta.id);
     const initialPosition = sub.position.clone();
     void props.load(contentUrl(propsLandmark, 'props.json'), propsLandmark).then((st) => {
+      if (disposed) return;
       if (props.placed.some((p) => p.def.clearsGround))
         terrain.scatter.setGroundKeepout((x, z) => props.coversGround(x, z));
       const manifest = siteManifest(propsLandmark);
@@ -49,6 +55,7 @@ export const propsSystem: GameSystem = {
       // Explicit probes and missions keep their poses; don't teleport a pilot
       // who has already moved while optional models were downloading.
       if (
+        ctx.app?.state !== 'home' &&
         !route &&
         !['at', 'poi', 'depth'].some((key) => params.has(key)) &&
         sub.position.distanceTo(initialPosition) < 2

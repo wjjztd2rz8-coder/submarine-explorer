@@ -139,6 +139,7 @@ export class Landmarks {
   readonly group = new THREE.Group();
   readonly placed: PlacedLandmark[] = [];
 
+  private disposed = false;
   private readonly parts: MarkerParts[] = [];
   private readonly dotGeometry: THREE.SphereGeometry;
 
@@ -175,6 +176,7 @@ export class Landmarks {
 
   /** Place an already-parsed list (also used by tests). */
   place(landmarks: Landmark[], terrain: Terrain): PlacedLandmark[] {
+    if (this.disposed) return this.placed;
     for (const l of landmarks) {
       const ll = landmarkLatLon(l);
       if (!ll || !bboxContains(this.meta.bbox, ll.lat, ll.lon)) continue;
@@ -317,6 +319,9 @@ export class Landmarks {
   }
 
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.group.removeFromParent();
     this.group.traverse((o) => {
       const mesh = o as THREE.Mesh & { material?: THREE.Material & { map?: THREE.Texture | null } };
       mesh.material?.map?.dispose();
