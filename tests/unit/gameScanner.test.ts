@@ -4,6 +4,7 @@ import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus, type GameEvents } from '../../src/core/EventBus.js';
 import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
 import { Scanner, type ScanTarget } from '../../src/game/Scanner.js';
+import titanicPois from '../../data/landmarks/titanic/pois.json' with { type: 'json' };
 
 const DT = 1 / 60;
 const cfg = { ...DEFAULT_CONFIG.scan, coneHalfAngleDeg: 30, closeRangeM: 10, decayPerSecond: 0.5 };
@@ -141,15 +142,25 @@ describe('Scanner', () => {
   );
 
   it.each([false, true])(
-    'selects the nearest adjacent POI at overlapping floor radii and holds its lock (reversed=%s)',
+    'selects the nearest adjacent Titanic fixture at overlapping floor radii and holds its lock (reversed=%s)',
     (reversed) => {
-      const a = target({ id: 'a', position: new Vector3(-10, -100, -80), radius: 30 });
-      const b = target({ id: 'b', position: new Vector3(10, -100, -80), radius: 30 });
+      // Compact fixture positions force overlapping reach; the real wreck sections are far apart.
+      const [a, b] = ['titanic-bow', 'titanic-stern'].map((id, i) => {
+        const poi = titanicPois.pois.find((p) => p.id === id)!;
+        return target({
+          id,
+          name: poi.name,
+          landmarkId: 'titanic',
+          position: new Vector3(i === 0 ? -10 : 10, -100, -80),
+          radius: poi.radius_m,
+          scanSeconds: poi.scan_seconds,
+        });
+      });
       const { scanner } = setup(reversed ? [b, a] : [a, b]);
       scanner.setConfig({ ...cfg, radiusFloorM: 100 });
       for (const [x, expected] of [
-        [-1, 'a'],
-        [1, 'b'],
+        [-1, a.id],
+        [1, b.id],
       ] as const) {
         scanner.update(0, new Vector3(x, -100, 0), NORTH, false);
         expect(scanner.view.nearestId).toBe(expected);
@@ -157,9 +168,10 @@ describe('Scanner', () => {
       }
       scanner.update(0.1, new Vector3(1, -100, 0), NORTH, true);
       scanner.update(0.1, new Vector3(-1, -100, 0), NORTH, true);
-      expect(scanner.view.activeId).toBe('b');
-      expect(scanner.view.nearestId).toBe('b');
-      expect(scanner.view.progress).toBeCloseTo(0.1);
+      expect(scanner.view.activeId).toBe(b.id);
+      expect(scanner.view.nearestId).toBe(b.id);
+      expect(scanner.view.nearestName).toBe(b.name);
+      expect(scanner.view.progress).toBeCloseTo(0.2 / b.scanSeconds);
     },
   );
 

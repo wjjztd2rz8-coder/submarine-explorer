@@ -31,6 +31,35 @@ function researcher(points = 0) {
 
 describe('research rewards and save migration', () => {
   it.each([
+    [1, 35, 'red'],
+    [2, 100, 'green'],
+    [3, 200, 'orange'],
+  ] as const)(
+    'preserves credit spent on retired boost level %s through migration and reload',
+    (level, spent, paint) => {
+      const store = storage();
+      store.setItem(
+        PROGRESS_STORAGE_KEY,
+        JSON.stringify({ version: 1, points: 0, lifetime: 0, upgrades: { boost: level } }),
+      );
+      const save = new ProgressSave(store);
+      expect(save.get().lifetime).toBe(spent);
+      expect(save.get().points).toBe(0);
+      expect(save.get().cosmeticGrants).toContain(`paint:${paint}`);
+      save.save(save.get());
+      const migrated = save.get();
+      for (let reload = 0; reload < 3; reload++) {
+        const restored = new ProgressSave(store);
+        expect(restored.get()).toEqual(migrated);
+        restored.save(restored.get());
+      }
+      const progress = new Progress(new ProgressSave(store));
+      expect(progress.selectCosmetic('paint', paint)).toBe(true);
+      expect(new Progress(new ProgressSave(store)).cosmetics.paint).toBe(paint);
+    },
+  );
+
+  it.each([
     { site: 'old' },
     { site: 'old', keys: null, bonus: false },
     { site: 'old', keys: ['old/a'], bonus: 'false' },

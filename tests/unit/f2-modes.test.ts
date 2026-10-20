@@ -1,12 +1,60 @@
 import { resolveEffective } from '../../src/game/EffectiveSettings.js';
 import { EQUIPMENT } from '../../src/core/config/progress.js';
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { Save, migrate, SETTINGS_STORAGE_KEY } from '../../src/core/Save.js';
 import { currentScale, MODES_CONFIG } from '../../src/core/config/modes.js';
 import { modesSystem } from '../../src/app/systems/modes.js';
 import type { GameContext } from '../../src/app/context.js';
 import titanicPois from '../../data/landmarks/titanic/pois.json' with { type: 'json' };
+
+it('restores Titanic data radii through live Arcade, Realistic and Custom changes without compounding', async () => {
+  const save = new Save({ config: DEFAULT_CONFIG, storage: null });
+  const configBefore = structuredClone(DEFAULT_CONFIG);
+  const ready = Promise.resolve();
+  const ctx = {
+    config: DEFAULT_CONFIG,
+    save,
+    daily: null,
+    effective: resolveEffective(save.get(), 'arcade', null),
+    discovery: {
+      ready,
+      pois: titanicPois.pois.map((p) => ({ id: p.id, radius: p.radius_m })),
+      scanner: { setConfig: vi.fn() },
+    },
+    sub: { setConfig: vi.fn() },
+    rig: { setConfig: vi.fn() },
+    power: { setConfig: vi.fn(), setEnabled: vi.fn() },
+    headlights: { setPreset: vi.fn() },
+    sonar: { setSensorRange: vi.fn() },
+    presets: { setCurrentMode: vi.fn() },
+    hud: { setCurrentMode: vi.fn() },
+    expose: vi.fn(),
+  } as unknown as GameContext;
+  try {
+    modesSystem.init!(ctx);
+    await ready;
+    modesSystem.start!(ctx);
+    for (const mode of ['realistic', 'arcade', 'realistic', 'arcade'] as const) {
+      save.setGameplayMode(mode);
+      for (const custom of [false, true]) {
+        if (custom) save.setGameplayOption('visualHints', !save.get().gameplay.visualHints);
+        expect(ctx.effective.scan.radiusFloorM).toBe(mode === 'arcade' ? 100 : 0);
+        for (const poi of ctx.discovery.pois) {
+          const authored = titanicPois.pois.find((p) => p.id === poi.id)!.radius_m;
+          expect(ctx.baseScanRadii.get(poi.id)).toBe(authored);
+          expect(poi.radius).toBe(
+            Math.max(mode === 'arcade' ? 100 : 0, authored * (mode === 'arcade' ? 2.4 : 1.2)),
+          );
+        }
+        expect(ctx.discovery.scanner.setConfig).toHaveBeenLastCalledWith(ctx.effective.scan);
+      }
+    }
+    expect(DEFAULT_CONFIG).toEqual(configBefore);
+  } finally {
+    modesSystem.dispose?.();
+  }
+});
 
 it.each(['arcade', 'realistic'] as const)(
   'resolves Titanic free-dive targets in %s from their authored data',
