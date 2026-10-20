@@ -149,10 +149,10 @@ export const LOST_CITY_FIDELITY: TerrainFidelity = {
   reliefM: 1.8,
   reliefWavelengthM: 36,
   // Parallel sine beds and z-stretched rills read as stretched stripes on the slope.
-  reliefBed: 0.08,
+  reliefBed: 0,
   rillStretch: 1,
   // Carbonate-cemented beds break into irregular shelves and rubble treads between the spires.
-  terrace: { periodM: 12, amount: 0.9 },
+  terrace: { periodM: 16, amount: 1.5 },
   normalStrength: 0.2,
 };
 

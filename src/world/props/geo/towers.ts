@@ -39,7 +39,7 @@ import { scatterRubble } from './talus.js';
 import { rimDrop, spireRadius, tieredSpire, trunkCrest, type SpireOpts } from './spire.js';
 import type { GeoBuildInput } from './types.js';
 
-const OLD = new THREE.Color(0xc8c0ac); // weathered, inactive carbonate
+const OLD = new THREE.Color(0xdcd3bc); // weathered, inactive carbonate
 const LIVE = new THREE.Color(0xfaf6ec); // fresh white carbonate and brucite, faintly warm
 const STAIN = new THREE.Color(0x938d7c);
 const CREAM = new THREE.Color(0xf8ecd2); // warm cream carbonate crust
@@ -423,7 +423,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     // drifting in broad patches that stretch vertically with the flow.
     const mineral = fbm3(x * 0.32, y * 0.045, z * 0.32, seed ^ 0x3b1, 3);
     out.lerp(CREAM, smooth(0.46, 0.64, mineral) * 0.6 * (0.4 + up));
-    out.lerp(GREYBLUE, (1 - smooth(0.34, 0.54, mineral)) * 0.7);
+    out.lerp(GREYBLUE, (1 - smooth(0.34, 0.54, mineral)) * 0.4);
     out.lerp(
       OCHRE,
       smooth(0.44, 0.62, fbm3(x * 0.2 + 9, y * 0.06, z * 0.2, seed ^ 0x0c4, 3)) * 0.8,
@@ -473,8 +473,8 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     }
     // Broad, slow staining: white crust patches against grey-brown weathered patches.
     const patch = fbm3(x * 0.07 + 4, y * 0.05, z * 0.07 + 4, seed ^ 0x9a7, 2);
-    out.lerp(TROUGH, smooth(0.5, 0.72, patch) * 0.5 * wall);
-    out.lerp(LIVE, (1 - smooth(0.28, 0.46, patch)) * 0.45 * wall * (0.3 + up));
+    out.lerp(TROUGH, smooth(0.5, 0.72, patch) * 0.3 * wall);
+    out.lerp(LIVE, (1 - smooth(0.28, 0.46, patch)) * 0.6 * wall * (0.3 + up));
     // Mottling: broad grey and ochre patches break the white wall; the foot is dirtier.
     const mottle = 0.5 + 2 * (fbm3(x * 0.11 + 5, y * 0.09, z * 0.11 + 5, seed ^ 0x6d1, 3) - 0.5);
     const foot = 1 - smooth(0.04, 0.4, (y - gnd(x, z)) / H);
