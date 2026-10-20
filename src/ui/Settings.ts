@@ -484,7 +484,8 @@ export class SettingsScreen {
     this.backButton.hidden = !show;
     // Extra header shortcuts (the dive's device layout) belong to the Settings view only, so
     // Back is the first control in the Controls view.
-    for (const b of this.root.querySelectorAll<HTMLElement>('.settings-layout-open')) b.hidden = show;
+    for (const b of this.root.querySelectorAll<HTMLElement>('.settings-layout-open'))
+      b.hidden = show;
     if (this.isOpen) (this.trap.focusables()[0] ?? this.panel).focus();
   }
 
