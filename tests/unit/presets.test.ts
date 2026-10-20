@@ -9,12 +9,12 @@ import {
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import { PerspectiveCamera, Points, Scene, Vector3 } from 'three';
+import { PerspectiveCamera, PointLight, Points, Scene, Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { Atmosphere } from '../../src/render/Atmosphere.js';
 import { Currents } from '../../src/world/Currents.js';
-import { VentPreset } from '../../src/world/presets/VentPreset.js';
+import { VentPreset, ventVariety } from '../../src/world/presets/VentPreset.js';
 import type { PresetEnterContext, PresetParams } from '../../src/world/presets/types.js';
 import {
   landmarkTypeFor,
@@ -265,8 +265,15 @@ describe('vent plume variety', () => {
   });
 });
 
-describe('vent haze draw budget', () => {
-  function enter(params: PresetParams): { scene: Scene; preset: VentPreset } {
+function glowLights(scene: Scene): PointLight[] {
+  return scene.children.filter(
+    (object): object is PointLight =>
+      object instanceof PointLight && object.name.startsWith('presetGlow'),
+  );
+}
+
+describe('vent haze and glow budgets', () => {
+  function enter(params: PresetParams, overrides: Partial<PresetEnterContext> = {}) {
     const scene = new Scene();
     const preset = new VentPreset({ ambient: 0.12, headlightGain: 1.6, headlightFalloffM: 90 });
     const context: PresetEnterContext = {
@@ -286,10 +293,162 @@ describe('vent haze draw budget', () => {
       spawn: new Vector3(0, -4980, 0),
       toWorld: () => ({ x: 0, z: 0 }),
       bus: new EventBus(),
+      ...overrides,
     };
     preset.enter(context);
-    return { scene, preset };
+    return { scene, preset, context };
   }
+
+  it('keeps zero offsets distinct from omitted defaults through mission override resolution', () => {
+    const defaults = presetDefaults(DEFAULT_CONFIG.presets, 'vent');
+    expect(defaults).toMatchObject({ glowDropM: 4, glowStandoffM: 0 });
+    for (const [overrides, drop, standoff] of [
+      [{}, 4, 0],
+      [{ glowDropM: 0 }, 0, 0],
+      [{ glowStandoffM: 6 }, 4, 6],
+      [{ glowDropM: 12, glowStandoffM: 0 }, 12, 0],
+      [{ glowDropM: 0, glowStandoffM: 6 }, 0, 6],
+      [{ glowDropM: 12, glowStandoffM: 6 }, 12, 6],
+      [{ glowDropM: 1_000_000, glowStandoffM: 1_000_000 }, 1_000_000, 1_000_000],
+    ] as const) {
+      const warn = vi.fn();
+      const resolved = mergePresetParams('vent', defaults, overrides, warn);
+      expect(warn).not.toHaveBeenCalled();
+      // Also exercise the consumer's own omitted-parameter fallback.
+      for (const params of [resolved, overrides]) {
+        const { scene, preset, context } = enter(params);
+        try {
+          const top = context.pois[0]!.position;
+          const lights = glowLights(scene);
+          expect(lights).toHaveLength(1);
+          const delta = lights[0]!.position.clone().sub(top);
+          expect(delta.y).toBeCloseTo(-drop);
+          expect(Math.hypot(delta.x, delta.z)).toBeCloseTo(standoff);
+          expect(delta.toArray().every(Number.isFinite)).toBe(true);
+        } finally {
+          preset.exit();
+        }
+      }
+    }
+  });
+
+  it.each([NaN, Infinity, -Infinity, -1, 1_000_001, null, '6'])(
+    'keeps defaults when new offset overrides are outside the accepted domain (%s)',
+    (invalid) => {
+      resetOverrideWarnings();
+      const warn = vi.fn();
+      const params = mergePresetParams(
+        'vent',
+        presetDefaults(DEFAULT_CONFIG.presets, 'vent'),
+        { glowDropM: invalid, glowStandoffM: invalid },
+        warn,
+      );
+      expect(params).toMatchObject({ glowDropM: 4, glowStandoffM: 0 });
+      expect(warn).toHaveBeenCalledTimes(2);
+    },
+  );
+
+  it('offsets the tallest selected chimney orifices along the supported seeded lean', () => {
+    for (const { firstTop, maxSources, selected } of [
+      { firstTop: new Vector3(0, -4990, 0), maxSources: 2, selected: [1, 3] },
+      { firstTop: new Vector3(31, -4905, -8), maxSources: 4, selected: [1, 3, 2] },
+    ]) {
+      const props = [10, 40, 20, 30].map((height, i) => ({
+        id: `chimney-${i}`,
+        model: 'procedural:chimney',
+        top: Object.freeze(
+          i === 1 ? firstTop.clone() : new Vector3(i * 13, -5000 + height, -i * 7),
+        ),
+        centre: Object.freeze(new Vector3()),
+        radius: 2,
+        height,
+      }));
+      const before = props.map((p) => p.top.toArray());
+      const { scene, preset } = enter(
+        Object.freeze({ glowDropM: 12, glowStandoffM: 6, glowLights: 8, maxSources }),
+        { props: Object.freeze(props) },
+      );
+      try {
+        const lights = glowLights(scene);
+        expect(lights).toHaveLength(selected.length); // Both source count and the three-light cap apply.
+        const angle = 0.35 + (ventVariety(firstTop).lean % 1) * 0.5;
+        for (const [i, source] of selected.entries()) {
+          const top = props[source]!.top;
+          const delta = lights[i]!.position.clone().sub(top);
+          expect(delta.x).toBeCloseTo(6 * Math.cos(angle));
+          expect(delta.y).toBe(-12);
+          expect(delta.z).toBeCloseTo(6 * Math.sin(angle));
+          expect(Math.hypot(delta.x, delta.z)).toBeCloseTo(6);
+        }
+        expect(props.map((p) => p.top.toArray())).toEqual(before);
+        expect(preset.stats.lights).toBe(selected.length);
+      } finally {
+        preset.exit();
+      }
+    }
+  });
+
+  it('preserves carbonate lights at two metres above the orifice despite sulfide offsets', () => {
+    const { scene, preset, context } = enter({
+      fluid: 'carbonate',
+      glowDropM: 12,
+      glowStandoffM: 6,
+    });
+    try {
+      const lights = glowLights(scene);
+      expect(lights).toHaveLength(1);
+      expect(lights[0]!.position.toArray()).toEqual(
+        context.pois[0]!.position.clone()
+          .add(new Vector3(0, 2, 0))
+          .toArray(),
+      );
+      expect(lights[0]!.intensity).toBe(260 * 0.35);
+    } finally {
+      preset.exit();
+    }
+  });
+
+  it('disposes each glow once and recreates without stale lights or compounded offsets', () => {
+    const params = Object.freeze({ glowDropM: 12, glowStandoffM: 6, glowLights: 3 });
+    const { scene, preset, context } = enter(params);
+    const top = context.pois[0]!.position.clone();
+    const first = glowLights(scene)[0]!;
+    const expected = first.position.clone();
+    const dispose = vi.spyOn(first, 'dispose');
+    preset.exit();
+    preset.exit();
+    expect(dispose).toHaveBeenCalledTimes(1);
+    expect(first.parent).toBeNull();
+    expect(scene.children).toHaveLength(0);
+    first.position.set(100, 200, 300);
+    for (const next of [
+      context,
+      { ...context, visuals: false },
+      context,
+      { ...context, pois: [] },
+      context,
+      { ...context, params: { ...params, glowLights: 0 } },
+      { ...context, scene: new Scene() },
+    ]) {
+      preset.enter(next);
+      const lights = glowLights(next.scene);
+      const count = next.visuals && next.pois.length && next.params.glowLights !== 0 ? 1 : 0;
+      expect(lights).toHaveLength(count);
+      expect(preset.stats.lights).toBe(count);
+      if (count) {
+        expect(lights[0]).not.toBe(first);
+        expect(lights[0]!.position).toEqual(expected);
+      }
+      const disposals = lights.map((light) => vi.spyOn(light, 'dispose'));
+      preset.exit();
+      expect(disposals.every((spy) => spy.mock.calls.length === 1)).toBe(true);
+      expect(next.scene.children).toHaveLength(0);
+      expect(scene.children).toHaveLength(0);
+      expect(preset.stats).toEqual({ draws: 0, particles: 0, lights: 0 });
+    }
+    expect(context.pois[0]!.position).toEqual(top);
+    expect(params).toEqual({ glowDropM: 12, glowStandoffM: 6, glowLights: 3 });
+  });
 
   it('keeps generic vent geometry at two draws with Config defaults or omitted params', () => {
     for (const params of [presetDefaults(DEFAULT_CONFIG.presets, 'vent'), {}]) {
@@ -407,6 +566,15 @@ describe('per-site preset atmosphere', () => {
           site === 'unknown-site'
             ? null
             : JSON.parse(readFileSync(`data/landmarks/${site}/mission.json`, 'utf8'));
+        const ventPois =
+          mission?.environment?.preset === 'vent'
+            ? Array.from({ length: 4 }, (_, i) => ({
+                id: `orifice-${i}`,
+                kind: 'vent',
+                position: Object.freeze(new Vector3(13 * i, -990 + i, -7 * i)),
+              }))
+            : [];
+        const sourceBefore = JSON.stringify({ mission, ventPois, presets: config.presets });
         const system = new PresetSystem({
           scene,
           bus: new EventBus(),
@@ -426,7 +594,10 @@ describe('per-site preset atmosphere', () => {
           // The same POI id everywhere must not enable another site's policy.
           discovery: {
             loaded: true,
-            pois: [{ id: 'endurance-hull', kind: 'wreck', position: new Vector3(0, -990, 0) }],
+            pois: [
+              { id: 'endurance-hull', kind: 'wreck', position: new Vector3(0, -990, 0) },
+              ...ventPois,
+            ],
           },
           sub: { position, velocity: new Vector3(), floorFor: (ground) => ground + 10 },
           currents,
@@ -451,8 +622,41 @@ describe('per-site preset atmosphere', () => {
             expect(scene.getObjectByName('enduranceRelief') !== undefined).toBe(
               site === 'endurance' && tier !== 'low',
             );
+            if (ventPois.length) {
+              const lights = glowLights(scene);
+              const count =
+                tier === 'low' || site === 'lost-city' ? 0 : site === 'beebe-vent-field' ? 3 : 2;
+              expect(lights).toHaveLength(count);
+              expect(system.preset!.stats.lights).toBe(count);
+              expect(new Set(lights.map((light) => light.name)).size).toBe(count);
+              expect(system.params).toMatchObject({
+                glowDropM: site === 'beebe-vent-field' ? 12 : 4,
+                glowStandoffM: site === 'beebe-vent-field' ? 6 : 0,
+              });
+              for (const [i, light] of lights.entries()) {
+                const delta = light.position.clone().sub(ventPois[i]!.position);
+                expect(delta.toArray().every(Number.isFinite)).toBe(true);
+                expect(delta.y).toBe(site === 'beebe-vent-field' ? -12 : -4);
+                expect(Math.hypot(delta.x, delta.z)).toBeCloseTo(
+                  site === 'beebe-vent-field' ? 6 : 0,
+                );
+                expect(light.distance).toBe(60);
+                expect(light.decay).toBe(2);
+                expect(light.castShadow).toBe(false);
+                const elapsed = frame / 60;
+                const base = site === 'beebe-vent-field' ? 3000 : 260;
+                expect(light.intensity).toBeCloseTo(
+                  base *
+                    (1 +
+                      0.07 * Math.sin(elapsed * 1.3 + i * 2.1) +
+                      0.04 * Math.sin(elapsed * 3.7 + i)),
+                );
+              }
+            }
           }
           system.dispose();
+          expect(glowLights(scene)).toHaveLength(0);
+          expect(JSON.stringify({ mission, ventPois, presets: config.presets })).toBe(sourceBefore);
           expect(atmosphere.update(-100, position, 0).hullLight).toBe(1);
         } finally {
           system.dispose();
