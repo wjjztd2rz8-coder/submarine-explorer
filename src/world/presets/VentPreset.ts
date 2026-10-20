@@ -135,15 +135,16 @@ export class VentPreset implements EnvPreset {
     );
     if (glowCount > 0) {
       const scale = carbonate ? num(p.glowCarbonateScale, 0.35) : 1;
+      const standoff = carbonate ? 0 : num(p.glowStandoffM, 0);
       this.glow = new GlowLights(
         ctx.scene,
         this.sources.slice(0, glowCount).map((s) =>
           s.top.clone().add(
             // Beside the stack, not on its axis: a light inside the column only lights the ground.
             new THREE.Vector3(
-              this.hazeLean.x * num(p.glowStandoffM, 0),
+              this.hazeLean.x * standoff,
               carbonate ? 2 : -num(p.glowDropM, 4),
-              this.hazeLean.y * num(p.glowStandoffM, 0),
+              this.hazeLean.y * standoff,
             ),
           ),
         ),
