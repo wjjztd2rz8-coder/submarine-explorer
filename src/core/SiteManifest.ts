@@ -75,7 +75,6 @@ const smokerDetailKeys = [
   'shelfJitter',
   'mouthClearanceM',
   'topMouthRadiusFraction',
-  'topMouthRecessFraction',
   'outletStartHeightFraction',
   'outletHeightStepFraction',
   'outletStartAngleRad',

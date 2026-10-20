@@ -67,7 +67,6 @@
         "collarEmissive": 1511693,
         "mouthClearanceM": 0.01,
         "topMouthRadiusFraction": 0.66,
-        "topMouthRecessFraction": 0.2,
         "outletCount": 3,
         "outletStartHeightFraction": 0.36,
         "outletHeightStepFraction": 0.14,
