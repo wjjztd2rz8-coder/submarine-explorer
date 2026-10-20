@@ -1563,3 +1563,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** at 2% 5h until 16:30; queued 2800 (verify Lost City/Beebe numerics), 2810 (Low-tier journey bug hunt), 2820 (CI watch of f-bughunt-960). 2770-2790 already collected earlier.
 - **Next Claude:** V-journeys-run, V-titanic-plating, V-monterey-bands; tag after hosted CI green.
 - **Needs owner:** phone retest on the newest build; real-phone Low play.
+
+## 2026-10-20 16:08 CDT headless run 68 (Claude)
+
+- **Merged (smoke + project-base green, no full e2e):** Sonnet V-titanic-plating (lane tint halved, warm rust deck tops in shared steel shader; I rate ~3.7, per-plate blockiness remains). Pushed.
+- **CI:** previous run still queued at start; no tag. Codex 2800-2820 queued (Codex at 2% 5h).
+- **Next Claude:** V-journeys-run, V-monterey-bands; tag after hosted CI green.
+- **Needs owner:** phone retest on the newest build; real-phone Low play.
