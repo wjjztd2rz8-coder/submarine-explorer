@@ -1,14 +1,60 @@
-import { Vector3 } from 'three';
+import { BoxGeometry, BufferGeometry, Float32BufferAttribute, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
+import { GRAPHICS_TIERS } from '../../src/core/config/quality.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
 import { apertureFor, clearFraction, CockpitView } from '../../src/vehicles/cockpit.js';
 import { buildVehicle, lodForTier, Vehicle } from '../../src/vehicles/index.js';
+import { auditVehicle, clearance, solid } from './helpers/vehicleClearance.js';
 
 /** Per-tier budgets for one vehicle. */
 const BUDGET = {
   low: { drawCalls: 8, triangles: 18_000 },
   full: { drawCalls: 25, triangles: 36_000 },
 };
+
+describe('sub geometry clearance', () => {
+  it('measures triangle gaps, crossings and enclosed solids independently of bounding boxes', () => {
+    const triangle = (vertices: number[]) => {
+      const g = new BufferGeometry();
+      g.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+      const result = solid(g, 'triangle');
+      g.dispose();
+      return result;
+    };
+    const a = triangle([0, 0, 0, 2, 0, 0, 0, 2, 0]);
+    const b = triangle([2, 2, 0, 2, 1.5, 0, 1.5, 2, 0]);
+    expect(a.bounds.intersectsBox(b.bounds)).toBe(true);
+    expect(clearance(a, b)).toBeCloseTo(1.5 * Math.SQRT1_2, 6);
+    expect(clearance(a, triangle([0.5, 0.5, -1, 0.5, 0.5, 1, 3, 3, 0]))).toBe(0);
+    expect(clearance(a, triangle([0.5, 0.5, 0, 3, 0.5, 0, 0.5, 3, 0]))).toBe(0);
+    const outer = new BoxGeometry(4, 4, 4);
+    const inner = new BoxGeometry(1, 1, 1);
+    try {
+      expect(solid(outer, 'outer').closed).toBe(true);
+      expect(clearance(solid(inner, 'inner'), solid(outer, 'outer'))).toBe(0);
+      inner.translate(3, 0, 0);
+      expect(clearance(solid(inner, 'inner'), solid(outer, 'outer'))).toBeCloseTo(0.5, 6);
+    } finally {
+      outer.dispose();
+      inner.dispose();
+    }
+  });
+
+  for (const hull of ['A', 'B', 'C']) {
+    for (const tier of GRAPHICS_TIERS) {
+      // Acceptance for Claude's hull correction: prevent the phone regression
+      // where a spinning propeller occupies a fin and thruster ducts clip the hull.
+      it(`${hull} ${tier}: propellers and thrusters clear the hull, fins and neighbours`, () => {
+        const report = auditVehicle(hull, tier);
+        expect(report).toHaveLength(5);
+        expect(
+          report.filter((part) => part.contacts.length || !Number.isFinite(part.gap)),
+          JSON.stringify(report, null, 2),
+        ).toEqual([]);
+      });
+    }
+  }
+});
 
 describe('vehicle builds (F1-VEHICLES)', () => {
   it('builds three distinct hull classes within the tier budgets', () => {
