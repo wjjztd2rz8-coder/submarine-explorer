@@ -45,6 +45,10 @@ for (const site of [
           terrain.sampleHeight(x, z),
         )) {
           const { kind } = contact;
+          expect(
+            contact.position.y - terrain.sampleHeight(contact.position.x, contact.position.z),
+            'the authored contact must be above the detailed bed so arrival is reachable',
+          ).toBeGreaterThan(0);
           if (kind !== 'whale') {
             const opening = new THREE.Vector3(pose.x, pose.y, pose.z);
             expect(

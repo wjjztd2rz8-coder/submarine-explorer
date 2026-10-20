@@ -176,7 +176,12 @@ describe('guidance slot', () => {
       expect(step().detail).toBe('RISE TOWARD TARGET');
       overlay.slot.offer('event', 'discovery', msg('Sighting'));
       expect(texts(overlay.slot).name).toBe('Sighting');
+      overlay.slot.offer('warning', 'urgent', msg('SEABED PROXIMITY'));
+      expect(texts(overlay.slot).name).toBe('SEABED PROXIMITY');
+      overlay.slot.offer('warning', 'urgent', null);
+      expect(texts(overlay.slot).name).toBe('Sighting');
       overlay.slot.offer('event', 'discovery', null);
+      expect(texts(overlay.slot).name).toBe('Vent plume');
       position.set(0, 0, 51);
       expect(step().hidden).toBe(true);
       overlay.dispose();

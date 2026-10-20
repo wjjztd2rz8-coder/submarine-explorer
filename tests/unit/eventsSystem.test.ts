@@ -33,7 +33,13 @@ for (const site of allSiteManifests().filter((site) => site.events)) {
         })),
       );
       const progress = new Progress(new ProgressSave(null));
-      const store = new DiscoveryStore(null);
+      const saved = new Map<string, string>();
+      const storage = {
+        getItem: (key: string) => saved.get(key) ?? null,
+        setItem: (key: string, value: string) => saved.set(key, value),
+        removeItem: (key: string) => saved.delete(key),
+      };
+      const store = new DiscoveryStore(storage);
       const exposed = { progress } as unknown as {
         progress: Progress;
         explore: {
@@ -185,6 +191,44 @@ for (const site of allSiteManifests().filter((site) => site.events)) {
         expect(exposed.explore.events.active).toBeNull();
         expect(exposed.explore.summary().events).toEqual([]);
         expect(store.isDiscovered(site.id, `event:${kind}`)).toBe(true);
+        // A reload keeps the Journal record, but starts a fresh arrival latch and dive summary.
+        system.dispose!();
+        const restored = new DiscoveryStore(storage);
+        expect(restored.snapshot()).toEqual(store.snapshot());
+        const reloadedContext = {
+          ...context,
+          discovery: {
+            ...context.discovery,
+            store: restored,
+            scanner: new Scanner(DEFAULT_CONFIG.scan, bus, restored),
+          },
+        } as unknown as GameContext;
+        const reloaded = createExploreSystem();
+        reloaded.init!(reloadedContext);
+        try {
+          await vi.waitFor(() => expect(exposed.explore.ready).toBe(true));
+          expect(exposed.explore.summary().events).toEqual([]);
+          expect(exposed.explore.events.active).toBeNull();
+          const step = () =>
+            reloaded.frame!['world.life']!(
+              {
+                pilotPosition: position,
+                clockDt: 1,
+                dt: 1,
+                blocked: false,
+                frozen: false,
+              } as FrameState,
+              reloadedContext,
+            );
+          step();
+          expect(exposed.explore.events.active?.kind).toBe(kind);
+          step();
+          expect(exposed.explore.summary().events).toHaveLength(1);
+          expect(restored.snapshot()).toEqual(store.snapshot());
+          expect(witnessed).toHaveBeenCalledTimes(3);
+        } finally {
+          reloaded.dispose!();
+        }
       } finally {
         system.dispose!();
       }
