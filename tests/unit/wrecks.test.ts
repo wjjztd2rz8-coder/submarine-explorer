@@ -60,6 +60,10 @@ it('textured steel shares plate tint and bounded rim light across tiers without 
       expect(steelMaterial(detail)).toBe(material);
       expect(material.map).toBe(map);
       expect(material.normalMap).toBe(tier === 'high' ? normal : null);
+      if (material.normalMap) {
+        expect(material.normalMapType).toBe(THREE.TangentSpaceNormalMap);
+        expect(material.normalScale.toArray()).toEqual([0.8, 0.8]);
+      }
       expect(material.roughness).toBe(0.9);
       expect(material.metalness).toBe(0.12);
       expect(material.emissive.getHex()).toBe(0);
@@ -137,6 +141,125 @@ it('textured steel shares plate tint and bounded rim light across tiers without 
           normal.multiplyScalar(-4);
           expect(evaluate()).toBeCloseTo(value, 12);
           previous = value;
+        }
+      }
+      const up = source.match(/float up = ([^;]+);/)!;
+      const multiplier = source.match(/outgoingLight\s*\*=\s*([^;]+);/)!;
+      expect(up).not.toBeNull();
+      expect(multiplier).not.toBeNull();
+      expect(source.indexOf(up[0])).toBeGreaterThan(
+        source.indexOf('#include <normal_fragment_maps>'),
+      );
+      expect(source.indexOf(up[0])).toBeGreaterThan(source.indexOf(weight[0]));
+      expect(source.indexOf(multiplier[0])).toBeLessThan(
+        source.indexOf('#include <opaque_fragment>'),
+      );
+      const endpoints = multiplier[1]!.match(/^mix\((vec3\([^)]+\)), (vec3\([^)]+\)),/)!;
+      expect(endpoints).not.toBeNull();
+      // Adapt only GLSL vector construction/multiplication to Three's CPU math;
+      // evaluate the emitted classification and blend rather than restating them.
+      const upMultiplier = new Function(
+        'normal',
+        'viewMatrix',
+        'normalize',
+        'dot',
+        'clamp',
+        'vec4',
+        'transform',
+        'vec3',
+        'mix',
+        'smoothstep',
+        `const up = ${up[1]!.replace(
+          /\(viewMatrix\s*\*\s*(vec4\([^)]+\))\)\.xyz/g,
+          'transform($1, viewMatrix)',
+        )}; return { up, value: ${multiplier[1]}, neutral: ${endpoints[1]}, rust: ${endpoints[2]} };`,
+      );
+      const evaluateUp = (normal: THREE.Vector3, view: THREE.Matrix4) =>
+        upMultiplier(
+          normal,
+          view,
+          (v: THREE.Vector3) => v.clone().normalize(),
+          (a: THREE.Vector3, b: THREE.Vector3) => a.dot(b),
+          THREE.MathUtils.clamp,
+          (x: number, y: number, z: number, w: number) => new THREE.Vector4(x, y, z, w),
+          (v: THREE.Vector4, m: THREE.Matrix4) => {
+            const result = v.clone().applyMatrix4(m);
+            return new THREE.Vector3(result.x, result.y, result.z);
+          },
+          (x: number, y = x, z = x) => new THREE.Vector3(x, y, z),
+          (a: THREE.Vector3, b: THREE.Vector3, t: number) => a.clone().lerp(b, t),
+          (lo: number, hi: number, x: number) => THREE.MathUtils.smoothstep(x, lo, hi),
+        ) as { up: number; value: THREE.Vector3; neutral: THREE.Vector3; rust: THREE.Vector3 };
+      const worldNormals = [
+        new THREE.Vector3(0, 1, 0), // deck
+        new THREE.Vector3(1, 0, 0), // side
+        new THREE.Vector3(0, -1, 0), // underside
+        ...Array.from({ length: 21 }, (_, i) => {
+          const y = i / 10 - 1;
+          return new THREE.Vector3(Math.sqrt(1 - y * y), y, 0);
+        }),
+      ];
+      if (material.normalMap) {
+        // Synthetic tangent-space perturbations on each surface. Three's final
+        // normal is in view space; the source audit separately traces its TBN.
+        for (const n of worldNormals.slice(0, 3)) {
+          const tangent = new THREE.Vector3(0, 0, 1);
+          const bitangent = n.clone().cross(tangent);
+          for (const [x, y, z] of [
+            [0, 0, 1],
+            [0.6, -0.3, 0.74],
+            [-0.8, 0.2, 0.56],
+          ]) {
+            worldNormals.push(
+              n
+                .clone()
+                .multiplyScalar(z!)
+                .addScaledVector(tangent, x! * material.normalScale.x)
+                .addScaledVector(bitangent, y! * material.normalScale.y)
+                .normalize(),
+            );
+          }
+        }
+      }
+      const rotations = [
+        [0, 0, 0],
+        [Math.PI / 2, 0, 0],
+        [0, Math.PI, 0],
+        [0, 0, Math.PI / 2],
+        [0.7, -1.2, 2.4],
+      ];
+      for (const [index, worldNormal] of worldNormals.entries()) {
+        const reference = evaluateUp(worldNormal, new THREE.Matrix4());
+        expect(reference.up).toBeCloseTo(Math.max(0, worldNormal.y), 12);
+        if (index < 3) {
+          expect(
+            reference.value.distanceTo(index === 0 ? reference.rust : reference.neutral),
+          ).toBeCloseTo(0, 12);
+        }
+        for (const [x, y, z] of rotations) {
+          const view = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(x, y, z));
+          view.setPosition(123, -456, 789);
+          const viewNormal = worldNormal
+            .clone()
+            .applyMatrix3(new THREE.Matrix3().getNormalMatrix(view));
+          for (const scale of [0.001, 1, 1000]) {
+            const result = evaluateUp(viewNormal.clone().multiplyScalar(scale), view);
+            expect(result.up).toBeCloseTo(reference.up, 12);
+            expect(result.value.distanceTo(reference.value)).toBeCloseTo(0, 12);
+            for (const [channel, value] of result.value.toArray().entries()) {
+              expect(Number.isFinite(value)).toBe(true);
+              expect(value).toBeGreaterThanOrEqual(
+                Math.min(
+                  ...[result.neutral.getComponent(channel), result.rust.getComponent(channel)],
+                ) - 1e-12,
+              );
+              expect(value).toBeLessThanOrEqual(
+                Math.max(
+                  ...[result.neutral.getComponent(channel), result.rust.getComponent(channel)],
+                ) + 1e-12,
+              );
+            }
+          }
         }
       }
       // Three invokes the cached material's hook with fresh shader objects for
