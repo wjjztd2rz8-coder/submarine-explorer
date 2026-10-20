@@ -40,7 +40,7 @@ const DIMS: Record<WreckId, [number, number, number]> = {
 };
 const TIERS = ['low', 'medium', 'high'] as const;
 
-it('textured steel shares the plate layer across tiers without adding GPU resources or changing lighting', async () => {
+it('textured steel shares plate tint and bounded rim light across tiers without adding GPU resources', async () => {
   // Node normally returns no canvas maps. Supply textures so this test exercises
   // the browser material path, including Low and Medium without normal maps.
   const map = new THREE.CanvasTexture();
@@ -63,6 +63,8 @@ it('textured steel shares the plate layer across tiers without adding GPU resour
       expect(material.roughness).toBe(0.9);
       expect(material.metalness).toBe(0.12);
       expect(material.emissive.getHex()).toBe(0);
+      expect(material.fog).toBe(true);
+      const cacheKey = material.customProgramCacheKey();
       const shader = {
         ...THREE.ShaderLib.standard,
         uniforms: { ...THREE.ShaderLib.standard.uniforms },
@@ -78,8 +80,8 @@ it('textured steel shares the plate layer across tiers without adding GPU resour
       expect(declarations(shader.fragmentShader)).toEqual(
         declarations(THREE.ShaderLib.standard.fragmentShader),
       );
-      // The layer changes diffuse colour; all standard normal, roughness, light,
-      // fog and output chunks must survive, and texture-fetch count stays fixed.
+      // Tint and rim light retain standard normal, roughness, lighting, fog and
+      // output chunks, with no additional texture fetches.
       const chunks = (source: string) => source.match(/#include <[^>]+>/g);
       expect(chunks(shader.fragmentShader)).toEqual(
         chunks(THREE.ShaderLib.standard.fragmentShader),
@@ -90,6 +92,65 @@ it('textured steel shares the plate layer across tiers without adding GPU resour
         samplers(THREE.ShaderLib.standard.fragmentShader),
       );
       expect(shader.fragmentShader).toContain('diffuseColor.rgb = mix(');
+      const source = shader.fragmentShader;
+      const rim = source.match(/float rimFacing = ([^;]+);/)!;
+      const weight = source.match(/outgoingLight\s*\+=\s*vec3\([^)]+\)\s*\*\s*([^;]+);/)!;
+      expect(rim).not.toBeNull();
+      expect(weight).not.toBeNull();
+      expect(source.indexOf(rim[0])).toBeGreaterThan(source.indexOf('vec3 outgoingLight ='));
+      expect(source.indexOf(weight[0])).toBeLessThan(source.indexOf('#include <opaque_fragment>'));
+      expect(source.indexOf(weight[0])).toBeLessThan(source.indexOf('#include <fog_fragment>'));
+      // CPU evaluation of the emitted expressions, not GLSL compilation. The
+      // standard shader supplies finite, nonzero view-space normal/view vectors.
+      const rimWeight = new Function(
+        'normal',
+        'vViewPosition',
+        'normalize',
+        'dot',
+        'clamp',
+        'abs',
+        'pow',
+        `const rimFacing = ${rim[1]}; return ${weight[1]};`,
+      );
+      for (const scale of [0.001, 1, 1000]) {
+        let previous = 1;
+        for (let i = 0; i <= 20; i++) {
+          const facing = i / 20;
+          const normal = new THREE.Vector3(Math.sqrt(1 - facing * facing), 0, facing);
+          const view = new THREE.Vector3(0, 0, scale);
+          const evaluate = () =>
+            rimWeight(
+              normal,
+              view,
+              (v: THREE.Vector3) => v.clone().normalize(),
+              (a: THREE.Vector3, b: THREE.Vector3) => a.dot(b),
+              THREE.MathUtils.clamp,
+              Math.abs,
+              Math.pow,
+            ) as number;
+          const value = evaluate();
+          expect(Number.isFinite(value)).toBe(true);
+          expect(value).toBeGreaterThanOrEqual(0);
+          expect(value).toBeLessThanOrEqual(previous);
+          if (i === 0) expect(value).toBe(1);
+          if (i === 20) expect(value).toBe(0);
+          normal.multiplyScalar(-4);
+          expect(evaluate()).toBeCloseTo(value, 12);
+          previous = value;
+        }
+      }
+      // Three invokes the cached material's hook with fresh shader objects for
+      // each program. Recompilation must not accumulate edits or change its key.
+      const repeated = {
+        ...THREE.ShaderLib.standard,
+        uniforms: { ...THREE.ShaderLib.standard.uniforms },
+      };
+      material.onBeforeCompile(
+        repeated as Parameters<typeof material.onBeforeCompile>[0],
+        {} as THREE.WebGLRenderer,
+      );
+      expect(repeated).toEqual(shader);
+      expect(material.customProgramCacheKey()).toBe(cacheKey);
       expect(material.customProgramCacheKey()).not.toBe(fittingMaterial().customProgramCacheKey());
     }
     expect(maps.mock.calls).toEqual([
