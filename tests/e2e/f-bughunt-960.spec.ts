@@ -174,6 +174,25 @@ for (const layout of [
               const g = window.__game as unknown as Game;
               const poi = g.discovery.pois[0]!;
               const pose = g.discovery.spawnPose(poi.id)!;
+              // The spawn can sit where the hull's own floor lifts the sub above a POI's minimum
+              // scan depth (its rim ledge). Walk toward the POI to the first spot where the hull
+              // can hover below that depth, instead of loosening the depth rule.
+              const minDepth = poi.minDepthM ?? 0;
+              const hull = g.sub as unknown as {
+                terrain: { sampleHeight(x: number, z: number): number };
+                floorFor(ground: number): number;
+              };
+              const hoverY = -(minDepth + 2);
+              const spawn = { x: pose.x, z: pose.z };
+              for (let t = 0; t <= 1 && minDepth > 0; t += 0.05) {
+                const x = spawn.x + (poi.position.x - spawn.x) * t;
+                const z = spawn.z + (poi.position.z - spawn.z) * t;
+                if (hull.floorFor(hull.terrain.sampleHeight(x, z)) > hoverY) continue;
+                pose.x = x;
+                pose.z = z;
+                pose.y = Math.min(pose.y, hoverY);
+                break;
+              }
               g.sub.reset(pose.x, pose.y, pose.z, pose.yaw);
               g.discovery.stats.markTeleport();
               return {
