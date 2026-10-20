@@ -173,9 +173,8 @@ for (const layout of [
             const target = await page.evaluate(() => {
               const g = window.__game as unknown as Game;
               const poi = g.discovery.pois[0]!;
-              // Hover over the POI at its minimum scan depth: the spawn pose can sit shallower.
-              const { x, z } = poi.position;
-              g.sub.reset(x, -(poi.minDepthM ?? 0) - 1, z, 0);
+              const pose = g.discovery.spawnPose(poi.id)!;
+              g.sub.reset(pose.x, pose.y, pose.z, pose.yaw);
               g.discovery.stats.markTeleport();
               return {
                 id: poi.id,
