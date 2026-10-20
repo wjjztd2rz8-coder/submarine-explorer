@@ -80,7 +80,7 @@ Evidence: reviews 2026-10-18 and 2026-10-18 midday (joint with Sol) in `plan/REV
 
 Owner phone test 2026-10-18: decisions and file ownership in [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md). P2 items go first (playability first); the numbered V/S/R list follows.
 
-- **P2-hull-a [Sonnet; start from the Codex audit in worktree `../subexp-wt/2710-P2-hull-a-geometry`: its helper and failing acceptance test (6 red cases) merge with the fix]:** Class A and Class C (Sol/Codex: Class C vertical thruster hardware intersects its crown; note Blue Hole's mission uses Class B) have a propeller inside the vertical stabiliser and thrusters clipping the hull. Target: every propeller and thruster sits clear on all three hulls and every tier; add a geometry test.
+- **P2-hull-a:** DONE 2026-10-20 (Class A and C thruster placement; Codex clearance audit merged as tests).
 - **P2-sub-screen [Sonnet, demoted 2026-10-19; do after hull-a]:** move the cosmetic picker out of the Journal into a "Your sub" screen reached from Pause and Home, with large swatches and a live sub preview. This is a move, not an addition.
 - **P2-globe-bright [Sonnet, demoted by Sol/Claude 2026-10-19: no release-blocking defect shown]:** the globe is a touch dark. Target: a brighter Google Earth feel (lighter ocean, saturated land, brighter day side) with pins still contrasting.
 - **P2-beebe-low [Sonnet, small]:** Low-tier Beebe chimney glow caps float off the orifice; seat them.
