@@ -152,7 +152,7 @@ export const LOST_CITY_FIDELITY: TerrainFidelity = {
   reliefBed: 0,
   rillStretch: 1,
   // Carbonate-cemented beds break into irregular shelves and rubble treads between the spires.
-  terrace: { periodM: 16, amount: 1.5 },
+  terrace: { periodM: 16, amount: 1.1 },
   normalStrength: 0.2,
 };
 

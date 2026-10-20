@@ -371,9 +371,9 @@ describe('Lost City transparent effect fill budget', () => {
           // Freeze the pre-change Low workload too: paired equality alone
           // would miss a shared change to both sides of the comparison.
           for (const [range, pixels] of [
-            [70, 10_430.157406],
-            [32, 42_124.961467],
-            [10, 64_347.673987],
+            [70, 10_433.658403],
+            [32, 44_317.485993],
+            [10, 66_444.480600],
           ]) {
             expect(
               Math.max(...measurements[1].filter((s) => s.range === range).map((s) => s.pixels)),
