@@ -92,7 +92,13 @@ afterAll(() => {
 
 describe('catalog site static prop budgets', () => {
   for (const site of sites) {
-    for (const tier of diagnostics ? (['low', 'high'] as const) : (['low'] as const)) {
+    const tiers =
+      site === 'lost-city' || site === 'beebe-vent-field'
+        ? (['low', 'medium', 'high'] as const)
+        : diagnostics
+          ? (['low', 'high'] as const)
+          : (['low'] as const);
+    for (const tier of tiers) {
       it(`${site} ${tier}: bounds prop draw calls and triangles before culling`, async () => {
         const meta = validateMeta(
           JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')),

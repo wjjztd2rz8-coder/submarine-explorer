@@ -1,14 +1,14 @@
 /** Procedural detail, chunk LOD and frustum bookkeeping; see docs/terrain.md. */
 
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { Terrain, fitSubdivToBudget } from '../../src/world/Terrain.js';
 import { detailAmplitude, fbm2, valueNoise2 } from '../../src/world/TerrainNoise.js';
 import { makeSyntheticTile } from './helpers.js';
 import sites from '../../data/landmarks/index.json';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import type { TileMeta } from '../../src/util/types.js';
 
 const base = DEFAULT_CONFIG.terrain;
@@ -562,3 +562,68 @@ function skirtVertexCount(geom: THREE.BufferGeometry): number {
   const nz = zs.size;
   return 2 * nx + 2 * nz;
 }
+
+const ventTerrainAudit: unknown[] = [];
+afterAll(() => {
+  const env = (globalThis as { process?: { env?: Record<string, string> } }).process?.env;
+  if (env?.VENT_SURFACE_AUDIT !== '1') return;
+  mkdirSync('.cache/vent-surfaces', { recursive: true });
+  writeFileSync(
+    '.cache/vent-surfaces/terrain.json',
+    JSON.stringify(ventTerrainAudit, null, 2) + '\n',
+  );
+});
+
+// Regression guard: shipped vent surveys and terrace displacement must produce
+// valid resident geometry at every quality level, including chunk skirts.
+describe('shipped vent terrain integrity', () => {
+  for (const site of ['lost-city', 'beebe-vent-field']) {
+    for (const tier of ['low', 'medium', 'high'] as const) {
+      it(`${site} ${tier}: keeps terrain buffers finite and triangles nondegenerate`, () => {
+        const meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;
+        const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
+        const terrain = new Terrain(
+          {
+            meta,
+            heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows),
+          },
+          base,
+          tier,
+        );
+        let degenerate = 0;
+        let invalidIndices = 0;
+        let triangles = 0;
+        const a = new THREE.Vector3(),
+          b = new THREE.Vector3(),
+          c = new THREE.Vector3();
+        try {
+          for (const object of terrain.group.children) {
+            if (!(object instanceof THREE.Mesh)) continue;
+            for (const attribute of Object.values(
+              object.geometry.attributes as Record<string, THREE.BufferAttribute>,
+            ))
+              expect(Array.from(attribute.array).every(Number.isFinite)).toBe(true);
+            const pos = object.geometry.getAttribute('position');
+            const index = object.geometry.index!;
+            expect(index.count % 3).toBe(0);
+            for (let i = 0; i < index.count; i += 3) {
+              const ids = [index.getX(i), index.getX(i + 1), index.getX(i + 2)];
+              if (ids.some((id) => id < 0 || id >= pos.count)) invalidIndices++;
+              a.fromBufferAttribute(pos, ids[0]);
+              b.fromBufferAttribute(pos, ids[1]);
+              c.fromBufferAttribute(pos, ids[2]);
+              if (b.sub(a).cross(c.sub(a)).lengthSq() === 0) degenerate++;
+              triangles++;
+            }
+          }
+          ventTerrainAudit.push({ site, ...terrain.stats, degenerate, invalidIndices });
+          expect(triangles).toBe(terrain.stats.triangles);
+          expect(degenerate).toBe(0);
+          expect(invalidIndices).toBe(0);
+        } finally {
+          terrain.dispose();
+        }
+      });
+    }
+  }
+});

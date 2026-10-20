@@ -1,9 +1,9 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { createHash } from 'node:crypto';
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterAll, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import * as manifests from '../../src/core/SiteManifest.js';
 import { PROCEDURAL_BUILDERS } from '../../src/world/props/builders/index.js';
@@ -620,6 +620,146 @@ describe('authored prop geometry golden', () => {
             return { id: def.id, ...propEvidence(built) };
           });
         expect(evidence).toMatchSnapshot();
+      });
+    }
+  }
+});
+
+const surfaceAudit: unknown[] = [];
+afterAll(() => {
+  const env = (globalThis as { process?: { env?: Record<string, string> } }).process?.env;
+  if (env?.VENT_SURFACE_AUDIT !== '1') return;
+  mkdirSync('.cache/vent-surfaces', { recursive: true });
+  writeFileSync('.cache/vent-surfaces/props.json', JSON.stringify(surfaceAudit, null, 2) + '\n');
+});
+
+// Regression guard: authored vent geometry must stay finite and nondegenerate,
+// and coarse crater meshes must support every top mouth vertex.
+describe('authored vent surface integrity', () => {
+  for (const site of ['lost-city', 'beebe-vent-field']) {
+    for (const tier of ['low', 'medium', 'high']) {
+      it(`${site} ${tier}: has valid buffers and seated top mouths`, () => {
+        const defs = parsePropsDoc(
+          JSON.parse(readFileSync(`data/landmarks/${site}/props.json`, 'utf8')),
+          cfg,
+        ).props;
+        const totals = { draws: 0, triangles: 0 };
+        expect(defs.length).toBeGreaterThan(0);
+        const issues: unknown[] = [];
+        let maxMouthDistance = 0;
+        let mouthVertices = 0;
+        for (const def of defs) {
+          const built = PROCEDURAL_BUILDERS[def.procedural!]({
+            def,
+            dims: def.dimensionsM!,
+            seed: hashString(def.id),
+            cfg,
+            tier,
+            groundHeight: () => (x, z) => x * 0.07 - z * 0.1,
+          });
+          try {
+            for (const box of [built.bounds, ...(built.colliders ?? [])]) {
+              expect(box.isEmpty()).toBe(false);
+              expect([...box.min.toArray(), ...box.max.toArray()].every(Number.isFinite)).toBe(
+                true,
+              );
+            }
+            const cost = countGeo(built.full);
+            totals.draws += cost.draws;
+            totals.triangles += cost.triangles;
+            for (const root of [built.full, built.impostor]) {
+              root.updateMatrixWorld(true);
+              root.traverse((object) => {
+                const mesh = object as THREE.Mesh;
+                if (!mesh.geometry) return;
+                for (const attribute of Object.values(mesh.geometry.attributes))
+                  expect(Array.from(attribute.array).every(Number.isFinite)).toBe(true);
+                expect(mesh.matrixWorld.elements.every(Number.isFinite)).toBe(true);
+                expect(mesh.matrixWorld.determinant()).not.toBe(0);
+                if (mesh instanceof THREE.InstancedMesh) {
+                  expect(Array.from(mesh.instanceMatrix.array).every(Number.isFinite)).toBe(true);
+                  if (mesh.instanceColor)
+                    expect(Array.from(mesh.instanceColor.array).every(Number.isFinite)).toBe(true);
+                  const instance = new THREE.Matrix4();
+                  for (let i = 0; i < mesh.count; i++) {
+                    mesh.getMatrixAt(i, instance);
+                    // Invertible transforms cannot collapse a valid template triangle.
+                    expect(instance.determinant()).not.toBe(0);
+                  }
+                }
+                if (!mesh.isMesh) return;
+                const geometry = mesh.geometry;
+                const pos = geometry.getAttribute('position');
+                const idx = geometry.index;
+                if (idx)
+                  expect(
+                    Array.from(idx.array as ArrayLike<number>).every(
+                      (i) => i >= 0 && i < pos.count,
+                    ),
+                  ).toBe(true);
+                const count = idx?.count ?? pos.count;
+                expect(count % 3).toBe(0);
+                const a = new THREE.Vector3(),
+                  b = new THREE.Vector3(),
+                  c = new THREE.Vector3();
+                let degenerate = 0;
+                for (let i = 0; i < count; i += 3) {
+                  a.fromBufferAttribute(pos, idx ? idx.getX(i) : i);
+                  b.fromBufferAttribute(pos, idx ? idx.getX(i + 1) : i + 1);
+                  c.fromBufferAttribute(pos, idx ? idx.getX(i + 2) : i + 2);
+                  const area = b.sub(a).cross(c.sub(a)).lengthSq();
+                  if (area === 0) degenerate++;
+                }
+                if (degenerate) issues.push({ prop: def.id, mesh: mesh.name, degenerate });
+              });
+            }
+            const body = built.full.getObjectByName('smoker-body') as THREE.Mesh | undefined;
+            const mouths = built.full.getObjectByName('beebe-orifices') as THREE.Mesh | undefined;
+            if (body && mouths) {
+              const positions = mouths.geometry.getAttribute('position');
+              const normals = mouths.geometry.getAttribute('normal');
+              const surface = body.geometry.getAttribute('position');
+              const index = body.geometry.index;
+              const triangle = new THREE.Triangle();
+              const vertex = new THREE.Vector3(),
+                closest = new THREE.Vector3();
+              const inverseBody = body.matrixWorld.clone().invert();
+              for (let i = 0; i < positions.count; i++) {
+                // Side outlet discs have horizontal normals and are seated on collars.
+                if (normals.getY(i) < 0.5) continue;
+                vertex
+                  .fromBufferAttribute(positions, i)
+                  .applyMatrix4(mouths.matrixWorld)
+                  .applyMatrix4(inverseBody);
+                let distance = Infinity;
+                for (let j = 0; j < (index?.count ?? surface.count); j += 3) {
+                  triangle.a.fromBufferAttribute(surface, index ? index.getX(j) : j);
+                  triangle.b.fromBufferAttribute(surface, index ? index.getX(j + 1) : j + 1);
+                  triangle.c.fromBufferAttribute(surface, index ? index.getX(j + 2) : j + 2);
+                  triangle.closestPointToPoint(vertex, closest);
+                  distance = Math.min(distance, closest.distanceTo(vertex));
+                }
+                maxMouthDistance = Math.max(maxMouthDistance, distance);
+                mouthVertices++;
+                expect(distance).toBeLessThanOrEqual(0.5);
+              }
+            }
+          } finally {
+            disposeProp(built);
+          }
+        }
+        surfaceAudit.push({ site, tier, ...totals, issues, mouthVertices, maxMouthDistance });
+        expect(totals.draws).toBeLessThanOrEqual(1200);
+        expect(totals.triangles).toBeGreaterThan(0);
+        expect(totals.triangles).toBeLessThanOrEqual(1_200_000);
+        // Frozen Low costs from the audited reference commit guard future growth.
+        const lowTriangles = { 'lost-city': 50_712, 'beebe-vent-field': 20_338 };
+        if (tier === 'low')
+          expect(totals.triangles).toBeLessThanOrEqual(
+            lowTriangles[site as keyof typeof lowTriangles] * 1.1,
+          );
+        expect(issues).toEqual([]);
+        if (site === 'beebe-vent-field') expect(mouthVertices).toBe(288);
       });
     }
   }
