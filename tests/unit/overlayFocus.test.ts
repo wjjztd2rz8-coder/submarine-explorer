@@ -1439,6 +1439,119 @@ describe('overlay policies across the app', () => {
     expect(active()).toBe(opener);
   });
 
+  it.each(
+    [false, true].flatMap((shortcut) => [false, true].map((direct) => ({ shortcut, direct }))),
+  )(
+    'Settings header transitions restore focus (dive shortcut=$shortcut, direct Controls=$direct)',
+    ({ shortcut, direct }) => {
+      const { screen } = settings();
+      const root = screen.root as unknown as Element;
+      const controls = root.querySelector('.settings-controls-open')!;
+      const back = root.querySelector('.settings-controls-back')!;
+      const pane = root.querySelector('.settings-bindings')!.parentElement!;
+      const card = new ControlsCard({ key: () => 'G', initialDevice: 'keyboard' });
+      cleanup.push(() => card.dispose());
+      // Match the dive's header extension; Home leaves the same SettingsScreen alone.
+      const layout = shortcut ? new Element('BUTTON') : null;
+      if (layout) {
+        layout.className = 'settings-layout-open';
+        layout.textContent = 'Device layout';
+        layout.addEventListener('click', () => card.open());
+        controls.after(layout);
+      }
+      const focus = trap(root);
+      const opener = element();
+      for (let cycle = 0; cycle < 3; cycle++) {
+        opener.focus();
+        screen.open();
+        expect(active()).toBe(body); // Preserve protection from a held activation key.
+        if (direct) screen.showControls(true);
+        else {
+          press('Tab');
+          expect(active()).toBe(controls);
+          controls.dispatchEvent(new Event('click'));
+        }
+        expect(pane.hidden).toBe(false);
+        expect(root.querySelector('.settings-title')!.textContent).toBe('Controls');
+        expect(active()).toBe(back);
+        if (layout) {
+          expect(layout.hidden).toBe(true);
+          expect(focus.focusables()).not.toContain(layout);
+        }
+        for (const shiftKey of [false, true]) {
+          for (let step = 0; step <= focus.focusables().length; step++) {
+            press('Tab', { shiftKey });
+            expect(root.contains(active())).toBe(true);
+            expect(active().closest('[hidden]')).toBe(null);
+            expect(active()).not.toBe(layout);
+          }
+        }
+        back.dispatchEvent(new Event('click'));
+        expect(pane.hidden).toBe(true);
+        expect(root.querySelector('.settings-title')!.textContent).toBe('Settings');
+        expect(active()).toBe(controls);
+        if (layout) {
+          expect(layout.hidden).toBe(false);
+          press('Tab');
+          expect(active()).toBe(layout);
+          layout.dispatchEvent(new Event('click'));
+          expect(card.isOpen).toBe(true);
+          press('Escape');
+          expect(card.isOpen).toBe(false);
+          expect(screen.isOpen).toBe(true);
+          expect(active()).toBe(layout);
+          expect(layout.isConnected).toBe(true);
+        } else expect(root.querySelector('.settings-layout-open')).toBe(null);
+        if (cycle === 1) screen.showControls(true);
+        if (cycle === 2) root.querySelector('.settings-close')!.dispatchEvent(new Event('click'));
+        else press('Escape');
+        expect(screen.isOpen).toBe(false);
+        expect(active()).toBe(opener);
+        expect(opener.isConnected).toBe(true);
+      }
+    },
+  );
+
+  it('Settings keeps the dive layout usable when a touch Controls request resolves to Settings', () => {
+    const { screen } = settings();
+    const root = screen.root as unknown as Element;
+    const controls = root.querySelector('.settings-controls-open')!;
+    const back = root.querySelector('.settings-controls-back')!;
+    const pane = root.querySelector('.settings-bindings')!.parentElement!;
+    const layout = new Element('BUTTON');
+    layout.className = 'settings-layout-open';
+    controls.after(layout);
+    const card = new ControlsCard({ key: () => 'G', initialDevice: 'touch' });
+    cleanup.push(() => card.dispose());
+    layout.addEventListener('click', () => card.open());
+    const opener = element();
+    opener.focus();
+    screen.open();
+    screen.showControls(true);
+    expect(active()).toBe(back);
+    expect(layout.hidden).toBe(true);
+    document.documentElement.classList.add('is-touch');
+    screen.showControls(true);
+    expect(pane.hidden).toBe(true);
+    expect(controls.hidden).toBe(true);
+    expect(back.hidden).toBe(true);
+    expect(layout.hidden).toBe(false);
+    expect(active()).toBe(layout);
+    layout.dispatchEvent(new Event('click'));
+    expect(card.isOpen).toBe(true);
+    press('Escape');
+    expect(active()).toBe(layout);
+    expect(screen.isOpen).toBe(true);
+    document.documentElement.classList.remove('is-touch');
+    screen.showControls(true);
+    expect(pane.hidden).toBe(false);
+    expect(layout.hidden).toBe(true);
+    expect(active()).toBe(back);
+    press('Escape');
+    expect(screen.isOpen).toBe(false);
+    expect(active()).toBe(opener);
+  });
+
   it.each(['before construction', 'before first open'])(
     'Settings keeps touch Controls hidden and normal settings usable with touch %s',
     (when) => {
