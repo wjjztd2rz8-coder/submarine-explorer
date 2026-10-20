@@ -57,7 +57,7 @@ test('Lost City mission and free dive both retain clear flow', async ({ page }) 
         params: { smokeIntensity: number; glowLights: number; shimmerStrength: number };
         preset: {
           smoke: unknown;
-          shimmer: { uniforms: { uStrength: { value: number } } };
+          shimmer: unknown;
           stats: { lights: number; particles: number };
         };
       };
@@ -65,18 +65,19 @@ test('Lost City mission and free dive both retain clear flow', async ({ page }) 
         smokeIntensity: p.params.smokeIntensity,
         glowLights: p.params.glowLights,
         smoke: p.preset.smoke,
-        strength: p.preset.shimmer.uniforms.uStrength.value,
+        shimmer: p.preset.shimmer,
         lights: p.preset.stats.lights,
         particles: p.preset.stats.particles,
       };
     });
+    // Lost City has zero shimmer strength, so its preset shimmer is not built.
     expect(effects).toEqual({
       smokeIntensity: 0,
       glowLights: 0,
       smoke: null,
-      strength: 0.03,
+      shimmer: null,
       lights: 0,
-      particles: 36, // 3 shimmer sprites at each of the 12 chimneys
+      particles: 0,
     });
     await page.screenshot({
       path: `${shots}/lost-city-${url.includes('mission=') ? 'mission' : 'free-dive'}.png`,

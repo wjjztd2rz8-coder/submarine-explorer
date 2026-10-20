@@ -155,8 +155,9 @@ for (const layout of [
               );
               await act(page.getByRole('button', { name: 'Skip', exact: true }));
               await page.clock.runFor(34);
+              // The scan step names the distance while out of range; in range it reads Hold SCAN.
               await expect(page.locator('.guidance-name')).toHaveText(
-                'Hold SCAN on a glowing target.',
+                /^(Get closer to scan · \d+ m|Hold SCAN on a glowing target\.)$/,
               );
             }
             await page.screenshot({ path: info.outputPath('opening.png') });
