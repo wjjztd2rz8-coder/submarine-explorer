@@ -499,19 +499,19 @@ export function classA(low: boolean): Blueprint {
     }),
   );
   props.push(
-    thruster(pb, V(-1.78, 0.2, -0.62), V(0, -1, 0), 0.2, 'vertical', 1, {
+    thruster(pb, V(-1.86, 0.2, -0.62), V(0, -1, 0), 0.2, 'vertical', 1, {
       bandColor: PAINT.yellow,
-      mount: V(-1.58, 0.2, -0.62),
+      mount: V(-1.66, 0.2, -0.62),
     }),
   );
   props.push(
-    thruster(pb, V(1.78, 0.2, -0.62), V(0, -1, 0), 0.2, 'vertical', -1, {
+    thruster(pb, V(1.86, 0.2, -0.62), V(0, -1, 0), 0.2, 'vertical', -1, {
       bandColor: PAINT.yellow,
-      mount: V(1.58, 0.2, -0.62),
+      mount: V(1.66, 0.2, -0.62),
     }),
   );
   props.push(
-    thruster(pb, V(0, 0.95, 1.2), V(1, 0, 0), 0.15, 'lateral', 1, { mount: V(0, 0.79, 1.2) }),
+    thruster(pb, V(0, 1.42, 1.2), V(1, 0, 0), 0.15, 'lateral', 1, { mount: V(0, 1.26, 1.2) }),
   );
 
   // Lights: a bar across the front under the sphere, lamps on the pontoon noses.
@@ -676,12 +676,12 @@ export function classC(low: boolean): Blueprint {
     }),
   );
   props.push(
-    thruster(pb, V(0, 2.32, -0.95), V(0, -1, 0), 0.24, 'vertical-fore', 1, {
+    thruster(pb, V(0, 2.43, -0.95), V(0, -1, 0), 0.24, 'vertical-fore', 1, {
       bandColor: PAINT.red,
     }),
   );
   props.push(
-    thruster(pb, V(0, 2.32, 1.35), V(0, -1, 0), 0.24, 'vertical-aft', -1, { bandColor: PAINT.red }),
+    thruster(pb, V(0, 2.43, 1.35), V(0, -1, 0), 0.24, 'vertical-aft', -1, { bandColor: PAINT.red }),
   );
   props.push(
     thruster(pb, V(0, -0.55, 2.55), V(1, 0, 0), 0.18, 'lateral', 1, { mount: V(0, -0.5, 2.3) }),
@@ -691,7 +691,7 @@ export function classC(low: boolean): Blueprint {
     pb.add(
       'frame',
       new THREE.CylinderGeometry(0.4, 0.44, 0.1, 28, 1, true),
-      T(0, 2.19, z),
+      T(0, 2.3, z),
       PAINT.black,
     );
   }
