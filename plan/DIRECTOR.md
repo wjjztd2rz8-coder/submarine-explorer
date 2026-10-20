@@ -83,7 +83,7 @@ Owner phone test 2026-10-18: decisions and file ownership in [PHONE-FEEDBACK-202
 - **P2-hull-a:** DONE 2026-10-20 (Class A and C thruster placement; Codex clearance audit merged as tests).
 - **P2-sub-screen [Sonnet, demoted 2026-10-19; do after hull-a]:** move the cosmetic picker out of the Journal into a "Your sub" screen reached from Pause and Home, with large swatches and a live sub preview. This is a move, not an addition.
 - **P2-globe-bright [Sonnet, demoted by Sol/Claude 2026-10-19: no release-blocking defect shown]:** the globe is a touch dark. Target: a brighter Google Earth feel (lighter ocean, saturated land, brighter day side) with pins still contrasting.
-- **P2-beebe-low [IN FLIGHT 2026-10-20, Sonnet, small]:** Low-tier Beebe chimney glow caps float off the orifice; seat them.
+- **P2-beebe-low:** DONE 2026-10-20 (425b7a6; mouth discs seated on the built crater).
 - **P2-text-size [Sonnet, small, demoted 2026-10-19]:** an "Aa" button on the briefing and Journal headers that steps the existing UI scale (no new setting).
 
 1. **V-lostcity-slice3 [Sonnet]** (agreed 3-3.5): the detail tower (`lost-city-3.png`) still reads as thin broken sheets with stair-step facets, and the mid-slope banding repeats. Target: the tower is a thick eroded carbonate mass with rounded chimneys, rubble at its foot in frame, and slope bands broken by terrace ledges.
@@ -97,7 +97,7 @@ Owner phone test 2026-10-18: decisions and file ownership in [PHONE-FEEDBACK-202
    12b. V-journeys-harness: DONE 2026-10-20 (merged). The six-journey Low matrix is written but **not yet run**: see V-journeys-run.
    12d. S-events-low-audit: DONE 2026-10-20 (clean audit, tests merged).
    12e. R-ci-shard-triage: DONE 2026-10-20. 29 of 43 failures were fixed by P2-copy; the stale-spec repairs for the rest merged 2026-10-20 except R-ci-green-f below.
-   12f. **R-ci-green-f [IN FLIGHT 2026-10-20, Haiku]:** f-bughunt-960 great-blue-hole arcade high (3 cases) still red: the mission button rebuilds the URL with only tier and touch, so `life=0` is dropped and wildlife wins the scan candidate. Pick an isolation route (a direct mission URL with life=0, or a test-side hook) and keep the expected-target guard. Also f-fidelity-rollout lost-city Medium timed out once at 240 s (render cost symptom, watch).
+   12f. **R-ci-green-f: DONE 2026-10-20 (6ecf57f), watch CI.** f-bughunt-960 great-blue-hole arcade high (3 cases) still red: the mission button rebuilds the URL with only tier and touch, so `life=0` is dropped and wildlife wins the scan candidate. Pick an isolation route (a direct mission URL with life=0, or a test-side hook) and keep the expected-target guard. Also f-fidelity-rollout lost-city Medium timed out once at 240 s (render cost symptom, watch).
    12g. **S-golden-compare, R-ci-trim, S-verify-merged [Codex, briefs 2770-2790]:** comparator pose tolerance and stale-PNG provenance; consolidate duplicate specs to cut CI wall time; verify the 2026-10-20 merge batch.
 9. **R-release [Haiku]:** f60 tagged 2026-10-18. Tag the latest green-CI main after each review.
 
