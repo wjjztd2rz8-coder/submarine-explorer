@@ -64,6 +64,7 @@ export const shellSystem: GameSystem = {
 /** Shared menu construction; no tile or dive simulation is required. */
 export function initializeShell(ctx: ShellContext): void {
   const { index, meta, route, bus, save, journal, discoveries, app } = ctx;
+  let disposed = false;
   const missionSelect = new MissionSelect(index, {
     currentTileId: meta?.id,
     currentMissionId: route?.missionId,
@@ -88,6 +89,8 @@ export function initializeShell(ctx: ShellContext): void {
     save,
   );
   ctx.home = home;
+  const updateDiveSite = (): void =>
+    home.setDiveSite(ctx.missionSummaries.find((entry) => entry.id === diveSite())?.title ?? null);
   const completion = (id: string, pois: string[]): string =>
     `${pois.filter((poi) => discoveries.isDiscovered(id, poi)).length}/${pois.length} logged`;
   const summaries = loadMissionSummaries();
@@ -133,6 +136,7 @@ export function initializeShell(ctx: ShellContext): void {
     : undefined;
   ctx.pause = pause;
   cleanup.add(() => {
+    disposed = true;
     pause?.dispose();
     homeSites.dispose();
     home.dispose();
@@ -149,14 +153,16 @@ export function initializeShell(ctx: ShellContext): void {
       }
     });
   void summaries.then((list) => {
+    if (disposed) return;
     ctx.missionSummaries = list;
     missionSelect.setMissions(list);
     homeSites.setMissions(list);
-    home.setDiveSite(list.find((entry) => entry.id === diveSite())?.title ?? null);
+    updateDiveSite();
   });
   cleanup.add(
     bus.on('mission:started', ({ missionId }) => {
       app.lastSite = missionId;
+      updateDiveSite();
       try {
         localStorage.setItem(LAST_SITE_KEY, JSON.stringify({ missionId }));
       } catch {
