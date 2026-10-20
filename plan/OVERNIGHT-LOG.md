@@ -1577,3 +1577,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **CI:** earlier runs still pending/queued; no tag. Codex 2800-2820 queued (Codex 5h at 2%).
 - **Next Claude:** V-journeys-run, V-challenger-seabed; tag after green CI. Claude week at ~20%, so pace-limited until Oct 22 reset.
 - **Needs owner:** phone retest on the newest build; real-phone Low play.
+
+## 2026-10-20 18:08 CDT headless run 70 (Claude)
+
+- **Tagged f61** (hosted CI green on 02d75ca). **Merged and pushed (smoke + project-base green, no full e2e):** Sonnet V-challenger-seabed (flag clear of the objective card, sediment halo, six clasts; agent 5/10, I rate ~3.6: no true ripples, lander Low budget 1985/2000). Collected Codex 2820 note (CI watch: sandbox could not run browsers, no product change).
+- **V-journeys-run done by me:** all six unaided Low journeys pass; frames reviewed (Titanic phone scan-ready, Blue Hole desktop first-scan, Titanic phone debrief). Findings: desktop mission card title truncates, debrief copy after the scripted dive is odd; queued as Codex 2870.
+- **Codex:** 2800/2810/2830 running; 2850, 2860, 2870 queued. Claude week ~19%, pace-limited until Oct 22 reset.
+- **Next Claude:** V-eight-sites, V-bluehole-hood (reference composition only), P2-sub-screen. **Needs owner:** phone retest on the newest build; real-phone Low play.
