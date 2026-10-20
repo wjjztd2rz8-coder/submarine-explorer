@@ -964,7 +964,7 @@ function settings(onResetProgress?: () => 'cleared' | 'sessionOnly') {
     screen.dispose();
     input.dispose();
   });
-  return { screen, input };
+  return { screen, input, save };
 }
 
 it.each(['cleared', 'sessionOnly'] as const)(
@@ -1438,6 +1438,125 @@ describe('overlay policies across the app', () => {
     expect(screen.isOpen).toBe(false);
     expect(active()).toBe(opener);
   });
+
+  it.each(['before construction', 'before first open'])(
+    'Settings keeps touch Controls hidden and normal settings usable with touch %s',
+    (when) => {
+      if (when === 'before construction') document.documentElement.classList.add('is-touch');
+      const { screen, save } = settings();
+      document.documentElement.classList.add('is-touch');
+      const root = screen.root as unknown as Element;
+      const controls = root.querySelector('.settings-controls-open')!;
+      const back = root.querySelector('.settings-controls-back')!;
+      const pane = root.querySelector('.settings-bindings')!.parentElement!;
+      const normal = root.querySelectorAll('.settings-section').filter((s) => s !== pane);
+      const close = root.querySelector('.settings-close')!;
+      const controlsFocus = vi.spyOn(controls, 'focus');
+      const backFocus = vi.spyOn(back, 'focus');
+      const opener = element();
+      for (let cycle = 0; cycle < 3; cycle++) {
+        opener.focus();
+        screen.open();
+        expect(active()).toBe(body); // Opening keeps the existing held-key protection.
+        expect(controls.hidden).toBe(true);
+        expect(back.hidden).toBe(true);
+        expect(pane.hidden).toBe(true);
+        press('Tab');
+        expect(active()).toBe(close);
+        screen.showControls(true);
+        expect(pane.hidden).toBe(true);
+        expect(normal.every((s) => !s.hidden)).toBe(true);
+        expect(root.querySelector('.settings-title')!.textContent).toBe('Settings');
+        expect(controlsFocus).not.toHaveBeenCalled();
+        expect(backFocus).not.toHaveBeenCalled();
+        expect(active().closest('[hidden]')).toBe(null);
+
+        const visited = new Set<Element>();
+        const items = root
+          .querySelectorAll('button, input, select, summary, [tabindex]')
+          .filter((el) => el.tabIndex >= 0 && !el.closest('[hidden]') && !el.disabled);
+        for (const shiftKey of [false, true]) {
+          for (let step = 0; step <= items.length; step++) {
+            press('Tab', { shiftKey });
+            expect(active().isConnected).toBe(true);
+            expect(active().closest('[hidden]')).toBe(null);
+            expect(root.contains(active())).toBe(true);
+            expect(pane.contains(active())).toBe(false);
+            expect([controls, back]).not.toContain(active());
+            visited.add(active());
+          }
+        }
+        expect(visited).toContain(root.querySelector('[data-setting="graphicsTier"]'));
+        expect(visited).toContain(root.querySelector('[data-setting="captions"]'));
+        expect(visited).toContain(root.querySelector('[data-setting="masterVolume"]'));
+        const captions = root.querySelector(
+          '[data-setting="captions"]',
+        )! as unknown as HTMLInputElement;
+        captions.focus();
+        const enabled = !save.get().captions;
+        captions.checked = enabled;
+        captions.dispatchEvent(new Event('change'));
+        expect(save.get().captions).toBe(enabled);
+        if (cycle % 2) close.dispatchEvent(new Event('click'));
+        else press('Escape');
+        expect(screen.isOpen).toBe(false);
+        expect(active()).toBe(opener);
+        expect(active().isConnected).toBe(true);
+        expect(active().getClientRects()).toHaveLength(1);
+      }
+    },
+  );
+
+  it.each([
+    { touch: false, requestControls: false },
+    { touch: true, requestControls: false },
+    { touch: true, requestControls: true },
+  ])(
+    'Settings cancels pane capture on return (touch=$touch, requestControls=$requestControls)',
+    ({ touch, requestControls }) => {
+      const { screen, input } = settings();
+      const opener = element();
+      opener.focus();
+      screen.open();
+      const root = screen.root as unknown as Element;
+      const controls = root.querySelector('.settings-controls-open')!;
+      const back = root.querySelector('.settings-controls-back')!;
+      const binding = root.querySelector('[data-action="thrustReverse"]')!;
+      const pane = binding.closest('.settings-section')!;
+      controls.dispatchEvent(new Event('click'));
+      expect(pane.hidden).toBe(false);
+      expect(active()).toBe(back);
+      binding.focus();
+      binding.dispatchEvent(new Event('click'));
+      expect(screen.capturingAction).toBe('thrustReverse');
+      const original = [...input.actions.find((a) => a.id === 'thrustReverse')!.keys];
+      document.documentElement.classList.toggle('is-touch', touch);
+      if (requestControls) screen.showControls(true);
+      else back.dispatchEvent(new Event('click'));
+      expect(pane.hidden).toBe(true);
+      expect(back.hidden).toBe(true);
+      expect(controls.hidden).toBe(touch);
+      expect(active() === (touch ? root.querySelector('.settings-close') : controls)).toBe(true);
+      expect(active().closest('[hidden]')).toBe(null);
+      expect(screen.capturingAction).toBe(null);
+      expect(binding.textContent).not.toBe('Press a key…');
+      press('KeyZ');
+      expect(input.actions.find((a) => a.id === 'thrustReverse')!.keys).toEqual(original);
+      press('Escape');
+      expect(screen.isOpen).toBe(false);
+      expect(active()).toBe(opener);
+
+      document.documentElement.classList.remove('is-touch');
+      screen.open();
+      expect(controls.hidden).toBe(false);
+      controls.dispatchEvent(new Event('click'));
+      expect(active()).toBe(back);
+      expect(pane.hidden).toBe(false);
+      expect(root.querySelector('.settings-title')!.textContent).toBe('Controls');
+      screen.close();
+      expect(active()).toBe(opener);
+    },
+  );
 
   it('only the top briefing handles Enter, while its Escape policy returns to Home', () => {
     const begin = vi.fn();
