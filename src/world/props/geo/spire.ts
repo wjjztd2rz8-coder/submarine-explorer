@@ -105,15 +105,11 @@ export function spireRadius(o: SpireOpts, t0: number): number {
 export function rimDrop(o: SpireOpts, ang: number): number {
   const broad = fbm3(Math.cos(ang) * 1.7 + 5, 3, Math.sin(ang) * 1.7 + 5, o.seed + 91, 3);
   const teeth = fbm3(Math.cos(ang) * 5 + 2, 8, Math.sin(ang) * 5 + 2, o.seed + 93, 2);
-  // Spalled notches and small steps: a staircase of the fine noise plus deep, narrow bites,
-  // so the broad drop never leaves one long planar facet.
-  const chip = fbm3(Math.cos(ang) * 11 + 6, 2, Math.sin(ang) * 11 + 6, o.seed + 97, 2);
-  const steps = Math.floor(chip * 5) / 5;
-  const bite = smooth(0.62, 0.78, chip);
+  // One smooth broad scoop plus soft teeth: quantised steps and narrow bites cut the rim into
+  // planar sheets at the ring spacing, so the trunk crown keeps a rounded, eroded outline.
   const drop =
-    Math.pow(smooth(0.35, 0.7, broad), 1.5) * (o.trunk ? 1.1 : 1.6) +
-    smooth(0.5, 0.8, teeth) * (o.trunk ? 0.25 : 0.5) +
-    (o.trunk ? steps * 0.3 + bite * 0.3 : 0);
+    Math.pow(smooth(0.3, 0.8, broad), 1.5) * (o.trunk ? 0.6 : 1.6) +
+    smooth(0.4, 0.9, teeth) * (o.trunk ? 0.15 : 0.5);
   return o.r0 * o.topFrac * drop;
 }
 
@@ -223,7 +219,7 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
       const k = smooth(0.8, 1, t);
       yy -= k * k * rimDrop(o, ang);
       const teeth = fbm3(Math.cos(ang) * 5 + 2, 8, Math.sin(ang) * 5 + 2, o.seed + 93, 2);
-      f *= 1 + k * (teeth - 0.5) * 0.5;
+      f *= 1 + k * (teeth - 0.5) * 0.25;
       // A rolled, thickened lip: the wall swells into a bead below the torn edge and rounds
       // back over it, so the rim has body instead of a paper edge.
       if (o.trunk) f *= 1 + 0.2 * (smooth(0.84, 0.94, t) - 0.65 * smooth(0.975, 1, t));

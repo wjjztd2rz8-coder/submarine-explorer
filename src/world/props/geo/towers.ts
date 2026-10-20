@@ -165,7 +165,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       ledge: main ? 0.12 : 0.1,
       wobble: 0.1,
       rough: 0.035,
-      ridges: main ? 22 : 14,
+      ridges: main ? 9 : 6,
       ridgeAmp: main ? 0.13 : 0.1,
       flare: main ? 0.7 : 0.5,
       lip: 0.1,
