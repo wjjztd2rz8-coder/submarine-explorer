@@ -1519,6 +1519,314 @@ freshTest.describe('Home to scan and return journey', () => {
     ).toBe(2);
   }
 
+  for (const layout of [
+    { width: 1280, height: 720, touch: false },
+    { width: 390, height: 844, touch: true },
+    { width: 844, height: 390, touch: true },
+  ]) {
+    const size = `${layout.width}x${layout.height}`;
+    test.describe(`unaided journey ${size}`, () => {
+      test.use({
+        viewport: { width: layout.width, height: layout.height },
+        hasTouch: layout.touch,
+        isMobile: layout.touch,
+        deviceScaleFactor: 1,
+        storageState: { cookies: [], origins: [] },
+        serviceWorkers: 'block',
+      });
+      for (const site of ['titanic', 'great-blue-hole']) {
+        // Regression guard: a Home journey must reach its first scan through real
+        // piloting and retain the reward in Journal/debrief on desktop and phones.
+        test(`${site}: Home -> pilot -> first scan -> Journal -> debrief`, async ({ page }) => {
+          test.setTimeout(360_000);
+          const directory = '.cache/codex/shots/journeys';
+          const prefix = `${site}-${size}`;
+          const planned = [
+            'home',
+            'pick-mission',
+            'briefing',
+            'dive-start',
+            'approach',
+            'scan-ready',
+            'first-scan',
+            'journal',
+            'debrief',
+          ];
+          const steps: unknown[] = [];
+          const failures: { step: string; error: string }[] = [];
+          const errors: string[] = [];
+          const startedAt = new Date().toISOString();
+          let current = planned[0];
+          let sequence = 0;
+          page.on('pageerror', (error) => errors.push(error.message));
+          await mkdir(directory, { recursive: true });
+          const persist = async (): Promise<void> => {
+            await writeFile(
+              `${directory}/${prefix}-manifest.json`,
+              JSON.stringify(
+                {
+                  site,
+                  layout: size,
+                  tier: 'low',
+                  input: layout.touch ? 'touch' : 'keyboard',
+                  route: 'Home mission selection; forward along the authored opening heading',
+                  clock: 'real game frames, at most 250 ms per advance; no direct simulation calls',
+                  startedAt,
+                  status: failures.length
+                    ? 'failed'
+                    : current === 'complete'
+                      ? 'passed'
+                      : 'running',
+                  planned,
+                  steps,
+                  failures,
+                  errors,
+                },
+                null,
+                2,
+              ),
+            );
+          };
+          const shot = async (step: string): Promise<void> => {
+            const path = `${directory}/${prefix}-${String(++sequence).padStart(2, '0')}-${step}.png`;
+            const state = await page.evaluate(() => {
+              const g = window.__game as unknown as Game & {
+                appState: string;
+                perf: { tier: string };
+                mission: { state: string; elapsedS: number; objectives: unknown[] } | null;
+              };
+              return {
+                url: location.href,
+                viewport: [innerWidth, innerHeight],
+                appState: g?.appState,
+                tier: g?.perf?.tier,
+                elapsedS: g?.discovery?.stats.elapsedS,
+                stats: g?.discovery?.stats.snapshot(),
+                debugSpawn: g?.discovery?.spawnedAt,
+                scanner: g?.discovery ? { ...g.discovery.scanner.view } : null,
+                position: g?.sub?.position.toArray(),
+                velocity: g?.sub?.velocity.toArray(),
+                yaw: g?.sub?.yaw,
+                pitch: g?.sub?.pitch,
+                mission: g?.mission
+                  ? {
+                      state: g.mission.state,
+                      elapsedS: g.mission.elapsedS,
+                      objectives: g.mission.objectives,
+                    }
+                  : null,
+                tutorialStep: g?.onboard?.tutorial.index,
+                panels: ['.guidance-slot', '.briefing', '.journal', '.mission-debrief'].flatMap(
+                  (selector) => {
+                    const el = document.querySelector<HTMLElement>(selector);
+                    return el?.getClientRects().length
+                      ? [
+                          {
+                            selector,
+                            text: el.innerText,
+                            rect: el.getBoundingClientRect().toJSON(),
+                          },
+                        ]
+                      : [];
+                  },
+                ),
+              };
+            });
+            steps.push({ step, path, state });
+            // Retain state even if image capture itself fails. Screenshots are
+            // required independently of render-review flags.
+            try {
+              await page.screenshot({ path });
+            } finally {
+              await persist();
+            }
+          };
+          // Native held controls only. In particular, do not use completeScan:
+          // this journey must exercise the normal input, physics and scan frame loop.
+          const held = async (
+            control: 'forward' | 'scan',
+            work: () => Promise<void>,
+          ): Promise<void> => {
+            if (!layout.touch) {
+              const key = control === 'forward' ? 'w' : 'g';
+              await page.keyboard.down(key);
+              try {
+                await work();
+              } finally {
+                await page.keyboard.up(key);
+              }
+              return;
+            }
+            const target = page.locator(control === 'forward' ? '.tc-stick' : '.tc-btn-scan');
+            await expect(target).toBeVisible();
+            const box = (await target.boundingBox())!;
+            const session = await page.context().newCDPSession(page);
+            try {
+              await session.send('Input.dispatchTouchEvent', {
+                type: 'touchStart',
+                touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }],
+              });
+              if (control === 'forward')
+                await session.send('Input.dispatchTouchEvent', {
+                  type: 'touchMove',
+                  touchPoints: [{ x: box.x + box.width / 2, y: box.y + 1 }],
+                });
+              await work();
+            } finally {
+              await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+              await session.detach();
+            }
+          };
+          try {
+            await persist();
+            await pauseClockBeforeNavigation(page);
+            // Low is a public launch option, not an injected save or game state.
+            await page.goto('/?tier=low', { waitUntil: 'domcontentloaded' });
+            await homeReady(page, true);
+            await shot(current);
+            current = 'pick-mission';
+            const home = page.locator('.home-screen');
+            await act(home.getByRole('button', { name: 'Dive sites', exact: true }), layout.touch);
+            await openSiteList(page, layout.touch, true);
+            const choice = home.locator(`.mission-item[data-mission="${site}"]`);
+            await expect(choice).toBeEnabled();
+            await choice.scrollIntoViewIfNeeded();
+            await shot(current);
+            await Promise.all([
+              page.waitForURL((url) => url.searchParams.get('mission') === site, {
+                waitUntil: 'domcontentloaded',
+              }),
+              act(choice, layout.touch),
+            ]);
+            current = 'briefing';
+            await clockFramesUntil(
+              page,
+              () =>
+                window.__gameReady === true && (window.__game as unknown as Game).discovery.loaded,
+            );
+            await expect(page.locator('.briefing')).toBeVisible();
+            await shot(current);
+            await act(page.locator('.briefing-begin'), layout.touch);
+            await page.clock.runFor(34);
+            current = 'dive-start';
+            expect(
+              await page.evaluate(
+                () => (window.__game as unknown as { perf: { tier: string } }).perf.tier,
+              ),
+            ).toBe('low');
+            await shot(current);
+            const start = await page.evaluate(() => {
+              const g = window.__game as unknown as Game;
+              return {
+                position: g.sub.position.toArray(),
+                target: g.discovery.scanner.view.objectiveId,
+              };
+            });
+            expect(start.target).toBeTruthy();
+            current = 'approach';
+            await held('forward', async () => {
+              for (let frame = 0; frame < 1200; frame++) {
+                await page.clock.fastForward(250);
+                if (frame === 3) await shot('approach');
+                const motion = await page.evaluate((origin) => {
+                  const g = window.__game as unknown as Game;
+                  return {
+                    elapsedS: g.discovery.stats.elapsedS,
+                    movedM: Math.hypot(...g.sub.position.toArray().map((n, i) => n - origin[i])),
+                  };
+                }, start.position);
+                // Follow the visible ready-to-scan cue, without hidden target coordinates
+                // or an autopilot. A bad opening route remains a recorded failure.
+                const guidance = await page.locator('.guidance-slot').innerText();
+                if (
+                  motion.movedM > 1 &&
+                  !/OPTIONAL/i.test(guidance) &&
+                  /HOLD .* TO SCAN/i.test(guidance)
+                )
+                  return;
+                if (motion.elapsedS >= 300) break;
+              }
+              throw new Error('No visible scan prompt within the first five simulation minutes');
+            });
+            current = 'scan-ready';
+            const arrived = await page.evaluate(() => {
+              const g = window.__game as unknown as Game;
+              return {
+                position: g.sub.position.toArray(),
+                candidate: g.discovery.scanner.view.candidateId,
+              };
+            });
+            expect(arrived.candidate).toBe(start.target);
+            expect(
+              Math.hypot(...arrived.position.map((n, i) => n - start.position[i])),
+            ).toBeGreaterThan(1);
+            await shot(current);
+            current = 'first-scan';
+            await held('scan', async () => {
+              await clockFramesUntil(
+                page,
+                () => (window.__game as unknown as Game).discovery.scanner.view.completed === 1,
+                250,
+                60_000,
+              );
+            });
+            const result = await page.evaluate(() => {
+              const g = window.__game as unknown as Game;
+              return {
+                id: g.discovery.scanner.view.lastCompleteId,
+                first: g.discovery.scanner.view.lastCompleteFirstTime,
+                entry: g.discovery.pois.find(
+                  (p) => p.id === g.discovery.scanner.view.lastCompleteId,
+                )?.guideEntry,
+                elapsedS: g.discovery.stats.elapsedS,
+              };
+            });
+            expect(result.id).toBe(start.target);
+            expect(result.first).toBe(true);
+            expect(result.elapsedS).toBeLessThanOrEqual(300);
+            await expect(page.locator('.guidance-slot')).toContainText('New Journal entry');
+            await shot(current);
+            current = 'journal';
+            await pause(page, layout.touch);
+            await act(
+              page.locator('.pause-menu').getByRole('button', { name: 'Journal', exact: true }),
+              layout.touch,
+            );
+            const journal = page.locator('.journal');
+            await expect(journal).toBeVisible();
+            await expect(journal.locator('.jr-body .jr-locked')).toHaveCount(0);
+            await expect(journal.locator('.jr-body .jr-title')).toBeVisible();
+            await expect(journal.locator('.jr-body .jr-title')).not.toHaveText('Undiscovered');
+            expect(
+              await page.evaluate(() => (window.__game as unknown as Game).journal.selectedId),
+            ).toBe(result.entry);
+            await shot(current);
+            await closeJournal(page, layout.touch);
+            current = 'debrief';
+            await act(page.locator('.pause-surface'), layout.touch);
+            const debrief = page.locator('.mission-debrief');
+            await expect(debrief).toBeVisible();
+            await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText(
+              '1',
+            );
+            await expect(debrief.locator('.debrief-highlight')).toContainText('Scanned');
+            await shot(current);
+            expect(errors).toEqual([]);
+            current = 'complete';
+          } catch (error) {
+            failures.push({ step: current, error: String(error) });
+            await shot(`blocked-${current}`).catch((captureError) => {
+              failures.push({ step: current, error: `Failure capture: ${String(captureError)}` });
+            });
+            throw error;
+          } finally {
+            await persist();
+          }
+        });
+      }
+    });
+  }
+
   for (const viewport of [
     { width: 1600, height: 900, touch: false, sites: ['titanic', 'great-blue-hole'] },
     {
