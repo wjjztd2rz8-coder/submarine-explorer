@@ -95,7 +95,6 @@ Owner phone test 2026-10-18: decisions and file ownership in [PHONE-FEEDBACK-202
 7. **V-eight-sites [Sonnet]** acceptance: capture mission-spawn frames of the eight non-hero sites (Low tier, portrait) and review; needs V-spawn-capture first.
 8. **S-verify / S-bughunt [Codex, standing]:** 2550-2570 queued; after visual merges verify numerics and hunt bugs (Lost City Low triangles +15%).
    12b. V-journeys-harness: DONE 2026-10-20 (merged). The six-journey Low matrix is written but **not yet run**: see V-journeys-run.
-   12c. **P2-hull-a-geometry [Codex numeric side, brief 2710]:** audit propeller/thruster clearance against hull and fin geometry on all three hulls and tiers; report offending coordinates and add the geometry test (failing first). Sonnet P2-hull-a applies the fix.
    12d. S-events-low-audit: DONE 2026-10-20 (clean audit, tests merged).
    12e. R-ci-shard-triage: DONE 2026-10-20. 29 of 43 failures were fixed by P2-copy; the stale-spec repairs for the rest merged 2026-10-20 except R-ci-green-f below.
    12f. **R-ci-green-f [Haiku/Sonnet]:** f-bughunt-960 great-blue-hole arcade high (3 cases) still red: the mission button rebuilds the URL with only tier and touch, so `life=0` is dropped and wildlife wins the scan candidate. Pick an isolation route (a direct mission URL with life=0, or a test-side hook) and keep the expected-target guard. Also f-fidelity-rollout lost-city Medium timed out once at 240 s (render cost symptom, watch).
