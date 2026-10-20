@@ -108,6 +108,25 @@ describe('anchored event arrivals', () => {
     expect(events.active).toBeNull();
     expect(events.update(1, second.position, contacts)?.contact.id).toBe('other');
   });
+  it('consumes coincident arrivals together without replaying an occupied spot', () => {
+    const first = eventContacts[0];
+    const second = { ...first, id: 'event:turbidity', kind: 'turbidity' as const };
+    for (const contacts of [
+      [first, second],
+      [second, first],
+    ]) {
+      const events = new AnchoredEvents();
+      expect(events.update(1, first.position, contacts)?.contact).toBe(contacts[0]);
+      expect(contacts.every((contact) => !events.available(contact))).toBe(true);
+      events.update(EXPLORE_CONFIG.eventDurationS, first.position, contacts);
+      expect(events.update(10000, first.position, contacts)).toBeNull();
+      expect(contacts.every((contact) => !events.available(contact))).toBe(true);
+      const outside = first.position.clone().add(new Vector3(0, 0, 41));
+      events.update(1, outside, contacts);
+      expect(contacts.every((contact) => events.available(contact))).toBe(true);
+      expect(events.update(1, first.position, contacts)?.contact).toBe(contacts[0]);
+    }
+  });
 });
 
 describe('content, collection and Journal', () => {

@@ -46,6 +46,40 @@ function run(s: Scanner, seconds: number, pos: Vector3, fwd: Vector3, held: bool
 
 const names = (log: Log) => log.map(([n]) => n);
 
+it.each(['fixed', 'wildlife', 'curiosity'] as const)(
+  'keeps a coincident arrival contact out of the %s scan beam across mode changes',
+  (pool) => {
+    const contact = target({ position: new Vector3(0, -100, -60), radius: 30 });
+    const arrival = target({
+      id: 'event:plume',
+      name: 'Vent plume',
+      position: contact.position.clone(),
+      radius: 110,
+      arrivalRadiusM: 40,
+      scanSeconds: 0,
+    });
+    const { scanner, log, store } = setup(pool === 'fixed' ? [contact] : []);
+    scanner.setExtraTargets(pool === 'wildlife' ? [contact] : []);
+    scanner.setSupplementalTargets(pool === 'curiosity' ? [arrival, contact] : [arrival]);
+    for (const radiusFloorM of [0, 100, 0]) {
+      scanner.setConfig({ ...cfg, radiusFloorM });
+      scanner.update(0, AT, NORTH, true);
+      const candidate = radiusFloorM === 100 ? contact.id : null;
+      expect(scanner.view.candidateId).toBe(candidate);
+      expect(scanner.view.nearestId).toBe(candidate ?? arrival.id);
+      expect(scanner.view.nearestArrivalRadiusM).toBe(candidate ? undefined : 40);
+      expect(store.keys()).toEqual([]);
+    }
+    scanner.setConfig({ ...cfg, radiusFloorM: 100 });
+    scanner.update(contact.scanSeconds, AT, NORTH, true);
+    expect(store.keys()).toEqual(['lm/bow']);
+    expect(names(log).filter((name) => name === 'scan:complete')).toHaveLength(1);
+    scanner.update(100, AT, NORTH, true);
+    expect(scanner.view.candidateId).toBeNull();
+    expect(store.keys()).toEqual(['lm/bow']);
+  },
+);
+
 it('prefers the nearest unscanned contact over a closer logged contact, independent of target order', () => {
   const logged = target({ id: 'west', position: new Vector3(0, -100, -20) });
   const fresh = target({ id: 'east', position: new Vector3(0, -100, -40) });
