@@ -249,17 +249,27 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     const mouths: THREE.BufferGeometry[] = [];
     const collars: THREE.BufferGeometry[] = [];
     const sideMouths: Array<{ centre: number[]; normal: number[] }> = [];
+    const ray = new THREE.Raycaster();
+    const down = new THREE.Vector3(0, -1, 0);
+    const probe = new THREE.Vector3();
     for (const s of stacks) {
-      const topRadius = s.r0 * s.top;
-      const radius = topRadius * profile.topMouthRadiusFraction;
-      mouths.push(
-        place(new THREE.CircleGeometry(radius, 16), {
-          x: s.x,
-          y: s.y + s.h - profile.crater * topRadius * profile.topMouthRecessFraction,
-          z: s.z,
-          rx: -Math.PI / 2,
-        }),
-      );
+      const radius = s.r0 * s.top * profile.topMouthRadiusFraction;
+      const disc = place(new THREE.CircleGeometry(radius, 16), {
+        x: s.x,
+        y: s.y + s.h,
+        z: s.z,
+        rx: -Math.PI / 2,
+      });
+      // Lay each vertex on the crater surface actually built for this tier. A flat disc at a
+      // computed depth floats over the coarse Low-tier crater, whose rim lacks the torn teeth
+      // that hide the gap on High.
+      const pos = disc.getAttribute('position');
+      for (let i = 0; i < pos.count; i++) {
+        probe.set(pos.getX(i), s.y + s.h + 2, pos.getZ(i));
+        const hit = ray.set(probe, down).intersectObject(body)[0];
+        if (hit) pos.setY(i, hit.point.y + profile.mouthClearanceM);
+      }
+      mouths.push(disc);
     }
     // The opening view sees the main stack from below its summit. Broken side vents
     // give that view a readable aperture even when the top rim is outside the frame.
@@ -272,7 +282,6 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     const axisY = new THREE.Vector3(0, 1, 0);
     const axisZ = new THREE.Vector3(0, 0, 1);
     const stack = stacks[0]!;
-    const ray = new THREE.Raycaster();
     for (let k = 0; k < profile.outletCount; k++) {
       const t = profile.outletStartHeightFraction + k * profile.outletHeightStepFraction;
       const angle = profile.outletStartAngleRad + k * profile.outletAngleStepRad;
