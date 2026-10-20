@@ -8,8 +8,8 @@
 ## Change
 
 - `towers.ts`: trunk ridges 22/14 to 9/6 (ridges are still painted as fine striations); paint pulls slightly toward warm white (less grey-blue and trough stain, paler base).
-- `spire.ts` `rimDrop`: deleted the stair-step and bite terms, softer broad scoop and tooth radius jitter.
-- `core/config/terrain.ts` (Lost City fidelity table): terrace 16 m / 1.5, `reliefBed` 0, so the slope breaks into wandering ledges rather than stripes.
+- `spire.ts` `rimDrop`: deleted the stair-step and bite terms and lowered the trunk drop (the shared Beebe/crusted path is untouched).
+- `core/config/terrain.ts` (Lost City fidelity table): terrace 16 m / 1.1, `reliefBed` 0, so the slope breaks into wandering ledges rather than stripes.
 
 ## Screenshots (`.cache/codex/shots/V-lostcity-slice3/{before,after}/`)
 
@@ -25,4 +25,4 @@ Replaced, not added: removed the `chip`/`steps`/`bite` rim code, lowered a ridge
 
 ## Gates
 
-See below.
+`PW_PORT=4401 tools/gates.sh`: PASS (python, content, build, unit, e2e smoke, e2e-base, attribution, prettier). Rebaselined, intended: Lost City entries of `props-geo` and `terrainMerge1140`; `perf-budget` Low frozen sprite-pixel figures at 70/32/10 m (0.03% to 5%, the vent mouths moved with the lower rim; budget ceilings unchanged). Screenshots were taken before the final terrace 1.5 to 1.1 and rim-jitter tidy; a final High frame 3 was re-captured and looks the same.
