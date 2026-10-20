@@ -5,7 +5,8 @@
  * housing, an arm carrying a wire bait cage with mackerel, and a tall mast with an orange recovery
  * flag and a white strobe. The frame is aged: sediment darkens its lower sections and rust stains
  * patch the legs. dims = [footprint width, footprint depth, overall height incl. mast]. Parts are
- * merged with vertex colours into one frame mesh; the flag (emissive) and strobe (unlit) are two
+ * merged with vertex colours into one frame mesh together with a disturbed-sediment halo and a few
+ * half-buried clasts on the seabed around the footprint (outside the reported bounds); the flag (emissive) and strobe (unlit) are two
  * small extra meshes, so the whole lander is three draw calls at every tier. Real lander dimensions
  * are unpublished: the shape is generic, only the position is the real one.
  */
@@ -37,9 +38,13 @@ const FISH = new THREE.Color(0x8fa6b4);
 const FLAG = new THREE.Color(0xff5a16);
 const STROBE = new THREE.Color(0xd6f4ff);
 const GLASS = new THREE.Color(0x1f3a48);
-const MUD = new THREE.Color(0x5e5443);
 const SEDIMENT = new THREE.Color(0x2a251d);
 const RUST = new THREE.Color(0x6b3a1e);
+const HALO = new THREE.Color(0x373a30);
+const HALO_EDGE = new THREE.Color(0x52554a);
+const FURROW = new THREE.Color(0x3d4034);
+const CREST = new THREE.Color(0x585b4b);
+const CLASTS = [0x3a3c37, 0x4a483e, 0x2c3130, 0x55513f].map((c) => new THREE.Color(c));
 
 /** Give a piece one flat colour and strip it to position/normal/colour so it can merge. */
 function tint(g: THREE.BufferGeometry, c: THREE.Color): THREE.BufferGeometry {
@@ -130,6 +135,102 @@ function strut(
   return g.translate(mid.x, mid.y, mid.z);
 }
 
+/**
+ * Disturbed-sediment dressing on the seabed around the footprint, authored in lander units (x k):
+ * a dark halo that eases into the ooze, slivers of light crest and dark furrow radiating from it, and
+ * a few clasts partly sunk in the floor. Vertex colour only, merged into the frame, so it costs no
+ * draw call. The floor is flat here and the lander is snapped to its lowest sample, so a thin lift
+ * keeps it on the ground.
+ */
+function seabedDressing(
+  k: number,
+  low: boolean,
+  ground: (x: number, z: number) => number,
+): THREE.BufferGeometry {
+  let s = 0x9e3779b1;
+  const rnd = () => {
+    s = (Math.imul(s ^ (s >>> 15), 0x2c1b3c6d) + 0x297a2d39) | 0;
+    return ((s >>> 0) % 100000) / 100000;
+  };
+  const pos: number[] = [];
+  const col: number[] = [];
+  const tri = (a: number[], b: number[], c: number[], ca: THREE.Color, cb = ca, cc = ca) => {
+    // Wound so the face points up (the material is single-sided).
+    pos.push(...a, ...c, ...b);
+    col.push(ca.r, ca.g, ca.b, cc.r, cc.g, cc.b, cb.r, cb.g, cb.b);
+  };
+  const up = (r: number, a: number, y: number) => {
+    const x = Math.cos(a) * r * k;
+    const z = Math.sin(a) * r * k;
+    return [x, ground(x, z) + y * k, z];
+  };
+
+  // Halo: three rings with a ragged outer edge, darkest against the legs. The middle and outer
+  // rings alternate light and dark per spoke, which reads as current furrows radiating from the frame.
+  const seg = low ? 14 : 20;
+  const radii = [0.45, 2, 3.4];
+  // The outer ring dips below the floor so its edge follows the ground relief instead of a polygon outline.
+  const lift = [0.04, 0.02, -0.05];
+  const ragged = Array.from({ length: seg }, () => 0.7 + 0.6 * rnd());
+  const ring = (i: number, j: number) =>
+    up(radii[i] * (i === 2 ? ragged[j % seg] : 1), (j / seg) * Math.PI * 2, lift[i]);
+  const tone = (i: number, j: number) => {
+    const streak = (j % 2 ? CREST : FURROW).clone().lerp(HALO, i === 1 ? 0.35 : 0);
+    return i === 0 ? HALO : streak.lerp(HALO_EDGE, i === 2 ? 0.8 : 0);
+  };
+  for (let j = 0; j < seg; j++) {
+    for (let i = 0; i < 2; i++) {
+      tri(
+        ring(i, j),
+        ring(i + 1, j),
+        ring(i + 1, j + 1),
+        tone(i, j),
+        tone(i + 1, j),
+        tone(i + 1, j + 1),
+      );
+      tri(
+        ring(i, j),
+        ring(i + 1, j + 1),
+        ring(i, j + 1),
+        tone(i, j),
+        tone(i + 1, j + 1),
+        tone(i, j + 1),
+      );
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  g.computeVertexNormals();
+  // Flat tops must face up whatever the winding.
+  const nor = g.getAttribute('normal');
+  for (let i = 0; i < nor.count; i++) nor.setXYZ(i, 0, 1, 0);
+  const parts = [g];
+
+  // Clasts: flattened, lumpy, a third buried, in varied sizes.
+  for (let n = 0; n < 6; n++) {
+    const a = (n / 6) * Math.PI * 2 + 0.5 + rnd() * 0.7;
+    const r = 2.6 + 2.4 * rnd();
+    const size = 0.16 + 0.3 * rnd();
+    const rock = tint(new THREE.IcosahedronGeometry(size * k, 0), CLASTS[n % CLASTS.length]);
+    const p = rock.getAttribute('position');
+    for (let i = 0; i < p.count; i++) {
+      const lump =
+        0.8 + 0.4 * valueNoise3((p.getX(i) / k) * 6, (p.getY(i) / k) * 6, (p.getZ(i) / k) * 6, n);
+      p.setXYZ(i, p.getX(i) * lump * 1.2, p.getY(i) * lump * 0.65, p.getZ(i) * lump);
+    }
+    rock.computeVertexNormals();
+    {
+      const rx = Math.cos(a) * r * k;
+      const rz = Math.sin(a) * r * k;
+      parts.push(rock.translate(rx, ground(rx, rz) - size * k * 0.12, rz));
+    }
+  }
+  const out = mergeGeometries(parts, false)!;
+  for (const q of parts) q.dispose();
+  return out;
+}
+
 export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
   const { dims, tier } = input;
   const d = geoDetail(tier);
@@ -147,7 +248,16 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
     const cx = Math.cos(a);
     const cz = Math.sin(a);
     parts.push(
-      tint(strut(v(cx * 1.5, 0.1, cz * 1.5), v(cx * 0.9, ringY, cz * 0.9), 0.09 * k, seg, 4), ALU),
+      tint(
+        strut(
+          v(cx * 1.5, 0.1, cz * 1.5),
+          v(cx * 0.9, ringY, cz * 0.9),
+          0.09 * k,
+          seg,
+          d.meshDensity < 0.7 ? 2 : 4,
+        ),
+        ALU,
+      ),
     );
     parts.push(
       tint(
@@ -157,17 +267,6 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
           cz * 1.5 * k,
         ),
         DARK,
-      ),
-    );
-    // Sediment that has settled around each foot pad.
-    parts.push(
-      tint(
-        new THREE.CylinderGeometry(0.46 * k, 0.52 * k, 0.05 * k, seg + 3).translate(
-          cx * 1.5 * k,
-          0.025 * k,
-          cz * 1.5 * k,
-        ),
-        MUD,
       ),
     );
     // Cross braces to the next leg at mid height.
@@ -400,9 +499,16 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
     ),
   );
 
-  const frameGeom = mergeGeometries(parts, false)!;
+  const bodyGeom = mergeGeometries(parts, false)!;
   for (const p of parts) p.dispose();
-  weather(frameGeom, k, H / k);
+  weather(bodyGeom, k, H / k);
+  // Footprint and impostor describe the lander itself, not its seabed dressing.
+  bodyGeom.computeBoundingBox();
+  const bodyBox = bodyGeom.boundingBox!.clone();
+  const dressing = seabedDressing(k, d.meshDensity < 0.7, input.groundHeight() ?? (() => 0));
+  const frameGeom = mergeGeometries([bodyGeom, dressing], false)!;
+  bodyGeom.dispose();
+  dressing.dispose();
   frameGeom.computeBoundingBox();
   frameGeom.computeBoundingSphere();
   const frame = new THREE.Mesh(
@@ -412,10 +518,11 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
   frame.name = 'lander-frame';
 
   // Recovery flag: a swallow-tailed pennant, double-sided and self-lit so it reads at depth.
-  const fl = 1.15 * k;
-  const fh = 0.62 * k;
+  // Hung part-way down the mast and kept compact, so it stays in the open sky clear of the objective card.
+  const fl = 0.8 * k;
+  const fh = 0.45 * k;
   const flagGeom = new THREE.BufferGeometry();
-  const top = mastTop - 0.1 * k;
+  const top = ringY * k + (mastTop - ringY * k) * 0.62;
   flagGeom.setAttribute(
     'position',
     new THREE.BufferAttribute(
@@ -463,7 +570,7 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
   const full = new THREE.Group();
   full.name = 'benthic-lander';
   full.add(frame, flag, strobe);
-  const bounds = new THREE.Box3().setFromObject(full);
+  const bounds = bodyBox.expandByObject(flag).expandByObject(strobe);
   const colliders: THREE.Box3[] = [boxCH(0, 1 * k, 0, 1.1 * k, 1 * k, 1.1 * k)];
   return { full, impostor: impostorFromBoxes(colliders, bounds, 0x8a9296), bounds, colliders };
 }
