@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
+import { makeConfig } from '../../src/core/Config.js';
+import { allSiteManifests } from '../../src/core/SiteManifest.js';
+import { Save } from '../../src/core/Save.js';
 import { EXPLORE_CONFIG } from '../../src/core/config/explore.js';
+import { EventBus } from '../../src/core/EventBus.js';
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { Scanner } from '../../src/game/Scanner.js';
+import { Terrain } from '../../src/world/Terrain.js';
+import type { TileMeta } from '../../src/util/types.js';
 import {
   AnchoredEvents,
   placeEventContacts,
@@ -29,6 +39,83 @@ function camera(aspect = 844 / 390): THREE.PerspectiveCamera {
 const pilot = new THREE.Vector3(0, -85, 0);
 const forward = new THREE.Vector3(0, 0, -1);
 const floor = (x: number, _z: number): number => -100 + x * 0.08;
+
+for (const site of allSiteManifests().filter((site) => site.events)) {
+  it(`${site.id}: Low contacts keep arrival separate from Arcade scanning and bounded through playback`, () => {
+    const config = makeConfig();
+    const settings = new Save({ config, storage: null }).get();
+    const scan = resolveEffective(settings, 'arcade', null, config).scan;
+    const meta = JSON.parse(readFileSync(`data/tiles/${site.id}/meta.json`, 'utf8')) as TileMeta;
+    const bytes = readFileSync(`data/tiles/${site.id}/heightmap.bin`);
+    const heights = new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows);
+    const terrain = new Terrain({ meta, heights }, config.terrain, 'low');
+    const ground = (x: number, z: number) => terrain.sampleHeight(x, z);
+    const visual = new EventsVisual('low');
+    try {
+      for (const contact of placeEventContacts(site.id, meta, ground)) {
+        const { kind } = contact;
+        const events = new AnchoredEvents();
+        const bus = new EventBus();
+        let scans = 0;
+        bus.on('scan:complete', () => scans++);
+        const scanner = new Scanner(scan, bus);
+        scanner.setSupplementalTargets([contact]);
+        expect(scan.radiusFloorM).toBe(100);
+        expect(contact.arrivalRadiusM).toBe(40);
+        expect(contact.radius).toBe(110);
+        expect(contact.arrivalRadiusM).toBeLessThan(scan.radiusFloorM);
+        expect(contact.radius).toBeGreaterThan(scan.radiusFloorM);
+        for (const range of [110.001, 109.999, 100, 40.001]) {
+          const pilot = contact.position.clone().add(new THREE.Vector3(0, 0, range));
+          scanner.update(100, pilot, forward, true);
+          expect(scanner.view.nearestId).toBe(range > contact.radius ? null : contact.id);
+          expect(scanner.view.candidateId).toBeNull();
+          expect(events.update(100, pilot, [contact])).toBeNull();
+        }
+        expect(scans).toBe(0);
+        // The inclusive 3D arrival starts once; occupation cannot retrigger at expiry.
+        const arrival = contact.position.clone().add(new THREE.Vector3(0, 40, 0));
+        const event = events.update(0.25, arrival, [contact])!;
+        expect(event?.contact).toBe(contact);
+        expect(event.elapsedS).toBe(0);
+        expect(event.durationS).toBe(18);
+        visual.begin(event, ground);
+        const object = visual.group.children[kind === 'whale' ? 1 : 0] as THREE.Mesh;
+        const positions = object.geometry.getAttribute('position');
+        const budget = kind === 'whale' ? positions.count / 3 : positions.count;
+        expect(budget).toBe(kind === 'whale' ? 588 : 100);
+        for (const elapsedS of [0, 0.8, 7, 15, 17.75]) {
+          visual.update({ ...event, elapsedS });
+          visual.group.updateMatrixWorld(true);
+          expect(visual.group.visible).toBe(true);
+          expect(visual.group.children.filter((child) => child.visible)).toEqual([object]);
+          expect(Array.from(positions.array).every(Number.isFinite)).toBe(true);
+          expect(object.matrixWorld.elements.every(Number.isFinite)).toBe(true);
+          expect(visual.origin.toArray().every(Number.isFinite)).toBe(true);
+          if (kind !== 'whale') {
+            const material = object.material as THREE.PointsMaterial;
+            expect(Number.isFinite(material.size) && material.size > 0).toBe(true);
+            expect(Number.isFinite(material.opacity) && material.opacity > 0).toBe(true);
+          }
+        }
+        for (let i = 1; i <= 72; i++) {
+          expect(events.update(0.25, arrival, [contact])).toBeNull();
+          if (i < 72) expect(events.active?.elapsedS).toBe(i / 4);
+        }
+        expect(events.active).toBeNull();
+        visual.update(events.active);
+        expect(visual.group.visible).toBe(false);
+        expect(events.update(10000, arrival, [contact])).toBeNull();
+        const outside = arrival.clone().add(new THREE.Vector3(0, 1, 0));
+        expect(events.update(1, outside, [contact])).toBeNull();
+        expect(events.update(1, arrival, [contact])?.contact).toBe(contact);
+      }
+    } finally {
+      visual.dispose();
+      terrain.dispose();
+    }
+  });
+}
 
 for (const aspect of [844 / 390, 1280 / 720]) {
   describe(`Low event geometry in landscape ${aspect}`, () => {
