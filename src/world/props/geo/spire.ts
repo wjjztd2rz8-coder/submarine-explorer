@@ -219,7 +219,7 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
       const k = smooth(0.8, 1, t);
       yy -= k * k * rimDrop(o, ang);
       const teeth = fbm3(Math.cos(ang) * 5 + 2, 8, Math.sin(ang) * 5 + 2, o.seed + 93, 2);
-      f *= 1 + k * (teeth - 0.5) * (o.trunk ? 0.25 : 0.5);
+      f *= 1 + k * (teeth - 0.5) * 0.5;
       // A rolled, thickened lip: the wall swells into a bead below the torn edge and rounds
       // back over it, so the rim has body instead of a paper edge.
       if (o.trunk) f *= 1 + 0.2 * (smooth(0.84, 0.94, t) - 0.65 * smooth(0.975, 1, t));
