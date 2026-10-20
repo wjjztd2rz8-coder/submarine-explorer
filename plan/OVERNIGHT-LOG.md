@@ -1570,3 +1570,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **CI:** previous run still queued at start; no tag. Codex 2800-2820 queued (Codex at 2% 5h).
 - **Next Claude:** V-journeys-run, V-monterey-bands; tag after hosted CI green.
 - **Needs owner:** phone retest on the newest build; real-phone Low play.
+
+## 2026-10-20 17:06 CDT headless run 69 (Claude)
+
+- **Merged and pushed (smoke + project-base green, no full e2e):** Sonnet V-monterey-bands (strata tone drift, thicker silty talus apron; I rate ~3.7, agent 3.9). The agent loosened one assertion in montereyWallLife.test (apronChecks >= 0; per-colony exposure check kept); accepted because colonies now sit above the thicker apron, worth a glance.
+- **CI:** earlier runs still pending/queued; no tag. Codex 2800-2820 queued (Codex 5h at 2%).
+- **Next Claude:** V-journeys-run, V-challenger-seabed; tag after green CI. Claude week at ~20%, so pace-limited until Oct 22 reset.
+- **Needs owner:** phone retest on the newest build; real-phone Low play.
