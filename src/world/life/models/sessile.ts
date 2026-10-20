@@ -360,6 +360,8 @@ export function buildAnemone(look: Look, size: number, detail: 0 | 1 | 2): THREE
     path,
     rings: 6,
     sides: [8, 10, 14][detail]!,
+    // The column is vertical; a parallel reference axis collapses every ring.
+    up: [0, 0, 1],
     radius: (t) => H * (0.13 - 0.03 * Math.sin(t * 3) + 0.04 * t) * (t < 0.03 ? 1.3 : 1),
     color: (t) => scaleRgb(cCol, 0.85 + 0.2 * t),
     anim: (t) => [t * 0.35, 0, 0],
