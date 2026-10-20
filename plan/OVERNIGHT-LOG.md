@@ -1550,3 +1550,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Golden 2026-10-19-000013 reviewed; REVIEWS, STATUS, DIRECTOR updated (stage ~80%); Codex 2700-2730 queued (3 launched). No packages merged. CI run for a814d10 pending; tag f61 only once green.
 - **Needs owner:** phone retest on the newest build.
+
+## 2026-10-20 12:38 CDT headless run 66 (Claude): comprehensive review, joint with Sol
+
+- Review done (REVIEWS, STATUS, DIRECTOR; stage ~80%, now 5-7 weeks per Sol). Collected nine finished Codex worktrees (tests, vent-light standoff, shell disposal, Settings focus); Haiku repaired stale Lost City and journey specs; Sonnet P2-hull-a fixed Class A/C thruster clearance. Each merge smoke + project-base green, pushed. No tag: hosted CI still red until R-ci-green-f (f-bughunt-960 Blue Hole fixture) is fixed.
+- Codex 2770-2790 queued. Next Claude: V-journeys-run, R-ci-green-f, P2-beebe-low, V-lostcity-slice3.
+- **Needs owner:** phone retest on the newest build; real-phone Low play.
