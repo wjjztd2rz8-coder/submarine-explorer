@@ -103,6 +103,11 @@ for (const layout of [
               }),
               act(home.locator(`[data-mission="${site}"]`)),
             ]);
+            // The mission button keeps only device prefs, so `life=0` from the test URL is lost.
+            // Re-enter the same mission with wildlife off: the scan target must be the site POI.
+            const isolated = new URL(page.url());
+            isolated.searchParams.set('life', '0');
+            await page.goto(isolated.href, { waitUntil: 'domcontentloaded' });
             await ready(page);
             const briefing = page.locator('.briefing');
             await expect(briefing).toBeVisible();
@@ -168,8 +173,9 @@ for (const layout of [
             const target = await page.evaluate(() => {
               const g = window.__game as unknown as Game;
               const poi = g.discovery.pois[0]!;
-              const pose = g.discovery.spawnPose(poi.id)!;
-              g.sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+              // Hover over the POI at its minimum scan depth: the spawn pose can sit shallower.
+              const { x, z } = poi.position;
+              g.sub.reset(x, -(poi.minDepthM ?? 0) - 1, z, 0);
               g.discovery.stats.markTeleport();
               return {
                 id: poi.id,
