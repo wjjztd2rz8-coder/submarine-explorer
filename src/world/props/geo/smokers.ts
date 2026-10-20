@@ -266,7 +266,8 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
       const pos = disc.getAttribute('position');
       for (let i = 0; i < pos.count; i++) {
         probe.set(pos.getX(i), s.y + s.h + 2, pos.getZ(i));
-        const hit = ray.set(probe, down).intersectObject(body)[0];
+        ray.set(probe, down);
+        const hit = ray.intersectObject(body)[0];
         if (hit) pos.setY(i, hit.point.y + profile.mouthClearanceM);
       }
       mouths.push(disc);
