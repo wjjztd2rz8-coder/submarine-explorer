@@ -263,3 +263,7 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 
 - Codex queue had run dry (only hold/launched) while Codex sat below its weekly pace gate; refilled 2700-2730 so dispatch has work when the pace line reopens. Cause: briefs get consumed faster than reviews refill; next runs should top the queue up to 3 each time (already in the resume prompt).
 - Merge policy conflict (RESUME-PROMPT "merges don't wait for CI" vs R-merge-verify guard): kept the owner's rule; noted in DIRECTOR.
+
+## 2026-10-20: finished Codex work waits for a Claude run
+
+Nine Codex worktrees finished 2026-10-18/19 but stayed uncommitted until this review, because only Claude runs collect and the weekly gate skipped runs for ~40 h. Also efficiency.sh's skip and idle counts are not date-filtered and the usage telemetry had a 39 h gap (Sol), so treat its 7-day figures as indicative. Follow-up: the collection step stays in resume; no tooling change made (Claude week is on the pace line, a Codex-side auto-merge would break the rule that Claude reviews Codex diffs).

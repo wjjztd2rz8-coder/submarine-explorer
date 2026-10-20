@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-20 comprehensive review, joint with Codex Sol (golden 2026-10-20-163035)
+
+Sol ran read-only (no live browser); one reconcile round, claims checked against files.
+
+**Changed since the last review:** no art or gameplay change (golden pairs differ only by particles/fish and pose drift). Collected nine finished Codex worktrees into main: S-bughunt-25, S-verify-20, steel-shader verification, vent-light offsets (carbonate glow standoff now 0), home-destination disposal and touch-settings focus fixes, S-events-low-audit (clean), V-journeys-harness, R-ci-shard-triage. Haiku repaired the stale Lost City preset and journey specs.
+
+**Scores, readable / beautiful (bands, Sol's lower bounds accepted where the image supports them):** Titanic 4 / 3.5; Lost City 3.5 / 2.5-3.2; Blue Hole 3.5 / 2.5-3.2; Beebe 3.5-4 / 3.5-3.6; Monterey 4 / 3-3.5; Challenger 3.5 / 3-3.5; Endurance 3.5 / 3.5. Biggest gaps: Lost City thin stepped tower, Blue Hole folded roof, Titanic repeated plating, Monterey banding. (Sol: Claude was generous on Lost City, Blue Hole and Monterey; accepted.)
+
+**Process:** CI main red on the last two completed pushes; triage (Codex 2730) shows 29 of 43 failures were stale hud-touch specs already fixed, 13 remain (10 stale scan-copy asserts and 2 stale Lost City preset asserts, repaired today; 1 wildlife-vs-target fixture still red, R-ci-green-f) plus one timing case. Finished Codex worktrees stay uncommitted until a Claude run collects them, and Claude runs were skipped by the weekly gate for ~40 h, so nine packages sat uncollected. Sol corrections (accepted): the 325 skips and "idle" counts in efficiency.sh are not date-filtered and the usage telemetry had a 39 h gap, so those figures are not evidence of waste; deploy already waits for green CI; CI shards upload no screenshots on success.
+
+**Sol's additions (credited to Sol):** Class C also intersects its hull; Blue Hole's mission uses Class B, so Class A free-dive evidence is not the mission defect; phone/simple/reward scores are provisional until the six-journey matrix is actually run; golden-compare rejects sets on mm-scale pose drift (brief 2770).
+
+**Disputed:** timeline. Claude 4-5 weeks, Sol 5-7; settled to 5-7 (limited Claude capacity, art gains ~0.1-0.2 per pass). CI-before-journeys ordering: Sol puts journeys first by player impact; kept as Sol's order.
+
+**Agreed blockers:** (1) unaided Titanic and Blue Hole journeys at 1280x720 and both phones (harness merged, matrix not run); (2) green hosted CI on the release SHA; (3) hull intersections (Class A and C), Beebe Low caps, current real-phone Low acceptance; (4) heroes consistently at 4; (5) eight-site spawn acceptance.
+
+**New priorities:** Claude: P2-hull-a (with the Codex audit), V-journeys-run, R-ci-green-f, P2-beebe-low, V-lostcity-slice3, V-titanic-plating, V-monterey-bands. Codex: 2770 S-golden-compare, 2780 R-ci-trim, 2790 S-verify-merged.
+
+**Stage:** about 80% to 1.0; 5-7 weeks (agreed with Sol).
+
+**Needs owner:** phone retest on the newest build (boost gone, scan range, anchored events); real-phone Low play.
+
 ## 2026-10-19 comprehensive review, joint with Codex Sol (golden 2026-10-19-000013)
 
 Sol ran read-only; one reconcile round. Scores are bands, not a forced decimal consensus.
