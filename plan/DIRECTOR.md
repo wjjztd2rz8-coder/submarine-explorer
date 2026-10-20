@@ -70,7 +70,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running. Merge policy stands as the owner set it on 2026-10-13: merges don't wait for CI (push after smoke + project-base); only tags wait. R-merge-verify's guard is advisory.
+- No Claude package running (2026-10-20: all three run-67 packages merged). Merge policy stands as the owner set it on 2026-10-13: merges don't wait for CI (push after smoke + project-base); only tags wait. R-merge-verify's guard is advisory.
 
 ## Backlog
 

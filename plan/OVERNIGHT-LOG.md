@@ -1556,3 +1556,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Review done (REVIEWS, STATUS, DIRECTOR; stage ~80%, now 5-7 weeks per Sol). Collected nine finished Codex worktrees (tests, vent-light standoff, shell disposal, Settings focus); Haiku repaired stale Lost City and journey specs; Sonnet P2-hull-a fixed Class A/C thruster clearance. Each merge smoke + project-base green, pushed. No tag: hosted CI still red until R-ci-green-f (f-bughunt-960 Blue Hole fixture) is fixed.
 - Codex 2770-2790 queued. Next Claude: V-journeys-run, R-ci-green-f, P2-beebe-low, V-lostcity-slice3.
 - **Needs owner:** phone retest on the newest build; real-phone Low play.
+
+## 2026-10-20 15:36 CDT headless run 67 (Claude)
+
+- **Merged and pushed (each smoke + project-base green, no full e2e):** Sonnet P2-beebe-low (mouth discs seated on built crater; geometry snapshots refreshed), Sonnet V-lostcity-slice3 (thicker eroded tower, fewer sheets; I rate ~3.6, not the agent's 3.9; foot rubble still out of the golden frame, crown facets remain), R-ci-green-f/g. CI run for the beebe merge was red on 14 shards: 13 were my own f-bughunt-960 Titanic regression (min-depth teleport; restored, cc106d8), 1 was settings.spec keyboard focus, a real product bug (dive device-layout button stole focus in Controls view), fixed. Blue Hole's first POI needs a teleport below its 10 m scan floor; fixed in the spec.
+- **Codex:** at 2% 5h until 16:30; queued 2800 (verify Lost City/Beebe numerics), 2810 (Low-tier journey bug hunt), 2820 (CI watch of f-bughunt-960). 2770-2790 already collected earlier.
+- **Next Claude:** V-journeys-run, V-titanic-plating, V-monterey-bands; tag after hosted CI green.
+- **Needs owner:** phone retest on the newest build; real-phone Low play.
