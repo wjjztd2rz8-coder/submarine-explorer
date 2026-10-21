@@ -1628,3 +1628,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 2900 and 2910 worktrees still open (stopped by the budget watchdog, not collected); 2920, 2930, 2940 queued, waiting on Codex 5h (5%, resets 03:00). Claude week 12%, pace-limited to the Oct 22 reset; one package only.
 - **CI:** the last three main pushes' runs were cancelled by newer pushes, so no tag this run.
 - **Needs owner:** decide whether the 150-300 m mission opening rule may be shortened for wrecks and landers (blocks nearer framing at Endurance, Bismarck, Challenger); phone retest on the newest build.
+
+## 2026-10-21 01:11 CDT headless run 78 (Claude): comprehensive review, Claude alone
+
+- Review done (REVIEWS, STATUS, DIRECTOR backlog refilled: V-bluehole-silhouette, V-eight-sites-lit, V-monterey-foot, V-challenger-ripples, V-lostcity-foot, V-spawn-sub-clear). Stage ~82%. Sol skipped (Codex 5h 5%). Scores: Titanic 3.7, Lost City 3.4, Blue Hole 3.4, Beebe 3.6, Monterey 3.7.
+- Merged and pushed (smoke + project-base green): Codex 2900, 2910 (S-verify test-only). 2920-2940 still queued. No Claude package: week 11%, pace-limited to the Oct 22 reset. No tag.
+- **Needs owner:** 150-300 m opening rule for wrecks/landers; phone retest.
