@@ -15,6 +15,7 @@
 
 import { blueHoleTint } from './terrainFeatures.js';
 import { challengerSlopeTint } from './ChallengerRelief.js';
+import { montereySlopeTint } from './MontereyBands.js';
 import { LOST_CITY_STRATA, lostCitySlopeTint } from './LostCityBands.js';
 
 /** The five packed texture sets in `public/assets/terrain/<set>_{a,n}.jpg`. */
@@ -386,6 +387,8 @@ export const BIOMES: Record<string, Biome> = {
     rockBias: 0.08,
     contrast: 0.55,
     detail: 0.5,
+    // The surveyed banks carry the same mudstone beds and dark face as the prop walls.
+    vertexTint: montereySlopeTint,
     scatter: [
       { kind: 'boulder', density: 1.1, slopeMaxDeg: 40, on: 'rock' },
       { kind: 'rubble', density: 3, slopeMaxDeg: 35, on: 'any' },

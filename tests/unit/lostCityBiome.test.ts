@@ -37,7 +37,7 @@ describe('lost-city biome', () => {
     expect(tones.reduce((sum, tone) => sum + tone, 0) / tones.length).toBeGreaterThan(0.94);
   });
 
-  it('only opts Lost City into baked colour, leaving geometry and LOD budgets unchanged', () => {
+  it('only opts Lost City and Monterey into baked colour, leaving geometry and LOD budgets unchanged', () => {
     const makeTile = (id: string): Tile => ({
       meta: {
         id,
@@ -51,6 +51,7 @@ describe('lost-city biome', () => {
     });
     const lost = new Terrain(makeTile('lost-city'), DEFAULT_CONFIG.terrain, 'low');
     const control = new Terrain(makeTile('monterey-canyon'), DEFAULT_CONFIG.terrain, 'low');
+    const plain = new Terrain(makeTile('hudson-canyon'), DEFAULT_CONFIG.terrain, 'low');
     try {
       expect(lost.stats.vertices).toBe(control.stats.vertices);
       expect(lost.stats.triangles).toBe(control.stats.triangles);
@@ -65,13 +66,14 @@ describe('lost-city biome', () => {
         ).toBe(0);
         expect(Array.from(colors.array).every(Number.isFinite)).toBe(true);
       }
-      for (const child of control.group.children) {
+      for (const child of plain.group.children) {
         if (child instanceof THREE.Mesh)
           expect(child.geometry.getAttribute('color')).toBeUndefined();
       }
     } finally {
       lost.dispose();
       control.dispose();
+      plain.dispose();
     }
   });
 });
