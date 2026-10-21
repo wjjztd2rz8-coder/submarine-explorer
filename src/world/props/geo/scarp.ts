@@ -212,7 +212,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     crest: new THREE.Color(0xb0ab8f),
     drape: new THREE.Color(0xa39a84), // pale silt
     boulder: new THREE.Color(0x8a846b),
-    boulders: 340,
+    boulders: 160,
     rockSize: 0.7,
     blocks: 0.04,
     rough: 0.97,
