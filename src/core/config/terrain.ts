@@ -133,8 +133,6 @@ export const MONTEREY_FIDELITY: TerrainFidelity = {
   nearSubdiv: { low: 1, medium: 4, high: 8 },
   reliefM: 1.2,
   reliefWavelengthM: 48,
-  // Broken shelves, so the bank crest is a soft ragged edge rather than one smooth plane.
-  terrace: { periodM: 14, amount: 0.35 },
   normalStrength: 0.24,
   // Medium reserves frame geometry for the sub, swimming life and scatter even when all
   // four canyon banks are in view. Keep the old vertical resolution and refine the hero face.
