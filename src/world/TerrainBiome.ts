@@ -300,13 +300,21 @@ export const BIOMES: Record<string, Biome> = {
     ...VOLCANIC,
     a: 'silt',
     b: 'basalt',
-    colorA: 0x4d4b49,
-    colorB: 0x3a3939,
+    colorA: 0x5e5c59,
+    colorB: 0x4a4948,
     stainAmount: 0.15,
     patch: 0.3,
     rockBias: 0.1,
   },
-  kamaehuakanaloa: { ...VOLCANIC, stain: 0x9a5326, stainAmount: 0.5 },
+  // Rust-stained basalt: a broad faint stain, not the speckle of the generic volcanic look.
+  kamaehuakanaloa: {
+    ...VOLCANIC,
+    stain: 0x8a4a22,
+    colorA: 0x55514e,
+    colorB: 0x6a645c,
+    stainAmount: 0.2,
+    patch: 0.45,
+  },
   // Cold-water coral rubble on carbonate sand.
   'blake-plateau-corals': {
     a: 'rubble',

@@ -2,7 +2,7 @@
   "id": "bismarck",
   "opening": {
     "mission": {
-      "rangeM": 150,
+      "rangeM": 110,
       "destinationLabel": "the main hull"
     },
     "freeDive": {
