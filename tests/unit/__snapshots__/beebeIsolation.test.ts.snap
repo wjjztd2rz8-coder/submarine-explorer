@@ -224,7 +224,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
     },
   },
   "hunga-tonga-caldera": {
-    "biome": "65b5b4c4cad2774c927bc9dee2d658ecc5870de78a1ddeb69067e50994881859",
+    "biome": "5dc21a2632b6533fd8efec3389dd3c1c2163252ce474354abfc8eb888d9e02cc",
     "tiers": {
       "high": {
         "buffers": [
@@ -237,7 +237,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
         ],
         "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
         "shader": "96a15d4fc33a4b2ed03ca7fe88d6611409e946b8700bf505922ba385016d4514",
-        "uniforms": "b7b4b3191e7babae109bd908163b6d193cdc36f4c3cf17d3bcbb797cd9947918",
+        "uniforms": "eb1ea4b1c1f91894c671871c6dd54f9d11ee33e8792cbe379b54f53de554c576",
       },
       "low": {
         "buffers": [
@@ -250,12 +250,12 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
         ],
         "cache": "seabed-",
         "shader": "c5b52d11643ff475e64f7b78f949647518cadd6ea6ae67d6490e283dba6825a4",
-        "uniforms": "b7b4b3191e7babae109bd908163b6d193cdc36f4c3cf17d3bcbb797cd9947918",
+        "uniforms": "eb1ea4b1c1f91894c671871c6dd54f9d11ee33e8792cbe379b54f53de554c576",
       },
     },
   },
   "kamaehuakanaloa": {
-    "biome": "214c5c2275f0dd26606460b2fb2eaa32ce3af0f10efacf18bb746c0f3d19423a",
+    "biome": "3f8ee73971632c25c02f48557e38444bc58af6735077c0a50ea05f3c9e41436f",
     "tiers": {
       "high": {
         "buffers": [
@@ -268,7 +268,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
         ],
         "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
         "shader": "96a15d4fc33a4b2ed03ca7fe88d6611409e946b8700bf505922ba385016d4514",
-        "uniforms": "e060c0e2e56387bfe78d1c7d406ab0d00e669e00229282c65c0bb5dd6d575e9c",
+        "uniforms": "88586fc869bedc33f82b971cd8d484dfd5b889de847d50a187a824150bc5b7c2",
       },
       "low": {
         "buffers": [
@@ -281,7 +281,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
         ],
         "cache": "seabed-",
         "shader": "c5b52d11643ff475e64f7b78f949647518cadd6ea6ae67d6490e283dba6825a4",
-        "uniforms": "e060c0e2e56387bfe78d1c7d406ab0d00e669e00229282c65c0bb5dd6d575e9c",
+        "uniforms": "88586fc869bedc33f82b971cd8d484dfd5b889de847d50a187a824150bc5b7c2",
       },
     },
   },

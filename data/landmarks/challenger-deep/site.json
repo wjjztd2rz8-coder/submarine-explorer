@@ -5,7 +5,7 @@
   },
   "opening": {
     "mission": {
-      "rangeM": 140,
+      "rangeM": 200,
       "destinationLabel": "Leggo's lander site"
     },
     "freeDive": {

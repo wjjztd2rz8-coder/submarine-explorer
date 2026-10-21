@@ -26,7 +26,7 @@
   },
   "opening": {
     "mission": {
-      "rangeM": 120,
+      "rangeM": 180,
       "destinationLabel": "the main hull"
     },
     "freeDive": {

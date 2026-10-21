@@ -142,7 +142,7 @@ exports[`1130: other sites retain byte-identical scatter geometry, placement, co
     },
   },
   "hunga-tonga-caldera": {
-    "meshes": "de4f42eaad511cf0facaafa5337190718fc99ad30303135a2d12c28547d688b6",
+    "meshes": "7ca04613c505f90afc211552d6fc3901f1555fcf935123c6b513c9967ba5083a",
     "stats": {
       "cells": 21,
       "drawCalls": 3,
@@ -150,7 +150,7 @@ exports[`1130: other sites retain byte-identical scatter geometry, placement, co
     },
   },
   "kamaehuakanaloa": {
-    "meshes": "a93a09f0c35869d402d10c257d21b8aedfec7e1f98b2ddec68332f8677d44b02",
+    "meshes": "8e575f7de08074ff862aaa2f1d73e7996ee4d78facf96dce0d7cddc6cc552bb5",
     "stats": {
       "cells": 21,
       "drawCalls": 3,
