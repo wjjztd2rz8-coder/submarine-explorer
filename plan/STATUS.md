@@ -1,13 +1,13 @@
-# Status (2026-10-20, joint review with Codex Sol)
+# Status (2026-10-21, Claude-only review; Sol skipped on Codex budget)
 
-**Stage:** about 80% to 1.0 (unchanged: no new art this window; nine finished Codex packages collected). 5-7 weeks (Sol judged 4-5 optimistic).
+**Stage:** about 81% to 1.0. 5-6 weeks; Claude capacity (week at 17% until Oct 22) is the limiter.
 
 ## 1.0 table
 
 | Requirement                               | State                                                                                                                                            |
 | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.5, Lost City 2.5-3.2, Blue Hole 2.5-3.2, Beebe 3.5-3.6, Monterey 3-3.5                                         |
-| Other eight sites coherent                | Challenger 3.5, Endurance 3.5-3.7; mission-spawn acceptance for all eight not certified (V-spawn-capture queued)                                 |
+| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.7, Lost City 3.2, Blue Hole 3.0, Beebe 3.6, Monterey 3.5                                         |
+| Other eight sites coherent                | Challenger 3.4, Endurance 3.5; mission-spawn acceptance for all eight not certified (V-spawn-capture queued)                                 |
 | New player understands first five minutes | Owner phone test: scan range, boost and events confuse; P2-scan-range and P2-boost-cut queued, then V-journeys                                   |
 | Acceptable Low-tier phone performance     | iPhone 17 Pro: Low great; High (opt-in only) stutters at Lost City; weaker phones untested                                                       |
 | Hosted CI green, releases tagged          | Main red on the latest runs from stale specs; most repaired 2026-10-20, one wildlife fixture still red (R-ci-green-f); deploy waits for green CI |

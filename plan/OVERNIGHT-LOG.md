@@ -1590,3 +1590,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (each smoke + project-base green, no full e2e):** Codex 2800 (anemone geometry fix, Beebe/Lost City numerics), 2810 (Low journey teardown/late-callback fixes, 21 files), 2830 and 2840 (tests only, no defects); Sonnet P2-sub-screen (new "Your sub" screen from Home and Pause replaces the Journal cosmetic picker; I rate ~3.7; portrait needs scrolling to reach decal and frame; second WebGL preview context, verify queued as 2880).
 - **Codex:** 5h at ~17% so dispatch waits; 2850, 2860, 2870, 2880 queued. Claude week ~17%, pace-limited until the Oct 22 reset.
 - **Next Claude:** P2-globe-bright, P2-text-size, V-eight-sites. No tag this run (CI for newest SHAs pending). **Needs owner:** phone retest on the newest build; real-phone Low play.
+
+## 2026-10-20 19:46 CDT headless run 72 (Claude): comprehensive review, Claude alone
+- Review done (REVIEWS, STATUS, DIRECTOR backlog rewritten: done items removed, V-bluehole-roof, V-lostcity-hill, V-monterey-cliff, P2-sub-screen-portrait added). Stage ~81%. Sol skipped (Codex 5h 17%); fixed the tool so a skipped start can't reconcile a stale review. No package launched: Claude week 17%, pace-limited to the Oct 22 reset. Codex 2850-2880 queued.
+- **Needs owner:** phone retest on the newest build; real-phone Low play.

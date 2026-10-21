@@ -27,6 +27,8 @@ browser_on() {
 case "${1:-}" in
 start)
   golden=${2:?golden dir}; prev=${3:-}
+  # A skipped start must not leave the previous review behind for reconcile to reuse.
+  rm -f .cache/review/current
   # Codex floor (owner): 5h >= 5%; leave room for the running tasks.
   if ! ai-limits --json 2>/dev/null | python3 -c '
 import json,sys; c=json.load(sys.stdin).get("codex",{})
@@ -57,6 +59,7 @@ EOF
   cat "$dir/sol-review.md" ;;
 reconcile)
   draft=${2:?claude review file}; dir=.cache/review/current
+  [[ -d $dir ]] || { echo "codex-review: no current Sol review (start skipped); review alone" >&2; exit 75; }
   # start may still be running (Claude reviews in parallel): wait up to 40 min.
   for _ in $(seq 240); do [[ -s $dir/session ]] && break; sleep 10; done
   [[ -s $dir/session ]] || { echo "codex-review: no Sol session after 40 min; review alone" >&2; exit 1; }

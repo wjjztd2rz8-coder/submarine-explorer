@@ -74,34 +74,20 @@ The newest items go first.
 
 ## Backlog
 
-One list, ordered by player impact and dependencies. Lane is in brackets. Evidence: review 2026-10-16 (third) in `plan/REVIEWS.md`. DONE items were removed at that review (history in git and `plan/progress/`). Per-package art gains are now ~0.1-0.2: each V-* brief below names a target composition (what the frame should look like), not a geometry list.
+One list, ordered by player impact and dependencies; lane in brackets. Evidence: joint review 2026-10-21 in `plan/REVIEWS.md` (DONE items removed there; history in git and `plan/progress/`). Art gains per package are ~0.1-0.2, so each V-* names a target composition, not a geometry list. Owner phone decisions: [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md).
 
-Evidence: reviews 2026-10-18 and 2026-10-18 midday (joint with Sol) in `plan/REVIEWS.md`. DONE items removed at the midday review. Art plateau: each V-* names a target composition.
+1. **V-bluehole-roof [Sonnet]** (~3.0, weakest hero): the roof arch with stalactites still reads as a synthetic shell and the pale interior is flat. Target composition: from the first-scan pose the gallery looks like a dark undercut limestone lip with hanging stalactite clusters, light falling in a soft shaft; no visible arch seam, interior value close to the wall. Keep the Class B mission spawn and the overlap numerics.
+2. **V-lostcity-hill [Sonnet]** (~3.2): the large faceted green hill dominates `lost-city-1.png` and the tower is a pale shard on it. Target: smooth the hill into broad rounded slopes with darker, lower-contrast tone so the thick tower with its skirts is the only bright mass; tower foot rubble inside the frame.
+3. **V-monterey-cliff [Sonnet]** (~3.6): the flat pale cliff at right of `monterey-canyon-1.png` reads as a slab. Target: same strata tone and talus as the left wall, soft top edge.
+4. **P2-sub-screen-portrait [Sonnet, small]:** portrait "Your sub" needs scrolling to reach decal and frame; fit swatches, decal and frame in one portrait screen, no new controls.
+5. **V-eight-sites [Sonnet]:** capture mission-spawn frames of the eight non-hero sites (Low tier, portrait) and review; V-spawn-capture is merged.
+6. **V-challenger-ripples [Sonnet, small]** (~3.4): seabed has no ripples; lander Low budget is 1985/2000, so cut something first. Target: gentle sediment ripples in the lander light pool.
+7. **P2-globe-bright, P2-text-size [Sonnet, demoted]:** brighter globe; "Aa" stepping the existing UI scale. Only if the lanes above are blocked.
+8. **V-bluehole-hood [Sonnet, demoted]:** east hood sheet facets; reference composition only.
+9. **S-verify / S-bughunt [Codex, standing]:** queued 2850 (power-start lifecycle), 2860 (Challenger seabed verify), 2870 (journey copy and mission card truncation), 2880 (Your sub verify, second WebGL context). After visual merges, verify numerics and hunt bugs.
+10. **R-release [Haiku]:** f61 tagged 2026-10-20. Tag the latest green-CI main after each review.
 
-Owner phone test 2026-10-18: decisions and file ownership in [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md). P2 items go first (playability first); the numbered V/S/R list follows.
-
-- **P2-hull-a:** DONE 2026-10-20 (Class A and C thruster placement; Codex clearance audit merged as tests).
-- **P2-sub-screen: DONE 2026-10-20 (da3ed5c; Your sub screen from Home and Pause, ~3.7/5 look, portrait needs scroll for decal/frame, second WebGL context while open; verify) [Sonnet]:** move the cosmetic picker out of the Journal into a "Your sub" screen reached from Pause and Home, with large swatches and a live sub preview. This is a move, not an addition.
-- **P2-globe-bright [Sonnet, demoted by Sol/Claude 2026-10-19: no release-blocking defect shown]:** the globe is a touch dark. Target: a brighter Google Earth feel (lighter ocean, saturated land, brighter day side) with pins still contrasting.
-- **P2-beebe-low:** DONE 2026-10-20 (425b7a6; mouth discs seated on the built crater).
-- **P2-text-size [Sonnet, small, demoted 2026-10-19]:** an "Aa" button on the briefing and Journal headers that steps the existing UI scale (no new setting).
-
-1. **V-lostcity-slice3: DONE 2026-10-20 (merged; ~3.6, tower thicker, foot rubble still out of golden frame, crown facets remain) [Sonnet]** (agreed 3-3.5): the detail tower (`lost-city-3.png`) still reads as thin broken sheets with stair-step facets, and the mid-slope banding repeats. Target: the tower is a thick eroded carbonate mass with rounded chimneys, rubble at its foot in frame, and slope bands broken by terrace ledges.
-2. **V-journeys-run: DONE 2026-10-20 (all 6 unaided Low journeys pass, frames reviewed; desktop mission card title truncates, Titanic debrief after scripted dive is odd but scripted) [was Haiku runs, Sonnet reviews]:** capture Home -> Titanic and Blue Hole missions -> first scan -> Journal -> debrief unaided (no teleport; the current journal-debrief spec teleports for its reward check) at 1280x720 (the owner's size, not 1600x900), 390x844 and 844x390 on Low; review against the rubric. Agreed blocker 1 (joint review 2026-10-19). Codex side: V-journeys-harness (brief 2700).
-3. **V-titanic-plating: DONE 2026-10-20 (1fff81d; ~3.7, decks warm, lane tint halved, blockiness remains) [Sonnet]** (~3.5): V-titanic-opening's lane tint reads as a rust/grey patchwork at close range and deck tops wash pale blue-grey (`titanic-2/3.png`). Target: lane variation half as strong, warm rust tops; keep the opening framing.
-4. **V-monterey-bands: DONE 2026-10-20 (merged; I rate ~3.7, agent 3.9; wall/apron edge still crisp, apron streaks) [Sonnet]** (~3.5-3.7): wall banding repeats and the wall-to-base transition is abrupt. Target: break banding with noise and talus at the base; keep the facing>0.98 opening spec.
-5. **V-challenger-seabed: DONE 2026-10-20 (84dd7da; flag clear of card, halo + 6 clasts, I rate ~3.6, no true ripples, lander budget nearly full) [Sonnet]** (~3.6): lander reads but seabed is sparse and the flag emissive sits behind the HUD card. Target: sediment ripples and a few rocks around the lander; flag away from the card.
-6. **V-bluehole-hood [Sonnet, demoted]** (~3.5): flat sheet facets on the east hood; only with a reference composition. Numeric side: see V-bluehole-overlap.
-7. **V-eight-sites [Sonnet]** acceptance: capture mission-spawn frames of the eight non-hero sites (Low tier, portrait) and review; needs V-spawn-capture first.
-8. **S-verify / S-bughunt [Codex, standing]:** 2550-2570 queued; after visual merges verify numerics and hunt bugs (Lost City Low triangles +15%).
-   12b. V-journeys-harness: DONE 2026-10-20 (merged). The six-journey Low matrix is written but **not yet run**: see V-journeys-run.
-   12d. S-events-low-audit: DONE 2026-10-20 (clean audit, tests merged).
-   12e. R-ci-shard-triage: DONE 2026-10-20. 29 of 43 failures were fixed by P2-copy; the stale-spec repairs for the rest merged 2026-10-20 except R-ci-green-f below.
-   12f. **R-ci-green-f: DONE 2026-10-20 (6ecf57f), watch CI.** f-bughunt-960 great-blue-hole arcade high (3 cases) still red: the mission button rebuilds the URL with only tier and touch, so `life=0` is dropped and wildlife wins the scan candidate. Pick an isolation route (a direct mission URL with life=0, or a test-side hook) and keep the expected-target guard. Also f-fidelity-rollout lost-city Medium timed out once at 240 s (render cost symptom, watch).
-   12g. **S-golden-compare, R-ci-trim, S-verify-merged [Codex, briefs 2770-2790]:** comparator pose tolerance and stale-PNG provenance; consolidate duplicate specs to cut CI wall time; verify the 2026-10-20 merge batch.
-9. **R-release [Haiku]:** f60 tagged 2026-10-18. Tag the latest green-CI main after each review.
-
-Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16; work kept as tag `parked/V-endurance-aim`).
+Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16; kept as tag `parked/V-endurance-aim`), Titanic per-plate blockiness (accepted ~3.7).
 
 ## Review rubric (every package, before merge)
 

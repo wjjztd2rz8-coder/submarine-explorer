@@ -2,6 +2,26 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-21 comprehensive review, Claude alone (golden 2026-10-21-003618)
+
+**Sol did not review this set:** Codex 5h was at 17% (< the 20% start gate), so `codex-review.sh start` exited 75 silently under nohup and reconcile then re-read the morning review. I discarded that output as stale (tool fixed, see PROCESS-LOG). Scores below stay inside Sol's 2026-10-20 bands where the images support it; the morning joint review's blockers still stand.
+
+**Changed since the morning review (52 commits, 8+ merges):** visible art: Lost City thicker tower, Titanic warm plating, Monterey strata and talus, Challenger flag/clasts/halo. Non-visual: Your-sub screen (Home and Pause), Low-journey teardown fixes, anemone geometry, Beebe/Lost City numerics, six unaided Low journeys all pass (run 70). f61 tagged on green CI.
+
+**Scores, readable / beautiful:** Titanic 4 / 3.7 (one warm hull now; per-plate blockiness remains); Lost City 3.5 / 3.2 (tower is thicker but the faceted green hill dominates the frame); Blue Hole 3.5 / 3.0 (roof reads as a shell, interior flat and pale: weakest hero); Beebe 4 / 3.6 (strongest: warm chimney, plume, clear sub); Monterey 4 / 3.5 (strata good, the flat pale cliff at right reads as a slab); Challenger 3.5 / 3.4 (lander and flag legible, seabed sparse); Endurance 3.5 / 3.5 (sub overlaps the hull silhouette in the pose).
+
+**Biggest gaps:** Blue Hole roof, Lost City hill, Monterey cliff. Package self-ratings ran ~0.2-0.3 above mine again, so the plateau is real: each pass buys 0.1-0.2.
+
+**Play check:** from run 70's unaided journeys: all six pass; desktop mission card title truncates and the debrief copy after a scripted dive is odd (Codex 2870). Your-sub screen needs scrolling in portrait (new item).
+
+**Process:** Claude week 17% (~11%/day), pace-limited until the Oct 22 reset, so only reviews and merges run; Codex 71% week but 5h at 17%. Four briefs queued (2850-2880). Reconcile-on-stale-review bug fixed. efficiency.sh "idle" figures remain unfiltered by date (Sol, 10-20); not acted on.
+
+**New priorities:** Claude: V-bluehole-roof, V-lostcity-hill, V-monterey-cliff, P2-sub-screen-portrait, V-eight-sites, V-challenger-ripples. Codex: 2850-2880 (S-verify / S-bughunt).
+
+**Stage:** about 81% to 1.0; 5-6 weeks (Claude capacity is the limiter; Sol's 5-7 from this morning not revisited).
+
+**Needs owner:** phone retest on the newest build (Your-sub screen, boost gone, scan range); real-phone Low play.
+
 ## 2026-10-20 comprehensive review, joint with Codex Sol (golden 2026-10-20-163035)
 
 Sol ran read-only (no live browser); one reconcile round, claims checked against files.

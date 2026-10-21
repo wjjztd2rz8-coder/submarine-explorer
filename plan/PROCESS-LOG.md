@@ -267,3 +267,6 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 ## 2026-10-20: finished Codex work waits for a Claude run
 
 Nine Codex worktrees finished 2026-10-18/19 but stayed uncommitted until this review, because only Claude runs collect and the weekly gate skipped runs for ~40 h. Also efficiency.sh's skip and idle counts are not date-filtered and the usage telemetry had a 39 h gap (Sol), so treat its 7-day figures as indicative. Follow-up: the collection step stays in resume; no tooling change made (Claude week is on the pace line, a Codex-side auto-merge would break the rule that Claude reviews Codex diffs).
+
+## 2026-10-21: codex-review start skipped silently, reconcile reused a stale review
+Run 72's `start` exited 75 (Codex 5h 17% < 20%) under nohup, so nobody saw it; `current` still pointed at the previous review and `reconcile` answered against the old golden set. Fix: `start` removes `.cache/review/current` before the budget check, and `reconcile` exits 75 at once if it is missing, so a skipped Sol review means "review alone" instead of stale reconciliation.
