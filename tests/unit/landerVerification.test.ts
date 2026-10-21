@@ -4,8 +4,12 @@ import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { buildBenthicLander } from '../../src/world/props/geo/lander.js';
 import { countGeo } from '../../src/world/props/geo/shared.js';
 import type { PropDef } from '../../src/world/PropLoader.js';
+import type { GeoBuildInput } from '../../src/world/props/geo/types.js';
 
-const build = (tier: string) =>
+const build = (
+  tier: string,
+  options: Partial<Pick<GeoBuildInput, 'dims' | 'seed' | 'groundHeight'>> = {},
+) =>
   buildBenthicLander({
     def: { feature: 'benthic-lander', raw: {} } as PropDef,
     dims: [9, 9, 12],
@@ -13,6 +17,7 @@ const build = (tier: string) =>
     cfg: DEFAULT_CONFIG.props,
     tier,
     groundHeight: () => undefined,
+    ...options,
   });
 
 function meshes(built: ReturnType<typeof build>): THREE.Mesh[] {
@@ -33,7 +38,7 @@ function release(built: ReturnType<typeof build>): void {
 }
 
 describe('merged Challenger lander', () => {
-  for (const tier of ['low', 'medium', 'high']) {
+  for (const tier of ['low', 'medium', 'high', 'ultra']) {
     it(`${tier}: three opaque draw calls, bounded triangles and finite vertex tint`, () => {
       const built = build(tier);
       try {
@@ -64,6 +69,63 @@ describe('merged Challenger lander', () => {
         }
       } finally {
         release(built);
+      }
+    });
+
+    it(`${tier}: dimensions, seed and ground relief cannot exceed the geometry budget`, () => {
+      const baseline = build(tier);
+      try {
+        const cost = countGeo(baseline.full);
+        for (const options of [
+          { dims: [3.4, 3.4, 4.6], seed: 0, groundHeight: () => () => 0 },
+          {
+            dims: [26, 26, 34],
+            seed: 0xffffffff,
+            groundHeight: () => (x: number, z: number) => 0.1 * x - 0.2 * z,
+          },
+        ] satisfies Partial<GeoBuildInput>[]) {
+          const built = build(tier, options);
+          try {
+            expect(countGeo(built.full)).toEqual(cost);
+            expect(countGeo(built.full).triangles).toBeLessThanOrEqual(
+              tier === 'low' ? 2000 : 3000,
+            );
+          } finally {
+            release(built);
+          }
+        }
+      } finally {
+        release(baseline);
+      }
+    });
+
+    it(`${tier}: terrain-following dressing cannot enlarge placement bounds or colliders`, () => {
+      const baseline = build(tier);
+      // Separate dressing vertically so the merged mesh can be checked without part offsets.
+      const ground = (x: number, z: number) => 1000 + 0.1 * x - 0.2 * z;
+      const raised = build(tier, { groundHeight: () => ground });
+      try {
+        expect(raised.bounds).toEqual(baseline.bounds);
+        expect(raised.colliders).toEqual(baseline.colliders);
+        const frame = raised.full.getObjectByName('lander-frame') as THREE.Mesh;
+        const vertices = frame.geometry.getAttribute('position');
+        let dressingVertices = 0;
+        let maximumRelief = 0;
+        for (let i = 0; i < vertices.count; i++) {
+          if (vertices.getY(i) < 500) continue;
+          dressingVertices++;
+          maximumRelief = Math.max(
+            maximumRelief,
+            Math.abs(vertices.getY(i) - ground(vertices.getX(i), vertices.getZ(i))),
+          );
+        }
+        expect(dressingVertices).toBeGreaterThan(0);
+        expect(maximumRelief).toBeLessThan(1);
+        expect(frame.geometry.boundingBox!.max.y).toBeGreaterThan(1000);
+        expect(raised.bounds.max.y).toBeLessThan(20);
+      } finally {
+        release(baseline);
+        release(raised);
       }
     });
   }

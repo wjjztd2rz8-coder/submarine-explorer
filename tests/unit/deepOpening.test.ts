@@ -1,10 +1,10 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { afterAll, describe, expect, it, vi } from 'vitest';
-import { Box2, InstancedMesh, Matrix4, Mesh, Raycaster, Vector2, Vector3 } from 'three';
+import { Box2, InstancedMesh, Matrix4, Mesh, Raycaster, Triangle, Vector2, Vector3 } from 'three';
 import { deepSiteWater, makeConfig } from '../../src/core/Config.js';
 import { siteManifest, type ApproachOpeningLife } from '../../src/core/SiteManifest.js';
-import { spawnSettings } from '../../src/game/Spawn.js';
+import { missionApproachScanRadius, spawnSettings } from '../../src/game/Spawn.js';
 import { composedFreeDiveSpawn, composedMissionSpawn } from '../../src/game/DeepOpeningSpawn.js';
 import { parsePois, placePois } from '../../src/game/Pois.js';
 import { Scanner } from '../../src/game/Scanner.js';
@@ -189,6 +189,54 @@ describe('Challenger / Endurance opening', () => {
           expect(missionPose!.y).toBeGreaterThanOrEqual(
             (site === 'challenger-deep' ? -11000 : -6500) + config.submarine.hullRadius,
           );
+          if (hero.def.feature === 'benthic-lander') {
+            // Dressing is outside the reported placement bounds: test the actual triangles.
+            const openings = [
+              position,
+              new Vector3(missionPose!.x, missionPose!.y, missionPose!.z),
+            ];
+            const gaps = openings.map(() => Infinity);
+            const triangle = new Triangle();
+            const closest = new Vector3();
+            let extent = 0;
+            hero.full.traverse((object) => {
+              if (!(object instanceof Mesh)) return;
+              const vertices = object.geometry.getAttribute('position');
+              const indices = object.geometry.index;
+              const count = indices?.count ?? vertices.count;
+              for (let i = 0; i < count; i += 3) {
+                for (const [j, point] of [triangle.a, triangle.b, triangle.c].entries()) {
+                  point
+                    .fromBufferAttribute(vertices, indices ? indices.getX(i + j) : i + j)
+                    .applyMatrix4(object.matrixWorld);
+                  extent = Math.max(extent, point.distanceTo(target.position));
+                }
+                for (const [j, opening] of openings.entries())
+                  gaps[j] = Math.min(
+                    gaps[j],
+                    triangle.closestPointToPoint(opening, closest).distanceTo(opening) -
+                      config.submarine.hullRadius,
+                  );
+              }
+            });
+            for (const gap of gaps)
+              expect(
+                gap,
+                'merged lander and dressing clear the opening hull keep-out',
+              ).toBeGreaterThan(4);
+            // The halo surrounds the scan centre, inside its sphere; it must not reach the boundary.
+            const scanRadius = Math.min(
+              target.radius,
+              missionApproachScanRadius(site, target.radius),
+            );
+            expect(extent, 'dressing leaves the full scan boundary accessible').toBeLessThan(
+              scanRadius,
+            );
+            audit.push({ site, tier, lander: { gaps, extent, scanRadius } });
+            console.log(
+              `LANDER CLEARANCE ${tier}: ${JSON.stringify({ gaps, extent, scanRadius })}`,
+            );
+          }
           const scanner = new Scanner(config.scan, new EventBus());
           scanner.setTargets([target]);
           scanner.update(1 / 60, position, forward, false);
