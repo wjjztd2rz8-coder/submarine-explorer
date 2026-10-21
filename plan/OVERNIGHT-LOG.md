@@ -1615,3 +1615,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Note:** the agent popped another worktree's stash (V-monterey-pose) by mistake and restored it; stash@{0} is intact.
 - **Codex:** 2850-2880 queued (5h near 0 until reset). Claude week ~14%, pace-limited to the Oct 22 reset. No tag (CI pending).
 - **Next Claude:** V-bluehole-roof (needs a reference composition), V-eight-sites. **Needs owner:** phone retest on the newest build; real-phone Low play.
+
+## 2026-10-20 23:26 CDT headless run 76 (Claude)
+
+- **Merged (smoke + project-base green, no full e2e):** Sonnet V-bluehole-roof third pass, colour/value only (roof and lip take wall strata, underside and interior dark and cool, pendants warm-grey, not white); I rate ~3.4 (self 3.3, from ~3.0). Still open: chunky rolled-slab lip outline, uniform tooth pendants, no light shaft; a fourth pass should be silhouette only. Two snapshots re-baselined for the colour change.
+- **Codex:** 2850, 2860, 2870 running in worktrees (not collected this run); 2880 queued. Claude week ~13%, pace-limited to the Oct 22 reset; one package only (agent took 53 min).
+- **Next Claude:** V-eight-sites, V-challenger-ripples. No tag (CI pending). **Needs owner:** phone retest on the newest build; real-phone Low play.

@@ -70,13 +70,13 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running (2026-10-20: all three run-67 packages merged). Merge policy stands as the owner set it on 2026-10-13: merges don't wait for CI (push after smoke + project-base); only tags wait. R-merge-verify's guard is advisory.
+- No Claude package running (2026-10-20: V-bluehole-roof third pass merged). Merge policy stands as the owner set it on 2026-10-13: merges don't wait for CI (push after smoke + project-base); only tags wait.
 
 ## Backlog
 
 One list, ordered by player impact and dependencies; lane in brackets. Evidence: joint review 2026-10-21 in `plan/REVIEWS.md` (DONE items removed there; history in git and `plan/progress/`). Art gains per package are ~0.1-0.2, so each V-* names a target composition, not a geometry list. Owner phone decisions: [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md).
 
-1. **V-bluehole-roof [Sonnet]** (~3.0, weakest hero): the roof arch with stalactites still reads as a synthetic shell and the pale interior is flat. Target composition: from the first-scan pose the gallery looks like a dark undercut limestone lip with hanging stalactite clusters, light falling in a soft shaft; no visible arch seam, interior value close to the wall. Keep the Class B mission spawn and the overlap numerics.
+1. **V-bluehole-roof [Sonnet] third pass DONE 2026-10-20 (colour/value only, ~3.4; lip outline still chunky rolled slab, pendants uniform teeth, no light shaft; next pass = silhouette only):** (~3.0 before, weakest hero): the roof arch with stalactites still reads as a synthetic shell and the pale interior is flat. Target composition: from the first-scan pose the gallery looks like a dark undercut limestone lip with hanging stalactite clusters, light falling in a soft shaft; no visible arch seam, interior value close to the wall. Keep the Class B mission spawn and the overlap numerics.
 2. **V-lostcity-hill [Sonnet] DONE 2026-10-20 (merged; ~3.6, hue still brownish, foot rubble sparse):** (~3.2): the large faceted green hill dominates `lost-city-1.png` and the tower is a pale shard on it. Target: smooth the hill into broad rounded slopes with darker, lower-contrast tone so the thick tower with its skirts is the only bright mass; tower foot rubble inside the frame.
 3. **V-monterey-cliff [Sonnet] DONE 2026-10-20 (~3.7; bank beds lower contrast, crest still clean, no foot talus)** (~3.6): the flat pale cliff at right of `monterey-canyon-1.png` reads as a slab. Target: same strata tone and talus as the left wall, soft top edge.
 4. **P2-sub-screen-portrait [Sonnet, small] DONE 2026-10-20 (90cd44b):** portrait "Your sub" needs scrolling to reach decal and frame; fit swatches, decal and frame in one portrait screen, no new controls.
