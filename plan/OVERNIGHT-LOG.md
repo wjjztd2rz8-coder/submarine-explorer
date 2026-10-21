@@ -1584,3 +1584,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **V-journeys-run done by me:** all six unaided Low journeys pass; frames reviewed (Titanic phone scan-ready, Blue Hole desktop first-scan, Titanic phone debrief). Findings: desktop mission card title truncates, debrief copy after the scripted dive is odd; queued as Codex 2870.
 - **Codex:** 2800/2810/2830 running; 2850, 2860, 2870 queued. Claude week ~19%, pace-limited until Oct 22 reset.
 - **Next Claude:** V-eight-sites, V-bluehole-hood (reference composition only), P2-sub-screen. **Needs owner:** phone retest on the newest build; real-phone Low play.
+
+## 2026-10-20 19:36 CDT headless run 71 (Claude)
+
+- **Merged and pushed (each smoke + project-base green, no full e2e):** Codex 2800 (anemone geometry fix, Beebe/Lost City numerics), 2810 (Low journey teardown/late-callback fixes, 21 files), 2830 and 2840 (tests only, no defects); Sonnet P2-sub-screen (new "Your sub" screen from Home and Pause replaces the Journal cosmetic picker; I rate ~3.7; portrait needs scrolling to reach decal and frame; second WebGL preview context, verify queued as 2880).
+- **Codex:** 5h at ~17% so dispatch waits; 2850, 2860, 2870, 2880 queued. Claude week ~17%, pace-limited until the Oct 22 reset.
+- **Next Claude:** P2-globe-bright, P2-text-size, V-eight-sites. No tag this run (CI for newest SHAs pending). **Needs owner:** phone retest on the newest build; real-phone Low play.
