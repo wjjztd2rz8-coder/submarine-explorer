@@ -57,6 +57,10 @@ const BED_COOL = new THREE.Color(0x7d8179);
 const BLUE_GREY = new THREE.Color(0x4e6c80);
 const CREAM_OCHRE = new THREE.Color(0xd4b57e);
 const DEEP_TEAL = new THREE.Color(0x5f817f);
+/** The cliff face's warm brown, which the roof top takes so it is not a separate pale slab. */
+const STRATA = new THREE.Color(0x7a6444);
+/** Shadow inside an undercut gallery: close to the wall tone, a little cooler. */
+const CAVE_DARK = new THREE.Color(0x2e3a40);
 
 const EDGE_START = 0.55;
 
@@ -224,7 +228,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   const surfaceMaterial: typeof geoMaterial = (kind, detail, opts) => {
     const m = geoMaterial(kind, detail, opts);
     if (!hood) return m;
-    m.emissive.set(0xa4ced8).multiplyScalar(0.16);
+    m.emissive.set(0xa4ced8).multiplyScalar(0.1);
     const inherited = m.onBeforeCompile;
     m.onBeforeCompile = (shader, renderer) => {
       inherited.call(m, shader, renderer);
@@ -235,7 +239,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
         .replace('#include <common>', '#include <common>\nvarying float vGrottoDepth;')
         .replace(
           '#include <emissivemap_fragment>',
-          `#include <emissivemap_fragment>\nfloat openingLight = 1.0 - smoothstep(${(-D * 0.95).toFixed(3)}, ${(-D * 0.12).toFixed(3)}, vGrottoDepth);\ntotalEmissiveRadiance *= 0.5 + 0.5 * openingLight;`,
+          `#include <emissivemap_fragment>\nfloat openingLight = 1.0 - smoothstep(${(-D * 0.95).toFixed(3)}, ${(-D * 0.12).toFixed(3)}, vGrottoDepth);\ntotalEmissiveRadiance *= 0.2 + 0.8 * openingLight;`,
         );
     };
     m.customProgramCacheKey = () => `blue-hole-east-opening-${D}`;
@@ -446,6 +450,19 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
         1 - 0.88 * crackAt(x + 0.4 * Math.sin(y * 0.5)) * smooth(0.5 * H, 0.6 * H, y);
       out.multiplyScalar(1 - roof * (1 - 0.5 * plateau * mottle * under * crackTone));
       out.lerp(GREY_BROWN, 0.45 * roof * smooth(0.35, 0.65, pit));
+      // The roof top and lip stay in the wall's strata tone, not a paler separate slab.
+      out.lerp(STRATA, 0.6 * roof * smooth(0.1, 0.5, ny));
+      // Underside and cavity fall into cool shadow, darkest deep in the bay.
+      const shade =
+        smooth(0.2, -0.4, ny) * smooth(0.4 * H, 0.52 * H, y) * (1 - smooth(0.62 * H, 0.7 * H, y));
+      out.lerp(
+        CAVE_DARK,
+        0.75 *
+          Math.max(
+            shade,
+            (1 - bay) * (1 - smooth(0.5 * H, 0.64 * H, y)) * smooth(0.4, -0.2, ny) * 0.8,
+          ),
+      );
     }
   });
   wall.computeBoundingBox();
@@ -509,6 +526,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       // Away from the wall the apron sinks toward the cool blue-green of the deep water.
       out.lerp(DEEP_TEAL, (0.3 + 0.35 * smooth(0.2, 0.9, u)) * (0.7 + 0.5 * (1 - t)));
       out.multiplyScalar(0.5 + 0.5 * smooth(0, 0.4, u));
+      if (hood) out.lerp(CAVE_DARK, 0.4 + 0.2 * (1 - u)).multiplyScalar(0.85);
       // Broad, light sediment beds follow actual apron terraces. Thin painted
       // joints drew contour lines even when the shared rock map was disabled.
       out.multiplyScalar(1.03 + 0.3 * bedTone(talusBedLevel(talus, x, y)));
@@ -708,6 +726,8 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
         .lerp(AMBER, t * 0.7)
         .lerp(WALL_DARK, smooth(0.62, 0.85, t) * 0.35)
         .multiplyScalar(0.8 + 0.4 * n);
+      // Hood: pendants take the rock's warm grey, darker toward the tip's shadowed side.
+      if (hood) out.lerp(GREY_BROWN, 0.55).multiplyScalar(0.8);
       void ny;
     });
     projectUVs(stal, 2);
