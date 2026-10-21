@@ -251,9 +251,21 @@ for (const [width, height] of [
     expect(await sub.locator('.ss-panel').evaluate((p) => p.scrollWidth <= p.clientWidth)).toBe(
       true,
     );
+    if (width === 390) {
+      // Portrait phone: paint, trim, decal and frame plus the preview fit without scrolling.
+      const inView = await sub
+        .locator('.ss-group, .ss-stage')
+        .evaluateAll((els) =>
+          els
+            .map((e) => e.getBoundingClientRect())
+            .map((r) => r.top >= 0 && r.bottom <= innerHeight),
+        );
+      expect(inView).toHaveLength(5);
+      expect(inView.every(Boolean)).toBe(true);
+    }
     await page.clock.runFor(500); // The preview draws on animation frames.
     await page.screenshot({
-      path: `.cache/codex/shots/P2-sub-screen/sub-${width}x${height}.png`,
+      path: `.cache/codex/shots/P2-sub-screen-portrait/sub-${width}x${height}.png`,
     });
     await page.keyboard.press('Escape');
     await expect(sub).toBeHidden();

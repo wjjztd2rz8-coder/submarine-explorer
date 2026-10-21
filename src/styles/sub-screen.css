@@ -118,16 +118,38 @@
   opacity: 0.7;
 }
 @media (max-width: 760px) and (orientation: portrait) {
+  .ss-panel {
+    max-height: 98vh;
+    padding: 10px 12px;
+  }
   .ss-main {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 200px auto;
-    overflow-y: auto;
+    grid-template-rows: 170px auto;
+    gap: 8px;
+    margin-top: 8px;
   }
   .ss-stage {
     min-height: 0;
   }
   .ss-side {
     overflow: visible;
+  }
+  .ss-group h3 {
+    margin: 4px 0;
+  }
+  .ss-row {
+    gap: 6px;
+  }
+  .ss-opt {
+    min-width: 56px;
+    padding: 2px 6px;
+  }
+  .ss-dot {
+    width: 22px;
+    height: 22px;
+  }
+  .ss-note {
+    margin-top: 6px;
   }
 }
 @media (max-height: 520px) {
