@@ -12,7 +12,7 @@
   box-sizing: border-box;
   padding: 16px 20px;
   pointer-events: auto;
-  background: var(--b1-panel-solid);
+  background: #071b28;
   border: 1px solid var(--b1-hair);
   border-radius: 3px;
 }
@@ -41,8 +41,11 @@
 .ss-main {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  flex: 1;
   gap: 16px;
   min-height: 0;
+  overflow-y: auto;
   margin-top: 12px;
 }
 .ss-stage {

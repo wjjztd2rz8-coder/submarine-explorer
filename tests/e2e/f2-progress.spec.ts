@@ -240,19 +240,18 @@ for (const [width, height] of [
       ).toHaveAttribute('aria-pressed', 'true');
     await expect(sub.getByRole('button', { name: /^Silver/ })).toBeDisabled();
     await expect(sub.locator('canvas')).toBeVisible();
-    const boxes = await sub
-      .locator('[data-cosmetic]')
-      .evaluateAll((els) =>
-        els.map((e) => ({
-          w: e.getBoundingClientRect().width,
-          h: e.getBoundingClientRect().height,
-        })),
-      );
+    const boxes = await sub.locator('[data-cosmetic]').evaluateAll((els) =>
+      els.map((e) => ({
+        w: e.getBoundingClientRect().width,
+        h: e.getBoundingClientRect().height,
+      })),
+    );
     expect(boxes.length).toBeGreaterThan(10);
     expect(boxes.every((b) => b.w >= 44 && b.h >= 44)).toBe(true);
     expect(await sub.locator('.ss-panel').evaluate((p) => p.scrollWidth <= p.clientWidth)).toBe(
       true,
     );
+    await page.clock.runFor(500); // The preview draws on animation frames.
     await page.screenshot({
       path: `.cache/codex/shots/P2-sub-screen/sub-${width}x${height}.png`,
     });

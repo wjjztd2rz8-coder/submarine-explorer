@@ -147,7 +147,7 @@ export class SubScreen {
     scene.add(mesh.group);
     const box = new THREE.Box3().setFromObject(mesh.group);
     const size = box.getSize(new THREE.Vector3());
-    const radius = Math.max(size.x, size.y, size.z) * 0.62;
+    const radius = Math.max(size.x, size.y, size.z) * 0.5;
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, radius * 20);
     const dist = radius / Math.sin((camera.fov * Math.PI) / 360);
     camera.position.set(0, radius * 0.35, dist);
