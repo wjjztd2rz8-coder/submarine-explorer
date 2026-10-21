@@ -55,6 +55,7 @@ test('home copy, semantic order and first focus', async ({ page }) => {
     'Free dive',
     'MODE',
     'Journal',
+    'Your sub',
     'Settings',
     'Controls',
   ]);
