@@ -1607,3 +1607,11 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (smoke + project-base green, no full e2e):** Sonnet V-lostcity-hill (hill softened and darkened via per-site terrain/colour data; tower is now the brightest mass; I rate ~3.6, up from ~3.2; sediment still brownish, foot rubble sparse, Low smooth). Two beebe snapshots re-baselined for the intended scatter change. One package only (agent took 30 min; Claude week ~15%, pace-limited to the Oct 22 reset).
 - **Codex:** 5h near 0 until reset; 2850-2880 queued. No tag (CI pending).
 - **Next Claude:** V-monterey-cliff, V-bluehole-roof (third pass needs a reference composition). **Needs owner:** phone retest on the newest build; real-phone Low play.
+
+## 2026-10-20 22:22 CDT headless run 75 (Claude)
+
+- **CI triage:** run 73's only red shard was f-title-layout (home order lacked the new "Your sub" button); test fixed and pushed.
+- **Merged and pushed (smoke + project-base green; the first main gates run hit prettier on the progress note, fixed):** Sonnet V-monterey-cliff (the right bank was surveyed terrain with no baked bed colour; it now gets the existing vertexTint hook via MontereyBands.ts, dark cooler strata, no budget change; I rate ~3.7, from ~3.6). Remaining: crest is a clean line, no foot talus. Beebe snapshot rebaselined (Monterey gains a colour buffer); lostCityBiome control switched to hudson-canyon.
+- **Note:** the agent popped another worktree's stash (V-monterey-pose) by mistake and restored it; stash@{0} is intact.
+- **Codex:** 2850-2880 queued (5h near 0 until reset). Claude week ~14%, pace-limited to the Oct 22 reset. No tag (CI pending).
+- **Next Claude:** V-bluehole-roof (needs a reference composition), V-eight-sites. **Needs owner:** phone retest on the newest build; real-phone Low play.
