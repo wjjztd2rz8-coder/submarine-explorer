@@ -146,13 +146,13 @@ export const LOST_CITY_FIDELITY: TerrainFidelity = {
   focus: { lat: 30.124, lon: -42.1195, radiusM: 650, fadeM: 250 },
   chunkCells: 16,
   nearSubdiv: { low: 1, medium: 4, high: 8 },
-  reliefM: 1.8,
-  reliefWavelengthM: 36,
+  reliefM: 1.0,
+  reliefWavelengthM: 48,
   // Parallel sine beds and z-stretched rills read as stretched stripes on the slope.
   reliefBed: 0,
   rillStretch: 1,
-  // Carbonate-cemented beds break into irregular shelves and rubble treads between the spires.
-  terrace: { periodM: 16, amount: 1.1 },
+  // Dark sediment drapes the massif into broad rounded slopes; only faint shelves survive.
+  terrace: { periodM: 24, amount: 0.3 },
   normalStrength: 0.2,
 };
 
