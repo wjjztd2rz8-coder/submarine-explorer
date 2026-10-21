@@ -1589,12 +1589,86 @@ freshTest.describe('Home to scan and return journey', () => {
           };
           const shot = async (step: string): Promise<void> => {
             const path = `${directory}/${prefix}-${String(++sequence).padStart(2, '0')}-${step}.png`;
-            const state = await page.evaluate(() => {
+            const state = await page.evaluate((touch) => {
               const g = window.__game as unknown as Game & {
                 appState: string;
                 perf: { tier: string };
                 mission: { state: string; elapsedS: number; objectives: unknown[] } | null;
               };
+              const visible = (el: HTMLElement): boolean => {
+                if (!el.checkVisibility({ checkVisibilityCSS: true, checkOpacity: true }))
+                  return false;
+                const rect = el.getBoundingClientRect();
+                return rect.width > 0 && rect.height > 0;
+              };
+              const describe = (el: HTMLElement) => ({
+                selector: `.${[...el.classList].join('.')}`,
+                text: el.innerText,
+                rect: el.getBoundingClientRect().toJSON(),
+              });
+              const modal = ['.home-screen', '.briefing', '.journal', '.mission-debrief']
+                .map((selector) => document.querySelector<HTMLElement>(selector))
+                .find((el) => el && visible(el));
+              const hudPanels = modal
+                ? []
+                : [
+                    '.sonar',
+                    '.objectives-panel',
+                    '.hud-readouts',
+                    '.guidance-slot',
+                    '.hud-bar',
+                    '.tc-stick',
+                    '.tc-slider',
+                    '.tc-buttons',
+                  ].flatMap((selector) => {
+                    const el = document.querySelector<HTMLElement>(selector);
+                    return el && visible(el) ? [describe(el)] : [];
+                  });
+              // Read primary copy rather than scroll containers: a scrollable
+              // Journal/body is intentional, an ellipsized mission title is not.
+              const text = [
+                ...document.querySelectorAll<HTMLElement>(
+                  '.obj-title, .obj-item.is-current .obj-item-title, .guidance-text, ' +
+                    '.briefing-title, .briefing-summary, .debrief-kicker, .debrief-title, ' +
+                    '.debrief-highlight, .debrief-next, .jr-body .jr-title',
+                ),
+              ]
+                .filter((el) => visible(el) && (!modal || modal.contains(el)))
+                .map((el) => ({
+                  ...describe(el),
+                  clips:
+                    el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1,
+                }));
+              const controls = modal ?? document;
+              const touchTargets = touch
+                ? [
+                    ...controls.querySelectorAll<HTMLElement>(
+                      'button, summary, a[href], select, input, [role="button"], [role="tab"], .tc-stick, .tc-slider',
+                    ),
+                  ]
+                    // Native radios may be transparent overlays; their visible
+                    // label is the full tappable target, as with a checkbox.
+                    .map((el) => (el instanceof HTMLInputElement ? (el.labels?.[0] ?? el) : el))
+                    .filter((el) => {
+                      if (!visible(el)) return false;
+                      const r = el.getBoundingClientRect();
+                      // Offscreen items in scrolling lists are not visible targets.
+                      if (
+                        r.bottom <= 0 ||
+                        r.top >= innerHeight ||
+                        r.right <= 0 ||
+                        r.left >= innerWidth
+                      )
+                        return false;
+                      return document
+                        .elementsFromPoint(
+                          Math.max(0, Math.min(innerWidth - 1, r.x + r.width / 2)),
+                          Math.max(0, Math.min(innerHeight - 1, r.y + r.height / 2)),
+                        )
+                        .some((hit) => el === hit || el.contains(hit));
+                    })
+                    .map(describe)
+                : [];
               return {
                 url: location.href,
                 viewport: [innerWidth, innerHeight],
@@ -1616,22 +1690,29 @@ freshTest.describe('Home to scan and return journey', () => {
                     }
                   : null,
                 tutorialStep: g?.onboard?.tutorial.index,
-                panels: ['.guidance-slot', '.briefing', '.journal', '.mission-debrief'].flatMap(
-                  (selector) => {
-                    const el = document.querySelector<HTMLElement>(selector);
-                    return el?.getClientRects().length
-                      ? [
-                          {
-                            selector,
-                            text: el.innerText,
-                            rect: el.getBoundingClientRect().toJSON(),
-                          },
-                        ]
-                      : [];
-                  },
-                ),
+                hudPanels,
+                text,
+                touchTargets,
+                panels: [
+                  '.home-screen',
+                  '.guidance-slot',
+                  '.briefing',
+                  '.journal',
+                  '.mission-debrief',
+                ].flatMap((selector) => {
+                  const el = document.querySelector<HTMLElement>(selector);
+                  return el && visible(el)
+                    ? [
+                        {
+                          selector,
+                          text: el.innerText,
+                          rect: el.getBoundingClientRect().toJSON(),
+                        },
+                      ]
+                    : [];
+                }),
               };
-            });
+            }, layout.touch);
             steps.push({ step, path, state });
             // Retain state even if image capture itself fails. Screenshots are
             // required independently of render-review flags.
@@ -1639,6 +1720,32 @@ freshTest.describe('Home to scan and return journey', () => {
               await page.screenshot({ path });
             } finally {
               await persist();
+            }
+            // Regression guard: passing navigation must also preserve readable
+            // mission copy, separate HUD regions and usable touch controls.
+            for (const text of state.text)
+              expect(text.clips, `${step}: clipped ${text.selector}: ${text.text}`).toBe(false);
+            for (const [i, panel] of state.hudPanels.entries()) {
+              const a = panel.rect;
+              expect(a.left, `${step}: ${panel.selector}`).toBeGreaterThanOrEqual(0);
+              expect(a.top, `${step}: ${panel.selector}`).toBeGreaterThanOrEqual(0);
+              expect(a.right, `${step}: ${panel.selector}`).toBeLessThanOrEqual(layout.width);
+              expect(a.bottom, `${step}: ${panel.selector}`).toBeLessThanOrEqual(layout.height);
+              for (const other of state.hudPanels.slice(i + 1)) {
+                const b = other.rect;
+                expect(
+                  a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom,
+                  `${step}: ${panel.selector} overlaps ${other.selector}`,
+                ).toBe(false);
+              }
+            }
+            if (layout.touch)
+              expect(state.touchTargets.length, `${step}: visible touch targets`).toBeGreaterThan(
+                0,
+              );
+            for (const target of state.touchTargets) {
+              expect(target.rect.width, `${step}: ${target.selector}`).toBeGreaterThanOrEqual(44);
+              expect(target.rect.height, `${step}: ${target.selector}`).toBeGreaterThanOrEqual(44);
             }
           };
           // Native held controls only. In particular, do not use completeScan:

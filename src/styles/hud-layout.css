@@ -78,6 +78,8 @@
 .hud-readouts {
   box-sizing: border-box;
 }
+/* Mission identity and the current instruction use the grid's available height. */
+.obj-title,
 .obj-item.is-current .obj-item-title {
   min-width: 0;
   white-space: normal;
