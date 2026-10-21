@@ -212,7 +212,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     crest: new THREE.Color(0xb0ab8f),
     drape: new THREE.Color(0xa39a84), // pale silt
     boulder: new THREE.Color(0x8a846b),
-    boulders: 230,
+    boulders: 340,
     rockSize: 0.7,
     blocks: 0.04,
     rough: 0.97,
@@ -788,7 +788,8 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       .lerp(P.drape, Math.max(smooth(0.05, 0.95, u) * 0.85 * (0.7 + 0.5 * n), nearWall));
     out.multiplyScalar(0.78 + 0.5 * n);
     // Monterey: dark rubble-flecked patches break up the smooth silt slope.
-    if (erodedBeds) out.multiplyScalar(1 - 0.35 * smooth(0.55, 0.8, fbm3(x * 0.45, z * 0.45, 5, seed ^ 0x77, 3)));
+    if (erodedBeds)
+      out.multiplyScalar(1 - 0.5 * smooth(0.5, 0.75, fbm3(x * 0.3, z * 0.3, 5, seed ^ 0x77, 3)));
     // Contact shading hugging the foot of the wall.
     out.multiplyScalar(0.82 + 0.18 * smooth(0, 0.25, u));
   });
