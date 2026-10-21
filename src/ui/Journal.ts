@@ -24,7 +24,6 @@
  */
 
 import { el } from './dom.js';
-import {} from '../game/Cosmetics.js';
 
 import type { GameEvents } from '../core/EventBus.js';
 import {
@@ -439,7 +438,6 @@ export class Journal {
     const target = focused?.dataset.target;
     const category = focused?.dataset.category;
     const row = focused?.dataset.row;
-    const cosmetic = focused?.dataset.cosmetic;
     const inside = !!focused && this.root.contains(focused);
     this.renderContent();
     // Rotation can hide the desktop nav without detaching its focused switch.
@@ -454,8 +452,8 @@ export class Journal {
       return;
     }
     if (inside && !focused?.isConnected) {
-      // Cosmetics stay on the front page; phone site navigation instead focuses the article.
-      if (this.phone && !cosmetic && category !== 'cosmetics') {
+      // Phone site navigation focuses the article.
+      if (this.phone) {
         this.body.focus({ preventScroll: true });
         return;
       }
@@ -464,11 +462,9 @@ export class Journal {
       const replacement = controls.find((control) =>
         target
           ? control.dataset.target === target
-          : cosmetic
-            ? control.dataset.cosmetic === cosmetic
-            : row
-              ? control.dataset.row === row
-              : !!category && control.dataset.category === category,
+          : row
+            ? control.dataset.row === row
+            : !!category && control.dataset.category === category,
       );
       (
         replacement ??

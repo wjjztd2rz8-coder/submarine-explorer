@@ -17,6 +17,7 @@ import { Debrief } from '../../src/ui/Debrief.js';
 import { Journal } from '../../src/ui/Journal.js';
 import { ControlsCard } from '../../src/ui/ControlsCard.js';
 import { Home } from '../../src/ui/Home.js';
+import { SubScreen } from '../../src/ui/SubScreen.js';
 import { PauseMenu } from '../../src/ui/PauseMenu.js';
 import { PhotoMode } from '../../src/ui/PhotoMode.js';
 import { discoverySystem } from '../../src/app/systems/discovery.js';
@@ -55,6 +56,16 @@ import { buildJournalSite } from '../../src/game/JournalData.js';
 import { ObjectivesPanel } from '../../src/ui/ObjectivesPanel.js';
 import { hudSystem } from '../../src/app/systems/hud.js';
 import { createHomeSystems } from '../../src/app/homeStartup.js';
+
+vi.mock('three', async (original) => {
+  const actual = await original<typeof import('three')>();
+  return {
+    ...actual,
+    WebGLRenderer: vi.fn(function (options?: THREE.WebGLRendererParameters) {
+      return new actual.WebGLRenderer(options);
+    }),
+  };
+});
 
 /** The same small EventTarget/DOM approach as the shell and Home focus specs. */
 class Element extends EventTarget {
@@ -201,6 +212,9 @@ class Element extends EventTarget {
   }
   getClientRects() {
     return this.layout && !this.closest('[hidden]') ? [{}] : [];
+  }
+  getContext() {
+    return null;
   }
   focus() {
     (document as unknown as { activeElement: Element }).activeElement = this;
@@ -2829,3 +2843,147 @@ it('shell host teardown releases Home, Pause, both Globes and shell fallback tog
   }
   expect(press('Escape').defaultPrevented).toBe(false);
 });
+
+it.each(['home', 'pause'] as const)(
+  'Your sub releases all preview resources and RAFs on close, navigation and teardown from %s',
+  async (source) => {
+    const frames = new Map<number, FrameRequestCallback>();
+    let nextFrame = 0;
+    vi.stubGlobal('requestAnimationFrame', (fn: FrameRequestCallback) => {
+      frames.set(++nextFrame, fn);
+      return nextFrame;
+    });
+    vi.stubGlobal('cancelAnimationFrame', (id: number) => frames.delete(id));
+    const renderers: Array<{
+      domElement: HTMLElement;
+      dispose: ReturnType<typeof vi.fn>;
+      forceContextLoss: ReturnType<typeof vi.fn>;
+      resources: Array<ReturnType<typeof vi.spyOn>>;
+    }> = [];
+    vi.spyOn(THREE, 'WebGLRenderer').mockImplementation(function () {
+      const resources: Array<ReturnType<typeof vi.spyOn>> = [];
+      const renderer = {
+        domElement: html(new Element('CANVAS')),
+        dispose: vi.fn(),
+        forceContextLoss: vi.fn(),
+        resources,
+        render: vi.fn((scene: THREE.Scene) => {
+          if (resources.length) return;
+          const owned = new Set<THREE.BufferGeometry | THREE.Material | THREE.Texture>();
+          scene.traverse((object) => {
+            if (
+              !(object instanceof THREE.Mesh) &&
+              !(object instanceof THREE.Points) &&
+              !(object instanceof THREE.Sprite)
+            )
+              return;
+            // Sprite geometry, the environment map and halo texture are shared caches.
+            if (!(object instanceof THREE.Sprite)) owned.add(object.geometry);
+            const materials = Array.isArray(object.material) ? object.material : [object.material];
+            for (const material of materials) {
+              owned.add(material);
+              if (material instanceof THREE.SpriteMaterial) continue;
+              const maps = material as THREE.MeshStandardMaterial;
+              for (const value of [maps.map, maps.normalMap, maps.roughnessMap])
+                if (value instanceof THREE.Texture) owned.add(value);
+            }
+          });
+          for (const resource of owned) resources.push(vi.spyOn(resource, 'dispose'));
+        }),
+      };
+      renderers.push(renderer);
+      return renderer as unknown as THREE.WebGLRenderer;
+    });
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, text: async () => '[]' }));
+    const ctx = {
+      bus: new EventBus(),
+      index: [],
+      meta: source === 'pause' ? { id: 'reef' } : undefined,
+      route: null,
+      save: new Save({ config: DEFAULT_CONFIG, storage: null }),
+      progress: new Progress(new ProgressSave(null)),
+      app: { state: source, lastSite: null },
+      expose: vi.fn(),
+      journal: { open: vi.fn() },
+      discoveries: { isDiscovered: () => false },
+    } as unknown as GameContext;
+    cleanup.push(() => shellSystem.dispose?.());
+    shellSystem.init?.(ctx);
+    ctx.setAppState(source);
+    let screen!: SubScreen;
+    const open = vi.spyOn(SubScreen.prototype, 'open');
+    const opener = ((source === 'home' ? ctx.home : ctx.pause).root as unknown as Element)
+      .querySelectorAll('button')
+      .find((button) => button.textContent === 'Your sub')!;
+    const show = () => {
+      opener.focus();
+      opener.dispatchEvent(new Event('click'));
+      screen = open.mock.instances.at(-1)! as SubScreen;
+      expect(screen.isOpen).toBe(true);
+    };
+    // Closing before the lazy import resolves must allocate no renderer at all.
+    show();
+    screen.close();
+    expect(renderers).toHaveLength(0);
+    const flush = async () => {
+      await vi.waitFor(() => expect(frames.size).toBe(1));
+      const [id, draw] = [...frames][0];
+      frames.delete(id);
+      draw(performance.now());
+      expect(frames.size).toBe(1);
+    };
+    const released = () => {
+      expect(frames.size).toBe(0);
+      expect(screen.root.querySelectorAll('canvas')).toHaveLength(0);
+      for (const renderer of renderers) {
+        expect(renderer.dispose).toHaveBeenCalledTimes(1);
+        expect(renderer.forceContextLoss).toHaveBeenCalledTimes(1);
+        expect(renderer.resources.length).toBeGreaterThan(10);
+        for (const dispose of renderer.resources) expect(dispose).toHaveBeenCalledTimes(1);
+      }
+    };
+    for (let cycle = 0; cycle < 3; cycle++) {
+      show();
+      screen.open(); // Duplicate open must keep the same preview and RAF.
+      await flush();
+      expect(renderers).toHaveLength(cycle + 1);
+      const controls = (screen.root as unknown as Element)
+        .querySelectorAll('button')
+        .filter((button) => !button.disabled);
+      expect((screen.root as unknown as Element).querySelectorAll('button').length).toBeGreaterThan(
+        controls.length,
+      );
+      for (const control of controls) {
+        press('Tab');
+        expect(active()).toBe(control);
+      }
+      press('Tab');
+      expect(active()).toBe(controls[0]);
+      press('Tab', { shiftKey: true });
+      expect(active()).toBe(controls.at(-1));
+      if (cycle % 2) {
+        (screen.root as unknown as Element)
+          .querySelector('.ss-close')!
+          .dispatchEvent(new Event('click'));
+      } else press('Escape');
+      expect(screen.isOpen).toBe(false);
+      expect(active()).toBe(opener);
+      expect(ctx.app.state).toBe(source);
+      screen.close(); // Repeated close must not dispose twice.
+      released();
+    }
+    show();
+    await flush();
+    ctx.setAppState(source === 'pause' ? 'home' : 'dive');
+    expect(screen.isOpen).toBe(false);
+    released();
+    ctx.setAppState(source);
+    show();
+    await flush();
+    shellSystem.dispose?.();
+    shellSystem.dispose?.();
+    expect(screen.root.isConnected).toBe(false);
+    expect(screen.isOpen).toBe(false);
+    released();
+  },
+);
