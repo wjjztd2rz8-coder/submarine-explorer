@@ -1595,3 +1595,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Review done (REVIEWS, STATUS, DIRECTOR backlog rewritten: done items removed, V-bluehole-roof, V-lostcity-hill, V-monterey-cliff, P2-sub-screen-portrait added). Stage ~81%. Sol skipped (Codex 5h 17%); fixed the tool so a skipped start can't reconcile a stale review. No package launched: Claude week 17%, pace-limited to the Oct 22 reset. Codex 2850-2880 queued.
 - **Needs owner:** phone retest on the newest build; real-phone Low play.
+
+## 2026-10-20 20:37 CDT headless run 73 (Claude)
+
+- **Merged and pushed (smoke + project-base green, no full e2e):** Sonnet P2-sub-screen-portrait ("Your sub" fits one 390x844 screen, all four slot groups visible, 44px targets kept; I rate ~3.8). Not checked on shorter phones (375x667 would likely still scroll); the agent's full e2e timed out, so the portrait-fit test was not proven to fail on the old CSS.
+- **Codex:** 5h at 1% until 21:45; 2850-2880 queued. Claude week ~16%, pace-limited until the Oct 22 reset, so only one package this run.
+- **Next Claude:** V-bluehole-roof, V-lostcity-hill, V-monterey-cliff. No tag (CI for newest SHAs pending). **Needs owner:** phone retest on the newest build; real-phone Low play.
