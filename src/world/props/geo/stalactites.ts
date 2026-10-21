@@ -526,7 +526,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       // Away from the wall the apron sinks toward the cool blue-green of the deep water.
       out.lerp(DEEP_TEAL, (0.3 + 0.35 * smooth(0.2, 0.9, u)) * (0.7 + 0.5 * (1 - t)));
       out.multiplyScalar(0.5 + 0.5 * smooth(0, 0.4, u));
-      if (hood) out.lerp(CAVE_DARK, 0.4 * (1 - smooth(0.3, 0.9, u))).multiplyScalar(0.85);
+      if (hood) out.lerp(CAVE_DARK, 0.4 + 0.2 * (1 - u)).multiplyScalar(0.85);
       // Broad, light sediment beds follow actual apron terraces. Thin painted
       // joints drew contour lines even when the shared rock map was disabled.
       out.multiplyScalar(1.03 + 0.3 * bedTone(talusBedLevel(talus, x, y)));
