@@ -1,9 +1,17 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { createHash } from 'node:crypto';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, expect, it, vi } from 'vitest';
 import { BIOMES, DEFAULT_BIOME, type Biome } from '../../src/world/TerrainBiome.js';
-import { Scatter } from '../../src/world/scatter/Scatter.js';
+import { Scatter, type ScatterOptions } from '../../src/world/scatter/Scatter.js';
+import { placeCell, type ScatterGround } from '../../src/world/scatter/ScatterPlacement.js';
+import { SCATTER_TYPES } from '../../src/world/scatter/ScatterTypes.js';
+import { Terrain } from '../../src/world/Terrain.js';
+import { latLonToWorld } from '../../src/util/geo.js';
+import { hashStringSigned } from '../../src/util/rng.js';
+import type { TileMeta } from '../../src/util/types.js';
 import { makeConfig } from '../../src/core/Config.js';
 
 const digest = (value: string | ArrayBufferView): string =>
@@ -11,7 +19,13 @@ const digest = (value: string | ArrayBufferView): string =>
 
 afterEach(() => vi.unstubAllGlobals());
 
-function populated(biome: Biome, density = 1, rangeM = 128): Scatter {
+function populated(
+  biome: Biome,
+  density = 1,
+  rangeM = 128,
+  options: Partial<Pick<ScatterOptions, 'ground' | 'seed' | 'rockLo' | 'rockHi'>> = {},
+  position: readonly [number, number] = [32, 32],
+): Scatter {
   // Scatter only needs the presence of document to enable its GPU-independent meshes.
   vi.stubGlobal('document', {});
   const scatter = new Scatter({
@@ -30,11 +44,25 @@ function populated(biome: Biome, density = 1, rangeM = 128): Scatter {
     seed: 1130,
     rockLo: 0.02,
     rockHi: 0.3,
+    ...options,
   });
-  const camera = new THREE.PerspectiveCamera();
-  camera.position.set(32, -85, 32);
-  for (let i = 0; i < 128; i++) scatter.update(camera);
+  settle(scatter, ...position);
   return scatter;
+}
+
+function settle(
+  scatter: Scatter,
+  x: number,
+  z: number,
+  check?: (previousCells: number) => void,
+): void {
+  const camera = new THREE.PerspectiveCamera();
+  camera.position.set(x, -85, z);
+  for (let i = 0; i < 128; i++) {
+    const previousCells = scatter.stats.cells;
+    scatter.update(camera);
+    check?.(previousCells);
+  }
 }
 
 it('1130: other sites retain byte-identical scatter geometry, placement, colors and draw counts', () => {
@@ -284,6 +312,233 @@ it.each([
       before.dispose();
       after.dispose();
       replay.dispose();
+    }
+  },
+);
+
+// Compare live data independently of buffer slots: resident-cell insertion order
+// can change after eviction, while placement promises deterministic cell contents.
+function liveScatter(scatter: Scatter) {
+  return (scatter.group.children as THREE.InstancedMesh[]).map((mesh) => {
+    const instances = Array.from({ length: mesh.count }, (_, i) =>
+      JSON.stringify([
+        ...mesh.instanceMatrix.array.slice(i * 16, (i + 1) * 16),
+        ...mesh.instanceColor!.array.slice(i * 3, (i + 1) * 3),
+      ]),
+    ).sort();
+    const faces = (mesh.geometry.index?.count ?? mesh.geometry.getAttribute('position').count) / 3;
+    return {
+      name: mesh.name,
+      count: mesh.count,
+      triangles: mesh.count * faces,
+      instances: digest(instances.join('\n')),
+    };
+  });
+}
+
+it.each(['low', 'medium', 'high'] as const)(
+  'carbonate scatter %s streams bounded, repeatable populations seated on its supplied ground',
+  (tier) => {
+    const biome = BIOMES['lost-city']!;
+    // Restore only density for the resource comparison; never mutate the site registry.
+    const previous: Biome = {
+      ...biome,
+      scatter: biome.scatter.map((spec) =>
+        spec.kind === 'rubble' ? { ...spec, density: 14 } : spec,
+      ),
+    };
+    const config = makeConfig().terrain;
+    const { scatterDensity, scatterRangeM } = config.tiers[tier];
+    const meta = JSON.parse(readFileSync('data/tiles/lost-city/meta.json', 'utf8')) as TileMeta;
+    const bytes = readFileSync('data/tiles/lost-city/heightmap.bin');
+    // Construct terrain before enabling the headless scatter meshes, so texture
+    // loading stays disabled. This is the shipped sampler, without prop keepouts.
+    const terrain = new Terrain(
+      { meta, heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows) },
+      config,
+      tier,
+    );
+    const normal = new THREE.Vector3();
+    const focus = latLonToWorld(
+      meta,
+      config.fidelity!['lost-city']!.focus.lat,
+      config.fidelity!['lost-city']!.focus.lon,
+    );
+    const grounds: Array<[string, ScatterGround, readonly [number, number]]> = [
+      [
+        'plane',
+        {
+          sampleHeight: (x, z) => -100 + x * 0.05 - z * 0.1,
+          normalAt: (_x, _z, out) => {
+            out[0] = -0.05;
+            out[1] = Math.sqrt(1 - 0.05 ** 2 - 0.1 ** 2);
+            out[2] = 0.1;
+          },
+          contains: () => true,
+        },
+        [32, 32],
+      ],
+      [
+        'survey',
+        {
+          sampleHeight: (x, z) => terrain.sampleHeight(x, z),
+          normalAt: (x, z, out) => {
+            terrain.getNormal(x, z, normal);
+            out[0] = normal.x;
+            out[1] = normal.y;
+            out[2] = normal.z;
+          },
+          contains: (x, z) => terrain.contains(x, z),
+        },
+        [Math.floor(focus.x / 64) * 64 + 32, Math.floor(focus.z / 64) * 64 + 32],
+      ],
+    ];
+    try {
+      for (const [_label, ground, origin] of grounds) {
+        for (const seed of [1130, config.detailSeed ^ hashStringSigned(meta.id)]) {
+          const options = {
+            ground,
+            seed,
+            rockLo: 1 - Math.cos((config.rockSlopeLoDeg * Math.PI) / 180),
+            rockHi: 1 - Math.cos((config.rockSlopeHiDeg * Math.PI) / 180),
+          };
+          const before = populated(previous, scatterDensity, scatterRangeM, options, origin);
+          const after = populated(biome, scatterDensity, scatterRangeM, options, origin);
+          try {
+            const initial = liveScatter(after);
+            const initialBefore = liveScatter(before);
+            const costs = [];
+            for (let cycle = 0; cycle < 2; cycle++) {
+              for (const [dx, dz] of [
+                [0, 0],
+                [64, 0],
+                [-64, 0],
+                [1024, 1024],
+                [0, 0],
+              ]) {
+                const x = origin[0] + dx!;
+                const z = origin[1] + dz!;
+                settle(before, x, z);
+                settle(after, x, z, (previousCells) => {
+                  expect(after.stats.cells - previousCells).toBeLessThanOrEqual(2);
+                  expect(after.stats.instances).toBeLessThanOrEqual(4 * 4096);
+                });
+                expect(after.stats.cells).toBe(before.stats.cells);
+                expect(after.stats.drawCalls).toBe(before.stats.drawCalls);
+                expect(after.stats.drawCalls).toBeLessThanOrEqual(biome.scatter.length);
+                const state = liveScatter(after);
+                const oldState = liveScatter(before);
+                expect(state.map((mesh) => mesh.count).reduce((a, b) => a + b, 0)).toBe(
+                  after.stats.instances,
+                );
+                for (const [i, mesh] of state.entries()) {
+                  expect(mesh.triangles).toBe(mesh.count * [80, 20, 180, 162][i]!);
+                  const old = oldState[i]!;
+                  if (mesh.name === 'scatter:rubble') {
+                    expect(mesh.count).toBeGreaterThan(old.count);
+                  } else {
+                    // Each kind has its own seed stream; a density-only change
+                    // must preserve the other kinds' complete live data.
+                    expect(mesh).toEqual(old);
+                  }
+                }
+                // The existing 4096-instance buffers, four biome kinds and
+                // eviction radius bound the population; no new budget is imposed.
+                expect(after.stats.instances).toBeLessThanOrEqual(4 * 4096);
+                const evictionDiameter = 2 * (scatterRangeM + 64 * 2.2);
+                expect(after.stats.cells).toBeLessThanOrEqual(
+                  (Math.ceil(evictionDiameter / 64) + 1) ** 2,
+                );
+                for (const [kindIndex, mesh] of (
+                  after.group.children as THREE.InstancedMesh[]
+                ).entries()) {
+                  const kind = biome.scatter[kindIndex]!.kind;
+                  expect(mesh.name).toBe(`scatter:${kind}`);
+                  const range = Math.min(scatterRangeM, SCATTER_TYPES[kind].drawRangeM);
+                  expect(mesh.count).toBeLessThanOrEqual(mesh.instanceMatrix.count);
+                  expect(mesh.instanceMatrix.count).toBe(4096);
+                  expect(
+                    Array.from(mesh.instanceMatrix.array.slice(0, mesh.count * 16)).every(
+                      Number.isFinite,
+                    ),
+                  ).toBe(true);
+                  expect(
+                    Array.from(mesh.instanceColor!.array.slice(0, mesh.count * 3)).every(
+                      Number.isFinite,
+                    ),
+                  ).toBe(true);
+                  const m = new THREE.Matrix4();
+                  const scale = new THREE.Vector3();
+                  for (let i = 0; i < mesh.count; i++) {
+                    mesh.getMatrixAt(i, m);
+                    expect(m.determinant()).toBeGreaterThan(0);
+                    expect(
+                      Math.hypot(m.elements[12]! - x, m.elements[14]! - z),
+                    ).toBeLessThanOrEqual(range + 0.001);
+                    scale.setFromMatrixScale(m);
+                    const bed = ground.sampleHeight(m.elements[12]!, m.elements[14]!);
+                    const burial = bed - m.elements[13]!;
+                    // Float32 translations at survey depth have sub-mm rounding.
+                    expect(burial).toBeGreaterThanOrEqual(-0.001);
+                    expect(burial).toBeLessThan(scale.y + 0.001);
+                  }
+                }
+                costs.push({
+                  cycle,
+                  dx,
+                  dz,
+                  cells: after.stats.cells,
+                  before: liveScatter(before).map(({ name, count, triangles }) => ({
+                    name,
+                    count,
+                    triangles,
+                  })),
+                  after: state.map(({ name, count, triangles }) => ({ name, count, triangles })),
+                });
+                if (dx === 0 && dz === 0) {
+                  expect(state).toEqual(initial);
+                  expect(liveScatter(before)).toEqual(initialBefore);
+                }
+              }
+            }
+            expect(costs.slice(5).map(({ cycle: _cycle, ...cost }) => cost)).toEqual(
+              costs.slice(0, 5).map(({ cycle: _cycle, ...cost }) => cost),
+            );
+            const cellOptions = {
+              cellSizeM: 64,
+              density: scatterDensity,
+              seed,
+              rockLo: options.rockLo,
+              rockHi: options.rockHi,
+            };
+            const cx = Math.floor(origin[0] / 64),
+              cz = Math.floor(origin[1] / 64);
+            const first = placeCell(cx, cz, ground, biome, cellOptions);
+            expect(placeCell(cx, cz, ground, biome, cellOptions)).toEqual(first);
+            const shifted = placeCell(
+              cx,
+              cz,
+              { ...ground, sampleHeight: (x, z) => ground.sampleHeight(x, z) + 37 },
+              biome,
+              cellOptions,
+            );
+            for (const spec of biome.scatter) {
+              const list = first[spec.kind] ?? [];
+              expect(shifted[spec.kind]?.length ?? 0).toBe(list.length);
+              for (const [i, inst] of list.entries()) {
+                expect(Object.values(inst).every(Number.isFinite)).toBe(true);
+                expect(shifted[spec.kind]![i]!.y - inst.y).toBeCloseTo(37, 8);
+                expect({ ...shifted[spec.kind]![i], y: inst.y }).toEqual(inst);
+              }
+            }
+          } finally {
+            before.dispose();
+            after.dispose();
+          }
+        }
+      }
+    } finally {
+      terrain.dispose();
     }
   },
 );
