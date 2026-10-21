@@ -126,16 +126,13 @@ export class SubScreen {
 
   /** A small private renderer, created per opening so it holds no GL context while closed. */
   private async startPreview(token: number): Promise<void> {
+    const { SubMesh } = await import('../sub/SubMesh.js');
+    if (token !== this.opening) return;
     let renderer: THREE.WebGLRenderer;
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     } catch {
       return; // No WebGL: the choices still work without a preview.
-    }
-    const { SubMesh } = await import('../sub/SubMesh.js');
-    if (token !== this.opening) {
-      renderer.dispose();
-      return;
     }
     const scene = new THREE.Scene();
     scene.add(new THREE.HemisphereLight(0xdcecff, 0x1a3a4a, 1.6));
@@ -175,8 +172,9 @@ export class SubScreen {
       mesh,
       stop: () => {
         cancelAnimationFrame(frame);
-        mesh.vehicle.dispose();
+        mesh.dispose();
         renderer.dispose();
+        renderer.forceContextLoss();
         renderer.domElement.remove();
       },
     };

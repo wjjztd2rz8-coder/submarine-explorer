@@ -446,4 +446,6 @@ it.each([false, true])('keeps cosmetic controls off the Journal front page (phon
   journal.show('front');
   expect(descendants(root).filter((el) => el.dataset.cosmetic)).toHaveLength(0);
   expect(descendants(root).some((el) => el.textContent === 'Cosmetics')).toBe(false);
+  expect(readFileSync('src/ui/Journal.ts', 'utf8')).not.toMatch(/cosmetic/i);
+  expect(readFileSync('src/styles/journal.css', 'utf8')).not.toMatch(/cosmetic/i);
 });

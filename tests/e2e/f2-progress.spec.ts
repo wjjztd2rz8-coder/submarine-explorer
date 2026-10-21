@@ -117,10 +117,10 @@ test('discoveries unlock Your sub cosmetics; photo bonus and best stars survive 
   await expect(
     page.locator('.pause-actions').getByRole('button', { name: 'Upgrades', exact: true }),
   ).toHaveCount(0);
-  await page
+  const subOpener = page
     .locator('.pause-actions')
-    .getByRole('button', { name: 'Your sub', exact: true })
-    .click();
+    .getByRole('button', { name: 'Your sub', exact: true });
+  await subOpener.click();
   const sub = page.locator('.sub-screen');
   await expect(sub).toBeVisible();
   await sub.getByRole('button', { name: 'Red', exact: true }).click();
@@ -147,6 +147,13 @@ test('discoveries unlock Your sub cosmetics; photo bonus and best stars survive 
   await page.keyboard.press('Escape');
   await page.clock.fastForward(50);
   await expect(sub).toBeHidden();
+  await expect(page.locator('.pause-menu')).toBeVisible();
+  await expect(subOpener).toBeFocused();
+  await subOpener.press('Enter');
+  await expect(sub).toBeVisible();
+  await sub.getByRole('button', { name: 'Back', exact: true }).click();
+  await expect(sub).toBeHidden();
+  await expect(subOpener).toBeFocused();
   await expect(page.locator('.pause-menu')).toBeVisible();
   await page.locator('.pause-actions button', { hasText: /^Resume$/ }).click();
   await page.keyboard.press('p');
@@ -226,7 +233,10 @@ for (const [width, height] of [
     await expect(page.locator('.journal')).toBeVisible();
     await expect(page.locator('.journal [data-cosmetic]')).toHaveCount(0);
     await page.locator('.jr-close').click();
-    await page.locator('.home-menu').getByRole('button', { name: 'Your sub', exact: true }).click();
+    const opener = page
+      .locator('.home-menu')
+      .getByRole('button', { name: 'Your sub', exact: true });
+    await opener.click();
     const sub = page.locator('.sub-screen');
     await expect(sub).toBeVisible();
     for (const [group, name] of [
@@ -240,6 +250,41 @@ for (const [width, height] of [
       ).toHaveAttribute('aria-pressed', 'true');
     await expect(sub.getByRole('button', { name: /^Silver/ })).toBeDisabled();
     await expect(sub.locator('canvas')).toBeVisible();
+    const previewContext = await sub
+      .locator('canvas')
+      .evaluateHandle((canvas: HTMLCanvasElement) => {
+        const context = canvas.getContext('webgl2');
+        if (!context) throw new Error('Missing preview WebGL context');
+        return context;
+      });
+    expect(await previewContext.evaluate((context) => context.isContextLost())).toBe(false);
+    const enabled = sub.locator('button:enabled');
+    const back = sub.getByRole('button', { name: 'Back', exact: true });
+    // Complete Tab and reverse-Tab cycles must skip every locked swatch.
+    await page.keyboard.press('Tab');
+    for (let i = 0; i < (await enabled.count()); i++) {
+      await expect(enabled.nth(i)).toBeFocused();
+      await page.keyboard.press('Tab');
+    }
+    await expect(back).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await expect(enabled.last()).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(back).toBeFocused();
+    const selectedPaint = sub
+      .getByRole('group', { name: 'Sub paint' })
+      .getByRole('button', { name: 'Gold', exact: true });
+    await selectedPaint.focus();
+    await sub
+      .getByRole('button', { name: /^Silver/ })
+      .evaluate((button: HTMLButtonElement) => button.focus());
+    await expect(selectedPaint).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(selectedPaint).toHaveAttribute('aria-pressed', 'true');
+    await expect(sub.getByRole('button', { name: /^Silver/ })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
     const boxes = await sub.locator('[data-cosmetic]').evaluateAll((els) =>
       els.map((e) => ({
         w: e.getBoundingClientRect().width,
@@ -270,6 +315,17 @@ for (const [width, height] of [
     await page.keyboard.press('Escape');
     await expect(sub).toBeHidden();
     await expect(page.locator('.home-menu')).toBeVisible();
+    await expect(opener).toBeFocused();
+    await expect
+      .poll(() => previewContext.evaluate((context) => context.isContextLost()))
+      .toBe(true);
+    await previewContext.dispose();
+    await expect(sub.locator('canvas')).toHaveCount(0);
+    await opener.press('Enter');
+    await expect(sub).toBeVisible();
+    await back.click();
+    await expect(sub).toBeHidden();
+    await expect(opener).toBeFocused();
   });
 
 test('all downloaded missions stay open in Realistic', async ({ page }) => {

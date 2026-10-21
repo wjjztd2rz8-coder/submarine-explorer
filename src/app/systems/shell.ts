@@ -176,6 +176,7 @@ export function initializeShell(ctx: ShellContext): void {
     }),
   );
   ctx.setAppState = (state: AppState): void => {
+    subScreen.close();
     app.state = state;
     document.body.dataset.appState = state;
     // The embedded globe is open only in the home sites subview.
