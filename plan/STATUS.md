@@ -6,8 +6,8 @@
 
 | Requirement                               | State                                                                                                                                            |
 | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.7, Lost City 3.2, Blue Hole 3.0, Beebe 3.6, Monterey 3.5                                         |
-| Other eight sites coherent                | Challenger 3.4, Endurance 3.5; mission-spawn acceptance for all eight not certified (V-spawn-capture queued)                                 |
+| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.7, Lost City 3.2, Blue Hole 3.0, Beebe 3.6, Monterey 3.5                                                       |
+| Other eight sites coherent                | Challenger 3.4, Endurance 3.5; mission-spawn acceptance for all eight not certified (V-spawn-capture queued)                                     |
 | New player understands first five minutes | Owner phone test: scan range, boost and events confuse; P2-scan-range and P2-boost-cut queued, then V-journeys                                   |
 | Acceptable Low-tier phone performance     | iPhone 17 Pro: Low great; High (opt-in only) stutters at Lost City; weaker phones untested                                                       |
 | Hosted CI green, releases tagged          | Main red on the latest runs from stale specs; most repaired 2026-10-20, one wildlife fixture still red (R-ci-green-f); deploy waits for green CI |
