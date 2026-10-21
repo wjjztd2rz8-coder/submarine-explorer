@@ -242,10 +242,10 @@ export const BIOMES: Record<string, Biome> = {
     a: 'carbonate',
     b: 'rubble',
     c: 'carbonate',
-    // Cool grey-green serpentinite and pale carbonate silt; the warm lamps do the tinting.
-    colorA: 0x3f5c68,
-    colorB: 0x56696f,
-    colorC: 0x6c7e84,
+    // Dark muted olive-grey sediment drapes the massif so the pale carbonate towers are the only bright mass.
+    colorA: 0x3a423f,
+    colorB: 0x454b46,
+    colorC: 0x4f544d,
     stain: 0x5a5646,
     stainAmount: 0.18,
     patch: 0.5,
@@ -261,7 +261,7 @@ export const BIOMES: Record<string, Biome> = {
     vertexTint: lostCitySlopeTint,
     scatter: [
       { kind: 'boulder', density: 4.5, slopeMaxDeg: 55, on: 'any', sizeMul: 2.4 },
-      { kind: 'rubble', density: 14, slopeMaxDeg: 45, on: 'any', sizeMul: 2.6 },
+      { kind: 'rubble', density: 18, slopeMaxDeg: 45, on: 'any', sizeMul: 2.6 },
       { kind: 'dropstone', density: 3.5, slopeMaxDeg: 40, on: 'any', sizeMul: 2.2 },
       { kind: 'sponge', density: 0.2, slopeMaxDeg: 40, on: 'rock' },
     ],
