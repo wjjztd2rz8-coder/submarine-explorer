@@ -60,32 +60,33 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
 | No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
-Stage (review 2026-10-20, joint with Sol, unchanged): about 80% to 1.0; 5-7 weeks (Sol: 4-5 is optimistic given limited Claude review capacity and small art gains per pass). Beautiful bands: Titanic 3.5, Lost City 2.5-3.2, Blue Hole 2.5-3.2, Beebe 3.5-3.6, Monterey 3-3.5, Challenger 3-3.5, Endurance 3.5. Agreed blockers in order: (1) first-five-minute scanning, guidance and reward verified unaided at 1280x720 and both phone orientations; (2) green hosted CI on the release SHA, deploy gate verified, tag; (3) phone defects (Class A clipping, Beebe Low caps) and a complete Low journey; (4) heroes consistently at beauty 4, Blue Hole overlap resolved; (5) eight-site acceptance at mission spawns.
+Stage (review 2026-10-21, Claude alone): about 82% to 1.0; 5-6 weeks. Beautiful: Titanic 3.7, Lost City 3.4, Blue Hole 3.4, Beebe 3.6, Monterey 3.7, Challenger 3.4, Endurance 3.4. Blockers in order: (1) first-five-minute journeys verified on phones; (2) green hosted CI on a quiet SHA and a tag; (3) heroes consistently at beauty 4 (Blue Hole silhouette, Lost City foot); (4) eight-site acceptance.
 
 ## Needs owner
 
 The newest items go first.
 
 - A short phone retest once the P2 items below land (boost gone, scan range, anchored events, Your sub screen).
+- Decide whether the 150-300 m mission opening rule may be shortened for wrecks and landers (blocks nearer framing at Endurance, Bismarck, Challenger; V-spawn-sub-clear).
 
 ## In flight
 
-- No Claude package running (2026-10-20: V-bluehole-roof third pass merged). Merge policy stands as the owner set it on 2026-10-13: merges don't wait for CI (push after smoke + project-base); only tags wait.
+- No Claude package running (2026-10-21: V-eight-sites review merged). Merge policy stands as the owner set it on 2026-10-13: merges don't wait for CI (push after smoke + project-base); only tags wait.
 
 ## Backlog
 
-One list, ordered by player impact and dependencies; lane in brackets. Evidence: joint review 2026-10-21 in `plan/REVIEWS.md` (DONE items removed there; history in git and `plan/progress/`). Art gains per package are ~0.1-0.2, so each V-* names a target composition, not a geometry list. Owner phone decisions: [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md).
+One list, ordered by player impact and dependencies; lane in brackets. Evidence: review 2026-10-21 (evening, Claude alone) in `plan/REVIEWS.md`; history in git and `plan/progress/`. Art gains per package are ~0.1-0.2, so each V-* names a target composition, not a geometry list. Claude week is pace-limited until the Oct 22 reset, so the first runs after it take one package each. Owner phone decisions: [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md).
 
-1. **V-bluehole-roof [Sonnet] third pass DONE 2026-10-20 (colour/value only, ~3.4; lip outline still chunky rolled slab, pendants uniform teeth, no light shaft; next pass = silhouette only):** (~3.0 before, weakest hero): the roof arch with stalactites still reads as a synthetic shell and the pale interior is flat. Target composition: from the first-scan pose the gallery looks like a dark undercut limestone lip with hanging stalactite clusters, light falling in a soft shaft; no visible arch seam, interior value close to the wall. Keep the Class B mission spawn and the overlap numerics.
-2. **V-lostcity-hill [Sonnet] DONE 2026-10-20 (merged; ~3.6, hue still brownish, foot rubble sparse):** (~3.2): the large faceted green hill dominates `lost-city-1.png` and the tower is a pale shard on it. Target: smooth the hill into broad rounded slopes with darker, lower-contrast tone so the thick tower with its skirts is the only bright mass; tower foot rubble inside the frame.
-3. **V-monterey-cliff [Sonnet] DONE 2026-10-20 (~3.7; bank beds lower contrast, crest still clean, no foot talus)** (~3.6): the flat pale cliff at right of `monterey-canyon-1.png` reads as a slab. Target: same strata tone and talus as the left wall, soft top edge.
-4. **P2-sub-screen-portrait [Sonnet, small] DONE 2026-10-20 (90cd44b):** portrait "Your sub" needs scrolling to reach decal and frame; fit swatches, decal and frame in one portrait screen, no new controls.
-5. **V-eight-sites [Sonnet] DONE 2026-10-21 (review merged; ratings 2.6-3.2, Kamaʻehuakanaloa 2.2 to 2.7):** follow-ups, ranked: (a) Kamaʻehuakanaloa still dark with a black-silhouette scan target, needs a lit subject at spawn; (b) Blake Plateau and Hunga Tonga empty dark upper half and hard horizon; (c) Endurance hull a thin strip at the horizon; (d) Axial and Hudson subjects small and distant. The 150-300 m mission opening rule (missionApproach/deepOpening) blocks nearer framing: owner/Director decision if we want it shorter for wrecks and landers.
-6. **V-challenger-ripples [Sonnet, small]** (~3.4): seabed has no ripples; lander Low budget is 1985/2000, so cut something first. Target: gentle sediment ripples in the lander light pool.
+1. **V-bluehole-silhouette [Sonnet]** (~3.4, weakest hero): colour is now right (three passes); the remaining defect is shape. Target composition from the first-scan pose: the gallery lip is a thin, irregular undercut edge (not a rolled slab), pendants vary in length and clump, and a soft light shaft falls through the opening. Silhouette only; no colour retune. Keep the Class B spawn and overlap numerics.
+2. **V-eight-sites-lit [Sonnet]** (2.6-3.2): follow-ups from the eight-site review, one package each, in this order: (a) Kamaʻehuakanaloa needs a lit subject at spawn (scan target is a black silhouette); (b) Blake Plateau and Hunga Tonga: empty dark upper half and hard horizon; (c) Axial and Hudson subjects small and distant. Take (a) first.
+3. **V-monterey-foot [Sonnet, small]** (~3.7): the new strata read well; the crest is a clean line with no foot talus. Target: soft rubble apron at the cliff foot, crest broken by two or three ledges.
+4. **V-challenger-ripples [Sonnet, small]** (~3.4): seabed has no ripples; lander Low budget is 1985/2000, so cut something first. Target: gentle sediment ripples inside the lander light pool.
+5. **V-lostcity-foot [Sonnet, small]** (~3.5 readable, ~3.4 beautiful): tower is now the brightest mass; hue still brownish and foot rubble sparse. Target: cooler olive-grey hill, a ring of carbonate rubble and chimney stumps around the tower base.
+6. **V-spawn-sub-clear [Sonnet, small]:** at the Titanic and Endurance openings the sub overlaps or floats over the wreck silhouette (Titanic: sub sits on the bow; Endurance: sub hangs high above a thin hull strip). Target: sub below and beside the wreck, hull filling the lower third. Needs the owner decision below about the 150-300 m opening rule; until then only reposition inside the rule.
 7. **P2-globe-bright, P2-text-size [Sonnet, demoted]:** brighter globe; "Aa" stepping the existing UI scale. Only if the lanes above are blocked.
 8. **V-bluehole-hood [Sonnet, demoted]:** east hood sheet facets; reference composition only.
-9. **S-verify / S-bughunt [Codex, standing]:** queued 2850 (power-start lifecycle), 2860 (Challenger seabed verify), 2870 (journey copy and mission card truncation), 2880 (Your sub verify, second WebGL context). After visual merges, verify numerics and hunt bugs.
-10. **R-release [Haiku]:** f61 tagged 2026-10-20. Tag the latest green-CI main after each review.
+9. **S-verify / S-bughunt [Codex, standing]:** queued 2920 (S-verify eight-site tint), 2930 (S-bughunt merged lifecycle), 2940 (S-ci-watch newest); worktrees 2900 and 2910 (S-verify Monterey tint, Lost City scatter) are finished-but-uncollected and get collected first. After visual merges, verify numerics and hunt bugs.
+10. **R-release [Haiku]:** f61 tagged 2026-10-20. Tag the latest green-CI main after each review; last three main pushes were cancelled by newer pushes, so wait for a quiet SHA.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16; kept as tag `parked/V-endurance-aim`), Titanic per-plate blockiness (accepted ~3.7).
 

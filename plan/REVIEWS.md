@@ -2,6 +2,24 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-21 (evening) comprehensive review, Claude alone (golden 2026-10-21-053709)
+
+**Sol did not review:** Codex 5h was at 5% (< the 20% start gate), `codex-review.sh start` exited 75, so there is no second opinion; scores are mine and may run ~0.2 high (package self-ratings and my earlier scores have been above Sol's bands before). Opening frames only were viewed; no new e2e captures, so the play check rests on run 70's six passing journeys and run 73's Your-sub fix.
+
+**Changed since the review earlier today:** five Claude art packages and a batch of Codex merges: V-lostcity-hill (hill softened, tower is the brightest mass), V-monterey-cliff (right bank gets strata and cooler colour), V-bluehole-roof third pass (colour/value only), V-eight-sites (review of the 8 non-hero spawns, Kamaʻehuakanaloa calmer), P2-sub-screen-portrait; Codex 2850-2890 (power-start guard, Challenger numerics, journey spec and mission-title wrapping, Your-sub focus cleanup, Lost City height verify).
+
+**Scores, readable / beautiful:** Titanic 4 / 3.7 (warm hull, but the sub sits on the bow in this pose); Lost City 3.5 / 3.4 (up from 3.2: tower reads, hill calm, hue brownish, foot sparse); Blue Hole 3.5 / 3.4 (up from 3.0: darker undercut roof, still a rolled-slab lip with uniform teeth); Beebe 4 / 3.6 (unchanged, strongest); Monterey 4 / 3.7 (up from 3.5: strata on both banks, no foot talus); Challenger 3.5 / 3.4; Endurance 3.5 / 3.4 (sub hangs high over a thin hull strip).
+
+**Biggest gaps:** Blue Hole lip silhouette, Lost City foot and hue, wreck openings where the sub overlaps the wreck. Heroes are still not consistently at 4; each pass buys 0.1-0.4 and the weakest heroes moved most this round.
+
+**Process:** Claude week 11% (~17%/day) with the reset Oct 22 06:59, so one package per run; Codex week 54%, 5h at 5% until 03:00, three briefs queued (2920-2940) and worktrees 2900/2910 finished but uncollected (watchdog stopped them). Last three main pushes were CI-cancelled by newer pushes, so no tag. efficiency.sh idle figures are still not date-filtered (see 2026-10-20 note); no process change.
+
+**New priorities (DIRECTOR Backlog):** Claude: V-bluehole-silhouette, V-eight-sites-lit (a: Kamaʻehuakanaloa), V-monterey-foot, V-challenger-ripples, V-lostcity-foot, V-spawn-sub-clear. Codex: 2920, 2930, 2940 queued; collect 2900/2910 first.
+
+**Stage:** about 82% to 1.0; 5-6 weeks (Claude capacity is the limiter; not cross-checked with Sol).
+
+**Needs owner:** decide whether the 150-300 m mission opening rule may be shortened for wrecks and landers; phone retest on the newest build.
+
 ## 2026-10-21 comprehensive review, Claude alone (golden 2026-10-21-003618)
 
 **Sol did not review this set:** Codex 5h was at 17% (< the 20% start gate), so `codex-review.sh start` exited 75 silently under nohup and reconcile then re-read the morning review. I discarded that output as stale (tool fixed, see PROCESS-LOG). Scores below stay inside Sol's 2026-10-20 bands where the images support it; the morning joint review's blockers still stand.

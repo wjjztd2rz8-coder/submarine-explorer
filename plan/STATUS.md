@@ -1,17 +1,17 @@
-# Status (2026-10-21, Claude-only review; Sol skipped on Codex budget)
+# Status (2026-10-21 evening, Claude-only review; Sol skipped on Codex budget)
 
-**Stage:** about 81% to 1.0. 5-6 weeks; Claude capacity (week at 17% until Oct 22) is the limiter.
+**Stage:** about 82% to 1.0. 5-6 weeks; Claude capacity (week at 11% until the Oct 22 reset) is the limiter.
 
 ## 1.0 table
 
-| Requirement                               | State                                                                                                                                            |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.7, Lost City 3.2, Blue Hole 3.0, Beebe 3.6, Monterey 3.5                                                       |
-| Other eight sites coherent                | Challenger 3.4, Endurance 3.5; mission-spawn acceptance for all eight not certified (V-spawn-capture queued)                                     |
-| New player understands first five minutes | Owner phone test: scan range, boost and events confuse; P2-scan-range and P2-boost-cut queued, then V-journeys                                   |
-| Acceptable Low-tier phone performance     | iPhone 17 Pro: Low great; High (opt-in only) stutters at Lost City; weaker phones untested                                                       |
-| Hosted CI green, releases tagged          | Main red on the latest runs from stale specs; most repaired 2026-10-20, one wildlife fixture still red (R-ci-green-f); deploy waits for green CI |
-| Code simple enough                        | Standing S-verify / S-bughunt; R-merge-verify queued so smoke-only gates can't hide a red e2e                                                    |
+| Requirement                               | State                                                                                                                                                             |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.7, Lost City 3.4, Blue Hole 3.4, Beebe 3.6, Monterey 3.7                                                                        |
+| Other eight sites coherent                | Challenger 3.4, Endurance 3.4; mission-spawn review done (2.6-3.2), follow-ups queued; acceptance acceptance for all eight not certified (V-spawn-capture queued) |
+| New player understands first five minutes | Owner phone test: scan range, boost and events confuse; P2-scan-range and P2-boost-cut queued, then V-journeys                                                    |
+| Acceptable Low-tier phone performance     | iPhone 17 Pro: Low great; High (opt-in only) stutters at Lost City; weaker phones untested                                                                        |
+| Hosted CI green, releases tagged          | Main red on the latest runs from stale specs; most repaired 2026-10-20, one wildlife fixture still red (R-ci-green-f); deploy waits for green CI                  |
+| Code simple enough                        | Standing S-verify / S-bughunt; R-merge-verify queued so smoke-only gates can't hide a red e2e                                                                     |
 
 ## Done recently
 
@@ -23,5 +23,6 @@ Unaided journeys at 1280x720 and phones (queued with Codex), CI triage (28/38 sh
 
 ## Needs owner
 
+- Decide whether the 150-300 m mission opening rule may be shortened for wrecks and landers (blocks nearer framing at Endurance, Bismarck, Challenger).
 - None for budget: the Claude reset is already used, so the Claude week (resets Oct 22) is paced by the run gate and Codex carries more work (dispatch head start widened to 30%).
 - A short phone retest once the P2 items land.
