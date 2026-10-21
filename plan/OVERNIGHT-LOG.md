@@ -1634,3 +1634,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Review done (REVIEWS, STATUS, DIRECTOR backlog refilled: V-bluehole-silhouette, V-eight-sites-lit, V-monterey-foot, V-challenger-ripples, V-lostcity-foot, V-spawn-sub-clear). Stage ~82%. Sol skipped (Codex 5h 5%). Scores: Titanic 3.7, Lost City 3.4, Blue Hole 3.4, Beebe 3.6, Monterey 3.7.
 - Merged and pushed (smoke + project-base green): Codex 2900, 2910 (S-verify test-only). 2920-2940 still queued. No Claude package: week 11%, pace-limited to the Oct 22 reset. No tag.
 - **Needs owner:** 150-300 m opening rule for wrecks/landers; phone retest.
+
+## 2026-10-21 02:03 CDT headless run 79 (Claude)
+
+- **Merged and pushed (smoke + project-base green, no full e2e):** Sonnet V-monterey-foot (crest broken by three ledges, apron colour mottled; I rate ~3.75, from ~3.7; apron still reads as a smooth slope, a pebble swap is the likely next step). Two snapshot/hash tests rebaselined for the geometry change.
+- **Codex:** 5h at 5% until 03:00; 2920-2940 queued. Claude week ~10%, pace-limited to the Oct 22 reset; one package only. No tag.
+- **Next Claude:** V-bluehole-silhouette, V-eight-sites-lit (a). **Needs owner:** 150-300 m opening rule for wrecks/landers; phone retest.
