@@ -8,6 +8,9 @@ import { makeSyntheticTile } from './helpers.js';
 import { buildTalusMesh, talusMeshSampler } from '../../src/world/props/geo/talus.js';
 import { canyonRockDetail, geoMaterial, vertexGlow } from '../../src/world/props/geo/materials.js';
 import { geoDetail } from '../../src/world/props/geo/detail.js';
+import { biomeFor } from '../../src/world/TerrainBiome.js';
+import { montereySlopeTint } from '../../src/world/MontereyBands.js';
+import survey from '../../data/tiles/monterey-canyon/meta.json';
 
 const tile = (id = 'monterey-canyon') =>
   makeSyntheticTile({
@@ -37,47 +40,140 @@ function meshes(t: Terrain): THREE.Mesh[] {
 }
 
 describe('Monterey fidelity profile', () => {
-  it('adds local density within the resident budget and shades mixed-density seams consistently', () => {
-    const t = new Terrain(tile(), config(), 'high');
-    try {
-      expect(t.stats.vertices).toBeLessThanOrEqual(config().maxVertices);
-      expect(Object.keys(t.stats.subdivisionCounts!)).toEqual(['2', '8']);
-      const seen = new Map<string, { y: number; normal: THREE.Vector3; cavity: number }>();
-      let seams = 0;
-      for (const m of meshes(t)) {
-        const p = m.geometry.getAttribute('position');
-        const n = m.geometry.getAttribute('normal');
-        const cav = m.geometry.getAttribute('aCavity');
-        const nx = new Set(Array.from({ length: p.count }, (_, i) => p.getX(i))).size;
-        const nz = new Set(Array.from({ length: p.count }, (_, i) => p.getZ(i))).size;
-        for (let i = 0; i < p.count - 2 * nx - 2 * nz; i++) {
-          const key = `${p.getX(i).toFixed(3)}|${p.getZ(i).toFixed(3)}`;
-          const normal = new THREE.Vector3().fromBufferAttribute(n, i);
-          const prev = seen.get(key);
-          if (prev) {
-            seams++;
-            expect(p.getY(i)).toBeCloseTo(prev.y, 4);
-            expect(normal.distanceTo(prev.normal)).toBeLessThan(1e-5);
-            expect(cav.getX(i)).toBe(prev.cavity);
-          } else seen.set(key, { y: p.getY(i), normal, cavity: cav.getX(i) });
-        }
-        // Every LOD index lands on a valid integer vertex (including the local 8/2/1 strides).
-        const chunks = (
-          t as unknown as { chunks: Array<{ mesh: THREE.Mesh; setLod(n: number): void }> }
-        ).chunks;
-        const chunk = chunks.find((c) => c.mesh === m)!;
-        for (const lod of [0, 1, 2]) {
-          chunk.setLod(lod);
-          const indices = m.geometry.getIndex()!;
-          for (let i = 0; i < indices.count; i++) expect(indices.getX(i)).toBeLessThan(p.count);
-        }
-        chunk.setLod(0);
-      }
-      expect(seams).toBeGreaterThan(100);
-    } finally {
-      t.dispose();
-    }
+  it('returns deterministic finite linear tint tuples over the survey extent and flat-to-steep normals', () => {
+    expect(biomeFor('monterey-canyon').vertexTint).toBe(montereySlopeTint);
+    const halfW = ((survey.cols - 1) * survey.cellsize_m_x) / 2;
+    const halfD = ((survey.rows - 1) * survey.cellsize_m_y) / 2;
+    for (const x of [-halfW, -13.25, 0, halfW])
+      for (const z of [-halfD, 0, 27.5, halfD])
+        for (const y of [survey.min_m, -800, 0, survey.max_m])
+          for (const degrees of [0, 4, 15, 30, 70, 89, 90]) {
+            const normalY = Math.cos((degrees * Math.PI) / 180);
+            const tint = montereySlopeTint(x, y, z, normalY);
+            expect(tint).toHaveLength(3);
+            expect(tint).toEqual(montereySlopeTint(x, y, z, normalY));
+            // The hook supplies linear multipliers, not bounded display RGB.
+            expect(tint.every((c) => Number.isFinite(c) && c >= 0)).toBe(true);
+            expect(tint.every((c) => Number.isFinite(Math.fround(c)))).toBe(true);
+          }
   });
+
+  it.each(['low', 'medium', 'high'] as const)(
+    '%s: bakes the hook at actual vertices through detail, pure survey and budget fallback paths',
+    async (tier) => {
+      for (const path of ['detail', 'survey', 'fallback'] as const) {
+        const cfg = config();
+        if (path === 'survey') {
+          cfg.detailStrength = 0;
+          cfg.verticalExaggeration = 2;
+        }
+        if (path === 'fallback') cfg.maxVertices = 10_000;
+        const t = new Terrain(tile(), cfg, tier);
+        try {
+          await t.texturesReady;
+          expect(meshes(t).length).toBeGreaterThan(0);
+          expect(t.stats.vertices).toBeLessThanOrEqual(cfg.maxVertices);
+          if (path === 'fallback') expect(t.stats.subdiv).toBe(1);
+          let vertices = 0;
+          for (const mesh of meshes(t)) {
+            const p = mesh.geometry.getAttribute('position');
+            const n = mesh.geometry.getAttribute('normal');
+            const color = mesh.geometry.getAttribute('color');
+            vertices += p.count;
+            expect(color.count).toBe(p.count);
+            expect(color.itemSize).toBe(3);
+            expect(color.array).toBeInstanceOf(Float32Array);
+            expect(color.normalized).toBe(false);
+            expect(Array.from(color.array).every((c) => Number.isFinite(c) && c >= 0)).toBe(true);
+            // Includes skirts; uses stored positions, true depth and stored normals.
+            for (let i = 0; i < p.count; i++) {
+              const expected = montereySlopeTint(
+                p.getX(i),
+                p.getY(i) / cfg.verticalExaggeration,
+                p.getZ(i),
+                n.getY(i),
+              ).map(Math.fround);
+              expect([color.getX(i), color.getY(i), color.getZ(i)]).toEqual(expected);
+            }
+            const material = mesh.material as THREE.MeshStandardMaterial;
+            expect(material.vertexColors).toBe(true);
+            expect(material.userData.uniforms.uStrata.value.y).toBe(0);
+            // Node uses the supported neutral texture placeholders. Inspect source
+            // composition only; this does not compile or execute a GPU program.
+            expect(material.userData.uniforms.tAlbA.value).toBeInstanceOf(THREE.DataTexture);
+            const shader = {
+              ...THREE.ShaderLib.standard,
+              uniforms: { ...THREE.ShaderLib.standard.uniforms },
+            };
+            material.onBeforeCompile(
+              shader as Parameters<typeof material.onBeforeCompile>[0],
+              {} as THREE.WebGLRenderer,
+            );
+            expect(shader.vertexShader).toContain('#include <color_vertex>');
+            expect(shader.fragmentShader).toContain('#include <color_fragment>');
+            expect(shader.fragmentShader.includes('#define TERRAIN_PBR_NORMALS')).toBe(
+              tier !== 'low',
+            );
+          }
+          expect(vertices).toBe(t.stats.vertices);
+        } finally {
+          t.dispose();
+        }
+      }
+    },
+  );
+
+  it.each(['low', 'medium', 'high'] as const)(
+    '%s: adds local density within the resident budget and shades seams consistently',
+    (tier) => {
+      const t = new Terrain(tile(), config(), tier);
+      try {
+        expect(t.stats.vertices).toBeLessThanOrEqual(config().maxVertices);
+        if (tier === 'high') expect(Object.keys(t.stats.subdivisionCounts!)).toEqual(['2', '8']);
+        const seen = new Map<
+          string,
+          { y: number; normal: THREE.Vector3; cavity: number; color: THREE.Vector3 }
+        >();
+        let seams = 0;
+        for (const m of meshes(t)) {
+          const p = m.geometry.getAttribute('position');
+          const n = m.geometry.getAttribute('normal');
+          const cav = m.geometry.getAttribute('aCavity');
+          const colors = m.geometry.getAttribute('color');
+          const nx = new Set(Array.from({ length: p.count }, (_, i) => p.getX(i))).size;
+          const nz = new Set(Array.from({ length: p.count }, (_, i) => p.getZ(i))).size;
+          for (let i = 0; i < p.count - 2 * nx - 2 * nz; i++) {
+            const key = `${p.getX(i).toFixed(3)}|${p.getZ(i).toFixed(3)}`;
+            const normal = new THREE.Vector3().fromBufferAttribute(n, i);
+            const color = new THREE.Vector3().fromBufferAttribute(colors, i);
+            const prev = seen.get(key);
+            if (prev) {
+              seams++;
+              expect(p.getY(i)).toBeCloseTo(prev.y, 4);
+              expect(normal.distanceTo(prev.normal)).toBeLessThan(1e-5);
+              expect(cav.getX(i)).toBe(prev.cavity);
+              expect(color.distanceTo(prev.color)).toBeLessThan(1e-5);
+            } else seen.set(key, { y: p.getY(i), normal, cavity: cav.getX(i), color });
+          }
+          // Every LOD index lands on a valid integer vertex (including the local 8/2/1 strides).
+          const chunks = (
+            t as unknown as { chunks: Array<{ mesh: THREE.Mesh; setLod(n: number): void }> }
+          ).chunks;
+          const chunk = chunks.find((c) => c.mesh === m)!;
+          for (const lod of [0, 1, 2]) {
+            chunk.setLod(lod);
+            expect(m.geometry.getAttribute('color')).toBe(colors);
+            const indices = m.geometry.getIndex()!;
+            for (let i = 0; i < indices.count; i++) expect(indices.getX(i)).toBeLessThan(p.count);
+          }
+          chunk.setLod(0);
+        }
+        expect(seams).toBeGreaterThan(100);
+      } finally {
+        t.dispose();
+      }
+    },
+  );
 
   it('samples the actual near triangles for collision and scan seats, including coarse patches', () => {
     const t = new Terrain(tile(), config(), 'high');

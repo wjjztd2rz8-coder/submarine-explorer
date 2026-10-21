@@ -37,7 +37,7 @@ describe('lost-city biome', () => {
     expect(tones.reduce((sum, tone) => sum + tone, 0) / tones.length).toBeGreaterThan(0.94);
   });
 
-  it('only opts Lost City and Monterey into baked colour, leaving geometry and LOD budgets unchanged', () => {
+  it('bakes Lost City and Monterey colour while retaining an uncoloured Hudson control and LOD budgets', () => {
     const makeTile = (id: string): Tile => ({
       meta: {
         id,
@@ -56,10 +56,13 @@ describe('lost-city biome', () => {
       expect(lost.stats.vertices).toBe(control.stats.vertices);
       expect(lost.stats.triangles).toBe(control.stats.triangles);
       expect(lost.stats.chunks).toBe(control.stats.chunks);
-      for (const child of lost.group.children) {
+      for (const child of [...lost.group.children, ...control.group.children]) {
         if (!(child instanceof THREE.Mesh)) continue;
         const colors = child.geometry.getAttribute('color');
         expect(colors.count).toBe(child.geometry.getAttribute('position').count);
+        expect(colors.itemSize).toBe(3);
+        expect(colors.array).toBeInstanceOf(Float32Array);
+        expect(colors.normalized).toBe(false);
         expect((child.material as THREE.MeshStandardMaterial).vertexColors).toBe(true);
         expect(
           (child.material as THREE.MeshStandardMaterial).userData.uniforms.uStrata.value.y,
@@ -67,8 +70,10 @@ describe('lost-city biome', () => {
         expect(Array.from(colors.array).every(Number.isFinite)).toBe(true);
       }
       for (const child of plain.group.children) {
-        if (child instanceof THREE.Mesh)
+        if (child instanceof THREE.Mesh) {
           expect(child.geometry.getAttribute('color')).toBeUndefined();
+          expect((child.material as THREE.MeshStandardMaterial).vertexColors).toBe(false);
+        }
       }
     } finally {
       lost.dispose();
