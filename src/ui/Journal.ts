@@ -24,8 +24,7 @@
  */
 
 import { el } from './dom.js';
-import {
-} from '../game/Cosmetics.js';
+import {} from '../game/Cosmetics.js';
 
 import type { GameEvents } from '../core/EventBus.js';
 import {
@@ -137,7 +136,6 @@ export class Journal {
   private readonly trap: FocusTrap;
   private readonly phoneMq: MediaQueryList | null;
   private readonly onPhoneChange = (): void => this.refresh();
-
 
   private store: DiscoveryReader = NO_STORE;
   private sites: JournalSite[] = [];
