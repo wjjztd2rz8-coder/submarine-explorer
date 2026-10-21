@@ -286,7 +286,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
     },
   },
   "lost-city": {
-    "biome": "7039e996007de016b1d455d041de82b41e1bb7b855c04bd44e95298d0f82cf26",
+    "biome": "f033e1c773a1b81d478da50805629645e805bc070066e99ae0659bdee5b1e7bb",
     "tiers": {
       "high": {
         "buffers": [
@@ -300,7 +300,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
         ],
         "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP#define TERRAIN_ROCK_DETAIL",
         "shader": "68f4afe00ae4c1890e8b3b930e5224c103bfab361ded6761159180ca9b246795",
-        "uniforms": "327345a4421a8d04dbb043f940226683fc535550a79931cf0b54c8bbd4aebd83",
+        "uniforms": "95b943a932b3eaee0071171fc313349c54e3763c7eac18eb7c19b0fe5d318aa7",
       },
       "low": {
         "buffers": [
@@ -314,7 +314,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
         ],
         "cache": "seabed-",
         "shader": "c5b52d11643ff475e64f7b78f949647518cadd6ea6ae67d6490e283dba6825a4",
-        "uniforms": "9c247bb14a995b093850fce6cb3e3769004b9b5ed9c90ece230e20a566971db4",
+        "uniforms": "d027f4cd7267f4a8983fa55ed0d11eaf70fc5725496304ce49f87598b789b01e",
       },
     },
   },

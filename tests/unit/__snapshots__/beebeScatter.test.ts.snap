@@ -158,11 +158,11 @@ exports[`1130: other sites retain byte-identical scatter geometry, placement, co
     },
   },
   "lost-city": {
-    "meshes": "d10be21c3ce778761488bf9cb4dfd59822e8db249223bf4082a5216b67d7ebd5",
+    "meshes": "3eafbb77a77b4a5a90636edb4d4003885bbfb6dd17ebfb3d01a81b3fc9234467",
     "stats": {
       "cells": 21,
       "drawCalls": 4,
-      "instances": 816,
+      "instances": 933,
     },
   },
   "monterey-canyon": {
