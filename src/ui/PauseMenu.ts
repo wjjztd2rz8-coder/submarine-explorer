@@ -10,6 +10,7 @@ export interface PauseObjective {
 export interface PauseActions {
   resume(): void;
   journal(): void;
+  subScreen(): void;
   settings(): void;
   controls(): void;
   /** The Controls entry's label: "How to play" on touch. */
@@ -64,6 +65,7 @@ export class PauseMenu {
     entry('Resume', actions.resume);
     entry('Objectives', () => this.showView('objectives'));
     entry('Journal', actions.journal);
+    entry('Your sub', actions.subScreen);
     entry('Settings', actions.settings);
     this.controlsButton = entry('Controls', actions.controls);
     entry('Data credits', () => this.showView('credits'));

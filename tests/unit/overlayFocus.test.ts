@@ -680,6 +680,7 @@ describe('migrated modal consumers', () => {
         credits: () => html(new Element()),
         objectives: () => [],
         journal: vi.fn(),
+        subScreen: vi.fn(),
         settings: vi.fn(),
         quit: vi.fn(),
       });
@@ -774,7 +775,7 @@ describe('migrated modal consumers', () => {
       true,
     ],
   ] as const)(
-    'opens debrief → Journal cosmetics after %s and reloads safely',
+    'opens debrief → Journal after %s and reloads safely',
     async (_name, raw, paint, readOnly) => {
       vi.spyOn(Journal.prototype, 'load').mockResolvedValue();
       const values = new Map([
@@ -797,7 +798,6 @@ describe('migrated modal consumers', () => {
         sites: [buildJournalSite({ id: 'reef', guide: null, pois: [], species: null })],
       });
       guide.setStore(new DiscoveryStore(storage));
-      guide.setProgress(progress);
       const debrief = new Debrief({ onFieldGuide: () => guide.open() });
       cleanup.push(() => debrief.dispose());
       const rating = progress.finish('reef', [{ primary: true, complete: true }]);
@@ -808,16 +808,8 @@ describe('migrated modal consumers', () => {
       journalButton.dispatchEvent(new Event('click'));
       await Promise.resolve();
       expect(guide.isOpen).toBe(true);
-      const select = (guide.root as unknown as Element)
-        .querySelectorAll('select')
-        .find((s) => s.dataset.cosmetic === 'paint')!;
-      expect(select.value).toBe(paint);
-      expect(select.disabled).toBe(readOnly);
-      if (!readOnly) {
-        select.value = 'stock';
-        select.dispatchEvent(new Event('change'));
-        expect(new Progress(new ProgressSave(storage)).cosmetics.paint).toBe('stock');
-      } else expect(storage.getItem(PROGRESS_STORAGE_KEY)).toBe(raw);
+      expect(progress.cosmetics.paint).toBe(paint);
+      if (readOnly) expect(storage.getItem(PROGRESS_STORAGE_KEY)).toBe(raw);
       press('Escape');
       expect(guide.isOpen).toBe(false);
       expect(debrief.isOpen).toBe(true);
@@ -1020,6 +1012,7 @@ function pauseMenu() {
   const pause = new PauseMenu({
     resume: () => pause.close(),
     journal: vi.fn(),
+    subScreen: vi.fn(),
     settings: vi.fn(),
     controls: vi.fn(),
     credits: () => html(element('DIV')),
@@ -1089,6 +1082,7 @@ describe('overlay policies across the app', () => {
     const home = new Home({
       dive: vi.fn(),
       journal: vi.fn(),
+      subScreen: vi.fn(),
       controls: vi.fn(),
       settings: () => screen.open(),
     });
@@ -1820,6 +1814,7 @@ describe('overlay policies across the app', () => {
     const home = new Home({
       dive: vi.fn(),
       journal: vi.fn(),
+      subScreen: vi.fn(),
       settings: vi.fn(),
       controls: vi.fn(),
     });
@@ -1852,6 +1847,7 @@ describe('overlay policies across the app', () => {
     const home = new Home({
       dive: vi.fn(),
       journal: vi.fn(),
+      subScreen: vi.fn(),
       settings: vi.fn(),
       controls: vi.fn(),
     });
@@ -2201,6 +2197,7 @@ describe('overlay host teardown', () => {
     const home = new Home({
       dive: vi.fn(),
       journal: vi.fn(),
+      subScreen: vi.fn(),
       settings: vi.fn(),
       controls: vi.fn(),
     });

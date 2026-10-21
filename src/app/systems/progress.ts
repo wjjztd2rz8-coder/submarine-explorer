@@ -74,9 +74,8 @@ export function createProgressSystem(): GameSystem {
   };
 }
 
-/** Journal owns the cosmetic picker; site selectors only display best ratings. */
+/** The Your sub screen owns the cosmetic picker; site selectors only display best ratings. */
 export function initializeProgressMenus(ctx: ShellContext, cleanup: Disposables): void {
-  ctx.journal.setProgress(ctx.progress);
   const update = (): void => {
     for (const selector of [ctx.missionSelect, ctx.homeSites]) selector.setProgress(ctx.progress);
   };

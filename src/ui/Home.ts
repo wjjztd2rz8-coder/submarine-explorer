@@ -7,6 +7,7 @@ export interface HomeActions {
   /** The one primary action: first run opens the opening briefing, afterwards the last mission. */
   dive(): void;
   journal(): void;
+  subScreen(): void;
   settings(): void;
   controls(): void;
 }
@@ -101,7 +102,7 @@ export class Home {
       return button;
     };
     // DOM order is the Tab order: Dive, Dive sites, Free dive, Daily dive,
-    // mode, Journal, Settings, Controls.
+    // mode, Journal, Your sub, Settings, Controls.
     this.diveButton = entry('Dive', actions.dive);
     this.diveButton.className = 'home-primary';
     this.diveSitesButton = entry('Dive sites', () => this.showSites(false, this.diveSitesButton));
@@ -114,6 +115,7 @@ export class Home {
     this.modeSelector = gameplay ? new ModeSelector('is-home', gameplay) : null;
     if (this.modeSelector) menu.append(this.modeSelector.root);
     entry('Journal', actions.journal);
+    entry('Your sub', actions.subScreen);
     entry('Settings', actions.settings);
     entry('Controls', actions.controls);
 

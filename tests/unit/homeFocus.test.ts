@@ -93,6 +93,7 @@ beforeEach(() => {
   home = new Home({
     dive,
     journal: vi.fn(),
+    subScreen: vi.fn(),
     settings: vi.fn(),
     controls: vi.fn(),
   });

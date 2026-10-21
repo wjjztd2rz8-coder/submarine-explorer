@@ -113,6 +113,7 @@ it('keeps the downloaded deep Daily accessible across mode changes and releases 
   ctx.home = new Home({
     dive: vi.fn(),
     journal: vi.fn(),
+    subScreen: vi.fn(),
     settings: vi.fn(),
     controls: vi.fn(),
   });

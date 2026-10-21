@@ -25,12 +25,7 @@
 
 import { el } from './dom.js';
 import {
-  COSMETIC_CHOICES,
-  cosmeticRequirement,
-  discoveryCount,
-  type CosmeticSlot,
 } from '../game/Cosmetics.js';
-import type { Progress } from '../game/Progress.js';
 
 import type { GameEvents } from '../core/EventBus.js';
 import {
@@ -143,10 +138,6 @@ export class Journal {
   private readonly phoneMq: MediaQueryList | null;
   private readonly onPhoneChange = (): void => this.refresh();
 
-  private progress: Progress | null = null;
-  setProgress(progress: Progress): void {
-    this.progress = progress;
-  }
 
   private store: DiscoveryReader = NO_STORE;
   private sites: JournalSite[] = [];
@@ -711,84 +702,9 @@ export class Journal {
     return ul;
   }
 
-  /** A single picker in the existing Journal front page; sub choices apply on the next dive. */
-  private renderCosmetics(): void {
-    const progress = this.progress;
-    if (!progress) return;
-    const found = discoveryCount(progress.snapshot());
-    const next = Math.min(
-      ...Object.values(COSMETIC_CHOICES).flatMap((defs) =>
-        defs.flatMap((def) =>
-          def.reward.kind === 'discoveries' && !progress.ownsCosmetic(def)
-            ? [def.reward.total]
-            : [],
-        ),
-      ),
-    );
-    const section = el('details', 'jr-category');
-    section.dataset.category = 'cosmetics';
-    section.open = this.expandedCategories.get('cosmetics') ?? false;
-    section.addEventListener('toggle', () => {
-      if (section.isConnected) this.expandedCategories.set('cosmetics', section.open);
-    });
-    const summary = el('summary', 'jr-group', 'Cosmetics');
-    summary.dataset.category = 'cosmetics';
-    section.append(summary);
-    section.append(
-      el(
-        'p',
-        'jr-empty',
-        `${found} discoveries${Number.isFinite(next) ? ` · next unlock at ${next}` : ''} · sub changes next dive`,
-      ),
-    );
-    for (const [slot, label] of [
-      ['paint', 'Sub paint'],
-      ['trim', 'Lamp trim'],
-      ['decal', 'Sub decal'],
-      ['frame', 'Photo frame'],
-    ] as const) {
-      const row = el('label', 'jr-group jr-cosmetic', label);
-      const select = el('select', 'jr-nav-item');
-      const swatch = el('span', 'jr-swatch');
-      const tint = (id: string): string => {
-        const def: { id: string; swatch?: string; color?: unknown } | undefined = COSMETIC_CHOICES[
-          slot
-        ].find((choice) => choice.id === id);
-        const color = def?.swatch ?? def?.color;
-        return typeof color === 'string' ? color : 'transparent';
-      };
-      select.setAttribute('aria-label', label);
-      select.dataset.cosmetic = slot;
-      select.disabled = progress.save.readOnly;
-      for (const def of COSMETIC_CHOICES[slot]) {
-        const available = progress.ownsCosmetic(def);
-        const option = el(
-          'option',
-          undefined,
-          available ? def.name : `${def.name} · ${cosmeticRequirement(def)}`,
-        );
-        option.value = def.id;
-        option.disabled = !available;
-        select.append(option);
-      }
-      select.value = progress.cosmetics[slot];
-      swatch.style.background = tint(select.value);
-      select.addEventListener('change', () => {
-        progress.selectCosmetic(slot as CosmeticSlot, select.value);
-        swatch.style.background = tint(select.value);
-      });
-      const pick = el('span', 'jr-cosmetic-pick');
-      pick.append(swatch, select);
-      row.append(pick);
-      section.append(row);
-    }
-    this.body.append(section);
-  }
-
   private renderFront(sites: JournalSite[]): void {
     const b = this.body;
     b.append(el('h2', 'jr-title', 'Dive journal'));
-    this.renderCosmetics();
     let logged = 0;
     let total = 0;
     for (const s of sites) {

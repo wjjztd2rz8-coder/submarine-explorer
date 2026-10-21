@@ -13,6 +13,7 @@ import { Globe } from '../../ui/Globe.js';
 import { Home } from '../../ui/Home.js';
 import { MissionSelect, missionUrl, tileUrl } from '../../ui/MissionSelect.js';
 import { PauseMenu } from '../../ui/PauseMenu.js';
+import { SubScreen } from '../../ui/SubScreen.js';
 import type { AppState, ShellContext } from '../context.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
@@ -77,10 +78,12 @@ export function initializeShell(ctx: ShellContext): void {
     const known = ctx.missionSummaries.some((entry) => entry.id === app.lastSite);
     return app.lastSite && known ? app.lastSite : FIRST_MISSION_ID;
   };
+  const subScreen = new SubScreen(() => ctx.progress);
   const home = new Home(
     {
       dive: () => selectMission(diveSite()),
       journal: () => journal.open(),
+      subScreen: () => subScreen.open(),
       settings: () => ctx.settingsScreen.open(),
       controls: () => ctx.controlsCard.open(),
     },
@@ -117,6 +120,7 @@ export function initializeShell(ctx: ShellContext): void {
     ? new PauseMenu({
         resume: () => ctx.setAppState('dive'),
         journal: () => journal.open(),
+        subScreen: () => subScreen.open(),
         settings: () => ctx.settingsScreen.open(),
         controls: () => ctx.controlsCard?.open(),
         controlsLabel: () => (ctx.controlsCard?.device === 'touch' ? 'How to play' : 'Controls'),
@@ -138,6 +142,7 @@ export function initializeShell(ctx: ShellContext): void {
   cleanup.add(() => {
     disposed = true;
     pause?.dispose();
+    subScreen.dispose();
     homeSites.dispose();
     home.dispose();
     missionSelect.dispose();

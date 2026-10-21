@@ -97,7 +97,7 @@ async function scan(page: Page, id: string): Promise<void> {
 }
 
 // Guards duplicate discoveries, cosmetic persistence and loss of star/debrief credit after the reward cut.
-test('discoveries unlock Journal cosmetics; photo bonus and best stars survive reload', async ({
+test('discoveries unlock Your sub cosmetics; photo bonus and best stars survive reload', async ({
   page,
 }) => {
   const errors: string[] = [];
@@ -119,18 +119,21 @@ test('discoveries unlock Journal cosmetics; photo bonus and best stars survive r
   ).toHaveCount(0);
   await page
     .locator('.pause-actions')
-    .getByRole('button', { name: 'Journal', exact: true })
+    .getByRole('button', { name: 'Your sub', exact: true })
     .click();
-  const journal = page.locator('.journal');
-  await expect(journal).toBeVisible();
-  // The existing Journal navigation leads to its front page on desktop and phone.
-  await journal.getByRole('button', { name: 'Front page', exact: true }).click();
-  await journal.getByText('Cosmetics', { exact: true }).click();
-  await journal.getByLabel('Sub paint', { exact: true }).selectOption('red');
-  await journal.getByLabel('Photo frame', { exact: true }).focus();
-  await journal.getByLabel('Photo frame', { exact: true }).selectOption('white');
-  await expect(journal.getByLabel('Sub paint', { exact: true })).toHaveValue('red');
-  await expect(journal.getByLabel('Photo frame', { exact: true })).toBeFocused();
+  const sub = page.locator('.sub-screen');
+  await expect(sub).toBeVisible();
+  await sub.getByRole('button', { name: 'Red', exact: true }).click();
+  await sub
+    .getByRole('group', { name: 'Photo frame' })
+    .getByRole('button', { name: 'White' })
+    .focus();
+  await page.keyboard.press('Enter');
+  await expect(sub.getByRole('button', { name: 'Red', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(sub.getByRole('button', { name: 'White', exact: true }).last()).toBeFocused();
   const held = await page.evaluate(
     () => (window.__game as { sub: { position: { y: number } } }).sub.position.y,
   );
@@ -143,7 +146,7 @@ test('discoveries unlock Journal cosmetics; photo bonus and best stars survive r
   ).toBe(held);
   await page.keyboard.press('Escape');
   await page.clock.fastForward(50);
-  await expect(journal).toBeHidden();
+  await expect(sub).toBeHidden();
   await expect(page.locator('.pause-menu')).toBeVisible();
   await page.locator('.pause-actions button', { hasText: /^Resume$/ }).click();
   await page.keyboard.press('p');
@@ -195,13 +198,17 @@ test('discoveries unlock Journal cosmetics; photo bonus and best stars survive r
   expect(errors).toEqual([]);
 });
 
-// Guards phone access to the single picker and removal of the old purchase/access surface.
-// Guards migrated grants showing as selected swatches, misleading unlock hints and refresh losing focus.
-for (const width of [1280, 390])
-  test(`migrated Journal cosmetics keep labels, swatches and keyboard focus at ${width}px`, async ({
+// Guards migrated grants showing as pressed swatches, locked choices staying disabled, phone-sized
+// touch targets, no horizontal overflow, and the picker no longer living on the Journal front page.
+for (const [width, height] of [
+  [1280, 720],
+  [390, 844],
+  [844, 390],
+])
+  test(`Your sub shows migrated cosmetics with touch-sized swatches at ${width}x${height}`, async ({
     page,
   }) => {
-    await page.setViewportSize({ width, height: 844 });
+    await page.setViewportSize({ width, height });
     await page.addInitScript(() => {
       if (!localStorage.getItem('subexplorer.progress.v1'))
         localStorage.setItem(
@@ -213,81 +220,53 @@ for (const width of [1280, 390])
           }),
         );
     });
-    for (let round = 0; round < 2; round++) {
-      await page.goto('/');
-      await homeReady(page, true);
-      await page
-        .locator('.home-menu')
-        .getByRole('button', { name: 'Journal', exact: true })
-        .click();
-      const journal = page.locator('.journal');
-      const summary = journal.locator('summary').filter({ hasText: /^Cosmetics$/ });
-      await summary.click();
-      await expect(journal.locator('.jr-empty').filter({ hasText: '0 discoveries' })).toContainText(
-        'next unlock at 20',
+    await page.goto('/');
+    await homeReady(page, true);
+    await page.locator('.home-menu').getByRole('button', { name: 'Journal', exact: true }).click();
+    await expect(page.locator('.journal')).toBeVisible();
+    await expect(page.locator('.journal [data-cosmetic]')).toHaveCount(0);
+    await page.locator('.jr-close').click();
+    await page.locator('.home-menu').getByRole('button', { name: 'Your sub', exact: true }).click();
+    const sub = page.locator('.sub-screen');
+    await expect(sub).toBeVisible();
+    for (const [group, name] of [
+      ['Sub paint', 'Gold'],
+      ['Lamp trim', 'Amber'],
+      ['Sub decal', 'Finder'],
+      ['Photo frame', 'Gold'],
+    ])
+      await expect(
+        sub.getByRole('group', { name: group }).getByRole('button', { name, exact: true }),
+      ).toHaveAttribute('aria-pressed', 'true');
+    await expect(sub.getByRole('button', { name: /^Silver/ })).toBeDisabled();
+    await expect(sub.locator('canvas')).toBeVisible();
+    const boxes = await sub
+      .locator('[data-cosmetic]')
+      .evaluateAll((els) =>
+        els.map((e) => ({
+          w: e.getBoundingClientRect().width,
+          h: e.getBoundingClientRect().height,
+        })),
       );
-      for (const [name, value, color] of [
-        ['Sub paint', 'gold', 'rgb(226, 178, 60)'],
-        ['Lamp trim', 'amber', 'rgb(255, 212, 154)'],
-        ['Sub decal', 'finder', 'rgba(0, 0, 0, 0)'],
-        ['Photo frame', 'gold', 'rgb(212, 180, 107)'],
-      ]) {
-        const select = journal.getByRole('combobox', { name, exact: true });
-        await expect(select).toHaveValue(value);
-        await expect(select.locator('..').locator('.jr-swatch')).toHaveCSS(
-          'background-color',
-          color,
-        );
-        await page.keyboard.press('Tab');
-        await select.focus();
-        expect(await select.evaluate((el) => getComputedStyle(el).outlineStyle)).toBe('solid');
-        await page.keyboard.press('Tab');
-        await page.keyboard.press('Shift+Tab');
-        await expect(select).toBeFocused();
-      }
-      const paint = journal.getByRole('combobox', { name: 'Sub paint', exact: true });
-      await paint.focus();
-      // Crossing the Journal's phone breakpoint rebuilds the page, as rotation does.
-      await page.setViewportSize({ width: width === 390 ? 1280 : 390, height: 844 });
-      await expect(summary.locator('..')).toHaveJSProperty('open', true);
-      await expect(paint).toBeFocused();
-      await paint.selectOption('red');
-      await paint.selectOption('gold'); // Write v2 and check the migrated grants after reload.
-      await journal.locator('.jr-close').click();
-      await page.setViewportSize({ width, height: 844 });
-    }
+    expect(boxes.length).toBeGreaterThan(10);
+    expect(boxes.every((b) => b.w >= 44 && b.h >= 44)).toBe(true);
+    expect(await sub.locator('.ss-panel').evaluate((p) => p.scrollWidth <= p.clientWidth)).toBe(
+      true,
+    );
+    await page.screenshot({
+      path: `.cache/codex/shots/P2-sub-screen/sub-${width}x${height}.png`,
+    });
+    await page.keyboard.press('Escape');
+    await expect(sub).toBeHidden();
+    await expect(page.locator('.home-menu')).toBeVisible();
   });
 
-test('phone Journal offers cosmetics and all downloaded missions stay open in Realistic', async ({
-  page,
-}) => {
+test('all downloaded missions stay open in Realistic', async ({ page }) => {
   await realistic(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await homeReady(page, true);
-  await page.locator('.home-menu').getByRole('button', { name: 'Journal', exact: true }).click();
-  const journal = page.locator('.journal');
-  await expect(journal).toBeVisible();
-  await journal.getByText('Cosmetics', { exact: true }).click();
-  await expect(journal.getByLabel('Sub paint', { exact: true })).toHaveValue('stock');
-  // Guards the formerly unreachable lamp slot alongside every existing cosmetic control.
-  await expect(journal.getByLabel('Lamp trim', { exact: true })).toHaveValue('stock');
-  await expect(journal.getByLabel('Sub decal', { exact: true })).toHaveValue('stock');
-  await expect(journal.getByLabel('Photo frame', { exact: true })).toHaveValue('stock');
-  // Preserve the workshop's phone touch-target guard on its replacement controls.
-  const controls = await journal.locator('[data-cosmetic]').evaluateAll((elements) =>
-    elements.map((element) => ({
-      width: element.getBoundingClientRect().width,
-      height: element.getBoundingClientRect().height,
-    })),
-  );
-  expect(controls).toHaveLength(4);
-  expect(controls.every((control) => control.width >= 44 && control.height >= 44)).toBe(true);
-  expect(
-    await journal.locator('.jr-panel').evaluate((panel) => panel.scrollWidth <= panel.clientWidth),
-  ).toBe(true);
-  await journal.locator('.jr-close').click();
-  await page.locator('.home-menu button', { hasText: /^Dive sites$/ }).click();
+  await page.locator('.home-menu').getByRole('button', { name: 'Dive sites', exact: true }).click();
   await expect(page.locator('.home-sites .is-mission:not(:disabled)')).toHaveCount(13);
   await expect(page.locator('.upgrades')).toHaveCount(0);
 });
