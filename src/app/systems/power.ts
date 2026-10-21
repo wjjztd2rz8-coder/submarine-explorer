@@ -8,15 +8,18 @@ import { Power, startingReserves } from '../../game/Power.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
-const cleanup = new Disposables();
-
 export function createPowerSystem(): GameSystem {
+  const cleanup = new Disposables();
   let powerEmergencyStarted = false;
   let freeDivePowerDebriefShown = false;
   return {
     name: 'power',
     dispose: () => cleanup.dispose(),
     init(ctx) {
+      let disposed = false;
+      cleanup.add(() => {
+        disposed = true;
+      });
       const { bus, route, discovery } = ctx;
       const power = new Power(ctx.effective.power, ctx.effective.gameplay.batteryOxygen);
       ctx.power = power;
@@ -27,7 +30,7 @@ export function createPowerSystem(): GameSystem {
           // The descent to a deep start already used some battery.
           void discovery.ready.then(() =>
             queueMicrotask(() => {
-              if (!ctx.effective.gameplay.batteryOxygen || !route) return;
+              if (disposed || !ctx.effective.gameplay.batteryOxygen || !route) return;
               const depth = Math.max(0, -ctx.sub.position.y);
               if (depth < 25) return;
               const reserve = startingReserves(depth, ctx.effective.submarine, ctx.effective.power);
