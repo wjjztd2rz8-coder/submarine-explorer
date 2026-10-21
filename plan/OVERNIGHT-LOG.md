@@ -1601,3 +1601,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (smoke + project-base green, no full e2e):** Sonnet P2-sub-screen-portrait ("Your sub" fits one 390x844 screen, all four slot groups visible, 44px targets kept; I rate ~3.8). Not checked on shorter phones (375x667 would likely still scroll); the agent's full e2e timed out, so the portrait-fit test was not proven to fail on the old CSS.
 - **Codex:** 5h at 1% until 21:45; 2850-2880 queued. Claude week ~16%, pace-limited until the Oct 22 reset, so only one package this run.
 - **Next Claude:** V-bluehole-roof, V-lostcity-hill, V-monterey-cliff. No tag (CI for newest SHAs pending). **Needs owner:** phone retest on the newest build; real-phone Low play.
+
+## 2026-10-20 21:16 CDT headless run 74 (Claude)
+
+- **Merged and pushed (smoke + project-base green, no full e2e):** Sonnet V-lostcity-hill (hill softened and darkened via per-site terrain/colour data; tower is now the brightest mass; I rate ~3.6, up from ~3.2; sediment still brownish, foot rubble sparse, Low smooth). Two beebe snapshots re-baselined for the intended scatter change. One package only (agent took 30 min; Claude week ~15%, pace-limited to the Oct 22 reset).
+- **Codex:** 5h near 0 until reset; 2850-2880 queued. No tag (CI pending).
+- **Next Claude:** V-monterey-cliff, V-bluehole-roof (third pass needs a reference composition). **Needs owner:** phone retest on the newest build; real-phone Low play.
