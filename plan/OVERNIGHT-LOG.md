@@ -1621,3 +1621,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged (smoke + project-base green, no full e2e):** Sonnet V-bluehole-roof third pass, colour/value only (roof and lip take wall strata, underside and interior dark and cool, pendants warm-grey, not white); I rate ~3.4 (self 3.3, from ~3.0). Still open: chunky rolled-slab lip outline, uniform tooth pendants, no light shaft; a fourth pass should be silhouette only. Two snapshots re-baselined for the colour change.
 - **Codex:** 2850, 2860, 2870 running in worktrees (not collected this run); 2880 queued. Claude week ~13%, pace-limited to the Oct 22 reset; one package only (agent took 53 min).
 - **Next Claude:** V-eight-sites, V-challenger-ripples. No tag (CI pending). **Needs owner:** phone retest on the newest build; real-phone Low play.
+
+## 2026-10-21 00:36 CDT headless run 77 (Claude)
+
+- **Merged and pushed (smoke + project-base green, no full e2e):** Codex 2850 (power-start disposal guard), 2860 (Challenger numerics tests), 2870 (journey spec plus mission-title wrapping CSS), 2880 (Your sub focus/Journal cleanup, tests), 2890 (clean Lost City height verify). Sonnet V-eight-sites: review of the 8 non-hero spawns (ratings 2.6-3.2); only Kamaʻehuakanaloa improved (2.2 to 2.7, calmer bed stain). Follow-ups ranked in DIRECTOR item 5. Codex worktrees had a stray reformat of V-monterey-cliff.md, reverted.
+- **Codex:** 2900 and 2910 worktrees still open (stopped by the budget watchdog, not collected); 2920, 2930, 2940 queued, waiting on Codex 5h (5%, resets 03:00). Claude week 12%, pace-limited to the Oct 22 reset; one package only.
+- **CI:** the last three main pushes' runs were cancelled by newer pushes, so no tag this run.
+- **Needs owner:** decide whether the 150-300 m mission opening rule may be shortened for wrecks and landers (blocks nearer framing at Endurance, Bismarck, Challenger); phone retest on the newest build.
