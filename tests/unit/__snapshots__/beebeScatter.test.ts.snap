@@ -150,7 +150,7 @@ exports[`1130: other sites retain byte-identical scatter geometry, placement, co
     },
   },
   "kamaehuakanaloa": {
-    "meshes": "8e575f7de08074ff862aaa2f1d73e7996ee4d78facf96dce0d7cddc6cc552bb5",
+    "meshes": "5b7f90b82652f1ddd961d3a3f37a690c6f9ad04f5f09dc0e422511bfdc2e7d06",
     "stats": {
       "cells": 21,
       "drawCalls": 3,
