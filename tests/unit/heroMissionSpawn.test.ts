@@ -6,7 +6,7 @@ import { makeConfig } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import type { InputState } from '../../src/core/Input.js';
 import { Mission, parseMission } from '../../src/game/Mission.js';
-import { Scanner, resolveScanRadius } from '../../src/game/Scanner.js';
+import { Scanner, resolveScanRadius, type ScannerConfig } from '../../src/game/Scanner.js';
 import { defaultSettings } from '../../src/core/Save.js';
 import { resolveEffective } from '../../src/game/EffectiveSettings.js';
 import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
@@ -245,9 +245,12 @@ for (const { site, primary, before } of heroes) {
             setItem: (key: string, value: string) => {
               saved.set(key, value);
             },
+            removeItem: (key: string) => {
+              saved.delete(key);
+            },
           };
           const store = new DiscoveryStore(storage);
-          const scanConfig = runtimeContacts ? effective.scan : config.scan;
+          const scanConfig: ScannerConfig = runtimeContacts ? effective.scan : config.scan;
           const scanner = new Scanner(scanConfig, bus, runtimeContacts ? store : null);
           const multiplier = runtimeContacts
             ? effective.sensor.scanRadiusMultiplier

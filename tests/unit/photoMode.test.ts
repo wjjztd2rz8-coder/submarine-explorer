@@ -358,7 +358,7 @@ function automaticStillFixture() {
   // Deterministic SOI/EOI bytes admitted by PhotoStore, without decoding an image.
   const image = 'data:image/jpeg;base64,/9j/2Q==';
   const thumbnail = vi.mocked(canvasThumbnail).mockReturnValue(image);
-  const dives: ReturnType<typeof createDive>[] = [];
+  const dives: Array<{ runner: SystemRunner }> = [];
   function createDive() {
     const data = new Map<string, string>();
     const storage = {
