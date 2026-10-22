@@ -40,6 +40,7 @@ const allTierFloorSites = [
   'blake-plateau-corals',
   'hudson-canyon',
   'hunga-tonga-caldera',
+  'kamaehuakanaloa',
 ];
 
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
@@ -92,6 +93,7 @@ for (const site of lowReadabilitySites) {
       sub: { position: new Vector3(0, -720, 0) },
       expose: () => {},
     } as unknown as GameContext;
+    const fill = siteManifests.siteManifest(site)!.atmosphere!.tiers!.low!.intensity;
     atmosphereSystem.init!(ctx);
     try {
       ctx.headlights.setEnabled(false);
@@ -105,8 +107,8 @@ for (const site of lowReadabilitySites) {
         const frame = { dt: 1 / 60 } as FrameState;
         atmosphereSystem.frame!['env.atmosphere']!(frame, ctx);
         expect(ctx.atmosphere.ambient).toBeInstanceOf(AmbientLight);
-        expect(ctx.atmosphere.ambient.intensity).toBe(6);
-        expect(frame.atmo.ambientIntensity).toBe(6);
+        expect(ctx.atmosphere.ambient.intensity).toBe(fill);
+        expect(frame.atmo.ambientIntensity).toBe(fill);
         expect(ctx.headlights.on).toBe(false);
       }
     } finally {

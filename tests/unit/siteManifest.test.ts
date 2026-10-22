@@ -757,7 +757,13 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
     'kamaehuakanaloa',
     'lost-city',
   ];
-  const allTiers = ['bismarck', 'blake-plateau-corals', 'hudson-canyon', 'hunga-tonga-caldera'];
+  const allTiers = [
+    'bismarck',
+    'blake-plateau-corals',
+    'hudson-canyon',
+    'hunga-tonga-caldera',
+    'kamaehuakanaloa',
+  ];
   for (const id of ids) {
     const atmosphere = siteManifest(id)!.atmosphere;
     if (id === 'monterey-canyon') {
@@ -773,7 +779,13 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
           ? { lamps: { intensity: 0.45, distance: 1, fillIntensity: 0.35, fillDistance: 1 } }
           : {}),
         tiers: Object.fromEntries(
-          tiers.map((tier) => [tier, { depthM: -200, color: 0x879399, intensity: 6 }]),
+          tiers.map((tier) => [
+            tier,
+            // Kamaʻehuakanaloa's spawn hangs in open water over a dark slope, so its fill is lifted.
+            id === 'kamaehuakanaloa'
+              ? { depthM: -200, color: 0x9aa6ad, intensity: 18 }
+              : { depthM: -200, color: 0x879399, intensity: 6 },
+          ]),
         ),
       });
     } else expect(atmosphere).toBeUndefined();

@@ -306,14 +306,16 @@ export const BIOMES: Record<string, Biome> = {
     patch: 0.3,
     rockBias: 0.1,
   },
-  // Rust-stained basalt: a broad faint stain, not the speckle of the generic volcanic look.
+  // Iron-oxide silt over basalt: a warm, pale-rust bed that stays readable in the lamp-and-ambient light.
   kamaehuakanaloa: {
     ...VOLCANIC,
-    stain: 0x8a4a22,
-    colorA: 0x55514e,
-    colorB: 0x6a645c,
-    stainAmount: 0.2,
-    patch: 0.45,
+    a: 'silt',
+    b: 'basalt',
+    stain: 0x6e3a1c,
+    colorA: 0x8a6b54,
+    colorB: 0x7a6a5c,
+    stainAmount: 0.12,
+    patch: 0.3,
   },
   // Cold-water coral rubble on carbonate sand.
   'blake-plateau-corals': {
