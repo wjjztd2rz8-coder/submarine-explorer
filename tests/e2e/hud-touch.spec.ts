@@ -597,6 +597,7 @@ freshTest.describe('large UI and menu reachability', () => {
             'Daily dive',
             'Mode',
             'Journal',
+            'Your sub',
             'Settings',
             'Controls',
           ]);

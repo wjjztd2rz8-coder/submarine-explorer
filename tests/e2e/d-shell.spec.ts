@@ -100,12 +100,13 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await expect(page.locator('.home-screen')).toBeVisible();
   // Preserve all actions and the title menu’s DOM/Tab order, including Daily and mode.
   const existingActions = page.locator('.home-menu > button:not(.daily-card)');
-  await expect(existingActions).toHaveCount(6);
+  await expect(existingActions).toHaveCount(7);
   await expect(existingActions).toHaveText([
     /^Dive(:|$)/,
     'Dive sites',
     'Free dive',
     'Journal',
+    'Your sub',
     'Settings',
     'Controls',
   ]);
@@ -128,13 +129,14 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
     'Daily dive',
     'Mode',
     'Journal',
+    'Your sub',
     'Settings',
     'Controls',
   ]);
   await expect(page.locator('.home-menu .daily-card')).toHaveCount(1);
   await expect(page.locator('.home-menu .mode-advanced-toggle')).toHaveCount(1);
-  // Six actions, Daily and Advanced; modes are native radios, not buttons.
-  await expect(page.locator('.home-menu button')).toHaveCount(8);
+  // Seven actions, Daily and Advanced; modes are native radios, not buttons.
+  await expect(page.locator('.home-menu button')).toHaveCount(9);
   const mode = page.locator('.home-menu').getByRole('radiogroup', { name: 'Game mode' });
   await expect(mode.getByRole('radio')).toHaveCount(2);
   await expect(mode.getByRole('radio', { name: 'Arcade' })).toBeChecked();
