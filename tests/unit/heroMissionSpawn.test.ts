@@ -6,7 +6,12 @@ import { makeConfig } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import type { InputState } from '../../src/core/Input.js';
 import { Mission, parseMission } from '../../src/game/Mission.js';
-import { Scanner } from '../../src/game/Scanner.js';
+import { Scanner, resolveScanRadius } from '../../src/game/Scanner.js';
+import { defaultSettings } from '../../src/core/Save.js';
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
+import { isEntryUnlocked, loadJournalSite } from '../../src/game/JournalData.js';
+import { PropContact } from '../../src/world/props/Wiring.js';
 import { Submarine } from '../../src/sub/Submarine.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
@@ -208,12 +213,19 @@ for (const { site, primary, before } of heroes) {
           }
         }
 
-        {
+        // Retain the original hero routes; Monterey also exercises the runtime
+        // contact stage and resolved equipment before the beam sees the position.
+        for (const runtimeContacts of site === 'monterey-canyon' ? [false, true] : [false]) {
+          const effective = resolveEffective(defaultSettings(config), 'arcade', null, config);
           // Exercise actual Arcade physics and scanner time, rather than infer
           // accessibility from distance or teleport the pilot to the contact.
           const sub = new Submarine(config.submarine, terrain);
           sub.setHullClass(mission.hull_class!);
-          sub.setConfig({ ...config.submarine, ...config.speedProfiles.fast });
+          sub.setConfig(
+            runtimeContacts
+              ? effective.submarine
+              : { ...config.submarine, ...config.speedProfiles.fast },
+          );
           sub.reset(pose.x, pose.y, pose.z, pose.yaw);
           const mesh = new SubMesh({ length: 26, hullClass: mission.hull_class!, tier });
           mesh.setView('chase');
@@ -227,12 +239,35 @@ for (const { site, primary, before } of heroes) {
           const run = new Mission({ def: mission, bus });
           run.resolve(pois.map((p) => p.id));
           run.start(site);
-          const scanner = new Scanner(config.scan, bus);
-          const multiplier = config.sensorPresets.extended.scanRadiusMultiplier;
+          const saved = new Map<string, string>();
+          const storage = {
+            getItem: (key: string) => saved.get(key) ?? null,
+            setItem: (key: string, value: string) => {
+              saved.set(key, value);
+            },
+          };
+          const store = new DiscoveryStore(storage);
+          const scanConfig = runtimeContacts ? effective.scan : config.scan;
+          const scanner = new Scanner(scanConfig, bus, runtimeContacts ? store : null);
+          const multiplier = runtimeContacts
+            ? effective.sensor.scanRadiusMultiplier
+            : config.sensorPresets.extended.scanRadiusMultiplier;
+          const contact = new PropContact(props, bus, config.props, config.submarine.hullRadius);
+          let contactFrames = 0;
+          let correctionM = 0;
+          let maximumStress = 0;
+          const beforeContact = new Vector3();
           scanner.setTargets(
             pois.map((p) => ({
               ...p,
-              radius: missionApproachScanRadius(site, p.radius) * multiplier,
+              radius: runtimeContacts
+                ? resolveScanRadius(
+                    (objectives.some((o) => o.poi === p.id)
+                      ? missionApproachScanRadius(site, p.radius)
+                      : p.radius) * multiplier,
+                    scanConfig,
+                  )
+                : missionApproachScanRadius(site, p.radius) * multiplier,
             })),
           );
           const input = {
@@ -249,7 +284,16 @@ for (const { site, primary, before } of heroes) {
             cycleSimSpeed: false,
             togglePhotoMode: false,
           } satisfies InputState;
-          const scanRadius = missionApproachScanRadius(site, first.radius) * multiplier;
+          const scanRadius = runtimeContacts
+            ? resolveScanRadius(
+                missionApproachScanRadius(site, first.radius) * multiplier,
+                scanConfig,
+              )
+            : missionApproachScanRadius(site, first.radius) * multiplier;
+          if (runtimeContacts) {
+            expect(range, 'resolved sensors still require an approach').toBeGreaterThan(scanRadius);
+            expect(store.isDiscovered(site, first.id)).toBe(false);
+          }
           let completedAt: number | null = null;
           let minimumClearance = Infinity;
           const rigs = [1600 / 900, 390 / 844].map((aspect) => {
@@ -276,6 +320,17 @@ for (const { site, primary, before } of heroes) {
                 ? Math.max(-1, Math.min(1, (delta.y + 16) / 10))
                 : 0;
             sub.step(input, 1 / 60);
+            if (runtimeContacts) {
+              // Runtime sim.contact follows sim.vehicles once per frame. This
+              // fixture uses one fixed physics step per 60 Hz frame at 1x.
+              beforeContact.copy(sub.position);
+              if (contact.resolve(sub, 1 / 60)) contactFrames++;
+              correctionM += beforeContact.distanceTo(sub.position);
+              maximumStress = Math.max(maximumStress, sub.getState().hullStress);
+              scanner.setObjective(
+                run.objectives.find((o) => o.primary && !o.complete)?.poiId ?? null,
+              );
+            }
             scanner.update(1 / 60, sub.position, sub.getForward(), input.scan);
             run.update(1 / 60);
             if (completedAt === null && scanner.isScanned(site, first.id))
@@ -315,6 +370,32 @@ for (const { site, primary, before } of heroes) {
           console.log(
             `VERIFY-1000 ${site} ${tier}: scan=${completedAt}s transit=${Math.hypot(sub.position.x - pose.x, sub.position.z - pose.z).toFixed(1)}m minClearance=${minimumClearance.toFixed(2)}m`,
           );
+          if (runtimeContacts) {
+            expect(completedAt!).toBeGreaterThan(first.scanSeconds);
+            expect(store.get(site, first.id)?.count).toBe(1);
+            expect(store.isDiscovered(site, first.id), 'real scan records the discovery').toBe(
+              true,
+            );
+            const journal = await loadJournalSite(site, new Map(), async (url) => {
+              try {
+                const text = readFileSync(url.replace(/^\//, ''), 'utf8');
+                return { ok: true, text: async () => text };
+              } catch {
+                return { ok: false, status: 404, text: async () => '' };
+              }
+            });
+            const entry = journal.entries.find((e) => e.id === first.guideEntry)!;
+            expect(entry.poiIds).toContain(first.id);
+            expect(isEntryUnlocked(journal, entry, new DiscoveryStore(storage))).toBe(true);
+            expect(run.objectives[1].complete, 'first scan does not grant the canyon floor').toBe(
+              false,
+            );
+            expect(sub.getState().hullClass).toBe(mission.hull_class);
+            expect(maximumStress).toBe(0);
+            console.log(
+              `MISSION-CONTACT ${site} ${tier}: scan=${completedAt}s contactFrames=${contactFrames} correction=${correctionM}m discovery=${first.id} journal=${entry.id}`,
+            );
+          }
           run.dispose();
         }
 
