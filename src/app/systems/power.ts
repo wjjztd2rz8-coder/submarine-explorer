@@ -30,7 +30,13 @@ export function createPowerSystem(): GameSystem {
           // The descent to a deep start already used some battery.
           void discovery.ready.then(() =>
             queueMicrotask(() => {
-              if (disposed || !ctx.effective.gameplay.batteryOxygen || !route) return;
+              if (
+                disposed ||
+                ctx.app?.state === 'home' ||
+                !ctx.effective.gameplay.batteryOxygen ||
+                !route
+              )
+                return;
               const depth = Math.max(0, -ctx.sub.position.y);
               if (depth < 25) return;
               const reserve = startingReserves(depth, ctx.effective.submarine, ctx.effective.power);

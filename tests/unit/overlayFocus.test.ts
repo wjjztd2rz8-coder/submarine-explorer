@@ -29,6 +29,8 @@ import * as THREE from 'three';
 import type { DebriefStats } from '../../src/game/Objectives.js';
 import type { FrameState } from '../../src/app/System.js';
 import { createPowerSystem } from '../../src/app/systems/power.js';
+import { missionSystem } from '../../src/app/systems/mission.js';
+import { startingReserves } from '../../src/game/Power.js';
 import {
   loadMissionSummaries,
   parseMission,
@@ -2844,9 +2846,110 @@ it('shell host teardown releases Home, Pause, both Globes and shell fallback tog
   expect(press('Escape').defaultPrevented).toBe(false);
 });
 
+it.each(
+  (['before readiness', 'after the reserve microtask is queued'] as const).flatMap((timing) =>
+    (['quit', 'pause', 'dispose'] as const).map((action) => ({ timing, action })),
+  ),
+)(
+  'deferred mission reserves respect $action $timing across shell lifetimes',
+  async ({ timing, action }) => {
+    // Quit keeps the shell runtime alive, while page teardown disposes it.
+    // Both must cancel a pending start; Pause must retain the live dive's reserves.
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, text: async () => '[]' }));
+    vi.stubGlobal('history', { pushState: vi.fn() });
+    const add = vi.spyOn(window, 'addEventListener');
+    const remove = vi.spyOn(window, 'removeEventListener');
+    const bus = new EventBus();
+    const previousResets: Array<ReturnType<typeof vi.spyOn>> = [];
+    let previousRunner: SystemRunner | undefined;
+    for (let cycle = 0; cycle < 3; cycle++) {
+      let resolveReady!: () => void;
+      const ready = new Promise<void>((resolve) => {
+        resolveReady = resolve;
+      });
+      const save = new Save({ config: DEFAULT_CONFIG, storage: null });
+      save.setGameplayMode('realistic');
+      const def = parseMission(titanicMission, 'titanic')!;
+      const notice = vi.fn();
+      const ctx = {
+        config: DEFAULT_CONFIG,
+        bus,
+        index: [],
+        meta: { id: 'titanic' },
+        route: {
+          missionId: 'titanic',
+          tileId: 'titanic',
+          landmarkId: 'titanic',
+          def,
+          skipBriefing: true,
+        },
+        params: new URLSearchParams('depth=3800'),
+        save,
+        effective: resolveEffective(save.get(), 'realistic', null),
+        app: { state: 'dive', lastSite: null },
+        discovery: { ready, pois: def.objectives.map((objective) => ({ id: objective.poi })) },
+        guidance: { notice },
+        sub: { position: new THREE.Vector3(0, -3800, 0), getState: () => ({ hullClass: 'C' }) },
+        expose: vi.fn(),
+        journal: { open: vi.fn() },
+        discoveries: { isDiscovered: () => false },
+        shellBaseHref: () => '/',
+      } as unknown as GameContext;
+      const runner = new SystemRunner(ctx);
+      cleanup.push(() => runner.dispose());
+      runner.init([createPowerSystem(), shellSystem, missionSystem, shellKeysSystem]);
+      previousRunner?.dispose();
+      for (const reset of previousResets) expect(reset).not.toHaveBeenCalled();
+      const setLevels = vi.spyOn(ctx.power, 'setLevels');
+      const reset = vi.spyOn(ctx.power, 'reset');
+      const resolveObjectives = vi.spyOn(ctx.missionRouter!.mission, 'resolve');
+      if (timing === 'after the reserve microtask is queued') {
+        resolveReady();
+        await ready;
+        expect(setLevels).not.toHaveBeenCalled();
+      }
+      press('Escape');
+      expect(ctx.app.state).toBe('pause');
+      if (action === 'quit') {
+        (ctx.pause.root as unknown as Element)
+          .querySelectorAll('button')
+          .find((button) => button.textContent === 'Quit to home')!
+          .dispatchEvent(new Event('click'));
+        expect(ctx.app.state).toBe('home');
+        expect(ctx.home.isOpen).toBe(true);
+      } else if (action === 'dispose') runner.dispose();
+      resolveReady();
+      await ready;
+      await Promise.resolve();
+      if (action === 'pause') {
+        const reserve = startingReserves(3800, ctx.effective.submarine, ctx.effective.power);
+        expect(setLevels).toHaveBeenCalledExactlyOnceWith(reserve.battery, reserve.oxygen);
+        expect(notice).toHaveBeenCalledOnce();
+        press('Escape');
+        expect(ctx.app.state).toBe('dive');
+      } else {
+        expect(setLevels).not.toHaveBeenCalled();
+        expect(notice).not.toHaveBeenCalled();
+        expect(ctx.power.state).toMatchObject({ battery: 1, oxygen: 1 });
+        if (timing === 'before readiness') expect(resolveObjectives).not.toHaveBeenCalled();
+      }
+      runner.dispose();
+      runner.dispose();
+      bus.emit('mission:started', { missionId: 'titanic', tileId: 'titanic' });
+      expect(reset).not.toHaveBeenCalled();
+      expect(press('Escape').defaultPrevented).toBe(false);
+      expect(remove.mock.calls).toHaveLength(add.mock.calls.length);
+      previousRunner = runner;
+      previousResets.push(reset);
+    }
+  },
+);
+
 it.each(['home', 'pause'] as const)(
   'Your sub releases all preview resources and RAFs on close, navigation and teardown from %s',
   async (source) => {
+    const add = vi.spyOn(window, 'addEventListener');
+    const remove = vi.spyOn(window, 'removeEventListener');
     const frames = new Map<number, FrameRequestCallback>();
     let nextFrame = 0;
     vi.stubGlobal('requestAnimationFrame', (fn: FrameRequestCallback) => {
@@ -2907,8 +3010,9 @@ it.each(['home', 'pause'] as const)(
       journal: { open: vi.fn() },
       discoveries: { isDiscovered: () => false },
     } as unknown as GameContext;
-    cleanup.push(() => shellSystem.dispose?.());
-    shellSystem.init?.(ctx);
+    const runner = new SystemRunner(ctx);
+    cleanup.push(() => runner.dispose());
+    runner.init([shellSystem, shellKeysSystem]);
     ctx.setAppState(source);
     let screen!: SubScreen;
     const open = vi.spyOn(SubScreen.prototype, 'open');
@@ -2961,6 +3065,9 @@ it.each(['home', 'pause'] as const)(
       expect(active()).toBe(controls[0]);
       press('Tab', { shiftKey: true });
       expect(active()).toBe(controls.at(-1));
+      press('Escape', { repeat: true });
+      expect(screen.isOpen).toBe(true);
+      expect(ctx.app.state).toBe(source);
       if (cycle % 2) {
         (screen.root as unknown as Element)
           .querySelector('.ss-close')!
@@ -2971,6 +3078,9 @@ it.each(['home', 'pause'] as const)(
       expect(ctx.app.state).toBe(source);
       screen.close(); // Repeated close must not dispose twice.
       released();
+      press('Escape');
+      expect(ctx.app.state).toBe(source === 'pause' ? 'dive' : 'home');
+      ctx.setAppState(source);
     }
     show();
     await flush();
@@ -2980,10 +3090,12 @@ it.each(['home', 'pause'] as const)(
     ctx.setAppState(source);
     show();
     await flush();
-    shellSystem.dispose?.();
-    shellSystem.dispose?.();
+    runner.dispose();
+    runner.dispose();
     expect(screen.root.isConnected).toBe(false);
     expect(screen.isOpen).toBe(false);
     released();
+    expect(press('Escape').defaultPrevented).toBe(false);
+    expect(remove.mock.calls).toHaveLength(add.mock.calls.length);
   },
 );
