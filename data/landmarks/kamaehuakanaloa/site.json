@@ -40,8 +40,18 @@
     "tiers": {
       "low": {
         "depthM": -200,
-        "color": 8885145,
-        "intensity": 6
+        "color": 10135213,
+        "intensity": 18
+      },
+      "medium": {
+        "depthM": -200,
+        "color": 10135213,
+        "intensity": 18
+      },
+      "high": {
+        "depthM": -200,
+        "color": 10135213,
+        "intensity": 18
       }
     }
   }
