@@ -26,6 +26,28 @@ it('refreshes the cache version when worker logic, shell or mutable content chan
   cpSync('public/icons', join(publicDir, 'icons'), { recursive: true });
   cpSync('public/share', join(publicDir, 'share'), { recursive: true });
   cpSync(publicDir, outDir, { recursive: true });
+  const emitted = {
+    'index.html': { type: 'asset', source: '<html>shell</html>' },
+    'assets/app-hash.js': {
+      type: 'chunk',
+      isEntry: true,
+      code: 'export const open = () => import("./preview-hash.js");',
+      dynamicImports: ['assets/preview-hash.js'],
+    },
+    'assets/preview-hash.js': {
+      type: 'chunk',
+      isEntry: false,
+      isDynamicEntry: true,
+      code: 'import "./shared-hash.js";',
+      imports: ['assets/shared-hash.js'],
+    },
+    'assets/shared-hash.js': { type: 'chunk', isEntry: false, code: 'export const shared = true;' },
+    'assets/preview-hash.css': { type: 'asset', source: '.preview { display: block; }' },
+    'assets/preview-hash.js.map': { type: 'asset', source: '{}' },
+  };
+  mkdirSync(join(outDir, 'assets'));
+  for (const [name, item] of Object.entries(emitted))
+    writeFileSync(join(outDir, name), 'code' in item ? item.code : item.source);
   const plugin = pwaPlugin();
   if (
     typeof plugin.configResolved !== 'function' ||
@@ -43,15 +65,7 @@ it('refreshes the cache version when worker logic, shell or mutable content chan
       logger: { info: vi.fn() },
     } as unknown as ResolvedConfig,
   );
-  await plugin.generateBundle.call(
-    {} as never,
-    {} as never,
-    {
-      'index.html': { type: 'asset', source: '<html>shell</html>' },
-      'assets/app-hash.js': { type: 'chunk' },
-    } as never,
-    false,
-  );
+  await plugin.generateBundle.call({} as never, {} as never, emitted as never, false);
   const stamp = async () => {
     await closeBundle.call({} as never);
     const output = readFileSync(join(outDir, 'sw.js'), 'utf8') as string;
@@ -59,16 +73,25 @@ it('refreshes the cache version when worker logic, shell or mutable content chan
     expect(output).not.toContain('__SW_PRECACHE__');
     const precache = JSON.parse(output.match(/JSON.parse\('([^']+)'\)/)![1]) as string[];
     expect(precache).toContain('share/bathyline-og-1200x630.png');
+    // Dynamic entries, their shared imports and CSS are required before first use offline.
+    for (const name of Object.keys(emitted).filter((name) => !name.endsWith('.map')))
+      expect(precache).toContain(name);
+    expect(precache).not.toContain('assets/preview-hash.js.map');
+    for (const base of ['https://example.test/', 'https://example.test/submarine-explorer/'])
+      for (const name of precache) expect(new URL(name, base).href.startsWith(base)).toBe(true);
     return output.match(/const VERSION = '([^']+)'/)![1];
   };
   const initial = await stamp();
   expect(await stamp()).toBe(initial);
+  writeFileSync(join(outDir, 'assets/shared-hash.js'), 'export const shared = false;');
+  const lazyChanged = await stamp();
+  expect(lazyChanged).not.toBe(initial);
   writeFileSync(
     join(publicDir, 'sw.js'),
     `${readFileSync('public/sw.js', 'utf8')}\n// worker logic changed\n`,
   );
   const workerChanged = await stamp();
-  expect(workerChanged).not.toBe(initial);
+  expect(workerChanged).not.toBe(lazyChanged);
   writeFileSync(join(outDir, 'manifest.webmanifest'), '{"name":"Updated shell"}');
   const shellChanged = await stamp();
   expect(shellChanged).not.toBe(workerChanged);

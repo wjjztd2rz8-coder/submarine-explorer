@@ -8,7 +8,12 @@ const template = readFileSync('public/sw.js', 'utf8');
 const defaultScope = 'https://example.test/submarine-explorer/';
 const keyOf = (request: Request | string) => (typeof request === 'string' ? request : request.url);
 
-function worker(scope = defaultScope, active = true) {
+function worker(
+  scope = defaultScope,
+  active = true,
+  precache = ['', 'index.html', 'app.js'],
+  stampedSource?: string,
+) {
   const handlers = new Map<string, (event: unknown) => void>();
   const entries = new Map<string, Map<string, Response>>();
   const put = vi.fn(
@@ -44,11 +49,13 @@ function worker(scope = defaultScope, active = true) {
     clients: { claim: vi.fn(async () => {}) },
   };
   const fetch = vi.fn(async (_request: Request, _options?: RequestInit) => new Response('fresh'));
-  const source = active
-    ? template
-        .replace('__SW_VERSION__', 'test')
-        .replace('__SW_PRECACHE__', JSON.stringify(['', 'index.html', 'app.js']))
-    : template;
+  const source =
+    stampedSource ??
+    (active
+      ? template
+          .replace('__SW_VERSION__', 'test')
+          .replace('__SW_PRECACHE__', JSON.stringify(precache))
+      : template);
   runInNewContext(source, { self, caches, fetch, Request, Response, URL });
   const prefix = `subexp-${encodeURIComponent(new URL(scope).pathname)}-`;
   function dispatch(name: string, request?: Request) {
@@ -81,14 +88,80 @@ describe('offline service worker', () => {
     expect(sw.self.clients.claim).not.toHaveBeenCalled();
   });
 
-  it('requires every shell file before replacing the previous offline worker', async () => {
-    const sw = worker();
-    sw.add.mockRejectedValueOnce(new Error('missing chunk'));
-    await expect(Promise.all(sw.dispatch('install').pending)).rejects.toThrow('missing chunk');
-    expect(sw.self.skipWaiting).not.toHaveBeenCalled();
-    await Promise.all(sw.dispatch('install').pending);
-    expect(sw.self.skipWaiting).toHaveBeenCalledOnce();
-  });
+  it.each(['missing chunk', 'quota exceeded'])(
+    'keeps the previous shell when a lazy dependency fails installation: %s',
+    async (failure) => {
+      const lazy = 'assets/preview-shared-hash.js';
+      const sw = worker(defaultScope, true, ['', 'app.js', lazy]);
+      await sw.seed('shell-old', '', 'previous offline shell');
+      await sw.seed('shell-old', lazy, 'previous lazy dependency');
+      if (failure === 'missing chunk') {
+        sw.fetch.mockImplementation(
+          async (request) =>
+            new Response('shell', { status: request.url.endsWith(lazy) ? 404 : 200 }),
+        );
+      } else {
+        sw.put.mockImplementation(async (cache, request, response) => {
+          if (keyOf(request).endsWith(lazy)) throw new Error(failure);
+          cache.set(keyOf(request), response);
+        });
+      }
+      await expect(Promise.all(sw.dispatch('install').pending)).rejects.toThrow(
+        failure === 'missing chunk' ? 'precache unavailable' : failure,
+      );
+      expect(sw.self.skipWaiting).not.toHaveBeenCalled();
+      expect(sw.self.clients.claim).not.toHaveBeenCalled();
+      expect(sw.caches.delete).not.toHaveBeenCalled();
+      const previous = sw.entries.get(`${sw.prefix}shell-old`)!;
+      expect(await previous.get(defaultScope)!.clone().text()).toBe('previous offline shell');
+      expect(await previous.get(`${defaultScope}${lazy}`)!.clone().text()).toBe(
+        'previous lazy dependency',
+      );
+      sw.fetch.mockResolvedValue(new Response('shell'));
+      sw.put.mockImplementation(async (cache, request, response) => {
+        cache.set(keyOf(request), response);
+      });
+      await Promise.all(sw.dispatch('install').pending);
+      expect(sw.self.skipWaiting).toHaveBeenCalledOnce();
+    },
+  );
+
+  it.each(['https://example.test/', defaultScope])(
+    'serves an unopened lazy JS/CSS chain from the installed shell at %s',
+    async (scope) => {
+      const files = {
+        '': '<script type="module" src="assets/app-hash.js"></script>',
+        'assets/app-hash.js': 'export const open = () => import("./preview-hash.js");',
+        'assets/preview-hash.js': 'import "./shared-hash.js"; import "./preview-hash.css";',
+        'assets/shared-hash.js': 'export const shared = true;',
+        'assets/preview-hash.css': '.preview { display: block; }',
+      };
+      const sw = worker(scope, true, Object.keys(files));
+      sw.fetch.mockImplementation(async (request) => {
+        const path = request.url.slice(scope.length) as keyof typeof files;
+        return new Response(files[path] ?? 'optional title asset');
+      });
+      await Promise.all(sw.dispatch('install').pending);
+      expect(sw.self.skipWaiting).toHaveBeenCalledOnce();
+      await Promise.all(sw.dispatch('activate').pending);
+      for (const path of Object.keys(files)) await sw.seed('assets-test', path, 'wrong cache');
+      sw.fetch.mockClear();
+      sw.fetch.mockRejectedValue(new Error('offline before the first preview open'));
+      for (const [path, body] of Object.entries(files)) {
+        expect(
+          await (await sw.dispatch('fetch', new Request(`${scope}${path}`)).response!).text(),
+        ).toBe(body);
+        expect(
+          sw.add.mock.calls.some(
+            ([request]) => request.url === `${scope}${path}` && request.cache === 'reload',
+          ),
+        ).toBe(true);
+      }
+      // Navigation remains network-first; all module/style requests must hit the shell.
+      expect(sw.fetch).toHaveBeenCalledTimes(1);
+      expect(sw.fetch.mock.calls[0][0].url).toBe(scope);
+    },
+  );
 
   it.each(['https://example.test/', defaultScope])(
     'uses the cached shell for a new offline navigation at %s',
