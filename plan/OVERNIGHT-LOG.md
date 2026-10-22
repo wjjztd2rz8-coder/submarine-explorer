@@ -1653,3 +1653,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Sonnet collected 20 of 22 uncommitted Codex worktrees (2920-3120) and pushed: test/note merges plus four small src fixes (power reserves after quit, scanner stale target, completion banner in emergency ascent, Low-tier ground contact). Left unmerged: 2980 (scarp crest contacts, no note) and 3050 (Terrain seam clearance, too heavy per frame). Gates green; the agent fixed type errors in two collected tests.
 - Codex briefs 3130-3150 queued, waiting for the Codex week (Oct 27). No Claude art package this run (collection took ~72 min). Claude week 98%.
 - **Needs owner:** 150-300 m opening rule for wrecks/landers; phone retest.
+
+## 2026-10-22 10:11 CDT headless run 82 (Claude)
+
+- **Merged and pushed (smoke + project-base green, no full e2e):** Sonnet V-eight-sites-lit (a): Kamaʻehuakanaloa bed lit (warm silt, site ambient 6 to 18 on all tiers); I rate ~3.4, from 2.2. The jelly subject is still a dark crimson shape (needs species or staging change); bed is slightly blotchy. Three snapshots rebaselined.
+- **Codex:** 3130-3150 queued, waiting for the Codex week (Oct 27). Worktrees 2980 and 3050 still unmerged by decision. Claude 5h fell to 49% (agent took 77 min), so one package only. No tag.
+- **Next Claude:** V-eight-sites-lit (b). **Needs owner:** 150-300 m opening rule; phone retest.
