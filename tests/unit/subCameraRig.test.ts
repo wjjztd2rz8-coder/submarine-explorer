@@ -70,6 +70,27 @@ describe('CameraRig modes', () => {
     expect(rig.camera.position.distanceTo(pos)).toBeLessThan(30);
   });
 
+  it.each([
+    { name: 'open water', depth: -100, seabed: -3000 },
+    { name: 'terrain clearance', depth: -100, seabed: -100 },
+    { name: 'surface ceiling', depth: -4, seabed: -3000 },
+  ])('keeps first-person aim at the eye in $name', ({ depth, seabed }) => {
+    const rig = new CameraRig(cam, 16 / 9, flatSeabed(seabed));
+    rig.setMode('first-person');
+    const pos = new Vector3(0, depth, 0);
+    for (const [yaw, expected] of [
+      [0, new Vector3(0, 0, -1)],
+      [Math.PI / 2, new Vector3(1, 0, 0)],
+    ] as const) {
+      rig.snap(pos, yaw, 0);
+      const forward = rig.camera.getWorldDirection(new Vector3());
+      // A level pilot command stays level regardless of the eye offset or clamp.
+      expect(forward.distanceTo(expected)).toBeLessThan(1e-6);
+      expect(rig.camera.position.y).toBeGreaterThanOrEqual(seabed + cam.terrainClearance);
+      expect(rig.camera.position.y).toBeLessThanOrEqual(-cam.surfaceClearance);
+    }
+  });
+
   it('orbits around the boat at the configured radius', () => {
     const pos = new Vector3(100, -2000, -50);
     const rig = new CameraRig(cam, 16 / 9);

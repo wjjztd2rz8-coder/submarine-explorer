@@ -13,9 +13,9 @@
  * identically. See `TerrainChunk.ts` for the per-chunk detail.
  *
  * The rendered surface is *measured data plus a procedural detail term*
- * (`TerrainNoise.ts`). Carved sites and fidelity profiles sample the near mesh
- * triangles for physics. Set `terrain.detailStrength` to 0 to remove detail;
- * site reconstructions remain applied to the survey.
+ * (`TerrainNoise.ts`). Detail-enabled Low, carved sites and fidelity profiles
+ * sample the near mesh triangles for physics. Set `terrain.detailStrength` to 0
+ * to remove detail; site reconstructions remain applied to the survey.
  *
  * Coordinates: +X east, +Z south, +Y up, origin at the tile centre
  * (see src/util/geo.ts). Heightmap row 0 is the NORTH edge, so grid row index
@@ -380,18 +380,21 @@ export class Terrain {
   }
 
   /**
-   * The rendered seabed elevation at a world position, in metres (negative below
-   * sea level): measured data, times the vertical exaggeration, plus the
-   * procedural detail term. Identical to the mesh's vertex Y at every vertex,
-   * so collision matches what the player sees. Positions outside the tile clamp
-   * to the edge.
+   * Seabed elevation in metres (negative below sea level). Supported Low detail,
+   * carved and fidelity paths interpolate the near mesh triangles for contact.
+   * Uncarved pure-data queries remain bilinear; unprofiled Medium/High and
+   * out-of-tile queries retain the continuous surface reconstruction.
    */
   sampleHeight(x: number, z: number): number {
     if (this.detail.strength <= 0 && !this.carve) return this.sampleDataHeight(x, z);
-    if ((!this.fidelity && !this.carve) || !this.contains(x, z) || this.patchSubdivs.size === 0)
+    if (
+      (!this.fidelity && !this.carve && this.stats.tier !== 'low') ||
+      !this.contains(x, z) ||
+      this.patchSubdivs.size === 0
+    )
       return this.surfaceHeight(x, z);
-    // Sharp carves can deviate from their triangles by tens of metres, even without
-    // noise. Seats, POIs and physics must use the near mesh at every carved tier.
+    // Coarse Low detail and sharp carves can deviate substantially between vertices.
+    // Reuse the near triangles for contact, keeping surfaceHeight as the vertex source.
     const c = Math.min(this.cols - 2, Math.floor((x + this.halfW) / this.dx));
     const r = Math.min(this.rows - 2, Math.floor((z + this.halfD) / this.dz));
     const c0 = Math.floor(c / this.meshChunkCells) * this.meshChunkCells;

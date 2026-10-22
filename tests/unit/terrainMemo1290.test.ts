@@ -18,7 +18,7 @@ interface MemoInternals {
 }
 const memo = (t: Terrain) => t as unknown as MemoInternals;
 
-function fixture(id = 'memo-fixture', offset = 0, tier: GraphicsTier = 'low') {
+function fixture(id = 'memo-fixture', offset = 0, tier: GraphicsTier = 'low', profile = true) {
   const tile = makeSyntheticTile({
     id,
     cols: 49,
@@ -30,15 +30,17 @@ function fixture(id = 'memo-fixture', offset = 0, tier: GraphicsTier = 'low') {
     height: (c, r) => -250 + offset + Math.round(c * 1.8 + r * 0.7 + Math.sin(c * r) * 4),
   });
   const config = makeConfig().terrain;
-  config.fidelity = {
-    [id]: {
-      ...MONTEREY_FIDELITY,
-      resolveLow: true,
-      focus: { ...tile.meta.center, radiusM: 35, fadeM: 20 },
-      chunkCells: 8,
-      nearSubdiv: { low: 4, medium: 4, high: 8 },
-    },
-  };
+  config.fidelity = profile
+    ? {
+        [id]: {
+          ...MONTEREY_FIDELITY,
+          resolveLow: true,
+          focus: { ...tile.meta.center, radiusM: 35, fadeM: 20 },
+          chunkCells: 8,
+          nearSubdiv: { low: 4, medium: 4, high: 8 },
+        },
+      }
+    : {};
   return new Terrain(tile, config, tier);
 }
 
@@ -131,6 +133,27 @@ describe('1290 terrain lattice memoisation', () => {
     } finally {
       t.dispose();
     }
+  });
+
+  it('reuses and releases unprofiled Low corners in either triangle half', () => {
+    const t = fixture('memo-fixture', 0, 'low', false);
+    const cache = memo(t).latticeHeights;
+    const surface = vi.spyOn(memo(t), 'surfaceHeight');
+    try {
+      const points = [0.2, 0.8].map((f) => [t.worldXOfCol(3 + f), t.worldZOfRow(3 + f)] as const);
+      const cold = points.map(([x, z]) => t.sampleHeight(x, z));
+      // Opposite triangles share two corners, so only four surface evaluations.
+      expect(surface).toHaveBeenCalledTimes(4);
+      expect(cache.size).toBe(4);
+      surface.mockClear();
+      for (let i = points.length - 1; i >= 0; i--)
+        expect(t.sampleHeight(...points[i])).toBe(cold[i]);
+      expect(surface).not.toHaveBeenCalled();
+    } finally {
+      surface.mockRestore();
+      t.dispose();
+    }
+    expect(cache.size).toBe(0);
   });
 
   it('isolates different sites and rebuilt tiles with different survey heights', () => {

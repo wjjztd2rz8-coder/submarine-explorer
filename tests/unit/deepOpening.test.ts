@@ -147,6 +147,18 @@ describe('Challenger / Endurance opening', () => {
           sim.update(1 / 60, pilot);
           const groups = sim.groups.filter((g) => staged.includes(g.id));
           expect(groups).toHaveLength(1);
+          if (tier === 'low') {
+            const ray = new Raycaster();
+            const meshes = terrain.group.children.filter((o) => o instanceof Mesh);
+            for (const point of [position, ...groups.flatMap((g) => g.members)]) {
+              ray.set(new Vector3(point.x, 100, point.z), new Vector3(0, -1, 0));
+              const hit = ray.intersectObjects(meshes)[0];
+              expect(hit).toBeDefined();
+              expect(Math.abs(terrain.sampleHeight(point.x, point.z) - hit.point.y)).toBeLessThan(
+                0.001,
+              );
+            }
+          }
           expect({
             pose,
             groups: groups.map((g) => ({

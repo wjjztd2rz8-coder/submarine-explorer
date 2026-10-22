@@ -14,6 +14,7 @@ import { spawnSettings } from '../../src/game/Spawn.js';
 import { composedFreeDiveSpawn } from '../../src/game/DeepOpeningSpawn.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import { Scatter } from '../../src/world/scatter/Scatter.js';
+import { SCATTER_TYPES } from '../../src/world/scatter/ScatterTypes.js';
 import { biomeFor } from '../../src/world/TerrainBiome.js';
 import { hashString } from '../../src/world/props/geo/shared.js';
 import { talusMeshSampler } from '../../src/world/props/geo/talus.js';
@@ -241,6 +242,7 @@ for (const tier of ['low', 'high'] as const) {
         rockHi: 1 - Math.cos((config.terrain.rockSlopeHiDeg * Math.PI) / 180),
       });
       vi.unstubAllGlobals();
+      const sampledGround = new Map<string, number>();
       for (const [width, height] of [
         [1600, 900],
         [844, 390],
@@ -282,6 +284,35 @@ for (const tier of ['low', 'high'] as const) {
                 3,
             ).toBe(before[i].triangles);
             expect(mesh.instanceMatrix.array).toEqual(before[i].matrices);
+          }
+        }
+        if (tier === 'low') {
+          const ray = new THREE.Raycaster();
+          const terrainMeshes = terrain.group.children.filter((o) => o instanceof THREE.Mesh);
+          const instance = new THREE.Matrix4();
+          const anchor = new THREE.Vector3();
+          const scale = new THREE.Vector3();
+          for (const object of scatter.group.children) {
+            const mesh = object as THREE.InstancedMesh;
+            const kind = mesh.name.slice('scatter:'.length) as keyof typeof SCATTER_TYPES;
+            for (let i = 0; i < mesh.count; i++) {
+              mesh.getMatrixAt(i, instance);
+              anchor.setFromMatrixPosition(instance);
+              scale.setFromMatrixScale(instance);
+              const key = `${anchor.x}|${anchor.z}`;
+              let floor = sampledGround.get(key);
+              if (floor === undefined) {
+                ray.set(new THREE.Vector3(anchor.x, 100, anchor.z), new THREE.Vector3(0, -1, 0));
+                const hit = ray.intersectObjects(terrainMeshes)[0];
+                expect(hit).toBeDefined();
+                floor = hit.point.y;
+                sampledGround.set(key, floor);
+              }
+              // Undo the declared embed depth to inspect the actual ground anchor.
+              expect(Math.abs(anchor.y + SCATTER_TYPES[kind].embed * scale.y - floor)).toBeLessThan(
+                0.001,
+              );
+            }
           }
         }
         keepoutEvidence.push({
@@ -371,7 +402,7 @@ for (const tier of ['low', 'high'] as const) {
         expect(eyeGap).toBeGreaterThan(1);
         expect(armGap).toBeGreaterThan(1);
       }
-      // Bounds and every placement/color buffer were captured before the policy moved to data.
+      // Freeze the grounded placement/colour buffers; Low anchors use near triangles.
       expect(keepoutEvidence).toEqual(json('tests/fixtures/challenger-keepout.json')[tier]);
     } finally {
       bounds.mockRestore();

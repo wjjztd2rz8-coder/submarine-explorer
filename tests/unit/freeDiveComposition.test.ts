@@ -1,7 +1,7 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { Vector3 } from 'three';
+import { Mesh, Raycaster, Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
 import { composedFreeDiveSpawn, spawnSettings } from '../../src/game/Spawn.js';
 import { composedFreeDiveSpawn as framedSpawn } from '../../src/game/DeepOpeningSpawn.js';
@@ -64,10 +64,22 @@ describe('free-dive openings on actual survey terrain and procedural hero geomet
             config.camera,
             mode,
           ] as const;
-          expect({
-            base: composedFreeDiveSpawn(...args),
-            framed: framedSpawn(...args),
-          }).toMatchSnapshot(mode);
+          const base = composedFreeDiveSpawn(...args);
+          const framed = framedSpawn(...args);
+          // Grounded openings must follow real near triangles, including when a
+          // continuous survey reconstruction would give a different elevation.
+          for (const pose of [base, framed]) {
+            expect(pose).not.toBeNull();
+            const ray = new Raycaster(new Vector3(pose!.x, 100, pose!.z), new Vector3(0, -1, 0));
+            const hit = ray.intersectObjects(
+              terrain.group.children.filter((o) => o instanceof Mesh),
+            )[0];
+            expect(hit).toBeDefined();
+            expect(Math.abs(terrain.sampleHeight(pose!.x, pose!.z) - hit.point.y)).toBeLessThan(
+              0.001,
+            );
+          }
+          expect({ base, framed }).toMatchSnapshot(mode);
         }
         const pos = new Vector3(spawn!.x, spawn!.y, spawn!.z);
         if (site === 'great-blue-hole')

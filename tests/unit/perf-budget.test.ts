@@ -374,16 +374,18 @@ describe('Lost City transparent effect fill budget', () => {
         }
         if (tier === 'low') {
           expect(measurements[1]).toEqual(measurements[0]);
-          // Freeze the pre-change Low workload too: paired equality alone
-          // would miss a shared change to both sides of the comparison.
-          for (const [range, pixels] of [
-            [70, 10_433.658403],
-            [32, 44_317.485993],
-            [10, 66_444.4806],
+          // Pin triangle-grounded placements as well as paired equality, retaining
+          // the previous continuous-field workload as an upper resource bound.
+          for (const [range, expectedPixels, ceiling] of [
+            [70, 10_427.554334, 10_433.658403],
+            [32, 43_367.581471, 44_317.485993],
+            [10, 66_410.314796, 66_444.4806],
           ]) {
-            expect(
-              Math.max(...measurements[1].filter((s) => s.range === range).map((s) => s.pixels)),
-            ).toBeCloseTo(pixels, 4);
+            const pixels = Math.max(
+              ...measurements[1].filter((s) => s.range === range).map((s) => s.pixels),
+            );
+            expect(pixels).toBeCloseTo(expectedPixels, 4);
+            expect(pixels).toBeLessThanOrEqual(ceiling);
           }
         }
         // Guard the High stutter workload: a redundant field-wide shimmer
