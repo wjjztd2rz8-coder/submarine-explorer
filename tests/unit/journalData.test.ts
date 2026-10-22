@@ -7,19 +7,22 @@ import { Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { Scanner } from '../../src/game/Scanner.js';
+import { HERO_SITES } from '../../src/game/Cosmetics.js';
 import { DiscoveryStore, DISCOVERY_STORAGE_KEY } from '../../src/game/DiscoveryStore.js';
 import { parseGuide } from '../../src/game/Guide.js';
 import {
   buildJournalSite,
   isEntryUnlocked,
   isSiteUnlocked,
+  journalEntryTag,
   loadJournalSites,
   parseJournalCatalogue,
   siteProgress,
   type DiscoveryReader,
 } from '../../src/game/JournalData.js';
 import { debriefText } from '../../src/game/MissionRouter.js';
-import { parsePois } from '../../src/game/Pois.js';
+import { loadMission, parseMissionIndex } from '../../src/game/Mission.js';
+import { parsePois, type PoiDef } from '../../src/game/Pois.js';
 import { parseSpecies } from '../../src/game/Species.js';
 import { parseLifeDoc } from '../../src/world/life/tables.js';
 import lifeDoc from '../../data/life/life.json';
@@ -30,16 +33,12 @@ import blueHole from '../../data/landmarks/great-blue-hole/mission.json';
 const quiet = (): void => {};
 
 const HERO_CONTENT_IDS = ['titanic', 'great-blue-hole', 'beebe-vent-field', 'lost-city'] as const;
+const shippedIds = parseMissionIndex(JSON.parse(readFileSync('data/landmarks/index.json', 'utf8')));
+const nonHeroIds = shippedIds.filter((id) => !HERO_SITES.some((hero) => hero === id));
 
 const realContentFetch: FetchJson = async (url) => {
-  if (url === '/data/landmarks/index.json') {
-    return {
-      ok: true,
-      text: async () => JSON.stringify({ version: 1, landmarks: HERO_CONTENT_IDS }),
-    };
-  }
   // Read the shipped content through the same URL paths as the runtime loader.
-  if (!/^\/data\/landmarks(?:\.json|\/[a-z0-9-]+\/[a-z]+\.json)$/.test(url)) {
+  if (!/^\/data\/landmarks(?:\.json|\/index\.json|\/[a-z0-9-]+\/[a-z]+\.json)$/.test(url)) {
     return { ok: false, text: async () => '' };
   }
   try {
@@ -50,10 +49,57 @@ const realContentFetch: FetchJson = async (url) => {
   }
 };
 
+const heroContentFetch: FetchJson = async (url) =>
+  url === '/data/landmarks/index.json'
+    ? { ok: true, text: async () => JSON.stringify({ version: 1, landmarks: HERO_CONTENT_IDS }) }
+    : realContentFetch(url);
+
+function discoveryFixture() {
+  const bytes = new Map<string, string>();
+  const writes: string[] = [];
+  const storage = {
+    getItem: (key: string) => bytes.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      writes.push(key);
+      bytes.set(key, value);
+    },
+    removeItem: (key: string) => {
+      writes.push(key);
+      bytes.delete(key);
+    },
+  };
+  const store = new DiscoveryStore(storage, () => new Date('2026-10-17T00:00:00Z'));
+  return { bytes, writes, storage, store };
+}
+
+function scanPoi(store: DiscoveryStore, id: string, target: PoiDef, depth: number) {
+  const scanner = new Scanner(DEFAULT_CONFIG.scan, new EventBus(), store);
+  scanner.setTargets([
+    {
+      id: target.id,
+      name: target.name,
+      landmarkId: id,
+      position: new Vector3(0, -depth, -10),
+      radius: target.radius_m ?? DEFAULT_CONFIG.scan.closeRangeM,
+      minDepthM: target.min_depth_m,
+      scanSeconds: target.scan_seconds ?? DEFAULT_CONFIG.scan.defaultSeconds,
+    },
+  ]);
+  scanner.update(
+    target.scan_seconds ?? DEFAULT_CONFIG.scan.defaultSeconds,
+    new Vector3(0, -depth, 0),
+    new Vector3(0, 0, -1),
+    true,
+  );
+  expect(scanner.view.lastCompleteId).toBe(target.id);
+  expect(scanner.view.lastCompleteFirstTime).toBe(true);
+  expect(store.keys()).toEqual([`${id}/${target.id}`]);
+}
+
 it.each(HERO_CONTENT_IDS)(
   '%s: an authored POI scan survives reload and unlocks only its Journal target',
   async (id) => {
-    const sites = await loadJournalSites([], realContentFetch);
+    const sites = await loadJournalSites([], heroContentFetch);
     expect(sites.map((site) => site.id)).toEqual(HERO_CONTENT_IDS);
     const current = sites.find((site) => site.id === id)!;
     const defs = parsePois(
@@ -73,40 +119,10 @@ it.each(HERO_CONTENT_IDS)(
     );
     expect(otherTarget, 'the site must contain another locked target').toBeDefined();
 
-    const bytes = new Map<string, string>();
-    const storage = {
-      getItem: (key: string) => bytes.get(key) ?? null,
-      setItem: (key: string, value: string) => {
-        bytes.set(key, value);
-      },
-      removeItem: (key: string) => {
-        bytes.delete(key);
-      },
-    };
-    const store = new DiscoveryStore(storage, () => new Date('2026-10-17T00:00:00Z'));
+    const { bytes, storage, store } = discoveryFixture();
     expect(sites.every((site) => !isSiteUnlocked(site, store))).toBe(true);
     const depth = Math.max(target.depth_m ?? 100, target.min_depth_m ?? 0);
-    const scanner = new Scanner(DEFAULT_CONFIG.scan, new EventBus(), store);
-    scanner.setTargets([
-      {
-        id: target.id,
-        name: target.name,
-        landmarkId: id,
-        position: new Vector3(0, -depth, -10),
-        radius: target.radius_m ?? DEFAULT_CONFIG.scan.closeRangeM,
-        minDepthM: target.min_depth_m,
-        scanSeconds: target.scan_seconds ?? DEFAULT_CONFIG.scan.defaultSeconds,
-      },
-    ]);
-    scanner.update(
-      target.scan_seconds ?? DEFAULT_CONFIG.scan.defaultSeconds,
-      new Vector3(0, -depth, 0),
-      new Vector3(0, 0, -1),
-      true,
-    );
-    expect(scanner.view.lastCompleteId).toBe(target.id);
-    expect(scanner.view.lastCompleteFirstTime).toBe(true);
-    expect(store.keys()).toEqual([`${id}/${target.id}`]);
+    scanPoi(store, id, target, depth);
 
     const archived = bytes.get(DISCOVERY_STORAGE_KEY);
     expect(archived).toBeDefined();
@@ -121,6 +137,93 @@ it.each(HERO_CONTENT_IDS)(
     }
     // Journal reads and store migration must leave the saved document byte-for-byte intact.
     expect(bytes.get(DISCOVERY_STORAGE_KEY)).toBe(archived);
+  },
+);
+
+it.each(nonHeroIds)(
+  '%s: first primary scan unlocks its shipped Journal entry through reload without leaking sites',
+  async (id) => {
+    expect(shippedIds).toHaveLength(13);
+    expect(nonHeroIds).toHaveLength(8);
+    const sites = await loadJournalSites([], realContentFetch);
+    expect(sites.map((site) => site.id)).toEqual(shippedIds);
+    const current = sites.find((site) => site.id === id)!;
+    const mission = await loadMission(id, realContentFetch);
+    expect(mission).not.toBeNull();
+    expect(mission!.landmark).toBe(id);
+    const first = mission!.objectives.find((objective) => objective.primary)!;
+    expect(first, 'the mission must have a primary scan').toBeDefined();
+    const defs = parsePois(
+      JSON.parse(readFileSync(`data/landmarks/${id}/pois.json`, 'utf8')),
+      quiet,
+    );
+    const target = defs.find((poi) => poi.id === first.poi)!;
+    expect(target, `${id}/${first.id}: authored POI ${first.poi}`).toBeDefined();
+    const guide = parseGuide(
+      JSON.parse(readFileSync(`data/landmarks/${id}/guide.json`, 'utf8')),
+      id,
+    )!;
+    // These shipped primaries all have authored links; a generated stand-in would hide a break.
+    const authored = guide.entries.find((entry) => entry.id === target.guide_entry)!;
+    expect(authored, `${target.id}: authored guide entry ${target.guide_entry}`).toBeDefined();
+    const entry = current.entries.find((item) => item.key === `${id}/poi/${authored.id}`)!;
+    expect(entry).toBeDefined();
+    expect(entry.poiIds).toContain(target.id);
+    expect(entry.guide).toEqual(authored);
+    expect(entry.recreation).toBe(authored.reconstruction);
+    expect(journalEntryTag(entry)).toBe(authored.reconstruction ? 'Recreation' : null);
+
+    const { bytes, writes, storage, store } = discoveryFixture();
+    expect(sites.every((site) => !isSiteUnlocked(site, store))).toBe(true);
+    expect(current.entries.every((item) => !isEntryUnlocked(current, item, store))).toBe(true);
+    // Same authored IDs and names under another namespace are a collision control,
+    // not an additional shipped POI or a navigation/terrain placement fixture.
+    const collision = buildJournalSite({
+      id: sites.find((site) => site.id !== id)!.id,
+      guide,
+      pois: defs,
+      species: null,
+    });
+    const depth = Math.max(
+      target.depth_m ?? mission!.briefing.depth_m ?? 100,
+      target.min_depth_m ?? 0,
+    );
+    scanPoi(store, id, target, depth);
+    const archived = bytes.get(DISCOVERY_STORAGE_KEY);
+    expect(archived).toBeDefined();
+    const savedWrites = [...writes];
+
+    // Reload content as well as storage so the full index participates in both reads.
+    const reloadedSites = await loadJournalSites([], realContentFetch);
+    const reloaded = new DiscoveryStore(storage);
+    for (const [loadedSites, saved] of [
+      [sites, store],
+      [reloadedSites, reloaded],
+    ] as const) {
+      const site = loadedSites.find((site) => site.id === id)!;
+      const linked = site.entries.find((item) => item.key === entry.key)!;
+      expect(saved.keys()).toEqual([`${id}/${target.id}`]);
+      expect(saved.get(id, target.id)).toEqual({ at: '2026-10-17T00:00:00.000Z', count: 1 });
+      expect(isSiteUnlocked(site, saved)).toBe(true);
+      expect(isEntryUnlocked(site, linked, saved)).toBe(true);
+      expect(linked).toEqual(entry);
+      // Grouped POIs legitimately share one entry; only independent entries must stay locked.
+      for (const item of site.entries.filter((item) => item.kind === 'poi')) {
+        expect(isEntryUnlocked(site, item, saved), item.key).toBe(item.poiIds.includes(target.id));
+      }
+      for (const other of loadedSites.filter((site) => site.id !== id)) {
+        expect(isSiteUnlocked(other, saved), other.id).toBe(false);
+        expect(other.entries.every((item) => !isEntryUnlocked(other, item, saved))).toBe(true);
+        siteProgress(other, saved);
+      }
+      expect(isSiteUnlocked(collision, saved)).toBe(false);
+      expect(collision.entries.every((item) => !isEntryUnlocked(collision, item, saved))).toBe(
+        true,
+      );
+      siteProgress(site, saved);
+    }
+    expect(bytes.get(DISCOVERY_STORAGE_KEY)).toBe(archived);
+    expect(writes).toEqual(savedWrites);
   },
 );
 
