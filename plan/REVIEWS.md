@@ -2,6 +2,24 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-22 comprehensive review, Claude alone (golden 2026-10-22-121525)
+
+**Sol did not review:** Codex week is at 6% (resets Oct 27 11:30), so `codex-review.sh start` skipped. Scores are mine and may run ~0.2 high. Opening frames of the seven main sites were viewed; no new e2e captures, so the play check still rests on run 70's six unaided journeys.
+
+**Changed since the last review:** one art merge, V-monterey-foot (crest ledges, mottled apron; ~3.7 to ~3.75). V-bluehole-silhouette was tried and parked (tag `parked/V-bluehole-silhouette`: shots barely changed). Golden pairs otherwise differ only by particles and pose drift. Twenty-one Codex worktrees (2920-3120: verify tests, bug hunts, a few small src fixes) had piled up uncommitted while the Codex week ran dry; a Sonnet agent is collecting them this run (see OVERNIGHT-LOG for what merged).
+
+**Scores, readable / beautiful:** Titanic 4 / 3.7 (warm hull; the sub still sits on the bow); Lost City 3.5 / 3.4 (tower reads; hill calm; foot sparse); Blue Hole 3.5 / 3.4 (rolled-slab lip, uniform pendants, light shafts present); Beebe 4 / 3.6 (strongest: warm chimney, plumes, clear sub); Monterey 4 / 3.75 (strata and ledges good; apron smooth); Challenger 3.5 / 3.4 (lander and flag legible; seabed flat); Endurance 3.5 / 3.4 (sub floats high above a thin hull strip).
+
+**Biggest gaps:** Blue Hole lip silhouette needs a different technique (prop-built or two-sided profile), not another tweak; wreck openings (Titanic, Endurance) put the sub over the wreck, which waits on the owner's opening-rule decision; Lost City foot and hue. No hero is consistently at 4; the plateau at ~0.1 per pass is real.
+
+**Process:** Claude week reset to 100% this morning, so Claude capacity is open again; Codex week 6% (burned ~32%/day earlier), so Codex briefs 3130-3150 queue and wait for Oct 27. The uncollected-worktree pile is the same pattern as 2026-10-19 (only Claude runs collect, and the Claude weekly gate skipped runs for days); the pile is now cleared in this run. efficiency.sh idle numbers are still not date-filtered (indicative only). No tooling change.
+
+**New priorities (DIRECTOR Backlog):** Claude: V-bluehole-silhouette (new technique), V-eight-sites-lit (a), V-monterey-apron, V-challenger-ripples, V-lostcity-foot, V-spawn-sub-clear. Codex (queued, waiting on the week): 3130 verify collected fixes, 3140 spawn bug hunt, 3150 CI watch and taggable SHA.
+
+**Stage:** about 83% to 1.0; roughly 5 weeks (Claude capacity is the limiter again now the week has reset; not cross-checked with Sol).
+
+**Needs owner:** the 150-300 m opening rule for wrecks and landers; a phone retest on the newest build.
+
 ## 2026-10-21 (evening) comprehensive review, Claude alone (golden 2026-10-21-053709)
 
 **Sol did not review:** Codex 5h was at 5% (< the 20% start gate), `codex-review.sh start` exited 75, so there is no second opinion; scores are mine and may run ~0.2 high (package self-ratings and my earlier scores have been above Sol's bands before). Opening frames only were viewed; no new e2e captures, so the play check rests on run 70's six passing journeys and run 73's Your-sub fix.
