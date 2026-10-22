@@ -518,6 +518,8 @@ export class MissionRouter {
   }
 
   private queueBanner(kind: 'primary' | 'all'): void {
+    // Scans still count during ascent, but must not restore completion actions.
+    if (this.blow) return;
     if (kind === 'primary' && this.mission.allComplete) this.allAnnounced = true;
     if (kind === 'all' && this.pendingBanner === 'primary' && this.bannerDelay !== null) {
       this.pendingBanner = 'all';
