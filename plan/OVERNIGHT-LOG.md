@@ -1646,3 +1646,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Not merged:** Sonnet V-bluehole-silhouette (thinner lip, varied pendant clusters): east-2 shots before/after are nearly identical and the right end became a flat plank, so I judged it not worth the snapshot churn. Kept as tag `parked/V-bluehole-silhouette`; DIRECTOR item 1 notes the next approach (two-sided lip profile or prop-built lip, plus loosening the pendant-envelope test).
 - **Codex:** 5h at 5% until 03:00; 2920-2940 queued. Claude week ~9%, pace-limited to the Oct 22 reset; one package only. No tag.
 - **Next Claude:** V-eight-sites-lit (a). **Needs owner:** 150-300 m opening rule for wrecks/landers; phone retest.
+
+## 2026-10-22 08:44 CDT headless run 81 (Claude): comprehensive review, Claude alone
+
+- Review done (REVIEWS, STATUS, DIRECTOR refilled; V-monterey-apron added). Stage ~83%. Sol skipped (Codex week 6%, resets Oct 27). Scores: Titanic 3.7, Lost City 3.4, Blue Hole 3.4, Beebe 3.6, Monterey 3.75.
+- Sonnet collected 20 of 22 uncommitted Codex worktrees (2920-3120) and pushed: test/note merges plus four small src fixes (power reserves after quit, scanner stale target, completion banner in emergency ascent, Low-tier ground contact). Left unmerged: 2980 (scarp crest contacts, no note) and 3050 (Terrain seam clearance, too heavy per frame). Gates green; the agent fixed type errors in two collected tests.
+- Codex briefs 3130-3150 queued, waiting for the Codex week (Oct 27). No Claude art package this run (collection took ~72 min). Claude week 98%.
+- **Needs owner:** 150-300 m opening rule for wrecks/landers; phone retest.

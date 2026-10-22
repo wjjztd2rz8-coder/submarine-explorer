@@ -6,7 +6,7 @@
 
 | Requirement                               | State                                                                                                                                                             |
 | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.7, Lost City 3.4, Blue Hole 3.4, Beebe 3.6, Monterey 3.75                                                                        |
+| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.7, Lost City 3.4, Blue Hole 3.4, Beebe 3.6, Monterey 3.75                                                                       |
 | Other eight sites coherent                | Challenger 3.4, Endurance 3.4; mission-spawn review done (2.6-3.2), follow-ups queued; acceptance acceptance for all eight not certified (V-spawn-capture queued) |
 | New player understands first five minutes | Owner phone test: scan range, boost and events confuse; P2-scan-range and P2-boost-cut queued, then V-journeys                                                    |
 | Acceptable Low-tier phone performance     | iPhone 17 Pro: Low great; High (opt-in only) stutters at Lost City; weaker phones untested                                                                        |
