@@ -1,11 +1,25 @@
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { Vector3 } from 'three';
 import { createPhotoSystem } from '../../src/app/systems/photo.js';
 import type { GameContext } from '../../src/app/context.js';
-import type { FrameState } from '../../src/app/System.js';
+import { SystemRunner, type FrameState } from '../../src/app/System.js';
+import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
-import { PhotoMode } from '../../src/ui/PhotoMode.js';
+import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
+import { Scanner, type ScanTarget } from '../../src/game/Scanner.js';
+import { parsePois, placePois } from '../../src/game/Pois.js';
+import { SPECIES_BY_ID } from '../../src/world/life/catalogue.js';
+import { LIFE_ID_PREFIX } from '../../src/world/life/Life.js';
+import { PhotoMode, canvasThumbnail } from '../../src/ui/PhotoMode.js';
 import { PhotoGallery } from '../../src/ui/PhotoGallery.js';
-import { PhotoStore, type Photo } from '../../src/game/PhotoStore.js';
+import { PHOTO_STORAGE_KEY, PhotoStore, type Photo } from '../../src/game/PhotoStore.js';
+import titanicPois from '../../data/landmarks/titanic/pois.json';
+import titanicMeta from '../../data/tiles/titanic/meta.json';
+
+vi.mock('../../src/ui/PhotoMode.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../src/ui/PhotoMode.js')>()),
+  canvasThumbnail: vi.fn(),
+}));
 
 // Only the DOM operations used by the viewfinder; event dispatch exercises its real listeners.
 class Element extends EventTarget {
@@ -34,6 +48,7 @@ class Element extends EventTarget {
 let touch = false;
 afterEach(() => {
   touch = false;
+  vi.mocked(canvasThumbnail).mockReset();
   vi.useRealTimers();
   vi.unstubAllGlobals();
 });
@@ -326,4 +341,189 @@ it('on touch the capture button and tips name no keys', () => {
   expect(tips.textContent).toBe('Drag to orbit · pinch to zoom');
   expect(`${capture.textContent} ${tips.textContent}`).not.toMatch(/Enter|Space|Esc|wheel/);
   mode.dispose();
+});
+
+// Keep the real viewfinder, bus, Scanner and stores; only canvas readback is replaced.
+function automaticStillFixture() {
+  vi.stubGlobal('document', {
+    body: new Element(),
+    documentElement,
+    createElement: () => new Element(),
+  });
+  vi.stubGlobal('window', {
+    clearTimeout: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  });
+  // Deterministic SOI/EOI bytes admitted by PhotoStore, without decoding an image.
+  const image = 'data:image/jpeg;base64,/9j/2Q==';
+  const thumbnail = vi.mocked(canvasThumbnail).mockReturnValue(image);
+  const dives: ReturnType<typeof createDive>[] = [];
+  function createDive() {
+    const data = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => data.get(key) ?? null,
+      setItem: vi.fn((key: string, value: string) => data.set(key, value)),
+    };
+    vi.stubGlobal('localStorage', storage);
+    const bus = new EventBus();
+    const completed = vi.fn();
+    bus.on('scan:complete', completed);
+    const discoveries = new DiscoveryStore(null);
+    const scanner = new Scanner(DEFAULT_CONFIG.scan, bus, discoveries);
+    const poi = placePois(
+      parsePois(titanicPois),
+      titanicMeta,
+      { sampleHeight: () => -3800 },
+      DEFAULT_CONFIG.scan,
+      'titanic',
+    )[0];
+    const species = SPECIES_BY_ID.get('rattail')!;
+    const animal: ScanTarget = {
+      id: `${LIFE_ID_PREFIX}${species.id}`,
+      name: species.common,
+      landmarkId: 'titanic',
+      position: poi.position.clone(),
+      radius: species.scanRadius,
+      scanSeconds: species.scanSeconds,
+    };
+    const ctx = {
+      bus,
+      contentLandmark: 'titanic',
+      discovery: { pois: [poi] },
+      journal: {
+        setPhotoGallery: vi.fn(),
+        siteName: vi.fn(() => 'RMS Titanic'),
+        refresh: vi.fn(),
+      },
+      progress: { cosmetics: { frame: 'stock' } },
+      renderer: { domElement: {} },
+      audio: { playShutter: vi.fn() },
+      expose: vi.fn(),
+      rig: { exitPhotoMode: vi.fn() },
+      input: { state: { lookDx: 0, lookDy: 0 }, wheelDelta: 0 },
+      setAppState: (state: 'dive' | 'pause' | 'home') => bus.emit('app:state', { state }),
+    } as unknown as GameContext;
+    const f = {
+      sampled: {},
+      frozen: false,
+      blocked: false,
+      pilotPosition: poi.position.clone().add(new Vector3(0, 0.26, 5)),
+    } as FrameState;
+    const forward = new Vector3(0, 0, -1);
+    let held = false;
+    const system = createPhotoSystem();
+    const runner = new SystemRunner(ctx);
+    runner.init([
+      {
+        name: 'scan-driver',
+        frame: {
+          'scan.discovery': () =>
+            scanner.update(1 / 60, f.pilotPosition, forward, held && !f.frozen),
+        },
+      },
+      system,
+    ]);
+    const shutter = vi.spyOn(ctx.photoMode, 'shutter');
+    const toast = vi.spyOn(ctx.photoMode, 'toast');
+    const complete = (target: ScanTarget, runFrame = true) => {
+      scanner.setTargets(target === poi ? [poi] : []);
+      scanner.setExtraTargets(target === poi ? [] : [target]);
+      held = true;
+      for (let step = 0; step < Math.ceil(target.scanSeconds * 60) + 1; step++) {
+        if (runFrame) runner.frame(f);
+        else scanner.update(1 / 60, f.pilotPosition, forward, true);
+      }
+      held = false;
+    };
+    const dive = {
+      ctx,
+      runner,
+      f,
+      scanner,
+      poi,
+      animal,
+      completed,
+      discoveries,
+      storage,
+      shutter,
+      toast,
+      complete,
+    };
+    dives.push(dive);
+    return dive;
+  }
+  return {
+    image,
+    thumbnail,
+    createDive,
+    dispose: () => dives.forEach(({ runner }) => runner.dispose()),
+  };
+}
+
+describe('automatic scan still handoff', () => {
+  it.each(['poi', 'animal'] as const)(
+    'files one quiet %s still at capture with real completion metadata and repeat semantics',
+    (kind) => {
+      const fixture = automaticStillFixture();
+      const dive = fixture.createDive();
+      const { ctx, runner, f, completed, storage, scanner, discoveries } = dive;
+      const target = dive[kind];
+      try {
+        expect(runner.order).toEqual([
+          'gate.photo: photo',
+          'camera.photo: photo',
+          'scan.discovery: scan-driver',
+          'render.capture: photo',
+        ]);
+        // The discovery event is synchronous; photo persistence belongs to the later hook.
+        ctx.bus.on('scan:complete', () => {
+          expect(storage.setItem).not.toHaveBeenCalled();
+          expect(ctx.photos.photos).toEqual([]);
+          expect(ctx.journal.refresh).not.toHaveBeenCalled();
+        });
+        dive.complete(target);
+        expect(completed.mock.calls).toEqual([
+          [{ poiId: target.id, landmarkId: 'titanic', firstTime: true }],
+        ]);
+        expect(fixture.thumbnail).toHaveBeenCalledExactlyOnceWith(
+          ctx.renderer.domElement,
+          undefined,
+          undefined,
+          'stock',
+        );
+        expect(ctx.photos.photos).toEqual([
+          expect.objectContaining({
+            image: fixture.image,
+            siteId: 'titanic',
+            siteName: 'RMS Titanic',
+            poiId: target.id,
+            poiName: target.name,
+            depthM: 3789.7,
+          }),
+        ]);
+        expect(storage.setItem).toHaveBeenCalledTimes(1);
+        expect(storage.setItem.mock.calls[0][0]).toBe(PHOTO_STORAGE_KEY);
+        expect(new PhotoStore(storage).photos).toEqual(ctx.photos.photos);
+        expect(ctx.journal.refresh).toHaveBeenCalledTimes(1);
+        expect(dive.shutter).not.toHaveBeenCalled();
+        expect(dive.toast).not.toHaveBeenCalled();
+        expect(ctx.audio.playShutter).not.toHaveBeenCalled();
+
+        // Same-dive completions are suppressed; a later dive emits firstTime:false.
+        dive.complete(target);
+        expect(completed).toHaveBeenCalledTimes(1);
+        scanner.resetDive();
+        completed.mockClear();
+        // The first completion's pending still was already consumed.
+        ctx.bus.clear();
+        // Keep the real photo listener: use a new observer instead of clearing the bus.
+        runner.frame(f);
+        expect(discoveries.isDiscovered('titanic', target.id)).toBe(true);
+        expect(fixture.thumbnail).toHaveBeenCalledTimes(1);
+      } finally {
+        fixture.dispose();
+      }
+    },
+  );
 });
