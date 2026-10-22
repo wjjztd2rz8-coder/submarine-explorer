@@ -1,15 +1,33 @@
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { Vector3 } from 'three';
 import { EventBus } from '../../src/core/EventBus.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EXPLORE_CONFIG } from '../../src/core/config/explore.js';
 import { AnchoredEvents, placeEventContacts } from '../../src/game/Events.js';
-import { parseSecrets, secretInRange, secretProgress } from '../../src/game/Secrets.js';
+import {
+  parseSecrets,
+  placeSecrets,
+  secretInRange,
+  secretProgress,
+} from '../../src/game/Secrets.js';
 import { Scanner, type ScanTarget } from '../../src/game/Scanner.js';
-import { Samples, type SampleTarget } from '../../src/game/Samples.js';
+import { Samples, placeSamples, type SampleTarget } from '../../src/game/Samples.js';
+import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
+import { parseMission, parseMissionIndex } from '../../src/game/Mission.js';
+import { parsePois, placePois } from '../../src/game/Pois.js';
+import { SPECIES_BY_ID } from '../../src/world/life/catalogue.js';
+import { buildEntries, parseLifeDoc } from '../../src/world/life/tables.js';
 import { buildSecret, seatOnSeabed, disposeExploreMesh } from '../../src/game/SecretsVisual.js';
 import { EventsVisual } from '../../src/game/EventsVisual.js';
-import { buildJournalSite, isEntryUnlocked, isSiteUnlocked } from '../../src/game/JournalData.js';
+import {
+  buildJournalSite,
+  isEntryUnlocked,
+  isSiteUnlocked,
+  lifeDiscoveryId,
+} from '../../src/game/JournalData.js';
+import type { TileMeta } from '../../src/util/types.js';
 
 const eventMeta = {
   center: { lat: 18.54635, lon: -81.71795 },
@@ -176,6 +194,130 @@ describe('content, collection and Journal', () => {
     samples.reset();
     expect(samples.collect(target)).toBe(true);
   });
+});
+
+describe('coexisting discovery identities', () => {
+  const readJson = (path: string): unknown => JSON.parse(readFileSync(path, 'utf8'));
+  const life = parseLifeDoc(readJson('data/life/life.json'));
+  // The shipped index excludes synthetic fixtures. Flat ground only supplies positions;
+  // this contract checks identities, not terrain, placement or simultaneous visibility.
+  const sites = parseMissionIndex(readJson('data/landmarks/index.json')).map((site) => {
+    const mission = parseMission(readJson(`data/landmarks/${site}/mission.json`), site)!;
+    const meta = readJson(`data/tiles/${mission.tile}/meta.json`) as TileMeta;
+    const pois = placePois(
+      parsePois(readJson(`data/landmarks/${mission.landmark}/pois.json`)),
+      meta,
+      { sampleHeight: () => -100 },
+      DEFAULT_CONFIG.scan,
+      mission.landmark,
+    );
+    const path = `data/secrets/${mission.landmark}.json`;
+    const doc = parseSecrets(existsSync(path) ? readJson(path) : null);
+    const secrets = placeSecrets(doc, mission.landmark, meta, () => -100);
+    const samples = placeSamples(doc.samples, mission.landmark, meta, () => -100);
+    const table = life.sites[mission.landmark];
+    const species = new Set(buildEntries(table).map((row) => row.def.id));
+    if (table?.rare && SPECIES_BY_ID.has(table.rare.species)) species.add(table.rare.species);
+    const targets = [
+      ...pois.map((t) => ({ ...t, pool: 'poi' })),
+      ...secrets.map((t) => ({ ...t, pool: 'secret' })),
+      ...samples.map((t) => ({ ...t, pool: 'sample' })),
+      ...[...species].map((id) => ({
+        id: lifeDiscoveryId(id),
+        landmarkId: mission.landmark,
+        pool: 'life',
+      })),
+    ];
+    return { site, mission, targets };
+  });
+
+  it.each(sites)(
+    '$site keeps optional, fixed and supported life identities independent',
+    ({ mission, targets }) => {
+      expect(new Set(targets.map((t) => t.id)).size, JSON.stringify(targets)).toBe(targets.length);
+      for (const objective of mission.objectives) {
+        // Mission completion matches the final POI ID; another pool must not satisfy it.
+        expect(targets.filter((t) => t.id === objective.poi).map((t) => t.pool)).toEqual(['poi']);
+      }
+      // Life's completion listener resolves against the whole catalogue, even when
+      // that animal is absent from this site's natural spawn table.
+      const catalogueIds = new Set([...SPECIES_BY_ID.keys()].map(lifeDiscoveryId));
+      for (const t of targets.filter((t) => t.pool !== 'life'))
+        expect(catalogueIds.has(t.id)).toBe(false);
+    },
+  );
+
+  type Identity = { id: string; landmarkId: string };
+  const allTargets = sites.flatMap((s) => s.targets);
+  function expectIsolatedReload(target: Identity, neighbors: Identity[]): void {
+    const values = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        values.set(key, value);
+      },
+      removeItem: (key: string) => {
+        values.delete(key);
+      },
+    };
+    const store = new DiscoveryStore(storage);
+    expect(store.record(target.landmarkId, target.id).firstTime).toBe(true);
+    const reloaded = new DiscoveryStore(storage);
+    expect(reloaded.keys()).toEqual([`${target.landmarkId}/${target.id}`]);
+    expect(reloaded.get(target.landmarkId, target.id)).toEqual(
+      store.get(target.landmarkId, target.id),
+    );
+    for (const neighbor of neighbors)
+      expect(
+        reloaded.isDiscovered(neighbor.landmarkId, neighbor.id),
+        JSON.stringify(neighbor),
+      ).toBe(false);
+  }
+
+  // Repeated local IDs at different sites are allowed; choose shipped examples
+  // where available rather than requiring any site to author optional content.
+  const repeated = ['secret', 'sample', 'life'].flatMap((pool) => {
+    const target = allTargets.find(
+      (t) =>
+        t.pool === pool &&
+        allTargets.some(
+          (other) => other.pool === pool && other.id === t.id && other.landmarkId !== t.landmarkId,
+        ),
+    );
+    return target ? [target] : [];
+  });
+  it.each(repeated)('$pool $id reloads only at $landmarkId among shipped contacts', (target) => {
+    expectIsolatedReload(
+      target,
+      allTargets.filter((other) => other !== target),
+    );
+  });
+
+  // Synthetic same-local-ID controls exercise the supported kind namespaces;
+  // they are not claims that these rows occur in shipped content.
+  const localId = 'comb-jelly';
+  const meta = { center: { lat: 0, lon: 0 } } as TileMeta;
+  const row = { id: localId, name: 'Contact', lat: 0, lon: 0 };
+  const doc = parseSecrets({
+    version: 1,
+    secrets: [{ ...row, kind: 'rock', text: 'A rock.' }],
+    samples: [row],
+  });
+  const controls = [
+    { id: parsePois([row])[0].id, landmarkId: 'fixture' },
+    ...placeSecrets(doc, 'fixture', meta, () => -100),
+    ...placeSamples(doc.samples, 'fixture', meta, () => -100),
+    { id: lifeDiscoveryId(localId), landmarkId: 'fixture' },
+  ];
+  it.each(controls)(
+    'synthetic $id stays independent of other kinds with the same local ID',
+    (target) => {
+      expectIsolatedReload(
+        target,
+        controls.filter((other) => other !== target),
+      );
+    },
+  );
 });
 
 describe('procedural visuals', () => {
