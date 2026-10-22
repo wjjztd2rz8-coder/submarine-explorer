@@ -384,6 +384,142 @@ describe('Input action map', () => {
     [14, 'toggleGuide'],
   ] as const;
 
+  it.each(padEdges)(
+    'gives a newly selected sparse pad its own button %s history for %s',
+    (button, action) => {
+      const pad = (index: number) => ({
+        connected: true,
+        mapping: 'standard',
+        index,
+        axes: [0, 0, 0, 0],
+        buttons: Array.from({ length: 16 }, () => ({ value: 0, pressed: false })),
+      });
+      const first = pad(1);
+      const second = pad(3);
+      let pads: Array<ReturnType<typeof pad> | null> = [null, first, null, second];
+      vi.stubGlobal('navigator', { getGamepads: () => pads });
+      const input = makeInput();
+      const check = (expected: typeof action | null) => {
+        const state = input.sample();
+        for (const [, edge] of padEdges) expect(Boolean(state[edge])).toBe(edge === expected);
+        expect(state).toMatchObject({ throttle: 0, yaw: 0, pitch: 0, ballast: 0, scan: false });
+      };
+      try {
+        first.buttons[button] = { value: 1, pressed: true };
+        check(action);
+        input.endFrame();
+        second.buttons[button] = { value: 1, pressed: true };
+        check(null); // The connected first pad still owns selection.
+        input.endFrame();
+        pads[1] = null;
+        check(action); // The old device's same button cannot suppress this edge.
+        check(action); // Sampled edges stay available until the frame ends.
+        input.endFrame();
+        check(null);
+        check(null);
+        input.endFrame();
+        check(null);
+        second.buttons[button] = { value: 0, pressed: false };
+        check(null);
+        second.buttons[button] = { value: 1, pressed: true };
+        check(action);
+        input.endFrame();
+        pads = [null, null, null, null];
+        check(null);
+        expect(input.gamepadActive).toBe(false);
+        input.endFrame();
+        pads[3] = second;
+        check(action); // Reconnection preserves the existing newly sampled held-button edge.
+        input.endFrame();
+        check(null);
+      } finally {
+        input.dispose();
+        vi.unstubAllGlobals();
+      }
+    },
+  );
+
+  it.each([false, true])(
+    'replaces the disconnected selected pad axes and scan (neutral fallback: %s)',
+    (neutral) => {
+      const first = {
+        connected: true,
+        mapping: 'standard',
+        index: 1,
+        axes: [0.6, -0.8, 0, -0.4],
+        buttons: Array.from({ length: 16 }, (_, i) => ({
+          value: i === 0 || i === 5 ? 1 : 0,
+          pressed: i === 0 || i === 5,
+        })),
+      };
+      const second = {
+        connected: true,
+        mapping: 'standard',
+        index: 3,
+        axes: neutral ? [0, 0, 0, 0] : [-0.3, 0.6, 0, 0.7],
+        buttons: Array.from({ length: 16 }, (_, i) => ({
+          value: !neutral && i === 1 ? 1 : 0,
+          pressed: !neutral && i === 1,
+        })),
+      };
+      const pads = [null, first, null, second];
+      vi.stubGlobal('navigator', { getGamepads: () => pads });
+      const input = makeInput();
+      const fallback = { throttle: 0.25, yaw: -1, pitch: 0.35, ballast: 0.45, scan: false };
+      try {
+        for (const key of ['KeyS', 'KeyA', 'KeyF', 'KeyC']) input.injectKey(key, true);
+        Object.assign(input.touchAxes, { throttle: 0.25, pitch: 0.35, ballast: 0.45 });
+        const selected = { throttle: 0.8, yaw: 0.6, pitch: 0.4, ballast: 1, scan: true };
+        expect(input.sample()).toMatchObject(selected);
+        expect(input.gamepadActive).toBe(true);
+        input.endFrame();
+        first.axes = [0, 0, 0, 0];
+        first.buttons[0] = first.buttons[5] = { value: 0, pressed: false };
+        expect(input.sample()).toMatchObject(fallback);
+        expect(input.gamepadActive).toBe(false); // An idle first pad still wins over the second.
+        input.endFrame();
+        first.axes = [0.6, -0.8, 0, -0.4];
+        first.buttons[0] = first.buttons[5] = { value: 1, pressed: true };
+        expect(input.sample()).toMatchObject(selected);
+        input.endFrame();
+        first.connected = false; // Keep its stale controls in the sparse array.
+        const handedOff = neutral
+          ? fallback
+          : { throttle: -0.6, yaw: -0.3, pitch: -0.7, ballast: -1, scan: false };
+        expect(input.sample()).toMatchObject(handedOff);
+        expect(input.gamepadActive).toBe(!neutral);
+        input.endFrame();
+        expect(input.sample()).toMatchObject(handedOff);
+        second.buttons[5] = { value: 1, pressed: true };
+        expect(input.sample().scan).toBe(true);
+        input.endFrame();
+        expect(input.sample().scan).toBe(true);
+        second.buttons[5] = { value: 0, pressed: false };
+        second.connected = false;
+        input.endFrame();
+        expect(input.sample()).toMatchObject(fallback);
+        expect(input.gamepadActive).toBe(false);
+        second.connected = true;
+        expect(input.sample()).toMatchObject(handedOff);
+        second.axes = [0, 0, 0, 0];
+        second.buttons[1] = { value: 0, pressed: false };
+        input.endFrame();
+        expect(input.sample()).toMatchObject(fallback);
+        expect(input.gamepadActive).toBe(false);
+        input.touchHeld.add('scan');
+        expect(input.sample().scan).toBe(true);
+        input.touchHeld.delete('scan');
+        input.injectKey('KeyG', true);
+        expect(input.sample().scan).toBe(true);
+        input.injectKey('KeyG', false);
+        expect(input.sample().scan).toBe(false);
+      } finally {
+        input.dispose();
+        vi.unstubAllGlobals();
+      }
+    },
+  );
+
   it.each(padEdges)('gamepad button %s fires only %s once per press', (button, action) => {
     const buttons = Array.from({ length: 16 }, () => ({ value: 0, pressed: false }));
     vi.stubGlobal('navigator', {
