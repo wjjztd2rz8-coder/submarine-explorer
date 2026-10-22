@@ -1,6 +1,9 @@
-import type * as THREE from 'three';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_CONFIG } from '../../src/core/Config.js';
+import type { TileMeta } from '../../src/util/types.js';
+import { DEFAULT_CONFIG, makeConfig } from '../../src/core/Config.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import { makeSyntheticTile } from './helpers.js';
 
@@ -78,6 +81,97 @@ describe('Terrain.sampleHeight', () => {
     expect(plain.sampleHeight(0, 0)).toBeCloseTo(-200, 5);
     expect(exaggerated.sampleHeight(0, 0)).toBeCloseTo(-500, 5);
   });
+});
+
+// CPU intersections use the generated positions and indices, independently of
+// the height sampler's patch selection and interpolation.
+function meshHeight(t: Terrain, x: number, z: number): number {
+  const ray = new THREE.Raycaster(new THREE.Vector3(x, 100, z), new THREE.Vector3(0, -1, 0));
+  const hit = ray.intersectObjects(t.group.children.filter((o) => o instanceof THREE.Mesh))[0];
+  expect(hit, `triangle at ${x}, ${z}`).toBeDefined();
+  return hit.point.y;
+}
+
+describe('Terrain near ground contact', () => {
+  it('matches shipped Lost City Low triangles between vertices and at chunk/tile edges', () => {
+    const meta = JSON.parse(readFileSync('data/tiles/lost-city/meta.json', 'utf8')) as TileMeta;
+    const bytes = readFileSync('data/tiles/lost-city/heightmap.bin');
+    const t = new Terrain(
+      { meta, heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows) },
+      makeConfig().terrain,
+      'low',
+    );
+    try {
+      const points: Array<[number, number]> = [[68.37023588203485, -190.23966161489727]];
+      // Opposite triangle interiors; source/chunk boundaries and both sides of them.
+      for (const c of [0, 63, 64, 127, meta.cols - 2])
+        for (const r of [0, 63, 64, 127, meta.rows - 2])
+          for (const f of [0.2, 0.8]) points.push([t.worldXOfCol(c + f), t.worldZOfRow(r + f)]);
+      for (const c of [64, 128])
+        for (const delta of [-0.001, 0, 0.001]) {
+          points.push([t.worldXOfCol(c + delta), t.worldZOfRow(64.37)]);
+          points.push([t.worldXOfCol(64.37), t.worldZOfRow(c + delta)]);
+        }
+      // Use the common supported Float32 mesh / double survey extent, including corners.
+      const xEdge = Math.min(t.widthM / 2, Math.fround(t.widthM / 2));
+      const zEdge = Math.min(t.depthM / 2, Math.fround(t.depthM / 2));
+      for (const f of [0, 0.37, 1]) {
+        for (const sign of [-1, 1]) {
+          points.push([sign * xEdge, (2 * f - 1) * zEdge]);
+          points.push([(2 * f - 1) * xEdge, sign * zEdge]);
+        }
+      }
+      for (const [x, z] of points)
+        expect(Math.abs(t.sampleHeight(x, z) - meshHeight(t, x, z)), `${x}, ${z}`).toBeLessThan(
+          0.001,
+        );
+    } finally {
+      t.dispose();
+    }
+  });
+
+  it('preserves uncarved pure-data bilinear sampling despite its triangle approximation', () => {
+    const tile = makeSyntheticTile({
+      cols: 2,
+      rows: 2,
+      height: (c, r) => [0, -10, -20, -40][r * 2 + c],
+    });
+    const t = new Terrain(tile, cfg, 'low');
+    try {
+      // The bilinear centre is -17.5; the actual diagonal joins -10 and -20.
+      expect(t.sampleHeight(0, 0)).toBeCloseTo(-17.5, 5);
+      expect(meshHeight(t, 0, 0)).toBeCloseTo(-15, 5);
+      expect(t.sampleHeight(0, 0)).toBe(t.sampleDataHeight(0, 0));
+    } finally {
+      t.dispose();
+    }
+  });
+
+  for (const tier of ['low', 'medium', 'high'] as const) {
+    it(`${tier}: keeps unprofiled detail and out-of-tile contracts explicit`, () => {
+      const tile = makeSyntheticTile({
+        cols: 9,
+        rows: 9,
+        height: (c, r) => -1000 + c * r * 3,
+      });
+      const t = new Terrain(tile, DEFAULT_CONFIG.terrain, tier);
+      try {
+        for (const f of [0.2, 0.8]) {
+          const x = t.worldXOfCol(3 + f),
+            z = t.worldZOfRow(3 + f);
+          if (tier === 'low')
+            expect(Math.abs(t.sampleHeight(x, z) - meshHeight(t, x, z))).toBeLessThan(0.001);
+          else expect(t.sampleHeight(x, z)).toBe(t.sampleDataHeight(x, z) + t.detailHeight(x, z));
+        }
+        const x = t.widthM / 2 + 10,
+          z = 2.3;
+        expect(t.contains(x, z)).toBe(false);
+        expect(t.sampleHeight(x, z)).toBe(t.sampleDataHeight(x, z) + t.detailHeight(x, z));
+      } finally {
+        t.dispose();
+      }
+    });
+  }
 });
 
 describe('Terrain.getNormal', () => {

@@ -326,7 +326,7 @@ export class CameraRig {
           .applyAxisAngle(new THREE.Vector3(0, 1, 0), this.lookAzimuth)
           .applyQuaternion(this.quat)
           .multiplyScalar(c.firstPersonLookAhead + speed * c.lookAheadPerSpeed)
-          .add(subPos);
+          .add(this.desiredPosition);
       }
     }
 
@@ -336,6 +336,9 @@ export class CameraRig {
     this.currentTarget.copy(this.desiredTarget);
 
     this.clampToTerrain(subPos);
+    // Keep first-person aim relative to the eye when clearance translates it.
+    if (this.mode === 'first-person')
+      this.currentTarget.add(this.camera.position).sub(this.desiredPosition);
     // Tall portrait frames: when the surface or terrain shortens the chase arm, the hull sits
     // low in a close view and ends up under the phone tutorial card.
     // Aim lower in proportion to the lost arm so the hull rides up the frame.
