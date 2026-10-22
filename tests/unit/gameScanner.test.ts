@@ -1,9 +1,12 @@
-import { Vector3 } from 'three';
+import { PerspectiveCamera, Scene, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus, type GameEvents } from '../../src/core/EventBus.js';
 import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
 import { Scanner, type ScanTarget } from '../../src/game/Scanner.js';
+import { AnchoredEvents, type EventContact } from '../../src/game/Events.js';
+import { Life } from '../../src/world/life/Life.js';
+import type { SubInfo } from '../../src/world/life/agent.js';
 import titanicPois from '../../data/landmarks/titanic/pois.json' with { type: 'json' };
 
 const DT = 1 / 60;
@@ -11,13 +14,12 @@ const cfg = { ...DEFAULT_CONFIG.scan, coneHalfAngleDeg: 30, closeRangeM: 10, dec
 
 type Log = Array<[keyof GameEvents, unknown]>;
 
-function setup(targets: ScanTarget[] = [target()]) {
+function setup(targets: ScanTarget[] = [target()], store = new DiscoveryStore(null)) {
   const bus = new EventBus();
   const log: Log = [];
   for (const name of ['scan:started', 'scan:progress', 'scan:aborted', 'scan:complete'] as const) {
     bus.on(name, (p) => log.push([name, p]));
   }
-  const store = new DiscoveryStore(null);
   const scanner = new Scanner(cfg, bus, store);
   scanner.setTargets(targets);
   return { bus, log, store, scanner };
@@ -45,6 +47,179 @@ function run(s: Scanner, seconds: number, pos: Vector3, fwd: Vector3, held: bool
 }
 
 const names = (log: Log) => log.map(([n]) => n);
+
+it.each([
+  ['departure', false],
+  ['departure', true],
+  ['range', false],
+  ['range', true],
+] as const)(
+  'drops a partial wildlife scan after live-list removal through %s (already interrupted=%s)',
+  (removal, interrupted) => {
+    const objective = target({ id: 'objective', position: new Vector3(500, -100, 0) });
+    const arrival = target({ id: 'event:plume', arrivalRadiusM: 40, scanSeconds: 0 });
+    let saved: string | null = null;
+    const storage = {
+      getItem: () => saved,
+      setItem: (_key: string, value: string) => {
+        saved = value;
+      },
+      removeItem: () => {
+        saved = null;
+      },
+    };
+    const store = new DiscoveryStore(storage);
+    const { scanner, log } = setup([objective], store);
+    scanner.setObjective(objective.id);
+    scanner.setSupplementalTargets([arrival]);
+    const sub: SubInfo = {
+      x: 0,
+      y: -100,
+      z: 0,
+      vx: 0,
+      vy: 0,
+      vz: 0,
+      fx: 0,
+      fy: 0,
+      fz: -1,
+      speed: 0,
+      lightsOn: true,
+      hullR: 6,
+    };
+    const life = new Life({
+      tier: 'low',
+      table: undefined,
+      env: { groundAt: () => -200 },
+      scene: new Scene(),
+      landmarkId: 'lm',
+      seed: 7,
+    });
+    const camera = new PerspectiveCamera();
+    const refresh = () => life.update(0, sub, camera, 800, 0);
+    try {
+      const [agent, incoming] = life.sim.spawnNear('comb-jelly', sub, 14, 2)!.members;
+      Object.assign(agent, { x: 0, y: -100, z: -12, fade: 1 });
+      Object.assign(incoming, { x: 0, y: -100, z: -10, fade: 0.5 });
+      // The app hands this array over once, before Life starts refreshing it.
+      scanner.setExtraTargets(life.targets);
+      refresh();
+      const animal = life.targets[0];
+      expect(animal.id).toBe('life:comb-jelly');
+      scanner.update(animal.scanSeconds / 2, AT, NORTH, true);
+      expect(scanner.view.activeId).toBe(animal.id);
+      expect(scanner.view.progress).toBeCloseTo(0.5);
+      if (interrupted) {
+        scanner.update(0.1, AT, NORTH, false);
+        expect(scanner.view.phase).toBe('interrupted');
+        expect(scanner.view.progress).toBeCloseTo(0.45);
+        expect(log.at(-1)).toEqual(['scan:aborted', { poiId: animal.id, reason: 'released' }]);
+      }
+      if (removal === 'departure') agent.leaving = true;
+      else agent.z = -100;
+      refresh();
+      expect(life.targets).toHaveLength(0);
+      expect(scanner.getExtraTargets()).toBe(life.targets);
+      log.length = 0;
+      scanner.update(0.1, AT, NORTH, true);
+      expect(scanner.view.phase).toBe('idle');
+      expect(scanner.view.activeId).toBeNull();
+      expect(scanner.view.progress).toBe(0);
+      expect(scanner.view.candidateId).toBeNull();
+      expect(scanner.view.nearestId).toBe(arrival.id);
+      expect(scanner.view.objectiveId).toBe(objective.id);
+      expect(log).toEqual([]); // membership loss uses the existing silent clear contract
+      expect(store.keys()).toEqual([]);
+
+      if (removal === 'departure') incoming.fade = 1;
+      else agent.z = -12;
+      refresh();
+      expect(life.targets[0]).toBe(animal); // cached species object returns
+      scanner.update(0, AT, NORTH, true);
+      expect(scanner.view.activeId).toBe(animal.id);
+      expect(scanner.view.progress).toBe(0);
+      scanner.update(animal.scanSeconds, AT, NORTH, true);
+      expect(log.filter(([name]) => name === 'scan:complete')).toEqual([
+        ['scan:complete', { poiId: animal.id, landmarkId: 'lm', firstTime: true }],
+      ]);
+      expect(store.keys()).toEqual(['lm/life:comb-jelly']);
+      scanner.update(animal.scanSeconds, AT, NORTH, true);
+      expect(scanner.view.candidateId).toBeNull();
+      expect(store.get('lm', animal.id)?.count).toBe(1);
+      // Discovery resets first, then Life clears on the same mission:restart.
+      scanner.resetDive();
+      life.clear();
+      const replacement = life.sim.spawnNear('comb-jelly', sub, 14, 1)!.members[0];
+      Object.assign(replacement, { x: 0, y: -100, z: -12, fade: 1 });
+      refresh();
+      expect(life.targets[0]).not.toBe(animal); // clear discards the species cache
+      expect(life.targets[0].id).toBe(animal.id);
+      scanner.update(animal.scanSeconds, AT, NORTH, true);
+      expect(log.filter(([name]) => name === 'scan:complete').at(-1)).toEqual([
+        'scan:complete',
+        { poiId: animal.id, landmarkId: 'lm', firstTime: false },
+      ]);
+      expect(store.get('lm', animal.id)?.count).toBe(2);
+      scanner.update(objective.scanSeconds, objective.position, NORTH, true);
+      expect(log.filter(([name]) => name === 'scan:complete').at(-1)).toEqual([
+        'scan:complete',
+        { poiId: objective.id, landmarkId: 'lm', firstTime: true },
+      ]);
+      expect(store.keys()).toEqual(['lm/life:comb-jelly', 'lm/objective']);
+      expect(scanner.view.completed).toBe(2);
+      const reloaded = new DiscoveryStore(storage);
+      expect(reloaded.keys()).toEqual(['lm/life:comb-jelly', 'lm/objective']);
+      expect(reloaded.get('lm', animal.id)?.count).toBe(2);
+    } finally {
+      life.dispose();
+    }
+  },
+);
+
+it('keeps partial curiosity progress across explore list replacements while arrivals retire and return', () => {
+  const secret = target({ id: 'secret:rock', position: new Vector3(0, -100, -20) });
+  const arrival: EventContact = {
+    ...target({ id: 'event:plume', position: new Vector3(0, -100, -60), scanSeconds: 0 }),
+    arrivalRadiusM: 40,
+    kind: 'plume',
+    headingDeg: 0,
+  };
+  const events = new AnchoredEvents();
+  const { scanner, log, store } = setup([]);
+  const replace = () =>
+    scanner.setSupplementalTargets([
+      secret,
+      ...[arrival].filter((contact) => events.available(contact)),
+    ]);
+  replace();
+  scanner.update(0.5, AT, NORTH, true);
+  expect(scanner.view.progress).toBeCloseTo(0.25);
+  const arriving = new Vector3(0, -100, -21);
+  expect(events.update(0.1, arriving, [arrival])?.contact).toBe(arrival);
+  replace();
+  expect(scanner.getSupplementalTargets()).toEqual([secret]);
+  scanner.update(0.1, arriving, NORTH, false);
+  expect(scanner.view.activeId).toBe(secret.id);
+  expect(scanner.view.candidateId).toBe(secret.id);
+  expect(scanner.view.nearestId).toBe(secret.id);
+  expect(scanner.view.progress).toBeCloseTo(0.2);
+  expect(log.at(-1)).toEqual(['scan:aborted', { poiId: secret.id, reason: 'released' }]);
+  replace();
+  scanner.update(0.1, arriving, NORTH, true);
+  expect(scanner.view.progress).toBeCloseTo(0.25);
+  scanner.update(secret.scanSeconds, arriving, NORTH, true);
+  expect(events.update(18, AT, [arrival])).toBeNull();
+  replace();
+  expect(scanner.getSupplementalTargets()).toEqual([secret, arrival]);
+  scanner.update(10, AT, NORTH, true);
+  expect(scanner.view.activeId).toBeNull();
+  expect(scanner.view.candidateId).toBeNull();
+  expect(scanner.view.nearestId).toBe(arrival.id);
+  expect(scanner.view.nearestArrivalRadiusM).toBe(40);
+  expect(store.keys()).toEqual(['lm/secret:rock']);
+  expect(log.filter(([name]) => name === 'scan:complete')).toEqual([
+    ['scan:complete', { poiId: secret.id, landmarkId: 'lm', firstTime: true }],
+  ]);
+});
 
 it.each(['fixed', 'wildlife', 'curiosity'] as const)(
   'keeps a coincident arrival contact out of the %s scan beam across mode changes',

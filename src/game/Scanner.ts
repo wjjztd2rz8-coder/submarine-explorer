@@ -362,6 +362,9 @@ export class Scanner {
         candidateDist = g.distance;
       }
     }
+    // Caller-owned live lists can drop the active object without a setter call.
+    // Match the setters' silent clear instead of retaining progress on a removed contact.
+    if (this.active && !activeGeo) this.clearActive();
     // Stickiness: keep scanning the active target while it stays valid, even
     // if another one drifts slightly closer.
     if (
