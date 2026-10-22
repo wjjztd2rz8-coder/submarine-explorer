@@ -5,12 +5,17 @@
  */
 
 import { Vector3 } from 'three';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { inputGateSystem } from '../../src/app/loop.js';
+import type { FrameState } from '../../src/app/System.js';
+import type { GameContext } from '../../src/app/context.js';
 import { DEFAULT_CONFIG, makeConfig } from '../../src/core/Config.js';
+import { EventBus } from '../../src/core/EventBus.js';
 import type { FetchJson } from '../../src/game/ContentPath.js';
 import { parseMission, type MissionDef, type ObjectiveStatus } from '../../src/game/Mission.js';
 import {
   FROZEN_INPUT,
+  MissionRouter,
   applyMissionLoadout,
   bearingTo,
   chooseTileId,
@@ -20,6 +25,7 @@ import {
 } from '../../src/game/MissionRouter.js';
 import { Submarine, type HeightField } from '../../src/sub/Submarine.js';
 import { formatTurn } from '../../src/ui/ObjectivesPanel.js';
+import type { DebriefStats } from '../../src/game/Objectives.js';
 import { missionUrl, tileUrl } from '../../src/ui/MissionSelect.js';
 import { latLonToWorld } from '../../src/util/geo.js';
 import type { TileMeta } from '../../src/util/types.js';
@@ -326,5 +332,375 @@ describe('mission select URLs', () => {
     expect(u.searchParams.get('skipBriefing')).toBeNull();
     expect(u.searchParams.get('tile')).toBe('lost-city');
     expect(u.searchParams.get('tier')).toBe('low');
+  });
+});
+
+/** Same minimal EventTarget DOM as debriefReopen; no layout or rendering. */
+class Element extends EventTarget {
+  children: Element[] = [];
+  hidden = false;
+  className = '';
+  textContent = '';
+  scrollTop = 0;
+  dataset: Record<string, string> = {};
+  attributes: Record<string, string> = {};
+  classList = {
+    contains: (name: string) => this.className.split(' ').includes(name),
+    toggle: (name: string, on = !this.classList.contains(name)) => {
+      const classes = new Set(this.className.split(' ').filter(Boolean));
+      if (on) classes.add(name);
+      else classes.delete(name);
+      this.className = [...classes].join(' ');
+      return on;
+    },
+    add: (name: string) => {
+      this.classList.toggle(name, true);
+    },
+  };
+  get childElementCount() {
+    return this.children.length;
+  }
+  setAttribute(name: string, value: string) {
+    this.attributes[name] = value;
+  }
+  append(...children: Element[]) {
+    this.children.push(...children);
+  }
+  appendChild(child: Element) {
+    this.append(child);
+  }
+  replaceChildren(...children: Element[]) {
+    this.children = children;
+  }
+  contains(child: Element): boolean {
+    return child === this || this.children.some((e) => e.contains(child));
+  }
+  blur() {}
+  remove() {}
+}
+
+function descendants(root: HTMLElement): Element[] {
+  const walk = (e: Element): Element[] => [e, ...e.children.flatMap(walk)];
+  return walk(root as unknown as Element);
+}
+
+function control(root: HTMLElement, className: string): Element {
+  const found = descendants(root).find((e) => e.classList.contains(className));
+  if (!found) throw new Error(`Missing control ${className}`);
+  return found;
+}
+
+const POSITION = { x: 0, y: -10, z: 0 };
+const BOUNDARIES = ['primary pending', 'primary open', 'all pending', 'all open'] as const;
+type Boundary = (typeof BOUNDARIES)[number];
+
+// Feed the router the same clock boundary as play.mission: a pause and the
+// first resumed interval both contribute zero, even though frame dt is nonzero.
+function frame(
+  router: MissionRouter,
+  options: {
+    frozen?: boolean;
+    resumeFrame?: boolean;
+    emergencyBlow?: boolean;
+  } = {},
+): void {
+  const f = {
+    dt: 0.25,
+    realSteps: 8,
+    sampled: FROZEN_INPUT,
+    frozen: options.frozen ?? router.frozen,
+    resumeFrame: options.resumeFrame ?? false,
+  } as FrameState;
+  inputGateSystem.frame!['gate.input']!(f, {} as GameContext);
+  router.update(f.clockDt, f.dt, POSITION, 0, {
+    emergencyBlow: options.emergencyBlow ?? router.emergencyAscent,
+    depth: 10,
+  });
+}
+
+function advance(router: MissionRouter, seconds: number): void {
+  for (let i = 0; i < seconds * 4; i++) frame(router);
+}
+
+function pauseAndResume(router: MissionRouter): void {
+  const elapsed = router.mission.elapsedS;
+  for (let i = 0; i < 16; i++) frame(router, { frozen: true });
+  frame(router, { frozen: false, resumeFrame: true });
+  expect(router.mission.elapsedS).toBe(elapsed);
+}
+
+describe('MissionRouter completion timing', () => {
+  let router: MissionRouter;
+  let bus: EventBus;
+  const events = () => router.mission.emitted.map((e) => e.name);
+  const scan = (poiId: 'primary' | 'optional') =>
+    bus.emit('scan:complete', { poiId, landmarkId: 'reef', firstTime: true });
+  const click = (element: Element) => element.dispatchEvent(new Event('click'));
+  const title = () => control(router.panel.root, 'obj-banner-title').textContent;
+
+  beforeEach(async () => {
+    const body = new Element();
+    vi.stubGlobal('HTMLElement', Element);
+    vi.stubGlobal('window', new EventTarget());
+    vi.stubGlobal('document', {
+      body,
+      activeElement: body,
+      documentElement: new Element(),
+      createElement: () => new Element(),
+    });
+    bus = new EventBus();
+    const def: MissionDef = {
+      version: 1,
+      id: 'reef',
+      tile: 'reef',
+      landmark: 'reef',
+      title: 'Reef',
+      spawn: { lat: 0, lon: 0, depth_m: 5, heading_deg: 0 },
+      briefing: { summary: '', facts: [], hazards: [] },
+      completion: 'all_primary',
+      objectives: [
+        { id: 'primary', poi: 'primary', type: 'scan', hint: '', title: 'Primary', primary: true },
+        {
+          id: 'optional',
+          poi: 'optional',
+          type: 'scan',
+          hint: '',
+          title: 'Optional',
+          primary: false,
+        },
+      ],
+    };
+    const stats: DebriefStats = {
+      elapsedS: 0,
+      distanceM: 0,
+      maxDepthM: 10,
+      discoveries: [],
+      newEntries: [],
+    };
+    router = new MissionRouter({
+      bus,
+      config: DEFAULT_CONFIG,
+      meta: { id: 'reef' } as TileMeta,
+      parent: body as unknown as HTMLElement,
+      route: { missionId: 'reef', tileId: 'reef', landmarkId: 'reef', skipBriefing: true, def },
+      discovery: {
+        ready: Promise.resolve(),
+        pois: ['primary', 'optional'].map((id) => ({ id, name: id, position: POSITION })),
+        guide: { isOpen: false, open() {} },
+        stats: { snapshot: (extra) => ({ ...stats, ...extra }) },
+      },
+    });
+    await Promise.resolve();
+  });
+
+  afterEach(() => {
+    router?.dispose();
+    vi.unstubAllGlobals();
+  });
+
+  function reach(boundary: Boundary): void {
+    scan('primary');
+    if (boundary.startsWith('all')) scan('optional');
+    advance(router, boundary.endsWith('pending') ? 2.75 : 3);
+    expect(router.panel.bannerOpen).toBe(boundary.endsWith('open'));
+  }
+
+  it.each(['pending', 'open', 'dismissed'] as const)(
+    'promotes a %s primary banner with the existing delay and full auto-dismiss lifetime',
+    (phase) => {
+      scan('primary');
+      if (phase === 'pending') {
+        advance(router, 1);
+        pauseAndResume(router);
+      } else {
+        advance(router, 3);
+        expect(title()).toBe('Primary objectives complete');
+        advance(router, phase === 'open' ? 1 : 20);
+        expect(router.panel.bannerOpen).toBe(phase === 'open');
+      }
+      scan('optional');
+      expect(router.panel.bannerOpen).toBe(false);
+      advance(router, phase === 'pending' ? 1.75 : 2.75);
+      pauseAndResume(router);
+      expect(router.panel.bannerOpen).toBe(false);
+      frame(router);
+      expect(router.panel.bannerOpen).toBe(true);
+      expect(title()).toBe('All objectives complete');
+      expect(control(router.panel.root, 'obj-banner-detail').textContent).toBe(
+        '2 of 2 objectives. Surface when you are ready.',
+      );
+      advance(router, 19.75);
+      pauseAndResume(router);
+      expect(router.panel.bannerOpen).toBe(true);
+      frame(router);
+      expect(router.panel.bannerOpen).toBe(false);
+      expect(router.mission.diving).toBe(true);
+      expect(router.debriefOpen).toBe(false);
+      expect(events()).toEqual([
+        'mission:started',
+        'mission:objective',
+        'mission:primaryComplete',
+        'mission:objective',
+      ]);
+      advance(router, 4);
+      expect(router.panel.bannerOpen).toBe(false);
+    },
+  );
+
+  it.each(BOUNDARIES)(
+    'Surface cancels %s and Keep exploring permits another end, not another completion',
+    (boundary) => {
+      reach(boundary);
+      const staleSurface = control(router.panel.root, 'is-surface');
+      if (router.panel.bannerOpen) click(staleSurface);
+      else expect(router.endDive()).toBe(true); // Pause-menu action while the banner is pending.
+      expect(router.debriefOpen).toBe(true);
+      expect(router.panel.root.hidden).toBe(true);
+      const debrief = router.debrief;
+      click(staleSurface);
+      scan('optional'); // The debrief blocks scans; even a late event is ignored by Mission.
+      advance(router, 24);
+      expect(router.debrief).toBe(debrief);
+      expect(router.panel.bannerOpen).toBe(false);
+      expect(events().filter((e) => e === 'mission:ended')).toHaveLength(1);
+      expect(events().filter((e) => e === 'mission:complete')).toHaveLength(1);
+      click(descendants(router.debrief!.root).find((e) => e.dataset.action === 'keep-exploring')!);
+      frame(router, { resumeFrame: true });
+      advance(router, 24);
+      expect(router.panel.bannerOpen).toBe(false);
+      expect(router.mission.diving).toBe(true);
+      expect(router.endDive()).toBe(true);
+      expect(events().filter((e) => e === 'mission:complete')).toHaveLength(1);
+      expect(events().filter((e) => e === 'mission:ended')).toHaveLength(2);
+      expect(
+        router.mission.emitted.filter((e) => e.name === 'mission:ended').map((e) => e.payload),
+      ).toEqual([
+        {
+          missionId: 'reef',
+          reason: boundary.startsWith('all') ? 'all' : 'surface',
+          completed: boundary.startsWith('all') ? 2 : 1,
+          total: 2,
+          durationS: boundary.endsWith('pending') ? 2.75 : 3,
+        },
+        {
+          missionId: 'reef',
+          reason: boundary.startsWith('all') ? 'all' : 'surface',
+          completed: boundary.startsWith('all') ? 2 : 1,
+          total: 2,
+          durationS: (boundary.endsWith('pending') ? 2.75 : 3) + 24,
+        },
+      ]);
+    },
+  );
+
+  for (const cause of ['crush', 'power'] as const) {
+    for (const finish of ['next update', 'after delay'] as const) {
+      it.each(BOUNDARIES)(
+        `${cause} ascent from %s finishes ${finish} without completion actions overriding abort`,
+        (boundary) => {
+          reach(boundary);
+          const staleSurface = control(router.panel.root, 'is-surface');
+          const staleKeep = control(router.panel.root, 'is-keep');
+          bus.emit('sub:emergencyBlow', { depth: 200, lockSeconds: 8, cause });
+          expect(router.panel.bannerOpen).toBe(false);
+          expect(router.canEndDive).toBe(false);
+          expect(router.alert).toContain('EMERGENCY ASCENT');
+          click(staleSurface);
+          click(staleKeep);
+          expect(router.endDive()).toBe(false);
+          // events precedes scan.discovery, which precedes play.mission. Ascent
+          // locks vehicle controls, but the caller still permits the scan beam.
+          scan('optional');
+          if (finish === 'after delay') {
+            advance(router, 3);
+            expect(router.panel.bannerOpen).toBe(false);
+            expect(router.debriefOpen).toBe(false);
+            expect(router.mission.diving).toBe(true);
+          }
+          frame(router, { emergencyBlow: false });
+          expect(router.emergencyAscent).toBe(false);
+          expect(router.alert).toBeNull();
+          expect(router.debriefOpen).toBe(true);
+          expect(router.debrief?.last?.title).toBe('Dive aborted');
+          expect(router.debrief?.last?.objectives).toEqual({ completed: 2, total: 2 });
+          expect(router.panel.bannerOpen).toBe(false);
+          expect(router.panel.root.hidden).toBe(true);
+          expect(router.mission.canResume).toBe(false);
+          expect(
+            descendants(router.debrief!.root).some((e) => e.dataset.action === 'keep-exploring'),
+          ).toBe(false);
+          const expected = [
+            'mission:started',
+            'mission:objective',
+            'mission:primaryComplete',
+            'mission:objective',
+            'mission:aborted',
+            'mission:ended',
+          ];
+          expect(events()).toEqual(expected);
+          expect(router.mission.emitted.find((e) => e.name === 'mission:aborted')?.payload).toEqual(
+            {
+              missionId: 'reef',
+              reason: cause,
+            },
+          );
+          const end = router.mission.emitted.at(-1)?.payload;
+          expect(end).toEqual({
+            missionId: 'reef',
+            reason: 'abort',
+            completed: 2,
+            total: 2,
+            durationS:
+              (boundary.endsWith('pending') ? 2.75 : 3) + (finish === 'after delay' ? 3 : 0) + 0.25,
+          });
+          const debrief = router.debrief;
+          click(staleSurface);
+          click(staleKeep);
+          router.keepExploring();
+          expect(router.endDive()).toBe(false);
+          scan('primary');
+          scan('optional');
+          advance(router, 24);
+          expect(router.debrief).toBe(debrief);
+          expect(router.debriefOpen).toBe(true);
+          expect(router.panel.bannerOpen).toBe(false);
+          expect(router.mission.diving).toBe(false);
+          expect(events()).toEqual(expected);
+        },
+      );
+    }
+  }
+
+  it('an abort after voluntary completion cannot resume through an old Keep exploring action or award completion again', () => {
+    reach('primary open');
+    click(control(router.panel.root, 'is-surface'));
+    const oldKeep = descendants(router.debrief!.root).find(
+      (e) => e.dataset.action === 'keep-exploring',
+    )!;
+    click(oldKeep);
+    frame(router, { resumeFrame: true });
+    scan('optional');
+    advance(router, 3);
+    expect(title()).toBe('All objectives complete');
+    bus.emit('sub:emergencyBlow', { depth: 200, lockSeconds: 8, cause: 'power' });
+    frame(router, { emergencyBlow: false });
+    const summary = router.debrief?.last;
+    click(oldKeep);
+    expect(router.endDive()).toBe(false);
+    advance(router, 24);
+    expect(router.debriefOpen).toBe(true);
+    expect(router.debrief?.last).toBe(summary);
+    expect(router.mission.diving).toBe(false);
+    expect(router.panel.bannerOpen).toBe(false);
+    expect(events()).toEqual([
+      'mission:started',
+      'mission:objective',
+      'mission:primaryComplete',
+      'mission:complete',
+      'mission:ended',
+      'mission:objective',
+      'mission:aborted',
+      'mission:ended',
+    ]);
   });
 });
