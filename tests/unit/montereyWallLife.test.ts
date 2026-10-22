@@ -68,6 +68,8 @@ describe('Monterey wall life on surveyed terrain', () => {
           const intersectApron = projectedRaycast(apron, 'y');
           const faceRay = new THREE.Raycaster();
           const intoRock = new THREE.Vector3(0, 0, 1);
+          const exposedDirection = new THREE.Vector3(0, 0, -1).transformDirection(wall.matrixWorld);
+          const growthDirection = new THREE.Vector3();
           const seat = new THREE.Vector3();
           const ray = new THREE.Raycaster();
           const down = new THREE.Vector3(0, -1, 0);
@@ -88,6 +90,13 @@ describe('Monterey wall life on surveyed terrain', () => {
               range.min = Math.min(range.min, clearance);
               range.max = Math.max(range.max, clearance);
               if (mesh.name.startsWith('wall-')) {
+                // Colony templates grow along +Y. Check their lean after the authored
+                // bank transform; a reversed colony can keep the same supported seat.
+                growthDirection.set(0, 1, 0).transformDirection(world);
+                expect(
+                  growthDirection.dot(exposedDirection),
+                  `${hero.def.id} ${mesh.name}[${i}]: growth leans toward exposed side`,
+                ).toBeGreaterThan(0);
                 seat.setFromMatrixPosition(instance);
                 faceRay.set(
                   new THREE.Vector3(seat.x, seat.y, wall.geometry.boundingBox!.min.z - 1),
