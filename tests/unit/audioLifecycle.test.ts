@@ -127,6 +127,161 @@ afterEach(() => {
 });
 
 describe('audio lifecycle', () => {
+  it('stays locked when context construction throws and retries with the latest saved gains', async () => {
+    const construct = vi.fn(function () {
+      throw new Error('Audio device unavailable');
+    });
+    vi.stubGlobal('window', { AudioContext: construct, setTimeout, clearTimeout });
+    const bus = new EventBus();
+    const audio = system(bus);
+    audio.setSettings({ muted: true, masterVolume: 0.7 });
+    expect(() => audio.unlock()).not.toThrow();
+    expect(construct).toHaveBeenCalledOnce();
+    expect(audio.isReady).toBe(false);
+    expect(audio.diagnostics.state).toBe('locked');
+    expect(Context.instances).toHaveLength(0);
+    expect(fetch).not.toHaveBeenCalled();
+    bus.emit('scan:started', { poiId: 'bow' });
+    audio.update(creakFrame());
+
+    audio.setSettings({ masterVolume: 0.4, sfxVolume: 0.2, musicVolume: 0.1 });
+    vi.stubGlobal('window', { AudioContext: Context, setTimeout, clearTimeout });
+    audio.unlock();
+    await flush();
+    expect(audio.isReady).toBe(true);
+    expect(audio.diagnostics).toMatchObject({ masterGain: 0, sfxGain: 0.2, musicGain: 0.1 });
+    audio.setSettings({ muted: false });
+    expect(audio.diagnostics.masterGain).toBe(0.4);
+    const caption = vi.fn();
+    audio.captions.on(caption);
+    bus.emit('scan:started', { poiId: 'bow' });
+    expect(caption.mock.calls.map(([event]) => event.id)).toEqual(['servo', 'scan-hum']);
+    audio.dispose();
+    for (const node of context().nodes) expect(node.connections).toEqual([]);
+  });
+
+  it.each(['suspended', 'interrupted'])(
+    'recovers a browser-%s context on a gesture without rebuilding loops or losing mute',
+    async (state) => {
+      const audio = system();
+      audio.setSettings({ muted: true });
+      audio.unlock();
+      await flush();
+      const ctx = context();
+      const nodes = [...ctx.nodes];
+      const resumes = ctx.resume.mock.calls.length;
+      ctx.state = state;
+      audio.unlock();
+      const warmup = ctx.nodes.slice(nodes.length);
+      expect(warmup).toHaveLength(1);
+      expect(warmup[0].start).toHaveBeenCalledOnce();
+      await flush();
+      expect(ctx.state).toBe('running');
+      expect(ctx.resume.mock.calls.length).toBeGreaterThan(resumes);
+      expect(Context.instances).toHaveLength(1);
+      expect(audio.diagnostics.masterGain).toBe(0);
+      warmup[0].end();
+      expect(warmup[0].connections).toEqual([]);
+      audio.unlock();
+      await flush();
+      expect(ctx.nodes).toEqual([...nodes, ...warmup]);
+      audio.dispose();
+      for (const node of ctx.nodes) expect(node.connections).toEqual([]);
+    },
+  );
+
+  it.each(['thruster', 'vent', 'shrimp', 'hull-creak'])(
+    'releases every node when a %s caption changes the scene during a frame',
+    async (trigger) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({ ok: true, arrayBuffer: async () => new ArrayBuffer(1) }),
+      );
+      const bus = new EventBus();
+      const audio = system(bus);
+      audio.unlock();
+      for (let i = 0; i < 8; i++) await flush();
+      const ctx = context();
+      ctx.currentTime = 12;
+      const depth = trigger === 'shrimp' ? -100 : -7000;
+      const captions: string[] = [];
+      audio.captions.on(({ id }) => {
+        captions.push(id);
+        if (id === trigger) audio.dispose();
+      });
+      audio.update({
+        ...creakFrame(depth),
+        throttle: trigger === 'thruster' ? 1 : 0,
+        ballast: 1,
+        whaleHabitat: true,
+        soundSites: [
+          { id: 'vent', kind: 'vent', position: { x: 0, y: trigger === 'vent' ? depth : 0, z: 0 } },
+          { id: 'reef', kind: 'reef', position: { x: 0, y: depth, z: 0 } },
+        ],
+      });
+      expect(captions).toContain(trigger);
+      expect(ctx.close).toHaveBeenCalledOnce();
+      for (const node of ctx.nodes) expect(node.connections).toHaveLength(0);
+      expect(captions.at(-1)).toBe(trigger);
+      const count = ctx.nodes.length;
+      audio.update(creakFrame());
+      bus.emit('scan:started', { poiId: 'bow' });
+      audio.unlock();
+      expect(ctx.nodes).toHaveLength(count);
+    },
+  );
+
+  it('isolates scene re-entry from a pending unlock and late optional sample load', async () => {
+    const response = { ok: true, arrayBuffer: async () => new ArrayBuffer(1) };
+    let finishFetch!: (value: typeof response) => void;
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockImplementationOnce(() => new Promise((resolve) => (finishFetch = resolve)))
+        .mockResolvedValue(response),
+    );
+    const bus = new EventBus();
+    const old = system(bus);
+    old.unlock();
+    const oldContext = context();
+    old.dispose();
+    const oldNodeCount = oldContext.nodes.length;
+
+    const next = system(bus);
+    const captions = vi.fn();
+    next.captions.on(captions);
+    next.unlock();
+    finishFetch(response);
+    for (let i = 0; i < 8; i++) await flush();
+    expect(old.diagnostics.sampleReady).toBe(false);
+    expect(next.diagnostics.sampleReady).toBe(true);
+    expect(oldContext.close).toHaveBeenCalledOnce();
+    expect(oldContext.suspend).not.toHaveBeenCalled();
+    expect(oldContext.nodes).toHaveLength(oldNodeCount);
+    for (const node of oldContext.nodes) expect(node.connections).toHaveLength(0);
+
+    context().currentTime = 12;
+    const frame = { ...creakFrame(-100), whaleHabitat: true };
+    const beforeCall = context().nodes.length;
+    next.update(frame);
+    expect(context().nodes).toHaveLength(beforeCall + 2);
+    next.update(frame);
+    expect(context().nodes).toHaveLength(beforeCall + 2);
+    bus.emit('scan:complete', { poiId: 'bow', landmarkId: 'titanic', firstTime: true });
+    expect(captions.mock.calls.map(([event]) => event.id)).toEqual(['whale', 'discovery']);
+    next.setPaused(true);
+    next.dispose();
+    expect(Context.instances).toHaveLength(2);
+    for (const ctx of Context.instances) {
+      expect(ctx.close).toHaveBeenCalledOnce();
+      for (const node of ctx.nodes) {
+        expect(node.connections).toHaveLength(0);
+        if (node.start.mock.calls.length) expect(node.stop).toHaveBeenCalled();
+      }
+    }
+  });
+
   it.each([
     {
       name: 'new player',
