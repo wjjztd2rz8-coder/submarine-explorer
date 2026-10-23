@@ -1,12 +1,22 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import { Props } from '../../src/world/Props.js';
 import { decodeHeightmap } from '../../src/world/TileLoader.js';
 import type { TileMeta } from '../../src/util/types.js';
+
+// Contact checks need the real survey mesh and props, but never read vertex colors.
+// Avoid coloring the entire tile while retaining its topology and height sampling.
+vi.mock('../../src/world/TerrainBiome.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../src/world/TerrainBiome.js')>();
+  return {
+    ...actual,
+    biomeFor: (id: string) => ({ ...actual.biomeFor(id), vertexTint: undefined }),
+  };
+});
 
 // Known upper-wall gaps remain pending the scarp collision repair. Keep fixture
 // validation outside the expected failure so a missing mesh cannot masquerade as it.
