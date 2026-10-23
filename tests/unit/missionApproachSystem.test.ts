@@ -1,3 +1,4 @@
+import { MISSION_APPROACH_M } from '../../src/game/Spawn.js';
 import { resolveEffective } from '../../src/game/EffectiveSettings.js';
 import { defaultSettings } from '../../src/core/Save.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
@@ -77,12 +78,13 @@ for (const mode of ['arcade', 'realistic'] as const) {
       } as unknown as GameContext;
       missionSystem.init!(ctx);
       ctx.applyMissionStart!('near-site');
-      expect(sub.position.distanceTo(target.position)).toBeCloseTo(220, 2);
+      expect(sub.position.distanceTo(target.position)).toBeCloseTo(MISSION_APPROACH_M.titanic, 2);
+      const approachRadius = Math.min(dataRadius, 80, (MISSION_APPROACH_M.titanic - 60) / 2);
       const multiplier = ctx.effective.sensor.scanRadiusMultiplier;
       expect(target.radius).toBe(
-        Math.max(mode === 'arcade' ? 100 : 0, Math.min(dataRadius, 80) * multiplier),
+        Math.max(mode === 'arcade' ? 100 : 0, approachRadius * multiplier),
       );
-      expect(ctx.baseScanRadii.get(target.id)).toBe(Math.min(dataRadius, 80));
+      expect(ctx.baseScanRadii.get(target.id)).toBe(approachRadius);
       const draw = () =>
         missionSystem.frame!['play.mission']!(
           { clockDt: 0, dt: 0, sub: sub.getState() } as FrameState,
