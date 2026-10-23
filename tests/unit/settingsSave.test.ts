@@ -8,6 +8,7 @@ import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import {
   SAVE_KEYS,
+  PROGRESS_STORAGE_KEY,
   SETTINGS_STORAGE_KEY,
   Save,
   defaultSettings,
@@ -167,6 +168,30 @@ describe('settings defaults and migrate', () => {
 });
 
 describe('Save', () => {
+  it.each([
+    { key: 'subexplorer.settings.v1', text: '{"version":1,"captions":true}' },
+    { key: 'subexplorer.settings.v2', text: '{"version":2,"gameplayMode":"realistic"}' },
+    { key: SETTINGS_STORAGE_KEY, text: '{broken' },
+  ])(
+    'keeps Journal and research saves intact through recovery, edits and reset of $key',
+    ({ key, text }) => {
+      const storage = new MemoryStore();
+      const discoveries = '{"version":0,"discoveries":["titanic/bow","retired-site/bow"]}';
+      const progress = '{"version":1,"ratings":{"titanic":2},"awarded":["poi:titanic/bow"]}';
+      storage.setItem(SAVE_KEYS.discoveries, discoveries);
+      storage.setItem(PROGRESS_STORAGE_KEY, progress);
+      storage.setItem(key, text);
+      const save = new Save({ config, storage });
+      save.setGameplayMode('arcade');
+      save.save({ captions: true });
+      save.reset();
+      expect(new Save({ config, storage }).get()).toEqual(defaultSettings(config));
+      expect(storage.getItem(SAVE_KEYS.discoveries)).toBe(discoveries);
+      expect(storage.getItem(PROGRESS_STORAGE_KEY)).toBe(progress);
+      if (key !== SETTINGS_STORAGE_KEY) expect(storage.getItem(key)).toBe(text);
+    },
+  );
+
   it('keeps accessibility changes usable when the localStorage accessor is denied', () => {
     vi.stubGlobal('localStorage', undefined);
     Object.defineProperty(globalThis, 'localStorage', {
