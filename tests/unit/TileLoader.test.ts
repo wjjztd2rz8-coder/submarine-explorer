@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   TileLoadError,
   TileLoader,
@@ -10,6 +10,46 @@ import {
 } from '../../src/world/TileLoader.js';
 import type { Tile } from '../../src/util/types.js';
 import { encodeHeightmap, makeFakeFetch, makeSyntheticTile } from './helpers.js';
+import { EventBus } from '../../src/core/EventBus.js';
+import type { BootContext } from '../../src/app/context.js';
+
+// Keep the real runtime error/cancellation boundary without constructing dive systems.
+vi.mock('../../src/app/boot.js', () => ({ showFatal: vi.fn() }));
+vi.mock('../../src/app/homeStartup.js', () => ({}));
+vi.mock('../../src/app/systems.js', () => ({ createSystems: vi.fn(() => []) }));
+import { startRuntime } from '../../src/app/startup.js';
+import { showFatal } from '../../src/app/boot.js';
+import { createSystems } from '../../src/app/systems.js';
+
+function pending<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (error: unknown) => void;
+  const promise = new Promise<T>((yes, no) => {
+    resolve = yes;
+    reject = no;
+  });
+  return { promise, resolve, reject };
+}
+
+function diveContext(loader: TileLoader, tileId: string): BootContext {
+  vi.stubGlobal('window', new EventTarget());
+  vi.stubGlobal('document', {
+    body: { append() {} },
+    createElement: () => ({ append() {}, setAttribute() {}, remove() {} }),
+  });
+  return {
+    app: { state: 'dive' },
+    params: new URLSearchParams({ tile: tileId }),
+    loader,
+    tileId,
+    bus: new EventBus(),
+  } as BootContext;
+}
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.clearAllMocks();
+});
 
 /** Quantise like tools/tile_writer.py quantize16 and serialise as LE uint16. */
 function quantize16(tile: Tile): { buffer: ArrayBuffer; min: number; scale: number } {
@@ -74,6 +114,73 @@ describe('TileLoader', () => {
       '/data/tiles/fixture/heightmap.bin',
     ]);
   });
+
+  it.each(['metadata request', 'metadata JSON', 'canonical request', 'canonical body'])(
+    'reports a rejected %s at the runtime boundary and can load another tile',
+    async (stage) => {
+      const failed = makeSyntheticTile({ id: 'unavailable', cols: 2, rows: 3 });
+      const recovered = makeSyntheticTile({
+        id: 'independent',
+        cols: 4,
+        rows: 2,
+        height: (c, r) => -100 - r * 4 - c,
+      });
+      const entered = pending<void>();
+      const held = pending<never>();
+      const error = stage === 'metadata JSON' ? new SyntaxError('invalid JSON') : new Error(stage);
+      const target = stage.startsWith('metadata') ? 'meta.json' : 'heightmap.bin';
+      const recoverySignal = new AbortController().signal;
+      let failedSignal: AbortSignal | undefined;
+      const fetch = vi.fn<FetchLike>(async (url, options) => {
+        if (url.includes('/independent/')) {
+          expect(options?.signal).toBe(recoverySignal);
+          return makeFakeFetch(recovered)(url);
+        }
+        failedSignal ??= options?.signal;
+        expect(options?.signal).toBe(failedSignal);
+        const response = await makeFakeFetch(failed)(url);
+        if (!url.endsWith(`/${target}`)) return response;
+        const rejectLater = () => {
+          entered.resolve();
+          return held.promise;
+        };
+        if (stage.endsWith('request')) return rejectLater();
+        return stage === 'metadata JSON'
+          ? { ...response, json: rejectLater }
+          : { ...response, arrayBuffer: rejectLater };
+      });
+      const loader = new TileLoader('/data/tiles', fetch);
+      const ctx = diveContext(loader, failed.meta.id);
+      const tileError = vi.fn();
+      ctx.bus.on('tile:error', tileError);
+      const starting = startRuntime(ctx);
+      await entered.promise;
+      expect(tileError).not.toHaveBeenCalled();
+      held.reject(error);
+      const dispose = await starting;
+      expect(tileError).toHaveBeenCalledExactlyOnceWith({
+        id: failed.meta.id,
+        error: error.message,
+      });
+      expect(showFatal).toHaveBeenCalledOnce();
+      expect(vi.mocked(showFatal).mock.calls[0][0]).toContain(error.message);
+      expect(createSystems).not.toHaveBeenCalled();
+      expect(window.__game).toBeUndefined();
+      expect(failedSignal).toBeInstanceOf(AbortSignal);
+      expect(failedSignal!.aborted).toBe(true);
+
+      const loaded = await loader.load(recovered.meta.id, recoverySignal);
+      expect(loaded.meta).toEqual(recovered.meta);
+      expect(loaded.heights).toEqual(recovered.heights);
+      expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+        '/data/tiles/unavailable/meta.json',
+        ...(target === 'heightmap.bin' ? ['/data/tiles/unavailable/heightmap.bin'] : []),
+        '/data/tiles/independent/meta.json',
+        '/data/tiles/independent/heightmap.bin',
+      ]);
+      dispose();
+    },
+  );
 
   it('preserves row-major order with row 0 = north', async () => {
     // Encode a recognisable pattern: value == index.
@@ -161,22 +268,145 @@ describe('TileLoader', () => {
 
     it('uses heightmap16.bin when prefer16 is set and meta advertises it', async () => {
       const seen: string[] = [];
-      const loader = new TileLoader('/data/tiles', fetchWith16(quantTile, buffer, seen), {
+      const signal = new AbortController().signal;
+      const base = fetchWith16(quantTile, buffer, seen);
+      const fetch: FetchLike = (url, options) => {
+        expect(options?.signal).toBe(signal);
+        return base(url, options);
+      };
+      const loader = new TileLoader('/data/tiles', fetch, {
         prefer16: true,
       });
-      const loaded = await loader.load('q16');
+      const loaded = await loader.load('q16', signal);
       expect(seen).toContain('/data/tiles/q16/heightmap16.bin');
       expect(seen).not.toContain('/data/tiles/q16/heightmap.bin');
       expect(loaded.heights[34]).toBeCloseTo(tile.heights[34] as number, 1);
     });
 
+    it.each(['non-ok response', 'rejected request', 'rejected body', 'wrong-sized payload'])(
+      'returns canonical metadata/heights after an optional %s',
+      async (failure) => {
+        const signal = new AbortController().signal;
+        const entered = pending<void>();
+        const response = pending<Awaited<ReturnType<FetchLike>>>();
+        const bodyEntered = pending<void>();
+        const body = pending<ArrayBuffer>();
+        const readOptionalBody = vi.fn(() => {
+          bodyEntered.resolve();
+          return body.promise;
+        });
+        const fetch = vi.fn<FetchLike>((url, options) => {
+          expect(options?.signal).toBe(signal);
+          if (!url.endsWith('/heightmap16.bin')) return makeFakeFetch(quantTile)(url);
+          entered.resolve();
+          return response.promise;
+        });
+        const loading = new TileLoader('/data/tiles', fetch, { prefer16: true }).load(
+          'q16',
+          signal,
+        );
+        await entered.promise;
+        expect(fetch.mock.calls.map(([url]) => url)).not.toContain('/data/tiles/q16/heightmap.bin');
+        if (failure === 'rejected request') response.reject(new Error('optional request failed'));
+        else {
+          response.resolve({
+            ok: failure !== 'non-ok response',
+            status: failure === 'non-ok response' ? 503 : 200,
+            json: async () => null,
+            arrayBuffer: readOptionalBody,
+          });
+          if (failure !== 'non-ok response') {
+            await bodyEntered.promise;
+            if (failure === 'rejected body') body.reject(new Error('optional body failed'));
+            else body.resolve(new ArrayBuffer(buffer.byteLength - 2));
+          }
+        }
+        const loaded = await loading;
+        expect(loaded.meta).toEqual(quantTile.meta);
+        expect(loaded.heights).toEqual(tile.heights);
+        expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+          '/data/tiles/q16/meta.json',
+          '/data/tiles/q16/heightmap16.bin',
+          '/data/tiles/q16/heightmap.bin',
+        ]);
+        expect(readOptionalBody).toHaveBeenCalledTimes(
+          failure === 'non-ok response' || failure === 'rejected request' ? 0 : 1,
+        );
+      },
+    );
+
+    it.each(['request', 'body'])(
+      'cancels optional %s IO at page teardown and keeps the next tile independent',
+      async (stage) => {
+        const entered = pending<void>();
+        const held = pending<never>();
+        const recovered = makeSyntheticTile({ id: 'independent', cols: 2, rows: 2 });
+        const recoverySignal = new AbortController().signal;
+        const readCanonicalBody = vi.fn();
+        let cancelledSignal: AbortSignal | undefined;
+        const fetch = vi.fn<FetchLike>(async (url, options) => {
+          if (url.includes('/independent/')) {
+            expect(options?.signal).toBe(recoverySignal);
+            return makeFakeFetch(recovered)(url);
+          }
+          const signal = options?.signal;
+          expect(signal).toBeInstanceOf(AbortSignal);
+          cancelledSignal ??= signal;
+          expect(signal).toBe(cancelledSignal);
+          // Like native fetch, an already-aborted signal rejects before returning a body.
+          signal!.throwIfAborted();
+          if (url.endsWith('/heightmap16.bin')) {
+            const waitForAbort = () => {
+              signal!.addEventListener('abort', () => held.reject(signal!.reason), { once: true });
+              entered.resolve();
+              return held.promise;
+            };
+            if (stage === 'request') return waitForAbort();
+            return { ok: true, status: 200, json: async () => null, arrayBuffer: waitForAbort };
+          }
+          const response = await makeFakeFetch(quantTile)(url);
+          return url.endsWith('/heightmap.bin')
+            ? { ...response, arrayBuffer: readCanonicalBody }
+            : response;
+        });
+        const loader = new TileLoader('/data/tiles', fetch, { prefer16: true });
+        const ctx = diveContext(loader, 'q16');
+        const tileError = vi.fn();
+        ctx.bus.on('tile:error', tileError);
+        const starting = startRuntime(ctx);
+        await entered.promise;
+        window.dispatchEvent(new Event('pagehide'));
+        const dispose = await starting;
+        expect(cancelledSignal!.aborted).toBe(true);
+        expect(tileError).not.toHaveBeenCalled();
+        expect(showFatal).not.toHaveBeenCalled();
+        expect(createSystems).not.toHaveBeenCalled();
+        expect(window.__game).toBeUndefined();
+        expect(readCanonicalBody).not.toHaveBeenCalled();
+        for (const [, options] of fetch.mock.calls) {
+          expect(options?.signal).toBe(cancelledSignal);
+        }
+        expect(fetch.mock.calls.slice(0, 2).map(([url]) => url)).toEqual([
+          '/data/tiles/q16/meta.json',
+          '/data/tiles/q16/heightmap16.bin',
+        ]);
+        const loaded = await loader.load(recovered.meta.id, recoverySignal);
+        expect(loaded.meta).toEqual(recovered.meta);
+        expect(loaded.heights).toEqual(recovered.heights);
+        dispose();
+      },
+    );
+
     it('falls back to float32 when heightmap16.bin is missing or meta lacks quant keys', async () => {
       const seenMissing: string[] = [];
-      const a = await new TileLoader('/data/tiles', fetchWith16(quantTile, null, seenMissing), {
+      const signal = new AbortController().signal;
+      const missingFetch = vi.fn<FetchLike>(fetchWith16(quantTile, null, seenMissing));
+      const a = await new TileLoader('/data/tiles', missingFetch, {
         prefer16: true,
-      }).load('q16');
+      }).load('q16', signal);
       expect(seenMissing).toContain('/data/tiles/q16/heightmap.bin');
       expect(Array.from(a.heights)).toEqual(Array.from(tile.heights));
+      for (const [, options] of missingFetch.mock.calls) expect(options?.signal).toBe(signal);
 
       const seenPlain: string[] = [];
       await new TileLoader('/data/tiles', fetchWith16(tile, buffer, seenPlain), {
