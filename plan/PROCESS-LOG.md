@@ -271,3 +271,8 @@ Nine Codex worktrees finished 2026-10-18/19 but stayed uncommitted until this re
 ## 2026-10-21: codex-review start skipped silently, reconcile reused a stale review
 
 Run 72's `start` exited 75 (Codex 5h 17% < 20%) under nohup, so nobody saw it; `current` still pointed at the previous review and `reconcile` answered against the old golden set. Fix: `start` removes `.cache/review/current` before the budget check, and `reconcile` exits 75 at once if it is missing, so a skipped Sol review means "review alone" instead of stale reconciliation.
+
+## 2026-10-22 (targeted review: Codex starved 2 h)
+
+- Cause: not a scheduling fault. Codex verify briefs finish in ~15 min, the last nine launched 17:18-19:33, and Codex 5h fell to 18% (< 20% dispatch gate) until its 22:15 reset; refill runs at most every 2 h. Queue was therefore empty and unlaunchable.
+- Fix: queued three R-ci-green briefs (3250-3270) so the 22:15 reset launches real work; collected 3130-3240 (12 worktrees) in one Sonnet pass. S-verify slices are now near diminishing returns (nine clean audits, one real Sonar fix, one CI pin), so the refill should prefer R-ci-green and S-* items over more verify briefs.
