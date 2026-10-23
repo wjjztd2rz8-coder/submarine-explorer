@@ -1682,3 +1682,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged and pushed (smoke + project-base green): Codex 3270 (globe pins/clusters round to whole px, fixes the 43.99998 px touch target; net -11 lines), 3290 (debrief/Journal audit: clean), 3300 (seam contact small-fix: reproduced, no compliant fix; note only). Hosted CI for run 85 merges was still in progress (26+ min); check next run. 2980/3050 unmerged by decision. 3310 queued, Codex 5h at 5% until 03:30. No Claude art package (kept the 5h window for the 01:49 reset). No tag.
 - **Needs owner:** OK for ~85 m Endurance opening or richer hull; phone retest.
+
+## 2026-10-23 01:21 CDT headless run 87 (Claude): no-op
+
+- Started minutes after run 86. Nothing to collect (only 2980/3050 remain, unmerged by decision). Codex 5h at 5% until 03:30; 3310 queued. Claude 5h 59% but resets 01:50, so no new package. Hosted CI for run 86 still pending; check next run. No tag.
+- **Needs owner:** OK for ~85 m Endurance opening or richer hull; phone retest.
