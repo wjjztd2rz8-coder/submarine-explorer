@@ -120,6 +120,103 @@ for (const site of lowReadabilitySites) {
   });
 }
 
+for (const tier of ['low', 'medium', 'high'] as const) {
+  test(`${tier}: live ambient colour follows depth and lamp toggles without leaking between sites`, () => {
+    const config = makeConfig();
+    const effective = resolveEffective(defaultSettings(config), 'arcade', null, config);
+    const sites = [
+      'kamaehuakanaloa',
+      'axial-seamount-ashes',
+      'great-blue-hole',
+      'endurance',
+      'monterey-canyon',
+    ];
+    const inputs = () =>
+      JSON.stringify({
+        config,
+        effective,
+        manifests: sites.map((site) => siteManifests.siteManifest(site)),
+        bytes: sites.map((site) => readFileSync(`data/landmarks/${site}/site.json`, 'utf8')),
+      });
+    const before = inputs();
+    const results = new Map<string, string>();
+    for (const order of [sites, [...sites].reverse()]) {
+      for (const site of order) {
+        const rig = new CameraRig(config.camera, 390 / 844);
+        const ctx = {
+          config,
+          effective,
+          tier,
+          rig,
+          scene: new Scene(),
+          bus: new EventBus(),
+          meta: { id: site },
+          terrain: { widthM: 1000, depthM: 1000 },
+          sub: { position: new Vector3(0, -720, 0) },
+          subMesh: { vehicle: { materials: { uniforms: { uHullLight: { value: 1 } } } } },
+          renderer: { domElement: { height: 844 } },
+          presets: { current: new Vector3() },
+          expose: () => {},
+        } as unknown as GameContext;
+        const water = siteLightWater(site, tier, deepSiteWater(site, config.water));
+        atmosphereSystem.init!(ctx);
+        try {
+          const lights: Light[] = [];
+          ctx.scene.traverse((object) => {
+            if (object instanceof Light) lights.push(object);
+          });
+          const hemisphere = site === 'endurance' || site === 'monterey-canyon' ? 1 : 0;
+          expect(lights).toHaveLength((tier === 'low' ? 5 : 6) + hemisphere);
+          const frames: string[] = [];
+          for (const on of [true, false, true]) {
+            ctx.headlights.setEnabled(on);
+            for (const depth of [-20, -110, -200, -700, -1500]) {
+              rig.camera.position.y = depth;
+              const frame = {
+                dt: 1 / 60,
+                elapsed: frames.length / 60,
+                forward: new Vector3(0, 0, -1),
+              } as FrameState;
+              atmosphereSystem.frame!['env.atmosphere']!(frame, ctx);
+              atmosphereSystem.frame!['env.lighting']!(frame, ctx);
+              const expected = sampleAtmosphere(water, depth);
+              expect(frame.atmo).toEqual(expected);
+              expect(ctx.atmosphere.ambient.color).toEqual(expected.ambientColor);
+              expect(ctx.atmosphere.ambient.intensity).toBe(expected.ambientIntensity);
+              expect(ctx.atmosphere.sunlight.intensity).toBe(expected.sunIntensity);
+              expect(frame.fog).toEqual({ color: expected.fogColor, density: expected.fogDensity });
+              expect(ctx.headlights.on).toBe(on);
+              for (const lamp of ctx.headlights.lights) expect(lamp.visible).toBe(on);
+              expect(ctx.scene.getObjectsByProperty('isLight', true)).toEqual(lights);
+              // Atmosphere reuses its sample; retain each frame's values before the next update.
+              frames.push(
+                JSON.stringify({
+                  sample: frame.atmo,
+                  lights: lights.map((light) => [
+                    light.type,
+                    light.color.toArray(),
+                    light.intensity,
+                    light.visible,
+                  ]),
+                }),
+              );
+            }
+          }
+          const result = JSON.stringify(frames);
+          if (results.has(site)) expect(result).toBe(results.get(site));
+          else results.set(site, result);
+          expect(inputs()).toBe(before);
+        } finally {
+          ctx.atmosphere.dispose();
+          ctx.headlights.dispose();
+          ctx.snow.dispose();
+          ctx.water.dispose();
+        }
+      }
+    }
+  });
+}
+
 for (const site of ['beebe-vent-field', 'axial-seamount-ashes', 'unknown']) {
   for (const tier of ['low', 'medium', 'high'] as const) {
     test(`${site} ${tier}: composes lamps once from effective modes and preserves inputs`, () => {
