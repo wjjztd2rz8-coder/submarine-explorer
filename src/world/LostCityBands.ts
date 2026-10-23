@@ -50,5 +50,6 @@ export function lostCitySlopeTint(
     0.1 * (fine - 0.5) +
     0.45 * (smooth(0.3, 0.7, cobble) - 0.5) * (0.6 + slope);
   const warm = 1 + 0.08 * (fbm3(x * 0.09, 17, z * 0.09, 617, 2) - 0.5);
-  return [bed[0] * silt * warm, bed[1] * silt, (bed[2] * silt) / warm];
+  // Cool olive-grey cast: the silt reads grey-green, not tan, under the warm lamps and fog.
+  return [bed[0] * silt * warm * 0.84, bed[1] * silt * 0.97, (bed[2] * silt * 1.04) / warm];
 }

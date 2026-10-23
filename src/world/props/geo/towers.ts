@@ -39,18 +39,18 @@ import { scatterRubble } from './talus.js';
 import { rimDrop, spireRadius, tieredSpire, trunkCrest, type SpireOpts } from './spire.js';
 import type { GeoBuildInput } from './types.js';
 
-const OLD = new THREE.Color(0xdcd3bc); // weathered, inactive carbonate
+const OLD = new THREE.Color(0xdcd8c6); // weathered, inactive carbonate
 const LIVE = new THREE.Color(0xfaf6ec); // fresh white carbonate and brucite, faintly warm
 const STAIN = new THREE.Color(0x938d7c);
 const CREAM = new THREE.Color(0xf8ecd2); // warm cream carbonate crust
 const GREYBLUE = new THREE.Color(0xaab6bb); // cooler, older grey-blue carbonate
 const BIOFILM = new THREE.Color(0x6f9a90); // faint blue-green microbial film in damp recesses
-const TROUGH = new THREE.Color(0x8a8270); // warm grey stain in the flow troughs
-const OCHRE = new THREE.Color(0xc9a46a); // warm iron-stained carbonate
+const TROUGH = new THREE.Color(0x7d8076); // cool grey stain in the flow troughs
+const OCHRE = new THREE.Color(0xb4a77f); // muted iron-stained carbonate
 const SHADE = new THREE.Color(0x5d6468); // shadowed flute, cool blue-grey
 const FRINGE = new THREE.Color(0xffffff); // brucite fringe round the vent mouth
 const VENT = new THREE.Color(0x14120f); // the dark vent mouth
-const SEABED = new THREE.Color(0xc2a468); // what the apron fades into: the Lost City sediment
+const SEABED = new THREE.Color(0x8e9284); // what the apron fades into: cool olive-grey Lost City sediment
 
 /**
  * Breaks the lathe-smooth trunk in place (local column frame, y up from the base):
@@ -227,8 +227,8 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       ...scatterRubble(onGround, nearFoot, {
         halfX: pw / 2,
         halfZ: pd / 2,
-        count: Math.round((lone ? 12 : 70) * d.growth ** 0.5),
-        size: Math.max(1, main.r0 * 0.09),
+        count: Math.round((lone ? 12 : 130) * d.growth ** 0.5),
+        size: Math.max(1, main.r0 * 0.1),
         detail: Math.min(d.sphereDetail, 1),
         seed: seed + 419,
       }),
