@@ -1,4 +1,7 @@
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { existsSync, readFileSync } from 'node:fs';
 import { afterEach, expect, it, vi } from 'vitest';
+import * as THREE from 'three';
 import { Scene, Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
@@ -6,7 +9,7 @@ import { Save, ProgressSave, type GameplayMode } from '../../src/core/Save.js';
 import { createExploreSystem } from '../../src/app/systems/explore.js';
 import type { GameContext } from '../../src/app/context.js';
 import { dailyDive } from '../../src/game/Daily.js';
-import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
+import { DiscoveryStore, DISCOVERY_STORAGE_KEY } from '../../src/game/DiscoveryStore.js';
 import { Progress } from '../../src/game/Progress.js';
 import { Scanner } from '../../src/game/Scanner.js';
 import * as Secrets from '../../src/game/Secrets.js';
@@ -20,6 +23,16 @@ import { createProgressSystem } from '../../src/app/systems/progress.js';
 import { Discovery } from '../../src/game/Discovery.js';
 import type { ScanTarget } from '../../src/game/Scanner.js';
 import type { TileMeta } from '../../src/util/types.js';
+import { parseMission, parseMissionIndex } from '../../src/game/Mission.js';
+import { isEntryUnlocked, isSiteUnlocked, loadJournalSites } from '../../src/game/JournalData.js';
+import type { FetchJson } from '../../src/game/ContentPath.js';
+import * as SecretVisuals from '../../src/game/SecretsVisual.js';
+import * as EventVisuals from '../../src/game/EventsVisual.js';
+
+// A local module facade lets individual CPU cases replace visual constructors.
+vi.mock('three', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('three')>()),
+}));
 
 // Replace DOM views only; keep Discovery's subscriptions and session reset real.
 vi.mock('../../src/ui/ScanOverlay.js', () => ({
@@ -48,6 +61,193 @@ afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
+
+const readJson = (path: string): unknown => JSON.parse(readFileSync(path, 'utf8'));
+const sampleSites = parseMissionIndex(readJson('data/landmarks/index.json')).map((site) => {
+  const path = `data/secrets/${site}.json`;
+  const doc = Secrets.parseSecrets(existsSync(path) ? readJson(path) : null);
+  return { site, doc };
+});
+const shippedSamples = sampleSites.flatMap(({ site, doc }) =>
+  doc.samples.map((sample) => ({ site, sample })),
+);
+const localContentFetch: FetchJson = async (url) => {
+  if (
+    !/^\/data\/(?:landmarks(?:\.json|\/index\.json|\/[a-z0-9-]+\/[a-z]+\.json)|secrets\/[a-z0-9-]+\.json)$/.test(
+      url,
+    )
+  )
+    return { ok: false, text: async () => '' };
+  try {
+    const source = readFileSync(`.${url}`, 'utf8');
+    return { ok: true, text: async () => source };
+  } catch {
+    return { ok: false, text: async () => '' };
+  }
+};
+
+/** Keep Explore's real subscriptions and placement without constructing its visuals. */
+function stubExplorationVisuals(): void {
+  const resource = class {
+    setAttribute() {}
+    dispose() {}
+  };
+  const object = class extends THREE.Object3D {
+    constructor(
+      readonly geometry: unknown,
+      readonly material: unknown,
+    ) {
+      super();
+    }
+  };
+  vi.spyOn(THREE, 'BufferGeometry').mockImplementation(
+    resource as unknown as typeof THREE.BufferGeometry,
+  );
+  vi.spyOn(THREE, 'DodecahedronGeometry').mockImplementation(
+    resource as unknown as typeof THREE.DodecahedronGeometry,
+  );
+  vi.spyOn(THREE, 'PointsMaterial').mockImplementation(
+    resource as unknown as typeof THREE.PointsMaterial,
+  );
+  vi.spyOn(THREE, 'MeshStandardMaterial').mockImplementation(
+    resource as unknown as typeof THREE.MeshStandardMaterial,
+  );
+  vi.spyOn(THREE, 'Mesh').mockImplementation(object as unknown as typeof THREE.Mesh);
+  vi.spyOn(THREE, 'Points').mockImplementation(object as unknown as typeof THREE.Points);
+  vi.spyOn(EventVisuals, 'EventsVisual').mockImplementation(
+    class {
+      group = new THREE.Group();
+      dispose() {}
+    } as unknown as typeof EventVisuals.EventsVisual,
+  );
+  vi.spyOn(SecretVisuals, 'buildSecret').mockImplementation(
+    () => new THREE.Object3D() as THREE.Mesh,
+  );
+  vi.spyOn(SecretVisuals, 'seatOnSeabed').mockImplementation(() => {});
+  vi.spyOn(SecretVisuals, 'disposeExploreMesh').mockImplementation(() => {});
+}
+
+it.each(shippedSamples)(
+  '$site/$sample.id: collecting an authored sample retains its Journal entry through reload',
+  async ({ site, sample }) => {
+    stubExplorationVisuals();
+    vi.stubGlobal('fetch', localContentFetch);
+    const doc = await Secrets.loadSecrets(site, localContentFetch);
+    expect(doc).toEqual(sampleSites.find((row) => row.site === site)!.doc);
+    const sites = await loadJournalSites([], localContentFetch);
+    expect(sites.map((s) => s.id)).toEqual(sampleSites.map((row) => row.site));
+    const journalKey = `${site}/sample/${sample.id}`;
+    const runtimeId = `sample:${sample.id}`;
+    const current = sites.find((s) => s.id === site)!;
+    const entry = current.entries.find((e) => e.key === journalKey)!;
+    expect(entry, journalKey).toMatchObject({
+      siteId: site,
+      id: runtimeId,
+      kind: 'secret',
+      title: sample.name,
+      poiIds: [runtimeId],
+      guide: { id: runtimeId, title: sample.name, paragraphs: ['Logged during a dive.'] },
+    });
+    const values = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: vi.fn((key: string, value: string) => {
+        values.set(key, value);
+      }),
+      removeItem: vi.fn(),
+    };
+    const store = new DiscoveryStore(storage, () => new Date('2026-10-17T00:00:00Z'));
+    const config = makeConfig();
+    const bus = new EventBus();
+    const scanner = new Scanner(config.scan, bus, store);
+    const mission = parseMission(readJson(`data/landmarks/${site}/mission.json`), site)!;
+    const meta = readJson(`data/tiles/${mission.tile}/meta.json`) as TileMeta;
+    let exploration!: { ready: boolean; samples: Samples; summary(): ExplorationSummary };
+    const ctx = {
+      config,
+      bus,
+      progress: { award: vi.fn() },
+      scene: new Scene(),
+      tier: 'low',
+      contentLandmark: site,
+      meta,
+      terrain: { sampleHeight: () => -100 },
+      discovery: {
+        ready: Promise.resolve(),
+        store,
+        scanner,
+        debrief: {},
+        onLifeScan: vi.fn(),
+      },
+      journal: { focus: vi.fn() },
+      expose: (value: { explore: typeof exploration }) => {
+        exploration = value.explore;
+      },
+    } as unknown as GameContext;
+    const system = createExploreSystem();
+    const collected = vi.fn();
+    const complete = vi.fn();
+    const errors = vi.spyOn(console, 'error');
+    bus.on('discovery:sample', collected);
+    bus.on('scan:complete', complete);
+    try {
+      system.init!(ctx);
+      await vi.waitFor(() => expect(exploration.ready).toBe(true));
+      const target = scanner.getSupplementalTargets().find((t) => t.id === runtimeId)!;
+      expect(target).toMatchObject({ landmarkId: site, name: sample.name, def: sample });
+      // Isolate scan admission from travel, terrain and other contacts' beam selection.
+      scanner.setSupplementalTargets([target]);
+      const position = target.position.clone().add(new Vector3(0, 0, 10));
+      const forward = new Vector3(0, 0, -1);
+      expect(sites.every((s) => !isSiteUnlocked(s, store))).toBe(true);
+      scanner.update(target.scanSeconds / 2, position, forward, true);
+      expect(scanner.view.progress).toBe(0.5);
+      expect(store.keys()).toEqual([]);
+      expect(collected).not.toHaveBeenCalled();
+      expect(exploration.summary().samples).toEqual([]);
+      scanner.update(target.scanSeconds / 2, position, forward, true);
+      expect(complete).toHaveBeenCalledExactlyOnceWith({
+        landmarkId: site,
+        poiId: runtimeId,
+        firstTime: true,
+      });
+      expect(collected).toHaveBeenCalledExactlyOnceWith({
+        landmarkId: site,
+        sampleId: sample.id,
+        name: sample.name,
+      });
+      expect([...exploration.samples.collected]).toEqual([[runtimeId, sample.name]]);
+      expect(exploration.summary().samples).toEqual([sample.name]);
+      expect(ctx.discovery.debrief.exploration!().samples).toEqual([sample.name]);
+      const archived = values.get(DISCOVERY_STORAGE_KEY)!;
+      expect(JSON.parse(archived)).toEqual(store.snapshot());
+      const reloadedSites = await loadJournalSites([], localContentFetch);
+      const reloaded = new DiscoveryStore(storage);
+      for (const [loaded, saved] of [
+        [sites, store],
+        [reloadedSites, reloaded],
+      ] as const) {
+        expect(saved.keys()).toEqual([`${site}/${runtimeId}`]);
+        expect(saved.get(site, runtimeId)).toEqual({ at: '2026-10-17T00:00:00.000Z', count: 1 });
+        const rebuilt = loaded.find((s) => s.id === site)!;
+        expect(rebuilt.entries.find((e) => e.key === journalKey)).toEqual(entry);
+        for (const s of loaded) {
+          expect(isSiteUnlocked(s, saved), s.id).toBe(s.id === site);
+          for (const e of s.entries)
+            expect(isEntryUnlocked(s, e, saved), e.key).toBe(
+              s.id === site && (e.kind === 'site' || e.key === journalKey),
+            );
+        }
+      }
+      expect(values.get(DISCOVERY_STORAGE_KEY)).toBe(archived);
+      expect(storage.setItem).toHaveBeenCalledTimes(1);
+      expect(storage.removeItem).not.toHaveBeenCalled();
+      expect(errors).not.toHaveBeenCalled();
+    } finally {
+      system.dispose?.();
+    }
+  },
+);
 
 it.each([false, true])(
   'recollects samples on same-instance mission restarts (earlier optional load pending: %s)',
