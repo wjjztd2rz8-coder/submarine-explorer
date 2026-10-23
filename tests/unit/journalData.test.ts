@@ -16,6 +16,7 @@ import {
   isSiteUnlocked,
   journalEntryTag,
   lifeDiscoveryId,
+  loadJournalSite,
   loadJournalSites,
   parseJournalCatalogue,
   siteProgress,
@@ -460,6 +461,154 @@ function reader(keys: string[]): DiscoveryReader {
 }
 
 describe('Journal content model', () => {
+  it('retains neighboring content when a guide body fails and restores authored grouping on a fresh load', async () => {
+    const guide = {
+      ...GUIDE,
+      title: 'Authored reef',
+      entries: [
+        GUIDE!.entries[0],
+        { ...GUIDE!.entries[1], paragraphs: ['Steel hosts Desmophyllum pertusum.'] },
+      ],
+    };
+    const pois = POIS.map((poi) =>
+      poi.id === 'reef-mound' ? { ...poi, guide_entry: 'wreck' } : poi,
+    );
+    const catalogue = parseJournalCatalogue({
+      landmarks: [
+        { id: 'reef', name: 'Reef', region: 'Sea', depth_m: 55, summary: 'A reef.' },
+        { id: 'neighbor', name: 'Neighbor', region: 'Sea', depth_m: 60 },
+      ],
+    });
+    const files: Record<string, unknown> = {};
+    for (const id of ['reef', 'neighbor']) {
+      files[`/data/landmarks/${id}/guide.json`] = { ...guide, landmark: id };
+      files[`/data/landmarks/${id}/pois.json`] = { pois };
+      files[`/data/landmarks/${id}/species.json`] = { ...SPECIES, landmark: id };
+      files[`/data/landmarks/${id}/mission.json`] = {
+        title: `${id} dive`,
+        spawn: { lat: 1, lon: 1, depth_m: 5 },
+        briefing: { summary: 'Explore the reef.', facts: ['A reef.'], hazards: [] },
+        objectives: [{ id: 'scan-wreck', poi: 'reef-wreck', primary: true }],
+      };
+      files[`/data/secrets/${id}.json`] = {
+        version: 1,
+        secrets: [
+          { id: 'arch', name: 'Arch', kind: 'rock', lat: 1, lon: 1, text: 'A hidden arch.' },
+        ],
+        samples: [{ id: 'mud', name: 'Sediment', lat: 1, lon: 1 }],
+      };
+    }
+    let rejectGuide!: (reason: Error) => void;
+    const guideBody = new Promise<never>((_, reject) => {
+      rejectGuide = reject;
+    });
+    let guideUnavailable = true;
+    const requests: string[] = [];
+    const fetchFn: FetchJson = async (url) => {
+      requests.push(url);
+      if (guideUnavailable && url === '/data/landmarks/reef/guide.json') {
+        return { ok: true, text: () => guideBody };
+      }
+      return { ok: url in files, text: async () => JSON.stringify(files[url]) };
+    };
+    const pending = loadJournalSite('reef', catalogue, fetchFn);
+    // A separate site's real loader can finish while the failing guide is still pending.
+    const neighbor = await loadJournalSite('neighbor', catalogue, fetchFn);
+    expect(neighbor.id).toBe('neighbor');
+    expect(neighbor.entries.find((entry) => entry.id === 'wreck')?.poiIds).toEqual([
+      'reef-wreck',
+      'reef-mound',
+    ]);
+    expect(neighbor.entries.find((entry) => entry.id === 'wreck')?.guide).toEqual(guide.entries[1]);
+    rejectGuide(new Error('guide response body interrupted'));
+    const fallback = await pending;
+    expect(fallback).toMatchObject({
+      id: 'reef',
+      name: 'Reef',
+      region: 'Sea',
+      depthM: 55,
+      summary: 'A reef.',
+      missionTitle: 'reef dive',
+      briefing: { summary: 'Explore the reef.', facts: ['A reef.'], hazards: [] },
+      poiIds: ['reef-wreck', 'reef-mound', 'reef-rock'],
+      species: SPECIES,
+    });
+    const standIns = fallback.entries.filter((entry) => entry.kind === 'poi');
+    expect(standIns.map((entry) => entry.key)).toEqual([
+      'reef/poi/reef-wreck',
+      'reef/poi/reef-mound',
+      'reef/poi/reef-rock',
+    ]);
+    expect(standIns[0]).toMatchObject({
+      siteId: 'reef',
+      title: 'Wreck',
+      poiIds: ['reef-wreck'],
+      recreation: true,
+      guide: { paragraphs: [], facts: [{ label: 'Kind', value: 'wreck' }] },
+    });
+    expect(fallback.entries.filter((entry) => entry.kind === 'species')).toHaveLength(3);
+    expect(
+      fallback.entries.filter((entry) => entry.kind === 'secret').map((entry) => entry.key),
+    ).toEqual(['reef/secret/arch', 'reef/sample/mud']);
+    const { store, storage, bytes, writes } = discoveryFixture();
+    expect(isSiteUnlocked(fallback, store)).toBe(false);
+    expect(fallback.entries.every((entry) => !isEntryUnlocked(fallback, entry, store))).toBe(true);
+    const neighborDiscovery = reader(['neighbor/reef-wreck']);
+    expect(isSiteUnlocked(neighbor, neighborDiscovery)).toBe(true);
+    expect(isSiteUnlocked(fallback, neighborDiscovery)).toBe(false);
+    store.record('reef', 'reef-wreck');
+    const savedBytes = bytes.get(DISCOVERY_STORAGE_KEY);
+    const savedWrites = [...writes];
+    const saved = new DiscoveryStore(storage);
+    expect(saved.keys()).toEqual(['reef/reef-wreck']);
+    expect(isSiteUnlocked(fallback, saved)).toBe(true);
+    expect(fallback.entries.filter((entry) => isEntryUnlocked(fallback, entry, saved))).toEqual([
+      standIns[0],
+    ]);
+    expect(isSiteUnlocked(neighbor, saved)).toBe(false);
+    expect(neighbor.entries.every((entry) => !isEntryUnlocked(neighbor, entry, saved))).toBe(true);
+
+    guideUnavailable = false;
+    const recovered = await loadJournalSite('reef', catalogue, fetchFn);
+    expect(recovered).toMatchObject({
+      id: 'reef',
+      name: 'Authored reef',
+      region: fallback.region,
+      depthM: fallback.depthM,
+      poiIds: fallback.poiIds,
+      species: fallback.species,
+      briefing: fallback.briefing,
+    });
+    const authored = recovered.entries.find((entry) => entry.key === 'reef/poi/wreck')!;
+    expect(authored).toMatchObject({
+      siteId: 'reef',
+      poiIds: ['reef-wreck', 'reef-mound'],
+      recreation: true,
+      guide: guide.entries[1],
+    });
+    expect(
+      recovered.entries.filter((entry) => entry.kind === 'poi').map((entry) => entry.key),
+    ).toEqual(['reef/poi/wreck', 'reef/poi/reef-rock']);
+    expect(
+      recovered.entries
+        .filter((entry) => isEntryUnlocked(recovered, entry, saved))
+        .map((entry) => entry.key),
+    ).toEqual(['reef/site/overview', 'reef/poi/wreck', 'reef/species/Desmophyllum pertusum']);
+    expect(isSiteUnlocked(neighbor, saved)).toBe(false);
+    expect(bytes.get(DISCOVERY_STORAGE_KEY)).toBe(savedBytes);
+    expect(writes).toEqual(savedWrites);
+    const siteRequests = (id: string) => [
+      `/data/landmarks/${id}/guide.json`,
+      `/data/landmarks/${id}/pois.json`,
+      `/data/landmarks/${id}/species.json`,
+      `/data/landmarks/${id}/mission.json`,
+      `/data/secrets/${id}.json`,
+    ];
+    expect([...new Set(requests)].sort()).toEqual(
+      [...siteRequests('reef'), ...siteRequests('neighbor')].sort(),
+    );
+  });
+
   it('retains one unlocked entry and its first timestamp after new-dive rescans', () => {
     const s = site();
     const storage = new Map<string, string>();
