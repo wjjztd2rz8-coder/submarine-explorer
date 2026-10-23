@@ -1687,3 +1687,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Started minutes after run 86. Nothing to collect (only 2980/3050 remain, unmerged by decision). Codex 5h at 5% until 03:30; 3310 queued. Claude 5h 59% but resets 01:50, so no new package. Hosted CI for run 86 still pending; check next run. No tag.
 - **Needs owner:** OK for ~85 m Endurance opening or richer hull; phone retest.
+
+## 2026-10-23 05:02 CDT headless run 88 (Claude): targeted review, red CI
+
+- Diagnosed main CI (4 root causes, see REVIEWS) and merged Sonnet R-ci-green-3 (ec7e4bc, pushed; smoke + project-base green, specific e2e specs green locally). Codex 3320/3330/3340 queued and launched. Hosted CI for ec7e4bc unchecked; no tag. 2980/3050 go to Codex 3330.
+- **Needs owner:** ~85 m Endurance opening OK or richer hull; phone retest.

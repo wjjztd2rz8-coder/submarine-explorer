@@ -2,6 +2,13 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-23 05:05 targeted review (Claude idle at >=50% for 2 h)
+
+- Cause: not a scheduling fault. Runs 86/87 deliberately held the 5h window for the 01:50 reset and Codex was at 5%; main CI was red for real reasons that nobody had triaged because pushes kept cancelling runs.
+- Diagnosis of run 39911030459: (1) spawn-clear openings made d-start, f-arcade-access and mission specs stale (35 degree yaw offset, 140 m range); (2) `.home-sites-grab` 24 px broke the 44 px guard at 390x844; (3) journal-debrief Titanic journeys held forward only and never got a scan prompt (real test hang, 360 s timeout); (4) montereyScarpSupport beforeAll 10 s hook timeout on CI. All fixed by Sonnet (R-ci-green-3), merged and pushed ec7e4bc; smoke + project-base green. Hosted CI for ec7e4bc still to check next run; tag only if green.
+- Codex: queued 3320 (full e2e on main), 3330 (decide 2980/3050), 3340 (touch-target audit); 3 running. Lesson: smoke-only gates keep missing e2e breakage from visual/opening merges; V-* packages that move openings should run the affected e2e specs.
+- Needs owner: ~85 m Endurance opening OK or richer hull; phone retest.
+
 ## 2026-10-22 (night) joint review, Claude + Codex 6.1 Sol (golden 2026-10-23-033406)
 
 **Method:** Sol reviewed independently, then one reconcile round (a stray `mkdir .cache/review/current` before `start` broke the symlink and a killed reconcile left a stale `resume` process holding Sol's thread; both recovered, PROCESS-LOG). Sol had no browser, so no fresh live play.
