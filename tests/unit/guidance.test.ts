@@ -7,10 +7,21 @@ import {
   type GuidanceOffer,
 } from '../../src/game/Guidance.js';
 import { ScanOverlay } from '../../src/ui/ScanOverlay.js';
-import { Scanner } from '../../src/game/Scanner.js';
+import { Scanner, resolveScanRadius } from '../../src/game/Scanner.js';
 import { Discovery } from '../../src/game/Discovery.js';
 import { EventBus } from '../../src/core/EventBus.js';
-import { Vector3 } from 'three';
+import { PerspectiveCamera, Vector3 } from 'three';
+import { Mission, nextScanObjective, parseMission } from '../../src/game/Mission.js';
+import { parsePois, placePois } from '../../src/game/Pois.js';
+import { defaultSettings } from '../../src/core/Save.js';
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { missionApproachScanRadius } from '../../src/game/Spawn.js';
+import { SystemRunner, type FrameState } from '../../src/app/System.js';
+import type { GameContext } from '../../src/app/context.js';
+import { discoverySystem } from '../../src/app/systems/discovery.js';
+import { waypointsSystem } from '../../src/app/systems/waypoints.js';
+import { Waypoints } from '../../src/ui/Waypoints.js';
+import type { TileMeta } from '../../src/util/types.js';
 import { GuidanceSlot } from '../../src/ui/GuidanceSlot.js';
 import { HULL_GAUGE_SHOW_RATIO, hullGaugeVisible } from '../../src/ui/HullGauge.js';
 import { TUTORIAL_STEPS, tutorialText } from '../../src/game/Tutorial.js';
@@ -80,6 +91,8 @@ class FakeElement extends EventTarget {
   hidden = false;
   textContent = '';
   type = '';
+  offsetWidth = 0;
+  offsetHeight = 0;
   dataset: Record<string, string> = {};
   style = { setProperty() {} };
   classList = { toggle() {} };
@@ -102,6 +115,7 @@ describe('guidance slot', () => {
       documentElement: { classList: { contains: () => false } },
       createElement: () => new FakeElement(),
       createElementNS: () => new FakeElement(),
+      querySelectorAll: () => [],
     });
   });
   afterEach(() => vi.unstubAllGlobals());
@@ -561,6 +575,207 @@ describe('guidance slot', () => {
     expect(f.step().detail).toBe('OPEN JOURNAL');
     f.overlay.dispose();
   });
+
+  const missionCases = sites.landmarks.flatMap((site) =>
+    (['arcade', 'realistic'] as const).flatMap((mode) =>
+      [false, true].flatMap((touch) =>
+        [false, true].map((firstTime) => ({ site, mode, touch, firstTime })),
+      ),
+    ),
+  );
+
+  it.each(missionCases)(
+    '$site $mode touch=$touch firstTime=$firstTime: rewards agree with the next waypoint through two objectives',
+    ({ site, mode, touch, firstTime }) => {
+      document.documentElement.classList.contains = () => touch;
+      vi.stubGlobal('window', { innerWidth: 800, innerHeight: 600 });
+      const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
+      const def = parseMission(json(`data/landmarks/${site}/mission.json`), site)!;
+      expect(def).not.toBeNull();
+      const meta = json(`data/tiles/${def.tile}/meta.json`) as TileMeta;
+      const effective = resolveEffective(defaultSettings(DEFAULT_CONFIG), mode, null);
+      // Isolate guidance from terrain rendering: authored coordinates and scan
+      // requirements remain real; seabed-snapped POIs use a controlled floor.
+      const pois = placePois(
+        parsePois(json(`data/landmarks/${def.landmark}/pois.json`)),
+        meta,
+        { sampleHeight: () => meta.min_m },
+        effective.scan,
+        def.landmark,
+      );
+      for (const poi of pois) {
+        const primary = def.objectives.some((o) => o.poi === poi.id && o.primary);
+        const radius = primary ? missionApproachScanRadius(site, poi.radius) : poi.radius;
+        poi.radius = resolveScanRadius(
+          radius * effective.sensor.scanRadiusMultiplier,
+          effective.scan,
+        );
+      }
+      const bus = new EventBus();
+      const scanner = new Scanner(effective.scan, bus, {
+        record: () => ({ firstTime }),
+      });
+      scanner.setTargets(pois);
+      const overlay = new ScanOverlay(effective.scan, document.body);
+      const keys = { scan: 'G', guide: 'J' };
+      // Discovery subscribes before Mission in production, and renders the result
+      // synchronously before Mission advances the objective on this same event.
+      const off = bus.on('scan:complete', ({ poiId, firstTime: fresh }) =>
+        overlay.showComplete(pois.find((p) => p.id === poiId)!.name, fresh, keys),
+      );
+      const mission = new Mission({ def, bus });
+      mission.resolve(pois.map((p) => p.id));
+      expect(mission.objectives.every((o) => o.resolved)).toBe(true);
+      mission.start(def.tile);
+      const waypoints = new Waypoints(scanner);
+      waypoints.setPois(pois);
+      waypoints.setVisualHints(effective.gameplay.visualHints);
+      const camera = new PerspectiveCamera(60, 4 / 3, 0.1, 100000);
+      const position = new Vector3();
+      const forward = new Vector3(0, 0, -1);
+      const discovery: Discovery = Object.assign(Object.create(Discovery.prototype) as Discovery, {
+        opts: { keyLabel: (action: string) => (action === 'scan' ? keys.scan : keys.guide) },
+        scanner,
+        overlay,
+        pois,
+        projected: new Vector3(),
+        guide: { isOpen: false, setFooter() {} },
+        debrief: { isOpen: false },
+        stats: { update() {} },
+      });
+      const ctx = {
+        app: { state: 'dive' },
+        discovery,
+        missionRouter: { mission, panel: { showsTarget: () => false } },
+        waypoints,
+        guidance: overlay.slot,
+        effective,
+        rig: { camera },
+      } as unknown as GameContext;
+      const runner = new SystemRunner(ctx);
+      runner.init([discoverySystem, waypointsSystem].map(({ name, frame }) => ({ name, frame })));
+      const frame = {
+        state: { scan: false, toggleGuide: false },
+        sampled: {},
+        pilotPosition: position,
+        pilotForward: forward,
+      } as FrameState;
+      const step = (dt = 0, held = false) => {
+        frame.dt = frame.fixedDt = frame.clockDt = dt;
+        frame.steps = 1;
+        frame.state = { ...frame.state, scan: held };
+        camera.position.copy(position);
+        camera.lookAt(position.clone().add(forward));
+        camera.updateMatrixWorld();
+        runner.frame(frame);
+        return texts(overlay.slot);
+      };
+      const edge = (waypoints.root as unknown as FakeElement).children[0];
+      const checkWaypoint = () => {
+        const objective = nextScanObjective(mission.objectives);
+        expect(frame.nextScanObjective?.poiId).toBe(objective?.poiId);
+        const next = pois.find((p) => p.id === objective?.poiId);
+        expect(edge.hidden).toBe(!next || !effective.gameplay.visualHints);
+        if (next && effective.gameplay.visualHints) {
+          expect(edge.children[0].textContent).toBe(next.name);
+          const dy = next.position.y - position.y;
+          expect(edge.children[1].textContent).toBe(
+            `${Math.round(position.distanceTo(next.position))} m · ${dy >= 0 ? '↑' : '↓'}${Math.round(Math.abs(dy))} m${position.distanceTo(next.position) <= next.radius ? ' · IN RANGE' : ''}`,
+          );
+        }
+        return next;
+      };
+      try {
+        const order = [
+          ...def.objectives.filter((o) => o.primary),
+          ...def.objectives.filter((o) => !o.primary),
+        ];
+        expect(order.length).toBeGreaterThanOrEqual(2);
+        for (const objective of order.slice(0, 2)) {
+          expect(nextScanObjective(mission.objectives)?.poiId).toBe(objective.poi);
+          const current = pois.find((p) => p.id === objective.poi)!;
+          position.copy(current.position).add(new Vector3(0, 0, 5));
+          forward.copy(current.position).sub(position).normalize();
+          step();
+          expect(scanner.view.candidateId).toBe(current.id);
+          checkWaypoint();
+          for (let elapsed = 0; !scanner.isScanned(def.landmark, current.id); elapsed += 0.25) {
+            expect(elapsed).toBeLessThan(current.scanSeconds + 1);
+            step(0.25, true);
+          }
+          const reward = texts(overlay.slot);
+          expect(reward).toMatchObject({
+            name: current.name,
+            kicker: firstTime ? 'New Journal entry' : 'SCAN COMPLETE',
+            kind: 'discovery',
+            detail: firstTime ? (touch ? 'OPEN JOURNAL' : 'PRESS J · JOURNAL') : 'LOGGED · JOURNAL',
+          });
+          const next = checkWaypoint();
+          expect(next?.id).not.toBe(current.id);
+          // The next frame refreshes the scanner geometry before composing reward text.
+          step();
+          expect(scanner.view.objectiveId).toBe(next?.id ?? null);
+          if (next) {
+            const detail = texts(overlay.slot).detail;
+            if (touch && detail !== (firstTime ? 'OPEN JOURNAL' : 'LOGGED · JOURNAL')) {
+              expect(detail.startsWith(`${next.name} · `)).toBe(true);
+              const turn = detail.match(/TURN (\d+)° (PORT|STARBOARD)/);
+              if (turn) {
+                const delta = next.position.clone().sub(position);
+                const heading = Math.atan2(forward.x, -forward.z);
+                const bearing = Math.atan2(delta.x, -delta.z);
+                const degrees = ((((bearing - heading) * 180) / Math.PI + 540) % 360) - 180;
+                expect(Number(turn[1])).toBe(Math.round(Math.abs(degrees)));
+                expect(turn[2]).toBe(degrees >= 0 ? 'STARBOARD' : 'PORT');
+              }
+              if (detail.includes('RISE'))
+                expect(next.position.y).toBeGreaterThanOrEqual(position.y);
+              if (detail.includes('SINK')) expect(next.position.y).toBeLessThan(position.y);
+              if (detail.includes('DIVE DEEPER')) expect(-position.y).toBeLessThan(next.minDepthM!);
+              if (detail.includes(' m AHEAD'))
+                expect(detail).toContain(
+                  `${position.distanceTo(next.position).toFixed(0)} m AHEAD`,
+                );
+            }
+            // Turn both ways and move above/below the next target while the same
+            // reward remains visible. Directions must use its current waypoint.
+            for (const turn of [-90, 90, 0]) {
+              position.copy(next.position).add(new Vector3(0, turn === 90 ? 40 : -40, 60));
+              if (turn === 0) position.copy(next.position).add(new Vector3(0, 0, 5));
+              forward.set(Math.sin((turn * Math.PI) / 180), 0, -Math.cos((turn * Math.PI) / 180));
+              const card = step(0.1);
+              checkWaypoint();
+              expect(card.name).toBe(current.name);
+              expect(card.kind).toBe('discovery');
+              if (!touch)
+                expect(card.detail).toBe(firstTime ? 'PRESS J · JOURNAL' : 'LOGGED · JOURNAL');
+              else if (turn !== 0) {
+                expect(card.detail).toBe(
+                  `${next.name} · TURN 90° ${turn < 0 ? 'STARBOARD' : 'PORT'}`,
+                );
+              } else expect(card.detail).toBe(firstTime ? 'OPEN JOURNAL' : 'LOGGED · JOURNAL');
+            }
+          }
+          // Expiry reveals the ready next objective through the same single slot.
+          step(effective.scan.completeBannerSeconds + 0.1);
+          checkWaypoint();
+          if (next) expect(texts(overlay.slot).name).toBe(next.name);
+          expect(
+            (document.body as unknown as FakeElement).children.filter(
+              (el) => el.className === 'guidance-slot',
+            ),
+          ).toHaveLength(1);
+        }
+        expect(mission.counts().completed).toBe(2);
+      } finally {
+        runner.dispose();
+        mission.dispose();
+        off();
+        overlay.dispose();
+        waypoints.dispose();
+      }
+    },
+  );
 
   it('keeps the range and turn to a remote objective visible on touch', () => {
     const f = contactGuidance(true);
