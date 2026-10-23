@@ -1659,3 +1659,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (smoke + project-base green, no full e2e):** Sonnet V-eight-sites-lit (a): Kamaʻehuakanaloa bed lit (warm silt, site ambient 6 to 18 on all tiers); I rate ~3.4, from 2.2. The jelly subject is still a dark crimson shape (needs species or staging change); bed is slightly blotchy. Three snapshots rebaselined.
 - **Codex:** 3130-3150 queued, waiting for the Codex week (Oct 27). Worktrees 2980 and 3050 still unmerged by decision. Claude 5h fell to 49% (agent took 77 min), so one package only. No tag.
 - **Next Claude:** V-eight-sites-lit (b). **Needs owner:** 150-300 m opening rule; phone retest.
+
+## 2026-10-22 22:33 CDT headless run 83 (Claude): targeted review (Codex starved)
+
+- Cause: Codex verify briefs finished fast and 5h fell to 18% (<20% gate) until its 22:15 reset; not a scheduling fault (PROCESS-LOG). Queued R-ci-green briefs 3250-3270 (CI static timeout, Chromium apt-lock, globe pin 43.99998 px).
+- Merged and pushed (smoke + project-base green): Sonnet collected Codex 3130-3240 (tests, Sonar modifier-key fix, setup-node pin 22.23.4); Sonnet V-spawn-sub-clear (Titanic ~3.8, Bismarck ~3.5; Endurance still weak). 2980 and 3050 remain unmerged.
+- Next Claude: V-eight-sites-lit (b), Endurance spawn altitude, objective-text wrap. **Needs owner:** phone retest.
