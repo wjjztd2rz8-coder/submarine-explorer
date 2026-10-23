@@ -54,6 +54,12 @@ export const cameraControlsSystem: GameSystem = {
       firstMove.reset(pose());
       tips.moved = false;
     };
+    ctx.reanchorFirstMove = () => {
+      if (!tips.moved) started = false;
+    };
+    cleanup.add(() => {
+      delete ctx.reanchorFirstMove;
+    });
     cleanup.add(
       bus.on('mission:started', () => {
         rig.resetView();
