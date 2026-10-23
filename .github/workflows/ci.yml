@@ -21,10 +21,28 @@ jobs:
   checks:
     # Preserve the existing status name for branch protection.
     name: build and static checks
+    needs: check-shards
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Require every static-check shard
+        env:
+          RESULT: ${{ needs.check-shards.result }}
+        run: test "$RESULT" = success
+
+  check-shards:
+    name: static checks (${{ matrix.shard }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ['1/3', '2/3', '3/3']
     env:
       CI: true
+      # Only unit tests shard; every runner retains the canonical static gates.
+      VITEST_SHARD: ${{ matrix.shard }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
