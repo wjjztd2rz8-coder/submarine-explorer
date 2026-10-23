@@ -79,6 +79,8 @@ export interface Biome {
   rippleLenM: number;
   /** Ripple crest direction, radians from +X in the XZ plane. */
   rippleDir: number;
+  /** Lowers the macro-noise threshold so ripples cover more of the flat bed, 0..0.4 (default 0). */
+  rippleReach?: number;
   /** Bioturbation mounds/tracks strength, 0..1. */
   burrow: number;
   /** Slot C coverage bias: + shows hard substrate on gentler slopes. */
@@ -222,7 +224,9 @@ export const BIOMES: Record<string, Biome> = {
     stainAmount: 0.07,
     patch: 0.45,
     burrow: 0.9,
-    ripple: 0.3,
+    ripple: 2.5,
+    // Ripples reach the whole lander light pool instead of isolated patches.
+    rippleReach: 0.4,
     // Separate the crests from the fine silt texture in the approach view.
     rippleLenM: 1.6,
     rippleDir: 0.5,

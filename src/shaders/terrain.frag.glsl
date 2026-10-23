@@ -45,6 +45,7 @@ uniform float uStainAmount;
 uniform float uPatch;
 uniform float uRipple;
 uniform float uRippleLen;
+uniform float uRippleReach;
 uniform vec2 uRippleDir;
 uniform float uBurrow;
 uniform float uRockBias;
@@ -263,7 +264,7 @@ float terrRough = 0.92;
     float warp = (m2 - 0.5) * 3.2 + (terrainNoise(P.xz / 1.9).x - 0.5) * 0.8;
     float ph = (dot(P.xz, uRippleDir) / uRippleLen + warp) * 6.2832;
     ph += 0.55 * sin(ph);                              // stoss/lee asymmetry
-    float mask = smoothstep(0.38, 0.62, macro * 0.7 + terrainNoise(P.xz / 8.0 + 3.0).x * 0.3);
+    float mask = smoothstep(0.38 - uRippleReach, 0.62 - uRippleReach, macro * 0.7 + terrainNoise(P.xz / 8.0 + 3.0).x * 0.3);
     mask *= flatT * uRipple * (0.5 + 0.5 * wB + 0.5 * (1.0 - wC));
     slope += uRippleDir * cos(ph) * 0.34 * mask * rFade;
     rip = sin(ph) * mask * rFade;

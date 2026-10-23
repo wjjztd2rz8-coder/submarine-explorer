@@ -20,6 +20,13 @@ const flatGround = {
 const cell = { cellSizeM: 64, density: 1, rockLo: 0.05, rockHi: 0.3, seed: 7 };
 
 describe('open sediment floor variety', () => {
+  it('the trench floor ripples reach the whole light pool but stay bounded', () => {
+    const biome = biomeFor('challenger-deep');
+    expect(biome.ripple).toBeGreaterThan(1);
+    expect(biome.rippleReach ?? 0).toBeGreaterThan(0);
+    expect(biome.rippleReach ?? 0).toBeLessThanOrEqual(0.4);
+  });
+
   it.each(['low', 'medium', 'high'] as const)(
     '%s: a canyon floor retains cobbles, sand patches and broad current ripples',
     (tier) => {

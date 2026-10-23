@@ -73,6 +73,7 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
     uStainAmount: { value: biome.stainAmount },
     uPatch: { value: biome.patch },
     uRipple: { value: biome.ripple },
+    uRippleReach: { value: biome.rippleReach ?? 0 },
     uRippleLen: { value: biome.rippleLenM },
     uRippleDir: { value: new THREE.Vector2(Math.cos(biome.rippleDir), Math.sin(biome.rippleDir)) },
     uBurrow: { value: biome.burrow },
