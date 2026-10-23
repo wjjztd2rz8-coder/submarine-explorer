@@ -61,16 +61,10 @@ jobs:
         timeout-minutes: 5
         run: npm ci 2>&1 | tee "$DIAGNOSTICS_DIR/npm-install.log"
 
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ubuntu-24.04-${{ runner.arch }}-playwright-${{ hashFiles('package-lock.json') }}
-
       - name: Install Playwright Chromium
         id: chromium
         timeout-minutes: 8
-        run: bash tools/install-playwright-chromium.sh 2>&1 | tee "$DIAGNOSTICS_DIR/chromium-install.log"
+        uses: ./.github/actions/install-chromium
 
       - name: Capture existing golden set
         id: golden
@@ -242,6 +236,7 @@ jobs:
           path: |
             ${{ env.DIAGNOSTICS_DIR }}/*.log
             ${{ env.DIAGNOSTICS_DIR }}/run.txt
+            .cache/chromium-install.log
             .cache/golden-build.log
             .cache/golden-preview.log
           include-hidden-files: true
@@ -304,7 +299,7 @@ jobs:
         run: node tools/ci-build-manifest.mjs verify / dist
       - name: Install Playwright Chromium
         timeout-minutes: 8
-        run: bash tools/install-playwright-chromium.sh
+        uses: ./.github/actions/install-chromium
       - name: Capture capability evidence and run its assertions
         run: >-
           npx playwright test tests/e2e/hud-touch.spec.ts
