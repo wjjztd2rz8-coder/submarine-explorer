@@ -4,7 +4,7 @@ Shots: `.cache/codex/shots/V-eight-sites-lit-c/{base,after1,after2,after3}-{high
 
 ## What changed (data only, no new code)
 
-- `data/landmarks/{axial-seamount-ashes,hudson-canyon}/site.json`: `opening.mission.rangeM` 180 / 160 to 110 (same fix as the wreck/lander openings in V-eight-sites), so the vent field and ledge are about a third closer at spawn. Site ambient now on low, medium and high: Axial 14 (was Low only, 6), Hudson 15 (was 6), colour 0x6f8f9e.
+- `data/landmarks/{axial-seamount-ashes,hudson-canyon}/site.json`: `opening.mission.rangeM` 180 / 160 to 110 / 112 (same fix as the wreck/lander openings in V-eight-sites), so the vent field and ledge are about a third closer at spawn. Site ambient now on low, medium and high: Axial 14 (was Low only, 6), Hudson 15 (was 6), colour 0x6f8f9e.
 - `src/world/TerrainBiome.ts`: `horizonFadeM` for Axial [200, 700] and Hudson [200, 800], so the far wall/shelf eases into the water.
 
 ## Findings
