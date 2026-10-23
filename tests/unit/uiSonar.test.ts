@@ -1,7 +1,8 @@
 /** The sonar follows tile aspect to prevent letterboxing and preserve map coordinates. */
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  Sonar,
   canSonarWheelStep,
   easeSonarRange,
   sonarCanvasSize,
@@ -15,6 +16,10 @@ import {
   sonarReliefRange,
 } from '../../src/ui/Sonar.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
+import type { Terrain } from '../../src/world/Terrain.js';
+import type { GameContext } from '../../src/app/context.js';
+import { sonarControlsSystem } from '../../src/app/systems/sonar.js';
+import { recordSonarCanvas } from './helpers/sonarCanvas.js';
 
 describe('sonar canvas sizing', () => {
   it('portrait tile (Titanic, ~25 x 33 km): 220 px tall, narrower wide', () => {
@@ -163,5 +168,387 @@ describe('flat-site sonar relief', () => {
     expect(mid.gainBoost).toBeCloseTo(1.5);
     expect(sonarFlatProfile(20, 500)).toEqual(mid);
     expect(sonarFlatProfile(60, 1000)).toEqual({ flatness: 0, gainBoost: 1, tint: 0 });
+  });
+});
+
+/** Only the attached DOM and event paths used by Sonar; no drawing or browser defaults. */
+class SonarElement extends EventTarget {
+  children: SonarElement[] = [];
+  parentElement: SonarElement | null = null;
+  className = '';
+  dataset: Record<string, string> = {};
+  attributes: Record<string, string> = {};
+  style = { setProperty() {} };
+  textContent = '';
+  type = '';
+  tabIndex = -1;
+  private listeners: Array<{
+    type: string;
+    fn: EventListenerOrEventListenerObject;
+    capture: boolean;
+  }> = [];
+  classList = {
+    contains: (name: string) => this.className.split(' ').includes(name),
+    toggle: (name: string, on = !this.classList.contains(name)) => {
+      const classes = new Set(this.className.split(' ').filter(Boolean));
+      if (on) classes.add(name);
+      else classes.delete(name);
+      this.className = [...classes].join(' ');
+      return on;
+    },
+  };
+  constructor(readonly tagName = 'DIV') {
+    super();
+    if (['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'].includes(tagName)) this.tabIndex = 0;
+  }
+  append(...children: SonarElement[]) {
+    for (const child of children) {
+      child.parentElement = this;
+      this.children.push(child);
+    }
+  }
+  appendChild(child: SonarElement) {
+    this.append(child);
+    return child;
+  }
+  setAttribute(name: string, value: string) {
+    this.attributes[name] = value;
+  }
+  getAttribute(name: string) {
+    return this.attributes[name] ?? null;
+  }
+  closest(selector: string): SonarElement | null {
+    const matches = selector
+      .split(',')
+      .some((part) =>
+        part.trim() === '[contenteditable="true"]'
+          ? this.getAttribute('contenteditable') === 'true'
+          : part.trim().toUpperCase() === this.tagName,
+      );
+    return matches ? this : (this.parentElement?.closest(selector) ?? null);
+  }
+  // The settings-note insertion is irrelevant to keyboard routing.
+  querySelector() {
+    return null;
+  }
+  focus() {
+    if (this.tabIndex < 0) throw new Error('Fixture target is not focusable');
+    (document as unknown as { activeElement: SonarElement }).activeElement = this;
+  }
+  blur() {
+    (document as unknown as { activeElement: SonarElement }).activeElement =
+      document.body as unknown as SonarElement;
+  }
+  click() {
+    this.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+  }
+  override addEventListener(
+    type: string,
+    fn: EventListenerOrEventListenerObject | null,
+    options?: boolean | AddEventListenerOptions,
+  ) {
+    if (fn)
+      this.listeners.push({
+        type,
+        fn,
+        capture: typeof options === 'boolean' ? options : !!options?.capture,
+      });
+  }
+  override removeEventListener(
+    type: string,
+    fn: EventListenerOrEventListenerObject | null,
+    options?: boolean | EventListenerOptions,
+  ) {
+    const capture = typeof options === 'boolean' ? options : !!options?.capture;
+    this.listeners = this.listeners.filter(
+      (l) => l.type !== type || l.fn !== fn || l.capture !== capture,
+    );
+  }
+  override dispatchEvent(event: Event): boolean {
+    const path: SonarElement[] = [];
+    for (let node: SonarElement | null = this; node; node = node.parentElement) path.push(node);
+    Object.defineProperty(event, 'target', { configurable: true, value: this });
+    let immediate = false;
+    const stopImmediate = event.stopImmediatePropagation.bind(event);
+    event.stopImmediatePropagation = () => {
+      immediate = true;
+      stopImmediate();
+    };
+    const invoke = (node: SonarElement, capture: boolean) => {
+      Object.defineProperty(event, 'currentTarget', { configurable: true, value: node });
+      Object.defineProperty(event, 'eventPhase', {
+        configurable: true,
+        value:
+          node === this ? Event.AT_TARGET : capture ? Event.CAPTURING_PHASE : Event.BUBBLING_PHASE,
+      });
+      for (const listener of [...node.listeners]) {
+        if (listener.type !== event.type || listener.capture !== capture) continue;
+        if (typeof listener.fn === 'function') listener.fn.call(node, event);
+        else listener.fn.handleEvent(event);
+        if (immediate) break;
+      }
+    };
+    for (const node of path.slice(1).reverse()) {
+      invoke(node, true);
+      if (event.cancelBubble) return !event.defaultPrevented;
+    }
+    invoke(this, true);
+    if (!immediate) invoke(this, false);
+    if (event.bubbles && !event.cancelBubble) {
+      for (const node of path.slice(1)) {
+        invoke(node, false);
+        if (event.cancelBubble) break;
+      }
+    }
+    return !event.defaultPrevented;
+  }
+}
+
+function sonarInputFixture() {
+  const recorder = recordSonarCanvas();
+  const context = recorder.document.createElement('canvas').getContext('2d');
+  const win = new SonarElement('WINDOW');
+  const body = new SonarElement('BODY');
+  win.append(body);
+  const createElement = (tag: string) =>
+    Object.assign(new SonarElement(tag.toUpperCase()), { getContext: () => context });
+  vi.stubGlobal('window', win);
+  vi.stubGlobal('Element', SonarElement);
+  vi.stubGlobal('HTMLElement', SonarElement);
+  vi.stubGlobal('document', {
+    body,
+    documentElement: new SonarElement('HTML'),
+    activeElement: body,
+    createElement,
+  });
+  const sonar = new Sonar(
+    { widthM: 2000, depthM: 3000, meta: { id: 'input-fixture', cols: 2, rows: 2 } } as Terrain,
+    [],
+    { parent: body as unknown as HTMLElement },
+  );
+  const ctx = {
+    app: { state: 'dive' },
+    sonar,
+    settingsScreen: { root: body, isOpen: false },
+    controlsCard: { isOpen: false },
+    globe: { isOpen: false },
+    discovery: { guide: { isOpen: false }, debrief: { isOpen: false } },
+    photoMode: { active: false },
+    missionRouter: { frozen: false },
+  } as unknown as GameContext;
+  sonarControlsSystem.init!(ctx);
+  const root = sonar.root as unknown as SonarElement;
+  const [out, label, into] = root.children[0].children[0].children;
+  const zoomBy = vi.spyOn(sonar, 'zoomBy');
+  const key = (target: SonarElement, code: string, extra: Partial<KeyboardEvent> = {}) => {
+    if (target === body) (document.activeElement as unknown as SonarElement).blur();
+    else target.focus();
+    expect(document.activeElement).toBe(target);
+    const event = Object.assign(new Event('keydown', { bubbles: true, cancelable: true }), {
+      code,
+      altKey: false,
+      ctrlKey: false,
+      metaKey: false,
+      shiftKey: false,
+      ...extra,
+    });
+    const prevent = vi.spyOn(event, 'preventDefault');
+    const stop = vi.spyOn(event, 'stopPropagation');
+    target.dispatchEvent(event);
+    return { event, prevent, stop };
+  };
+  return { sonar, root, out, into, label, body, win, key, zoomBy, recorder, createElement };
+}
+
+describe('sonar keyboard and button routing', () => {
+  afterEach(() => {
+    sonarControlsSystem.dispose?.();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  const keys = [
+    { code: 'Equal', direction: -1, expected: 500 },
+    { code: 'NumpadAdd', direction: -1, expected: 500 },
+    { code: 'Minus', direction: 1, expected: 2000 },
+    { code: 'NumpadSubtract', direction: 1, expected: 2000 },
+  ];
+  it.each(keys)(
+    'consumes one $code step locally, then globally when focus leaves the map',
+    ({ code, direction, expected }) => {
+      const f = sonarInputFixture();
+      const capture = vi.fn((event: Event) => event.eventPhase);
+      const owner = vi.fn();
+      f.win.addEventListener('keydown', capture, true);
+      f.win.addEventListener('keydown', owner);
+      const local = f.key(f.root, code);
+      expect(capture).toHaveBeenCalledOnce();
+      expect(capture.mock.results[0].value).toBe(Event.CAPTURING_PHASE);
+      expect(capture.mock.calls[0][0].target).toBe(f.root);
+      expect(owner).not.toHaveBeenCalled();
+      expect(f.zoomBy).toHaveBeenCalledExactlyOnceWith(direction);
+      expect(local.prevent).toHaveBeenCalledOnce();
+      expect(local.stop).toHaveBeenCalledOnce();
+      expect(local.event.defaultPrevented).toBe(true);
+      expect(f.sonar.targetZoom).toBe(expected);
+      expect(f.root.dataset.zoom).toBe(String(expected));
+      expect(f.label.textContent).toBe(`${expected} m`);
+      // Input changes the target immediately; the existing easing guard owns animation.
+      expect(f.sonar.zoom).toBe(1000);
+      f.sonar.setZoom(1000);
+      f.zoomBy.mockClear();
+      const global = f.key(f.body, code);
+      expect(f.zoomBy).toHaveBeenCalledExactlyOnceWith(direction);
+      expect(global.prevent).toHaveBeenCalledOnce();
+      expect(global.stop).not.toHaveBeenCalled();
+      expect(owner).toHaveBeenCalledOnce();
+      expect(f.sonar.targetZoom).toBe(expected);
+    },
+  );
+
+  it('leaves unrelated keys to their owner and accepts Shift plus', () => {
+    const f = sonarInputFixture();
+    const owner = vi.fn();
+    f.win.addEventListener('keydown', owner);
+    const unrelated = f.key(f.root, 'KeyM');
+    expect(owner).toHaveBeenCalledOnce();
+    expect(unrelated.prevent).not.toHaveBeenCalled();
+    expect(unrelated.stop).not.toHaveBeenCalled();
+    expect(f.zoomBy).not.toHaveBeenCalled();
+    expect(f.sonar.expanded).toBe(false);
+    f.key(f.root, 'Equal', { shiftKey: true });
+    expect(f.sonar.targetZoom).toBe(500);
+    expect(f.zoomBy).toHaveBeenCalledExactlyOnceWith(-1);
+  });
+
+  it.each(
+    keys.flatMap((key) =>
+      ['altKey', 'ctrlKey', 'metaKey'].map((modifier) => ({ ...key, modifier })),
+    ),
+  )('leaves $modifier + $code available on map, buttons and global paths', ({ code, modifier }) => {
+    const f = sonarInputFixture();
+    const owner = vi.fn();
+    f.win.addEventListener('keydown', owner);
+    for (const target of [f.root, f.into, f.out, f.body]) {
+      const result = f.key(target, code, { [modifier]: true });
+      expect({ prevented: result.event.defaultPrevented, zoom: f.sonar.targetZoom }).toEqual({
+        prevented: false,
+        zoom: 1000,
+      });
+      expect(result.prevent).not.toHaveBeenCalled();
+      expect(result.stop).not.toHaveBeenCalled();
+      expect(f.sonar.targetZoom).toBe(1000);
+    }
+    expect(f.zoomBy).not.toHaveBeenCalled();
+    expect(owner).toHaveBeenCalledTimes(4);
+  });
+
+  it.each(keys)('leaves $code on native zoom buttons to the focused control', ({ code }) => {
+    const f = sonarInputFixture();
+    const owner = vi.fn();
+    f.win.addEventListener('keydown', owner);
+    for (const button of [f.into, f.out]) {
+      const result = f.key(button, code);
+      expect({ prevented: result.event.defaultPrevented, zoom: f.sonar.targetZoom }).toEqual({
+        prevented: false,
+        zoom: 1000,
+      });
+      expect(result.stop).not.toHaveBeenCalled();
+    }
+    expect(f.zoomBy).not.toHaveBeenCalled();
+    expect(f.sonar.targetZoom).toBe(1000);
+    expect(owner).toHaveBeenCalledTimes(2);
+  });
+
+  it.each(['input', 'select', 'textarea', 'button', 'contenteditable'])(
+    'retains the global editable-target exclusion for %s',
+    (tag) => {
+      const f = sonarInputFixture();
+      const field = f.createElement(tag === 'contenteditable' ? 'div' : tag);
+      if (tag === 'contenteditable') {
+        field.setAttribute('contenteditable', 'true');
+        field.tabIndex = 0;
+      }
+      f.body.append(field);
+      for (const { code } of keys) {
+        const result = f.key(field, code);
+        expect(result.event.defaultPrevented).toBe(false);
+        expect(result.stop).not.toHaveBeenCalled();
+      }
+      expect(f.zoomBy).not.toHaveBeenCalled();
+      expect(f.sonar.targetZoom).toBe(1000);
+    },
+  );
+
+  it.each([false, true])(
+    'routes native button clicks once without expanding the map (touch=%s)',
+    (touch) => {
+      const f = sonarInputFixture();
+      document.documentElement.classList.toggle('is-touch', touch);
+      expect(f.root.tabIndex).toBe(0);
+      expect(f.root.getAttribute('aria-label')).toContain('Plus and minus change range');
+      expect(f.into.tagName).toBe('BUTTON');
+      expect(f.into.type).toBe('button');
+      expect(f.out.type).toBe('button');
+      expect(f.into.tabIndex).toBe(0);
+      expect(f.out.tabIndex).toBe(0);
+      expect(f.into.getAttribute('aria-label')).toBe('Sonar zoom in');
+      expect(f.out.getAttribute('aria-label')).toBe('Sonar zoom out');
+      for (const expanded of [false, true]) {
+        if (f.sonar.expanded !== expanded) f.sonar.toggle();
+        f.sonar.setZoom(1000);
+        f.zoomBy.mockClear();
+        for (const button of [f.into, f.out]) {
+          for (const code of ['Enter', 'Space']) {
+            const activation = f.key(button, code);
+            expect(activation.event.defaultPrevented).toBe(false);
+            expect(activation.stop).not.toHaveBeenCalled();
+          }
+        }
+        expect(f.zoomBy).not.toHaveBeenCalled();
+        // Deliver the click a native activation produces; the fixture does not synthesize defaults.
+        f.into.focus();
+        f.into.click();
+        expect(f.zoomBy).toHaveBeenCalledExactlyOnceWith(-1);
+        expect(f.sonar.targetZoom).toBe(500);
+        expect(f.sonar.expanded).toBe(expanded);
+        f.zoomBy.mockClear();
+        f.out.focus();
+        f.out.click();
+        expect(f.zoomBy).toHaveBeenCalledExactlyOnceWith(1);
+        expect(f.sonar.targetZoom).toBe(1000);
+        expect(f.sonar.expanded).toBe(expanded);
+      }
+      f.sonar.canvas.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(f.sonar.expanded).toBe(!touch);
+      expect(f.sonar.backdrop.hidden).toBe(touch);
+      expect(f.recorder.rasters).toHaveLength(0);
+      expect(f.recorder.draws).toHaveLength(0);
+    },
+  );
+
+  it('clamps keyboard and native button steps at both public endpoints', () => {
+    const f = sonarInputFixture();
+    for (const { level, codes, button, label } of [
+      { level: 250 as const, codes: ['Equal', 'NumpadAdd'], button: f.into, label: '250 m' },
+      {
+        level: 'tile' as const,
+        codes: ['Minus', 'NumpadSubtract'],
+        button: f.out,
+        label: 'Whole tile',
+      },
+    ]) {
+      f.sonar.setZoom(level);
+      for (const code of codes) {
+        const result = f.key(f.root, code);
+        expect(result.prevent).toHaveBeenCalledOnce();
+        expect(result.stop).toHaveBeenCalledOnce();
+        expect(f.sonar.targetZoom).toBe(level);
+      }
+      button.click();
+      expect(f.sonar.targetZoom).toBe(level);
+      expect(f.root.dataset.zoom).toBe(String(level));
+      expect(f.label.textContent).toBe(label);
+    }
   });
 });
