@@ -276,3 +276,7 @@ Run 72's `start` exited 75 (Codex 5h 17% < 20%) under nohup, so nobody saw it; `
 
 - Cause: not a scheduling fault. Codex verify briefs finish in ~15 min, the last nine launched 17:18-19:33, and Codex 5h fell to 18% (< 20% dispatch gate) until its 22:15 reset; refill runs at most every 2 h. Queue was therefore empty and unlaunchable.
 - Fix: queued three R-ci-green briefs (3250-3270) so the 22:15 reset launches real work; collected 3130-3240 (12 worktrees) in one Sonnet pass. S-verify slices are now near diminishing returns (nine clean audits, one real Sonar fix, one CI pin), so the refill should prefer R-ci-green and S-* items over more verify briefs.
+
+## 2026-10-22 (night): joint review plumbing
+
+Creating `.cache/review/current` as a directory before `codex-review.sh start` makes its `ln -sfn` nest inside it, so reconcile never finds `sol-review.md` and hangs; killing a reconcile mid-run leaves a `codex exec resume` process holding the thread (later reconciles fail with "active writer"). Rule: never create `.cache/review/current` by hand (write the draft only after `start` has made the symlink), and wait for a stale resume process to exit before retrying. Background Bash commands are stopped after 10 min regardless of `timeout`; poll the output file in 10-min foreground loops.

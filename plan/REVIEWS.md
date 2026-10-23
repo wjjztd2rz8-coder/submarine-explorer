@@ -2,6 +2,26 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-22 (night) joint review, Claude + Codex 6.1 Sol (golden 2026-10-23-033406)
+
+**Method:** Sol reviewed independently, then one reconcile round (a stray `mkdir .cache/review/current` before `start` broke the symlink and a killed reconcile left a stale `resume` process holding Sol's thread; both recovered, PROCESS-LOG). Sol had no browser, so no fresh live play.
+
+**Changed since this morning:** V-eight-sites-lit (a) (Kama bed lit), V-spawn-sub-clear (Titanic/Bismarck/Challenger mission openings closer), Codex 3130-3240 collected (tests, Sonar modifier-key fix, setup-node pin). Free-dive goldens differ little from the morning set (Sol: no material improvement).
+
+**Scores, readable / beautiful (agreed bands):** Titanic 4 / 3.5-3.8; Lost City 3.5 / 3-3.4; Blue Hole 3.5 / 3-3.4; Beebe 4 / 3.5-3.6 (strongest); Monterey 4 / 3.5-3.75; Challenger 3.5 / 3.4; Endurance 3.2 / 3.0. Disputed and settled: I said Titanic still overlaps; Sol showed the _mission_ opening separates sub and bow while the _free-dive_ golden still overlaps (mixing modes, my error). Endurance blocker rank: Sol is right that it needs coherence, not beauty 4, so it ranks below journey acceptance.
+
+**Sol's findings I accepted (credit Sol):** journey captures are from Oct 20 and reach only the first reward; a phone capture showed "New Journal entry" beside a conflicting "SINK TOWARD TARGET" cue (unverified on main); Arcade scan margin is 10 m (Endurance/Bismarck) and 40 m (Titanic/Challenger), not 60 m; range/yaw alone cannot lower the spawn clearance floor (`Spawn.ts:68`); expected-failure scarp collision tests and the terrain-seam gap belong on the blocker list; CI is not only infra (44 px measurement failures too); "Pages deploys every push" is outdated; efficiency.sh "idle" hours are sampled concurrency, not proof of waste.
+
+**Biggest gaps:** current five-minute journey acceptance and phone performance; green hosted CI on a quiet SHA (no tag since f61); Blue Hole lip and Lost City tower construction; eight-site subjects (Axial, Hudson tiny; Blake, Hunga weak identity; Kama contact dark); Monterey scarp collisions.
+
+**Process:** Codex week 73%, three R-ci-green tasks running; queued 3280 (spawn-clear verify, already reported), 3290, 3300. Claude week 90%. No change to the scheduler.
+
+**New priorities (DIRECTOR Backlog):** Claude: V-bluehole-silhouette, V-eight-sites-lit (b), V-endurance-spawn (split out, spawn floor), V-monterey-apron, V-challenger-ripples, V-lostcity-foot. Codex: V-journeys-current, S-collision, R-ci-green, 3290/3300.
+
+**Stage (agreed with Sol):** 80-83% to 1.0; 5-7 weeks (five if art and verification converge).
+
+**Needs owner:** phone retest on the newest build (real-device Low performance is the only owner-dependent gate).
+
 ## 2026-10-22 comprehensive review, Claude alone (golden 2026-10-22-121525)
 
 **Sol did not review:** Codex week is at 6% (resets Oct 27 11:30), so `codex-review.sh start` skipped. Scores are mine and may run ~0.2 high. Opening frames of the seven main sites were viewed; no new e2e captures, so the play check still rests on run 70's six unaided journeys.

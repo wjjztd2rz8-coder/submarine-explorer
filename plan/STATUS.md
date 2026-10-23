@@ -1,12 +1,12 @@
-# Status (2026-10-22, Claude-only review; Sol skipped on Codex budget)
+# Status (2026-10-22 night, joint review with Sol)
 
-**Stage:** about 83% to 1.0. About 5 weeks; Claude capacity is the limiter (week reset to 100% on Oct 22; Codex week at 6% until Oct 27).
+**Stage:** 80-83% to 1.0 (agreed with Sol); 5-7 weeks. Claude capacity limits art; Codex runs verification and CI.
 
 ## 1.0 table
 
 | Requirement                               | State                                                                                                                                                             |
 | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.7, Lost City 3.4, Blue Hole 3.4, Beebe 3.6, Monterey 3.75                                                                       |
+| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.5-3.8, Lost City 3-3.4, Blue Hole 3-3.4, Beebe 3.5-3.6, Monterey 3.5-3.75                                                       |
 | Other eight sites coherent                | Challenger 3.4, Endurance 3.4; mission-spawn review done (2.6-3.2), follow-ups queued; acceptance acceptance for all eight not certified (V-spawn-capture queued) |
 | New player understands first five minutes | Owner phone test: scan range, boost and events confuse; P2-scan-range and P2-boost-cut queued, then V-journeys                                                    |
 | Acceptable Low-tier phone performance     | iPhone 17 Pro: Low great; High (opt-in only) stutters at Lost City; weaker phones untested                                                                        |
