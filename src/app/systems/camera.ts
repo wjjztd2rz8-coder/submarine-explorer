@@ -57,7 +57,9 @@ export const cameraControlsSystem: GameSystem = {
     cleanup.add(
       bus.on('mission:started', () => {
         rig.resetView();
-        startTips();
+        // skipBriefing can place the opening after this event, before play resumes.
+        started = false;
+        tips.moved = false;
       }),
     );
     noteControlUse = (s) => {

@@ -74,6 +74,112 @@ describe('AssetService', () => {
     expect(svc.stats.gltf).toBe(1);
   });
 
+  it('keeps overlapping mixed preload outcomes independent while sharing loads', async () => {
+    const deferred = <T>() => {
+      let resolve!: (value: T) => void;
+      let reject!: (error: Error) => void;
+      const promise = new Promise<T>((yes, no) => {
+        resolve = yes;
+        reject = no;
+      });
+      return { promise, resolve, reject };
+    };
+    type Model = Awaited<ReturnType<typeof loadAsync>>;
+    const model = deferred<Model>();
+    const independent = deferred<Model>();
+    const texture = deferred<THREE.Texture<HTMLImageElement>>();
+    const failure = deferred<THREE.Texture<HTMLImageElement>>();
+    const recovery = deferred<THREE.Texture<HTMLImageElement>>();
+    const modelsStarted = deferred<void>();
+    const originalLoad = loadAsync.getMockImplementation()!;
+    loadAsync
+      .mockReset()
+      .mockImplementation(() => {
+        throw new Error('unexpected model request');
+      })
+      .mockImplementationOnce(() => model.promise)
+      .mockImplementationOnce(() => {
+        modelsStarted.resolve();
+        return independent.promise;
+      });
+    const load = vi
+      .spyOn(THREE.TextureLoader.prototype, 'loadAsync')
+      .mockImplementation(() => {
+        throw new Error('unexpected texture request');
+      })
+      .mockImplementationOnce(() => texture.promise)
+      .mockImplementationOnce(() => failure.promise)
+      .mockImplementationOnce(() => recovery.promise);
+    vi.stubEnv('BASE_URL', '/submarine-explorer/');
+    const base = '/submarine-explorer';
+    try {
+      const svc = new AssetService();
+      const first = svc.preload([
+        '/m/shared.glb',
+        '/t/shared.png',
+        '/t/retry.png',
+        '/m/independent.glb',
+        { kind: 'gltf', url: `${base}/m/shared.glb` },
+        { kind: 'texture', url: `${base}/t/retry.png` },
+      ]);
+      const firstSettled = vi.fn();
+      void first.then(firstSettled, firstSettled);
+      const second = svc.preload([
+        { kind: 'texture', url: '/t/retry.png', options: { srgb: true } },
+        `${base}/m/shared.glb`,
+        { kind: 'texture', url: `${base}/t/shared.png`, options: { srgb: true } },
+      ]);
+      await modelsStarted.promise;
+      expect(loadAsync.mock.calls).toEqual([
+        [`${base}/m/shared.glb`],
+        [`${base}/m/independent.glb`],
+      ]);
+      expect(load.mock.calls).toEqual([[`${base}/t/shared.png`], [`${base}/t/retry.png`]]);
+
+      const sharedTexture = new THREE.Texture<HTMLImageElement>();
+      texture.resolve(sharedTexture);
+      failure.reject(new Error('texture unavailable'));
+      await expect(svc.loadTexture('/t/shared.png')).resolves.toBe(sharedTexture);
+
+      // A later explicit request can recover while both original batches still wait.
+      const retry = svc.loadTexture('/t/retry.png', { srgb: true });
+      expect(load).toHaveBeenCalledTimes(3);
+      expect(load).toHaveBeenLastCalledWith(`${base}/t/retry.png`);
+      const recoveredTexture = new THREE.Texture<HTMLImageElement>();
+      recovery.resolve(recoveredTexture);
+      await expect(retry).resolves.toBe(recoveredTexture);
+      await expect(svc.loadTexture(`${base}/t/retry.png`)).resolves.toBe(recoveredTexture);
+      await expect(svc.loadTexture(`${base}/t/shared.png`)).resolves.toBe(sharedTexture);
+      expect(load).toHaveBeenCalledTimes(3);
+
+      const sharedModel = { scene: new THREE.Group(), url: `${base}/m/shared.glb` };
+      model.resolve(sharedModel);
+      await expect(second).resolves.toEqual({
+        loaded: 2,
+        failed: [{ url: '/t/retry.png', error: 'texture unavailable' }],
+      });
+      expect(firstSettled).not.toHaveBeenCalled();
+      await expect(svc.loadGLTF('/m/shared.glb')).resolves.toBe(sharedModel);
+
+      const independentModel = { scene: new THREE.Group(), url: `${base}/m/independent.glb` };
+      independent.resolve(independentModel);
+      await expect(first).resolves.toEqual({
+        loaded: 4,
+        failed: [
+          { url: '/t/retry.png', error: 'texture unavailable' },
+          { url: `${base}/t/retry.png`, error: 'texture unavailable' },
+        ],
+      });
+      await expect(svc.loadGLTF('/m/independent.glb')).resolves.toBe(independentModel);
+      expect(loadAsync).toHaveBeenCalledTimes(2);
+      expect(svc.stats).toEqual({ gltf: 2, textures: 2 });
+    } finally {
+      load.mockRestore();
+      loadAsync.mockReset().mockImplementation(originalLoad);
+      vi.unstubAllEnvs();
+    }
+  });
+
   it('loads ordinary textures once per option set and retains their disposal', async () => {
     const load = vi
       .spyOn(THREE.TextureLoader.prototype, 'loadAsync')
