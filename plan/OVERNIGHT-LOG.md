@@ -1677,3 +1677,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (smoke + project-base green, no full e2e):** Sonnet collected Codex 3250 (static-check unit tests in 3 shards), 3260 (composite Chromium-install action, -19 lines), 3280 (spawn tests across all tiers). Sonnet V-endurance-spawn: only the orphan-"m" hint wrap fix (`text-wrap: balance`) landed; lowering the spawn made the shot worse (hull is 44 x 8 m at the 110 m floor), so Endurance stays ~3.0.
 - **Not yet checked:** hosted CI for the shard/Chromium changes. Codex 3270, 3290, 3300 worktrees idle (Codex 5h low); 3310 queued. 2980/3050 still unmerged. No tag.
 - **Needs owner:** OK for an ~85 m Endurance opening, or a richer hull model; phone retest.
+
+## 2026-10-23 01:21 CDT headless run 86 (Claude): collection only
+
+- Merged and pushed (smoke + project-base green): Codex 3270 (globe pins/clusters round to whole px, fixes the 43.99998 px touch target; net -11 lines), 3290 (debrief/Journal audit: clean), 3300 (seam contact small-fix: reproduced, no compliant fix; note only). Hosted CI for run 85 merges was still in progress (26+ min); check next run. 2980/3050 unmerged by decision. 3310 queued, Codex 5h at 5% until 03:30. No Claude art package (kept the 5h window for the 01:49 reset). No tag.
+- **Needs owner:** OK for ~85 m Endurance opening or richer hull; phone retest.
