@@ -1,8 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import * as THREE from 'three';
 import { DEFAULT_CONFIG, makeConfig } from '../../src/core/Config.js';
-import { biomeFor } from '../../src/world/TerrainBiome.js';
+import { BIOMES, biomeFor } from '../../src/world/TerrainBiome.js';
+import { createTerrainMaterial } from '../../src/world/TerrainMaterial.js';
 import { placeCell } from '../../src/world/scatter/ScatterPlacement.js';
 import { SCATTER_TYPES } from '../../src/world/scatter/ScatterTypes.js';
+
+afterEach(() => vi.unstubAllGlobals());
 
 const flatGround = {
   sampleHeight: () => -700,
@@ -127,6 +131,168 @@ describe('open sediment floor variety', () => {
           .flat()
           .every((inst) => inst.x < 32),
       ).toBe(true);
+    },
+  );
+});
+
+describe('site floor material bindings', () => {
+  it.each(
+    (['low', 'medium', 'high'] as const).flatMap((tier) =>
+      (['loaded', 'unavailable'] as const).map((maps) => ({ tier, maps })),
+    ),
+  )(
+    '$tier / $maps: retains silt over basalt and isolates repeated site construction',
+    async ({ tier, maps }) => {
+      // Control image completion without decoding assets or constructing a renderer.
+      const images: Array<{ src: string; onload: () => void; onerror: () => void }> = [];
+      vi.stubGlobal('document', {});
+      vi.stubGlobal(
+        'Image',
+        class {
+          src = '';
+          onload = () => {};
+          onerror = () => {};
+          constructor() {
+            images.push(this);
+          }
+        },
+      );
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const config = makeConfig().terrain;
+      const before = JSON.stringify({ config, biomes: BIOMES });
+      const built: ReturnType<typeof createTerrainMaterial>[] = [];
+      const signatures = new Map<string, string>();
+      const bindingState = (uniforms: Record<string, THREE.IUniform>) =>
+        JSON.stringify(
+          Object.fromEntries(
+            Object.entries(uniforms).map(([name, uniform]) => [
+              name,
+              uniform.value instanceof THREE.Texture
+                ? (uniform.value.image?.src ?? Array.from(uniform.value.image.data))
+                : uniform.value,
+            ]),
+          ),
+        );
+      const retained = new Map<ReturnType<typeof createTerrainMaterial>, string>();
+      try {
+        // The volcanic and sediment controls bracket Kama in both orders, with the
+        // same config and registry objects throughout, including shared scatter data.
+        for (const controls of [
+          ['axial-seamount-ashes', 'titanic'],
+          ['titanic', 'axial-seamount-ashes'],
+        ]) {
+          for (const site of [...controls, 'kamaehuakanaloa', ...controls]) {
+            const biome = biomeFor(site);
+            expect(biome).toBe(BIOMES[site]);
+            const start = images.length;
+            const result = createTerrainMaterial({ config, tier, biome, exaggeration: 1 });
+            built.push(result);
+            const uniforms = result.material.userData.uniforms as Record<string, THREE.IUniform>;
+            const requested = images.slice(start);
+            const normalMaps = tier !== 'low';
+            const slots =
+              site === 'kamaehuakanaloa'
+                ? ['silt', 'basalt', 'basalt']
+                : [biome.a, biome.b, biome.c];
+            const files = slots.flatMap((set) => [
+              `${set}_a.jpg`,
+              ...(normalMaps ? [`${set}_n.jpg`] : []),
+            ]);
+            expect(requested.map((image) => image.src)).toEqual(
+              [...new Set(files)].map(
+                (file) => `${import.meta.env.BASE_URL}assets/terrain/${file}`,
+              ),
+            );
+            expect(result.textures).toHaveLength(2 + new Set(files).size);
+            for (const image of requested) {
+              if (maps === 'loaded') image.onload();
+              else image.onerror();
+            }
+            await result.texturesReady;
+            for (const [index, slot] of ['A', 'B', 'C'].entries()) {
+              for (const [prefix, suffix, fallback] of [
+                ['tAlb', 'a', 0],
+                ['tNrm', 'n', 1],
+              ] as const) {
+                const texture = uniforms[`${prefix}${slot}`].value as THREE.Texture;
+                if (maps === 'unavailable' || (prefix === 'tNrm' && !normalMaps)) {
+                  expect(texture).toBe(result.textures[fallback]);
+                } else {
+                  expect(result.textures.slice(2)).toContain(texture);
+                  expect(texture.image).toBe(
+                    requested.find((image) => image.src.endsWith(`${slots[index]}_${suffix}.jpg`)),
+                  );
+                  expect(texture.colorSpace).toBe(
+                    prefix === 'tAlb' ? THREE.SRGBColorSpace : THREE.NoColorSpace,
+                  );
+                }
+              }
+            }
+            await expect(result.rockTexture).resolves.toBe(
+              maps === 'loaded' ? uniforms.tAlbC.value : null,
+            );
+            const shader = {
+              ...THREE.ShaderLib.standard,
+              uniforms: { ...THREE.ShaderLib.standard.uniforms },
+            };
+            result.material.onBeforeCompile(
+              shader as Parameters<typeof result.material.onBeforeCompile>[0],
+              {} as THREE.WebGLRenderer,
+            );
+            for (const [name, uniform] of Object.entries(uniforms))
+              expect((shader.uniforms as Record<string, THREE.IUniform>)[name]).toBe(uniform);
+            expect(shader.fragmentShader.includes('#define TERRAIN_PBR_NORMALS')).toBe(normalMaps);
+            expect(shader.fragmentShader.includes('#define TERRAIN_BREAKUP')).toBe(normalMaps);
+            if (site === 'kamaehuakanaloa') {
+              expect(biome.vertexTint).toBeUndefined();
+              for (const [name, color] of [
+                ['uColA', 0x8a6b54],
+                ['uColB', 0x7a6a5c],
+                ['uColC', 0x2f2e30],
+                ['uStain', 0x6e3a1c],
+              ] as const)
+                expect(uniforms[name].value.toArray()).toEqual(new THREE.Color(color).toArray());
+              expect(uniforms.uPatch.value).toBe(0.3);
+              expect(uniforms.uStainAmount.value).toBe(0.12);
+              expect(uniforms.uContrast.value.toArray()).toEqual([1.9, 1.3, 1.3]);
+              expect(uniforms.uNormalStrength.value).toBe(0.9);
+              expect(uniforms.uRipple.value).toBe(0.1);
+              expect(uniforms.uRippleLen.value).toBe(0.45);
+              expect(uniforms.uRippleDir.value.toArray()).toEqual([Math.cos(1.1), Math.sin(1.1)]);
+              expect(uniforms.uBurrow.value).toBe(0.25);
+              expect(uniforms.uRockBias.value).toBe(0.25);
+              // B/C share the basalt request within this material owner.
+              expect(uniforms.tAlbB.value).toBe(uniforms.tAlbC.value);
+              expect(uniforms.tNrmB.value).toBe(uniforms.tNrmC.value);
+            }
+            const signature = bindingState(uniforms);
+            if (signatures.has(site)) expect(signature).toBe(signatures.get(site));
+            else signatures.set(site, signature);
+            // URL reuse never permits material, uniform or texture ownership to leak.
+            for (const previous of built.slice(0, -1)) {
+              expect(bindingState(previous.material.userData.uniforms)).toBe(
+                retained.get(previous),
+              );
+              expect(result.material).not.toBe(previous.material);
+              for (const [name, uniform] of Object.entries(uniforms)) {
+                const other = previous.material.userData.uniforms[name];
+                expect(uniform).not.toBe(other);
+                if (typeof uniform.value === 'object') expect(uniform.value).not.toBe(other?.value);
+              }
+              for (const texture of result.textures)
+                expect(previous.textures).not.toContain(texture);
+            }
+            retained.set(result, signature);
+            expect(JSON.stringify({ config, biomes: BIOMES })).toBe(before);
+          }
+        }
+      } finally {
+        warn.mockRestore();
+        for (const result of built) {
+          result.material.dispose();
+          for (const texture of result.textures) texture.dispose();
+        }
+      }
     },
   );
 });
