@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Scene, Vector3 } from 'three';
+import { Scene, Texture, Vector3 } from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { ModelCache } from '../../src/world/PropLoader.js';
 import { FirstMove } from '../../src/game/FirstMove.js';
 import { currentObjectiveId } from '../../src/ui/ObjectivesPanel.js';
 import type { ObjectiveStatus } from '../../src/game/Mission.js';
@@ -22,6 +24,7 @@ import { requiredHull } from '../../src/game/Progress.js';
 import { createSubmarineSystem } from '../../src/app/systems/submarine.js';
 import { propsSystem } from '../../src/app/systems/props.js';
 import { missionSystem } from '../../src/app/systems/mission.js';
+import type { DebriefAction } from '../../src/ui/Debrief.js';
 import { FROZEN_INPUT } from '../../src/game/MissionRouter.js';
 
 const origin = { x: 0, y: -100, z: 0, yaw: 0 };
@@ -255,6 +258,8 @@ vi.mock('../../src/ui/ObjectivesPanel.js', async (original) => ({
     setObjectives() {}
     setVisible() {}
     setGuided() {}
+    setNav() {}
+    hideBanner() {}
     dispose() {}
   },
 }));
@@ -273,6 +278,23 @@ vi.mock('../../src/ui/Briefing.js', () => ({
     dispose() {}
   },
 }));
+// Keep debrief actions callable while leaving the lifecycle in MissionRouter.
+const debrief = vi.hoisted(() => ({ actions: [] as DebriefAction[] }));
+vi.mock('../../src/ui/Debrief.js', async (original) => ({
+  ...(await original<typeof import('../../src/ui/Debrief.js')>()),
+  Debrief: class {
+    isOpen = false;
+    root = { classList: { add() {}, toggle() {} } };
+    show(_stats: unknown, actions: DebriefAction[]) {
+      this.isOpen = true;
+      debrief.actions = actions;
+    }
+    hide() {
+      this.isOpen = false;
+    }
+    dispose() {}
+  },
+}));
 const json = (p: string) => JSON.parse(readFileSync(p, 'utf8'));
 const deferred = () => {
   let resolve!: () => void;
@@ -286,221 +308,306 @@ const flush = async () => {
 };
 const pose = (ctx: GameContext) => [...ctx.sub.position.toArray(), ctx.sub.yaw];
 
-const site = 'beebe-vent-field';
-for (const order of [
+const sites: string[] = json('data/landmarks/index.json').landmarks;
+const orders = [
   'briefing-late-props',
   'skip-late-props',
   'free-late-props',
   'mission-props-first',
+  'free-props-first',
   'free-no-reset',
   'skip-delayed-ready',
   'free-learned',
   'skip-learned-props',
-] as const) {
-  it(`keeps authored placement separate from piloting: ${order}`, async () => {
-    vi.stubGlobal('document', { hidden: false, createElement: () => ({ getContext: () => null }) });
-    vi.stubGlobal(
-      'Image',
-      class {
-        onerror?: () => void;
-        set src(_value: string) {
-          this.onerror?.();
+  'restart-after-debrief',
+  'respawn-after-hull-loss',
+] as const;
+const placements = sites.flatMap((site) =>
+  (['arcade', 'realistic'] as const).flatMap((mode) =>
+    orders
+      .filter(
+        (order) =>
+          site === 'beebe-vent-field' ||
+          ['briefing-late-props', 'skip-late-props', 'free-late-props'].includes(order),
+      )
+      .map((order) => ({ site, mode, order })),
+  ),
+);
+it.each(placements)(
+  'keeps authored placement separate from piloting: $site / $mode / $order',
+  async ({ site, mode, order }) => {
+    const lifecycle = order === 'restart-after-debrief' || order === 'respawn-after-hull-loss';
+    // Dive again reloads the page: dispose all old systems before the next init.
+    for (let dive = 0; dive < (lifecycle ? 2 : 1); dive++) {
+      vi.stubGlobal('document', {
+        hidden: false,
+        createElement: () => ({ getContext: () => null }),
+      });
+      vi.stubGlobal(
+        'Image',
+        class {
+          onerror?: () => void;
+          set src(_value: string) {
+            this.onerror?.();
+          }
+        },
+      );
+      // Decode shipped GLBs locally; texture decoding is the only model stub.
+      vi.spyOn(ModelCache.prototype, 'get').mockImplementation(async (url) => {
+        const loader = new GLTFLoader();
+        loader.register(() => ({
+          name: 'headless-textures',
+          loadTexture: async () => new Texture(),
+        }));
+        const data = readFileSync(`public${url}`);
+        return (
+          await loader.parseAsync(
+            data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength),
+            '',
+          )
+        ).scene;
+      });
+      const config = makeConfig(),
+        settings = defaultSettings(config);
+      settings.gameplayMode = mode;
+      const effective = resolveEffective(settings, mode, null, config);
+      const meta = json(`data/tiles/${site}/meta.json`);
+      const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
+      const terrain = new Terrain(
+        { meta, heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows) },
+        config.terrain,
+        'low',
+      );
+      const def = parseMission(json(`data/landmarks/${site}/mission.json`), site);
+      const free = order.startsWith('free');
+      const ready = deferred(),
+        propsIO = deferred();
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async (url) => {
+          expect(url).toContain(`/data/landmarks/${site}/props.json`);
+          await propsIO.promise;
+          return {
+            ok: true,
+            text: async () => JSON.stringify(json(`data/landmarks/${site}/props.json`)),
+          };
+        }),
+      );
+      const ctx = {
+        config,
+        settings,
+        effective,
+        meta,
+        terrain,
+        tier: 'low',
+        scene: new Scene(),
+        spawnDepth: order === 'free-no-reset' ? 5 : null,
+        app: { state: 'dive' },
+        params: new URLSearchParams(
+          order === 'free-no-reset' ? 'depth=5' : free ? '' : `mission=${site}`,
+        ),
+        route: free
+          ? null
+          : {
+              landmarkId: site,
+              missionId: site,
+              tileId: site,
+              def,
+              skipBriefing: order !== 'briefing-late-props',
+            },
+        bus: new EventBus(),
+        progress: {
+          hullFor: (d: number) => requiredHull(d).id,
+          cosmetics: {},
+          finish: () => ({ stars: 0 }),
+        },
+        baseScanRadii: new Map(),
+        input: { wheelDelta: 0 },
+        canvas: new EventTarget(),
+        rig: { resetView() {}, snap() {}, setChaseRadiusDefault() {} },
+        hud: { onResetCamera: () => () => {}, setHullNote() {} },
+        headlights: { setEnabled() {} },
+        photoMode: { active: false },
+        keyboard: { unlock() {} },
+        globe: { isOpen: false },
+        settingsScreen: { isOpen: false },
+        save: { get: () => settings, onChange: () => () => {} },
+        expose() {},
+        shellBaseHref: () => 'http://localhost/',
+        guidance: { visible: false },
+        discovery: {
+          ready: ready.promise,
+          pois: [],
+          guide: { isOpen: false },
+          debrief: { isOpen: false },
+          stats: { snapshot: (extra: object) => extra },
+        },
+      } as unknown as GameContext;
+      const reload = vi.fn();
+      vi.stubGlobal('window', { location: { reload } });
+      const vehicle = createSubmarineSystem();
+      try {
+        vehicle.init!(ctx);
+        const reset = vi.spyOn(ctx.sub, 'reset');
+        propsSystem.init!(ctx);
+        cameraControlsSystem.init!(ctx);
+        missionSystem.init!(ctx);
+        const loaded = new Promise<void>((resolve) => ctx.bus.on('props:loaded', () => resolve()));
+        if (order.endsWith('props-first')) {
+          propsIO.resolve();
+          await loaded;
         }
-      },
-    );
-    const config = makeConfig(),
-      settings = defaultSettings(config);
-    const effective = resolveEffective(settings, 'arcade', null, config);
-    const meta = json(`data/tiles/${site}/meta.json`);
-    const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
-    const terrain = new Terrain(
-      { meta, heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows) },
-      config.terrain,
-      'low',
-    );
-    const def = parseMission(json(`data/landmarks/${site}/mission.json`), site);
-    const free = order.startsWith('free');
-    const ready = deferred(),
-      propsIO = deferred();
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async (url) => {
-        expect(url).toContain(`/data/landmarks/${site}/props.json`);
-        await propsIO.promise;
-        return {
-          ok: true,
-          text: async () => JSON.stringify(json(`data/landmarks/${site}/props.json`)),
+        const settleReady = async () => {
+          ctx.discovery.pois = placePois(
+            parsePois(json(`data/landmarks/${site}/pois.json`)),
+            meta,
+            terrain,
+            config.scan,
+            site,
+          );
+          ready.resolve();
+          await flush();
         };
-      }),
-    );
-    const ctx = {
-      config,
-      settings,
-      effective,
-      meta,
-      terrain,
-      tier: 'low',
-      scene: new Scene(),
-      spawnDepth: order === 'free-no-reset' ? 5 : null,
-      app: { state: 'dive' },
-      params: new URLSearchParams(
-        order === 'free-no-reset' ? 'depth=5' : free ? '' : `mission=${site}`,
-      ),
-      route: free
-        ? null
-        : {
-            landmarkId: site,
-            missionId: site,
-            tileId: site,
-            def,
-            skipBriefing: order !== 'briefing-late-props',
-          },
-      bus: new EventBus(),
-      progress: { hullFor: (d: number) => requiredHull(d).id, cosmetics: {} },
-      baseScanRadii: new Map(),
-      input: { wheelDelta: 0 },
-      canvas: new EventTarget(),
-      rig: { resetView() {}, snap() {}, setChaseRadiusDefault() {} },
-      hud: { onResetCamera: () => () => {}, setHullNote() {} },
-      headlights: { setEnabled() {} },
-      photoMode: { active: false },
-      keyboard: { unlock() {} },
-      globe: { isOpen: false },
-      settingsScreen: { isOpen: false },
-      save: { get: () => settings, onChange: () => () => {} },
-      expose() {},
-      shellBaseHref: () => 'http://localhost/',
-      guidance: { visible: false },
-      discovery: {
-        ready: ready.promise,
-        pois: [],
-        guide: { isOpen: false },
-        debrief: { isOpen: false },
-      },
-    } as unknown as GameContext;
-    const vehicle = createSubmarineSystem();
-    try {
-      vehicle.init!(ctx);
-      const reset = vi.spyOn(ctx.sub, 'reset');
-      propsSystem.init!(ctx);
-      cameraControlsSystem.init!(ctx);
-      missionSystem.init!(ctx);
-      const loaded = new Promise<void>((resolve) => ctx.bus.on('props:loaded', () => resolve()));
-      if (order === 'mission-props-first') {
-        propsIO.resolve();
-        await loaded;
-      }
-      const settleReady = async () => {
-        ctx.discovery.pois = placePois(
-          parsePois(json(`data/landmarks/${site}/pois.json`)),
-          meta,
-          terrain,
-          config.scan,
-          site,
-        );
-        ready.resolve();
-        await flush();
-      };
-      if (order !== 'skip-delayed-ready') await settleReady();
-      if (order === 'briefing-late-props') {
-        ctx.missionRouter!.begin('near-site');
-        await flush();
-      }
-      const frame = (throttle = 0, resumeFrame = false) => {
-        const f = {
-          sampled: { ...FROZEN_INPUT, throttle },
-          dt: 1 / 60,
-          fixedDt: 1 / 60,
-          realSteps: 1,
-          resumeFrame,
-        } as FrameState;
-        shellSystem.frame!['gate.shell']!(f, ctx);
-        inputGateSystem.frame!['gate.input']!(f, ctx);
-        vehicle.frame!['sim.vehicles']!(f, ctx);
-        propsSystem.frame!['sim.contact']!(f, ctx);
-        cameraControlsSystem.frame!['controls.camera']!(f, ctx);
-        return f;
-      };
-      frame(0, true);
-      expect(ctx.cameraTips.moved).toBe(false);
-      const anchor = ctx.sub.position.clone();
-      frame(1); // arm and move through real fixed-step physics
-      let steps = 1;
-      while (
-        steps < 600 &&
-        ctx.sub.position.distanceTo(anchor) < FIRST_MINUTE_GUIDANCE.moveDistanceM / 2
-      ) {
-        frame(1);
-        steps++;
-      }
-      frame(); // release, genuine post-release physics before IO settles
-      const partial = ctx.sub.position.distanceTo(anchor);
-      expect(partial).toBeGreaterThanOrEqual(FIRST_MINUTE_GUIDANCE.moveDistanceM / 2);
-      expect(partial).toBeLessThan(FIRST_MINUTE_GUIDANCE.moveDistanceM);
-      expect(partial).toBeLessThan(2);
-      expect(ctx.cameraTips.moved).toBe(false);
-      if (order.includes('learned')) {
-        while (!ctx.cameraTips.moved && steps++ < 600) frame(1);
-        expect(ctx.cameraTips.moved).toBe(true);
-        expect(ctx.sub.position.distanceTo(anchor)).toBeLessThan(2);
-      }
-      const learned = ctx.cameraTips.moved;
-      const calls = reset.mock.calls.length;
-      if (order === 'skip-delayed-ready') await settleReady();
-      else if (order !== 'mission-props-first') {
-        propsIO.resolve();
-        await loaded;
-      }
-      const resetCalls = reset.mock.calls.length - calls;
-      expect(ctx.props.stats.count).toBe(order === 'skip-delayed-ready' ? 0 : 3);
-      expect(ctx.props.stats.failed).toBe(0);
-      expect(ctx.props.stats.skipped).toBe(0);
-      expect(resetCalls).toBe(['free-no-reset', 'mission-props-first'].includes(order) ? 0 : 1);
-      expect(ctx.cameraTips.moved).toBe(learned);
-      frame(); // Authored replacement cannot complete the earlier partial command.
-      expect(ctx.cameraTips.moved).toBe(learned);
-      if (resetCalls && !learned) {
-        // Reset discarded the old command; idle drift from the new opening cannot learn.
-        ctx.sub.position.x += FIRST_MINUTE_GUIDANCE.moveDistanceM * 2;
-        frame();
-        expect(ctx.cameraTips.moved).toBe(false);
-        const placed = ctx.sub.position.clone();
-        steps = 0;
-        while (!ctx.cameraTips.moved && steps++ < 600) frame(1);
-        expect(ctx.cameraTips.moved).toBe(true);
-        expect(ctx.sub.position.distanceTo(placed)).toBeGreaterThanOrEqual(
-          FIRST_MINUTE_GUIDANCE.moveDistanceM,
-        );
-      }
-      if (resetCalls === 0) {
-        const pausedPose = pose(ctx);
-        ctx.app.state = 'pause';
-        expect(frame(1).steps).toBe(0);
-        expect(ctx.cameraTips.moved).toBe(false);
-        expect(pose(ctx)).toEqual(pausedPose);
-        ctx.app.state = 'dive';
+        if (order !== 'skip-delayed-ready') await settleReady();
+        if (order === 'briefing-late-props') {
+          ctx.missionRouter!.begin('near-site');
+          await flush();
+        }
+        const frame = (throttle = 0, resumeFrame = false) => {
+          const f = {
+            sampled: { ...FROZEN_INPUT, throttle },
+            dt: 1 / 60,
+            fixedDt: 1 / 60,
+            realSteps: 1,
+            resumeFrame,
+          } as FrameState;
+          shellSystem.frame!['gate.shell']!(f, ctx);
+          inputGateSystem.frame!['gate.input']!(f, ctx);
+          vehicle.frame!['sim.vehicles']!(f, ctx);
+          propsSystem.frame!['sim.contact']!(f, ctx);
+          vehicle.frame!.events!(f, ctx);
+          missionSystem.frame!['play.mission']!(f, ctx);
+          cameraControlsSystem.frame!['controls.camera']!(f, ctx);
+          return f;
+        };
         frame(0, true);
-        let coastFrames = 0;
+        expect(ctx.cameraTips.moved).toBe(false);
+        const anchor = ctx.sub.position.clone();
+        frame(1); // arm and move through real fixed-step physics
+        let steps = 1;
         while (
-          coastFrames++ < 600 &&
-          ctx.sub.position.distanceTo(anchor) < FIRST_MINUTE_GUIDANCE.moveDistanceM
-        )
+          steps < 600 &&
+          ctx.sub.position.distanceTo(anchor) < FIRST_MINUTE_GUIDANCE.moveDistanceM / 2
+        ) {
+          frame(1);
+          steps++;
+        }
+        frame(); // release, genuine post-release physics before IO settles
+        const partial = ctx.sub.position.distanceTo(anchor);
+        expect(partial).toBeGreaterThanOrEqual(FIRST_MINUTE_GUIDANCE.moveDistanceM / 2);
+        expect(partial).toBeLessThan(FIRST_MINUTE_GUIDANCE.moveDistanceM);
+        expect(partial).toBeLessThan(2);
+        expect(ctx.cameraTips.moved).toBe(false);
+        if (order.includes('learned')) {
+          while (!ctx.cameraTips.moved && steps++ < 600) frame(1);
+          expect(ctx.cameraTips.moved).toBe(true);
+          expect(ctx.sub.position.distanceTo(anchor)).toBeLessThan(2);
+        }
+        const learned = ctx.cameraTips.moved;
+        const calls = reset.mock.calls.length;
+        if (order === 'skip-delayed-ready') await settleReady();
+        else if (!order.endsWith('props-first')) {
+          propsIO.resolve();
+          await loaded;
+        }
+        const resetCalls = reset.mock.calls.length - calls;
+        expect(ctx.props.stats.count).toBe(
+          order === 'skip-delayed-ready'
+            ? 0
+            : json(`data/landmarks/${site}/props.json`).props.length,
+        );
+        expect(ctx.props.stats.failed).toBe(0);
+        expect(ctx.props.stats.skipped).toBe(0);
+        expect(resetCalls).toBe(
+          ['free-no-reset', 'mission-props-first', 'free-props-first'].includes(order) ? 0 : 1,
+        );
+        expect(ctx.cameraTips.moved).toBe(learned);
+        frame(); // Authored replacement cannot complete the earlier partial command.
+        expect(ctx.cameraTips.moved).toBe(learned);
+        if (resetCalls && !learned) {
+          // Reset discarded the old command; idle drift from the new opening cannot learn.
+          ctx.sub.position.x += FIRST_MINUTE_GUIDANCE.moveDistanceM * 2;
           frame();
-        expect(ctx.cameraTips.moved).toBe(true);
-        ctx.app.state = 'pause';
-        frame();
-        ctx.app.state = 'dive';
-        frame(0, true);
-        expect(ctx.cameraTips.moved).toBe(true);
+          expect(ctx.cameraTips.moved).toBe(false);
+          const placed = ctx.sub.position.clone();
+          steps = 0;
+          while (!ctx.cameraTips.moved && steps++ < 600) frame(1);
+          expect(ctx.cameraTips.moved).toBe(true);
+          expect(ctx.sub.position.distanceTo(placed)).toBeGreaterThanOrEqual(
+            FIRST_MINUTE_GUIDANCE.moveDistanceM,
+          );
+        }
+        if (resetCalls === 0) {
+          const pausedPose = pose(ctx);
+          ctx.app.state = 'pause';
+          expect(frame(1).steps).toBe(0);
+          expect(ctx.cameraTips.moved).toBe(false);
+          expect(pose(ctx)).toEqual(pausedPose);
+          ctx.app.state = 'dive';
+          frame(0, true);
+          let coastFrames = 0;
+          while (
+            coastFrames++ < 600 &&
+            ctx.sub.position.distanceTo(anchor) < FIRST_MINUTE_GUIDANCE.moveDistanceM
+          )
+            frame();
+          expect(ctx.cameraTips.moved).toBe(true);
+          ctx.app.state = 'pause';
+          frame();
+          ctx.app.state = 'dive';
+          frame(0, true);
+          expect(ctx.cameraTips.moved).toBe(true);
+        }
+        if (lifecycle && dive === 0) {
+          expect(ctx.cameraTips.moved).toBe(true);
+          const router = ctx.missionRouter!;
+          if (order === 'respawn-after-hull-loss') {
+            // Fault injection: give the breached hull water below its crush depth.
+            // Restore the shipped seabed once real physics has emitted the failure.
+            const crush = ctx.sub.getState().crushDepth;
+            const ground = vi.spyOn(terrain, 'sampleHeight').mockReturnValue(crush - 100);
+            ctx.sub.position.y = crush - 1;
+            frame();
+            ground.mockRestore();
+            expect(ctx.sub.getState().hullBreached).toBe(true);
+            expect(router.emergencyAscent).toBe(true);
+            let frames = 0;
+            while (!router.debriefOpen && frames++ < 600) frame();
+            expect(router.mission.endReason).toBe('abort');
+          } else {
+            expect(router.endDive()).toBe(true);
+            expect(router.mission.endReason).toBe('surface');
+          }
+          expect(router.debriefOpen).toBe(true);
+          const heldPose = pose(ctx);
+          expect(frame(1).steps).toBe(0);
+          expect(pose(ctx)).toEqual(heldPose);
+          const again = debrief.actions.find((action) => action.id === 'dive-again');
+          expect(again).toBeDefined();
+          again!.run();
+          expect(router.mission.emitted.at(-1)?.name).toBe('mission:restart');
+          expect(reload).toHaveBeenCalledExactlyOnceWith();
+        }
+      } finally {
+        missionSystem.dispose!();
+        cameraControlsSystem.dispose!();
+        expect(ctx.reanchorFirstMove).toBeUndefined();
+        propsSystem.dispose!();
+        vehicle.dispose!();
+        terrain.dispose();
+        vi.restoreAllMocks();
+        vi.unstubAllGlobals();
       }
-    } finally {
-      missionSystem.dispose!();
-      cameraControlsSystem.dispose!();
-      propsSystem.dispose!();
-      vehicle.dispose!();
-      terrain.dispose();
-      vi.restoreAllMocks();
-      vi.unstubAllGlobals();
     }
-  });
-}
+  },
+);
