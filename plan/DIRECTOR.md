@@ -71,7 +71,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running (2026-10-21: V-eight-sites review merged). Merge policy stands as the owner set it on 2026-10-13: merges don't wait for CI (push after smoke + project-base); only tags wait.
+- V-endurance-spawn IN FLIGHT (Sonnet, 2026-10-23).
 
 ## Backlog
 
