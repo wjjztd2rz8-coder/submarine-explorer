@@ -5,7 +5,7 @@ Shots: `.cache/codex/shots/V-eight-sites-lit-b/{base,after3}-{high,low}-*` (miss
 ## What changed (data only, net no new code)
 
 - `src/world/TerrainBiome.ts`: both biomes gain the existing `horizonFadeM` (Hunga [250, 900], Blake [150, 700]), so the far seabed eases to the fog colour instead of ending in a hard line. Blake's bed colours are lighter (about +0x10 per channel).
-- `data/landmarks/{blake-plateau-corals,hunga-tonga-caldera}/site.json`: the existing site ambient floor changed from 6 / 0x87a899 to 11 (Blake) and 9 (Hunga) with a cooler blue-grey 0x6f8f9e, on all tiers.
+- `data/landmarks/{blake-plateau-corals,hunga-tonga-caldera}/site.json`: the existing site ambient floor changed from 6 / 0x879399 to 11 (Blake) and 9 (Hunga) with a cooler blue-grey 0x6f8f9e, on all tiers.
 - No spawn, overlap or scatter numerics touched; no new draw calls or code paths, Low unchanged in cost.
 
 ## Ratings (my reading of the shots)

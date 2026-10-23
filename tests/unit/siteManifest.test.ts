@@ -784,7 +784,14 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
             // Kamaʻehuakanaloa's spawn hangs in open water over a dark slope, so its fill is lifted.
             id === 'kamaehuakanaloa'
               ? { depthM: -200, color: 0x9aa6ad, intensity: 18 }
-              : { depthM: -200, color: 0x879399, intensity: 6 },
+              : // Blake and Hunga lift the same fill so the opening bed reads.
+                id === 'blake-plateau-corals' || id === 'hunga-tonga-caldera'
+                ? {
+                    depthM: -200,
+                    color: 0x6f8f9e,
+                    intensity: id === 'blake-plateau-corals' ? 11 : 9,
+                  }
+                : { depthM: -200, color: 0x879399, intensity: 6 },
           ]),
         ),
       });
