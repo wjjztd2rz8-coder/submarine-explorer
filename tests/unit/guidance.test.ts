@@ -300,7 +300,9 @@ describe('guidance slot', () => {
       expect(texts(overlay.slot)).toMatchObject({
         name: 'Next contact',
         kind: 'objective',
-        detail: 'Get closer to scan · 100 m',
+        detail: touch
+          ? 'Get closer to scan · 100 m · TURN 90° STARBOARD'
+          : 'Get closer to scan · 100 m',
       });
 
       // Free exploration retains its logged-contact confirmation without an objective.
@@ -437,7 +439,9 @@ describe('guidance slot', () => {
       expect(f.step()).toMatchObject({
         name: 'Stern',
         kind: 'objective',
-        detail: 'Get closer to scan · 1044 m',
+        detail: touch
+          ? 'Get closer to scan · 1044 m · TURN 17° PORT'
+          : 'Get closer to scan · 1044 m',
       });
       f.position.set(0, 0, 0);
       expect(f.step()).toMatchObject({ name: 'Memorial', kicker: 'SCAN TARGET · OPTIONAL' });
@@ -483,7 +487,9 @@ describe('guidance slot', () => {
       expect(texts(f.overlay.slot)).toMatchObject({
         name: 'Stern',
         kind: 'objective',
-        detail: 'Get closer to scan · 1044 m',
+        detail: touch
+          ? 'Get closer to scan · 1044 m · TURN 17° PORT'
+          : 'Get closer to scan · 1044 m',
       });
       f.position.set(0, 0, 0);
       expect(f.step().kicker).toBe('SCAN TARGET · OPTIONAL');
@@ -546,10 +552,24 @@ describe('guidance slot', () => {
     f.scanner.setObjective('memorial');
     f.step(0.2, true);
     expect(f.step(0.9, true)).toMatchObject({ name: 'Memorial', kicker: 'New Journal entry' });
+    // The completion frame still contains the old objective geometry. Its
+    // direction must not send the pilot back to the contact just scanned.
+    expect(texts(f.overlay.slot).detail).toBe('OPEN JOURNAL');
     f.scanner.setObjective('stern');
     expect(f.step().detail).toBe('Stern · TURN 90° PORT');
     f.scanner.setObjective(null);
     expect(f.step().detail).toBe('OPEN JOURNAL');
+    f.overlay.dispose();
+  });
+
+  it('keeps the range and turn to a remote objective visible on touch', () => {
+    const f = contactGuidance(true);
+    f.scanner.setTargets([f.targets[1]]);
+    expect(f.step()).toMatchObject({
+      name: 'Stern',
+      kind: 'objective',
+      detail: 'Get closer to scan · 300 m · TURN 90° PORT',
+    });
     f.overlay.dispose();
   });
 

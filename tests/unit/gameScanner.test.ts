@@ -436,6 +436,27 @@ describe('Scanner', () => {
     },
   );
 
+  it('selects the objective on a new hold after releasing an incidental wildlife scan', () => {
+    const objective = target({ id: 'objective', position: new Vector3(100, -100, 0) });
+    const animal = target({ id: 'life:shrimp', position: new Vector3(0, -100, -15) });
+    const { scanner, store } = setup([objective]);
+    scanner.setObjective(objective.id);
+    scanner.setExtraTargets([animal]);
+    scanner.update(0.1, AT, NORTH, true);
+    expect(scanner.view.activeId).toBe(animal.id);
+    scanner.update(DT, AT, NORTH, false);
+    expect(scanner.view.phase).toBe('interrupted');
+    objective.position.set(0, -100, -50);
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.candidateId).toBe(objective.id);
+    scanner.update(0.1, AT, NORTH, true);
+    expect(scanner.view.activeId).toBe(objective.id);
+    expect(scanner.view.progress).toBeCloseTo(0.1 / objective.scanSeconds);
+    scanner.update(objective.scanSeconds, AT, NORTH, true);
+    expect(scanner.view.lastCompleteId).toBe(objective.id);
+    expect(store.isDiscovered('lm', animal.id)).toBe(false);
+  });
+
   it.each(['facing', 'range'] as const)(
     'starts and names the new contact when a held scan loses its target through %s',
     (reason) => {

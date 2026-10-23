@@ -365,12 +365,13 @@ export class Scanner {
     // Caller-owned live lists can drop the active object without a setter call.
     // Match the setters' silent clear instead of retaining progress on a removed contact.
     if (this.active && !activeGeo) this.clearActive();
-    // Stickiness: keep scanning the active target while it stays valid, even
-    // if another one drifts slightly closer.
+    // Keep an uninterrupted beam locked. After release, a newly eligible
+    // objective wins the next hold over an incidental contact's partial scan.
     if (
       this.active &&
       activeGeo?.inRange &&
       activeGeo.facing &&
+      (v.phase === 'scanning' || candidate?.id !== this.objectivePoiId) &&
       !this.isScanned(this.active.landmarkId, this.active.id)
     ) {
       candidate = this.active;

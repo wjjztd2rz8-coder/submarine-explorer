@@ -185,7 +185,8 @@ export class ScanOverlay {
 
   /** "STERN · TURN 30° PORT": where the outstanding objective lies, unless ready to scan. */
   private objectiveCue(view: ScanView): string | null {
-    if (view.objectiveId == null || !view.objectiveName) return null;
+    if (view.objectiveId == null || !view.objectiveName || view.objectiveId === view.lastCompleteId)
+      return null;
     if (view.objectiveId === view.candidateId) return null;
     const turn = view.objectiveTurnDeg;
     const how =
@@ -327,7 +328,9 @@ export class ScanOverlay {
           text: view.objectiveName,
           detail: view.objectiveInRange
             ? guide(turn, view.objectiveVertDeg, 'PITCH TOWARD TARGET')
-            : near,
+            : touch && Math.abs(turn) >= 10
+              ? `${near} · ${guide(turn, view.objectiveVertDeg, near)}`
+              : near,
           tone: view.objectiveInRange ? 'amber' : 'dim',
           ring: { progress: 0, label: `${view.objectiveDistance.toFixed(0)} m` },
         },
