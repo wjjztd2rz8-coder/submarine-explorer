@@ -2,29 +2,34 @@
 
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
-import { EventBus } from '../../src/core/EventBus.js';
+import { EventBus, type GameEvents } from '../../src/core/EventBus.js';
 import { Scanner } from '../../src/game/Scanner.js';
 import { HERO_SITES } from '../../src/game/Cosmetics.js';
 import { DiscoveryStore, DISCOVERY_STORAGE_KEY } from '../../src/game/DiscoveryStore.js';
-import { parseGuide } from '../../src/game/Guide.js';
+import { loadGuide, parseGuide } from '../../src/game/Guide.js';
 import {
   buildJournalSite,
   isEntryUnlocked,
   isSiteUnlocked,
   journalEntryTag,
+  lifeDiscoveryId,
   loadJournalSites,
   parseJournalCatalogue,
   siteProgress,
+  wildlifeProgress,
   type DiscoveryReader,
+  type JournalSite,
 } from '../../src/game/JournalData.js';
 import { debriefText } from '../../src/game/MissionRouter.js';
 import { loadMission, parseMissionIndex } from '../../src/game/Mission.js';
-import { parsePois, type PoiDef } from '../../src/game/Pois.js';
-import { parseSpecies } from '../../src/game/Species.js';
-import { parseLifeDoc } from '../../src/world/life/tables.js';
+import { loadPois, parsePois, type PoiDef } from '../../src/game/Pois.js';
+import { loadSpecies, parseSpecies } from '../../src/game/Species.js';
+import { LIFE_ID_PREFIX } from '../../src/world/life/Life.js';
+import { SPECIES_BY_ID } from '../../src/world/life/catalogue.js';
+import { bandOverlap, parseLifeDoc } from '../../src/world/life/tables.js';
 import lifeDoc from '../../data/life/life.json';
 import type { FetchJson } from '../../src/game/ContentPath.js';
 import titanic from '../../data/landmarks/titanic/mission.json';
@@ -226,6 +231,135 @@ it.each(nonHeroIds)(
     expect(writes).toEqual(savedWrites);
   },
 );
+
+describe('shipped wildlife scan-to-Journal linkage', () => {
+  const life = parseLifeDoc(lifeDoc);
+  const rows = shippedIds.flatMap((siteId) => {
+    const table = life.sites[siteId]!;
+    // A rare swarm of a common species shares its existing per-species discovery.
+    return [...new Set([...table.spawns.map((row) => row.species), table.rare!.species])].map(
+      (speciesId) => ({ siteId, speciesId }),
+    );
+  });
+  let sites: JournalSite[];
+
+  beforeAll(async () => {
+    const catalogue = parseJournalCatalogue(
+      JSON.parse(readFileSync('data/landmarks.json', 'utf8')),
+    );
+    sites = await Promise.all(
+      shippedIds.map(async (id) => {
+        const [guide, pois, species] = await Promise.all([
+          loadGuide(id, realContentFetch),
+          loadPois(id, realContentFetch, quiet),
+          loadSpecies(id, realContentFetch, quiet),
+        ]);
+        // loadJournalSite deliberately omits life with a custom fetch fixture.
+        return buildJournalSite({ id, catalogue: catalogue.get(id), guide, pois, species, life });
+      }),
+    );
+  });
+
+  it.each(rows)(
+    '$siteId / $speciesId: first scan retains its wildlife entry, overview and isolated counters',
+    ({ siteId, speciesId }) => {
+      const site = sites.find((item) => item.id === siteId)!;
+      const wildlife = site.entries.filter((entry) => entry.kind === 'life');
+      const expectedIds = rows.filter((row) => row.siteId === siteId).map((row) => row.speciesId);
+      expect(wildlife.map((entry) => entry.key)).toEqual(
+        expectedIds.map((id) => `${siteId}/life/${id}`),
+      );
+      const entry = wildlife.find((item) => item.id === speciesId)!;
+      const def = SPECIES_BY_ID.get(speciesId)!;
+      const table = life.sites[siteId]!;
+      const common = table.spawns.find((row) => row.species === speciesId);
+      const source = common ?? table.rare!;
+      const band = bandOverlap(source.depth, def.depth);
+      expect(band).not.toBeNull();
+      const depth = (band![0] + band![1]) / 2;
+      expect(entry.title).toBe(def.common);
+      expect(entry.life).toEqual({ def, info: life.species[speciesId], rare: !common });
+      expect(entry.poiIds).toEqual([]);
+      expect(entry.linkedEntryIds).toEqual([]);
+      expect(journalEntryTag(entry)).toBe('Game addition');
+      const overviews = site.entries.filter((item) => item.kind === 'site');
+      expect(overviews.length).toBeGreaterThan(0);
+      expect(wildlife.some((item) => item.id !== speciesId)).toBe(true);
+
+      const { bytes, writes, storage, store } = discoveryFixture();
+      expect(sites.every((item) => !isSiteUnlocked(item, store))).toBe(true);
+      expect(site.entries.every((item) => !isEntryUnlocked(site, item, store))).toBe(true);
+      expect(wildlifeProgress(site, store)).toEqual({ scanned: 0, total: expectedIds.length });
+      const before = siteProgress(site, store);
+      const bus = new EventBus();
+      const completions: GameEvents['scan:complete'][] = [];
+      bus.on('scan:complete', (event) => completions.push(event));
+      const scanner = new Scanner(DEFAULT_CONFIG.scan, bus, store);
+      // Life emits one live contact per species. Catalogue range is conservative:
+      // Life can also extend it by the animal's body length and the mode floor.
+      const target = {
+        id: LIFE_ID_PREFIX + speciesId,
+        name: def.common,
+        landmarkId: siteId,
+        position: new Vector3(0, -depth, -Math.min(5, def.scanRadius / 2)),
+        radius: def.scanRadius,
+        scanSeconds: def.scanSeconds,
+      };
+      expect(target.id).toBe(lifeDiscoveryId(speciesId));
+      scanner.setExtraTargets([target]);
+      const scan = () =>
+        scanner.update(def.scanSeconds, new Vector3(0, -depth, 0), new Vector3(0, 0, -1), true);
+      scan();
+      expect(scanner.view.lastCompleteId).toBe(target.id);
+      expect(completions).toEqual([{ poiId: target.id, landmarkId: siteId, firstTime: true }]);
+      const first = { at: '2026-10-17T00:00:00.000Z', count: 1 };
+      expect(JSON.parse(bytes.get(DISCOVERY_STORAGE_KEY)!)).toMatchObject({
+        discovered: { [`${siteId}/${target.id}`]: first },
+        stats: { scans: 1 },
+      });
+      const archived = bytes.get(DISCOVERY_STORAGE_KEY);
+      const savedWrites = [...writes];
+      expect(savedWrites).toEqual([DISCOVERY_STORAGE_KEY]);
+      for (const saved of [store, new DiscoveryStore(storage)]) {
+        expect(saved.keys()).toEqual([`${siteId}/${target.id}`]);
+        expect(saved.get(siteId, target.id)).toEqual(first);
+        expect(saved.stats.scans).toBe(1);
+        expect(isSiteUnlocked(site, saved)).toBe(true);
+        for (const item of site.entries) {
+          // Survey records require a scanned POI naming them; wildlife does not supply that link.
+          expect(isEntryUnlocked(site, item, saved), item.key).toBe(
+            item.kind === 'site' || item.key === entry.key,
+          );
+        }
+        expect(wildlifeProgress(site, saved)).toEqual({ scanned: 1, total: expectedIds.length });
+        expect(siteProgress(site, saved)).toEqual({ ...before, logged: overviews.length });
+        for (const other of sites.filter((item) => item.id !== siteId)) {
+          expect(isSiteUnlocked(other, saved), other.id).toBe(false);
+          expect(other.entries.every((item) => !isEntryUnlocked(other, item, saved))).toBe(true);
+          expect(wildlifeProgress(other, saved).scanned).toBe(0);
+        }
+      }
+      expect(bytes.get(DISCOVERY_STORAGE_KEY)).toBe(archived);
+      expect(writes).toEqual(savedWrites);
+      // Another individual of this species cannot add a second discovery in this dive.
+      scan();
+      expect(completions).toHaveLength(1);
+      expect(writes).toEqual(savedWrites);
+      scanner.resetDive();
+      scan();
+      expect(completions.at(-1)).toEqual({
+        poiId: target.id,
+        landmarkId: siteId,
+        firstTime: false,
+      });
+      const reloaded = new DiscoveryStore(storage);
+      expect(reloaded.keys()).toEqual([`${siteId}/${target.id}`]);
+      expect(reloaded.get(siteId, target.id)).toEqual({ ...first, count: 2 });
+      expect(reloaded.stats.scans).toBe(2);
+      expect(wildlifeProgress(site, reloaded)).toEqual({ scanned: 1, total: expectedIds.length });
+    },
+  );
+});
 
 it.each([titanic, blueHole])(
   'retains every verified briefing bullet in the Journal ($landmark)',
