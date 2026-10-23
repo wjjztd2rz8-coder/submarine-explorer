@@ -594,6 +594,32 @@ describe('MissionRouter completion timing', () => {
   );
 
   for (const cause of ['crush', 'power'] as const) {
+    it(`${cause} ascent counts the first primary scan without scheduling completion actions`, () => {
+      bus.emit('sub:emergencyBlow', { depth: 200, lockSeconds: 8, cause });
+      scan('primary');
+      expect(router.mission.primaryComplete).toBe(true);
+      advance(router, 3);
+      expect(router.panel.bannerOpen).toBe(false);
+      expect(router.canEndDive).toBe(false);
+      expect(router.emergencyAscent).toBe(true);
+      expect(router.debriefOpen).toBe(false);
+      frame(router, { emergencyBlow: false });
+      expect(router.debrief?.last?.title).toBe('Dive aborted');
+      expect(router.debrief?.last?.objectives).toEqual({ completed: 1, total: 2 });
+      expect(events()).toEqual([
+        'mission:started',
+        'mission:objective',
+        'mission:primaryComplete',
+        'mission:aborted',
+        'mission:ended',
+      ]);
+      expect(router.mission.emitted.at(-1)?.payload).toMatchObject({
+        reason: 'abort',
+        completed: 1,
+        total: 2,
+      });
+    });
+
     for (const finish of ['next update', 'after delay'] as const) {
       it.each(BOUNDARIES)(
         `${cause} ascent from %s finishes ${finish} without completion actions overriding abort`,

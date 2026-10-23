@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import type { TileMeta } from '../../src/util/types.js';
 import { DEFAULT_CONFIG, makeConfig } from '../../src/core/Config.js';
 import { Terrain } from '../../src/world/Terrain.js';
+import { CameraRig } from '../../src/sub/CameraRig.js';
 import { makeSyntheticTile } from './helpers.js';
 
 /**
@@ -93,6 +94,55 @@ function meshHeight(t: Terrain, x: number, z: number): number {
 }
 
 describe('Terrain near ground contact', () => {
+  it.each([16 / 9, 9 / 16])(
+    'keeps first-person clearance and aim together on Low triangles (aspect %s)',
+    (aspect) => {
+      const config = makeConfig();
+      // A nonplanar bank makes bilinear heights differ from the actual triangles.
+      const tile = makeSyntheticTile({
+        cols: 9,
+        rows: 9,
+        height: (c, r) => -1000 - r * 160 - c * r * 30,
+      });
+      const terrain = new Terrain(tile, config.terrain, 'low');
+      try {
+        const x = terrain.worldXOfCol(3.2);
+        const z = terrain.worldZOfRow(3.2);
+        const floor = meshHeight(terrain, x, z);
+        const offset = config.camera.firstPersonOffset;
+        const pilot = new THREE.Vector3(
+          x - offset.x,
+          floor + config.camera.terrainClearance - offset.y - 0.25,
+          z - offset.z,
+        );
+        // A valid hull on the downslope can still put its eye too near the bank.
+        expect(pilot.y - meshHeight(terrain, pilot.x, pilot.z)).toBeGreaterThan(
+          config.submarine.hullRadius + config.submarine.seabedClearance,
+        );
+        const rig = new CameraRig(config.camera, aspect, terrain);
+        rig.setMode('first-person');
+        for (const dt of [0, 1 / 60]) {
+          rig.update(pilot, 0, 0, dt);
+          const eye = rig.camera.position;
+          expect(eye.x).toBeCloseTo(x, 8);
+          expect(eye.z).toBeCloseTo(z, 8);
+          expect(eye.y - meshHeight(terrain, eye.x, eye.z)).toBeCloseTo(
+            config.camera.terrainClearance,
+            3,
+          );
+          expect(eye.y).toBeLessThanOrEqual(-config.camera.surfaceClearance);
+          expect(
+            rig.camera
+              .getWorldDirection(new THREE.Vector3())
+              .distanceTo(new THREE.Vector3(0, 0, -1)),
+          ).toBeLessThan(1e-6);
+        }
+      } finally {
+        terrain.dispose();
+      }
+    },
+  );
+
   it('matches shipped Lost City Low triangles between vertices and at chunk/tile edges', () => {
     const meta = JSON.parse(readFileSync('data/tiles/lost-city/meta.json', 'utf8')) as TileMeta;
     const bytes = readFileSync('data/tiles/lost-city/heightmap.bin');
