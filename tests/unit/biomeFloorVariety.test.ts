@@ -204,8 +204,7 @@ describe('site floor material bindings', () => {
           expect(JSON.stringify({ config, biomes: BIOMES })).toBe(before);
         }
         // Different endpoint values can share a program; the absent fade needs a different one.
-        for (const site of sites.slice(0, 2))
-          expect(keys.get(site)).not.toBe(keys.get('titanic'));
+        for (const site of sites.slice(0, 2)) expect(keys.get(site)).not.toBe(keys.get('titanic'));
       } finally {
         for (const result of built) {
           result.material.dispose();
