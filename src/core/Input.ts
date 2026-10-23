@@ -706,7 +706,12 @@ export class Input {
     }
 
     // Gamepad overrides whenever a stick or button is actually deflected.
-    const pads = typeof navigator !== 'undefined' && navigator.getGamepads?.();
+    let pads: (Gamepad | null)[] | undefined;
+    try {
+      pads = typeof navigator !== 'undefined' ? navigator.getGamepads?.() : undefined;
+    } catch {
+      // Browser policy can deny this optional API; keep keyboard and touch usable.
+    }
     const pad = pads ? [...pads].find((p) => p?.connected) : null;
     this.gamepadActive = false;
     if (pad) {

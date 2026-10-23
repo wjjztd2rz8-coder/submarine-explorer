@@ -15,6 +15,18 @@ import {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('touch detection persistence', () => {
+  it('falls back to desktop when storage and media-query detection are unavailable', () => {
+    vi.stubGlobal('localStorage', {
+      getItem() {
+        throw new DOMException('Storage denied', 'SecurityError');
+      },
+    });
+    vi.stubGlobal('navigator', { maxTouchPoints: 5 });
+    vi.stubGlobal('window', {});
+    expect(detectTouchPrimary()).toBe(false);
+    expect(classifyDevice(detectTouchPrimary(), 390, 844)).toBe('desktop');
+  });
+
   it('restores the existing touch-seen flag even with desktop pointer capabilities', () => {
     const getItem = vi.fn(() => '1');
     vi.stubGlobal('localStorage', { getItem });

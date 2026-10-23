@@ -66,6 +66,80 @@ describe('pointer look preference and lock decisions', () => {
 });
 
 describe('Input action map', () => {
+  it('keeps keyboard and touch input usable without the gamepad API', () => {
+    vi.stubGlobal('navigator', {});
+    const input = makeInput();
+    try {
+      input.injectKey('KeyW', true);
+      input.injectKey('KeyQ', true);
+      input.touchAxes.yaw = 0.4;
+      input.touchHeld.add('scan');
+      expect(input.sample()).toMatchObject({
+        throttle: 1,
+        yaw: 0.4,
+        scan: true,
+        toggleCamera: true,
+      });
+      expect(input.gamepadActive).toBe(false);
+      input.endFrame();
+      expect(input.sample().toggleCamera).toBe(false);
+      input.clear();
+      expect(input.sample()).toMatchObject({ throttle: 0, yaw: 0, scan: false });
+    } finally {
+      input.dispose();
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('falls back to keyboard and touch when pad polling is denied, then recovers', () => {
+    const buttons = Array.from({ length: 16 }, () => ({ value: 0, pressed: false }));
+    buttons[3] = buttons[5] = { value: 1, pressed: true };
+    const pad = { connected: true, index: 0, axes: [0.6, -0.8, 0, -0.4], buttons };
+    const getGamepads = vi.fn(() => [pad]);
+    vi.stubGlobal('navigator', { getGamepads });
+    const input = makeInput();
+    try {
+      input.injectKey('KeyS', true);
+      input.touchAxes.yaw = -0.25;
+      expect(input.sample()).toMatchObject({
+        throttle: 0.8,
+        yaw: 0.6,
+        pitch: 0.4,
+        scan: true,
+        toggleCamera: true,
+      });
+      expect(input.gamepadActive).toBe(true);
+      input.endFrame();
+      getGamepads.mockImplementation(() => {
+        throw new DOMException('Gamepad access denied', 'SecurityError');
+      });
+      expect(input.sample()).toMatchObject({
+        throttle: -1,
+        yaw: -0.25,
+        pitch: 0,
+        ballast: 0,
+        scan: false,
+        toggleCamera: false,
+      });
+      expect(input.gamepadActive).toBe(false);
+      input.touchHeld.add('scan');
+      expect(input.sample().scan).toBe(true);
+      input.touchHeld.clear();
+      input.endFrame();
+      buttons[3] = buttons[5] = { value: 0, pressed: false };
+      getGamepads.mockImplementation(() => [pad]);
+      expect(input.sample()).toMatchObject({ throttle: 0.8, scan: false, toggleCamera: false });
+      expect(input.gamepadActive).toBe(true);
+      buttons[3] = { value: 1, pressed: true };
+      expect(input.sample().toggleCamera).toBe(true);
+      input.endFrame();
+      expect(input.sample().toggleCamera).toBe(false);
+    } finally {
+      input.dispose();
+      vi.unstubAllGlobals();
+    }
+  });
+
   it.each([false, true])(
     'suppresses hidden-page pad polling without blur or replayed edges (background frames: %s)',
     (poll) => {
@@ -741,6 +815,41 @@ describe('Input action map', () => {
 });
 
 describe('Input rebinding', () => {
+  it('repairs malformed saved bindings without losing valid neighbors or reserving unknown actions', () => {
+    store.setItem(
+      BINDINGS_STORAGE_KEY,
+      JSON.stringify({
+        version: 3,
+        keys: {
+          scan: 'KeyZ',
+          yawPort: ['KeyB', 17],
+          thrustForward: ['KeyI'],
+          toggleSonar: ['KeyN'],
+          toggleLights: [],
+          unknownAction: ['KeyG', 'KeyA', 'KeyI'],
+        },
+      }),
+    );
+    const input = makeInput();
+    expect(input.getAction('scan')?.keys).toEqual(['KeyG']);
+    expect(input.getAction('yawPort')?.keys).toEqual(['KeyA', 'ArrowLeft']);
+    expect(input.getAction('thrustForward')?.keys).toEqual(['KeyI']);
+    expect(input.getAction('toggleSonar')?.keys).toEqual(['KeyN']);
+    expect(input.getAction('toggleLights')?.keys).toEqual([]);
+    const repaired = JSON.parse(store.getItem(BINDINGS_STORAGE_KEY)!);
+    expect(repaired.keys).not.toHaveProperty('unknownAction');
+    expect(makeInput().actions).toEqual(input.actions);
+    const neutral = { ...input.sample() };
+    input.injectKey('Unidentified', true);
+    input.injectKey('KeyZ', true);
+    input.injectKey('KeyB', true);
+    expect(input.sample()).toEqual(neutral);
+    input.injectKey('KeyG', true);
+    input.injectKey('KeyI', true);
+    input.injectKey('KeyN', true);
+    expect(input.sample()).toMatchObject({ throttle: 1, scan: true, toggleSonar: true });
+  });
+
   it('rebinds, steals the key from any other action, and persists', () => {
     const input = makeInput();
     expect(input.rebind('thrustForward', ['KeyI'])).toBe(true);

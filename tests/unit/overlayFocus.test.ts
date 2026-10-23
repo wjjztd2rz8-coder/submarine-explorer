@@ -1275,6 +1275,66 @@ describe('overlay policies across the app', () => {
     expect(ctx.waypoints.root.dataset.reduceMotion).toBe('false');
   });
 
+  it('applies session-only accessibility edits and detaches live consumers on disposal', () => {
+    const motion = Object.assign(new EventTarget(), { matches: false });
+    Object.assign(window, { matchMedia: () => motion });
+    const save = new Save({
+      config: DEFAULT_CONFIG,
+      storage: {
+        getItem: () => null,
+        setItem() {
+          throw new DOMException('Full', 'QuotaExceededError');
+        },
+        removeItem() {},
+      },
+    });
+    const ctx = {
+      config: DEFAULT_CONFIG,
+      settings: save.get(),
+      save,
+      tier: 'low',
+      quality: { setting: 'low', urlForced: false, detected: { tier: 'low' } },
+      input: new Input({ storage: null }),
+      globe: { isOpen: false },
+      expose: vi.fn(),
+      rig: {},
+      waypoints: { setReducedMotion: vi.fn() },
+      captions: { setEnabled: vi.fn() },
+      sonar: { setPalette: vi.fn() },
+    } as unknown as GameContext;
+    settingsSystem.init!(ctx);
+    cleanup.push(() => settingsSystem.dispose?.());
+    const scale = vi.spyOn(document.documentElement.style, 'setProperty');
+    save.save({ reduceMotion: true, captions: true, sonarPalette: 'highContrast', uiScale: 140 });
+    expect(save.reloadSafe).toBe(false);
+    expect(ctx.rig.reduceMotion).toBe(true);
+    expect(document.documentElement.dataset.reduceMotion).toBe('true');
+    expect(ctx.waypoints.setReducedMotion).toHaveBeenLastCalledWith(true);
+    expect(ctx.captions.setEnabled).toHaveBeenCalledExactlyOnceWith(true);
+    expect(ctx.sonar.setPalette).toHaveBeenLastCalledWith('highContrast');
+    expect(scale).toHaveBeenLastCalledWith('--ui-user-scale', '1.4');
+    save.save({ reduceMotion: false, captions: false, sonarPalette: 'default', uiScale: 100 });
+    expect(ctx.rig.reduceMotion).toBe(false);
+    expect(ctx.captions.setEnabled).toHaveBeenLastCalledWith(false);
+    expect(ctx.sonar.setPalette).toHaveBeenLastCalledWith('default');
+    expect(scale).toHaveBeenLastCalledWith('--ui-user-scale', '1');
+    settingsSystem.dispose?.();
+    vi.mocked(ctx.waypoints.setReducedMotion).mockClear();
+    vi.mocked(ctx.captions.setEnabled).mockClear();
+    vi.mocked(ctx.sonar.setPalette).mockClear();
+    scale.mockClear();
+    motion.matches = true;
+    motion.dispatchEvent(new Event('change'));
+    save.save({ reduceMotion: true, captions: true, sonarPalette: 'highContrast', uiScale: 150 });
+    expect(save.get().reduceMotion).toBe(true);
+    expect(ctx.rig.reduceMotion).toBe(false);
+    expect(document.documentElement.dataset.reduceMotion).toBe('false');
+    expect(ctx.waypoints.setReducedMotion).not.toHaveBeenCalled();
+    expect(ctx.captions.setEnabled).not.toHaveBeenCalled();
+    expect(ctx.sonar.setPalette).not.toHaveBeenCalled();
+    expect(scale).not.toHaveBeenCalled();
+  });
+
   it.each([
     { savedMotion: false, osMotion: false },
     { savedMotion: true, osMotion: false },
