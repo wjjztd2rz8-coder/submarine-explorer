@@ -40,17 +40,17 @@
       "low": {
         "depthM": -200,
         "color": 7311262,
-        "intensity": 10
+        "intensity": 15
       },
       "medium": {
         "depthM": -200,
         "color": 7311262,
-        "intensity": 10
+        "intensity": 15
       },
       "high": {
         "depthM": -200,
         "color": 7311262,
-        "intensity": 10
+        "intensity": 15
       }
     }
   }
