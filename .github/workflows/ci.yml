@@ -163,17 +163,9 @@ jobs:
           name: ci-build-${{ github.run_id }}-${{ github.run_attempt }}-root
           path: dist-root
 
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ubuntu-24.04-${{ runner.arch }}-playwright-${{ hashFiles('package-lock.json') }}
-
       - name: Install Playwright Chromium
-        # Always ensure OS dependencies, even when the browser cache was restored.
-        # Three bounded attempts with back-off (tools/install-playwright-chromium.sh).
         timeout-minutes: 8
-        run: bash tools/install-playwright-chromium.sh
+        uses: ./.github/actions/install-chromium
 
       - name: End-to-end tests (Playwright)
         # Refreshed hosted weights and 38 shards target two waves at 20 runner slots,
@@ -242,15 +234,9 @@ jobs:
           name: ci-build-${{ github.run_id }}-${{ github.run_attempt }}-project-base
           path: dist-project-base
 
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ubuntu-24.04-${{ runner.arch }}-playwright-${{ hashFiles('package-lock.json') }}
-
       - name: Install Playwright Chromium
         timeout-minutes: 8
-        run: bash tools/install-playwright-chromium.sh
+        uses: ./.github/actions/install-chromium
 
       - name: Project-base browser check
         timeout-minutes: 10

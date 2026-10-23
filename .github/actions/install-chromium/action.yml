@@ -1,0 +1,18 @@
+name: Install Playwright Chromium
+description: Cache and install the browser on hosted Ubuntu 24.04 runners
+runs:
+  using: composite
+  steps:
+    - name: Cache Playwright browsers
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: ubuntu-24.04-${{ runner.arch }}-playwright-${{ hashFiles('package-lock.json') }}
+
+    - name: Install Playwright Chromium
+      shell: bash
+      # The hosted image supplies runtime libraries. Avoid apt and its locks.
+      # Run on cache hits too, so an incomplete cache cannot skip installation.
+      run: |
+        mkdir -p .cache
+        npx playwright install chromium 2>&1 | tee .cache/chromium-install.log
