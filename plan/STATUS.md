@@ -1,6 +1,6 @@
-# Status (2026-10-22 night, joint review with Sol)
+# Status (2026-10-23 morning, review by Claude alone)
 
-**Stage:** 80-83% to 1.0 (agreed with Sol); 5-7 weeks. Claude capacity limits art; Codex runs verification and CI.
+**Stage:** about 83% to 1.0; ~5 weeks (Sol skipped, Codex 5h low; last joint view 80-83%). Claude capacity limits art; Codex runs verification and CI.
 
 ## 1.0 table
 
@@ -22,6 +22,9 @@ Boost cut, 100 m scan floor, anchored optional events, quieter ambience, Lost Ci
 Unaided journeys at 1280x720 and phones (queued with Codex), CI triage (28/38 shards red on one run; latest run pending), Class A hull clipping, Beebe Low caps. First-five-minute scanning and guidance (agreed top blocker), deploy gating, phone defects (Class A clipping, Beebe Low caps), Lost City tower, Titanic plating patchwork, Monterey bands, Challenger seabed, Blue Hole hood and overlap, eight-site acceptance.
 
 ## Needs owner
+
+- Accept deleting the four S-collision expected-failure cases (3330 proposal).
+- OK for an ~85 m Endurance opening, or a richer hull model.
 
 - None for budget: the Claude reset is already used, so the Claude week (resets Oct 22) is paced by the run gate and Codex carries more work (dispatch head start widened to 30%).
 - A short phone retest once the P2 items land.

@@ -61,11 +61,14 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
 | No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
-Stage (review 2026-10-22, Claude alone): about 83% to 1.0; 5 weeks. Beautiful: Titanic 3.7, Lost City 3.4, Blue Hole 3.4, Beebe 3.6, Monterey 3.7, Challenger 3.4, Endurance 3.4. Blockers in order: (1) first-five-minute journeys verified on phones; (2) green hosted CI on a quiet SHA and a tag; (3) heroes consistently at beauty 4 (Blue Hole silhouette, Lost City foot); (4) eight-site acceptance.
+Stage (review 2026-10-23, Claude alone): about 83% to 1.0; 5 weeks. Beautiful: Titanic 3.7, Lost City 3.4, Blue Hole 3.4, Beebe 3.6, Monterey 3.7, Challenger 3.4, Endurance 3.4. Blockers in order: (1) first-five-minute journeys verified on phones; (2) green hosted CI on a quiet SHA and a tag; (3) heroes consistently at beauty 4 (Blue Hole silhouette, Lost City foot); (4) eight-site acceptance.
 
 ## Needs owner
 
 The newest items go first.
+
+- Delete the four S-collision expected-failure cases? (Sol 3330 proposes it; neither 2980 nor 3050 should be collected.)
+- ~85 m Endurance opening OK, or a richer hull model.
 
 - A short phone retest once the P2 items below land (boost gone, scan range, anchored events, Your sub screen).
 
@@ -88,7 +91,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 9. **S-verify / S-bughunt [Codex, standing]:** 3130-3270 done or running; queued 3280 (verify spawn-clear openings), 3290 (debrief/Journal bug hunt), 3300 (smaller 3050 seam fix). Codex week is at 6% until Oct 27 11:30, so they wait; Claude collects finished worktrees at each review (2920-3120 collected 2026-10-22; 2980 scarp crest-contact fix and 3050 Terrain seam-clearance fix left unmerged in their worktrees: 2980 has no note and rebaselines scarp hashes, 3050 adds ~40 per-frame lines and fails net-simpler; decide next collection, ask for a smaller 3050). After visual merges, verify numerics and hunt bugs.
 10. **R-ci-green [Codex]:** (2026-10-23 ec7e4bc: fixed stale spawn-opening tests, 44 px grab handle, journey steering, Monterey hook timeout; queued 3320 full e2e on main, 3340 touch-target audit) earlier: queued 3250 (static-check job 15-min timeout), 3260 (Chromium apt-lock install), 3270 (globe pin measures 43.99998 px vs the 44 px guard). Newest fully green main was `55220c8`; tag after these land and a quiet SHA is green.
 11. **V-journeys-current [Codex]:** (review 2026-10-22, Sol) the six journey captures date from Oct 20 and reach the first reward in 18-27 s only; re-run them on current main, extend through the second objective, and check that the reward card ("New Journal entry") never carries directional text that conflicts with the next waypoint (`src/ui/ScanOverlay.ts:106-116`; unverified on main). Report only; fixes go to a Claude lane if visual.
-12. **S-collision [Codex]:** (3330 queued to decide 2980/3050) four expected-failure tests record unresolved Monterey scarp collisions (worktrees 2980, 3050); queued 3300 for a smaller seam fix. Decide on 2980 at the next collection.
+12. **S-collision [Codex]:** (3330 reported 2026-10-23: collect neither; proposes deleting the four expected-failure cases, owner decision; close 2980/3050 worktrees after that) four expected-failure tests record unresolved Monterey scarp collisions (worktrees 2980, 3050); queued 3300 for a smaller seam fix. Decide on 2980 at the next collection.
 13. **R-release [Haiku]:** f61 tagged 2026-10-20. Tag the latest green-CI main after each review; last three main pushes were cancelled by newer pushes, so wait for a quiet SHA.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16; kept as tag `parked/V-endurance-aim`), Titanic per-plate blockiness (accepted ~3.7).

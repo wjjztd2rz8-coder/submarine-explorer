@@ -2,6 +2,24 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-23 (morning) comprehensive review, Claude alone (golden 2026-10-23-111524)
+
+**Sol did not review:** Codex 5h is at 11% (< the 20% start gate); `codex-review.sh start` exited 75. Scores are mine and may run ~0.2 high. Opening frames of seven sites viewed; no new live play captures, so the play check rests on 3290's clean debrief/Journal audit and 3310 (journeys on current main, still running).
+
+**Changed since the last review (11 merges):** no art merges. All Codex/CI: ec7e4bc (stale spawn-opening specs, 44 px grab handle, journey steering, Monterey hook timeout), 3320 ContentPath/Journal failure guards, 3330 guide base-link audit, 3340 collected CI fixes, V-endurance-spawn wrap fix only. Goldens differ from the night set only by particles and pose drift.
+
+**Scores, readable / beautiful:** Titanic 4 / 3.7 (warm hull, plates read; sub off the bow in this pose); Lost City 3.5 / 3.4 (tower is clear and bright, cool grey; foot still sparse); Blue Hole 3.5 / 3.4 (stalactites read, lip band still smooth and terraced); Beebe 4 / 3.6 (strongest: chimney, plume, sub clear); Monterey 4 / 3.75 (strata, boulders, corals); Challenger 3.5 / 3.4 (lander and flag legible, flat seabed); Endurance 3.2 / 3.0 (hull now readable but small in a bare sand frame).
+
+**Biggest gaps:** no hero is consistently at 4 and nothing visual moved this cycle because Claude spent it on CI triage; Blue Hole lip needs a different technique; Endurance needs a bigger or richer hull (owner choice); hosted CI for the latest pushes was still running (30+ min) so no tag.
+
+**Process:** Claude week 86% with ~14%/day burn, Codex week 45% with ~51%/day burn (runs out in ~0.9 d on paper; the dispatcher's pacing handles it). Run skips are the budget gate (408), watchdog trips 162, no failed timer runs. Merge-time smoke gates keep missing e2e breakage (lesson from 05:05 entry stands; R-ci-green full-e2e task 3320 is running). Codex queue refilled: 3360, 3370, 3380 (CI watch for a taggable SHA). No tooling change.
+
+**New priorities (DIRECTOR Backlog):** unchanged order. Claude lanes now have art runs free again: V-bluehole-silhouette, V-eight-sites-lit (b), V-monterey-apron, V-challenger-ripples, V-lostcity-foot. Codex: 3310 journeys, 3320 full e2e, 3340 touch HUD, 3350 tile fallback, queued 3360-3380.
+
+**Stage:** about 83% to 1.0; roughly 5 weeks (not cross-checked with Sol).
+
+**Needs owner:** (1) accept deleting the four S-collision expected-failure cases (Sol's 3330 proposes it); (2) ~85 m Endurance opening OK or richer hull; (3) phone retest on the newest build.
+
 ## 2026-10-23 05:05 targeted review (Claude idle at >=50% for 2 h)
 
 - Cause: not a scheduling fault. Runs 86/87 deliberately held the 5h window for the 01:50 reset and Codex was at 5%; main CI was red for real reasons that nobody had triaged because pushes kept cancelling runs.
