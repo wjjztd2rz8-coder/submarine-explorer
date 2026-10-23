@@ -267,7 +267,12 @@ export const BIOMES: Record<string, Biome> = {
       { kind: 'sponge', density: 0.2, slopeMaxDeg: 40, on: 'rock' },
     ],
   },
-  'axial-seamount-ashes': { ...VOLCANIC, colorB: 0x6a655c },
+  'axial-seamount-ashes': {
+    ...VOLCANIC,
+    colorB: 0x6a655c,
+    // The caldera wall ends at the tile edge; dissolve it into the water rather than a hard line.
+    horizonFadeM: [200, 700],
+  },
   // Warm grey sulphide sediment: enough albedo for the vent pools to read against the abyss.
   'beebe-vent-field': {
     ...VOLCANIC,
@@ -429,6 +434,7 @@ export const BIOMES: Record<string, Biome> = {
     rippleDir: 0.8,
     burrow: 0.7,
     rockBias: 0.08,
+    horizonFadeM: [200, 800],
     scatter: [
       { kind: 'boulder', density: 0.8, slopeMaxDeg: 40, on: 'rock' },
       { kind: 'seapen', density: 0.4, slopeMaxDeg: 10, on: 'flat' },

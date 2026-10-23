@@ -26,7 +26,7 @@
   },
   "opening": {
     "mission": {
-      "rangeM": 160,
+      "rangeM": 110,
       "destinationLabel": "the coral ledge"
     },
     "freeDive": {
@@ -39,18 +39,18 @@
     "tiers": {
       "low": {
         "depthM": -200,
-        "color": 8885145,
-        "intensity": 6
+        "color": 7311262,
+        "intensity": 10
       },
       "medium": {
         "depthM": -200,
-        "color": 8885145,
-        "intensity": 6
+        "color": 7311262,
+        "intensity": 10
       },
       "high": {
         "depthM": -200,
-        "color": 8885145,
-        "intensity": 6
+        "color": 7311262,
+        "intensity": 10
       }
     }
   }
