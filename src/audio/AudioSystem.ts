@@ -149,7 +149,12 @@ export class AudioSystem {
       void this.engine.unlock().then(() => this.syncPlayback());
       return;
     }
-    this.engine = new AudioEngine(this.config);
+    try {
+      this.engine = new AudioEngine(this.config);
+    } catch {
+      // An unavailable audio device must not interrupt play; a later gesture can retry.
+      return;
+    }
     // Apply saved gains before any source starts, including a muted first touch.
     this.engine.master.gain.value =
       this.settings.muted || this.playbackBlocked ? 0 : this.settings.masterVolume;
@@ -295,6 +300,8 @@ export class AudioSystem {
     this.thruster.update(frame.throttle);
     if (Math.abs(frame.throttle) > 0.2 && this.lastThrust <= 0.2)
       this.captions.emit({ id: 'thruster', text: 'Thrusters whine', durationS: 1.5 });
+    // Caption callbacks can pause or dispose the scene before this frame finishes.
+    if (this.disposed || this.playbackBlocked) return;
     this.lastThrust = Math.abs(frame.throttle);
     this.ambient.update(frame.depth);
     this.score?.update(frame.depth, frame.ratedDepth ?? -6000, this.settings.reduceMotion);
@@ -305,6 +312,7 @@ export class AudioSystem {
       this.settings.reduceMotion,
       frame.whaleHabitat ?? false,
     );
+    if (this.disposed || this.playbackBlocked) return;
     this.scanHum?.update(this.scanning ? 0.06 : 0);
     const stress = frame.hullStress ?? 0;
     const gap = 20 - Math.min(1, stress) * 17;
@@ -316,6 +324,7 @@ export class AudioSystem {
       });
     }
 
+    if (this.disposed || this.playbackBlocked) return;
     const ballastSign = Math.sign(frame.ballast);
     if (ballastSign !== 0 && ballastSign !== this.lastBallastSign) {
       playBallastHiss(this.engine, this.config);

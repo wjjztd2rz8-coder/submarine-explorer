@@ -30,9 +30,13 @@ keyboard input; rejected resumes release their warmup and retry on a later
 gesture. The app shell suspends the context outside a dive, and hidden
 tabs suspend independently of shell pause. The master is silenced immediately
 while suspension completes; returning to a paused tab keeps it silent.
+If AudioContext construction fails, the system stays locked and a later gesture
+can retry with the current saved settings.
 One-shots disconnect their complete graphs after their last source ends.
 Disposal stops and disconnects every source and processor, unsubscribes
-handlers and closes the context. Optional sample-fetch failures
+handlers and closes the context. A caption callback that tears down the scene
+also stops the current audio frame before it can allocate more voices.
+Optional sample-fetch failures
 are silent.
 The app audio system also disposes its caption overlay, subscription and expiry
 timer on teardown, including repeated in-page system restarts.
@@ -81,6 +85,9 @@ captions and touch targets, and writes review screenshots under
 `tests/unit/audioLifecycle.test.ts` covers first-gesture warmup, asynchronous
 resume races, independent pause/visibility state, blocked cues, graph reuse,
 complete one-shot/loop teardown and the final output peak guard.
+It also covers throwing context construction, gesture recovery from suspended
+or interrupted contexts, caption-triggered scene disposal, and scene re-entry
+while an old unlock or sample load is still pending.
 
 `tests/unit/audioTouchUnlock.test.ts` checks capture-phase touch press/release
 listeners and their removal across two app restarts.

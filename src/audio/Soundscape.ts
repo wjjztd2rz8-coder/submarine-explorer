@@ -158,6 +158,8 @@ export class Soundscape {
             text: voice.kind === 'vent' ? 'Vent rumbles nearby' : 'Wreck metal creaks nearby',
             durationS: 2,
           });
+          // A caption subscriber can synchronously tear down the scene.
+          if (this.disposed) return;
           this.nextCaption = now + 20;
         }
       }
@@ -167,6 +169,7 @@ export class Soundscape {
       this.nextReef = now + (reduceMotion ? 8 : 3 + Math.random() * 5);
       if (now >= this.nextCaption) {
         this.captions.emit({ id: 'shrimp', text: 'Snapping shrimp crackle', durationS: 2 });
+        if (this.disposed) return;
         this.nextCaption = now + 20;
       }
     }
