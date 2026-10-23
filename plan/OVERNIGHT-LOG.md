@@ -1697,3 +1697,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Started right after run 88. Codex 3310, 3320, 3330 running (3 of 3), 3340 queued; nothing finished to collect. Hosted CI for the run 88 pushes is still pending, so no tag; triage next run. Claude 5h 85%, no art package started to keep the window for the post-CI triage.
 - **Needs owner:** ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-23 06:05 CDT headless run 90 (Claude): collection only
+
+- Merged and pushed (smoke + project-base green, no full e2e): Codex 3320 (ContentPath/Journal failure guards), 3330 guide base-link tests (clean audit), plus report-only notes 3330-S-collision-decide (do not collect either candidate; proposes deleting the four expected-failure contact cases, **owner/director decision**) and 3340-R-ci-green (local integration confirmed; R-ci-green still open).
+- Running: Codex 3310, 3320-R-ci-green-full-e2e-main, 3340 touch-hud bug hunt. Hosted CI for run 88/89 pushes still queued; no tag. No Claude art package this run.
+- **Needs owner:** accept deleting the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
