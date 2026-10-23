@@ -1665,3 +1665,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Cause: Codex verify briefs finished fast and 5h fell to 18% (<20% gate) until its 22:15 reset; not a scheduling fault (PROCESS-LOG). Queued R-ci-green briefs 3250-3270 (CI static timeout, Chromium apt-lock, globe pin 43.99998 px).
 - Merged and pushed (smoke + project-base green): Sonnet collected Codex 3130-3240 (tests, Sonar modifier-key fix, setup-node pin 22.23.4); Sonnet V-spawn-sub-clear (Titanic ~3.8, Bismarck ~3.5; Endurance still weak). 2980 and 3050 remain unmerged.
 - Next Claude: V-eight-sites-lit (b), Endurance spawn altitude, objective-text wrap. **Needs owner:** phone retest.
+
+## 2026-10-22 23:36 CDT headless run 84 (Claude): comprehensive review, joint with Sol
+
+- Review done with Sol (REVIEWS, STATUS, DIRECTOR). Stage 80-83% (Sol's band; my 83-84% was optimistic), 5-7 weeks. Scores: Titanic 3.5-3.8, Lost City 3-3.4, Blue Hole 3-3.4, Beebe 3.5-3.6, Monterey 3.5-3.75, Endurance 3.0. Main CI still red on infra/44 px (3250-3270 running); no tag.
+- New backlog: V-endurance-spawn (spawn floor), V-journeys-current, S-collision. Codex queued 3290, 3300, 3310. No Claude art package this run (review took most of the window).
+- **Needs owner:** phone retest on the newest build.
