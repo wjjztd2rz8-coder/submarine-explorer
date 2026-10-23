@@ -632,8 +632,9 @@ export class Globe {
       const clustered = o >= 0 && groupN[o] > 1;
       const back = alpha[i] <= 0.05;
       const opacity = back || clustered ? 0 : Math.round(alpha[i] * 100) / 100;
-      const x = Math.round(sx[i] * 10) / 10;
-      const y = Math.round(sy[i] * 10) / 10;
+      // Whole-pixel translations keep the rendered hit box at its CSS size.
+      const x = Math.round(sx[i]);
+      const y = Math.round(sy[i]);
       if (x !== p.x || y !== p.y) {
         p.x = x;
         p.y = y;
@@ -666,8 +667,8 @@ export class Globe {
       if (owner[i] !== i || groupN[i] < 2) continue;
       const c = this.clusterEl(k++);
       const size = groupN[i];
-      const x = Math.round((groupX[i] / size) * 10) / 10;
-      const y = Math.round((groupY[i] / size) * 10) / 10;
+      const x = Math.round(groupX[i] / size);
+      const y = Math.round(groupY[i] / size);
       if (c.leader !== i || c.size !== size || c.hash !== groupHash[i]) {
         c.leader = i;
         c.size = size;
