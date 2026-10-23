@@ -173,31 +173,21 @@ test.describe('globe pins on touch', () => {
     const box = await page.locator('.globe.is-embedded .globe-canvas').boundingBox();
     expect(box!.width).toBeGreaterThanOrEqual(390 * 0.6);
     expect(box!.height).toBeGreaterThanOrEqual(220);
+    // Regression: fractional pin/cluster translations rounded rendered hit areas below 44 px.
     const sizes = await page
-      .locator('.globe.is-embedded .globe-pin:not(.is-catalogue)')
+      .locator(
+        '.globe.is-embedded :is(.globe-pin:not(.is-catalogue), .globe-cluster:not([hidden]))',
+      )
       .evaluateAll((pins) =>
         pins.map((p) => {
-          const style = getComputedStyle(p);
-          // Fractional translations can subtract to 43.999996 in DOMRect.
-          // Measure the layout box and prove neither it nor its ancestors
-          // shrink the hit area on screen.
-          const transforms = [];
-          for (let element: Element | null = p; element; element = element.parentElement) {
-            const transform = new DOMMatrixReadOnly(getComputedStyle(element).transform);
-            transforms.push([transform.a, transform.b, transform.c, transform.d]);
-          }
-          return {
-            width: parseFloat(style.width),
-            height: parseFloat(style.height),
-            transforms,
-          };
+          const { width, height } = p.getBoundingClientRect();
+          return { width, height };
         }),
       );
     expect(sizes.length).toBeGreaterThan(0);
     for (const size of sizes) {
       expect(size.width).toBeGreaterThanOrEqual(44);
       expect(size.height).toBeGreaterThanOrEqual(44);
-      for (const linear of size.transforms) expect(linear).toEqual([1, 0, 0, 1]);
     }
     // The sites list is a sheet over the globe: collapsed it keeps its rows out of reach, and the
     // grab bar opens it.
