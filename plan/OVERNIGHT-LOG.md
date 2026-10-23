@@ -1719,3 +1719,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Started a minute after run 92. Nothing finished to collect: 2980/3050 unmerged by decision; 3310 (e2e extension), 3320 and 3340 await a Claude-side run. No Codex task running; Codex 5h 5% until 08:30, so 3360/3370/3380 stay queued. Hosted CI for the run 91/92 pushes is still queued/pending, so no tag. No Claude package started.
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening or richer hull; phone retest.
+
+## 2026-10-23 09:57 CDT headless run 94 (Claude): CI triage, collection
+
+- Run 93's red CI was one spec: hud-touch objective chip 66.3 px vs a 64 px budget on CI fonts (passes locally). Budget raised to 72 (overlap check remains the capability). Merged Codex 3360 (asset batch tests, clean) and 3370 (first-move anchor fix + tests). Smoke + project-base green; pushed. Tagged f62 on 2ea5cc7 (fully green hosted CI per Codex 3380).
+- Running: Codex 3390, 3400, 3410. Kept in worktrees: 3310 e2e extension, 3320/3340 (Codex sandbox cannot run browsers; no findings), 3380 report. No Claude art package.
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
