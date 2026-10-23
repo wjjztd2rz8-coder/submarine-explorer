@@ -1569,7 +1569,7 @@ freshTest.describe('Home to scan and return journey', () => {
                   layout: size,
                   tier: 'low',
                   input: layout.touch ? 'touch' : 'keyboard',
-                  route: 'Home mission selection; forward along the authored opening heading',
+                  route: 'Home mission selection; forward, steering by the nav turn cue',
                   clock: 'real game frames, at most 250 ms per advance; no direct simulation calls',
                   startedAt,
                   status: failures.length
@@ -1750,16 +1750,24 @@ freshTest.describe('Home to scan and return journey', () => {
           };
           // Native held controls only. In particular, do not use completeScan:
           // this journey must exercise the normal input, physics and scan frame loop.
+          // `work` may steer the held control: -1 turns left, 1 right, 0 straight on.
           const held = async (
             control: 'forward' | 'scan',
-            work: () => Promise<void>,
+            work: (steer: (turn: -1 | 0 | 1) => Promise<void>) => Promise<void>,
           ): Promise<void> => {
             if (!layout.touch) {
               const key = control === 'forward' ? 'w' : 'g';
+              let side: -1 | 0 | 1 = 0;
               await page.keyboard.down(key);
               try {
-                await work();
+                await work(async (turn) => {
+                  if (turn === side) return;
+                  if (side) await page.keyboard.up(side < 0 ? 'a' : 'd');
+                  if (turn) await page.keyboard.down(turn < 0 ? 'a' : 'd');
+                  side = turn;
+                });
               } finally {
+                if (side) await page.keyboard.up(side < 0 ? 'a' : 'd');
                 await page.keyboard.up(key);
               }
               return;
@@ -1778,7 +1786,14 @@ freshTest.describe('Home to scan and return journey', () => {
                   type: 'touchMove',
                   touchPoints: [{ x: box.x + box.width / 2, y: box.y + 1 }],
                 });
-              await work();
+              await work(async (turn) => {
+                await session.send('Input.dispatchTouchEvent', {
+                  type: 'touchMove',
+                  touchPoints: [
+                    { x: box.x + box.width / 2 + (turn * box.width) / 3, y: box.y + 1 },
+                  ],
+                });
+              });
             } finally {
               await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
               await session.detach();
@@ -1831,9 +1846,12 @@ freshTest.describe('Home to scan and return journey', () => {
             });
             expect(start.target).toBeTruthy();
             current = 'approach';
-            await held('forward', async () => {
+            await held('forward', async (steer) => {
               for (let frame = 0; frame < 1200; frame++) {
                 await page.clock.fastForward(250);
+                // Follow the nav line's turn cue ("35° STBD" / "10° PORT" / "AHEAD").
+                const cue = (await page.locator('.obj-nav-turn').textContent()) ?? '';
+                await steer(/STBD/.test(cue) ? 1 : /PORT/.test(cue) ? -1 : 0);
                 if (frame === 3) await shot('approach');
                 const motion = await page.evaluate((origin) => {
                   const g = window.__game as unknown as Game;

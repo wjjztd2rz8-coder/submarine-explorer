@@ -58,7 +58,7 @@ describe.each([
       props.dispose();
       terrain.dispose();
     }
-  });
+  }, 60_000); // builds a real tile and prop set; slow hosted runners need headroom
 
   // Promote to a normal test when collision coverage is repaired; an unexpected
   // pass deliberately fails the suite so this known defect cannot disappear silently.

@@ -2,6 +2,7 @@ import { waitForFrames } from './helpers/frames.js';
 import { GUIDANCE } from './helpers/guidance.js';
 import { homeReady } from './helpers/home.js';
 import { scanWithKeyboard } from './helpers/scan.js';
+import { siteData } from './helpers/site.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 
 /**
@@ -156,7 +157,8 @@ test.describe('B3 mission flow', () => {
       ((await panel.locator('.obj-nav-bearing').textContent()) ?? '').replace(/\D/g, ''),
     );
     const off = Math.abs(((brg - heading + 540) % 360) - 180);
-    expect(off).toBeLessThan(15);
+    // The opening aims off the target by the authored yaw offset.
+    expect(Math.abs(off - (siteData('titanic').opening!.mission!.yawOffset ?? 0))).toBeLessThan(2);
     // The range is the waypoint label's slant range (the nav line keeps bearing and
     // depth): Arcade opens on a composed approach (tens of metres from the set piece);
     // the classic near-site offset is 350-600 m.

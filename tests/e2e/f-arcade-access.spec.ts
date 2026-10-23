@@ -1,4 +1,5 @@
 import { homeReady } from './helpers/home.js';
+import { missionApproachRanges, siteData } from './helpers/site.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
@@ -66,9 +67,11 @@ test('fresh Arcade Titanic starts on an approach in its deep-ocean vehicle', asy
   expect(pose.altitude).toBeGreaterThan(10);
   expect(pose.altitude).toBeLessThan(80);
   expect(pose.wreckRange).toBeGreaterThan(8);
-  expect(pose.primaryRange).toBeCloseTo(220, 0);
+  expect(pose.primaryRange).toBeCloseTo(missionApproachRanges.titanic!, 0);
   expect(pose.primaryRange).toBeGreaterThan(pose.scanRadius);
-  expect(pose.facing).toBeGreaterThan(0.999);
+  expect(pose.facing).toBeGreaterThan(
+    Math.cos(((siteData('titanic').opening!.mission!.yawOffset ?? 0) * Math.PI) / 180) - 0.001,
+  );
   await expect(page.locator('.obj-item.is-current')).toContainText('Head to the bow');
   expect(pose.hull).toBe('B');
   expect(pose.vehicle).toBe('B');

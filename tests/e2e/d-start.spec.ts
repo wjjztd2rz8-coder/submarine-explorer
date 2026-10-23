@@ -1,6 +1,6 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
-import { missionApproachRanges as MISSION_APPROACH_M } from './helpers/site.js';
+import { missionApproachRanges as MISSION_APPROACH_M, siteData } from './helpers/site.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 import { openBriefingAdvanced } from './helpers/briefing.js';
 
@@ -88,7 +88,8 @@ test('Custom near-site starts retain the authored approach at deep and shallow s
     });
     expect(near.range).toBeCloseTo(MISSION_APPROACH_M[id], 0);
     expect(near.range).toBeGreaterThan(near.scanRadius);
-    expect(Math.abs(near.turn)).toBeLessThan(0.02);
+    const aimOffset = ((siteData(id).opening!.mission!.yawOffset ?? 0) * Math.PI) / 180;
+    expect(near.turn).toBeCloseTo(-aimOffset, 2);
     expect(near.altitude).toBeGreaterThanOrEqual(near.minAltitude - 0.5);
     expect(near.y).toBeGreaterThan(near.rating);
   }
