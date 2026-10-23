@@ -72,6 +72,7 @@ export const propsSystem: GameSystem = {
         );
         if (pose) {
           sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+          ctx.reanchorFirstMove?.();
           if (manifest?.opening?.camera?.applyDefaults || pose.chaseOffsetY !== undefined)
             rig.setChaseRadiusDefault(
               pose.chaseRadius,

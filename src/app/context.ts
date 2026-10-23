@@ -155,6 +155,8 @@ export interface GameContext extends BootContext {
   input: Input;
   /** True once the pilot has made the first deliberate move or turn of the dive. */
   cameraTips: { moved: boolean };
+  /** Authored opening placement restarts an unlearned movement anchor. */
+  reanchorFirstMove?(): void;
   keyboard: { lock(): Promise<void>; unlock(): void };
   pointerLook: { updateHint(): void };
   settingsScreen: SettingsScreen;

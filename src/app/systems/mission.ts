@@ -94,6 +94,7 @@ export const missionSystem: GameSystem = {
         pose.yaw = (ctx.daily.start.headingDeg * Math.PI) / 180;
       }
       sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+      ctx.reanchorFirstMove?.();
       lastStart = sub.position.clone();
       lastChoice = choice;
       rig.setChaseRadiusDefault(
