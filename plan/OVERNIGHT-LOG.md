@@ -1745,3 +1745,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Review in plan/REVIEWS.md and STATUS.md (Sol skipped, Codex 5h 5%). Stage ~83-84%. Tagged f63 on 66c9147 (green CI). Queued Codex 3510 (journeys), 3520 (scarp seam), 3530 (lifecycle); 3480-3500 still in worktrees. No Claude art package this run.
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-23 16:24 CDT headless run 99 (Claude): collection, one visual package
+
+- Merged and pushed (smoke + project-base green): Codex 3450/3460/3470 (Blake/Hunga verifies, clean; one extra test case), 3480 (save migration: partial `discovered` no longer masks legacy discoveries), 3490 (late-placement mode tests), 3500 (audio ctor failure and caption-teardown guards). Fixed a test whose no-fade control site (Axial) gained a fade. Sonnet V-lostcity-foot: cooler olive-grey hill and apron, foot rubble 70 to 130, ~3.5 (modest; chimney stumps and scatter tint left). Codex 5h 5% until 17:45; 3510/3520/3530 queued. 3310, 3320, 3340, 3380, 2980, 3050 worktrees still kept. No tag (f63 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
