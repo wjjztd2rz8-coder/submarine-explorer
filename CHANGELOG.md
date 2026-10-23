@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **V-eight-sites-lit (b):** Blake Plateau and Hunga Tonga fade their distant seabed into the water (per-biome `horizonFadeM`, no hard edge) and lift the site ambient (6 to 11 and 9) so the opening bed is readable on every tier; Blake's carbonate-rubble bed is lighter.
+
 - **P2-copy:** home primary reads "Dive: <site>" (the site the Dive button will start); the scan confirmation reads "New Journal entry"; Graphics "Auto" names its resolved tier, e.g. "Auto (high on this device)".
 
 - **P2-events-anchored:** replace random event timers and camera-relative spawns with named optional contacts at authored spots across the six event sites. Arrivals play the existing effects; remaining inside does not replay them. No event kind is cut pending Claude’s Low-tier visual review.
