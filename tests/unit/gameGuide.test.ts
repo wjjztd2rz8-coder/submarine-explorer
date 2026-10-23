@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { buildGuideEntries, entryIdForPoi, parseGuide, safeUrl } from '../../src/game/Guide.js';
 
 const doc = {
@@ -80,5 +80,47 @@ describe('buildGuideEntries', () => {
 
   it('works with no guide at all', () => {
     expect(buildGuideEntries(null, [poi('a', null)]).map((e) => e.id)).toEqual(['a']);
+  });
+});
+
+describe('guide URLs under deployment bases', () => {
+  it.each(['/', '/submarine-explorer/'])('resolves href/src values once under %s', async (base) => {
+    vi.stubEnv('BASE_URL', base);
+    vi.resetModules();
+    try {
+      const guideApi = await import('../../src/game/Guide.js');
+      // The content contract documents this optional image path; no image file is promised.
+      const local = '/data/landmarks/titanic/img/bow.jpg';
+      const https = 'https://en.wikipedia.org/wiki/Wreck_of_the_Titanic';
+      const http = 'http://www.joncopley.com/docs/Rimicaris_hybisae.pdf';
+      const sources = [{ title: 'Wiki', url: https }, { title: 'Paper', url: http }, local];
+      const guide = guideApi.parseGuide(
+        { entries: [{ id: 'bow', image: { url: local }, sources }] },
+        'titanic',
+      )!;
+      const expectedLocal = `${base}data/landmarks/titanic/img/bow.jpg`;
+      const expectedSources = [
+        { title: 'Wiki', url: https },
+        { title: 'Paper', url: http },
+        { title: local, url: expectedLocal },
+      ];
+      expect(guide.entries[0]?.image?.url).toBe(expectedLocal);
+      expect(guide.entries[0]?.sources).toEqual(expectedSources);
+      const entries = guideApi.buildGuideEntries(guide, [
+        {
+          id: 'unlinked',
+          name: 'Unlinked',
+          kind: 'debris',
+          guideEntry: null,
+          def: { sources: [local, https, http] },
+        },
+      ]);
+      expect(entries[0]?.image?.url).toBe(expectedLocal);
+      expect(entries[0]?.sources).toEqual(expectedSources);
+      expect(entries[1]?.sources.map((s) => s.url)).toEqual([expectedLocal, https, http]);
+    } finally {
+      vi.unstubAllEnvs();
+      vi.resetModules();
+    }
   });
 });
