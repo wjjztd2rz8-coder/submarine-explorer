@@ -96,12 +96,11 @@ for (const site of sites.landmarks) {
         expect(p.y).toBeLessThan(-settings.hullRadius);
         expect(props.collide(p.clone(), settings.hullRadius + 4, new Vector3())).toBe(false);
         const direction = target.position.clone().sub(p).setY(0).normalize();
-        expect(
-          new Vector3(Math.sin(pose!.yaw), 0, -Math.cos(pose!.yaw)).dot(direction),
-        ).toBeCloseTo(
-          Math.cos(((siteManifest(site)?.opening?.mission?.yawOffset ?? 0) * Math.PI) / 180),
-          3,
-        );
+        const forward = new Vector3(Math.sin(pose!.yaw), 0, -Math.cos(pose!.yaw));
+        const yawOffset = ((siteManifest(site)?.opening?.mission?.yawOffset ?? 0) * Math.PI) / 180;
+        expect(forward.dot(direction)).toBeCloseTo(Math.cos(yawOffset), 3);
+        // The side of the authored offset matters; a dot product accepts either sign.
+        expect(direction.clone().cross(forward).y).toBeCloseTo(-Math.sin(yawOffset), 3);
         mesh.setPose(p, pose!.yaw, 0, 0);
         expect(hullClearance(mesh.group, terrain)).toBeGreaterThan(0);
         for (const sensors of Object.values(config.sensorPresets)) {
@@ -135,6 +134,7 @@ for (const site of sites.landmarks) {
         }
       } finally {
         mesh.dispose();
+        props.dispose();
         terrain.dispose();
       }
     });

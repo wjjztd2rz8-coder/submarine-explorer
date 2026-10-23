@@ -296,9 +296,11 @@ function screenBounds(root: Object3D, rig: CameraRig): Box2 {
   return bounds;
 }
 
-it.each(sites)(
-  '%s Low: opening hulls clear terrain/props and the first scan is reachable with runtime contact',
-  async (site) => {
+it.each(
+  sites.flatMap((site) => (['low', 'medium', 'high'] as const).map((tier) => ({ site, tier }))),
+)(
+  '$site $tier: opening hulls clear terrain/props and the first scan is reachable with runtime contact',
+  async ({ site, tier }) => {
     const config = makeConfig();
     const effective = resolveEffective(defaultSettings(config), 'arcade', null, config);
     const meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;
@@ -306,15 +308,15 @@ it.each(sites)(
     const terrain = new Terrain(
       { meta, heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows) },
       config.terrain,
-      'low',
+      tier,
     );
-    const props = new Props(meta, terrain, config.props, 'low');
+    const props = new Props(meta, terrain, config.props, tier);
     const mission = parseMission(
       JSON.parse(readFileSync(`data/landmarks/${site}/mission.json`, 'utf8')),
       site,
     )!;
     const missionHull = requiredHull(mission.briefing.depth_m ?? Math.abs(meta.min_m)).id;
-    const mesh = new SubMesh({ length: 26, hullClass: missionHull, tier: 'low' });
+    const mesh = new SubMesh({ length: 26, hullClass: missionHull, tier });
     try {
       await placeProps(props, site);
       const pois = placePois(
@@ -429,6 +431,7 @@ it.each(sites)(
         }
       }
       const range = target.position.distanceTo(new Vector3(pose.x, pose.y, pose.z));
+      expect(range).toBeCloseTo(MISSION_APPROACH_M[site], 2);
       expect(range).toBeGreaterThanOrEqual(110);
       expect(range).toBeLessThanOrEqual(300);
       const radius = resolveScanRadius(
@@ -444,6 +447,23 @@ it.each(sites)(
       const scanner = new Scanner(effective.scan, bus);
       scanner.setTargets([{ ...target, radius }]);
       scanner.setObjective(target.id);
+      scanner.update(0, sub.position, sub.getForward(), false);
+      expect(scanner.view.objectiveTurnDeg).toBeCloseTo(
+        -(siteManifest(site)?.opening?.mission?.yawOffset ?? 0),
+        3,
+      );
+      // Aim directly at the objective so range alone must prevent an opening scan,
+      // including Arcade's radius floor after the per-site cap and sensor scaling.
+      scanner.update(
+        target.scanSeconds + 1,
+        sub.position,
+        target.position.clone().sub(sub.position).normalize(),
+        true,
+      );
+      expect(scanner.view.objectiveInRange).toBe(false);
+      expect(scanner.view.candidateId).toBeNull();
+      expect(scanner.view.progress).toBe(0);
+      expect(scanner.isScanned(site, target.id)).toBe(false);
       const input = { ...FROZEN_INPUT, scan: true };
       let completedAt: number | null = null;
       let contactFrames = 0;
@@ -474,6 +494,7 @@ it.each(sites)(
       }
       audit.push({
         site,
+        tier,
         range,
         radius,
         missionHull,
