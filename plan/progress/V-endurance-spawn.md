@@ -15,4 +15,4 @@ The hull is only 44 x 8 m and the range floor is 110 m (owner-approved 110-140 m
 
 ## Gates
 
-See final report.
+PW_PORT=4871 tools/gates.sh: all PASS (python, content, build, unit, e2e smoke, e2e-base, attribution, prettier).
