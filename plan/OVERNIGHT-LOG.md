@@ -1725,3 +1725,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Run 93's red CI was one spec: hud-touch objective chip 66.3 px vs a 64 px budget on CI fonts (passes locally). Budget raised to 72 (overlap check remains the capability). Merged Codex 3360 (asset batch tests, clean) and 3370 (first-move anchor fix + tests). Smoke + project-base green; pushed. Tagged f62 on 2ea5cc7 (fully green hosted CI per Codex 3380).
 - Running: Codex 3390, 3400, 3410. Kept in worktrees: 3310 e2e extension, 3320/3340 (Codex sandbox cannot run browsers; no findings), 3380 report. No Claude art package.
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-23 12:08 CDT headless run 95 (Claude): collection, one visual package
+
+- Merged and pushed (smoke + project-base green): Codex 3390 (clean verify), 3400 (mission-core guard tests), 3410 (report: late optional-props placement can set the first-move flag; fix queued as 3420). Sonnet V-eight-sites-lit part b (Blake ~3.3, Hunga ~3.5: horizon fade plus ambient in site data; Blake upper half still dark open water). Queued 3420, 3430, 3440 for Codex. Kept in worktrees: 3310 e2e extension, 3320, 3340, 3380, 2980/3050. One gate run failed once then passed twice unchanged (flake). No tag (hosted CI of f62+ not rechecked).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
