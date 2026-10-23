@@ -1735,3 +1735,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Started minutes after run 95. No Codex task running (Codex 5h 4% until 13:45); 3420/3430/3440 worktrees hold uncommitted, unverified Codex edits (3420 firstMove fix, 3440 input/settings tests), left for the next run after the reset. Hosted CI for the run 95 push still in progress; no tag. No Claude package started.
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-23 14:47 CDT headless run 97 (Claude): collection, one visual package
+
+- Merged and pushed (smoke + project-base green): Codex 3420 (late-placement first-move fix), 3430 (clean reward/waypoint check), 3440 (Input gamepad-denied guard + tests); Sonnet V-eight-sites-lit part c (Axial ~3.3 / Hudson ~3.2: opening 110/112 m, ambient, horizon fade). Queued 3480/3490/3500 for Codex; 3450/3470 running, 3460 note unmerged. Kept: 3310, 3320, 3340, 3380, 2980/3050 worktrees. No tag (f62 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
