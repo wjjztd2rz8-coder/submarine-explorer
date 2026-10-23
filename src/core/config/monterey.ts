@@ -29,11 +29,11 @@ export const MONTEREY_RUBBLE = {
   blockRunout: [0.22, 1.55],
   fragmentRunout: [0.08, 1.75],
   blockRadius: [1.0, 2.4],
-  fragmentRadius: [0.1, 1.8],
+  fragmentRadius: [0.3, 1.8],
   separationRadii: 0.6,
   placementAttempts: 32,
   radiusSkew: 2.6,
   scarRunout: [0.12, 1.5],
   scarSpread: 3.2,
-  scarRadius: [0.35, 1.8],
+  scarRadius: [0.6, 1.8],
 } as const;
