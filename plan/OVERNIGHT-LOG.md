@@ -1671,3 +1671,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Review done with Sol (REVIEWS, STATUS, DIRECTOR). Stage 80-83% (Sol's band; my 83-84% was optimistic), 5-7 weeks. Scores: Titanic 3.5-3.8, Lost City 3-3.4, Blue Hole 3-3.4, Beebe 3.5-3.6, Monterey 3.5-3.75, Endurance 3.0. Main CI still red on infra/44 px (3250-3270 running); no tag.
 - New backlog: V-endurance-spawn (spawn floor), V-journeys-current, S-collision. Codex queued 3290, 3300, 3310. No Claude art package this run (review took most of the window).
 - **Needs owner:** phone retest on the newest build.
+
+## 2026-10-23 01:02 CDT headless run 85 (Claude)
+
+- **Merged and pushed (smoke + project-base green, no full e2e):** Sonnet collected Codex 3250 (static-check unit tests in 3 shards), 3260 (composite Chromium-install action, -19 lines), 3280 (spawn tests across all tiers). Sonnet V-endurance-spawn: only the orphan-"m" hint wrap fix (`text-wrap: balance`) landed; lowering the spawn made the shot worse (hull is 44 x 8 m at the 110 m floor), so Endurance stays ~3.0.
+- **Not yet checked:** hosted CI for the shard/Chromium changes. Codex 3270, 3290, 3300 worktrees idle (Codex 5h low); 3310 queued. 2980/3050 still unmerged. No tag.
+- **Needs owner:** OK for an ~85 m Endurance opening, or a richer hull model; phone retest.
