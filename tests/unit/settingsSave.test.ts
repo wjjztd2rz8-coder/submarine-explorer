@@ -167,6 +167,36 @@ describe('settings defaults and migrate', () => {
 });
 
 describe('Save', () => {
+  it('keeps accessibility changes usable when the localStorage accessor is denied', () => {
+    vi.stubGlobal('localStorage', undefined);
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      get() {
+        throw new DOMException('Storage denied', 'SecurityError');
+      },
+    });
+    try {
+      const save = new Save({ config });
+      expect(save.get()).toEqual(defaultSettings(config));
+      const changed = vi.fn();
+      save.onChange(changed);
+      save.save({ reduceMotion: true, captions: true, sonarPalette: 'highContrast' });
+      expect(save.get()).toMatchObject({
+        reduceMotion: true,
+        captions: true,
+        sonarPalette: 'highContrast',
+      });
+      expect(changed).toHaveBeenCalledExactlyOnceWith(save.get(), [
+        'reduceMotion',
+        'captions',
+        'sonarPalette',
+      ]);
+      expect(save.reloadSafe).toBe(false);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it.each([2, 3])(
     'keeps accessibility choices through v%s migration, mode edits, reload and reset',
     (version) => {
