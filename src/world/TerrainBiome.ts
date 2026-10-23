@@ -305,6 +305,8 @@ export const BIOMES: Record<string, Biome> = {
     stainAmount: 0.15,
     patch: 0.3,
     rockBias: 0.1,
+    // The rim slope ends at the tile edge; dissolve it into the water rather than a hard line.
+    horizonFadeM: [250, 900],
   },
   // Iron-oxide silt over basalt: a warm, pale-rust bed that stays readable in the lamp-and-ambient light.
   kamaehuakanaloa: {
@@ -322,9 +324,9 @@ export const BIOMES: Record<string, Biome> = {
     a: 'rubble',
     b: 'sand',
     c: 'carbonate',
-    colorA: 0x4f4b42,
-    colorB: 0x45423a,
-    colorC: 0x3f3c34,
+    colorA: 0x5f5a4d,
+    colorB: 0x56524a,
+    colorC: 0x4f4b44,
     stain: 0x6d5f47,
     stainAmount: 0.1,
     patch: 0.4,
@@ -333,6 +335,8 @@ export const BIOMES: Record<string, Biome> = {
     rippleDir: 0.9,
     burrow: 0.5,
     rockBias: 0.1,
+    // The plateau ends at the tile edge; dissolve it into the water rather than a hard line.
+    horizonFadeM: [150, 700],
     scatter: [
       { kind: 'rubble', density: 8, slopeMaxDeg: 30, on: 'any' },
       { kind: 'sponge', density: 0.9, slopeMaxDeg: 30, on: 'any' },
