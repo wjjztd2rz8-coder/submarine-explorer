@@ -230,6 +230,113 @@ describe('manifest + loaders', () => {
       tile: 'site-tile',
     });
   });
+
+  it('keeps usable neighbors through mixed failures and recovers on a fresh explicit load', async () => {
+    const ids = ['site', 'failed', 'invalid', 'neighbor'];
+    const files = {
+      '/data/landmarks/index.json': { version: 1, landmarks: ids },
+      '/data/landmarks/site/mission.json': MINIMAL,
+      '/data/landmarks/failed/mission.json': {
+        ...MINIMAL,
+        title: 'Restored dive',
+        tile: 'restored-tile',
+        briefing: { ...MINIMAL.briefing, summary: 'Restored.', depth_m: 750 },
+      },
+      '/data/landmarks/invalid/mission.json': { ...MINIMAL, objectives: [] },
+      '/data/landmarks/neighbor/mission.json': {
+        ...MINIMAL,
+        title: 'Neighbor dive',
+        tile: 'neighbor-tile',
+        briefing: { ...MINIMAL.briefing, summary: 'Nearby.', depth_m: 125 },
+      },
+    };
+    const fetchFiles = fakeFetch(files);
+    type Response = Awaited<ReturnType<FetchJson>>;
+    const held = new Map(
+      ids.map((id) => {
+        let resolve!: (value: Response | PromiseLike<Response>) => void;
+        let reject!: (reason: Error) => void;
+        const promise = new Promise<Response>((yes, no) => {
+          resolve = yes;
+          reject = no;
+        });
+        return [
+          `/data/landmarks/${id}/mission.json` as string,
+          { promise, resolve, reject },
+        ] as const;
+      }),
+    );
+    const requested: string[] = [];
+    const completed: string[] = [];
+    let allStarted!: () => void;
+    const started = new Promise<void>((resolve) => {
+      allStarted = resolve;
+    });
+    const batch = loadMissionSummaries(async (url) => {
+      const request = held.get(url);
+      if (!request) return fetchFiles(url);
+      requested.push(url);
+      if (requested.length === ids.length) allStarted();
+      try {
+        return await request.promise;
+      } finally {
+        completed.push(url);
+      }
+    }, quiet);
+    await started;
+    // A later usable document settles first; neither failure may discard its neighbors.
+    for (const id of ['neighbor', 'invalid', 'failed', 'site']) {
+      const url = `/data/landmarks/${id}/mission.json`;
+      const request = held.get(url)!;
+      if (id === 'failed') request.reject(new Error('mission request unavailable'));
+      else request.resolve(await fetchFiles(url));
+      await request.promise.catch(quiet);
+    }
+    const list = await batch;
+    expect(completed).toEqual(
+      ['neighbor', 'invalid', 'failed', 'site'].map((id) => `/data/landmarks/${id}/mission.json`),
+    );
+    const usable = [
+      { id: 'site', title: 'Test dive', summary: 'Go.', depthM: 3800, tile: 'site-tile' },
+      {
+        id: 'neighbor',
+        title: 'Neighbor dive',
+        summary: 'Nearby.',
+        depthM: 125,
+        tile: 'neighbor-tile',
+      },
+    ];
+    expect(list).toEqual(usable);
+
+    const recovered = await loadMissionSummaries(fetchFiles, quiet);
+    expect(recovered).toEqual([
+      usable[0],
+      {
+        id: 'failed',
+        title: 'Restored dive',
+        summary: 'Restored.',
+        depthM: 750,
+        tile: 'restored-tile',
+      },
+      usable[1],
+    ]);
+    expect(list).toEqual(usable);
+  });
+
+  it('fulfills with an empty catalog when the index request rejects', async () => {
+    let reject!: (reason: Error) => void;
+    const held = new Promise<never>((_resolve, no) => {
+      reject = no;
+    });
+    const requested: string[] = [];
+    const batch = loadMissionSummaries((url) => {
+      requested.push(url);
+      return held;
+    }, quiet);
+    reject(new Error('index request unavailable'));
+    await expect(batch).resolves.toEqual([]);
+    expect(requested).toEqual(['/data/landmarks/index.json']);
+  });
 });
 
 describe('Mission state machine (D-FLOW)', () => {
