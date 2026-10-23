@@ -26,6 +26,7 @@ The owner treats this as a curiosity project about how far current models and wo
   - Keep the HUD uncluttered.
   - Phone and tablet are first-class.
   - Every cut is logged in CHANGELOG.md.
+  - Rules can bend (owner, 2026-10-22): this is an exploratory project, so a decision that is logically consistent with the rule's purpose and safe may break a hard rule, including an owner-set one, without asking. Example: shortening the 150-300 m mission opening for small subjects keeps the target out of scan range, which is what the rule was for. Record the reasoning in the progress note and update the tests that enforce the old rule.
 - **Core to protect** (from the 2026-10-11 simplification review): enter a real place, pilot comfortably, approach something striking, scan it, keep the discovery in the Journal. That means:
   - real GMRT terrain;
   - the identity of all 13 sites and the five hero set pieces;
@@ -67,7 +68,6 @@ Stage (review 2026-10-22, Claude alone): about 83% to 1.0; 5 weeks. Beautiful: T
 The newest items go first.
 
 - A short phone retest once the P2 items below land (boost gone, scan range, anchored events, Your sub screen).
-- Decide whether the 150-300 m mission opening rule may be shortened for wrecks and landers (blocks nearer framing at Endurance, Bismarck, Challenger; V-spawn-sub-clear).
 
 ## In flight
 
@@ -82,7 +82,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 3. **V-monterey-apron [Sonnet, small]** (~3.75): crest ledges and mottling landed; the apron still reads as a smooth slope. Swap some apron rocks for pebbles at the same instance count (update instance-count tests); right-bank crest untouched.
 4. **V-challenger-ripples [Sonnet, small]** (~3.4): seabed has no ripples; lander Low budget is 1985/2000, so cut something first. Target: gentle sediment ripples inside the lander light pool.
 5. **V-lostcity-foot [Sonnet, small]** (~3.5 readable, ~3.4 beautiful): tower is now the brightest mass; hue still brownish and foot rubble sparse. Target: cooler olive-grey hill, a ring of carbonate rubble and chimney stumps around the tower base.
-6. **V-spawn-sub-clear [Sonnet, small]:** at the Titanic and Endurance openings the sub overlaps or floats over the wreck silhouette (Titanic: sub sits on the bow; Endurance: sub hangs high above a thin hull strip). Target: sub below and beside the wreck, hull filling the lower third. Needs the owner decision below about the 150-300 m opening rule; until then only reposition inside the rule.
+6. **V-spawn-sub-clear [Sonnet, small]:** at the Titanic and Endurance openings the sub overlaps or floats over the wreck silhouette (Titanic: sub sits on the bow; Endurance: sub hangs high above a thin hull strip). Target: sub below and beside the wreck, hull filling the lower third. Owner approved 2026-10-22: wreck and lander missions (Endurance, Bismarck, Challenger) may open closer than 150 m (about 110-140 m, see `plan/progress/V-eight-sites.md`), provided the first target stays out of scan range and still needs a short approach. Update missionApproach, missionComposition and deepOpening tests to the new floor rather than adding exceptions.
 7. **P2-globe-bright, P2-text-size [Sonnet, demoted]:** brighter globe; "Aa" stepping the existing UI scale. Only if the lanes above are blocked.
 8. **V-bluehole-hood [Sonnet, demoted]:** east hood sheet facets; reference composition only.
 9. **S-verify / S-bughunt [Codex, standing]:** queued 3130 (verify the collected 2920-3120 fixes), 3140 (spawn bug hunt, all 13 sites), 3150 (CI watch, names a taggable SHA). Codex week is at 6% until Oct 27 11:30, so they wait; Claude collects finished worktrees at each review (2920-3120 collected 2026-10-22; 2980 scarp crest-contact fix and 3050 Terrain seam-clearance fix left unmerged in their worktrees: 2980 has no note and rebaselines scarp hashes, 3050 adds ~40 per-frame lines and fails net-simpler; decide next collection, ask for a smaller 3050). After visual merges, verify numerics and hunt bugs.

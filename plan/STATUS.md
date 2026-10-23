@@ -23,6 +23,5 @@ Unaided journeys at 1280x720 and phones (queued with Codex), CI triage (28/38 sh
 
 ## Needs owner
 
-- Decide whether the 150-300 m mission opening rule may be shortened for wrecks and landers (blocks nearer framing at Endurance, Bismarck, Challenger).
 - None for budget: the Claude reset is already used, so the Claude week (resets Oct 22) is paced by the run gate and Codex carries more work (dispatch head start widened to 30%).
 - A short phone retest once the P2 items land.
