@@ -14,12 +14,12 @@ Shots: `.cache/codex/shots/V-eight-sites-lit-c/{base,after1,after2,after3}-{high
 
 ## Ratings (my reading of the shots)
 
-| Site | Before | After |
-| ---- | ------ | ----- |
-| Axial desktop High | 2.0 | 3.3 |
-| Axial portrait Low | 2.4 | 3.0 |
-| Hudson desktop High | 2.6 | 3.2 |
-| Hudson portrait Low | 2.6 | 3.0 |
+| Site                | Before | After |
+| ------------------- | ------ | ----- |
+| Axial desktop High  | 2.0    | 3.3   |
+| Axial portrait Low  | 2.4    | 3.0   |
+| Hudson desktop High | 2.6    | 3.2   |
+| Hudson portrait Low | 2.6    | 3.0   |
 
 ## Known gaps
 
