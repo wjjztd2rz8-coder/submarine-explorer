@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { expect, it } from 'vitest';
 import { Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
+import { siteManifest } from '../../src/core/SiteManifest.js';
 import {
   MISSION_APPROACH_M,
   missionApproachScanRadius,
@@ -25,17 +26,17 @@ it('every authored site retains its mission approach distance', () => {
   // three geometry cases or silently substitute the generic spawn distance.
   expect(Object.keys(MISSION_APPROACH_M).sort()).toEqual([...sites.landmarks].sort());
   expect(MISSION_APPROACH_M).toEqual({
-    titanic: 220,
-    'challenger-deep': 200,
+    titanic: 140,
+    'challenger-deep': 140,
     'lost-city': 220,
     'monterey-canyon': 240,
-    endurance: 180,
+    endurance: 110,
     'axial-seamount-ashes': 180,
     'hudson-canyon': 160,
     kamaehuakanaloa: 200,
     'beebe-vent-field': 220,
     'great-blue-hole': 150,
-    bismarck: 150,
+    bismarck: 110,
     'hunga-tonga-caldera': 160,
     'blake-plateau-corals': 160,
   });
@@ -89,7 +90,7 @@ for (const site of sites.landmarks) {
         const target = primaries[0];
         const range = p.distanceTo(target.position);
         expect(range).toBeCloseTo(MISSION_APPROACH_M[site], 2);
-        expect(range).toBeGreaterThanOrEqual(150);
+        expect(range).toBeGreaterThanOrEqual(110);
         expect(range).toBeLessThanOrEqual(300);
         expect(p.y).toBeGreaterThanOrEqual(ratedDepth + settings.hullRadius);
         expect(p.y).toBeLessThan(-settings.hullRadius);
@@ -97,7 +98,10 @@ for (const site of sites.landmarks) {
         const direction = target.position.clone().sub(p).setY(0).normalize();
         expect(
           new Vector3(Math.sin(pose!.yaw), 0, -Math.cos(pose!.yaw)).dot(direction),
-        ).toBeGreaterThan(0.999);
+        ).toBeCloseTo(
+          Math.cos(((siteManifest(site)?.opening?.mission?.yawOffset ?? 0) * Math.PI) / 180),
+          3,
+        );
         mesh.setPose(p, pose!.yaw, 0, 0);
         expect(hullClearance(mesh.group, terrain)).toBeGreaterThan(0);
         for (const sensors of Object.values(config.sensorPresets)) {

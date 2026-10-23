@@ -4,7 +4,11 @@ import { afterAll, describe, expect, it, vi } from 'vitest';
 import { Box2, InstancedMesh, Matrix4, Mesh, Raycaster, Triangle, Vector2, Vector3 } from 'three';
 import { deepSiteWater, makeConfig } from '../../src/core/Config.js';
 import { siteManifest, type ApproachOpeningLife } from '../../src/core/SiteManifest.js';
-import { missionApproachScanRadius, spawnSettings } from '../../src/game/Spawn.js';
+import {
+  MISSION_APPROACH_M,
+  missionApproachScanRadius,
+  spawnSettings,
+} from '../../src/game/Spawn.js';
 import { composedFreeDiveSpawn, composedMissionSpawn } from '../../src/game/DeepOpeningSpawn.js';
 import { parsePois, placePois } from '../../src/game/Pois.js';
 import { Scanner } from '../../src/game/Scanner.js';
@@ -197,7 +201,7 @@ describe('Challenger / Endurance opening', () => {
           expect(missionPose).not.toEqual(pose);
           expect(
             target.position.distanceTo(new Vector3(missionPose!.x, missionPose!.y, missionPose!.z)),
-          ).toBeCloseTo(site === 'challenger-deep' ? 200 : 180, 2);
+          ).toBeCloseTo(MISSION_APPROACH_M[site], 2);
           expect(missionPose!.y).toBeGreaterThanOrEqual(
             (site === 'challenger-deep' ? -11000 : -6500) + config.submarine.hullRadius,
           );

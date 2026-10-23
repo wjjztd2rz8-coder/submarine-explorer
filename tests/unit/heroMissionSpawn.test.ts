@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { afterAll, expect, it } from 'vitest';
 import { Box2, InstancedMesh, Mesh, Vector2, Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
+import { siteManifest } from '../../src/core/SiteManifest.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import type { InputState } from '../../src/core/Input.js';
 import { Mission, parseMission } from '../../src/game/Mission.js';
@@ -117,7 +118,7 @@ for (const { site, primary, before } of heroes) {
           first.position.z - pose.z,
         );
         expect(range).toBeCloseTo(MISSION_APPROACH_M[site], 2);
-        expect(range).toBeGreaterThanOrEqual(150);
+        expect(range).toBeGreaterThanOrEqual(110);
         expect(range).toBeLessThanOrEqual(300);
         expect(range).toBeGreaterThan(missionApproachScanRadius(site, first.radius) * 2);
         const toTarget = first.position
@@ -125,9 +126,10 @@ for (const { site, primary, before } of heroes) {
           .sub(new Vector3(pose.x, pose.y, pose.z))
           .setY(0)
           .normalize();
-        expect(
-          new Vector3(Math.sin(pose.yaw), 0, -Math.cos(pose.yaw)).dot(toTarget),
-        ).toBeGreaterThan(0.999);
+        expect(new Vector3(Math.sin(pose.yaw), 0, -Math.cos(pose.yaw)).dot(toTarget)).toBeCloseTo(
+          Math.cos(((siteManifest(site)?.opening?.mission?.yawOffset ?? 0) * Math.PI) / 180),
+          3,
+        );
         expect(
           props.collide(
             new Vector3(pose.x, pose.y, pose.z),

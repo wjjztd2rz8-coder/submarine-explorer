@@ -2,7 +2,8 @@
   "id": "bismarck",
   "opening": {
     "mission": {
-      "rangeM": 150,
+      "rangeM": 110,
+      "yawOffset": 25,
       "destinationLabel": "the main hull"
     },
     "freeDive": {

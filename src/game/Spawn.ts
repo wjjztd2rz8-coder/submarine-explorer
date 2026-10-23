@@ -115,7 +115,9 @@ export function composedMissionSpawn(
         clear = false;
     }
     if (!clear) continue;
-    const yaw = Math.atan2(target.x - p.x, -(target.z - p.z));
+    const yaw =
+      Math.atan2(target.x - p.x, -(target.z - p.z)) +
+      ((siteManifest(siteId)?.opening?.mission?.yawOffset ?? 0) * Math.PI) / 180;
     rig.snap(p, yaw, 0);
     for (let step = 1; step <= 8; step++) {
       const eye = p.clone().lerp(rig.camera.position, step / 8);

@@ -196,7 +196,12 @@ export interface SiteManifest {
     reef?: boolean;
   };
   opening?: {
-    mission?: { rangeM: number; destinationLabel?: string; localAltitudeWeight?: number };
+    mission?: {
+      rangeM: number;
+      destinationLabel?: string;
+      localAltitudeWeight?: number;
+      yawOffset?: number;
+    };
     freeDive?: OpeningPose & {
       modes?: { arcade?: OpeningMode; realistic?: OpeningMode; custom?: OpeningMode };
     };
@@ -284,7 +289,10 @@ const modeCheck = fields({}, { range: aboveZero, ...cameraFields });
 const openingCheck = fields(
   {},
   {
-    mission: fields({ rangeM: aboveZero }, { destinationLabel: text, localAltitudeWeight: finite }),
+    mission: fields(
+      { rangeM: aboveZero },
+      { destinationLabel: text, localAltitudeWeight: finite, yawOffset: finite },
+    ),
     freeDive: fields(
       { hero: text, bearing: finite, range: aboveZero },
       {

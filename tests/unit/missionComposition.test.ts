@@ -199,7 +199,7 @@ it.each(sites)(
 );
 
 for (const site of sites) {
-  it(`Arcade ${site}: starts 150–300 m from the first primary before and after props load`, async () => {
+  it(`Arcade ${site}: starts 110–300 m from the first primary before and after props load`, async () => {
     const config = makeConfig();
     const meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;
     const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
@@ -246,7 +246,7 @@ for (const site of sites) {
         ),
       );
       expect(spatialRange).toBeCloseTo(MISSION_APPROACH_M[site], 2);
-      expect(spatialRange).toBeGreaterThanOrEqual(150);
+      expect(spatialRange).toBeGreaterThanOrEqual(110);
       expect(spatialRange).toBeLessThanOrEqual(300 + 1e-8);
       expect(pose!.y).toBeGreaterThanOrEqual(safeDepth + config.submarine.hullRadius);
       expect(pose!.y).toBeGreaterThanOrEqual(
@@ -429,7 +429,7 @@ it.each(sites)(
         }
       }
       const range = target.position.distanceTo(new Vector3(pose.x, pose.y, pose.z));
-      expect(range).toBeGreaterThanOrEqual(150);
+      expect(range).toBeGreaterThanOrEqual(110);
       expect(range).toBeLessThanOrEqual(300);
       const radius = resolveScanRadius(
         missionApproachScanRadius(site, target.radius) * effective.sensor.scanRadiusMultiplier,
