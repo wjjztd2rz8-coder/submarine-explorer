@@ -332,6 +332,13 @@ export class Sonar {
       { passive: false },
     );
     this.root.addEventListener('keydown', (event) => {
+      // Match the global range shortcuts while focus is inside the map.
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+      if (
+        event.target instanceof HTMLElement &&
+        event.target.closest('input, select, textarea, button, [contenteditable="true"]')
+      )
+        return;
       if (event.code === 'Equal' || event.code === 'NumpadAdd') this.zoomBy(-1);
       else if (event.code === 'Minus' || event.code === 'NumpadSubtract') this.zoomBy(1);
       else return;
