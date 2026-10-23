@@ -136,6 +136,85 @@ describe('open sediment floor variety', () => {
 });
 
 describe('site floor material bindings', () => {
+  it.each(['low', 'medium', 'high'] as const)(
+    '%s: horizon fades bind authored endpoints without leaking across material owners',
+    (tier) => {
+      vi.stubGlobal('document', undefined);
+      const config = makeConfig().terrain;
+      const before = JSON.stringify({ config, biomes: BIOMES });
+      const sites = ['blake-plateau-corals', 'hunga-tonga-caldera', 'axial-seamount-ashes'];
+      const built: ReturnType<typeof createTerrainMaterial>[] = [];
+      const retained = new Map<ReturnType<typeof createTerrainMaterial>, string>();
+      const state = (result: ReturnType<typeof createTerrainMaterial>) =>
+        JSON.stringify(result.material.userData.uniforms);
+      const keys = new Map<string, string>();
+      try {
+        // Keep the first order alive while reversing it, using the same registry and config.
+        for (const site of [...sites, ...sites.slice().reverse()]) {
+          const biome = biomeFor(site);
+          expect(biome).toBe(BIOMES[site]);
+          const result = createTerrainMaterial({ config, tier, biome, exaggeration: 1 });
+          built.push(result);
+          const uniforms = result.material.userData.uniforms as Record<string, THREE.IUniform>;
+          const shader = {
+            ...THREE.ShaderLib.standard,
+            uniforms: { ...THREE.ShaderLib.standard.uniforms },
+          };
+          result.material.onBeforeCompile(
+            shader as Parameters<typeof result.material.onBeforeCompile>[0],
+            {} as THREE.WebGLRenderer,
+          );
+          for (const [name, uniform] of Object.entries(uniforms))
+            expect((shader.uniforms as Record<string, THREE.IUniform>)[name]).toBe(uniform);
+          for (const [name, color] of [
+            ['uColA', biome.colorA],
+            ['uColB', biome.colorB],
+            ['uColC', biome.colorC],
+          ] as const)
+            expect(uniforms[name].value.toArray()).toEqual(new THREE.Color(color).toArray());
+          expect(shader.fragmentShader.includes('#define TERRAIN_PBR_NORMALS')).toBe(
+            tier !== 'low',
+          );
+          expect(shader.fragmentShader.includes('#define TERRAIN_BREAKUP')).toBe(tier !== 'low');
+          if (biome.horizonFadeM) {
+            expect(biome.horizonFadeM.every(Number.isFinite)).toBe(true);
+            expect(biome.horizonFadeM[0]).toBeLessThan(biome.horizonFadeM[1]);
+            expect(uniforms.uHorizonFadeM.value).toBeInstanceOf(THREE.Vector2);
+            expect(uniforms.uHorizonFadeM.value.toArray()).toEqual(biome.horizonFadeM);
+            const fade = shader.fragmentShader.indexOf(
+              'smoothstep(uHorizonFadeM.x, uHorizonFadeM.y',
+            );
+            expect(fade).toBeGreaterThan(shader.fragmentShader.indexOf('#include <fog_fragment>'));
+            expect(shader.fragmentShader).toContain('uniform vec2 uHorizonFadeM;');
+          } else {
+            expect(uniforms.uHorizonFadeM).toBeUndefined();
+            expect(shader.fragmentShader).not.toContain('uHorizonFadeM');
+          }
+          keys.set(site, result.material.customProgramCacheKey());
+          for (const previous of built.slice(0, -1)) {
+            expect(state(previous)).toBe(retained.get(previous));
+            expect(result.material).not.toBe(previous.material);
+            for (const [name, uniform] of Object.entries(uniforms)) {
+              const other = previous.material.userData.uniforms[name];
+              expect(uniform).not.toBe(other);
+              if (typeof uniform.value === 'object') expect(uniform.value).not.toBe(other?.value);
+            }
+          }
+          retained.set(result, state(result));
+          expect(JSON.stringify({ config, biomes: BIOMES })).toBe(before);
+        }
+        // Different endpoint values can share a program; the absent fade needs a different one.
+        for (const site of sites.slice(0, 2))
+          expect(keys.get(site)).not.toBe(keys.get('axial-seamount-ashes'));
+      } finally {
+        for (const result of built) {
+          result.material.dispose();
+          for (const texture of result.textures) texture.dispose();
+        }
+      }
+    },
+  );
+
   it.each(
     (['low', 'medium', 'high'] as const).flatMap((tier) =>
       (['loaded', 'unavailable'] as const).map((maps) => ({ tier, maps })),
