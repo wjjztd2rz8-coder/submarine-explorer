@@ -461,6 +461,85 @@ function reader(keys: string[]): DiscoveryReader {
 }
 
 describe('Journal content model', () => {
+  it.each([
+    {
+      label: 'old duplicate list',
+      raw: {
+        version: 0,
+        discoveries: ['reef/reef-mound', 'reef/reef-mound', 'retired-site/reef-wreck', null],
+      },
+    },
+    {
+      label: 'partial mixed fields',
+      raw: {
+        version: 1,
+        discovered: { 'reef/removed-poi': true, 'reef/reef-rock': null },
+        discoveries: ['reef/reef-mound', 'retired-site/reef-wreck'],
+      },
+    },
+  ])(
+    'loads a $label without losing Journal unlocks or opening unrelated entries',
+    async ({ raw }) => {
+      const { storage, bytes, writes } = discoveryFixture();
+      const original = JSON.stringify(raw);
+      storage.setItem(DISCOVERY_STORAGE_KEY, original);
+      const store = new DiscoveryStore(storage);
+      const requests: string[] = [];
+      const fetchFn: FetchJson = async (url) => {
+        requests.push(url);
+        if (url === '/data/landmarks/index.json')
+          return {
+            ok: true,
+            text: async () => JSON.stringify({ landmarks: ['reef', 'reef', 'neighbor'] }),
+          };
+        if (url.endsWith('/guide.json'))
+          return { ok: true, text: async () => JSON.stringify(GUIDE) };
+        if (url.endsWith('/pois.json'))
+          return { ok: true, text: async () => JSON.stringify({ pois: POIS }) };
+        if (url.endsWith('/species.json'))
+          return { ok: true, text: async () => JSON.stringify(SPECIES) };
+        return { ok: false, text: async () => '' };
+      };
+      const sites = await loadJournalSites([], fetchFn);
+      expect(sites.map((site) => site.id)).toEqual(['reef', 'neighbor']);
+      expect(requests.every((url) => !url.includes('retired-site'))).toBe(true);
+      const reef = sites[0];
+      const mound = reef.entries.find((entry) => entry.id === 'mound')!;
+      const wreck = reef.entries.find((entry) => entry.id === 'wreck')!;
+      expect(isSiteUnlocked(reef, store)).toBe(true);
+      expect(isEntryUnlocked(reef, mound, store)).toBe(true);
+      expect(isEntryUnlocked(reef, wreck, store)).toBe(false);
+      expect(isSiteUnlocked(sites[1], store)).toBe(false);
+      expect(siteProgress(reef, store)).toEqual({
+        logged: 2,
+        total: 4,
+        species: 1,
+        speciesTotal: 3,
+      });
+      expect(bytes.get(DISCOVERY_STORAGE_KEY)).toBe(original);
+      expect(writes).toEqual([DISCOVERY_STORAGE_KEY]);
+
+      const retired = store.get('retired-site', 'reef-wreck');
+      expect(store.record('reef', 'reef-wreck').firstTime).toBe(true);
+      const saved = bytes.get(DISCOVERY_STORAGE_KEY);
+      const reloaded = new DiscoveryStore(storage);
+      const loadedSites = await loadJournalSites([], fetchFn);
+      expect(isEntryUnlocked(loadedSites[0], wreck, reloaded)).toBe(true);
+      expect(isEntryUnlocked(loadedSites[0], mound, reloaded)).toBe(true);
+      expect(siteProgress(loadedSites[0], reloaded)).toEqual({
+        logged: 3,
+        total: 4,
+        species: 1,
+        speciesTotal: 3,
+      });
+      expect(isSiteUnlocked(loadedSites[1], reloaded)).toBe(false);
+      expect(reloaded.get('retired-site', 'reef-wreck')).toEqual(retired);
+      expect(reloaded.get('reef', 'reef-mound')?.count).toBe(1);
+      expect(bytes.get(DISCOVERY_STORAGE_KEY)).toBe(saved);
+      expect(writes).toEqual([DISCOVERY_STORAGE_KEY, DISCOVERY_STORAGE_KEY]);
+    },
+  );
+
   it('retains neighboring content when a guide body fails and restores authored grouping on a fresh load', async () => {
     const guide = {
       ...GUIDE,

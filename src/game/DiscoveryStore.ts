@@ -83,13 +83,13 @@ export function migrate(raw: unknown, fallbackAt = new Date().toISOString()): Di
   const out = emptyDiscoveryData();
   const addKeys = (keys: unknown[]): void => {
     for (const k of keys) {
-      if (typeof k === 'string' && k.includes('/'))
+      if (typeof k === 'string' && k.includes('/') && !Object.hasOwn(out.discovered, k))
         out.discovered[k] = { at: fallbackAt, count: 1 };
     }
   };
   const addMap = (map: Record<string, unknown>): void => {
     for (const [k, v] of Object.entries(map)) {
-      if (!k.includes('/')) continue;
+      if (!k.includes('/') || Object.hasOwn(out.discovered, k)) continue;
       const rec = sanitizeRecord(v, fallbackAt);
       if (rec) out.discovered[k] = rec;
     }
@@ -104,6 +104,11 @@ export function migrate(raw: unknown, fallbackAt = new Date().toISOString()): Di
     if (Array.isArray(d)) addKeys(d);
     else if (typeof d === 'object' && d !== null) addMap(d as Record<string, unknown>);
     else if (o.version === undefined || o.version === 0) addMap(o);
+    // A partial current field must not hide discoveries still in the legacy field.
+    const legacy = o.discoveries;
+    if (Array.isArray(legacy)) addKeys(legacy);
+    else if (typeof legacy === 'object' && legacy !== null)
+      addMap(legacy as Record<string, unknown>);
     const s = o.stats;
     if (typeof s === 'object' && s !== null) {
       const so = s as Record<string, unknown>;

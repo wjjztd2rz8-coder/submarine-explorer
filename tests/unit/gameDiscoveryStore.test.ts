@@ -77,6 +77,76 @@ describe('DiscoveryStore', () => {
     expect(store.discoveredFor('nope')).toEqual([]);
   });
 
+  it.each([
+    {
+      label: 'duplicate legacy list',
+      raw: ['titanic/bow', null, 'titanic/bow', 7, 'retired-site/bow', 'junk'],
+      count: 1,
+    },
+    {
+      label: 'partial current map',
+      raw: {
+        version: 1,
+        discovered: {
+          'titanic/bow': { at: T0.toISOString(), count: 3 },
+          'titanic/stern': null,
+          'retired-site/bow': true,
+          junk: { count: 1 },
+        },
+        stats: { scans: 'damaged' },
+      },
+      count: 3,
+    },
+  ])(
+    'retains valid discoveries from a $label through the next scan and reload',
+    ({ raw, count }) => {
+      const storage = new MemoryStorage();
+      const original = JSON.stringify(raw);
+      storage.setItem(DISCOVERY_STORAGE_KEY, original);
+      const store = new DiscoveryStore(storage, () => T0);
+      expect(store.keys()).toEqual(['titanic/bow', 'retired-site/bow']);
+      expect(store.stats).toEqual({ scans: count + 1, firstAt: T0.toISOString() });
+      expect(storage.getItem(DISCOVERY_STORAGE_KEY)).toBe(original);
+      expect(store.isDiscovered('titanic', 'stern')).toBe(false);
+      expect(store.record('titanic', 'stern').firstTime).toBe(true);
+      const reloaded = new DiscoveryStore(storage, () => T1);
+      expect(reloaded.snapshot()).toEqual(store.snapshot());
+      expect(reloaded.get('titanic', 'bow')).toEqual({ at: T0.toISOString(), count });
+      expect(reloaded.discoveredFor('retired-site')).toEqual(['bow']);
+      expect(reloaded.stats.scans).toBe(count + 2);
+    },
+  );
+
+  it.each([
+    { discovered: [], bow: { at: T1.toISOString(), count: 1 } },
+    { discovered: false, bow: { at: T1.toISOString(), count: 1 } },
+    {
+      discovered: { 'titanic/bow': { at: T0.toISOString(), count: 4 } },
+      bow: { at: T0.toISOString(), count: 4 },
+    },
+  ])(
+    'recovers legacy discoveries beside a partial current field $discovered without replacing current metadata',
+    ({ discovered, bow }) => {
+      const storage = new MemoryStorage();
+      storage.setItem(
+        DISCOVERY_STORAGE_KEY,
+        JSON.stringify({
+          version: 1,
+          discovered,
+          discoveries: ['titanic/bow', 'titanic/stern', 'titanic/stern', 'retired-site/bow'],
+        }),
+      );
+      const store = new DiscoveryStore(storage, () => T1);
+      expect(store.keys()).toEqual(['titanic/bow', 'titanic/stern', 'retired-site/bow']);
+      expect(store.get('titanic', 'bow')).toEqual(bow);
+      expect(store.record('titanic', 'stern').firstTime).toBe(false);
+      const reloaded = new DiscoveryStore(storage, () => T1);
+      expect(reloaded.snapshot()).toEqual(store.snapshot());
+      expect(reloaded.get('titanic', 'bow')).toEqual(bow);
+      expect(reloaded.get('titanic', 'stern')?.count).toBe(2);
+    },
+  );
+
   it('reset() clears memory and storage', () => {
     const storage = new MemoryStorage();
     const store = new DiscoveryStore(storage);
@@ -114,10 +184,15 @@ describe('DiscoveryStore', () => {
 
   it('does not overwrite a save from a newer version', () => {
     const storage = new MemoryStorage();
-    const future = JSON.stringify({ version: 99, whatever: true });
+    const future = JSON.stringify({
+      version: 99,
+      discovered: { 'titanic/bow': true },
+      discoveries: ['titanic/stern'],
+    });
     storage.setItem(DISCOVERY_STORAGE_KEY, future);
     const store = new DiscoveryStore(storage);
     expect(store.readOnly).toBe(true);
+    expect(store.keys()).toEqual([]);
     store.record('a', 'b');
     store.reset();
     expect(storage.getItem(DISCOVERY_STORAGE_KEY)).toBe(future);
@@ -152,6 +227,29 @@ describe('migrate', () => {
     );
     expect(d.discovered).toEqual({ 'a/b': { at, count: 1 } });
     expect(d.stats.scans).toBe(1);
+  });
+
+  it('fills damaged current map entries from a legacy map and counts each discovery once', () => {
+    const d = migrate(
+      {
+        version: 1,
+        discovered: { 'a/b': { at, count: 4 }, 'a/c': null },
+        discoveries: {
+          'a/b': { at: T1.toISOString(), count: 9 },
+          'a/c': { at, count: 2 },
+          'retired-site/b': true,
+          junk: true,
+        },
+        stats: { scans: 0 },
+      },
+      at,
+    );
+    expect(d.discovered).toEqual({
+      'a/b': { at, count: 4 },
+      'a/c': { at, count: 2 },
+      'retired-site/b': { at, count: 1 },
+    });
+    expect(d.stats).toEqual({ scans: 7, firstAt: at });
   });
 
   it('returns an empty document for garbage', () => {

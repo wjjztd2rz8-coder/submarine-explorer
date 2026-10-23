@@ -1,12 +1,17 @@
 /**
  * Mission core: mission.json validation, the landmarks manifest, and the
- * Mission state machine driven by a fake bus (no DOM, no Three.js).
+ * Mission state machine driven by a fake bus and headless scans (no DOM).
  */
 
 import { describe, expect, it } from 'vitest';
 import { EventBus } from '../../src/core/EventBus.js';
+import { DEFAULT_CONFIG } from '../../src/core/Config.js';
+import { Vector3 } from 'three';
+import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
+import { Scanner } from '../../src/game/Scanner.js';
 import {
   Mission,
+  nextScanObjective,
   loadMission,
   loadMissionSummaries,
   parseMission,
@@ -50,6 +55,69 @@ function fakeFetch(files: Record<string, unknown>): FetchJson {
     return { ok: true, text: async () => JSON.stringify(hit) };
   };
 }
+
+it('reloads a mid-mission save with Journal discoveries intact and a scannable opening objective', () => {
+  const values = new Map<string, string>();
+  const storage = {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      values.set(key, value);
+    },
+    removeItem: (key: string) => {
+      values.delete(key);
+    },
+  };
+  const bus = new EventBus();
+  const mission = new Mission({ def: def(), bus });
+  const store = new DiscoveryStore(storage);
+  const scanner = new Scanner(DEFAULT_CONFIG.scan, bus, store);
+  const target = (id: string) => ({
+    id,
+    name: id,
+    landmarkId: 'site',
+    position: new Vector3(0, -100, -10),
+    radius: 20,
+    scanSeconds: 2,
+  });
+  const position = new Vector3(0, -100, 0);
+  const forward = new Vector3(0, 0, -1);
+  mission.start('site-tile');
+  mission.update(30);
+  scanner.setTargets([target('poi-a')]);
+  scanner.update(2, position, forward, true);
+  expect(mission.counts()).toEqual({ completed: 1, total: 3 });
+  expect(store.isDiscovered('site', 'poi-a')).toBe(true);
+  scanner.setTargets([target('poi-b')]);
+  scanner.update(1, position, forward, true);
+  expect(scanner.view.progress).toBe(0.5);
+  expect(store.isDiscovered('site', 'poi-b')).toBe(false);
+  const saved = new Map(values);
+  const firstRecord = store.get('site', 'poi-a');
+  mission.dispose();
+
+  const reloadedBus = new EventBus();
+  const reloaded = new Mission({ def: def(), bus: reloadedBus });
+  const journal = new DiscoveryStore(storage);
+  const beam = new Scanner(DEFAULT_CONFIG.scan, reloadedBus, journal);
+  expect(reloaded.state).toBe('briefing');
+  expect(reloaded.elapsedS).toBe(0);
+  expect(reloaded.counts()).toEqual({ completed: 0, total: 3 });
+  expect(nextScanObjective(reloaded.objectives)?.poiId).toBe('poi-a');
+  expect(beam.view.progress).toBe(0);
+  expect(beam.view.completed).toBe(0);
+  expect(journal.keys()).toEqual(['site/poi-a']);
+  expect(values).toEqual(saved);
+  reloaded.start('site-tile');
+  beam.setTargets([target('poi-a')]);
+  beam.update(2, position, forward, true);
+  expect(beam.view.lastCompleteFirstTime).toBe(false);
+  expect(reloaded.counts()).toEqual({ completed: 1, total: 3 });
+  expect(reloaded.state).toBe('diving');
+  expect(nextScanObjective(reloaded.objectives)?.poiId).toBe('poi-b');
+  expect(journal.get('site', 'poi-a')).toEqual({ ...firstRecord, count: 2 });
+  expect(new DiscoveryStore(storage).keys()).toEqual(['site/poi-a']);
+  reloaded.dispose();
+});
 
 describe('parseMission', () => {
   it('accepts the contracts §2.4 shape', () => {
