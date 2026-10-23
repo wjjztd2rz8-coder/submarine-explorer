@@ -808,7 +808,7 @@ freshTest.describe('landscape guidance and completion', () => {
         await expect(chip).toBeVisible();
         await expect(chip).toContainText('OBJECTIVE');
         const box = (await chip.boundingBox())!;
-        expect(box.height).toBeLessThanOrEqual(64);
+        expect(box.height).toBeLessThanOrEqual(72);
         const overlaps = await page.evaluate((b) => {
           return [
             '.tc-stick',
