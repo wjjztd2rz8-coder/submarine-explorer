@@ -746,6 +746,13 @@ describe('site manifest atmosphere validation', () => {
   });
 });
 
+const LIFTED_FILL: Record<string, number> = {
+  'blake-plateau-corals': 11,
+  'hunga-tonga-caldera': 9,
+  'axial-seamount-ashes': 14,
+  'hudson-canyon': 15,
+};
+
 it('ships exactly the authored atmosphere policies and leaves other sites absent', () => {
   const low = [
     'axial-seamount-ashes',
@@ -758,6 +765,7 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
     'lost-city',
   ];
   const allTiers = [
+    'axial-seamount-ashes',
     'bismarck',
     'blake-plateau-corals',
     'hudson-canyon',
@@ -784,13 +792,9 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
             // Kamaʻehuakanaloa's spawn hangs in open water over a dark slope, so its fill is lifted.
             id === 'kamaehuakanaloa'
               ? { depthM: -200, color: 0x9aa6ad, intensity: 18 }
-              : // Blake and Hunga lift the same fill so the opening bed reads.
-                id === 'blake-plateau-corals' || id === 'hunga-tonga-caldera'
-                ? {
-                    depthM: -200,
-                    color: 0x6f8f9e,
-                    intensity: id === 'blake-plateau-corals' ? 11 : 9,
-                  }
+              : // Blake, Hunga, Axial and Hudson lift the same fill so the opening bed reads.
+                id in LIFTED_FILL
+                ? { depthM: -200, color: 0x6f8f9e, intensity: LIFTED_FILL[id] }
                 : { depthM: -200, color: 0x879399, intensity: 6 },
           ]),
         ),

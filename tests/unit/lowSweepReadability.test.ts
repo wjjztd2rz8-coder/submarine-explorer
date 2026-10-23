@@ -36,6 +36,7 @@ const lowReadabilitySites = [
   'lost-city',
 ];
 const allTierFloorSites = [
+  'axial-seamount-ashes',
   'bismarck',
   'blake-plateau-corals',
   'hudson-canyon',
