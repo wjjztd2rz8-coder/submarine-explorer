@@ -280,4 +280,5 @@ Run 72's `start` exited 75 (Codex 5h 17% < 20%) under nohup, so nobody saw it; `
 ## 2026-10-22 (night): joint review plumbing
 
 Creating `.cache/review/current` as a directory before `codex-review.sh start` makes its `ln -sfn` nest inside it, so reconcile never finds `sol-review.md` and hangs; killing a reconcile mid-run leaves a `codex exec resume` process holding the thread (later reconciles fail with "active writer"). Rule: never create `.cache/review/current` by hand (write the draft only after `start` has made the symlink), and wait for a stale resume process to exit before retrying. Background Bash commands are stopped after 10 min regardless of `timeout`; poll the output file in 10-min foreground loops.
+
 - 2026-10-23 review: no process change; Codex queue refilled (3380). Sol skipped (Codex 5h 11%).
