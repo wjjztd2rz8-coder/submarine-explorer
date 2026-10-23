@@ -2,6 +2,24 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-23 (evening) comprehensive review, Claude alone (golden 2026-10-23-194733)
+
+**Sol did not review:** Codex 5h at 5% (< start gate). Scores are mine and may run ~0.2 high. Opening frames of Titanic, Blue Hole, Lost City, Beebe, Endurance, Monterey and Challenger viewed against the morning set; no new live play captures (play check rests on 3290's clean debrief/Journal audit; 3310 e2e extension still unverified in its worktree).
+
+**Changed since the morning review (~20 merges):** Claude: V-eight-sites-lit b (Blake ~3.3, Hunga ~3.5) and c (Axial ~3.3, Hudson ~3.2). Codex (all tests/guards, clean): 3350, 3360, 3370 (first-move anchor), 3390-3410, 3420 (late-placement first-move fix), 3430, 3440 (gamepad-denied guard); CI fix for the hud-touch chip budget. Tag f63 on 66c9147 (green hosted CI). The golden set covers seven sites only, so the b/c gains are not in it.
+
+**Scores, readable / beautiful:** Titanic 4 / 3.7 (hull warm and legible, sub still sits on the bow); Lost City 3.5 / 3.4 (tower reads, cool grey, hill and foot sparse); Blue Hole 3.5 / 3.4 (lip is a rolled arch, still terraced); Beebe 4 / 3.6 (strongest); Monterey 4 / 3.8 (strata and corals; apron smoother than ledges); Challenger 3.5 / 3.4 (lander and flag clear, seabed flat); Endurance 3.2 / 3.0 (small hull, sub floating high in bare water).
+
+**Biggest gaps:** unchanged: no hero consistently at 4; Blue Hole lip needs a prop-built or two-sided profile; Endurance needs owner choice (85 m opening or richer hull); phone retest.
+
+**Process:** efficiency.sh: Claude week 80% (~13%/day), Codex week 85% (~67%/day, paced by the dispatcher), no failed timer runs. Codex queue was empty; refilled 3510 (journeys on current main), 3520 (smallest scarp fix), 3530 (lifecycle bug hunt). Claude merged work needs the affected e2e specs when openings move (lesson stands). No tooling change.
+
+**New priorities:** order unchanged. Claude lanes unblocked: V-bluehole-silhouette (new technique), V-monterey-apron, V-challenger-ripples, V-lostcity-foot, V-endurance-spawn (needs owner), V-eight-sites-lit follow-ups (Hudson ledge, Axial chimney scale).
+
+**Stage:** about 83-84% to 1.0; ~5 weeks (not cross-checked with Sol).
+
+**Needs owner:** (1) delete the four S-collision expected-failure cases?; (2) ~85 m Endurance opening OK or richer hull; (3) phone retest on the newest build.
+
 ## 2026-10-23 (morning) comprehensive review, Claude alone (golden 2026-10-23-111524)
 
 **Sol did not review:** Codex 5h is at 11% (< the 20% start gate); `codex-review.sh start` exited 75. Scores are mine and may run ~0.2 high. Opening frames of seven sites viewed; no new live play captures, so the play check rests on 3290's clean debrief/Journal audit and 3310 (journeys on current main, still running).
