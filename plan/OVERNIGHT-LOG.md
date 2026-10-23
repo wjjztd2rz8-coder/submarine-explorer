@@ -1708,3 +1708,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Review in plan/REVIEWS.md and STATUS.md (Sol skipped, Codex 5h 11%). Stage ~83%. Merged V-monterey-apron (rubble size retune, ~3.85, modest). Queued Codex 3380 (CI watch for a taggable SHA); 3310, 3320, 3340, 3350 running, 3360/3370 queued. Hosted CI for run 90 pushes still pending; no tag.
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening or richer hull; phone retest.
+
+## 2026-10-23 07:59 CDT headless run 92 (Claude): collection only
+
+- Merged and pushed (smoke + project-base green): Codex 3350 tile-load failure tests; Codex 3310 scanner/overlay fixes (objective wins next hold, touch turn cue) with unit tests only. 3310's e2e journey extension conflicted with main's R-ci-green-3 spec fixes and was left in its worktree (branch codex/3310-...), unverified.
+- 3320 (full e2e) and 3340 (touch HUD) were blocked by the Codex sandbox (no localhost); worktrees kept for a Claude-side run. Codex 5h ~6%, so 3360/3370/3380 stay queued. Hosted CI for run 91 still unchecked. No tag, no Claude art package.
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening or richer hull; phone retest.
