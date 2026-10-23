@@ -1730,3 +1730,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged and pushed (smoke + project-base green): Codex 3390 (clean verify), 3400 (mission-core guard tests), 3410 (report: late optional-props placement can set the first-move flag; fix queued as 3420). Sonnet V-eight-sites-lit part b (Blake ~3.3, Hunga ~3.5: horizon fade plus ambient in site data; Blake upper half still dark open water). Queued 3420, 3430, 3440 for Codex. Kept in worktrees: 3310 e2e extension, 3320, 3340, 3380, 2980/3050. One gate run failed once then passed twice unchanged (flake). No tag (hosted CI of f62+ not rechecked).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-23 12:08 CDT headless run 96 (Claude): no-op
+
+- Started minutes after run 95. No Codex task running (Codex 5h 4% until 13:45); 3420/3430/3440 worktrees hold uncommitted, unverified Codex edits (3420 firstMove fix, 3440 input/settings tests), left for the next run after the reset. Hosted CI for the run 95 push still in progress; no tag. No Claude package started.
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
