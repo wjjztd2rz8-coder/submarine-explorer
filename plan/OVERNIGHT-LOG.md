@@ -1826,3 +1826,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Started minutes after run 113. Nothing new to collect; no Codex task running (Codex 5h 6%, dispatch waits for 20%), 3730-3750 queued. Older held worktrees unchanged. No Claude package (run 113 just merged one; remaining V-* items gain ~0.1 each), no tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-24 10:14 CDT headless run 115 (Claude): one Sonnet package
+
+- Merged (smoke + project-base green on main): Sonnet V-lostcity-foot-2, a per-biome `scatterTint` for rock scatter (Lost City rubble orange to olive-grey, no new instances; two Beebe snapshots rebaselined; ~3.6 by my read, agent said 3.7). Codex 5h ~6%, nothing running, 3730-3750 queued. No tag (f64 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
