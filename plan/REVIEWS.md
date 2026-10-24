@@ -8,6 +8,24 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-24 (afternoon) comprehensive review, Claude alone (golden 2026-10-24-165922)
+
+**Sol did not review:** Codex 5h is 4% (`codex-review.sh start` skipped, below the gate). Scores are mine and may run ~0.2 high. Challenger, Lost City and Blue Hole opening frames viewed against the midday set; no new live play captures.
+
+**Changed since the midday review (9 merges):** Codex: 3730 battery/oxygen boundary tests, 3740/3750 clean audits, 3760 Blake dome tests, 3770 Challenger fade table, 3780 CI audit (found the red reef draw-count expectation, fixed), 3790 save round trip, 3800 and 3810 (3800 found a rooted-life band defect, fixed by Haiku as 3830). Claude: V-challenger-ripples-2 (ripples now in the Challenger opening view) and V-lostcity-foot-2 (olive-grey scatter tint).
+
+**Scores, readable / beautiful:** Titanic 4 / 3.7; Lost City 3.6 / 3.6; Blue Hole 3.5 / 3.4 (lip still a terraced arch); Beebe 4 / 3.6; Monterey 4 / 3.8; Challenger 3.6 / 3.6 (ripples visible, lander and flag clear; bow of the sub still shows a white notch); Endurance 3.2 / 3.0; Blake ~3.4.
+
+**Biggest gaps:** unchanged: Blue Hole lip, Endurance (owner choice), no hero consistently at 4, phone retest. Hosted CI for the run 117 reef fix was still pending; d-shell journey flake (3820 queued) blocks a clean tag.
+
+**Process:** efficiency.sh: Claude week 71% (~11%/day, fine), idle 14-28 h/24 h but the idle runs are collection-only runs with art items at ~0.1 gain each; Codex week 28% (~66%/day), 5h at 4%, dispatch waits. 408 budget-gate skips, no failed timer runs. No tooling change. Fourth review in two days, all Claude-alone: reviews triggered by Codex test-only merges add little, so the next review should wait for a visual merge or a tag.
+
+**New priorities:** DIRECTOR Backlog trimmed (V-challenger-ripples and V-lostcity-foot removed as done). Claude lanes unblocked: V-bluehole-silhouette, V-eight-sites-lit follow-ups, V-monterey-apron, P2-globe-bright, P2-text-size, V-bluehole-hood. Codex queue: 3820 (d-shell journey timing), 3840 (verify rooted-life fix), 3850 (scan reward bug hunt).
+
+**Stage:** about 85% to 1.0; ~5 weeks (not cross-checked with Sol).
+
+**Needs owner:** (1) delete the four S-collision expected-failure cases?; (2) ~85 m Endurance opening OK or richer hull; (3) phone retest on the newest build.
+
 ## 2026-10-24 (midday) comprehensive review, Claude alone (golden 2026-10-24-101521)
 
 **Sol did not review:** `codex-review.sh start` exited 75 (Codex 5h 6%). Scores are mine and may run ~0.2 high. Trigger was 8+ merges, but all of them were Codex test-only audits, so the goldens match the early-morning set (pose drift only); Titanic, Blue Hole, Lost City and Beebe opening frames re-viewed. No new live play captures.
