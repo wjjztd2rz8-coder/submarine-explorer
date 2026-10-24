@@ -7,10 +7,17 @@ import { makeConfig } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { Save } from '../../src/core/Save.js';
 import type { GameContext } from '../../src/app/context.js';
-import type { FrameState } from '../../src/app/System.js';
+import { SystemRunner, type FrameState } from '../../src/app/System.js';
+import { inputGateSystem, makeFrameState } from '../../src/app/loop.js';
+import { shellSystem } from '../../src/app/systems/shell.js';
+import { createSubmarineSystem } from '../../src/app/systems/submarine.js';
+import { Time } from '../../src/core/Time.js';
+import { FROZEN_INPUT } from '../../src/game/MissionRouter.js';
+import { Submarine } from '../../src/sub/Submarine.js';
+import { Vector3 } from 'three';
 import { createPowerSystem } from '../../src/app/systems/power.js';
 import { Mission, parseMission } from '../../src/game/Mission.js';
-import { startingReserves } from '../../src/game/Power.js';
+import { Power, startingReserves } from '../../src/game/Power.js';
 import titanicMission from '../../data/landmarks/titanic/mission.json';
 
 afterEach(() => vi.unstubAllGlobals());
@@ -142,39 +149,233 @@ it('keeps successive runtimes isolated when both starts precede discovery readin
   }
 });
 
+function powerFixture() {
+  vi.stubGlobal('window', new EventTarget());
+  vi.stubGlobal('document', { hidden: false });
+  const config = makeConfig();
+  const save = new Save({ config, storage: null });
+  save.setGameplayMode('realistic');
+  const effective = resolveEffective(save.get(), 'realistic', null, config);
+  const sub = new Submarine(effective.submarine, {
+    sampleHeight: () => -20000,
+    getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
+  });
+  sub.reset(0, -20, 0);
+  const ascent = vi.spyOn(sub, 'startEmergencyAscent');
+  const showDebrief = vi.fn();
+  const headlights = { on: true, setPreset: vi.fn() };
+  const debrief = { isOpen: false };
+  const ctx = {
+    config,
+    save,
+    settings: save.get(),
+    progress: new Progress(new ProgressSave(null)),
+    effective,
+    daily: null,
+    app: { state: 'dive' },
+    globe: { isOpen: false },
+    settingsScreen: { isOpen: false },
+    input: { state: { ...FROZEN_INPUT } },
+    rig: { setConfig: vi.fn() },
+    presets: { setCurrentMode: vi.fn() },
+    hud: { setCurrentMode: vi.fn(), setPowerState: vi.fn() },
+    waypoints: { setVisualHints: vi.fn() },
+    bus: new EventBus(),
+    route: null,
+    discovery: {
+      ready: Promise.resolve(),
+      pois: [],
+      scanner: { setConfig: vi.fn() },
+      guide: { isOpen: false },
+      debrief,
+      showDebrief,
+    },
+    expose: vi.fn(),
+    sub,
+    headlights,
+    sonar: { visible: true, setSensorRange: vi.fn() },
+  } as unknown as GameContext;
+  const system = createPowerSystem();
+  const submarine = createSubmarineSystem();
+  const runner = new SystemRunner(ctx);
+  // Use the production CPU hooks without constructing a hull mesh or renderer.
+  runner.init([
+    { name: shellSystem.name, frame: { 'gate.shell': shellSystem.frame!['gate.shell']! } },
+    inputGateSystem,
+    {
+      name: submarine.name,
+      frame: {
+        'sim.vehicles': submarine.frame!['sim.vehicles']!,
+        events: submarine.frame!.events!,
+      },
+    },
+    system,
+  ]);
+  const frame = (realSteps: number, extra: Partial<FrameState> = {}) => {
+    const f = {
+      ...makeFrameState(ctx),
+      realSteps,
+      fixedDt: 1 / config.physicsHz,
+      dt: realSteps / config.physicsHz,
+      ...extra,
+    };
+    runner.frame(f);
+    return f;
+  };
+  return {
+    ctx,
+    system,
+    frame,
+    ascent,
+    showDebrief,
+    headlights,
+    debrief,
+    dispose: () => runner.dispose(),
+  };
+}
+
+const loads = [
+  { throttle: 0, ballast: 0, scan: false, sonar: false, lights: false, sensors: false },
+  { throttle: 0.6, ballast: 0, scan: true, sonar: false, lights: true, sensors: true },
+  { throttle: -0.2, ballast: -0.8, scan: false, sonar: true, lights: false, sensors: true },
+];
+
+it.each(makeConfig().submarine.simSpeeds)(
+  'conserves six simulated seconds across ordinary and batched fixed steps at %s×',
+  (speed) => {
+    for (const load of loads) {
+      for (const batch of [1, 6]) {
+        const f = powerFixture();
+        try {
+          expect(f.ctx.sub.setSimSpeed(speed)).toBe(speed);
+          Object.assign(f.ctx.input.state, {
+            throttle: load.throttle,
+            ballast: load.ballast,
+            scan: load.scan,
+          });
+          f.headlights.on = load.lights;
+          f.ctx.sonar.visible = load.sonar;
+          const reference = new Power(f.ctx.effective.power, true);
+          reference.step(6, load);
+          const clock = new Time(f.ctx.config.physicsHz);
+          expect(clock.tick(0)).toBe(0);
+          const totalSteps = (6 * f.ctx.config.physicsHz) / speed;
+          for (let i = batch; i <= totalSteps; i += batch) {
+            // A microsecond past the boundary avoids rounding down an exact tick.
+            const steps = clock.tick((i * 1000) / f.ctx.config.physicsHz + 0.001);
+            expect(steps).toBe(batch);
+            f.frame(steps, { fixedDt: clock.fixedDelta, dt: clock.frameDelta });
+          }
+          expect(clock.steps).toBe(totalSteps);
+          expect(f.ctx.power.state.battery).toBeCloseTo(reference.state.battery, 12);
+          expect(f.ctx.power.state.oxygen).toBeCloseTo(reference.state.oxygen, 12);
+          expect(f.ctx.power.state).toMatchObject({ enabled: true, depleted: null });
+          expect(f.ascent).not.toHaveBeenCalled();
+          expect(f.showDebrief).not.toHaveBeenCalled();
+        } finally {
+          f.dispose();
+        }
+      }
+    }
+  },
+);
+
+it.each(makeConfig().submarine.simSpeeds)(
+  'charges only admitted fixed steps, once per active frame at %s×',
+  (speed) => {
+    const f = powerFixture();
+    try {
+      f.ctx.sub.setSimSpeed(speed);
+      Object.assign(f.ctx.input.state, { throttle: 0.6, scan: true });
+      f.ctx.sonar.visible = false;
+      const step = vi.spyOn(f.ctx.power, 'step');
+      const initial = f.ctx.power.state;
+      expect(f.frame(0, { dt: 0.25 }).steps).toBe(0);
+      f.ctx.app.state = 'pause';
+      expect(f.frame(8).steps).toBe(0);
+      f.ctx.app.state = 'dive';
+      f.debrief.isOpen = true;
+      expect(f.frame(8).steps).toBe(0);
+      f.debrief.isOpen = false;
+      expect(f.frame(8, { resumeFrame: true }).steps).toBe(0);
+      expect(step).not.toHaveBeenCalled();
+      expect(f.ctx.power.state).toEqual(initial);
+      const reference = new Power(f.ctx.effective.power, true);
+      for (const steps of [1, 8]) {
+        f.frame(steps, { dt: 0.25 });
+        reference.step((steps * speed) / f.ctx.config.physicsHz, loads[1]!);
+        expect(f.ctx.power.state.battery).toBeCloseTo(reference.state.battery, 12);
+        expect(f.ctx.power.state.oxygen).toBeCloseTo(reference.state.oxygen, 12);
+      }
+      expect(step).toHaveBeenCalledTimes(2);
+      expect(f.ascent).not.toHaveBeenCalled();
+    } finally {
+      f.dispose();
+    }
+  },
+);
+
+it.each([
+  { battery: 1e-9, oxygen: 0.5, depleted: 'battery' },
+  { battery: 0.5, oxygen: 1e-9, depleted: 'oxygen' },
+  { battery: 1e-9, oxygen: 1e-9, depleted: 'battery' },
+])('dispatches one ascent for depletion from $battery/$oxygen', ({ battery, oxygen, depleted }) => {
+  for (const missionOwned of [false, true]) {
+    const f = powerFixture();
+    try {
+      if (missionOwned) {
+        // The real router's abort/debrief behavior is guarded in missionRouter.test.
+        f.ctx.missionRouter = { frozen: false, debriefOpen: false } as GameContext['missionRouter'];
+      }
+      const blow = vi.fn();
+      const off = f.ctx.bus.on('sub:emergencyBlow', blow);
+      f.ctx.power.setLevels(battery, oxygen);
+      f.frame(1);
+      expect(f.ctx.power.state.depleted).toBe(depleted);
+      if (battery === 1e-9) expect(f.ctx.power.state.battery).toBe(0);
+      if (oxygen === 1e-9) expect(f.ctx.power.state.oxygen).toBe(0);
+      expect(f.ctx.sub.getState()).toMatchObject({ emergencyBlow: true, emergencyCause: 'power' });
+      expect(f.ascent).toHaveBeenCalledOnce();
+      expect(blow).toHaveBeenCalledExactlyOnceWith({
+        depth: f.ctx.sub.getState().depth,
+        lockSeconds: f.ctx.effective.submarine.emergencyBlowLockSeconds,
+        cause: 'power',
+      });
+      expect(f.showDebrief).not.toHaveBeenCalled();
+      for (let i = 0; i < 600 && f.ctx.sub.getState().emergencyBlow; i++) {
+        f.frame(8);
+        if (f.ctx.sub.getState().emergencyBlow) expect(f.showDebrief).not.toHaveBeenCalled();
+      }
+      expect(f.ctx.sub.getState().emergencyBlow).toBe(false);
+      expect(f.ctx.sub.position.y).toBeCloseTo(-f.ctx.effective.submarine.hullRadius);
+      if (missionOwned) expect(f.showDebrief).not.toHaveBeenCalled();
+      else
+        expect(f.showDebrief).toHaveBeenCalledExactlyOnceWith(
+          { title: 'Dive aborted', subtitle: 'Supplies exhausted · safe ascent completed' },
+          null,
+        );
+      // Further active frames cannot restart the blow or repeat either dispatch.
+      for (let i = 0; i < 3; i++) f.frame(1);
+      expect(f.ascent).toHaveBeenCalledOnce();
+      expect(blow).toHaveBeenCalledOnce();
+      expect(f.showDebrief).toHaveBeenCalledTimes(missionOwned ? 0 : 1);
+      off();
+    } finally {
+      f.dispose();
+    }
+  }
+});
+
 it.each([
   [0, 0.5],
   [0.5, 0],
 ])(
   'freezes exhausted supplies (%s/%s) in Arcade and restores depletion on returning to Realistic',
   (battery, oxygen) => {
-    vi.stubGlobal('window', new EventTarget());
-    const config = makeConfig();
-    const save = new Save({ config, storage: null });
-    save.setGameplayMode('realistic');
-    const progress = new Progress(new ProgressSave(null));
-    const ctx = {
-      config,
-      save,
-      settings: save.get(),
-      progress,
-      effective: resolveEffective(save.get(), 'realistic', null, config),
-      daily: null,
-      rig: { setConfig: vi.fn() },
-      presets: { setCurrentMode: vi.fn() },
-      hud: { setCurrentMode: vi.fn() },
-      waypoints: { setVisualHints: vi.fn() },
-      bus: new EventBus(),
-      route: null,
-      discovery: { ready: Promise.resolve(), pois: [], scanner: { setConfig: vi.fn() } },
-      expose: vi.fn(),
-      sub: { simSpeed: 1, setConfig: vi.fn(), startEmergencyAscent: vi.fn() },
-      headlights: { on: true, setPreset: vi.fn() },
-      sonar: { visible: true, setSensorRange: vi.fn() },
-    } as unknown as GameContext;
-    const system = createPowerSystem();
+    const f = powerFixture();
+    const { ctx, system } = f;
+    const { save } = ctx;
     try {
-      system.init?.(ctx);
       modesSystem.init?.(ctx);
       modesSystem.start?.(ctx);
       ctx.power.setLevels(battery, oxygen);
@@ -192,7 +393,7 @@ it.each([
       expect(ctx.sub.startEmergencyAscent).toHaveBeenCalledOnce();
     } finally {
       modesSystem.dispose?.();
-      system.dispose?.();
+      f.dispose();
     }
   },
 );
