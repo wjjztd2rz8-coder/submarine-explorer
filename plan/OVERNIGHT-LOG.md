@@ -1810,3 +1810,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged and pushed (smoke + project-base green on 3660; notes-only for the others): Codex 3640 (Journal discovery) and 3650 (save migration) clean audits, 3660 (mission objective order) two sequence guards in missionRouter tests. No production defect. Removed those worktrees. 3670-3690 running; queued 3700-3720 (scan cooldown, input state, pause/resume clock). No Claude package, no tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-24 06:35 CDT headless run 112 (Claude): comprehensive review, Claude alone
+
+- Review in plan/REVIEWS.md and STATUS.md (Sol skipped: Codex 5h 6%, exit 75). Stage ~84%. Merged and pushed (smoke + project-base green on main): Codex 3670-3690 clean audits (3690 adds 10 uiHud boundary tests) and Sonnet V-eight-sites-lit (d): Blake graded water dome from site data, subtle (~3.4; agent's 3.7 not accepted). 3700-3720 running; queued 3730-3750. No tag (f64 stands; hosted CI for the latest pushes pending).
+- Process: Claude idled 14-28 h in 24 h because runs 105-111 started no package; rule logged in PROCESS-LOG (start one Sonnet package per run when 5h >= 45%).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
