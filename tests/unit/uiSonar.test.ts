@@ -17,6 +17,8 @@ import {
 } from '../../src/ui/Sonar.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import type { Terrain } from '../../src/world/Terrain.js';
+import type { PlacedPoi } from '../../src/game/Pois.js';
+import type { SubmarineState } from '../../src/sub/Submarine.js';
 import type { GameContext } from '../../src/app/context.js';
 import { sonarControlsSystem } from '../../src/app/systems/sonar.js';
 import { recordSonarCanvas } from './helpers/sonarCanvas.js';
@@ -304,14 +306,27 @@ class SonarElement extends EventTarget {
   }
 }
 
-function sonarInputFixture() {
+function sonarInputFixture(metadataOnly = false) {
   const recorder = recordSonarCanvas();
   const context = recorder.document.createElement('canvas').getContext('2d');
+  if (metadataOnly) {
+    // Consume calls without recording paths, text, images or pixels.
+    for (const name of ['beginPath', 'moveTo', 'lineTo', 'stroke', 'fillText', 'drawImage'])
+      Object.assign(context!, { [name]: () => {} });
+    Object.assign(context!, { strokeRect: () => {} });
+  }
   const win = new SonarElement('WINDOW');
   const body = new SonarElement('BODY');
   win.append(body);
-  const createElement = (tag: string) =>
-    Object.assign(new SonarElement(tag.toUpperCase()), { getContext: () => context });
+  let canvases = 0;
+  const createElement = (tag: string) => {
+    // The metadata fixture has no backing relief context; update still owns
+    // contact admission and descriptions, with no raster work or terrain mesh.
+    const backing = tag === 'canvas' && ++canvases === 2;
+    return Object.assign(new SonarElement(tag.toUpperCase()), {
+      getContext: () => (metadataOnly && backing ? null : context),
+    });
+  };
   vi.stubGlobal('window', win);
   vi.stubGlobal('Element', SonarElement);
   vi.stubGlobal('HTMLElement', SonarElement);
@@ -359,6 +374,181 @@ function sonarInputFixture() {
   };
   return { sonar, root, out, into, label, body, win, key, zoomBy, recorder, createElement };
 }
+
+describe('sonar live contact metadata', () => {
+  afterEach(() => {
+    sonarControlsSystem.dispose?.();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  const a = { id: 'a', name: 'First contact', position: { x: 20, z: 0 } } as PlacedPoi;
+  const b = { id: 'b', name: 'Next contact', position: { x: 40, z: 0 } } as PlacedPoi;
+  const pilot = { position: { x: 0, z: 0 }, headingDeg: 0 } as SubmarineState;
+
+  it('replaces objectives and POIs while consuming live and replaced scan callbacks', () => {
+    vi.spyOn(performance, 'now').mockReturnValue(1000);
+    const { sonar } = sonarInputFixture(true);
+    const scanned = new Set<string>();
+    sonar.setScanState((poi) => scanned.has(poi.id));
+    sonar.setPois([a, b]);
+    sonar.setObjective(a.id);
+    sonar.update(pilot);
+    expect(sonar.markers).toMatchObject([
+      { poiId: 'a', name: a.name, current: true, scanned: false, visible: true, icon: '◇' },
+      { poiId: 'b', name: b.name, current: false, scanned: false, visible: true, icon: '·' },
+    ]);
+    expect(sonar.canvas.getAttribute('aria-label')).toBe(
+      'Sonar map: First contact, objective; Next contact, contact',
+    );
+
+    scanned.add(a.id);
+    sonar.update(pilot);
+    expect(sonar.markers[0]).toMatchObject({ current: false, scanned: true, icon: '✓' });
+    expect(sonar.canvas.getAttribute('aria-label')).toBe(
+      'Sonar map: First contact, scanned; Next contact, contact',
+    );
+    sonar.setObjective(b.id);
+    sonar.update(pilot);
+    expect(sonar.markers).toMatchObject([
+      { poiId: 'a', current: false, scanned: true, visible: true, icon: '✓' },
+      { poiId: 'b', current: true, scanned: false, visible: true, icon: '◇' },
+    ]);
+    expect(sonar.canvas.getAttribute('aria-label')).toBe(
+      'Sonar map: First contact, scanned; Next contact, objective',
+    );
+    sonar.setObjective(null);
+    sonar.update(pilot);
+    expect(sonar.markers.every((marker) => !marker.current)).toBe(true);
+    expect(sonar.canvas.getAttribute('aria-label')).toBe(
+      'Sonar map: First contact, scanned; Next contact, contact',
+    );
+
+    const renamed = { ...b, name: 'Replacement contact' };
+    sonar.setPois([renamed]);
+    sonar.update(pilot);
+    expect(sonar.markers).toMatchObject([
+      { poiId: 'b', name: renamed.name, current: false, scanned: false, visible: true },
+    ]);
+    expect(sonar.markers).toHaveLength(1);
+    expect(sonar.canvas.getAttribute('aria-label')).toBe('Sonar map: Replacement contact, contact');
+    sonar.setScanState(() => true);
+    sonar.update(pilot);
+    expect(sonar.markers[0]).toMatchObject({ scanned: true, current: false, icon: '✓' });
+    expect(sonar.canvas.getAttribute('aria-label')).toBe('Sonar map: Replacement contact, scanned');
+    sonar.setPois([]);
+    sonar.update(pilot);
+    expect(sonar.markers).toEqual([]);
+    expect(sonar.canvas.getAttribute('aria-label')).toBe('Sonar map: no contacts in view');
+  });
+
+  it('restores current data after marker suppression and a paused hidden-map update', () => {
+    vi.spyOn(performance, 'now').mockReturnValue(1000);
+    const { sonar, root } = sonarInputFixture(true);
+    sonar.setPois([a]);
+    sonar.setObjective(a.id);
+    sonar.update(pilot);
+    sonar.setMarkersVisible(false);
+    sonar.update(pilot);
+    expect(root.classList.contains('d2-sonar-markers-hidden')).toBe(true);
+    expect(sonar.markers).toMatchObject([{ poiId: 'a', current: true, visible: false }]);
+    expect(sonar.canvas.getAttribute('aria-label')).toBe('Sonar map: no contacts in view');
+    sonar.setPois([b]);
+    sonar.setObjective(b.id);
+    sonar.update(pilot);
+    expect(sonar.markers).toHaveLength(1);
+    expect(sonar.markers[0]).toMatchObject({ poiId: 'b', current: true, visible: false });
+    sonar.setMarkersVisible(true);
+    sonar.update(pilot);
+    expect(root.classList.contains('d2-sonar-markers-hidden')).toBe(false);
+    expect(sonar.markers[0]).toMatchObject({ poiId: 'b', current: true, visible: true });
+    expect(sonar.canvas.getAttribute('aria-label')).toBe('Sonar map: Next contact, objective');
+
+    sonar.visible = false;
+    sonar.setPois([a]);
+    sonar.setObjective(null);
+    sonar.setScanState((poi) => poi.id === a.id);
+    sonar.update(pilot);
+    // Hidden maps may retain cached metadata until their next visible update.
+    sonar.visible = true;
+    sonar.update(pilot);
+    expect(sonar.markers).toHaveLength(1);
+    expect(sonar.markers[0]).toMatchObject({
+      poiId: 'a',
+      current: false,
+      scanned: true,
+      visible: true,
+      icon: '✓',
+    });
+    expect(sonar.canvas.getAttribute('aria-label')).toBe('Sonar map: First contact, scanned');
+  });
+
+  it('describes only admitted ordinary contacts after sensor and public zoom endpoint changes', () => {
+    const now = vi.spyOn(performance, 'now').mockReturnValue(1000);
+    const { sonar } = sonarInputFixture(true);
+    const far = { ...b, position: { x: 200, z: 0 } } as PlacedPoi;
+    sonar.setPois([a, far]);
+    sonar.setObjective(b.id);
+    sonar.setScanState((poi) => poi.id === a.id);
+    sonar.setSensorRange(100);
+    sonar.update(pilot);
+    expect(sonar.markers).toMatchObject([
+      { poiId: 'a', visible: true, scanned: true, current: false },
+      { poiId: 'b', visible: false, scanned: false, current: true },
+    ]);
+    expect(sonar.canvas.getAttribute('aria-label')).toBe('Sonar map: First contact, scanned');
+    sonar.setSensorRange(500);
+    sonar.update(pilot);
+    expect(sonar.markers[1].visible).toBe(true);
+    expect(sonar.canvas.getAttribute('aria-label')).toBe(
+      'Sonar map: First contact, scanned; Next contact, objective',
+    );
+    sonar.setZoom(250);
+    now.mockReturnValue(2000);
+    sonar.update(pilot);
+    expect(sonar.zoom).toBe(250);
+    expect(sonar.markers[1]).toMatchObject({ visible: false, current: true });
+    expect(sonar.canvas.getAttribute('aria-label')).toBe('Sonar map: First contact, scanned');
+    sonar.setZoom('tile');
+    now.mockReturnValue(3000);
+    sonar.update(pilot);
+    expect(sonar.zoom).toBe('tile');
+    expect(sonar.markers[1]).toMatchObject({ visible: true, current: true });
+    expect(sonar.canvas.getAttribute('aria-label')).toBe(
+      'Sonar map: First contact, scanned; Next contact, objective',
+    );
+    sonar.setSensorRange(100);
+    sonar.update(pilot);
+    expect(sonar.markers[1].visible).toBe(false);
+    expect(sonar.canvas.getAttribute('aria-label')).toBe('Sonar map: First contact, scanned');
+  });
+
+  it('keeps faint contacts anonymous and separate from ordinary sensor-filtered markers', () => {
+    vi.spyOn(performance, 'now').mockReturnValue(1000);
+    const { sonar } = sonarInputFixture(true);
+    sonar.setSensorRange(1);
+    sonar.setPois([a]);
+    sonar.setFaintContacts([{ id: 'secret-identity', position: a.position }]);
+    sonar.update(pilot);
+    expect(sonar.markers).toHaveLength(1);
+    expect(sonar.markers[0]).toMatchObject({ poiId: 'a', visible: false });
+    expect(sonar.canvas.getAttribute('aria-label')).toBe(
+      'Sonar map: no contacts in view; faint unidentified contact',
+    );
+    sonar.setMarkersVisible(false);
+    sonar.update(pilot);
+    expect(sonar.canvas.getAttribute('aria-label')).toBe('Sonar map: no contacts in view');
+    sonar.setFaintContacts([{ id: 'replacement-secret', position: b.position }]);
+    sonar.setMarkersVisible(true);
+    sonar.update(pilot);
+    expect(sonar.canvas.getAttribute('aria-label')).toBe(
+      'Sonar map: no contacts in view; faint unidentified contact',
+    );
+    sonar.setFaintContacts([]);
+    sonar.update(pilot);
+    expect(sonar.canvas.getAttribute('aria-label')).toBe('Sonar map: no contacts in view');
+  });
+});
 
 describe('sonar keyboard and button routing', () => {
   afterEach(() => {
