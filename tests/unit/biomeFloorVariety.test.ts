@@ -20,6 +20,61 @@ const flatGround = {
 const cell = { cellSizeM: 64, density: 1, rockLo: 0.05, rockHi: 0.3, seed: 7 };
 
 describe('open sediment floor variety', () => {
+  it('optional scatter tint multiplies rock colours once without changing soft life or placement', () => {
+    const biome = biomeFor('lost-city');
+    expect(biome.scatterTint).toEqual([0.62, 0.9, 0.9]);
+    const absent = { ...biome };
+    delete absent.scatterTint;
+    const identity = { ...biome, scatterTint: [1, 1, 1] as const };
+    const authored = { ...biome, scatterTint: [...biome.scatterTint!] as const };
+    const control = biomeFor('titanic');
+    expect(control.scatterTint).toBeUndefined();
+    const inputs = { biomes: BIOMES, absent, identity, authored, control };
+    const before = JSON.stringify(inputs);
+    const controlBefore = placeCell(1, -2, flatGround, control, cell);
+    const retainedControl = JSON.stringify(controlBefore);
+    // This cell populates all three stone kinds and sponges with the shipped specs.
+    const original = placeCell(1, -2, flatGround, absent, cell);
+    const neutral = placeCell(1, -2, flatGround, identity, cell);
+    const tinted = placeCell(1, -2, flatGround, authored, cell);
+    expect(neutral).toEqual(original);
+    expect(Object.keys(tinted)).toEqual(Object.keys(original));
+    for (const kind of ['boulder', 'rubble', 'dropstone', 'sponge'] as const) {
+      const base = original[kind]!;
+      const changed = tinted[kind]!;
+      expect(base.length).toBeGreaterThan(0);
+      expect(changed).toHaveLength(base.length);
+      for (const [index, instance] of changed.entries()) {
+        const uncoloured = base[index]!;
+        // Compare the supported per-cell order, including yaw/scale draws after colour.
+        expect({ ...instance, r: uncoloured.r, g: uncoloured.g, b: uncoloured.b }).toEqual(
+          uncoloured,
+        );
+        if (kind === 'sponge') expect(instance).toEqual(uncoloured);
+        else {
+          expect([uncoloured.r, uncoloured.g, uncoloured.b].every((v) => v > 0)).toBe(true);
+          expect([instance.r, instance.g, instance.b]).toEqual([
+            uncoloured.r * 0.62,
+            uncoloured.g * 0.9,
+            uncoloured.b * 0.9,
+          ]);
+        }
+      }
+    }
+    const controlAfter = placeCell(1, -2, flatGround, control, cell);
+    expect(controlBefore.dropstone!.length).toBeGreaterThan(0);
+    expect(controlAfter).toEqual(controlBefore);
+    expect(JSON.stringify(controlBefore)).toBe(retainedControl);
+    for (const placed of [original, neutral, tinted, controlBefore, controlAfter]) {
+      for (const instances of Object.values(placed)) {
+        for (const { r, g, b } of instances) {
+          expect([r, g, b].every(Number.isFinite)).toBe(true);
+        }
+      }
+    }
+    expect(JSON.stringify(inputs)).toBe(before);
+  });
+
   it('the trench floor ripples reach the whole light pool but stay bounded', () => {
     const biome = biomeFor('challenger-deep');
     expect(biome.ripple).toBeGreaterThan(1);
