@@ -7,7 +7,7 @@
 
 import * as THREE from 'three';
 import { geoDetail, type GeoDetail } from './detail.js';
-import { geoMaterial, LIFE_TINT } from './materials.js';
+import { geoMaterial, LIFE_TINT, vertexGlow } from './materials.js';
 import {
   boxCH,
   clamp01,
@@ -122,7 +122,10 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
   body.computeBoundingSphere();
   const full = new THREE.Group();
   full.name = 'coral-mound';
-  full.add(new THREE.Mesh(body, geoMaterial('sediment', d, { roughness: 0.95, bumpScale: 1 })));
+  const bodyMat = geoMaterial('sediment', d, { roughness: 0.95, bumpScale: 1 });
+  // Scattered light keeps the pale mound readable from far outside the headlight beams.
+  vertexGlow(bodyMat, 0.3, 0xe8dcc0, 0.25);
+  full.add(new THREE.Mesh(body, bodyMat));
 
   // Live colonies: three templates, instanced.
   const total = Math.round(700 * Math.min(d.growth, 1.15));
@@ -134,6 +137,7 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
     metalness: 0,
     side: THREE.DoubleSide,
   });
+  vertexGlow(cmat, 0.4, 0xf4e8d0, 0.4);
   const groups: InstanceSpec[][] = [[], [], []];
   for (let i = 0; i < total; i++) {
     const a = rnd() * 6.283;
