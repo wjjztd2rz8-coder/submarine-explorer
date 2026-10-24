@@ -208,6 +208,28 @@ describe('rooted animals and crawlers', () => {
       expect(-env.groundAt(a.x, a.z), a.def.id).toBeLessThanOrEqual(row.entry.depth[1] + 6);
     }
   });
+
+  it('keeps every rooted member inside its band at its own final spot on a steep slope', () => {
+    // Patch centres pass the cell check, but members spread across a 1.2 m/m slope.
+    const doc = parseLifeDoc(lifeJson);
+    const slope: SimEnv = { groundAt: (x) => -984.4 - 1.2 * x };
+    const sim = new LifeSim({
+      tier: LIFE_TIERS.high,
+      table: doc.sites['lost-city']!,
+      seed: 1,
+      rand: mulberry32(1),
+      env: slope,
+    });
+    sim.update(1 / 60, makeSub({ x: 13, y: -980, z: 0, hullR: 7 }));
+    const coral = sim.pool.filter((a) => a.alive && a.def.id === 'cold-water-coral');
+    expect(coral.length).toBeGreaterThan(0);
+    for (const a of coral) {
+      const row = a.group.row!;
+      const depth = -slope.groundAt(a.x, a.z);
+      expect(depth, `${a.x},${a.z}`).toBeGreaterThanOrEqual(row.entry.depth[0] - 6);
+      expect(depth, `${a.x},${a.z}`).toBeLessThanOrEqual(row.entry.depth[1] + 6);
+    }
+  });
 });
 
 describe('steering stability', () => {

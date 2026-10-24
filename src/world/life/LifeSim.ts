@@ -620,6 +620,8 @@ export class LifeSim {
     const h = (k: number): number => hash3(cx * 7 + k, cz * 13 - k, salt + k * 17);
     const x = (cx + 0.15 + 0.7 * h(1)) * cell;
     const z = (cz + 0.15 + 0.7 * h(2)) * cell;
+    const band = entryBand(row);
+    if (!band) return null;
     const g = this.newGroup(def, row, x, this.env.groundAt(x, z), z);
     g.cell = key;
     const range = row.entry.group;
@@ -636,7 +638,10 @@ export class LifeSim {
       const px = x + Math.cos(th) * rr;
       const pz = z + Math.sin(th) * rr;
       if (this.env.blocked?.(px, pz)) continue;
-      const a = this.addAgent(g, px, this.env.groundAt(px, pz), pz, instant);
+      // Depth is judged at the animal's own spot, not the patch centre the cell check used.
+      const gy = this.env.groundAt(px, pz);
+      if (!inBand(-gy, band, 6)) continue;
+      const a = this.addAgent(g, px, gy, pz, instant);
       if (!a) break;
       // Colonies: large old heads at the core, small young ones toward the fringe.
       a.scale = (1.3 - 0.75 * rf) * (0.65 + 0.7 * h(12 + i * 3));
