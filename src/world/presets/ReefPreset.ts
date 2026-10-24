@@ -18,6 +18,7 @@
 import * as THREE from 'three';
 import type { EnvPresetName } from '../../core/Config.js';
 import { mulberry, smoothstep } from './maths.js';
+import { TitanicHorizon } from './TitanicHorizon.js';
 import {
   COMMON_VERT,
   commonUniforms,
@@ -40,6 +41,7 @@ export class ReefPreset implements EnvPreset {
   private material: THREE.ShaderMaterial | null = null;
   private mesh: THREE.Mesh | null = null;
   private halo: THREE.ShaderMaterial | null = null;
+  private horizon: TitanicHorizon | null = null;
   private params: PresetParams = {};
   private readonly warm = new THREE.Color();
 
@@ -49,6 +51,10 @@ export class ReefPreset implements EnvPreset {
     const p = (this.params = ctx.params);
     this.scene = ctx.scene;
     this.warm.setHex(num(p.warmColor, 0xffe9b8));
+    if (ctx.site?.horizon) {
+      this.horizon = new TitanicHorizon(ctx.scene, ctx.site.horizon);
+      this.stats.draws += 1;
+    }
     // One cheap disc even on the low tier: it also lifts the dark hole interior there.
     this.buildHalocline(ctx);
     if (!ctx.visuals) return;
@@ -108,7 +114,7 @@ export class ReefPreset implements EnvPreset {
     this.mesh.name = 'reefShafts';
     ctx.scene.add(this.mesh);
     this.objects.push(this.mesh);
-    this.stats.draws = 1;
+    this.stats.draws += 1;
   }
 
   private buildHalocline(ctx: PresetEnterContext): void {
@@ -161,6 +167,7 @@ export class ReefPreset implements EnvPreset {
 
   update(_dt: number, ctx: PresetFrameContext): void {
     if (this.halo) updateCommonUniforms(this.halo, ctx, this.look);
+    this.horizon?.update(ctx.camera, ctx.atmo);
     // Low tier omits shafts, but still needs the site's ambient light adjustments.
     const p = this.params;
     const depth = -ctx.camera.position.y;
@@ -185,6 +192,8 @@ export class ReefPreset implements EnvPreset {
     this.material = null;
     this.mesh = null;
     this.halo = null;
+    this.horizon?.dispose();
+    this.horizon = null;
     this.stats.draws = 0;
   }
 }

@@ -828,3 +828,25 @@ describe('event anchor validation', () => {
     });
   }
 });
+
+describe('site manifest graded backdrop', () => {
+  const horizon = siteManifest('blake-plateau-corals')!.horizon!;
+  it('accepts the authored backdrop and rejects typos and bad values', () => {
+    expect(validateSiteManifest({ id: 's', horizon }, 's').horizon).toEqual(horizon);
+    expect(() => validateSiteManifest({ id: 's', horizon: { ...horizon, typo: 1 } }, 's')).toThrow(
+      'horizon.typo: unknown field',
+    );
+    for (const key of Object.keys(horizon)) {
+      expect(() =>
+        validateSiteManifest({ id: 's', horizon: { ...horizon, [key]: -1 } }, 's'),
+      ).toThrow(`horizon.${key}`);
+    }
+  });
+  it('is authored only where the water above the seabed needs grading', () => {
+    expect(
+      allSiteManifests()
+        .filter((m) => m.horizon)
+        .map((m) => m.id),
+    ).toEqual(['blake-plateau-corals']);
+  });
+});

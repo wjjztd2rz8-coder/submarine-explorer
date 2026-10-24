@@ -184,6 +184,15 @@ export interface SiteManifest {
       fogHaze: number;
     };
   };
+  /** Graded water backdrop for a non-wreck site (upper column lighter, easing to the fog colour below). */
+  horizon?: {
+    upperColor: number;
+    hazeColor: number;
+    hazePeakElevation: number;
+    fogLift: number;
+    fadeStartM: number;
+    fadeEndM: number;
+  };
   terrain?: {
     /** Select an analytic reconstruction where the survey grid cannot resolve the feature. */
     carve?: 'canyon-bend' | 'sinkhole';
@@ -479,6 +488,7 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
     'sonar',
     'terrain',
     'wreck',
+    'horizon',
   ]);
   if (root.id !== id) fail(id, 'id', `expected "${id}"`);
   const out: SiteManifest = { id };
@@ -505,6 +515,17 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
       }),
     })(id, 'wreck', root.wreck);
     out.wreck = root.wreck as SiteManifest['wreck'];
+  }
+  if (root.horizon !== undefined) {
+    fields({
+      upperColor: color,
+      hazeColor: color,
+      hazePeakElevation: positiveFraction,
+      fogLift: nonnegative,
+      fadeStartM: nonnegative,
+      fadeEndM: aboveZero,
+    })(id, 'horizon', root.horizon);
+    out.horizon = root.horizon as SiteManifest['horizon'];
   }
   if (root.terrain !== undefined) {
     fields(
