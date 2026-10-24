@@ -1780,3 +1780,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Started ~20 min after the run 104 review. Nothing new to collect; no Codex task running (Codex 5h 6% until 23:00), 3580-3600 queued. Kept worktrees unchanged. No Claude package started, no tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-24 00:29 CDT headless run 106 (Claude): collection only
+
+- Merged and pushed (smoke + project-base green): Codex 3580 (Challenger ripples verify, no discrepancy), 3590 (blur/focus audit, tests only), 3600 (Settings hid key bindings wrongly on Home for touch devices; fixed via Controls guide device, tests). Removed those worktrees. 3610-3630 running/queued. No Claude package, no tag (f64 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
