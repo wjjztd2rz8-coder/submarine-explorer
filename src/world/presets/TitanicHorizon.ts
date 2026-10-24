@@ -97,11 +97,7 @@ export class TitanicHorizon {
   update(camera: THREE.PerspectiveCamera, atmo: AtmosphereSample): void {
     // Preserve surface starts and the shallower depth bands. Full effect only
     // below 1,200 m, comfortably above the Titanic inspection depth.
-    const abyss = THREE.MathUtils.smoothstep(
-      -camera.position.y,
-      this.fadeStartM,
-      this.fadeEndM,
-    );
+    const abyss = THREE.MathUtils.smoothstep(-camera.position.y, this.fadeStartM, this.fadeEndM);
     this.dome.visible = abyss > 0;
     if (abyss <= 0) return;
     // Preserve the fog hue: the shared post pass derives its foreground
