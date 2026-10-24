@@ -3,6 +3,9 @@ import { readFileSync } from 'node:fs';
 import { expect, it } from 'vitest';
 import { Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
+import { defaultSettings } from '../../src/core/Save.js';
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { resolveScanRadius } from '../../src/game/Scanner.js';
 import { siteManifest } from '../../src/core/SiteManifest.js';
 import {
   MISSION_APPROACH_M,
@@ -43,13 +46,24 @@ it('every authored site retains its mission approach distance', () => {
 });
 
 for (const site of sites.landmarks) {
-  for (const tier of ['low', 'medium', 'high'] as const) {
-    it(`${site} ${tier}: first primary has a clear, hull-safe approach and visible navigation`, async () => {
+  const modes =
+    site === 'axial-seamount-ashes' || site === 'hudson-canyon'
+      ? (['arcade', 'realistic'] as const)
+      : (['arcade'] as const);
+  for (const { tier, mode } of (['low', 'medium', 'high'] as const).flatMap((tier) =>
+    modes.map((mode) => ({ tier, mode })),
+  )) {
+    it(`${site} ${tier} ${mode}: first primary has a clear, hull-safe approach and visible navigation`, async () => {
       const config = makeConfig();
+      const saved = defaultSettings(config);
+      const effective = resolveEffective({ ...saved, gameplayMode: mode }, mode, null, config);
       const meta = json(`data/tiles/${site}/meta.json`) as TileMeta;
       const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
       const terrain = new Terrain(
-        { meta, heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows) },
+        {
+          meta,
+          heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows),
+        },
         config.terrain,
         tier,
       );
@@ -83,7 +97,7 @@ for (const site of sites.landmarks) {
           props,
           settings,
           ratedDepth,
-          config.camera,
+          effective.camera,
         );
         expect(pose).not.toBeNull();
         const p = new Vector3(pose!.x, pose!.y, pose!.z);
@@ -110,6 +124,15 @@ for (const site of sites.landmarks) {
           expect(range - scanRadius).toBeGreaterThanOrEqual(60 - 0.01);
           expect(range).toBeLessThan(sensors.sonarPoiRange);
         }
+        // Every required contact must need an approach after the shipped mode's
+        // equipment scaling and scan floor, not only the first objective.
+        for (const primary of primaries) {
+          const radius = resolveScanRadius(
+            missionApproachScanRadius(site, primary.radius) * effective.sensor.scanRadiusMultiplier,
+            effective.scan,
+          );
+          expect(p.distanceTo(primary.position), primary.id).toBeGreaterThan(radius);
+        }
         const radius = missionApproachScanRadius(site, target.radius);
         for (let distance = 0; distance < range - radius; distance += 5) {
           const point = p.clone().lerp(target.position.clone().setY(p.y), distance / range);
@@ -119,7 +142,7 @@ for (const site of sites.landmarks) {
           expect(props.collide(point, settings.hullRadius + 4, new Vector3())).toBe(false);
         }
         for (const aspect of [1280 / 720, 390 / 844, 844 / 390]) {
-          const rig = new CameraRig(config.camera, aspect, terrain);
+          const rig = new CameraRig(effective.camera, aspect, terrain);
           rig.snap(p, pose!.yaw, 0);
           rig.camera.updateMatrixWorld(true);
           expect(
