@@ -38,7 +38,8 @@ for (const { name, url, draws, source } of [
   {
     name: 'reef',
     url: '/?tile=great-blue-hole&preset=reef&depth=20',
-    draws: 1,
+    // halocline haze + light shafts
+    draws: 2,
     source: 'param',
   },
   {
