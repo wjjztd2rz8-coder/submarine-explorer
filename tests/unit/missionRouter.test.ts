@@ -12,7 +12,12 @@ import type { GameContext } from '../../src/app/context.js';
 import { DEFAULT_CONFIG, makeConfig } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import type { FetchJson } from '../../src/game/ContentPath.js';
-import { parseMission, type MissionDef, type ObjectiveStatus } from '../../src/game/Mission.js';
+import {
+  nextScanObjective,
+  parseMission,
+  type MissionDef,
+  type ObjectiveStatus,
+} from '../../src/game/Mission.js';
 import {
   FROZEN_INPUT,
   MissionRouter,
@@ -432,6 +437,7 @@ function pauseAndResume(router: MissionRouter): void {
 describe('MissionRouter completion timing', () => {
   let router: MissionRouter;
   let bus: EventBus;
+  let options: ConstructorParameters<typeof MissionRouter>[0];
   const events = () => router.mission.emitted.map((e) => e.name);
   const scan = (poiId: 'primary' | 'optional') =>
     bus.emit('scan:complete', { poiId, landmarkId: 'reef', firstTime: true });
@@ -477,11 +483,12 @@ describe('MissionRouter completion timing', () => {
       discoveries: [],
       newEntries: [],
     };
-    router = new MissionRouter({
+    options = {
       bus,
       config: DEFAULT_CONFIG,
       meta: { id: 'reef' } as TileMeta,
       parent: body as unknown as HTMLElement,
+      navigate: vi.fn(),
       route: { missionId: 'reef', tileId: 'reef', landmarkId: 'reef', skipBriefing: true, def },
       discovery: {
         ready: Promise.resolve(),
@@ -489,7 +496,8 @@ describe('MissionRouter completion timing', () => {
         guide: { isOpen: false, open() {} },
         stats: { snapshot: (extra) => ({ ...stats, ...extra }) },
       },
-    });
+    };
+    router = new MissionRouter(options);
     await Promise.resolve();
   });
 
@@ -504,6 +512,108 @@ describe('MissionRouter completion timing', () => {
     advance(router, boundary.endsWith('pending') ? 2.75 : 3);
     expect(router.panel.bannerOpen).toBe(boundary.endsWith('open'));
   }
+
+  it('accepts optional-first and reversed primary scans without stale guidance or duplicate completion', async () => {
+    router.dispose();
+    options = {
+      ...options,
+      route: {
+        ...options.route,
+        def: {
+          ...options.route.def,
+          objectives: [
+            ...options.route.def.objectives,
+            { id: 'later', poi: 'later', type: 'scan', hint: '', title: 'Later', primary: true },
+          ],
+        },
+      },
+      discovery: {
+        ...options.discovery,
+        pois: [...options.discovery.pois, { id: 'later', name: 'later', position: POSITION }],
+      },
+    };
+    router = new MissionRouter(options);
+    await Promise.resolve();
+    expect(nextScanObjective(router.mission.objectives)?.poiId).toBe('primary');
+    for (const poiId of ['optional', 'later']) {
+      bus.emit('scan:complete', { poiId, landmarkId: 'reef', firstTime: false });
+      expect(nextScanObjective(router.mission.objectives)?.poiId).toBe('primary');
+      expect(pickNavTarget(router.mission.objectives, options.discovery.pois, POSITION)?.name).toBe(
+        'primary',
+      );
+    }
+    expect(router.mission.counts()).toEqual({ completed: 2, total: 3 });
+    advance(router, 3);
+    expect(router.panel.bannerOpen).toBe(false);
+    expect(events()).not.toContain('mission:primaryComplete');
+    scan('primary');
+    expect(nextScanObjective(router.mission.objectives)).toBeUndefined();
+    expect(pickNavTarget(router.mission.objectives, options.discovery.pois, POSITION)).toBeNull();
+    advance(router, 2.75);
+    const completedEvents = [...router.mission.emitted];
+    for (const poiId of ['later', 'optional', 'primary']) {
+      bus.emit('scan:complete', { poiId, landmarkId: 'reef', firstTime: false });
+    }
+    expect(router.mission.emitted).toEqual(completedEvents);
+    frame(router);
+    expect(router.panel.bannerOpen).toBe(true);
+    expect(title()).toBe('All objectives complete');
+    expect(control(router.panel.root, 'obj-banner-detail').textContent).toBe(
+      '3 of 3 objectives. Surface when you are ready.',
+    );
+    expect(events()).toEqual([
+      'mission:started',
+      'mission:objective',
+      'mission:objective',
+      'mission:objective',
+      'mission:primaryComplete',
+    ]);
+    expect(router.endDive()).toBe(true);
+    expect(router.debrief?.last?.title).toBe('All objectives complete');
+    router.keepExploring();
+    scan('primary');
+    expect(router.endDive()).toBe(true);
+    expect(events().filter((name) => name === 'mission:complete')).toHaveLength(1);
+  });
+
+  it('Dive again after abort reloads a fresh run whose logged objectives must be scanned again', async () => {
+    scan('primary');
+    scan('optional');
+    bus.emit('sub:emergencyBlow', { depth: 200, lockSeconds: 8, cause: 'power' });
+    frame(router, { emergencyBlow: false });
+    expect(router.debrief?.last?.title).toBe('Dive aborted');
+    expect(events()).not.toContain('mission:complete');
+    click(descendants(router.debrief!.root).find((e) => e.dataset.action === 'dive-again')!);
+    expect(options.navigate).toHaveBeenCalledExactlyOnceWith(null);
+    expect(events().at(-1)).toBe('mission:restart');
+    expect(router.mission.state).toBe('briefing');
+    expect(router.mission.counts()).toEqual({ completed: 0, total: 2 });
+    expect(router.mission.elapsedS).toBe(0);
+    expect(router.mission.durationS).toBeNull();
+    expect(router.mission.endReason).toBeNull();
+
+    // Dive again navigates; a new controller owns the next run, as on reload.
+    const aborted = router.mission;
+    router.dispose();
+    router = new MissionRouter(options);
+    await Promise.resolve();
+    expect(nextScanObjective(router.mission.objectives)?.poiId).toBe('primary');
+    advance(router, 3);
+    expect(router.panel.bannerOpen).toBe(false);
+    expect(router.mission.counts()).toEqual({ completed: 0, total: 2 });
+    bus.emit('scan:complete', { poiId: 'primary', landmarkId: 'reef', firstTime: false });
+    expect(nextScanObjective(router.mission.objectives)?.poiId).toBe('optional');
+    expect(router.endDive()).toBe(true);
+    expect(router.debrief?.last?.title).toBe('Primaries complete');
+    expect(router.debrief?.last?.objectives).toEqual({ completed: 1, total: 2 });
+    router.keepExploring();
+    bus.emit('scan:complete', { poiId: 'optional', landmarkId: 'reef', firstTime: false });
+    advance(router, 3);
+    expect(title()).toBe('All objectives complete');
+    expect(router.endDive()).toBe(true);
+    expect(events().filter((name) => name === 'mission:complete')).toHaveLength(1);
+    expect(aborted.counts()).toEqual({ completed: 0, total: 2 });
+  });
 
   it.each(['pending', 'open', 'dismissed'] as const)(
     'promotes a %s primary banner with the existing delay and full auto-dismiss lifetime',
