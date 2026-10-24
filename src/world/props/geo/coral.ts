@@ -124,7 +124,7 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
   full.name = 'coral-mound';
   const bodyMat = geoMaterial('sediment', d, { roughness: 0.95, bumpScale: 1 });
   // Scattered light keeps the pale mound readable from far outside the headlight beams.
-  vertexGlow(bodyMat, 0.3, 0xe8dcc0, 0.25);
+  vertexGlow(bodyMat, 0.45, 0xf0dcb4, 0.2);
   full.add(new THREE.Mesh(body, bodyMat));
 
   // Live colonies: three templates, instanced.
@@ -137,7 +137,7 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
     metalness: 0,
     side: THREE.DoubleSide,
   });
-  vertexGlow(cmat, 0.4, 0xf4e8d0, 0.4);
+  vertexGlow(cmat, 0.5, 0xf6e6c4, 0.45);
   const groups: InstanceSpec[][] = [[], [], []];
   for (let i = 0; i < total; i++) {
     const a = rnd() * 6.283;
