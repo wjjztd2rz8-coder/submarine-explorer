@@ -360,9 +360,13 @@ Physics is fixed-step so behaviour does not change with frame rate; sim speed
 runs more whole sub-steps inside `Submarine.step` rather than a larger `dt`.
 Scan progress takes `N/60` seconds. The mission clock uses the unfrozen frame
 delta so fixed-step backlog limits do not slow the displayed dive time.
-Both stop during briefing/globe/settings pauses and are not multiplied by sim
-speed. Everything visual uses the variable frame delta, and camera smoothing is expressed as a
-half-life so it feels identical at 30 and 144 fps.
+Both stop during briefing/globe/settings/Journal pauses and while the document
+is hidden, and are not multiplied by sim speed. The first frame after a shell,
+visibility, blur or focus transition discards physics steps and dive-clock time,
+including when RAF was suspended across the transition. Blur alone clears input;
+a visible, unfocused page can still run subsequent frames. Everything visual uses
+the variable frame delta, and camera smoothing is expressed as a half-life so it
+feels identical at 30 and 144 fps.
 
 ## Phase F structure
 
@@ -923,9 +927,13 @@ Physics is fixed-step so behaviour does not change with frame rate; sim speed
 runs more whole sub-steps inside `Submarine.step` rather than a larger `dt`.
 Scan progress takes `N/60` seconds. The mission clock uses the unfrozen frame
 delta so fixed-step backlog limits do not slow the displayed dive time.
-Both stop during briefing/globe/settings pauses and are not multiplied by sim
-speed. Everything visual uses the variable frame delta, and camera smoothing is expressed as a
-half-life so it feels identical at 30 and 144 fps.
+Both stop during briefing/globe/settings/Journal pauses and while the document
+is hidden, and are not multiplied by sim speed. The first frame after a shell,
+visibility, blur or focus transition discards physics steps and dive-clock time,
+including when RAF was suspended across the transition. Blur alone clears input;
+a visible, unfocused page can still run subsequent frames. Everything visual uses
+the variable frame delta, and camera smoothing is expressed as a half-life so it
+feels identical at 30 and 144 fps.
 
 ## Phase F structure
 

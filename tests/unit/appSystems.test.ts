@@ -86,7 +86,9 @@ it('resumes dive clocks and quality sampling without counting paused or hidden t
   const callbacks = new Map<number, FrameRequestCallback>();
   let nextId = 0;
   vi.stubGlobal('document', doc);
-  vi.stubGlobal('window', {});
+  const win = new EventTarget();
+  const removeWindowListener = vi.spyOn(win, 'removeEventListener');
+  vi.stubGlobal('window', win);
   vi.stubGlobal('requestAnimationFrame', (fn: FrameRequestCallback) => {
     callbacks.set(++nextId, fn);
     return nextId;
@@ -182,7 +184,19 @@ it('resumes dive clocks and quality sampling without counting paused or hidden t
     expect(step(240_000)).toMatchObject({ steps: 0, clock: 0 });
     expect(step(240_008).steps).toBe(0);
     expect(step(240_017).steps).toBe(1);
-    expect(mission.elapsedS).toBeCloseTo(0.325);
+    // Focus can return after RAF stalls without a visibility transition.
+    win.dispatchEvent(new Event('blur'));
+    win.dispatchEvent(new Event('focus'));
+    expect(step(300_000)).toMatchObject({ dt: 0.25, steps: 0, clock: 0 });
+    expect(step(300_008)).toMatchObject({ steps: 0, clock: expect.closeTo(0.008) });
+    expect(step(300_017).steps).toBe(1);
+    // A throttled frame after blur must not consume the later focus reset.
+    win.dispatchEvent(new Event('blur'));
+    expect(step(360_000)).toMatchObject({ steps: 0, clock: 0 });
+    win.dispatchEvent(new Event('focus'));
+    expect(step(420_000)).toMatchObject({ steps: 0, clock: 0 });
+    expect(step(420_008)).toMatchObject({ steps: 0, clock: expect.closeTo(0.008) });
+    expect(mission.elapsedS).toBeCloseTo(0.35);
     expect(stats.snapshot().elapsedS).toBeCloseTo(mission.elapsedS);
     expect(perf.pixelRatio).toBe(2);
     expect(ctx.resize).not.toHaveBeenCalled();
@@ -191,10 +205,13 @@ it('resumes dive clocks and quality sampling without counting paused or hidden t
   } finally {
     stop();
     mission.dispose();
-    expect(callbacks.size).toBe(0);
-    expect(unlisten).toHaveBeenCalledWith('visibilitychange', listen.mock.calls[0][1]);
+    input.dispose();
     vi.unstubAllGlobals();
   }
+  expect(callbacks.size).toBe(0);
+  expect(unlisten).toHaveBeenCalledWith('visibilitychange', listen.mock.calls[0][1]);
+  expect(removeWindowListener).toHaveBeenCalledWith('blur', expect.any(Function));
+  expect(removeWindowListener).toHaveBeenCalledWith('focus', expect.any(Function));
 });
 
 describe('SystemRunner', () => {

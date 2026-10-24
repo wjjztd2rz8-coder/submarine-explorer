@@ -46,7 +46,7 @@ import { createControlsSystem } from '../../src/app/systems/controls.js';
 import { createPhotoSystem } from '../../src/app/systems/photo.js';
 import { sonarControlsSystem } from '../../src/app/systems/sonar.js';
 import { createDailySystem } from '../../src/app/systems/daily.js';
-import { inputGateSystem } from '../../src/app/loop.js';
+import { inputGateSystem, startLoop } from '../../src/app/loop.js';
 import { modesSystem } from '../../src/app/systems/modes.js';
 import { settingsSystem } from '../../src/app/systems/settings.js';
 import { waypointsSystem } from '../../src/app/systems/waypoints.js';
@@ -1768,64 +1768,119 @@ describe('overlay policies across the app', () => {
     expect(cancel).toHaveBeenCalledOnce();
   });
 
-  it('mission debrief Escape keeps exploring; Journal closes first and an aborted mission remains a decision point', async () => {
-    const guide = journal();
-    const bus = new EventBus();
-    const router = new MissionRouter({
-      config: DEFAULT_CONFIG,
-      bus,
-      meta: { id: 'reef' } as GameContext['meta'],
-      route: {
-        missionId: 'reef',
-        tileId: 'reef',
-        landmarkId: 'reef',
-        skipBriefing: true,
-        def: {
-          version: 1,
-          id: 'reef',
-          tile: 'reef',
-          landmark: 'reef',
-          title: 'Reef',
-          spawn: { lat: 0, lon: 0, depth_m: 5, heading_deg: 0 },
-          briefing: { summary: '', facts: [], hazards: [] },
-          objectives: [],
-          completion: 'all_primary',
+  it.each(['primary', 'all'] as const)(
+    'keeps Journal ownership through %s completion, then resumes debrief and abort decisions',
+    async (completion) => {
+      const guide = journal();
+      const bus = new EventBus();
+      const router = new MissionRouter({
+        config: DEFAULT_CONFIG,
+        bus,
+        meta: { id: 'reef' } as GameContext['meta'],
+        route: {
+          missionId: 'reef',
+          tileId: 'reef',
+          landmarkId: 'reef',
+          skipBriefing: true,
+          def: {
+            version: 1,
+            id: 'reef',
+            tile: 'reef',
+            landmark: 'reef',
+            title: 'Reef',
+            spawn: { lat: 0, lon: 0, depth_m: 5, heading_deg: 0 },
+            briefing: { summary: '', facts: [], hazards: [] },
+            objectives: [
+              {
+                id: 'primary',
+                poi: 'primary',
+                type: 'scan',
+                title: 'Primary',
+                hint: '',
+                primary: true,
+              },
+              {
+                id: 'optional',
+                poi: 'optional',
+                type: 'scan',
+                title: 'Optional',
+                hint: '',
+                primary: false,
+              },
+            ],
+            completion: 'all_primary',
+          },
         },
-      },
-      discovery: {
-        ready: Promise.resolve(),
-        pois: [],
-        guide,
-        stats: { snapshot: (extra) => ({ ...stats, ...extra }) },
-      },
-    });
-    cleanup.push(() => router.dispose());
-    await Promise.resolve();
-    const fallback = shell();
-    expect(router.endDive()).toBe(true);
-    const debrief = router.debrief!;
-    press('Tab');
-    const control = active();
-    guide.open();
-    press('Escape');
-    expect(guide.isOpen).toBe(false);
-    expect(router.debriefOpen).toBe(true);
-    expect(active()).toBe(control);
-    press('Escape');
-    expect(router.debriefOpen).toBe(false);
-    expect(router.mission.diving).toBe(true);
-    bus.emit('sub:emergencyBlow', { depth: 200, lockSeconds: 0, cause: 'power' });
-    router.update(0, 0, { x: 0, y: 0, z: 0 }, 0, { emergencyBlow: false, depth: 5 });
-    expect(debrief.isOpen).toBe(true);
-    expect(router.mission.canResume).toBe(false);
-    guide.open();
-    press('Escape');
-    expect(guide.isOpen).toBe(false);
-    expect(debrief.isOpen).toBe(true);
-    expect(press('Escape').defaultPrevented).toBe(true);
-    expect(debrief.isOpen).toBe(true);
-    expect(fallback).not.toHaveBeenCalled();
-  });
+        discovery: {
+          ready: Promise.resolve(),
+          pois: ['primary', 'optional'].map((id) => ({
+            id,
+            name: id,
+            position: { x: 0, y: -100, z: -10 },
+          })),
+          guide,
+          stats: { snapshot: (extra) => ({ ...stats, ...extra }) },
+        },
+      });
+      cleanup.push(() => router.dispose());
+      await Promise.resolve();
+      const fallback = shell();
+      // A late scan may finish dispatching while Journal owns the keyboard.
+      guide.open();
+      press('Tab');
+      const journalControl = active();
+      bus.emit('scan:complete', { poiId: 'primary', landmarkId: 'reef', firstTime: true });
+      if (completion === 'all') {
+        bus.emit('scan:complete', { poiId: 'optional', landmarkId: 'reef', firstTime: true });
+      }
+      expect(router.mission.primaryComplete).toBe(true);
+      expect(router.mission.allComplete).toBe(completion === 'all');
+      const tick = (frozen: boolean, resumeFrame = false) => {
+        const f = { dt: 0.25, realSteps: 8, frozen, resumeFrame, sampled: {} } as FrameState;
+        inputGateSystem.frame!['gate.input']!(f, {} as GameContext);
+        router.update(f.clockDt, f.dt, { x: 0, y: -100, z: 0 }, 0);
+      };
+      for (let i = 0; i < 16; i++) tick(true);
+      expect(router.mission.elapsedS).toBe(0);
+      expect(router.panel.bannerOpen).toBe(false);
+      expect(router.debriefOpen).toBe(false);
+      expect(guide.isTop).toBe(true);
+      expect(active()).toBe(journalControl);
+      press('Escape');
+      expect(guide.isOpen).toBe(false);
+      tick(false, true);
+      for (let i = 0; i < 11; i++) tick(false);
+      expect(router.panel.bannerOpen).toBe(false);
+      const beforeBanner = active();
+      tick(false);
+      expect(router.panel.bannerOpen).toBe(true);
+      expect(router.mission.elapsedS).toBe(3);
+      expect(active()).toBe(beforeBanner);
+      expect(router.endDive()).toBe(true);
+      const debrief = router.debrief!;
+      press('Tab');
+      const control = active();
+      guide.open();
+      press('Escape');
+      expect(guide.isOpen).toBe(false);
+      expect(router.debriefOpen).toBe(true);
+      expect(active()).toBe(control);
+      press('Escape');
+      expect(router.debriefOpen).toBe(false);
+      expect(router.mission.diving).toBe(true);
+      bus.emit('sub:emergencyBlow', { depth: 200, lockSeconds: 0, cause: 'power' });
+      router.update(0, 0, { x: 0, y: 0, z: 0 }, 0, { emergencyBlow: false, depth: 5 });
+      expect(debrief.isOpen).toBe(true);
+      expect(router.mission.canResume).toBe(false);
+      guide.open();
+      press('Escape');
+      expect(guide.isOpen).toBe(false);
+      expect(debrief.isOpen).toBe(true);
+      expect(press('Escape').defaultPrevented).toBe(true);
+      expect(debrief.isOpen).toBe(true);
+      expect(fallback).not.toHaveBeenCalled();
+    },
+  );
 
   it('power exhaustion opens a non-dismissible free-dive debrief, with Journal and Settings above it', () => {
     const guide = journal();
@@ -2809,6 +2864,144 @@ it('Discovery host disposal releases Journal/debrief ownership even with both op
   expect(ctx.discovery.debrief.root.isConnected).toBe(false);
   expect(press('Escape').defaultPrevented).toBe(false);
 });
+
+it.each(['pause', 'journal', 'hidden', 'blur then hidden', 'hidden then blur'] as const)(
+  'interrupts a scan once through %s and excludes a long resume interval',
+  async (boundary) => {
+    // Exercise real discovery and frame gates: frozen time must neither scan nor decay.
+    const events = new EventTarget();
+    Object.assign(document, {
+      hidden: false,
+      addEventListener: events.addEventListener.bind(events),
+      removeEventListener: events.removeEventListener.bind(events),
+    });
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, text: async () => '[]' }));
+    vi.spyOn(Journal.prototype, 'load').mockResolvedValue();
+    const callbacks = new Map<number, FrameRequestCallback>();
+    let nextId = 0;
+    vi.stubGlobal('requestAnimationFrame', (fn: FrameRequestCallback) => {
+      callbacks.set(++nextId, fn);
+      return nextId;
+    });
+    vi.stubGlobal('cancelAnimationFrame', (id: number) => callbacks.delete(id));
+    const ctx = {
+      bus: new EventBus(),
+      config: DEFAULT_CONFIG,
+      effective: resolveEffective(defaultSettings(DEFAULT_CONFIG), 'arcade', null),
+      meta: { id: 'reef' },
+      terrain: { sampleHeight: () => -200 },
+      contentLandmark: 'reef',
+      params: new URLSearchParams(),
+      app: { state: 'dive' },
+      globe: { isOpen: false },
+      settingsScreen: { isOpen: false },
+      photoMode: { active: false },
+      rig: {},
+      sub: {
+        getState: () => ({}),
+        position: new THREE.Vector3(0, -100, 0),
+        velocity: new THREE.Vector3(),
+      },
+      expose: vi.fn(),
+    } as unknown as GameContext;
+    discoverySystem.init!(ctx);
+    cleanup.push(() => discoverySystem.dispose?.());
+    await ctx.discovery.ready;
+    const inputSystem = createInputSystem();
+    inputSystem.init!(ctx);
+    cleanup.push(() => inputSystem.dispose?.());
+    const scanner = ctx.discovery.scanner;
+    scanner.setTargets([
+      {
+        id: 'target',
+        landmarkId: 'reef',
+        name: 'Target',
+        position: new THREE.Vector3(0, -100, -10),
+        radius: 50,
+        scanSeconds: 1,
+      },
+    ]);
+    const aborted = vi.fn();
+    const completed = vi.fn();
+    ctx.bus.on('scan:aborted', aborted);
+    ctx.bus.on('scan:complete', completed);
+    const frames: FrameState[] = [];
+    const runner = new SystemRunner(ctx);
+    runner.init([
+      { name: 'shell', frame: shellSystem.frame },
+      inputGateSystem,
+      {
+        name: 'pose',
+        frame: { 'camera.pilot': (f) => f.pilotForward.set(0, 0, -1) },
+      },
+      { name: 'discovery', frame: discoverySystem.frame },
+      { name: 'input', frame: inputSystem.frame },
+      { name: 'capture', frame: { 'late.debug': (f) => frames.push({ ...f }) } },
+    ]);
+    const stop = startLoop(ctx, runner);
+    cleanup.push(stop);
+    const step = (now: number) => {
+      const [id, fn] = callbacks.entries().next().value!;
+      callbacks.delete(id);
+      fn(now);
+      return frames.at(-1)!;
+    };
+    const setState = (state: 'pause' | 'dive') => {
+      ctx.app.state = state;
+      ctx.bus.emit('app:state', { state });
+    };
+    const visibility = (hidden: boolean) => {
+      Object.assign(document, { hidden });
+      events.dispatchEvent(new Event('visibilitychange'));
+    };
+    step(0);
+    const scanKey = ctx.input.actions.find((action) => action.id === 'scan')!.keys[0];
+    ctx.input.injectKey(scanKey, true);
+    step(100);
+    const progress = scanner.view.progress;
+    const elapsed = ctx.discovery.stats.elapsedS;
+    expect(progress).toBeGreaterThan(0);
+    if (boundary === 'pause') setState('pause');
+    else if (boundary === 'journal') ctx.discovery.guide.open();
+    else {
+      if (boundary === 'blur then hidden') window.dispatchEvent(new Event('blur'));
+      visibility(true);
+      if (boundary === 'hidden then blur') window.dispatchEvent(new Event('blur'));
+    }
+    for (const now of [1_000, 30_000, 60_000]) {
+      expect(step(now)).toMatchObject({ frozen: true, steps: 0, clockDt: 0 });
+      expect(scanner.view.progress).toBe(progress);
+      expect(ctx.discovery.stats.elapsedS).toBe(elapsed);
+    }
+    expect(aborted).toHaveBeenCalledExactlyOnceWith({ poiId: 'target', reason: 'released' });
+    expect(scanner.view.phase).toBe('interrupted');
+    expect(completed).not.toHaveBeenCalled();
+    if (boundary === 'pause') setState('dive');
+    else if (boundary === 'journal') ctx.discovery.guide.close();
+    else {
+      if (boundary === 'hidden then blur') window.dispatchEvent(new Event('focus'));
+      visibility(false);
+      if (boundary !== 'hidden then blur') window.dispatchEvent(new Event('focus'));
+    }
+    expect(step(3_600_000)).toMatchObject({ frozen: false, steps: 0, clockDt: 0 });
+    expect(scanner.view.progress).toBe(progress);
+    expect(ctx.discovery.stats.elapsedS).toBe(elapsed);
+    expect(ctx.input.state.scan).toBe(false);
+    step(3_600_100);
+    expect(scanner.view.progress).toBeLessThan(progress);
+    ctx.input.injectKey(scanKey, true);
+    for (let now = 3_600_200; now <= 3_601_500; now += 100) step(now);
+    expect(completed).toHaveBeenCalledExactlyOnceWith({
+      poiId: 'target',
+      landmarkId: 'reef',
+      firstTime: true,
+    });
+    expect(ctx.discovery.store.get('reef', 'target')?.count).toBe(1);
+    expect(aborted).toHaveBeenCalledOnce();
+    stop();
+    expect(callbacks.size).toBe(0);
+  },
+);
 
 it('Settings keyboard toggle retains typing and repeat guards in the shared dispatcher', () => {
   const { screen, input } = settings();
