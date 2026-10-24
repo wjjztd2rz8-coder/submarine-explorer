@@ -143,6 +143,67 @@ describe('open sediment floor variety', () => {
 });
 
 describe('site floor material bindings', () => {
+  // Regression guard: ripple reach must bind on Low too, and constructing the
+  // trench material must never change another site's default or live uniforms.
+  it.each(['low', 'medium', 'high'] as const)(
+    '%s: ripple reach binds per material without leaking into sediment controls',
+    (tier) => {
+      vi.stubGlobal('document', undefined);
+      const config = makeConfig().terrain;
+      const before = JSON.stringify({ config, biomes: BIOMES });
+      const built: ReturnType<typeof createTerrainMaterial>[] = [];
+      try {
+        for (const site of [
+          'titanic',
+          'monterey-canyon',
+          'challenger-deep',
+          'monterey-canyon',
+          'titanic',
+        ]) {
+          const biome = biomeFor(site);
+          const result = createTerrainMaterial({ config, tier, biome, exaggeration: 1 });
+          built.push(result);
+          const uniforms = result.material.userData.uniforms as Record<string, THREE.IUniform>;
+          const shader = {
+            ...THREE.ShaderLib.standard,
+            uniforms: { ...THREE.ShaderLib.standard.uniforms },
+          };
+          result.material.onBeforeCompile(
+            shader as Parameters<typeof result.material.onBeforeCompile>[0],
+            {} as THREE.WebGLRenderer,
+          );
+          expect(uniforms.uRippleReach.value).toBe(site === 'challenger-deep' ? 0.4 : 0);
+          expect(uniforms.uRipple.value).toBe(biome.ripple);
+          expect(uniforms.uRippleLen.value).toBe(biome.rippleLenM);
+          expect(uniforms.uRippleLen.value).toBeGreaterThan(0);
+          expect(
+            [
+              uniforms.uRippleReach.value,
+              uniforms.uRipple.value,
+              uniforms.uRippleLen.value,
+              ...uniforms.uRippleDir.value.toArray(),
+            ].every(Number.isFinite),
+          ).toBe(true);
+          expect((shader.uniforms as Record<string, THREE.IUniform>).uRippleReach).toBe(
+            uniforms.uRippleReach,
+          );
+          expect(shader.fragmentShader).toContain('0.38 - uRippleReach, 0.62 - uRippleReach');
+          for (const previous of built.slice(0, -1)) {
+            const retained = previous.material.userData.uniforms.uRippleReach;
+            expect(retained).not.toBe(uniforms.uRippleReach);
+            expect(retained.value).toBe(previous === built[2] ? 0.4 : 0);
+          }
+        }
+        expect(JSON.stringify({ config, biomes: BIOMES })).toBe(before);
+      } finally {
+        for (const result of built) {
+          result.material.dispose();
+          for (const texture of result.textures) texture.dispose();
+        }
+      }
+    },
+  );
+
   it.each(['low', 'medium', 'high'] as const)(
     '%s: horizon fades bind authored endpoints without leaking across material owners',
     (tier) => {
