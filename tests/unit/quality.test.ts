@@ -14,6 +14,7 @@ import {
   type PerfStats,
 } from '../../src/app/systems/quality.js';
 import type { ShellContext } from '../../src/app/context.js';
+import { Save, SETTINGS_STORAGE_KEY } from '../../src/core/Save.js';
 
 // @ts-expect-error The Node CLI module intentionally has no browser declarations.
 import { diagnosticTiers } from '../../tools/diagnostic-tiers.mjs';
@@ -127,6 +128,41 @@ describe('detectTier', () => {
 
 describe('resolveQuality', () => {
   const sw = caps({ renderer: 'SwiftShader' });
+
+  it.each(['auto', 'low', 'medium', 'high'] as const)(
+    'keeps saved %s separate from URL and device decisions across reloads',
+    (setting) => {
+      const records = new Map<string, string>();
+      const storage = {
+        getItem: (key: string) => records.get(key) ?? null,
+        setItem: (key: string, value: string) => {
+          records.set(key, value);
+        },
+        removeItem: (key: string) => {
+          records.delete(key);
+        },
+      };
+      new Save({ config: DEFAULT_CONFIG, storage }).save({ graphicsTier: setting });
+      const original = records.get(SETTINGS_STORAGE_KEY);
+      for (const device of [sw, caps({ renderer: 'NVIDIA GeForce RTX 4080' })]) {
+        const detected = device === sw ? 'low' : 'high';
+        for (const url of [null, 'medium', 'auto', 'bogus']) {
+          const restored = new Save({ config: DEFAULT_CONFIG, storage });
+          const quality = resolveQuality(url, restored.get().graphicsTier, device);
+          const auto = url === 'auto' || (url !== 'medium' && setting === 'auto');
+          expect(quality).toMatchObject({
+            tier: url === 'medium' ? 'medium' : auto ? detected : setting,
+            setting,
+            source: url === 'medium' ? 'url' : auto ? 'auto' : 'setting',
+            detected: { tier: detected },
+            urlForced: url === 'medium' || url === 'auto',
+          });
+          expect(dynamicResolutionEnabled(null, quality.source)).toBe(auto);
+          expect(records.get(SETTINGS_STORAGE_KEY)).toBe(original);
+        }
+      }
+    },
+  );
 
   it('uses detection for new players and preserves a saved fixed medium tier', () => {
     expect(DEFAULT_CONFIG.graphicsTier).toBe('auto');

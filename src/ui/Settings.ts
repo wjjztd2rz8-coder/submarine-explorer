@@ -134,6 +134,8 @@ export interface SettingsScreenOptions {
   autoTier?: GraphicsTier;
   /** False while something else owns the keyboard (e.g. the globe). */
   canOpen?: () => boolean;
+  /** Home resolves the input device without constructing dive touch controls. */
+  isTouch?: () => boolean;
   /** After any rebind / reset (the HUD help re-renders). */
   onBindingsChanged?: () => void;
   onRequestPointerLock?: () => void;
@@ -474,7 +476,8 @@ export class SettingsScreen {
 
   showControls(show: boolean): void {
     // Touch devices have no key bindings: the Controls button and section stay hidden.
-    const touch = document.documentElement.classList.contains('is-touch');
+    const touch =
+      document.documentElement.classList.contains('is-touch') || this.opts.isTouch?.() === true;
     show = show && !touch;
     if (!show && this.capturing) this.cancelCapture();
     this.controlsSection.hidden = !show;

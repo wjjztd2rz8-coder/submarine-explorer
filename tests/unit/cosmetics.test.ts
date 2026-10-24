@@ -142,6 +142,63 @@ describe('cosmetic rewards', () => {
 });
 
 describe('cosmetic save migration and gameplay isolation', () => {
+  it('round trips all four selected slots and passes the restored appearance to replacement hulls', () => {
+    const store = storage();
+    const progress = new Progress(new ProgressSave(store));
+    for (let i = 0; i < 15; i++) progress.award('poi', `site/${i}`);
+    progress.award('secret', 'site/find');
+    expect(progress.selectCosmetic('paint', 'gold')).toBe(true);
+    expect(progress.selectCosmetic('trim', 'amber')).toBe(true);
+    expect(progress.selectCosmetic('decal', 'finder')).toBe(true);
+    expect(progress.selectCosmetic('frame', 'gold')).toBe(true);
+    const selection = { paint: 'gold', trim: 'amber', decal: 'finder', frame: 'gold' };
+    const restored = new Progress(new ProgressSave(store));
+    expect(restored.cosmetics).toEqual(selection);
+    const atlas = vi.spyOn(decals, 'decalAtlas');
+    const mesh = new SubMesh({ tier: 'high', hullClass: 'A', cosmetics: restored.cosmetics });
+    try {
+      for (const hull of ['A', 'C', 'B']) {
+        mesh.setHullClass(hull);
+        expect(mesh.vehicle.materials.paintUniforms.uHullBase.value.getHex()).toBe(0xe2b23c);
+        mesh.vehicle.materials.setLensesOn(true);
+        expect((mesh.vehicle.materials.bySlot.lens as MeshBasicMaterial).color.getHex()).toBe(
+          0xffd49a,
+        );
+        expect(atlas).toHaveBeenLastCalledWith(
+          expect.objectContaining({ name: 'FINDER', number: 'FIND' }),
+        );
+      }
+      restored.award('photo', 'site/photo');
+      expect(new Progress(new ProgressSave(store)).cosmetics).toEqual(selection);
+      expect(restored.snapshot().cosmeticGrants).toEqual([]);
+    } finally {
+      mesh.dispose();
+      atlas.mockRestore();
+    }
+  });
+
+  it.each(['paint', 'trim', 'decal', 'frame'] as const)(
+    'repairs a stale %s choice without discarding valid sibling selections on reload',
+    (slot) => {
+      const store = storage();
+      const selection = { paint: 'red', trim: 'amber', decal: 'finder', frame: 'white' };
+      store.setItem(
+        PROGRESS_STORAGE_KEY,
+        JSON.stringify({
+          version: 2,
+          legacyCredited: true,
+          awarded: ['poi:site/1', 'poi:site/2', 'secret:site/find'],
+          cosmetics: { ...selection, [slot]: 'retired-choice' },
+        }),
+      );
+      const progress = new Progress(new ProgressSave(store));
+      const expected = { ...selection, [slot]: 'stock' };
+      expect(progress.cosmetics).toEqual(expected);
+      progress.award('photo', 'site/photo');
+      expect(new Progress(new ProgressSave(store)).cosmetics).toEqual(expected);
+    },
+  );
+
   it.each([0, 1, 2])(
     'does not turn truncated v%s discovery records or reward tokens into cosmetic unlocks',
     (version) => {

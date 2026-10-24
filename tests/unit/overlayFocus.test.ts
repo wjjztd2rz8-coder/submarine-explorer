@@ -12,6 +12,7 @@ import { Progress as SavedProgress } from '../../src/game/Progress.js';
 import { DailySave } from '../../src/game/DailySave.js';
 import { resolveEffective } from '../../src/game/EffectiveSettings.js';
 import { Input } from '../../src/core/Input.js';
+import { TOUCH_SEEN_KEY } from '../../src/core/Touch.js';
 import { Briefing } from '../../src/ui/Briefing.js';
 import { Debrief } from '../../src/ui/Debrief.js';
 import { Journal } from '../../src/ui/Journal.js';
@@ -1235,6 +1236,56 @@ describe('overlay policies across the app', () => {
     frame();
     expect(apply).toHaveBeenCalledExactlyOnceWith(true);
   });
+
+  it.each(['remembered', 'hardware', 'forced'])(
+    'uses %s touch detection for Home Settings before a dive creates touch controls',
+    (source) => {
+      Object.assign(window, {
+        matchMedia: () => Object.assign(new EventTarget(), { matches: source === 'hardware' }),
+      });
+      vi.stubGlobal('navigator', { maxTouchPoints: source === 'hardware' ? 5 : 0 });
+      vi.stubGlobal('localStorage', {
+        getItem: (key: string) => (source === 'remembered' && key === TOUCH_SEEN_KEY ? '1' : null),
+      });
+      const save = new Save({ config: DEFAULT_CONFIG, storage: null });
+      const ctx = {
+        config: DEFAULT_CONFIG,
+        settings: save.get(),
+        save,
+        tier: 'low',
+        quality: { setting: 'auto', urlForced: false, detected: { tier: 'low' } },
+        input: new Input({ storage: null }),
+        params: new URLSearchParams(source === 'forced' ? 'touch=1' : ''),
+        globe: { isOpen: false },
+        expose: vi.fn(),
+      } as unknown as GameContext;
+      const controls = createControlsSystem();
+      cleanup.push(() => {
+        controls.dispose?.();
+        settingsSystem.dispose?.();
+      });
+      // Home initializes Settings first and has no TouchControls or camera rig.
+      settingsSystem.init!(ctx);
+      controls.init!(ctx);
+      expect(ctx.controlsCard.device).toBe('touch');
+      const button = ctx.settingsScreen.root.querySelector<HTMLElement>('.settings-controls-open')!;
+      ctx.settingsScreen.open();
+      expect(button.hidden).toBe(true);
+      ctx.settingsScreen.showControls(true);
+      expect(
+        ctx.settingsScreen.root.querySelector('.settings-bindings')!.parentElement!.hidden,
+      ).toBe(true);
+      ctx.settingsScreen.close();
+      window.dispatchEvent(Object.assign(new Event('pointerdown'), { pointerType: 'mouse' }));
+      expect(ctx.controlsCard.device).toBe('keyboard');
+      ctx.settingsScreen.open();
+      expect(button.hidden).toBe(false);
+      ctx.settingsScreen.close();
+      window.dispatchEvent(Object.assign(new Event('pointerdown'), { pointerType: 'touch' }));
+      ctx.settingsScreen.open();
+      expect(button.hidden).toBe(true);
+    },
+  );
 
   it('applies reduced motion to waypoints once per edit and preserves the OS preference', () => {
     const motion = Object.assign(new EventTarget(), { matches: true });
