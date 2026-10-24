@@ -10,17 +10,17 @@ Shots: `.cache/codex/shots/V-eight-sites-lit-d/{before,after}-{desktop,portrait}
 - `src/world/presets/TitanicHorizon.ts`: the look type is exported and the depth fade band (`fadeStartM`, `fadeEndM`) is optional per site; defaults are the existing abyss values, so Titanic and Endurance are unchanged.
 - `tests/unit/siteManifest.test.ts`: backdrop validation and "authored only for Blake" capability checks.
 
-Cost: one extra draw call, one 32x16 dome with per-frame vertex colours, on every tier including Low (the dome is unlit and drawn before terrain, no depth writes). Within the Low budget in the perf spec if it passes below.
+Cost: one extra draw call, one 32x16 dome with per-frame vertex colours, on every tier including Low (the dome is unlit and drawn before terrain, no depth writes). The Low-tier geometry budget spec passed.
 
 ## Rating (conservative, my reading of the shots)
 
-| Shot            | Before | After |
-| --------------- | ------ | ----- |
-| Blake desktop   | 3.3    | 3.7   |
-| Blake portrait  | 3.3    | 3.7   |
+| Shot           | Before | After |
+| -------------- | ------ | ----- |
+| Blake desktop  | 3.3    | 3.7   |
+| Blake portrait | 3.3    | 3.7   |
 
 The top now reads as water with depth, the horizon stays soft, and the coral mound plus sub remain the brightest masses. Still short of 4: the mound is a dark silhouette at 160 m and the upper column has no life or particles.
 
 ## Gates
 
-See the final report block below.
+`PW_PORT=4395 tools/gates.sh`: python, content, build, unit (192 files), e2e smoke, e2e-base, attribution and prettier all PASS (the first run failed only because a leftover preview server held port 4395, and the second run's prettier failure was this note itself, since fixed).
