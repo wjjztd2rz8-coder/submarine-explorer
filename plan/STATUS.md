@@ -1,6 +1,6 @@
-# Status (2026-10-23 evening, review by Claude alone)
+# Status (2026-10-24 early, review by Claude alone)
 
-**Stage:** about 83-84% to 1.0; ~5 weeks (Sol skipped, Codex 5h low; last joint view 80-83%). Tag f63 (green CI) on 2026-10-23; Monterey ~3.8, Endurance 3.0. Claude capacity limits art; Codex runs verification and CI.
+**Stage:** about 84% to 1.0; ~5 weeks (Sol skipped, Codex 5h low; last joint view 80-83%). Tag f64 (green CI) on 2026-10-24; Lost City 3.6, Monterey ~3.8, Endurance 3.0. Claude capacity limits art; Codex runs verification and CI.
 
 ## 1.0 table
 

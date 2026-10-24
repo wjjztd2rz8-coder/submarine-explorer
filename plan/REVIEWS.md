@@ -8,6 +8,24 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-24 (early) comprehensive review, Claude alone (golden 2026-10-24-024522)
+
+**Sol did not review:** Codex 5h at 6% (< start gate, exit 75). Scores are mine and may run ~0.2 high. Third review in 24 h; the golden set differs from the evening one only through the V-lostcity-foot and V-challenger-ripples merges plus pose drift. No new live play captures.
+
+**Changed since the evening review (~14 merges):** Sonnet: V-lostcity-foot, V-challenger-ripples. Codex (tests, guards, reports; all clean): 3480 save migration, 3490, 3500 audio guards, 3530 blur/focus clock reset, 3540/3550 Axial/Hudson verifies, 3560, 3570 resume-skip audit. Tag f64 on bb72bf1 (green hosted CI).
+
+**Scores, readable / beautiful:** Titanic 4 / 3.7; Lost City 3.6 / 3.6 (cooler olive hill, tower and stumps read; best so far); Blue Hole 3.5 / 3.4 (lip still a terraced arch); Beebe 4 / 3.6; Monterey 4 / 3.8; Challenger 3.5 / 3.5 (lander and flag clear; bow of sub shows a notch at this pose); Endurance 3.2 / 3.0.
+
+**Biggest gaps:** unchanged: Blue Hole lip silhouette, Endurance (owner choice), no hero consistently at 4, phone retest.
+
+**Process:** efficiency.sh: Claude week 76% (~15%/day), Codex week 70% (~69%/day, dispatcher-paced), no failed timer runs. Codex queue holds 3580-3600. Kept worktrees 2980/3050/3310/3320/3340/3380 await the owner's S-collision decision or a later collection. No tooling change.
+
+**New priorities:** order unchanged; Claude lanes unblocked: V-bluehole-silhouette, V-eight-sites-lit follow-ups (Blake sky, Hudson ledge, Axial chimneys), V-monterey-apron, V-challenger-ripples opening fade, V-lostcity scatter tint.
+
+**Stage:** about 84% to 1.0; ~5 weeks (not cross-checked with Sol).
+
+**Needs owner:** (1) delete the four S-collision expected-failure cases?; (2) ~85 m Endurance opening OK or richer hull; (3) phone retest on the newest build.
+
 ## 2026-10-23 (evening) comprehensive review, Claude alone (golden 2026-10-23-194733)
 
 **Sol did not review:** Codex 5h at 5% (< start gate). Scores are mine and may run ~0.2 high. Opening frames of Titanic, Blue Hole, Lost City, Beebe, Endurance, Monterey and Challenger viewed against the morning set; no new live play captures (play check rests on 3290's clean debrief/Journal audit; 3310 e2e extension still unverified in its worktree).
