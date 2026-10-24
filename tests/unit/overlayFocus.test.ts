@@ -2865,9 +2865,21 @@ it('Discovery host disposal releases Journal/debrief ownership even with both op
   expect(press('Escape').defaultPrevented).toBe(false);
 });
 
-it.each(['pause', 'journal', 'hidden', 'blur then hidden', 'hidden then blur'] as const)(
-  'interrupts a scan once through %s and excludes a long resume interval',
-  async (boundary) => {
+it.each(
+  (
+    [
+      'pause',
+      'journal',
+      'debrief',
+      'hidden',
+      'blur',
+      'blur then hidden',
+      'hidden then blur',
+    ] as const
+  ).flatMap((boundary) => (['keyboard', 'touch'] as const).map((device) => ({ boundary, device }))),
+)(
+  'interrupts a $device scan once through $boundary and excludes a long resume interval',
+  async ({ boundary, device }) => {
     // Exercise real discovery and frame gates: frozen time must neither scan nor decay.
     const events = new EventTarget();
     Object.assign(document, {
@@ -2956,20 +2968,35 @@ it.each(['pause', 'journal', 'hidden', 'blur then hidden', 'hidden then blur'] a
     };
     step(0);
     const scanKey = ctx.input.actions.find((action) => action.id === 'scan')!.keys[0];
-    ctx.input.injectKey(scanKey, true);
+    ctx.input.touchActive = device === 'touch';
+    const holdScan = () => {
+      if (device === 'touch') ctx.input.touchHeld.add('scan');
+      else ctx.input.injectKey(scanKey, true);
+    };
+    holdScan();
     step(100);
     const progress = scanner.view.progress;
     const elapsed = ctx.discovery.stats.elapsedS;
     expect(progress).toBeGreaterThan(0);
     if (boundary === 'pause') setState('pause');
     else if (boundary === 'journal') ctx.discovery.guide.open();
+    else if (boundary === 'debrief') ctx.discovery.showDebrief();
+    else if (boundary === 'blur') window.dispatchEvent(new Event('blur'));
     else {
       if (boundary === 'blur then hidden') window.dispatchEvent(new Event('blur'));
       visibility(true);
       if (boundary === 'hidden then blur') window.dispatchEvent(new Event('blur'));
     }
-    for (const now of [1_000, 30_000, 60_000]) {
-      expect(step(now)).toMatchObject({ frozen: true, steps: 0, clockDt: 0 });
+    for (const now of boundary === 'blur' ? [60_000] : [1_000, 30_000, 60_000]) {
+      // Visible phone interruptions can happen inside an already frozen modal.
+      if (
+        device === 'touch' &&
+        (boundary === 'pause' || boundary === 'journal' || boundary === 'debrief')
+      ) {
+        window.dispatchEvent(new Event('blur'));
+        window.dispatchEvent(new Event('focus'));
+      }
+      expect(step(now)).toMatchObject({ frozen: boundary !== 'blur', steps: 0, clockDt: 0 });
       expect(scanner.view.progress).toBe(progress);
       expect(ctx.discovery.stats.elapsedS).toBe(elapsed);
     }
@@ -2978,6 +3005,8 @@ it.each(['pause', 'journal', 'hidden', 'blur then hidden', 'hidden then blur'] a
     expect(completed).not.toHaveBeenCalled();
     if (boundary === 'pause') setState('dive');
     else if (boundary === 'journal') ctx.discovery.guide.close();
+    else if (boundary === 'debrief') ctx.discovery.debrief.hide();
+    else if (boundary === 'blur') window.dispatchEvent(new Event('focus'));
     else {
       if (boundary === 'hidden then blur') window.dispatchEvent(new Event('focus'));
       visibility(false);
@@ -2989,7 +3018,7 @@ it.each(['pause', 'journal', 'hidden', 'blur then hidden', 'hidden then blur'] a
     expect(ctx.input.state.scan).toBe(false);
     step(3_600_100);
     expect(scanner.view.progress).toBeLessThan(progress);
-    ctx.input.injectKey(scanKey, true);
+    holdScan();
     for (let now = 3_600_200; now <= 3_601_500; now += 100) step(now);
     expect(completed).toHaveBeenCalledExactlyOnceWith({
       poiId: 'target',
@@ -2997,6 +3026,7 @@ it.each(['pause', 'journal', 'hidden', 'blur then hidden', 'hidden then blur'] a
       firstTime: true,
     });
     expect(ctx.discovery.store.get('reef', 'target')?.count).toBe(1);
+    expect(ctx.discovery.stats.elapsedS).toBeCloseTo(1.6);
     expect(aborted).toHaveBeenCalledOnce();
     stop();
     expect(callbacks.size).toBe(0);

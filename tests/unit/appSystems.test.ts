@@ -87,6 +87,7 @@ it('resumes dive clocks and quality sampling without counting paused or hidden t
   let nextId = 0;
   vi.stubGlobal('document', doc);
   const win = new EventTarget();
+  const addWindowListener = vi.spyOn(win, 'addEventListener');
   const removeWindowListener = vi.spyOn(win, 'removeEventListener');
   vi.stubGlobal('window', win);
   vi.stubGlobal('requestAnimationFrame', (fn: FrameRequestCallback) => {
@@ -108,6 +109,10 @@ it('resumes dive clocks and quality sampling without counting paused or hidden t
   let perf!: PerfStats;
   let pixelRatio = 2;
   const ctx = {
+    app: { state: 'dive' },
+    globe: { isOpen: false },
+    settingsScreen: { isOpen: false },
+    discovery: { guide: { isOpen: false }, debrief: { isOpen: false } },
     config: DEFAULT_CONFIG,
     quality: { source: 'auto' },
     params: new URLSearchParams(),
@@ -129,10 +134,9 @@ it('resumes dive clocks and quality sampling without counting paused or hidden t
   const frames: { dt: number; steps: number; elapsed: number; clock: number }[] = [];
   const quality = createQualitySystem();
   quality.init!(ctx);
-  let frozen = false;
   const runner = {
     frame(f: FrameState) {
-      f.frozen = frozen;
+      shellSystem.frame!['gate.shell']!(f, ctx);
       inputGateSystem.frame!['gate.input']!(f, ctx);
       mission.update(f.clockDt);
       stats.update(f.clockDt, ctx.sub.position);
@@ -158,10 +162,10 @@ it('resumes dive clocks and quality sampling without counting paused or hidden t
     bus.emit('app:state', { state: 'dive' });
     expect(step(60_100)).toMatchObject({ dt: 0.25, steps: 0, clock: 0 });
     expect(step(60_200).clock).toBeCloseTo(0.1);
-    frozen = true;
+    ctx.app.state = 'pause';
     expect(step(60_300)).toMatchObject({ dt: expect.closeTo(0.1), clock: 0 });
     expect(step(60_400)).toMatchObject({ dt: expect.closeTo(0.1), clock: 0 });
-    frozen = false;
+    ctx.app.state = 'dive';
     expect(step(90_300)).toMatchObject({ dt: 0.25, steps: 0, clock: 0 });
     doc.hidden = true;
     doc.dispatchEvent(new Event('visibilitychange'));
@@ -200,6 +204,48 @@ it('resumes dive clocks and quality sampling without counting paused or hidden t
     expect(stats.snapshot().elapsedS).toBeCloseTo(mission.elapsedS);
     expect(perf.pixelRatio).toBe(2);
     expect(ctx.resize).not.toHaveBeenCalled();
+    // Repeated visible blur/focus pairs inside Pause or a debrief must not
+    // leak resets into subsequent active intervals or change either clock.
+    let now = 420_008;
+    let active = mission.elapsedS;
+    for (const modal of ['pause', 'debrief'] as const) {
+      ctx.app.state = modal === 'pause' ? 'pause' : 'dive';
+      Object.assign(ctx.discovery.debrief, { isOpen: modal === 'debrief' });
+      for (let i = 0; i < 3; i++) {
+        win.dispatchEvent(new Event('blur'));
+        win.dispatchEvent(new Event('focus'));
+        expect(step((now += 60_000))).toMatchObject({ steps: 0, clock: 0 });
+        expect(mission.elapsedS).toBeCloseTo(active);
+        expect(stats.snapshot().elapsedS).toBeCloseTo(active);
+      }
+      ctx.app.state = 'dive';
+      Object.assign(ctx.discovery.debrief, { isOpen: false });
+      expect(step((now += 60_000))).toMatchObject({ steps: 0, clock: 0 });
+      expect(step((now += 16))).toMatchObject({ steps: 0, clock: expect.closeTo(0.016) });
+      expect(step((now += 16))).toMatchObject({ steps: 1, clock: expect.closeTo(0.016) });
+      active += 0.032;
+      expect(mission.elapsedS).toBeCloseTo(active);
+      expect(stats.snapshot().elapsedS).toBeCloseTo(active);
+    }
+    // Phone keyboard/share/address-bar interruptions need no visibility event.
+    // Pairs before one RAF coalesce; active frames still reach quality sampling.
+    ctx.input.touchActive = true;
+    for (let i = 0; i < 40; i++) {
+      const before = perf.frameMs;
+      for (let pair = 0; pair < 3; pair++) {
+        win.dispatchEvent(new Event('blur'));
+        win.dispatchEvent(new Event('focus'));
+      }
+      expect(step((now += 5000))).toMatchObject({ steps: 0, clock: 0 });
+      expect(perf.frameMs).toBe(before);
+      expect(step((now += 50)).clock).toBeCloseTo(0.05);
+      active += 0.05;
+      expect(mission.elapsedS).toBeCloseTo(active);
+      expect(stats.snapshot().elapsedS).toBeCloseTo(active);
+    }
+    expect(perf.frameMs).toBeGreaterThan(45);
+    expect(perf.pixelRatio).toBeLessThan(2);
+    expect(ctx.resize).toHaveBeenCalled();
     // Camera/UI animation time still advances during frozen frames.
     expect(frames.at(-1)!.elapsed).toBeGreaterThan(1);
   } finally {
@@ -210,8 +256,10 @@ it('resumes dive clocks and quality sampling without counting paused or hidden t
   }
   expect(callbacks.size).toBe(0);
   expect(unlisten).toHaveBeenCalledWith('visibilitychange', listen.mock.calls[0][1]);
-  expect(removeWindowListener).toHaveBeenCalledWith('blur', expect.any(Function));
-  expect(removeWindowListener).toHaveBeenCalledWith('focus', expect.any(Function));
+  for (const event of ['blur', 'focus']) {
+    const handler = addWindowListener.mock.calls.find(([type]) => type === event)![1];
+    expect(removeWindowListener).toHaveBeenCalledWith(event, handler);
+  }
 });
 
 describe('SystemRunner', () => {
