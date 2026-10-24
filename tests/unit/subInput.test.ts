@@ -8,6 +8,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
+import { Save } from '../../src/core/Save.js';
 import {
   BINDINGS_STORAGE_KEY,
   LEGACY_BINDINGS_STORAGE_KEY,
@@ -899,6 +900,33 @@ describe('Input rebinding', () => {
 });
 
 describe('Input bindings across reloads (C5)', () => {
+  it.each([false, true])(
+    'keeps pointer look=%s and remaps separate from settings and binding resets',
+    (pointerLook) => {
+      const save = new Save({ config: DEFAULT_CONFIG, storage: store });
+      const input = makeInput();
+      input.setPointerLookPreference(true);
+      input.setPointerLookPreference(pointerLook);
+      input.rebind('thrustForward', ['KeyG']);
+      const remapped = structuredClone(input.actions);
+      const bytes = store.getItem(BINDINGS_STORAGE_KEY);
+      save.save({ captions: true, muted: true });
+      save.reset();
+      expect(store.getItem(BINDINGS_STORAGE_KEY)).toBe(bytes);
+      const restored = makeInput();
+      expect(restored.actions).toEqual(remapped);
+      expect(restored.getAction('scan')?.keys).toEqual([]);
+      expect(restored.pointerLookEnabled).toBe(pointerLook);
+      expect(restored.pointerLookActive).toBe(false);
+      save.save({ captions: true, masterVolume: 0 });
+      const settings = save.get();
+      restored.resetBindings();
+      expect(makeInput().actions).toEqual(defaultActions());
+      expect(makeInput().pointerLookEnabled).toBe(pointerLook);
+      expect(new Save({ config: DEFAULT_CONFIG, storage: store }).get()).toEqual(settings);
+    },
+  );
+
   it('a binding displaced by a conflict stays unbound after reload', () => {
     const first = makeInput();
     first.rebind('thrustForward', ['KeyG']); // takes the scan key

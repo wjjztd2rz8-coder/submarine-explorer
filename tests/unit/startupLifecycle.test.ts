@@ -673,6 +673,10 @@ describe('page boot capability', () => {
         expect(first?.tier).toBe('low');
         expect(first?.settings.gameplay.currents).toBe('realistic');
       }
+      const unchanged = await boot();
+      expect(unchanged?.settings).toEqual(first?.settings);
+      expect(unchanged?.effective).toEqual(first?.effective);
+      expect(unchanged?.quality).toEqual(first?.quality);
       const input = new Input({ storage });
       if (shape === 'legacy') expect(input.getAction('thrustForward')?.keys).toEqual(['KeyI']);
       expect(input.getAction('toggleRov' as never)).toBeUndefined();
@@ -681,6 +685,13 @@ describe('page boot capability', () => {
       first!.save.setGameplayOption('batteryOxygen', false);
       first!.save.save({
         graphicsTier: 'medium',
+        postFx: false,
+        detailStrength: 0,
+        masterVolume: 0,
+        musicVolume: 0.19,
+        sfxVolume: 0.27,
+        muted: true,
+        hullWarningStyle: 'gauge',
         reduceMotion: true,
         captions: true,
         sonarPalette: 'highContrast',
@@ -689,6 +700,7 @@ describe('page boot capability', () => {
       const second = await boot();
       expect(second?.settings).toEqual(first!.save.get());
       expect(second?.tier).toBe('medium');
+      expect(second?.postFx).toBe(false);
       expect(second?.effective.gameplay.batteryOxygen).toBe(false);
       expect(second?.effective.speedName).toBe('research');
       expect(new Input({ storage }).getAction('thrustForward')?.keys).toEqual(['KeyK']);

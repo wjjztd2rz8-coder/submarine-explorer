@@ -127,6 +127,56 @@ afterEach(() => {
 });
 
 describe('audio lifecycle', () => {
+  it.each([false, true])(
+    'restores live volume edits and mute=%s in a new audio graph after reload',
+    async (muted) => {
+      const records = new Map<string, string>();
+      const storage = {
+        getItem: (key: string) => records.get(key) ?? null,
+        setItem: (key: string, value: string) => {
+          records.set(key, value);
+        },
+        removeItem: (key: string) => {
+          records.delete(key);
+        },
+      };
+      const first = new Save({ config: DEFAULT_CONFIG, storage });
+      const audio = system();
+      audio.setSettings(first.get());
+      const off = first.onChange((next) => audio.setSettings(next));
+      try {
+        first.save({ masterVolume: 0, sfxVolume: 0.27, musicVolume: 0 });
+        audio.unlock();
+        await flush();
+        expect(audio.diagnostics).toMatchObject({ masterGain: 0, sfxGain: 0.27, musicGain: 0 });
+        audio.setPaused(true);
+        first.save({ masterVolume: 0.43, sfxVolume: 0, musicVolume: 0.19, muted });
+        expect(audio.diagnostics.masterGain).toBe(0);
+        audio.setPaused(false);
+        await flush();
+        const expected = { masterGain: muted ? 0 : 0.43, sfxGain: 0, musicGain: 0.19, muted };
+        expect(audio.diagnostics).toMatchObject(expected);
+        off();
+        audio.dispose();
+        const restored = new Save({ config: DEFAULT_CONFIG, storage });
+        expect(restored.get()).toEqual(first.get());
+        const next = system();
+        try {
+          next.setSettings(restored.get());
+          next.unlock();
+          await flush();
+          expect(next.diagnostics).toMatchObject(expected);
+          expect(Context.instances).toHaveLength(2);
+        } finally {
+          next.dispose();
+        }
+      } finally {
+        off();
+        audio.dispose();
+      }
+    },
+  );
+
   it('stays locked when context construction throws and retries with the latest saved gains', async () => {
     const construct = vi.fn(function () {
       throw new Error('Audio device unavailable');

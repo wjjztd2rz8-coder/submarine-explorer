@@ -27,6 +27,7 @@ export const settingsSystem: GameSystem<ShellContext, unknown> = {
       activeDetailStrength: settings.detailStrength,
       tierFromUrl: quality.urlForced,
       canOpen: () => !ctx.globe.isOpen,
+      isTouch: () => ctx.controlsCard?.device === 'touch',
       onOpen: () => {
         document.exitPointerLock?.();
         ctx.keyboard?.unlock();
