@@ -1852,3 +1852,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Claude-alone review (Codex 5h 4%, Sol skipped); entry at top of plan/REVIEWS.md, STATUS.md refreshed, DIRECTOR trimmed. Stage ~85%. No package started (art gains ~0.1; 3 Codex briefs queued). No tag (CI for run 117 fix pending).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-24 12:15 CDT headless run 120 (Claude): no-op
+
+- Started 8 min after run 119. Nothing to collect, no Codex task running (Codex 5h 4%, dispatch waits), 3820/3840/3850 queued, held worktrees unchanged. CI for the run 119 push pending, so no tag (f64 stands). No Claude package (art gains ~0.1).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
