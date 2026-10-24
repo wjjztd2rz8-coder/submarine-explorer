@@ -287,3 +287,9 @@ Creating `.cache/review/current` as a directory before `codex-review.sh start` m
 
 - Cause: `resume.sh` skips a headless run for 3 h when main's non-log HEAD and Codex results are unchanged. Run 100 (16:25) found nothing new, so runs at 17:15-18:15 all exited "no new work" while Claude sat at 76-79% with unblocked Sonnet items (V-challenger-ripples, V-monterey-apron). The skip is right for collection, wrong when a Claude lane has work.
 - Fix: skip window 3 h -> 90 min, so an idle Claude gets a package-starting run at most 90 min after the last one. Backlog items stay the source; a run that finds nothing still exits cheaply.
+
+## 2026-10-24 midday (comprehensive review)
+
+- Finding: Claude idled 14-28 h of the last 24 h at 100% 5h: runs 105-111 ended "collection only/no-op" without starting a package although Backlog items 1-6 were unblocked. Cause was run judgment, not a gate (skip window already 90 min).
+- Fix: rule in the run notes, not tooling: any run with Claude 5h >= 45% and week on pace starts one Sonnet package after collecting. Gates on a loaded machine take 20-40 min; run them backgrounded.
+- Codex bug hunts: ~1 real defect in 25 audits; shift briefs to verifying new visual packages and CI.

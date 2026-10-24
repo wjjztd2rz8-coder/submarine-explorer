@@ -8,6 +8,24 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-24 (midday) comprehensive review, Claude alone (golden 2026-10-24-101521)
+
+**Sol did not review:** `codex-review.sh start` exited 75 (Codex 5h 6%). Scores are mine and may run ~0.2 high. Trigger was 8+ merges, but all of them were Codex test-only audits, so the goldens match the early-morning set (pose drift only); Titanic, Blue Hole, Lost City and Beebe opening frames re-viewed. No new live play captures.
+
+**Changed since the early review (~9 merges):** Codex (all clean audits or test additions, no production defect): 3580 ripples verify, 3590 blur/focus, 3600 Settings key bindings on touch Home (the one real fix), 3610-3630 sim bug hunts, 3640-3660 Journal/save/mission order, 3670-3690 audio, settings persistence, depth/hull bounds. Claude: V-eight-sites-lit (d), a data-driven graded water dome for Blake (reef preset reuses the wreck horizon dome; one extra draw call). Visible gain is small (~3.3 to ~3.4; the agent self-rated 3.7, I did not accept that): the mound is still a dark silhouette.
+
+**Scores, readable / beautiful:** Titanic 4 / 3.7; Lost City 3.6 / 3.6; Blue Hole 3.5 / 3.4 (lip still a terraced arch); Beebe 4 / 3.6; Monterey 4 / 3.8; Challenger 3.5 / 3.5; Endurance 3.2 / 3.0; Blake 3.4.
+
+**Biggest gaps:** unchanged: Blue Hole lip silhouette, Endurance (owner choice), no hero consistently at 4, phone retest. The Codex bug-hunt stream now yields almost nothing (one fix in ~25 audits): diminishing returns, so new Codex briefs should shift toward verifying visual packages' numerics and CI.
+
+**Process:** efficiency.sh: Claude week 75% (~11%/day) but idle 14-28 h in 24 h: runs 105-111 started no package at 100% 5h because their collection-only reading found "nothing unblocked" while art items 1-6 were open. Logged in PROCESS-LOG; each run with Claude 5h >= 45% must start one Sonnet package. Codex week 43% (~66%/day, paced). Gates on a loaded machine take 20-40 min: run them in the background. Hosted CI for the 05:05 pushes was still running.
+
+**New priorities:** order unchanged. Claude lanes unblocked: V-bluehole-silhouette, V-eight-sites-lit (Blake mound lit, Hudson ledge, Axial chimneys), V-monterey-apron, V-challenger-ripples opening fade, V-lostcity scatter tint. Codex queue: 3730 battery/oxygen, 3740 Journal reload, 3750 site selection (all S-bughunt); 3700-3720 running.
+
+**Stage:** about 84% to 1.0; ~5 weeks (not cross-checked with Sol).
+
+**Needs owner:** (1) delete the four S-collision expected-failure cases?; (2) ~85 m Endurance opening OK or richer hull; (3) phone retest on the newest build.
+
 ## 2026-10-24 (early) comprehensive review, Claude alone (golden 2026-10-24-024522)
 
 **Sol did not review:** Codex 5h at 6% (< start gate, exit 75). Scores are mine and may run ~0.2 high. Third review in 24 h; the golden set differs from the evening one only through the V-lostcity-foot and V-challenger-ripples merges plus pose drift. No new live play captures.
