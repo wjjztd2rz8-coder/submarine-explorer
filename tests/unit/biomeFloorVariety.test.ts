@@ -149,7 +149,13 @@ describe('site floor material bindings', () => {
       vi.stubGlobal('document', undefined);
       const config = makeConfig().terrain;
       const before = JSON.stringify({ config, biomes: BIOMES });
-      const sites = ['blake-plateau-corals', 'hunga-tonga-caldera', 'titanic'];
+      const sites = [
+        'blake-plateau-corals',
+        'hunga-tonga-caldera',
+        'axial-seamount-ashes',
+        'hudson-canyon',
+        'titanic',
+      ];
       const built: ReturnType<typeof createTerrainMaterial>[] = [];
       const retained = new Map<ReturnType<typeof createTerrainMaterial>, string>();
       const state = (result: ReturnType<typeof createTerrainMaterial>) =>
@@ -211,7 +217,7 @@ describe('site floor material bindings', () => {
           expect(JSON.stringify({ config, biomes: BIOMES })).toBe(before);
         }
         // Different endpoint values can share a program; the absent fade needs a different one.
-        for (const site of sites.slice(0, 2)) expect(keys.get(site)).not.toBe(keys.get('titanic'));
+        for (const site of sites.slice(0, -1)) expect(keys.get(site)).not.toBe(keys.get('titanic'));
       } finally {
         for (const result of built) {
           result.material.dispose();
