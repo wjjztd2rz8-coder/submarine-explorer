@@ -1836,3 +1836,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged and pushed (smoke + project-base green on 3730 and on main): Codex 3730 (12 battery/oxygen boundary cases in d2Hazard.test.ts), 3740 and 3750 clean audit notes. Removed those worktrees. 3760-3780 (verify Blake dome, Challenger fade, CI post-f64) running; queued 3790-3810 (save round trip, spawn determinism, scan targets). No Claude package (Claude idle by design this run: 3 Codex tasks already in flight, remaining V-* items gain ~0.1), no tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-24 11:17 CDT headless run 117 (Claude): collection + CI fix
+
+- Merged (smoke + project-base green on main): Codex 3760 (Blake dome lifecycle tests), 3770 (Challenger fade table), 3780 (post-f64 CI audit). 3780 found hosted CI red since Blake's dome: the e2e reef preset case expected 1 draw but truthful accounting reports 2 (halocline + shafts); fixed the expectation (exact equality kept). Second red cause: d-shell journey times out (240 s) on ~3 of 13 runs; queued 3820 to make it cheaper. Queue: 3790-3810, 3820. No Claude package, no tag (f64 stands; need green CI first).
+- Process: a timed-out gates run leaves its preview server on PW_PORT; use a fresh port when rerunning.
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
