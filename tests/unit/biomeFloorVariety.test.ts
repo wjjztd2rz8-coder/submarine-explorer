@@ -25,6 +25,9 @@ describe('open sediment floor variety', () => {
     expect(biome.ripple).toBeGreaterThan(1);
     expect(biome.rippleReach ?? 0).toBeGreaterThan(0);
     expect(biome.rippleReach ?? 0).toBeLessThanOrEqual(0.4);
+    // The fade begins beyond the global detail fade so ripples read from the opening height.
+    expect(biome.rippleFadeM?.[0]).toBeGreaterThan(DEFAULT_CONFIG.terrain.detailFadeRippleM[0]);
+    expect(biome.rippleFadeM?.[1]).toBeGreaterThan(biome.rippleFadeM![0]);
   });
 
   it.each(['low', 'medium', 'high'] as const)(
@@ -173,6 +176,9 @@ describe('site floor material bindings', () => {
             {} as THREE.WebGLRenderer,
           );
           expect(uniforms.uRippleReach.value).toBe(site === 'challenger-deep' ? 0.4 : 0);
+          expect(uniforms.uFadeRipple.value.toArray()).toEqual(
+            biome.rippleFadeM ?? [...config.detailFadeRippleM],
+          );
           expect(uniforms.uRipple.value).toBe(biome.ripple);
           expect(uniforms.uRippleLen.value).toBe(biome.rippleLenM);
           expect(uniforms.uRippleLen.value).toBeGreaterThan(0);

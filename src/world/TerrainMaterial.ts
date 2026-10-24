@@ -82,7 +82,7 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
     uMacroScale: { value: config.materialMacroScaleM },
     uNormalStrength: { value: config.materialNormalStrength * (biome.detail ?? 1) },
     uFadeNormal: { value: new THREE.Vector2(...config.detailFadeNormalM) },
-    uFadeRipple: { value: new THREE.Vector2(...config.detailFadeRippleM) },
+    uFadeRipple: { value: new THREE.Vector2(...(biome.rippleFadeM ?? config.detailFadeRippleM)) },
     uFadeBurrow: { value: new THREE.Vector2(...config.detailFadeBurrowM) },
     uContrast: {
       value: new THREE.Vector3(

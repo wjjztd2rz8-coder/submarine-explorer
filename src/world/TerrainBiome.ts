@@ -81,6 +81,8 @@ export interface Biome {
   rippleDir: number;
   /** Lowers the macro-noise threshold so ripples cover more of the flat bed, 0..0.4 (default 0). */
   rippleReach?: number;
+  /** Near/far metres over which ripples fade out; defaults to the global detail fade. */
+  rippleFadeM?: [number, number];
   /** Bioturbation mounds/tracks strength, 0..1. */
   burrow: number;
   /** Slot C coverage bias: + shows hard substrate on gentler slopes. */
@@ -227,6 +229,7 @@ export const BIOMES: Record<string, Biome> = {
     ripple: 2.5,
     // Ripples reach the whole lander light pool instead of isolated patches.
     rippleReach: 0.4,
+    rippleFadeM: [70, 200],
     // Separate the crests from the fine silt texture in the approach view.
     rippleLenM: 1.6,
     rippleDir: 0.5,
