@@ -128,6 +128,7 @@ for (const tier of ['low', 'medium', 'high'] as const) {
     const sites = [
       'kamaehuakanaloa',
       'axial-seamount-ashes',
+      'hudson-canyon',
       'great-blue-hole',
       'endurance',
       'monterey-canyon',
