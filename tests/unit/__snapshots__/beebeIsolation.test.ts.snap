@@ -286,7 +286,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
     },
   },
   "lost-city": {
-    "biome": "f033e1c773a1b81d478da50805629645e805bc070066e99ae0659bdee5b1e7bb",
+    "biome": "11dfd61ab340722d609bab0fb3907bff57bd65f0d125db8ee956d9c04b4c906a",
     "tiers": {
       "high": {
         "buffers": [

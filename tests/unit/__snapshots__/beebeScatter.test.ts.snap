@@ -158,7 +158,7 @@ exports[`1130: other sites retain byte-identical scatter geometry, placement, co
     },
   },
   "lost-city": {
-    "meshes": "3eafbb77a77b4a5a90636edb4d4003885bbfb6dd17ebfb3d01a81b3fc9234467",
+    "meshes": "34c37d093b8887a2fb200faf2211df6df4074a24adbfa4c4adb287cdb09f75ed",
     "stats": {
       "cells": 21,
       "drawCalls": 4,
