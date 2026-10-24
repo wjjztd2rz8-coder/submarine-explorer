@@ -61,6 +61,8 @@ export interface ScatterSpec {
 export interface Biome {
   /** Baked finish for existing rock instances; absent preserves the shared shapes. */
   scatterRock?: 'fractured-basalt';
+  /** Linear rgb multiplier on rock-like scatter, so loose stone shares the ground's cast. */
+  scatterTint?: readonly [number, number, number];
   /** Slot A / B / C texture sets. */
   a: TerrainSet;
   b: TerrainSet;
@@ -267,6 +269,8 @@ export const BIOMES: Record<string, Biome> = {
     // Broad carbonate-cemented beds also read on the gentle massif slopes, at every tier.
     strata: LOST_CITY_STRATA,
     vertexTint: lostCitySlopeTint,
+    // Rubble and boulders take the hill's cool olive-grey rather than the warm lamp-lit tan.
+    scatterTint: [0.62, 0.9, 0.9],
     scatter: [
       { kind: 'boulder', density: 4.5, slopeMaxDeg: 55, on: 'any', sizeMul: 2.4 },
       { kind: 'rubble', density: 18, slopeMaxDeg: 45, on: 'any', sizeMul: 2.6 },
