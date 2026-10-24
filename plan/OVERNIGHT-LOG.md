@@ -1873,3 +1873,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: Codex 3860 (x2) and 3870 still running (3 tasks), 3880 verify worktree holds a note but its task is live. Queued 3870/3880/3890 bug-hunts (save migration, pause/resume clock, hazard recovery). CI for run 122 push pending, so no tag (f64 stands). No Claude package (art gains ~0.1).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-24 17:00 CDT headless run 124 (Claude): collection + one Sonnet package
+
+- Merged and pushed (smoke + project-base green on main): Codex 3860 x2, 3870, 3880 audits (clean; 3860 adds a scatter tint contract unit test) and Sonnet V-eight-sites-lit (e): Blake coral mound self-lit via the shared vertexGlow lift, ~3.6 by my read (agent said 4.0). Hudson shares the coral-mound prop and was not checked; next package checks it. 3870-3890 bug-hunts queued (Codex 5h 16%, dispatch waits for 20%). No tag (f64 stands; CI for run 123 pending).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
