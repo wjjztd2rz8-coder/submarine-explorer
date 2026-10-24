@@ -1868,3 +1868,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Hosted CI was red on run 121's push: static job failed on Prettier for plan/DIRECTOR.md (backlog numbering). Fixed on main. Merged (smoke + project-base green; d-shell spec 5/5 locally): Codex 3820 (cheaper d-shell journey: dropped screenshots, settings round trip and post-quit freeze check, claimed covered elsewhere), 3840 (39 rooted-depth guards, clean), 3850 (scan/reward audit, no defect). Codex 5h recovered to ~56%, dispatch will take the queue. No Claude package (art gains ~0.1), no tag (f64 stands until CI green).
 - Process: three Codex worktrees each found the same Prettier failure on DIRECTOR.md; it was caused by a log-trim commit, not by them.
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-24 15:46 CDT headless run 123 (Claude): no-op
+
+- Nothing to collect: Codex 3860 (x2) and 3870 still running (3 tasks), 3880 verify worktree holds a note but its task is live. Queued 3870/3880/3890 bug-hunts (save migration, pause/resume clock, hazard recovery). CI for run 122 push pending, so no tag (f64 stands). No Claude package (art gains ~0.1).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
