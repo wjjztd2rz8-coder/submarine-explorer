@@ -1842,3 +1842,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged (smoke + project-base green on main): Codex 3760 (Blake dome lifecycle tests), 3770 (Challenger fade table), 3780 (post-f64 CI audit). 3780 found hosted CI red since Blake's dome: the e2e reef preset case expected 1 draw but truthful accounting reports 2 (halocline + shafts); fixed the expectation (exact equality kept). Second red cause: d-shell journey times out (240 s) on ~3 of 13 runs; queued 3820 to make it cheaper. Queue: 3790-3810, 3820. No Claude package, no tag (f64 stands; need green CI first).
 - Process: a timed-out gates run leaves its preview server on PW_PORT; use a fresh port when rerunning.
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-24 11:59 CDT headless run 118 (Claude): collection + one Haiku fix
+
+- Merged and pushed (smoke + project-base green on main): Codex 3790 (save round trip, clean), 3810 (scan-target registry tests in gamePois), 3800 (found a rooted-life depth defect: members were not band-checked at their final position on slopes; synthetic fixture, real-site impact unproven). Fixed it with Haiku (3830, placePatch samples final ground once, regression case in lifeSim.test.ts). Codex 5h ~5%, dispatch waits; queue 3820, 3840 (verify 3830), 3850 (scan reward bug-hunt). No tag (f64 stands; hosted CI for run 117 fix pending).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
