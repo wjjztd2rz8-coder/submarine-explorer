@@ -7,7 +7,7 @@ const UPPER_WATER = new THREE.Color(ABYSS_HORIZON.upperColor);
 const HAZE_WATER = new THREE.Color(ABYSS_HORIZON.hazeColor);
 
 /** Optional per-site grade of the backdrop (Endurance: a paler water band above the seabed). */
-interface HorizonLook {
+export interface HorizonLook {
   upperColor?: number;
   hazeColor?: number;
   hazePeakElevation?: number;
@@ -15,6 +15,9 @@ interface HorizonLook {
   fogLift?: number;
   /** Share (0..1) of the haze colour mixed into the fog at full abyss depth; default 0 keeps the fog hue. */
   fogHaze?: number;
+  /** Camera depth (m) where the backdrop starts and reaches full effect; default ABYSS_HORIZON fade band. */
+  fadeStartM?: number;
+  fadeEndM?: number;
 }
 
 export class TitanicHorizon {
@@ -25,6 +28,8 @@ export class TitanicHorizon {
   private readonly weights: Float32Array;
   private readonly upperWeights: Float32Array;
 
+  private readonly fadeStartM: number;
+  private readonly fadeEndM: number;
   private readonly fogLift: number;
   private readonly fogHaze: number;
   private readonly upperWater: THREE.Color;
@@ -34,6 +39,8 @@ export class TitanicHorizon {
     private readonly scene: THREE.Scene,
     look: HorizonLook = {},
   ) {
+    this.fadeStartM = look.fadeStartM ?? ABYSS_HORIZON.fadeStartM;
+    this.fadeEndM = look.fadeEndM ?? ABYSS_HORIZON.fadeEndM;
     this.fogLift = look.fogLift ?? ABYSS_HORIZON.fogLift;
     this.fogHaze = look.fogHaze ?? 0;
     this.upperWater =
@@ -92,8 +99,8 @@ export class TitanicHorizon {
     // below 1,200 m, comfortably above the Titanic inspection depth.
     const abyss = THREE.MathUtils.smoothstep(
       -camera.position.y,
-      ABYSS_HORIZON.fadeStartM,
-      ABYSS_HORIZON.fadeEndM,
+      this.fadeStartM,
+      this.fadeEndM,
     );
     this.dome.visible = abyss > 0;
     if (abyss <= 0) return;
