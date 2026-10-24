@@ -355,6 +355,126 @@ describe('steering stability', () => {
 });
 
 describe('the rare appearance', () => {
+  const shipped = parseLifeDoc(lifeJson).sites;
+
+  function checkPopulation(sim: LifeSim): void {
+    const live = sim.pool.filter((a) => a.alive);
+    const members = sim.groups.flatMap((g) => g.members);
+    expect(sim.liveCount).toBe(live.length);
+    expect(sim.stats().agents).toBe(live.length);
+    expect(live.length).toBeLessThanOrEqual(sim.tier.maxAgents);
+    expect(sim.stats().species).toBeLessThanOrEqual(sim.tier.maxSpecies);
+    expect(new Set(members).size).toBe(members.length);
+    expect(new Set(members)).toEqual(new Set(live));
+    expect(sim.stats().liveSpecies.sort()).toEqual([...new Set(live.map((a) => a.def.id))].sort());
+    for (const def of SPECIES) {
+      expect(sim.countOf(def.id), def.id).toBe(live.filter((a) => a.def === def).length);
+      expect(sim.countOf(def.id), def.id).toBeLessThanOrEqual(sim.capacityOf(def));
+    }
+    for (const g of sim.groups) {
+      expect(g.members.length).toBeGreaterThan(0);
+      for (const a of g.members) {
+        expect(a.group).toBe(g);
+        expect(a.def).toBe(g.def);
+        expect(
+          Object.values(a).every((value) => typeof value !== 'number' || Number.isFinite(value)),
+        ).toBe(true);
+      }
+    }
+  }
+
+  it.each([
+    ['beebe-vent-field', 'low', 4800, true],
+    ['beebe-vent-field', 'medium', 4800, true],
+    ['beebe-vent-field', 'high', 4800, true],
+    ['challenger-deep', 'low', 10000, false],
+    ['hunga-tonga-caldera', 'low', 20, true],
+    ['titanic', 'low', 3800, false],
+  ] as const)(
+    'admits a natural rare and reuses capacity after departure: %s %s',
+    (site, tier, depth, full) => {
+      const table = shipped[site]!;
+      const rule = table.rare!;
+      const random = mulberry32(1);
+      const threshold = 1 - Math.exp(-rule.chancePerMin / 60);
+      let draws: 'seeded' | 'boundary' | 'admit' = 'seeded';
+      const sim = new LifeSim({
+        tier: LIFE_TIERS[tier],
+        table,
+        seed: 1,
+        env: { groundAt: () => -depth - 8 },
+        // Ordinary population uses seeded draws; keep incidental rare rolls above
+        // the shipped threshold, then control the one-second eligibility boundary.
+        rand: () =>
+          draws === 'boundary'
+            ? threshold
+            : draws === 'admit'
+              ? threshold / 2
+              : Math.max(0.01, random()),
+      });
+      const sub = makeSub({ y: -depth });
+      const advance = (steps: number): void => {
+        for (let i = 0; i < steps; i++) sim.update(0.01, sub);
+      };
+      const seen: string[] = [];
+      sim.onRare = (def) => {
+        seen.push(def.id);
+        checkPopulation(sim);
+      };
+      advance(2000);
+      expect(sim.liveCount).toBeGreaterThan(0);
+      if (full) expect(sim.liveCount).toBe(sim.tier.maxAgents);
+      checkPopulation(sim);
+      // Equality must reject: rareTick uses a strict probability boundary.
+      draws = 'boundary';
+      advance(101);
+      expect(seen).toEqual([]);
+      draws = 'admit';
+      advance(101);
+      draws = 'seeded';
+      expect(seen).toEqual([rule.species]);
+      const rares = sim.groups.filter((g) => g.rare);
+      expect(rares).toHaveLength(1);
+      const rare = rares[0]!;
+      expect(rare.members.length).toBeGreaterThan(0);
+      expect(rare.members.length).toBeLessThanOrEqual(rule.group?.[1] ?? 1);
+      if (full && tier !== 'high' && rare.def.archetype === 'swarm')
+        expect(rare.members.length).toBe(sim.tier.maxAgents);
+      checkPopulation(sim);
+
+      if (site === 'beebe-vent-field' && tier === 'low') {
+        // A long-lived surge can outlast its cooldown. Eligibility must still
+        // retain the single existing rare group rather than start another one.
+        for (let t = 0; t < rule.cooldownS + 2; t += 0.25) sim.update(0.25, sub);
+        expect(sim.rareCooldown).toBe(0);
+        expect(sim.groups).toContain(rare);
+        draws = 'admit';
+        advance(101);
+        draws = 'seeded';
+        expect(seen).toEqual([rule.species]);
+        expect(sim.groups.filter((g) => g.rare)).toEqual([rare]);
+        checkPopulation(sim);
+      }
+
+      // Move continuously, below the per-update teleport threshold, so normal
+      // distance despawning and fade release run before the explicit teleport.
+      for (let i = 0; i < 600; i++) {
+        sub.x += 0.5;
+        sim.update(0.01, sub);
+      }
+      expect(sim.groups).not.toContain(rare);
+      expect(rare.members).toHaveLength(0);
+      checkPopulation(sim);
+      sub.x += 2000;
+      sim.update(0.01, sub);
+      expect(sim.liveCount).toBeGreaterThan(0);
+      expect(sim.groups.every((g) => !g.rare && g.row !== null)).toBe(true);
+      if (full) expect(sim.liveCount).toBe(sim.tier.maxAgents);
+      checkPopulation(sim);
+      expect(seen).toEqual([rule.species]);
+    },
+  );
+
   it('appears on its own at a high chance, once per cooldown, only in its band', () => {
     const sim = makeSim('high', 81);
     const seen: string[] = [];
