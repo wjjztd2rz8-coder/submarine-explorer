@@ -146,15 +146,26 @@ describe('open sediment floor variety', () => {
 });
 
 describe('site floor material bindings', () => {
-  // Regression guard: ripple reach must bind on Low too, and constructing the
-  // trench material must never change another site's default or live uniforms.
-  it.each(['low', 'medium', 'high'] as const)(
-    '%s: ripple reach binds per material without leaking into sediment controls',
-    (tier) => {
+  // Ripple reach and fade must bind on Low too, without changing another site's
+  // configured fallback or already-constructed uniforms.
+  it.each(
+    (['low', 'medium', 'high'] as const).flatMap((tier) =>
+      (['default', 'custom'] as const).map((fade) => ({ tier, fade })),
+    ),
+  )(
+    '$tier/$fade: ripple reach and fade bind without leaking into sediment controls',
+    ({ tier, fade }) => {
       vi.stubGlobal('document', undefined);
-      const config = makeConfig().terrain;
-      const before = JSON.stringify({ config, biomes: BIOMES });
+      const config = makeConfig({
+        terrain: {
+          ...makeConfig().terrain,
+          detailFadeRippleM:
+            fade === 'custom' ? [18, 92] : DEFAULT_CONFIG.terrain.detailFadeRippleM,
+        },
+      }).terrain;
+      const before = JSON.stringify({ config, defaults: DEFAULT_CONFIG, biomes: BIOMES });
       const built: ReturnType<typeof createTerrainMaterial>[] = [];
+      const retainedFades = new Map<ReturnType<typeof createTerrainMaterial>, number[]>();
       try {
         for (const site of [
           'titanic',
@@ -176,9 +187,13 @@ describe('site floor material bindings', () => {
             {} as THREE.WebGLRenderer,
           );
           expect(uniforms.uRippleReach.value).toBe(site === 'challenger-deep' ? 0.4 : 0);
-          expect(uniforms.uFadeRipple.value.toArray()).toEqual(
-            biome.rippleFadeM ?? [...config.detailFadeRippleM],
-          );
+          if (site === 'challenger-deep') expect(biome.rippleFadeM).toEqual([70, 200]);
+          else expect(biome.rippleFadeM).toBeUndefined();
+          const expectedFade = site === 'challenger-deep' ? [70, 200] : config.detailFadeRippleM;
+          expect(uniforms.uFadeRipple.value).toBeInstanceOf(THREE.Vector2);
+          expect(uniforms.uFadeRipple.value.toArray()).toEqual(expectedFade);
+          expect(uniforms.uFadeRipple.value.toArray().every(Number.isFinite)).toBe(true);
+          expect(uniforms.uFadeRipple.value.x).toBeLessThan(uniforms.uFadeRipple.value.y);
           expect(uniforms.uRipple.value).toBe(biome.ripple);
           expect(uniforms.uRippleLen.value).toBe(biome.rippleLenM);
           expect(uniforms.uRippleLen.value).toBeGreaterThan(0);
@@ -193,14 +208,22 @@ describe('site floor material bindings', () => {
           expect((shader.uniforms as Record<string, THREE.IUniform>).uRippleReach).toBe(
             uniforms.uRippleReach,
           );
+          expect((shader.uniforms as Record<string, THREE.IUniform>).uFadeRipple).toBe(
+            uniforms.uFadeRipple,
+          );
           expect(shader.fragmentShader).toContain('0.38 - uRippleReach, 0.62 - uRippleReach');
           for (const previous of built.slice(0, -1)) {
             const retained = previous.material.userData.uniforms.uRippleReach;
             expect(retained).not.toBe(uniforms.uRippleReach);
             expect(retained.value).toBe(previous === built[2] ? 0.4 : 0);
+            const previousFade = previous.material.userData.uniforms.uFadeRipple;
+            expect(previousFade).not.toBe(uniforms.uFadeRipple);
+            expect(previousFade.value).not.toBe(uniforms.uFadeRipple.value);
+            expect(previousFade.value.toArray()).toEqual(retainedFades.get(previous));
           }
+          retainedFades.set(result, uniforms.uFadeRipple.value.toArray());
+          expect(JSON.stringify({ config, defaults: DEFAULT_CONFIG, biomes: BIOMES })).toBe(before);
         }
-        expect(JSON.stringify({ config, biomes: BIOMES })).toBe(before);
       } finally {
         for (const result of built) {
           result.material.dispose();
