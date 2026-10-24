@@ -1,3 +1,5 @@
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
 import { Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
@@ -10,6 +12,8 @@ import {
   type PoiDef,
 } from '../../src/game/Pois.js';
 import { latLonToWorld } from '../../src/util/geo.js';
+import type { TileMeta } from '../../src/util/types.js';
+import { Terrain } from '../../src/world/Terrain.js';
 import { makeSyntheticTile } from './helpers.js';
 
 const quiet = () => {};
@@ -76,6 +80,35 @@ describe('poiElevation', () => {
 });
 
 describe('placePois', () => {
+  const read = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
+  const sites = read('data/landmarks/index.json').landmarks as string[];
+
+  it.each(sites)('%s retains every authored POI inside its real terrain bounds', (site) => {
+    const doc = read(`data/landmarks/${site}/pois.json`);
+    const defs = parsePois(doc);
+    const meta = read(`data/tiles/${site}/meta.json`) as TileMeta;
+    const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
+    const heights = new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows);
+    const terrain = new Terrain({ meta, heights }, DEFAULT_CONFIG.terrain, 'low');
+    try {
+      // Parsing and placement can silently drop content; require the complete authored list.
+      expect(defs).toHaveLength(doc.pois.length);
+      expect(defs.length).toBeGreaterThan(0);
+      const placed = placePois(defs, meta, terrain, scan, site);
+      expect(placed.map((p) => p.id)).toEqual(defs.map((p) => p.id));
+      for (const poi of placed) {
+        expect(poi.position.toArray().every(Number.isFinite), poi.id).toBe(true);
+        expect(terrain.contains(poi.position.x, poi.position.z), poi.id).toBe(true);
+        expect(poi.position.y, poi.id).toBeLessThanOrEqual(0);
+        expect(poi.position.y, poi.id).toBeGreaterThanOrEqual(
+          terrain.sampleHeight(poi.position.x, poi.position.z),
+        );
+      }
+    } finally {
+      terrain.dispose();
+    }
+  });
+
   it('places via latLonToWorld and fills defaults from Config.scan', () => {
     const defs = parsePois(
       [bow, { id: 'd', lat: 41.7298, lon: -49.9502, snap_to_seabed: true }],
