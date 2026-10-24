@@ -1,7 +1,11 @@
 /** Guard HUD depth signs, hull ratings and seabed proximity warnings. */
 
 import { describe, expect, it } from 'vitest';
+import { Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
+import { FROZEN_INPUT } from '../../src/game/MissionRouter.js';
+import { spawnHeight, spawnSettings } from '../../src/game/Spawn.js';
+import { Submarine } from '../../src/sub/Submarine.js';
 import {
   formatDepth,
   formatTileLine,
@@ -26,6 +30,69 @@ describe('formatDepth', () => {
     expect(formatDepth(-9, 8)).toBe('9 m');
     expect(formatDepth(-3812.4, 8)).toBe('3812 m');
     expect(Number.parseFloat(formatDepth(-8, 8))).toBe(8);
+  });
+});
+
+describe('depth and hull reporting at input boundaries', () => {
+  it.each([NaN, Infinity, -Infinity, -1, -1000, 0])(
+    'rejects depth request %s before it can corrupt HUD or hull state',
+    (requestedDepth) => {
+      const terrain = {
+        sampleHeight: () => -500,
+        getNormal: (_x: number, _z: number, out = new Vector3()) => out.set(0, 1, 0),
+      };
+      const settings = spawnSettings(DEFAULT_CONFIG);
+      const y = spawnHeight(-500, requestedDepth, settings);
+      expect(y).toBe(spawnHeight(-500, null, settings));
+      const sub = new Submarine(s, terrain);
+      sub.reset(0, y, 0);
+      sub.step(FROZEN_INPUT, 1 / 60);
+      const state = sub.getState();
+      for (const value of [state.depth, state.altitude, state.crushRatio, state.ratedRatio]) {
+        expect(Number.isFinite(value)).toBe(true);
+      }
+      expect(Number.isFinite(Number.parseFloat(formatDepth(state.depth, s.hullRadius)))).toBe(true);
+      expect(state.hullStress).toBe(0);
+      expect(state.hullBreached).toBe(false);
+      expect(state.emergencyBlow).toBe(false);
+    },
+  );
+
+  it.each(Object.entries(s.hullClasses))(
+    'keeps the exact %s operating rating quiet and warns immediately below it',
+    (classId, hull) => {
+      const sub = new Submarine(s, {
+        sampleHeight: () => -20000,
+        getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
+      });
+      sub.setHullClass(classId);
+      sub.reset(0, hull.ratedDepth, 0);
+      expect(sub.getState()).toMatchObject({ ratedRatio: 1, crushWarning: false, hullStress: 0 });
+      sub.step(FROZEN_INPUT, 1 / 60);
+      expect(sub.getState()).toMatchObject({ hullBreached: false, emergencyBlow: false });
+      sub.reset(0, hull.ratedDepth - 1, 0);
+      const warning = sub.getState();
+      expect(warning.crushWarning).toBe(true);
+      expect(warning.hullStress).toBeGreaterThan(0);
+      expect(warning.hullStress).toBeLessThan(1);
+      expect(warning.hullBreached).toBe(false);
+    },
+  );
+
+  it('clamps an extreme finite depth request above the trench floor without pressure damage', () => {
+    const ground = -10931;
+    const sub = new Submarine(s, {
+      sampleHeight: () => ground,
+      getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
+    });
+    sub.setHullClass('C');
+    sub.reset(0, spawnHeight(ground, Number.MAX_VALUE, spawnSettings(DEFAULT_CONFIG)), 0);
+    sub.step(FROZEN_INPUT, 1 / 60);
+    const state = sub.getState();
+    expect(state.altitude).toBeGreaterThanOrEqual(s.hullRadius + s.seabedClearance);
+    expect(state.ratedRatio).toBeLessThan(1);
+    expect(Number.parseFloat(formatDepth(state.depth, s.hullRadius))).toBeGreaterThan(10800);
+    expect(state).toMatchObject({ hullStress: 0, hullBreached: false, emergencyBlow: false });
   });
 });
 
