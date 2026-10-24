@@ -192,6 +192,11 @@ function makeInstance(
   const tilt = Math.hypot(ax, az);
   const col: [number, number, number] = [1, 1, 1];
   def.color(biome, rnd, col);
+  if (biome.scatterTint && def.material === 'rock') {
+    col[0] *= biome.scatterTint[0];
+    col[1] *= biome.scatterTint[1];
+    col[2] *= biome.scatterTint[2];
+  }
   return {
     x,
     y,
