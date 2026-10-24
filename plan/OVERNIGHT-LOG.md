@@ -1883,3 +1883,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged and pushed (smoke + project-base green on main): Sonnet V-eight-sites-lit (f), stronger warm lift on the shared coral mound; Hudson ~3.5 by my read (before/after differ modestly). The mound is still small and half hidden by the sub at the opening, so more glow won't help; it needs framing. Next step is the Axial chimney scale. Codex 5h 16%, dispatch waits for 20%; 3870-3890 queued; held worktrees unchanged. No tag (f64 stands; CI for run 124 pending).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-24 17:35 CDT headless run 126 (Claude): no-op
+
+- Started right after run 125. No Codex task running (Codex 5h 16%, dispatch waits for 20%), 3870-3890 queued, held worktrees unchanged, nothing to collect. No Claude package (next art step is the Axial chimney scale; saved for a later run). No tag (f64 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
