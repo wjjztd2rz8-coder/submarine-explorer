@@ -74,7 +74,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running (2026-10-24 review).
+- V-lostcity-foot-2 IN FLIGHT (Sonnet, 2026-10-24), worktree subexp-wt/V-lostcity-foot-2.
 
 ## Backlog
 
