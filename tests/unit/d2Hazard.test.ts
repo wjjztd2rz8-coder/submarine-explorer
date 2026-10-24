@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import type { InputState } from '../../src/core/Input.js';
-import { startingReserves } from '../../src/game/Power.js';
+import { Power, startingReserves } from '../../src/game/Power.js';
 import { snowFlowStep } from '../../src/render/MarineSnow.js';
 import { Submarine } from '../../src/sub/Submarine.js';
 
@@ -89,6 +89,64 @@ describe('descent reserves', () => {
     );
     expect(oneHour.oxygen).toBeCloseTo(1 - 1.03 / power.oxygenHours);
     expect(startingReserves(100000, speedProfiles.research, power).battery).toBe(0);
+  });
+});
+
+describe('dive supply boundaries', () => {
+  it.each([0, -1, -Number.MAX_VALUE, NaN, Infinity, -Infinity])(
+    'preserves both reserves and their warnings for elapsed time %s',
+    (dt) => {
+      const power = new Power(config.power, true);
+      power.setLevels(0.24, 0.09);
+      const before = power.state;
+      expect(power.step(dt, { throttle: 1, ballast: -1, lights: true, sensors: true })).toBeNull();
+      expect(power.state).toEqual(before);
+      power.step(1 / 60, { throttle: 0, ballast: 0, lights: false, sensors: false });
+      expect(power.state.battery).toBeLessThan(before.battery);
+      expect(power.state.oxygen).toBeLessThan(before.oxygen);
+      expect(power.state.depleted).toBeNull();
+    },
+  );
+
+  it.each([1e12, Number.MAX_VALUE])(
+    'saturates both supplies at zero for a finite %s second step and stays empty',
+    (dt) => {
+      for (const load of [
+        { throttle: 0, ballast: 0, lights: false, sensors: false },
+        { throttle: -1, ballast: 1, lights: true, sensors: true },
+      ]) {
+        const power = new Power(config.power, true);
+        power.step(dt, load);
+        expect(power.state).toMatchObject({
+          battery: 0,
+          oxygen: 0,
+          low: ['battery', 'oxygen'],
+          critical: ['battery', 'oxygen'],
+          depleted: 'battery',
+        });
+        power.step(1 / 60, load);
+        expect(power.state).toMatchObject({ battery: 0, oxygen: 0, depleted: 'battery' });
+      }
+    },
+  );
+
+  it.each([
+    { level: 0.250001, low: [], critical: [] },
+    { level: 0.25, low: ['battery', 'oxygen'], critical: [] },
+    { level: 0.100001, low: ['battery', 'oxygen'], critical: [] },
+    { level: 0.1, low: ['battery', 'oxygen'], critical: ['battery', 'oxygen'] },
+  ])('classifies both supplies at $level without consuming them', ({ level, low, critical }) => {
+    const power = new Power(config.power, true);
+    power.setLevels(level, level);
+    for (let i = 0; i < 3; i++) {
+      expect(power.state).toMatchObject({
+        battery: level,
+        oxygen: level,
+        low,
+        critical,
+        depleted: null,
+      });
+    }
   });
 });
 
