@@ -78,6 +78,9 @@ export function startLoop(ctx: GameContext, runner: SystemRunner): () => void {
   };
   const offState = ctx.bus.on('app:state', resetClock);
   document.addEventListener('visibilitychange', resetClock);
+  // RAF can stall across app switches without a visibility transition.
+  window.addEventListener('blur', resetClock);
+  window.addEventListener('focus', resetClock);
 
   function frame(nowMs: number): void {
     frameId = requestAnimationFrame(frame);
@@ -114,5 +117,7 @@ export function startLoop(ctx: GameContext, runner: SystemRunner): () => void {
     cancelAnimationFrame(frameId);
     offState();
     document.removeEventListener('visibilitychange', resetClock);
+    window.removeEventListener('blur', resetClock);
+    window.removeEventListener('focus', resetClock);
   };
 }
