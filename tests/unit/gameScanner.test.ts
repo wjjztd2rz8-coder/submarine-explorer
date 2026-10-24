@@ -324,6 +324,69 @@ it('prefers an unscanned contact in range over a closer remote hint with a small
 });
 
 describe('Scanner', () => {
+  it.each([0, 100])(
+    'records simultaneous eligible contacts once each with finite scan state at %s m',
+    (distance) => {
+      const objective = target({ position: new Vector3(0, -100, -distance), radius: 30 });
+      const sample = target({ ...objective, id: 'sample:rock' });
+      const animal = target({ ...objective, id: 'life:fish' });
+      const { scanner, log, store } = setup([objective]);
+      scanner.setObjective(objective.id);
+      scanner.setSupplementalTargets([sample]);
+      scanner.setExtraTargets([animal]);
+      scanner.setConfig({ ...cfg, radiusFloorM: 100 });
+
+      for (const [index, contact] of [objective, sample, animal].entries()) {
+        scanner.update(0, AT, NORTH, false);
+        expect(scanner.view.candidateId).toBe(contact.id);
+        expect(scanner.view.nearestDistance).toBe(distance);
+        expect(scanner.view.nearestRadius).toBe(100);
+        for (const value of [
+          scanner.view.nearestAngleDeg,
+          scanner.view.nearestTurnDeg,
+          scanner.view.nearestVertDeg,
+        ]) {
+          expect(Number.isFinite(value)).toBe(true);
+        }
+        scanner.update(0.5, AT, NORTH, true);
+        expect(scanner.view.activeId).toBe(contact.id);
+        expect(scanner.view.progress).toBe(0.25);
+        expect(scanner.view.completed).toBe(index);
+        scanner.update(1.5, AT, NORTH, true);
+        expect(scanner.view.completed).toBe(index + 1);
+        expect(store.get('lm', contact.id)?.count).toBe(1);
+        expect(log.filter(([name]) => name === 'scan:complete')).toHaveLength(index + 1);
+      }
+
+      run(scanner, 3, AT, NORTH, true);
+      scanner.update(0, AT, NORTH, false);
+      run(scanner, 3, AT, NORTH, true);
+      expect(scanner.view.completed).toBe(3);
+      expect(scanner.view.candidateId).toBeNull();
+      expect(store.keys()).toHaveLength(3);
+      expect(log.filter(([name]) => name === 'scan:complete')).toEqual(
+        [objective, sample, animal].map((contact) => [
+          'scan:complete',
+          { poiId: contact.id, landmarkId: 'lm', firstTime: true },
+        ]),
+      );
+      for (const contact of [objective, sample, animal]) {
+        expect(store.get('lm', contact.id)?.count).toBe(1);
+      }
+      for (const value of Object.values(scanner.view)) {
+        if (typeof value === 'number') expect(Number.isNaN(value)).toBe(false);
+      }
+      for (const [name, payload] of log) {
+        if (name === 'scan:progress') {
+          const { progress } = payload as GameEvents['scan:progress'];
+          expect(Number.isFinite(progress)).toBe(true);
+          expect(progress).toBeGreaterThanOrEqual(0);
+          expect(progress).toBeLessThanOrEqual(1);
+        }
+      }
+    },
+  );
+
   it.each(['fixed', 'wildlife', 'curiosity'] as const)(
     'applies the Arcade floor to %s targets and restores data reach in Realistic',
     (pool) => {
