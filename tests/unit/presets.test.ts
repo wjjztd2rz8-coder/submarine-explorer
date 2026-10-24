@@ -9,13 +9,20 @@ import {
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import { PerspectiveCamera, PointLight, Points, Scene, Vector3 } from 'three';
+import { Color, FogExp2, Mesh, PerspectiveCamera, PointLight, Points, Scene, Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
+import { allSiteManifests, siteManifest } from '../../src/core/SiteManifest.js';
 import { EventBus } from '../../src/core/EventBus.js';
-import { Atmosphere } from '../../src/render/Atmosphere.js';
+import { Atmosphere, sampleAtmosphere } from '../../src/render/Atmosphere.js';
+import { ReefPreset } from '../../src/world/presets/ReefPreset.js';
+import type { TitanicHorizon } from '../../src/world/presets/TitanicHorizon.js';
 import { Currents } from '../../src/world/Currents.js';
 import { VentPreset, ventVariety } from '../../src/world/presets/VentPreset.js';
-import type { PresetEnterContext, PresetParams } from '../../src/world/presets/types.js';
+import type {
+  PresetEnterContext,
+  PresetFrameContext,
+  PresetParams,
+} from '../../src/world/presets/types.js';
 import {
   landmarkTypeFor,
   mergePresetParams,
@@ -504,6 +511,167 @@ describe('vent haze and glow budgets', () => {
   });
 });
 
+describe('optional reef backdrop', () => {
+  it.each(['low', 'medium', 'high'] as const)(
+    '%s: propagates site depth/fog policy and releases it across scene re-entry',
+    (tier) => {
+      const config = DEFAULT_CONFIG;
+      const manifests = allSiteManifests();
+      const before = JSON.stringify({ config, manifests });
+      const blake = siteManifest('blake-plateau-corals')!;
+      const control = siteManifest('great-blue-hole')!;
+      const horizon = blake.horizon!;
+      const midpoint = (horizon.fadeStartM + horizon.fadeEndM) / 2;
+      const results: string[] = [];
+      for (const sites of [
+        [blake, control],
+        [control, blake],
+      ]) {
+        const states = sites.map((site) => {
+          const scene = new Scene();
+          const mission = JSON.parse(
+            readFileSync(`data/landmarks/${site.id}/mission.json`, 'utf8'),
+          );
+          const preset = new ReefPreset({ ambient: 0.1, headlightGain: 1, headlightFalloffM: 60 });
+          const ctx: PresetEnterContext = {
+            site,
+            scene,
+            params: mergePresetParams(
+              'reef',
+              presetDefaults(config.presets, 'reef'),
+              mission.environment.overrides ?? {},
+            ),
+            visuals: tier !== 'low',
+            particleScale: config.presets.tierParticleScale[tier],
+            maxParticles: config.presets.maxParticles,
+            props: [],
+            pois: [],
+            terrain: {
+              sampleHeight: () => -1000,
+              getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
+              widthM: 1000,
+              depthM: 1000,
+            },
+            spawn: new Vector3(0, -800, 0),
+            toWorld: () => ({ x: 0, z: 0 }),
+            bus: new EventBus(),
+          };
+          return { site, preset, ctx };
+        });
+        const observed: Record<string, unknown> = {};
+        try {
+          for (const state of states) {
+            const { site, preset, ctx } = state;
+            // Reuse the preset after exit, including entry into a different scene.
+            for (const scene of [ctx.scene, new Scene()]) {
+              preset.enter({ ...ctx, scene });
+              const dome = scene.getObjectByName('titanicHorizon') as
+                TitanicHorizon['dome'] | undefined;
+              expect(!!dome).toBe(site === blake);
+              expect(dome?.visible).toBe(site === blake ? false : undefined);
+              const draws = tier === 'low' ? 1 : 2;
+              expect(preset.stats).toEqual({ draws, particles: 0, lights: 0 });
+              expect(scene.children).toHaveLength(draws);
+              const camera = new PerspectiveCamera(60, 16 / 9, 0.1, 5000);
+              for (const depth of [
+                5,
+                horizon.fadeStartM,
+                midpoint,
+                horizon.fadeEndM,
+                800,
+                midpoint,
+                5,
+              ]) {
+                camera.position.set(depth / 2, -depth, -depth / 3);
+                camera.rotation.set(0.4, 1.2, 0.2);
+                camera.far = depth + 3000;
+                const atmo = sampleAtmosphere(config.water, camera.position.y);
+                const fog = atmo.fogColor.clone();
+                const density = atmo.fogDensity;
+                scene.fog = new FogExp2(fog, density);
+                scene.background = fog.clone();
+                const frame: PresetFrameContext = {
+                  camera,
+                  atmo,
+                  terrain: ctx.terrain,
+                  subPosition: ctx.spawn,
+                  subVelocity: new Vector3(),
+                  elapsed: 1,
+                  viewportH: 900,
+                  headlightsOn: true,
+                  baseCurrent: new Vector3(),
+                  current: new Vector3(),
+                  canyonReferenceSpeedMps: 1,
+                  causticsScale: 1,
+                  bus: ctx.bus,
+                };
+                preset.update(1 / 60, frame);
+                // Authored midpoint gives half the full lift; samples reset each frame.
+                const fade = depth <= horizon.fadeStartM ? 0 : depth >= horizon.fadeEndM ? 1 : 0.5;
+                const expected = fog.multiplyScalar(
+                  site === blake ? 1 + horizon.fogLift * fade : 1,
+                );
+                expect(atmo.fogColor).toEqual(expected);
+                expect(atmo.fogDensity).toBe(density);
+                expect(scene.fog.color).toEqual(expected);
+                expect(scene.background).toEqual(expected);
+                if (dome) {
+                  expect(dome.visible).toBe(fade > 0);
+                  if (fade > 0) {
+                    expect(dome.position).toEqual(camera.position);
+                    expect(dome.scale.toArray()).toEqual(Array(3).fill(camera.far * 0.9));
+                    expect(dome.rotation.toArray()).toEqual([0, 0, 0, 'XYZ']);
+                    const colors = dome.geometry.getAttribute('color');
+                    const positions = dome.geometry.getAttribute('position');
+                    for (let i = 0; i < positions.count; i++) {
+                      if (positions.getY(i) <= 0.2)
+                        expect([colors.getX(i), colors.getY(i), colors.getZ(i)]).toEqual(
+                          expected.toArray().map(Math.fround),
+                        );
+                      if (positions.getY(i) === 1 && fade === 1)
+                        expect([colors.getX(i), colors.getY(i), colors.getZ(i)]).toEqual(
+                          new Color(horizon.upperColor).toArray().map(Math.fround),
+                        );
+                    }
+                  }
+                }
+                for (const object of scene.children) {
+                  expect(object).toBeInstanceOf(Mesh);
+                  for (const attribute of Object.values((object as Mesh).geometry.attributes))
+                    expect(Array.from(attribute.array).every(Number.isFinite)).toBe(true);
+                }
+              }
+              observed[site.id] = {
+                stats: { ...preset.stats },
+                names: scene.children.map((o) => o.name),
+              };
+              const disposals = scene.children.flatMap((object) => {
+                const mesh = object as Mesh;
+                return [
+                  vi.spyOn(mesh.geometry, 'dispose'),
+                  vi.spyOn(mesh.material as import('three').Material, 'dispose'),
+                ];
+              });
+              const objects = [...scene.children];
+              preset.exit();
+              preset.exit();
+              expect(disposals.every((spy) => spy.mock.calls.length === 1)).toBe(true);
+              expect(objects.every((object) => object.parent === null)).toBe(true);
+              expect(scene.children).toHaveLength(0);
+              expect(preset.stats).toEqual({ draws: 0, particles: 0, lights: 0 });
+            }
+          }
+          results.push(JSON.stringify([observed[blake.id], observed[control.id]]));
+        } finally {
+          for (const { preset } of states) preset.exit();
+        }
+      }
+      expect(results[0]).toBe(results[1]);
+      expect(JSON.stringify({ config, manifests })).toBe(before);
+    },
+  );
+});
+
 describe('shared scalar maths', () => {
   it('retains clamp boundaries, non-finite inputs and min/max ordering', () => {
     expect([-Infinity, -1, 0, 0.5, 1, 2, Infinity].map(clamp01)).toEqual([0, 0, 0, 0.5, 1, 1, 1]);
@@ -562,6 +730,7 @@ describe('per-site preset atmosphere', () => {
         await currents.ready;
         const position = new Vector3(0, -800, 0);
         const camera = new PerspectiveCamera();
+        if (site === 'blake-plateau-corals') camera.position.copy(position);
         const mission =
           site === 'unknown-site'
             ? null
@@ -612,8 +781,22 @@ describe('per-site preset atmosphere', () => {
           const expected = site === 'beebe-vent-field' ? 0.27 : 1;
           for (let frame = 0; frame < 3; frame++) {
             const sample = atmosphere.update(position.y, position, 1 / 60);
+            const fog = sample.fogColor.clone();
             expect(sample.hullLight).toBe(1);
             system.update(1 / 60, 0, sample, camera, 844, frame / 60);
+            if (site === 'blake-plateau-corals') {
+              expect(scene.getObjectByName('titanicHorizon')?.visible).toBe(true);
+              expect(system.preset!.stats).toEqual({
+                draws: tier === 'low' ? 1 : 2,
+                particles: 0,
+                lights: 0,
+              });
+              expect(sample.fogColor).toEqual(
+                fog.multiplyScalar(1 + siteManifest(site)!.horizon!.fogLift),
+              );
+              expect(scene.fog!.color).toEqual(sample.fogColor);
+              expect(scene.background).toEqual(sample.fogColor);
+            }
             expect(Number.isFinite(sample.hullLight)).toBe(true);
             expect(sample.hullLight).toBe(expected);
             expect(scene.getObjectByName('enduranceHorizon') !== undefined).toBe(
