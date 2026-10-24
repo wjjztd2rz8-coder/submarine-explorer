@@ -568,6 +568,10 @@ describe('touch control interruptions', () => {
         } else f.win.dispatchEvent(new Event(interruption));
         expect(f.input.touchAxes).toEqual({ throttle: 0, yaw: 0, pitch: 0, ballast: 0 });
         expect(f.input.touchHeld.size).toBe(0);
+        // Returning from phone chrome must not revive captured fingers.
+        f.win.dispatchEvent(new Event('focus'));
+        expect(f.input.touchAxes).toEqual({ throttle: 0, yaw: 0, pitch: 0, ballast: 0 });
+        expect(f.input.touchHeld.size).toBe(0);
         pointer(f.stick, 'pointermove', 1);
         expect(f.input.touchAxes.throttle).toBe(0);
         pointer(f.stick, 'pointerdown', 4);
