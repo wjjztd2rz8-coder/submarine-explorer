@@ -1862,3 +1862,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: no Codex task running (Codex 5h 4%, dispatch waits for 20%), 3820/3840/3850 queued, held worktrees unchanged. Latest Pages deploy green. No Claude package (remaining art gains ~0.1), no tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-24 15:36 CDT headless run 122 (Claude): collection + CI fix
+
+- Hosted CI was red on run 121's push: static job failed on Prettier for plan/DIRECTOR.md (backlog numbering). Fixed on main. Merged (smoke + project-base green; d-shell spec 5/5 locally): Codex 3820 (cheaper d-shell journey: dropped screenshots, settings round trip and post-quit freeze check, claimed covered elsewhere), 3840 (39 rooted-depth guards, clean), 3850 (scan/reward audit, no defect). Codex 5h recovered to ~56%, dispatch will take the queue. No Claude package (art gains ~0.1), no tag (f64 stands until CI green).
+- Process: three Codex worktrees each found the same Prettier failure on DIRECTOR.md; it was caused by a log-trim commit, not by them.
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.

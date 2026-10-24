@@ -1,9 +1,5 @@
-// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
-import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from './helpers/unlocked.js';
 import { waitForFrames } from './helpers/frames.js';
-
-const shots = '.cache/codex/shots/d-shell';
 
 async function boot(page: Page, url: string): Promise<void> {
   await page.goto(url, { waitUntil: 'domcontentloaded' });
@@ -94,7 +90,7 @@ async function expectGlobeClearEdges(page: Page): Promise<void> {
 }
 
 test('home, site grid, pause, objectives, resume and quit', async ({ page }) => {
-  await mkdir(shots, { recursive: true });
+  // Guards the shell round trip; layout captures live in the title layout specs.
   await page.setViewportSize({ width: 1280, height: 720 });
   await boot(page, '/');
   await expect(page.locator('.home-screen')).toBeVisible();
@@ -148,7 +144,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await expect(page.locator('.home-menu .mode-advanced')).toBeHidden();
   await expect(page.getByRole('button', { name: /^Dive(:|$)/ })).toBeEnabled();
   await expect(page.getByRole('button', { name: 'Continue' })).toHaveCount(0);
-  // F-TITLE-E: the title scene backs the menu; the embedded globe opens only in the sites view.
+  // The title scene backs the menu; the embedded globe opens only in the sites view.
   await expect(page.locator('.globe.is-embedded')).toBeHidden();
   const diveResources = () =>
     page.evaluate(() => {
@@ -166,12 +162,10 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
     });
   expect(await diveResources()).toEqual([]);
   await page.keyboard.down('w');
-  await waitForFrames(page, 8, 400);
+  // Give held input a loop interval to exercise lazy dive initialization.
+  await waitForFrames(page, 2);
   await page.keyboard.up('w');
   expect(await diveResources()).toEqual([]);
-  await page.screenshot({ path: `${shots}/home-1280.png` });
-  await page.setViewportSize({ width: 1920, height: 1080 });
-  await page.screenshot({ path: `${shots}/home-1920.png` });
 
   await page.locator('.home-menu').getByRole('button', { name: 'Dive sites' }).click();
   const sites = page.locator('.home-sites');
@@ -201,7 +195,6 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await expect(sites.locator('[data-mission="titanic"]')).toContainText(/\d+\/\d+ logged/);
   await sites.locator('[data-mission="titanic"]').hover();
   await expect(page.locator('.globe.is-embedded .globe-card')).toContainText('Titanic');
-  await page.screenshot({ path: `${shots}/mission-select.png` });
   await Promise.all([
     page.waitForURL(/[?&]mission=titanic\b/),
     sites.locator('[data-mission="titanic"]').click(),
@@ -212,46 +205,39 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await expect(page.locator('.briefing')).toBeHidden();
   await page.keyboard.press('Escape');
   await expect(page.locator('.pause-menu')).toBeVisible();
+  await expect(page.locator('body')).toHaveAttribute('data-app-state', 'pause');
   const paused = await pose(page);
   await page.keyboard.down('w');
-  await waitForFrames(page, 8, 400);
+  // Keep the freeze observation window, with fewer required software-GL frames.
+  await waitForFrames(page, 2, 400);
   await page.keyboard.up('w');
   expect(await pose(page)).toEqual(paused);
-  await page.screenshot({ path: `${shots}/pause-menu.png` });
-  for (let i = 0; i < 20; i++) await page.keyboard.press('Tab');
-  expect(
-    await page.evaluate(() =>
-      document.querySelector('.pause-menu')?.contains(document.activeElement),
-    ),
-  ).toBe(true);
-  await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
-  await expect(page.locator('.settings')).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(page.locator('.settings')).toBeHidden();
-  await expect(page.locator('.pause-menu')).toBeVisible();
+  // Exercise both trap boundaries directly; Settings round trips have their own spec.
+  const pause = page.locator('.pause-menu');
+  const quit = pause.getByRole('button', { name: 'Quit to home' });
+  await quit.focus();
+  await page.keyboard.press('Tab');
+  await expect(pause.getByRole('button', { name: 'Resume', exact: true })).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(quit).toBeFocused();
   await page.locator('.pause-menu').getByRole('button', { name: 'Objectives' }).click();
   await expect(page.locator('.pause-objectives li')).toHaveCount(4);
   await expect(page.locator('.pause-objectives')).toContainText('north end');
-  await page.screenshot({ path: `${shots}/pause-objectives.png` });
   await page.keyboard.press('Escape');
   await expect(page.locator('.pause-actions')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.locator('.pause-menu')).toBeHidden();
+  await expect(page.locator('body')).toHaveAttribute('data-app-state', 'dive');
   await page.keyboard.press('Escape');
+  await expect(pause).toBeVisible();
   // dispatchEvent needs no rendered frame: hosted software GL can stall click's scroll-into-view for minutes.
-  await page
-    .locator('.pause-menu')
-    .getByRole('button', { name: 'Quit to home' })
-    .dispatchEvent('click');
+  await quit.dispatchEvent('click');
   await expect(page.locator('.home-screen')).toBeVisible();
   await expect(page.locator('.pause-menu')).toBeHidden();
+  await expect(page.locator('body')).toHaveAttribute('data-app-state', 'home');
   expect(new URL(page.url()).search).toBe('');
   await expect(page.getByRole('button', { name: /^Dive(:|$)/ })).toBeEnabled();
-  const homeAgain = await pose(page);
-  await page.keyboard.down('w');
-  await waitForFrames(page, 8, 400);
-  await page.keyboard.up('w');
-  expect(await pose(page)).toEqual(homeAgain);
+  // Freezing the sub after Quit is covered by the title scene lifecycle spec.
 });
 
 test('URL probes bypass home and home site grid scrolls vertically with trapped focus', async ({

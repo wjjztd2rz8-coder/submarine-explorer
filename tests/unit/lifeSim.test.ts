@@ -7,7 +7,7 @@ import { Life } from '../../src/world/life/Life.js';
 import { LifeSim, TICK } from '../../src/world/life/LifeSim.js';
 import { mulberry32 } from '../../src/world/life/rng.js';
 import { bodyLen } from '../../src/world/life/steer.js';
-import { parseLifeDoc } from '../../src/world/life/tables.js';
+import { buildEntries, parseLifeDoc } from '../../src/world/life/tables.js';
 import { LIFE_TIERS, type SiteTable } from '../../src/world/life/types.js';
 
 /** A seabed that slopes from 500 m deep in the west to 900 m in the east, with a gentle ridge. */
@@ -230,6 +230,74 @@ describe('rooted animals and crawlers', () => {
       expect(depth, `${a.x},${a.z}`).toBeLessThanOrEqual(row.entry.depth[1] + 6);
     }
   });
+
+  it.each(
+    Object.entries(parseLifeDoc(lifeJson).sites).flatMap(([site, shipped]) =>
+      (['low', 'medium', 'high'] as const).map((tier) => [site, tier, shipped] as const),
+    ),
+  )(
+    'respects final rooted habitat and population budgets with shipped table %s %s',
+    (site, tier, shipped) => {
+      const rows = buildEntries(shipped);
+      const rootedRows = rows.filter((row) => row.def.archetype === 'sessile');
+      let agentsSeen = 0;
+      let rootedSeen = 0;
+      // Tables without rooted species still exercise population and budgets.
+      for (const row of rootedRows.length ? rootedRows : rows.slice(0, 1)) {
+        const lo = Math.max(row.entry.depth[0], row.def.depth[0]);
+        const hi = Math.min(row.entry.depth[1], row.def.depth[1]);
+        for (const [ground, depth, slope] of [
+          ['flat midpoint', (lo + hi) / 2, 0],
+          // Keep the existing six-metre tolerance usable, including beside dense mobile life.
+          ['flat margin', lo - 5, 0],
+          ['lower slope', lo, 1.2],
+          ['upper slope', hi, 1.2],
+        ] as const) {
+          for (const seed of [1, 7, 21, 42]) {
+            const habitat: SimEnv = {
+              groundAt: (x, z) => -Math.max(0.5, depth + slope * (x - 13) + (slope * z) / 3),
+            };
+            const sim = new LifeSim({
+              tier: LIFE_TIERS[tier],
+              table: shipped,
+              seed,
+              rand: mulberry32(seed),
+              env: habitat,
+            });
+            const sub = makeSub({ x: 13, y: -Math.max(0.6, depth - 8) });
+            const context = `${site} ${tier} ${row.def.id} ${ground} seed ${seed}`;
+            // Check both initial fill and subsequent cell/despawn passes at normal frame steps.
+            for (const seconds of [1 / 60, 0.5]) {
+              run(sim, sub, seconds);
+              const stats = sim.stats();
+              agentsSeen += stats.agents;
+              expect(stats.agents, context).toBeLessThanOrEqual(LIFE_TIERS[tier].maxAgents);
+              expect(stats.species, context).toBeLessThanOrEqual(LIFE_TIERS[tier].maxSpecies);
+              for (const id of stats.liveSpecies) {
+                const def = sim.pool.find((a) => a.alive && a.def.id === id)!.def;
+                expect(sim.countOf(id), `${context} ${id}`).toBeLessThanOrEqual(
+                  sim.capacityOf(def),
+                );
+              }
+              for (const a of sim.pool) {
+                if (!a.alive || a.def.archetype !== 'sessile') continue;
+                rootedSeen++;
+                expect(a.y, context).toBeCloseTo(habitat.groundAt(a.x, a.z), 9);
+                // Assert against both authored habitats, independently of the placement helper.
+                for (const band of [a.group.row!.entry.depth, a.def.depth]) {
+                  expect(-a.y, `${context} ${a.def.id}`).toBeGreaterThanOrEqual(band[0] - 6);
+                  expect(-a.y, `${context} ${a.def.id}`).toBeLessThanOrEqual(band[1] + 6);
+                }
+              }
+            }
+          }
+        }
+      }
+      // Presence across the seeded habitats, not a promise that every cell or depth is populated.
+      expect(agentsSeen, `${site} ${tier}`).toBeGreaterThan(0);
+      if (rootedRows.length) expect(rootedSeen, `${site} ${tier}`).toBeGreaterThan(0);
+    },
+  );
 });
 
 describe('steering stability', () => {
