@@ -1805,3 +1805,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing new to collect; older held worktrees unchanged. Codex 5h reset, dispatch launched 3640-3660 (journal discovery, save migration, mission objective order). Queued 3670-3690 (audio state, settings persistence, depth/hull bounds bug-hunts). No Claude package, no tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-24 05:06 CDT headless run 111 (Claude): collection only
+
+- Merged and pushed (smoke + project-base green on 3660; notes-only for the others): Codex 3640 (Journal discovery) and 3650 (save migration) clean audits, 3660 (mission objective order) two sequence guards in missionRouter tests. No production defect. Removed those worktrees. 3670-3690 running; queued 3700-3720 (scan cooldown, input state, pause/resume clock). No Claude package, no tag (f64 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
