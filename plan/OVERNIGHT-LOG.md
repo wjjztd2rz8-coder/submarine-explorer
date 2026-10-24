@@ -1831,3 +1831,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged (smoke + project-base green on main): Sonnet V-lostcity-foot-2, a per-biome `scatterTint` for rock scatter (Lost City rubble orange to olive-grey, no new instances; two Beebe snapshots rebaselined; ~3.6 by my read, agent said 3.7). Codex 5h ~6%, nothing running, 3730-3750 queued. No tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-24 10:45 CDT headless run 116 (Claude): collection only
+
+- Merged and pushed (smoke + project-base green on 3730 and on main): Codex 3730 (12 battery/oxygen boundary cases in d2Hazard.test.ts), 3740 and 3750 clean audit notes. Removed those worktrees. 3760-3780 (verify Blake dome, Challenger fade, CI post-f64) running; queued 3790-3810 (save round trip, spawn determinism, scan targets). No Claude package (Claude idle by design this run: 3 Codex tasks already in flight, remaining V-* items gain ~0.1), no tag (f64 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
