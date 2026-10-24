@@ -20,7 +20,7 @@ Net simplicity is neutral: one optional data field and one uniform, no new eleme
 
 ## Screenshots
 
-`.cache/golden/2026-10-23-235424/` (ripple 4, reach 0.4: close view too strong) and the final 2.5 value is gentler.
+`.cache/golden/2026-10-24-001430/` (final, ripple 2.5).
 Baseline: `.cache/golden/2026-10-23-234620/`. Close views (poses 2, 3) show clear sand ripples across the floor.
 
 ## Honest score
