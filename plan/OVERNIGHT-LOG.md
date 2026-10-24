@@ -1755,3 +1755,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Started seconds after run 99. Nothing new to collect; no Codex task running (Codex 5h 5% until 17:45), 3510/3520/3530 queued. Hosted CI for the run 99 push still pending, so no tag (f63 stands). No Claude package started.
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-23 19:36 CDT headless run 101 (Claude): targeted review, one visual package
+
+- Targeted review (Claude idle): resume.sh skip window 3 h -> 90 min. Merged Sonnet V-challenger-ripples (gates smoke green; ripples now read in approach views, not yet the opening). Queued Codex 3570, 3580. No tag (f63 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.

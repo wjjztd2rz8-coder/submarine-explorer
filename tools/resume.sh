@@ -36,7 +36,7 @@ days=max(0,min(7,((w.get("resets_at") or now)-now)/86400))
 sys.exit(0 if left("five_hour")>=50 and left("seven_day")>=max(10,7+93*days/7-20) else 1)'
 }
 # Work state: main HEAD, finished Codex results and paused Claude packages. If it
-# hasn't changed since the last run started (and that was < 3 h ago), a new run
+# hasn't changed since the last run started (and that was < 90 min ago), a new run
 # would only re-read everything and log "nothing to do", so skip it cheaply.
 # The dispatcher launching a brief (new worktree, queue file moved) is not Claude
 # work: on 2026-10-08 that alone started two "nothing to collect" runs.
@@ -46,7 +46,7 @@ tools/review-triggers.sh > /dev/null 2>&1 || true
 # every run from 2026-10-13 08:09 to 21:15, hence the || true.
 state=$( { git log -1 --format=%H -- . ':!plan/OVERNIGHT-LOG.md' ':!plan/PROCESS-LOG.md'; ls -l --time-style=+%s .cache/codex/*-result.md .cache/claude/paused-packages.md 2>/dev/null || true; } | md5sum | cut -c1-12)
 if [[ "${1:-}" == "--headless" && ! -f .cache/review-due && -f .cache/resume-state && "$(cut -d' ' -f1 .cache/resume-state)" == "$state" ]] \
-   && (( $(date +%s) - $(stat -c %Y .cache/resume-state) < 10800 )); then
+   && (( $(date +%s) - $(stat -c %Y .cache/resume-state) < 5400 )); then
   echo "no new work since last run; exiting"; exit 0
 fi
 if [[ "${1:-}" == "--headless" ]] && ! { ai-limits > .cache/resume-gate.txt 2>&1; claude_ok; }; then

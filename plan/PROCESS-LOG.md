@@ -282,3 +282,8 @@ Run 72's `start` exited 75 (Codex 5h 17% < 20%) under nohup, so nobody saw it; `
 Creating `.cache/review/current` as a directory before `codex-review.sh start` makes its `ln -sfn` nest inside it, so reconcile never finds `sol-review.md` and hangs; killing a reconcile mid-run leaves a `codex exec resume` process holding the thread (later reconciles fail with "active writer"). Rule: never create `.cache/review/current` by hand (write the draft only after `start` has made the symlink), and wait for a stale resume process to exit before retrying. Background Bash commands are stopped after 10 min regardless of `timeout`; poll the output file in 10-min foreground loops.
 
 - 2026-10-23 review: no process change; Codex queue refilled (3380). Sol skipped (Codex 5h 11%).
+
+## 2026-10-23 evening (targeted review: Claude idle at >=50% for 2 h)
+
+- Cause: `resume.sh` skips a headless run for 3 h when main's non-log HEAD and Codex results are unchanged. Run 100 (16:25) found nothing new, so runs at 17:15-18:15 all exited "no new work" while Claude sat at 76-79% with unblocked Sonnet items (V-challenger-ripples, V-monterey-apron). The skip is right for collection, wrong when a Claude lane has work.
+- Fix: skip window 3 h -> 90 min, so an idle Claude gets a package-starting run at most 90 min after the last one. Backlog items stay the source; a run that finds nothing still exits cheaply.

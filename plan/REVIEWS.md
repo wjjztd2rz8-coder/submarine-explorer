@@ -1,3 +1,9 @@
+## 2026-10-23 (late, targeted review: Claude idle at >=50% for 2 h)
+
+- Cause: the resume.sh "no new work" skip (3 h) idled Claude at 76-79% with unblocked Sonnet items. Window cut to 90 min (PROCESS-LOG).
+- Work taken: V-challenger-ripples (Sonnet) merged: per-biome ripple reach, close/approach views clearly show ripples, opening view still none (~3.5). Gates green (smoke). Queued Codex 3570 (skip-rule audit), 3580 (verify ripples numerics) beside 3560.
+- No change to stage (~83-84%) or Needs owner.
+
 # Reviews
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
