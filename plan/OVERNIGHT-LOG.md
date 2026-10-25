@@ -1983,3 +1983,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: no Codex task running; 4120, 4130, 4140 queued and waiting for Codex 5h 20% (now 5%, resets 11:30). Held worktrees unchanged, main clean. Claude 5h 93%, week 66%. No Claude package (next art step: Blue Hole two-sided lip or Axial chimney scale; gains ~0.1). No tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-25 12:16 CDT headless run 146 (Claude): collection + tag
+
+- Collected report-only notes 4120 (difficulty/mode switching: no leak found), 4130 (Endurance 85 m opening would put the first target 15 m inside the 100 m Arcade scan radius; altitude barely changes; hull measures 47.9 x 9.8 x 11.0 m, chase view span +13%), 4140 (hosted CI unreachable from the Codex sandbox; no new evidence). Worktrees removed. 4150, 4160, 4170 still running. Queued 4180 (save migration), 4190 (audio state), 4200 (Journal scans). Main `b7f3ca59` has green CI and Pages, so tagged and pushed `f65`. Claude 5h 100%, week 66%. No Claude package (next art step: Blue Hole two-sided lip or Axial chimney scale; gains ~0.1).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK (4130 says Arcade scan exclusion would break, so it needs a shorter first-target range rule or a richer hull); phone retest.
