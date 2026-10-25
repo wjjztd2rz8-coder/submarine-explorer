@@ -96,7 +96,9 @@ seabed + hullRadius + seabedClearance + mission.spawnClearanceM]`. The
    exploring** (the default; it applies after `mission.completionBannerS`,
    20 s) and **Surface and debrief**. Secondary scans keep counting; when
    everything is done the banner returns as **All objectives complete**. The
-   banner buttons never take keyboard focus.
+   banner buttons never take keyboard focus. Its star preview updates when a
+   photo or wildlife scan earns the dive bonus, without extending the banner's
+   dismissal timer.
 6. **Debrief.** Only the player ends a dive: the banner's Surface and debrief,
    or **Surface and debrief** in the Esc menu (any time during a mission dive;
    before the primaries it is titled **Dive ended**). `Mission.end()` emits

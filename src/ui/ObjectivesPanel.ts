@@ -196,12 +196,20 @@ export class ObjectivesPanel {
     this.banner = banner;
     this.bannerTitle.textContent = banner.title;
     this.bannerDetail.textContent = banner.detail;
-    const stars = banner.stars ?? 0;
-    this.bannerStars.hidden = banner.stars === undefined;
-    this.bannerStars.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
-    this.bannerStars.setAttribute('aria-label', `${stars} of 3 stars`);
+    this.setBannerStars(banner.stars);
     this.bannerEl.hidden = false;
     this.sync();
+  }
+
+  /** Refresh the live rating without reopening the banner or extending its lifetime. */
+  setBannerStars(stars?: number): void {
+    const key = String(stars);
+    if (this.cache.get('banner-stars') === key) return;
+    this.cache.set('banner-stars', key);
+    this.bannerStars.hidden = stars === undefined;
+    const count = stars ?? 0;
+    this.bannerStars.textContent = '★'.repeat(count) + '☆'.repeat(3 - count);
+    this.bannerStars.setAttribute('aria-label', `${count} of 3 stars`);
   }
 
   hideBanner(): void {
