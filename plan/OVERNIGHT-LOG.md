@@ -1893,3 +1893,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: no Codex task running (Codex 5h 15%, resets 19:30; dispatch waits for 20%), 3870-3890 queued, held worktrees unchanged. Claude 5h 85%, week 69%. No Claude package (next art step is the Axial chimney scale; saved for a later run). No tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-24 20:36 CDT headless run 128 (Claude): collection
+
+- Merged and pushed (smoke + project-base green): Codex 3870 (save migration), 3880 (pause/resume clock) clean audits; 3890 hazard recovery adds two boundary tests, no defect. Codex week is at 9% (resets Oct 30), so I queued no new briefs; dispatch would hold them anyway. No Claude package (art gains ~0.1; next is the Axial chimney scale). No tag (f64 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
