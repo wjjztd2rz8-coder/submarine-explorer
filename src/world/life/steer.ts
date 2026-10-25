@@ -687,20 +687,20 @@ export function integrate(a: Agent, env: SimEnv, dt: number): boolean {
     a.ex *= k;
     a.ey *= k;
     a.ez *= k;
-    // Hard floor and ceiling: no animal can end a frame in rock or air.
+    // Hard water limits: the seabed wins when the water is too shallow to fit.
     if (def.archetype === 'crawler') {
       a.y = env.groundAt(a.x, a.z);
     } else {
       const L = bodyLen(a);
       const gnd = env.groundAt(a.x, a.z) + Math.max(0.12, L * 0.25);
+      if (a.y > -0.6 - L * 0.2) {
+        a.y = -0.6 - L * 0.2;
+        if (a.vy > 0) a.vy = 0;
+      }
       if (a.y < gnd) {
         a.y = gnd;
         if (a.vy < 0) a.vy = 0;
         if (a.ey < 0) a.ey = 0;
-      }
-      if (a.y > -0.6 - L * 0.2) {
-        a.y = -0.6 - L * 0.2;
-        if (a.vy > 0) a.vy = 0;
       }
     }
   }
