@@ -1968,3 +1968,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Joint review skipped for Sol (Codex 5h 6%); Claude-alone entry in plan/REVIEWS.md, STATUS.md rewritten, process note logged (silent skipped Sol start stalls reconcile). Stage ~85%, ~5 weeks. Queued 4120 (difficulty-mode bug hunt), 4130 (Endurance clearance numbers), 4140 (CI after 4090-4110); 4070-4110 still running or queued. No Claude package this run (review used the run; next art step: Blue Hole two-sided lip or Axial chimney scale). No tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-25 08:47 CDT headless run 143 (Claude): collection
+
+- Merged and pushed (smoke + project-base green): Codex 4090 (completion-banner stars now refresh when a dive bonus lands, timer unchanged, with test). Collected notes 4070 (start clearance), 4080/4110 (CI audit blocked: GitHub DNS unavailable in the Codex sandbox; newest green stays `164da7fe`). 4100 finished without a note (no budget violations; exact animal-count preservation after re-entry differs by up to 43, not treated as a defect). Worktrees removed. 4120, 4130, 4140 queued (Codex 5h 6%, waiting for 20%). No Claude package (next art step: Blue Hole two-sided lip or Axial chimney scale). No tag (f64 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
