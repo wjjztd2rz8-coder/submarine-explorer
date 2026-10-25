@@ -2003,3 +2003,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: no Codex task running, queue empty (auto-refill writes briefs; the last 14 Codex verify/bug-hunt notes found no defects, so more of the same has low value). Held worktrees unchanged, main clean and pushed. Claude 5h 96%, week 66%; Codex 5h 25%. No Claude package (next art step: Axial chimney scale or Blue Hole two-sided lip; gains ~0.1). No tag (f65 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK (needs a shorter first-target range rule or richer hull); phone retest.
+
+## 2026-10-25 14:45 CDT headless run 150 (Claude): cleanup
+
+- Codex 4210, 4220 and 4230 (verify/bug-hunt briefs) were launched at 14:19 and killed by the watchdog when Codex 5h fell to 1% (resets 16:45). They left no output and no changes, so I removed their worktrees and branches and did not requeue them: the last 14 verify/bug-hunt notes found no defects. Held worktrees unchanged, main clean and pushed. Claude 5h 93%, week 65%. No Claude package (the next art step, Blue Hole two-sided lip, gains ~0.1 and its first pass was parked). No tag (f65 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK (needs a shorter first-target range rule or richer hull); phone retest.
