@@ -25,12 +25,15 @@ export interface DiveRating {
 export interface RatingObjective {
   primary: boolean;
   complete: boolean;
+  resolved?: boolean;
 }
 export function diveStars(
   objectives: readonly RatingObjective[],
   bonus: boolean,
   aborted = false,
 ): number {
+  // Missing POIs are excluded from mission completion and its rating alike.
+  objectives = objectives.filter((o) => o.resolved !== false);
   const primary = objectives.filter((o) => o.primary);
   if (aborted || !primary.length || primary.some((o) => !o.complete)) return 0;
   if (objectives.some((o) => !o.primary && !o.complete)) return 1;
