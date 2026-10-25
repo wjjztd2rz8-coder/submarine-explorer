@@ -1993,3 +1993,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Collected report-only notes 4150 (opening life), 4160 (rooted prop masks), 4170 (life instance sync: 5,650 checks pass), 4180 (save migration: duplicate coverage, no defect). No defects found; no code changed. Worktrees removed, pushed. 4190, 4200 still running; queue empty (auto-refill writes briefs). Claude 5h 98%, week 66%; Codex 5h 40%. No Claude package (next art step: Blue Hole two-sided lip or Axial chimney scale; gains ~0.1). No tag (f65 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK (needs a shorter first-target range rule or richer hull); phone retest.
+
+## 2026-10-25 13:15 CDT headless run 148 (Claude): collection
+
+- Collected report-only notes 4190 (audio state: covered by existing 3670/3600 evidence and specs, no defect) and 4200 (117 targets x 2 modes: one Journal entry each, repeat and return dives behave, clean). No code changed. Worktrees removed. No Codex task running; queue empty (auto-refill writes briefs). Claude 5h 97%, week 66%; Codex 5h 25%. No Claude package (next art step: Blue Hole two-sided lip or Axial chimney scale; gains ~0.1). No tag (f65 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK (needs a shorter first-target range rule or richer hull); phone retest.
