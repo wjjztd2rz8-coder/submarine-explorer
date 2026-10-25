@@ -1898,3 +1898,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged and pushed (smoke + project-base green): Codex 3870 (save migration), 3880 (pause/resume clock) clean audits; 3890 hazard recovery adds two boundary tests, no defect. Codex week is at 9% (resets Oct 30), so I queued no new briefs; dispatch would hold them anyway. No Claude package (art gains ~0.1; next is the Axial chimney scale). No tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-24 21:16 CDT headless run 129 (Claude): collection
+
+- Merged and pushed (smoke + project-base green): partial Codex coral verification tests 3900 (materials) and 3920 (lifetime), both passing; the tasks stopped when the Codex week hit 6%. 3910 had no output and was dropped. First gate attempt failed from a stale preview port, not a code fault. Codex week resets Oct 30, so no briefs queued. No Claude package (art gains ~0.1; next is the Axial chimney scale). No tag (f64 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
