@@ -2637,6 +2637,78 @@ describe('overlay host teardown', () => {
     }
   });
 
+  it.each([
+    { outcome: 'acquired', flush: true },
+    { outcome: 'acquired', flush: false },
+    { outcome: 'denied', flush: true },
+    { outcome: 'other canvas', flush: true },
+  ])(
+    'pointer teardown settles a pending legacy void request ($outcome, flush: $flush)',
+    async ({ outcome, flush }) => {
+      // Guards late acquisition leaking a lock after the void API's synthetic continuation ran.
+      const doc = Object.assign(new EventTarget(), document, { pointerLockElement: null });
+      vi.stubGlobal('document', doc);
+      vi.stubGlobal('navigator', {});
+      const remove = vi.spyOn(doc, 'removeEventListener');
+      const canvas = html(element('CANVAS')) as HTMLCanvasElement;
+      Object.assign(canvas, { requestPointerLock: vi.fn(() => undefined) });
+      doc.exitPointerLock = vi.fn(() => {
+        Object.assign(doc, { pointerLockElement: null });
+      });
+      const input = new Input({ storage: null });
+      input.setPointerLookPreference(true);
+      const ctx = {
+        canvas,
+        input,
+        app: { state: 'dive' },
+        pause: { isOpen: false },
+        settingsScreen: { isOpen: false },
+        globe: { isOpen: false },
+        discovery: { guide: { isOpen: false }, debrief: { isOpen: false } },
+        photoMode: { active: false },
+        setAppState: vi.fn(),
+      } as unknown as GameContext;
+      const runner = new SystemRunner(ctx);
+      runner.init([createPointerSystem()]);
+      cleanup.push(() => runner.dispose());
+      runner.frame({ frozen: false } as FrameState);
+      const down = new Event('mousedown', { cancelable: true });
+      Object.defineProperty(down, 'button', { value: 0 });
+      canvas.dispatchEvent(down);
+      canvas.dispatchEvent(new Event('mouseup'));
+      canvas.dispatchEvent(new Event('click', { cancelable: true }));
+      expect(canvas.requestPointerLock).toHaveBeenCalledOnce();
+      // The browser request remains pending before and after the void wrapper's microtask.
+      if (flush) await Promise.resolve();
+      runner.dispose();
+      runner.dispose();
+      await Promise.resolve();
+      expect(canvas.isConnected).toBe(true);
+      expect(input.pointerLookActive).toBe(false);
+      expect(doc.exitPointerLock).not.toHaveBeenCalled();
+      expect(body.querySelectorAll('.d3-pointer-look-hint')).toHaveLength(0);
+      expect(body.querySelectorAll('.hud-ctrl-tip')).toHaveLength(0);
+      const setMouseLook = vi.spyOn(input, 'setMouseLook');
+      const target = outcome === 'other canvas' ? html(element('CANVAS')) : canvas;
+      if (outcome !== 'denied') Object.assign(doc, { pointerLockElement: target });
+      doc.dispatchEvent(new Event(outcome === 'denied' ? 'pointerlockerror' : 'pointerlockchange'));
+      await Promise.resolve();
+      expect(doc.exitPointerLock).toHaveBeenCalledTimes(outcome === 'acquired' ? 1 : 0);
+      expect(doc.pointerLockElement).toBe(outcome === 'other canvas' ? target : null);
+      // Both terminal subscriptions must leave, including on denial or foreign ownership.
+      for (const type of ['pointerlockchange', 'pointerlockerror']) {
+        expect(remove.mock.calls.filter(([name]) => name === type)).toHaveLength(1);
+      }
+      Object.assign(doc, { pointerLockElement: canvas });
+      doc.dispatchEvent(new Event('pointerlockchange'));
+      doc.dispatchEvent(new Event('pointerlockerror'));
+      expect(doc.exitPointerLock).toHaveBeenCalledTimes(outcome === 'acquired' ? 1 : 0);
+      expect(setMouseLook).not.toHaveBeenCalled();
+      expect(input.pointerLookActive).toBe(false);
+      expect(ctx.setAppState).not.toHaveBeenCalled();
+    },
+  );
+
   it.each(['settled', 'keyboard', 'pointer'] as const)(
     'pointer teardown releases controls, DOM and pending locks (%s)',
     async (pending) => {
