@@ -1938,3 +1938,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: Codex 4000, 4010, 4020 still running (Codex 5h 13%, week 86%); other held worktrees unchanged, main clean. Claude 5h 97%, week 68%. No Claude package (next art step is the Axial chimney scale; gains ~0.1). No tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-25 04:05 CDT headless run 137 (Claude): collection
+
+- Merged and pushed (smoke + project-base green): Codex 4000 (shark floor now wins over ceiling in shallow columns, with test), 4010 (mission start position read live, stale-settings fix with tests), 4020 (hosted CI evidence: newest fully green main ddcaaac5, 45 jobs; journal-debrief keeps shared CI timeout). Worktrees removed. Queued 4030 (verify clamp on shipped sites), 4040 (debrief/save bug hunt), 4050 (CI triage); dispatch waits for Codex 5h 20% (now 13%). No Claude package (next art step is the Axial chimney scale; gains ~0.1). No tag (f64 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
