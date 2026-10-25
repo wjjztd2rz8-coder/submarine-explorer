@@ -10,6 +10,8 @@ import {
   type SettingsStorage,
 } from '../../src/core/Save.js';
 import { Progress, diveStars, requiredHull } from '../../src/game/Progress.js';
+import { EventBus } from '../../src/core/EventBus.js';
+import { Mission, parseMission } from '../../src/game/Mission.js';
 
 function storage(): SettingsStorage {
   const values = new Map<string, string>();
@@ -247,6 +249,57 @@ describe('ratings and hull unlocks', () => {
     expect(diveStars([primary, { ...secondary, complete: true }], false)).toBe(2);
     expect(diveStars([primary, { ...secondary, complete: true }], true)).toBe(3);
     expect(diveStars([primary], true, true)).toBe(0);
+  });
+  it('keeps debrief ratings and saved stars aligned with resolved mission objectives', () => {
+    const bus = new EventBus();
+    const mission = new Mission({
+      bus,
+      warn: () => {},
+      def: parseMission(
+        {
+          version: 1,
+          id: 'site',
+          tile: 'site',
+          landmark: 'site',
+          title: 'Site',
+          spawn: { lat: 0, lon: 0 },
+          completion: 'all_primary',
+          objectives: [
+            { id: 'primary', poi: 'target', primary: true },
+            { id: 'missing-primary', poi: 'absent-primary', primary: true },
+            { id: 'missing-optional', poi: 'absent-optional', primary: false },
+          ],
+        },
+        'site',
+      )!,
+    });
+    const { progress, store } = researcher();
+    try {
+      mission.resolve(['target']);
+      mission.start('site');
+      bus.emit('scan:complete', { landmarkId: 'site', poiId: 'target', firstTime: true });
+      expect(mission.primaryComplete).toBe(true);
+      expect(mission.allComplete).toBe(true);
+      expect(mission.counts()).toEqual({ completed: 1, total: 1 });
+      expect(mission.end()).toBe(true);
+      expect(mission.endReason).toBe('all');
+      expect(progress.previewStars(mission.objectives)).toBe(2);
+      expect(progress.finish('site', mission.objectives)).toEqual({ stars: 2, best: 2, points: 0 });
+      const restored = new Progress(new ProgressSave(store));
+      expect(restored.rating('site')).toBe(2);
+      expect(restored.snapshot().awarded).toEqual([
+        'primary:site',
+        'rating:site/1',
+        'rating:site/2',
+      ]);
+      // No resolvable primary still means no completion, even with a bonus.
+      mission.resolve([]);
+      expect(restored.previewStars(mission.objectives)).toBe(0);
+      restored.award('species', 'ray');
+      expect(restored.previewStars(mission.objectives)).toBe(0);
+    } finally {
+      mission.dispose();
+    }
   });
   it('only pays rating improvements and preserves the best rating on return dives', () => {
     const { progress, store } = researcher();
