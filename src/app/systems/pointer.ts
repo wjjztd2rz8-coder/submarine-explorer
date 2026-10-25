@@ -77,6 +77,11 @@ export function createPointerSystem(): GameSystem {
         (ctx.missionRouter?.debriefOpen ?? false) ||
         ctx.photoMode.active;
       let pointerLockPending = false;
+      const pointerLockEvents = new Disposables();
+      cleanup.add(() => {
+        // The legacy void API settles only by event; disposal cannot cancel its request.
+        if (!pointerLockPending) pointerLockEvents.dispose();
+      });
       let swallowPointerLookClick = false;
       updatePointerLookHint = (): void => {
         hint.hidden =
@@ -102,23 +107,33 @@ export function createPointerSystem(): GameSystem {
         pointerLockPending = true;
         updatePointerLookHint();
         try {
-          void Promise.resolve(canvas.requestPointerLock())
-            .then(() => {
-              if (disposed && document.pointerLockElement === canvas) document.exitPointerLock?.();
+          void canvas
+            .requestPointerLock()
+            ?.then(() => {
+              if (disposed) {
+                pointerLockEvents.dispose();
+                if (document.pointerLockElement === canvas) document.exitPointerLock?.();
+              }
             })
             .catch(() => {
               pointerLockPending = false;
-              if (!disposed) updatePointerLookHint();
+              if (disposed) pointerLockEvents.dispose();
+              else updatePointerLookHint();
             });
         } catch {
           pointerLockPending = false;
           updatePointerLookHint();
         }
       };
-      cleanup.listen(document, 'pointerlockchange', () => {
+      pointerLockEvents.listen(document, 'pointerlockchange', () => {
         const locked = document.pointerLockElement === canvas;
-        const wasLocked = input.pointerLookActive;
         pointerLockPending = false;
+        if (disposed) {
+          pointerLockEvents.dispose();
+          if (locked) document.exitPointerLock?.();
+          return;
+        }
+        const wasLocked = input.pointerLookActive;
         input.setMouseLook(locked);
         if (
           !locked &&
@@ -133,9 +148,10 @@ export function createPointerSystem(): GameSystem {
         }
         updatePointerLookHint();
       });
-      cleanup.listen(document, 'pointerlockerror', () => {
+      pointerLockEvents.listen(document, 'pointerlockerror', () => {
         pointerLockPending = false;
-        updatePointerLookHint();
+        if (disposed) pointerLockEvents.dispose();
+        else updatePointerLookHint();
       });
       cleanup.listen(document, 'click', () => {
         if (pointerLookWasBlocked && !pointerLookBlocked()) requestPointerLook();
