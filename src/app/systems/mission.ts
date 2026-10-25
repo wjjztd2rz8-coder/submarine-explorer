@@ -143,7 +143,9 @@ export const missionSystem: GameSystem = {
           config,
           meta,
           discovery,
-          defaultStartPosition: ctx.effective.gameplay.startPosition,
+          get defaultStartPosition() {
+            return ctx.effective.gameplay.startPosition;
+          },
           applyStart: applyMissionStart,
           // D-FLOW: debrief "Dive sites" / "Home" go to the shell without launching a dive.
           onDiveSites: () => {

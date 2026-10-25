@@ -15,7 +15,7 @@ import type { FrameState } from '../../src/app/System.js';
 
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
-import { defaultSettings } from '../../src/core/Save.js';
+import { defaultSettings, ProgressSave, Save } from '../../src/core/Save.js';
 import { resolveEffective } from '../../src/game/EffectiveSettings.js';
 import { parseMission } from '../../src/game/Mission.js';
 import { parsePois, placePois } from '../../src/game/Pois.js';
@@ -26,6 +26,12 @@ import { propsSystem } from '../../src/app/systems/props.js';
 import { missionSystem } from '../../src/app/systems/mission.js';
 import type { DebriefAction } from '../../src/ui/Debrief.js';
 import { FROZEN_INPUT } from '../../src/game/MissionRouter.js';
+import { modesSystem } from '../../src/app/systems/modes.js';
+import { CameraRig } from '../../src/sub/CameraRig.js';
+import { Submarine } from '../../src/sub/Submarine.js';
+import { Progress } from '../../src/game/Progress.js';
+import { createProgressSystem } from '../../src/app/systems/progress.js';
+import { MISSION_APPROACH_M } from '../../src/game/Spawn.js';
 
 const origin = { x: 0, y: -100, z: 0, yaw: 0 };
 const idle = { throttle: 0, yaw: 0, ballast: 0 };
@@ -307,6 +313,112 @@ const flush = async () => {
   for (let i = 0; i < 16; i++) await Promise.resolve();
 };
 const pose = (ctx: GameContext) => [...ctx.sub.position.toArray(), ctx.sub.yaw];
+
+it.each([
+  ['near-site', 'surface', null],
+  ['surface', 'near-site', null],
+  ['surface', 'arcade', null],
+  ['surface', 'realistic', null],
+  ['near-site', 'surface', 'near-site'],
+  ['surface', 'near-site', 'surface'],
+] as const)(
+  'pending mission start %s → %s honors the live default and explicit Begin choice %s',
+  async (initial, selected, explicit) => {
+    vi.stubGlobal('document', { createElement: () => ({}) });
+    const config = makeConfig();
+    const save = new Save({ config, storage: null });
+    save.setGameplayOption('startPosition', initial);
+    const settings = save.get();
+    const effective = resolveEffective(settings, settings.gameplayMode, null, config);
+    const terrain = {
+      sampleHeight: () => -3820,
+      getNormal: (_x: number, _z: number, out = new Vector3()) => out.set(0, 1, 0),
+    };
+    const meta = json('data/tiles/titanic/meta.json');
+    const def = parseMission(json('data/landmarks/titanic/mission.json'), 'titanic')!;
+    const sub = new Submarine(effective.submarine, terrain);
+    sub.setHullClass('B');
+    sub.reset(0, -5, 0);
+    const ready = deferred();
+    const progressSystem = createProgressSystem();
+    const ctx = {
+      config,
+      save,
+      settings,
+      effective,
+      meta,
+      terrain,
+      sub,
+      daily: null,
+      app: { state: 'dive' },
+      route: {
+        landmarkId: 'titanic',
+        missionId: 'titanic',
+        tileId: 'titanic',
+        def,
+        skipBriefing: explicit === null,
+      },
+      params: new URLSearchParams('mission=titanic'),
+      bus: new EventBus(),
+      progress: new Progress(new ProgressSave(null)),
+      discovery: { ready: ready.promise, pois: [], scanner: { setConfig() {} } },
+      rig: new CameraRig(effective.camera, 16 / 9, terrain),
+      props: { placed: [], collide: () => false },
+      headlights: { setEnabled() {}, setPreset() {} },
+      power: { setConfig() {}, setEnabled() {} },
+      sonar: { setSensorRange() {} },
+      presets: { setCurrentMode() {} },
+      hud: { setCurrentMode() {} },
+      reanchorFirstMove: vi.fn(),
+      shellBaseHref: () => 'http://localhost/',
+      expose() {},
+    } as unknown as GameContext;
+    try {
+      progressSystem.init!(ctx);
+      modesSystem.init!(ctx);
+      missionSystem.init!(ctx);
+      modesSystem.start!(ctx);
+      if (explicit) ctx.missionRouter!.begin(explicit);
+      ctx.app.state = 'pause';
+      if (selected === 'arcade' || selected === 'realistic') save.setGameplayMode(selected);
+      else save.setGameplayOption('startPosition', selected);
+      const selectedChoice = selected === 'surface' ? 'surface' : 'near-site';
+      expect(settings.gameplay.startPosition).toBe(initial);
+      expect(ctx.effective.gameplay.startPosition).toBe(selectedChoice);
+      const pois = placePois(
+        parsePois(json('data/landmarks/titanic/pois.json')),
+        meta,
+        terrain,
+        config.scan,
+        'titanic',
+      );
+      ctx.discovery.pois = pois;
+      ready.resolve();
+      await flush();
+      const choice = explicit ?? selectedChoice;
+      if (choice === 'surface')
+        expect(sub.position.y).toBe(-Math.max(5, config.submarine.hullRadius));
+      else
+        expect(sub.position.distanceTo(pois[0].position)).toBeCloseTo(
+          MISSION_APPROACH_M.titanic,
+          2,
+        );
+      expect(ctx.reanchorFirstMove).toHaveBeenCalledTimes(explicit ? 2 : 1);
+      expect(def.hull_class).toBe('B');
+      const placed = pose(ctx);
+      // A later settings change must not move a settled dive, even when props arrive.
+      save.setGameplayOption('startPosition', choice === 'surface' ? 'near-site' : 'surface');
+      expect(pose(ctx)).toEqual(placed);
+      ctx.bus.emit('props:loaded', { landmarkId: 'titanic', count: 0, models: 0, procedural: 0 });
+      expect(pose(ctx)).toEqual(placed);
+    } finally {
+      missionSystem.dispose?.();
+      modesSystem.dispose?.();
+      progressSystem.dispose?.();
+      vi.unstubAllGlobals();
+    }
+  },
+);
 
 const sites: string[] = json('data/landmarks/index.json').landmarks;
 const orders = [
