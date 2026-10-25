@@ -92,6 +92,59 @@ describe('descent reserves', () => {
   });
 });
 
+describe('power ascent recovery', () => {
+  it('releases controls on surfacing before the emergency lock can expire', () => {
+    const sub = new Submarine(config.submarine, terrain);
+    sub.reset(0, -config.submarine.hullRadius - 0.01, 0);
+    sub.startEmergencyAscent();
+    expect(sub.getState().controlLockRemaining).toBe(config.submarine.emergencyBlowLockSeconds);
+
+    // This shallow rescue must finish before the normal lock countdown.
+    for (let i = 0; i < 60; i++) sub.step(idle, 1 / 60);
+    expect(config.submarine.emergencyBlowLockSeconds).toBeGreaterThan(1);
+    expect(sub.position.y).toBe(-config.submarine.hullRadius);
+    expect(sub.getState()).toMatchObject({
+      emergencyBlow: false,
+      emergencyCause: null,
+      controlLockRemaining: 0,
+      crushWarning: false,
+      hullBreached: false,
+      hullStress: 0,
+    });
+    for (let i = 0; i < 60; i++) sub.step({ ...idle, throttle: 1, yaw: 1, ballast: -1 }, 1 / 60);
+    expect(sub.yaw).toBeGreaterThan(0);
+    expect(sub.position.z).toBeLessThan(0);
+    expect(sub.position.y).toBeLessThan(-config.submarine.hullRadius);
+    expect(sub.getState().emergencyBlow).toBe(false);
+  });
+
+  it('clears an active ascent and its remaining lock when reset for a fresh dive', () => {
+    const sub = new Submarine(config.submarine, terrain);
+    sub.reset(0, -100, 0);
+    sub.startEmergencyAscent();
+    sub.step(idle, 1 / 60);
+    expect(sub.getState().emergencyBlow).toBe(true);
+    expect(sub.getState().controlLockRemaining).toBeGreaterThan(0);
+    expect(sub.velocity.y).toBeGreaterThan(0);
+
+    sub.reset(0, -100, 0);
+    expect(sub.velocity.length()).toBe(0);
+    expect(sub.getState()).toMatchObject({
+      emergencyBlow: false,
+      emergencyCause: null,
+      controlLockRemaining: 0,
+      crushWarning: false,
+      hullBreached: false,
+      hullStress: 0,
+    });
+    for (let i = 0; i < 60; i++) sub.step({ ...idle, throttle: 1, yaw: 1, ballast: -1 }, 1 / 60);
+    expect(sub.yaw).toBeGreaterThan(0);
+    expect(sub.position.z).toBeLessThan(0);
+    expect(sub.position.y).toBeLessThan(-100);
+    expect(sub.getState().emergencyBlow).toBe(false);
+  });
+});
+
 describe('dive supply boundaries', () => {
   it.each([0, -1, -Number.MAX_VALUE, NaN, Infinity, -Infinity])(
     'preserves both reserves and their warnings for elapsed time %s',
