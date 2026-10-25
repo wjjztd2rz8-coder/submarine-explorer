@@ -2013,3 +2013,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: no Codex task running (Codex 5h 1%, resets 16:45), queue empty, held worktrees unchanged. Main clean and pushed; hosted CI and Pages green on the latest push. Claude 5h 92%, week 65%. No Claude package (the next art step, Blue Hole two-sided lip, gains ~0.1). No tag (f65 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK (needs a shorter first-target range rule or richer hull); phone retest.
+
+## 2026-10-25 17:45 CDT headless run 152 (Claude): collected notes
+
+- Collected Codex report-only notes 4250 (startup rollback through the real runner: clean) and 4260 (13 GMRT tiles, 91 sampled indices georeference exactly: clean), and 4240 (lock settlement: live paths settle safely; one narrow teardown gap with the legacy `requestPointerLock(): void` API, where disposal during a pending request leaves later acquisition without an exit call. Not a shipped leak; no fix made, low value). No code changed; worktrees removed. Claude 5h 100%, week 65%; Codex 5h 74%. No Claude package (next art step gains ~0.1). No tag (f65 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK (needs a shorter first-target range rule or richer hull); phone retest.
