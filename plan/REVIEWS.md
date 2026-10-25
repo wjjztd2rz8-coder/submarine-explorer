@@ -8,6 +8,24 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-25 comprehensive review, Claude alone (golden 2026-10-25-125617)
+
+**Sol did not review:** Codex 5h was 6% (`codex-review.sh start` exited 75 at its gate). Scores are mine and may run ~0.2 high. Opening frames viewed for Titanic, Blue Hole, Challenger and Lost City against the 2026-10-24 afternoon set.
+
+**Changed since the last review (~12 merges, all Codex):** 4000 shark floor wins over ceiling in shallow columns, 4010 mission start position read live, 4020/4050 CI evidence (newest fully green main `164da7fe`), 4030 life births obey water limits, 4040 dive rating ignores unresolved objectives, 4060 clean scan audit. No visual merge, so the goldens match the previous set (pose drift only).
+
+**Scores, readable / beautiful:** Titanic 4 / 3.7; Lost City 3.6 / 3.6; Blue Hole 3.5 / 3.4 (lip still a terraced arch); Beebe 4 / 3.6; Monterey 4 / 3.8; Challenger 3.6 / 3.6 (white notch on the sub bow); Endurance 3.2 / 3.0; Blake ~3.4.
+
+**Biggest gaps:** unchanged: Blue Hole lip silhouette, Endurance (owner choice), no hero consistently at 4, phone retest, Axial chimney scale.
+
+**Process:** efficiency.sh: Claude week 67% (~6%/day), idle 18-36 h/24 h; Codex week 73% but ~60%/day and the 5h window empty, so dispatch waits. Codex bug hunts yielded 2 real fixes in the last ~8 audits: diminishing returns, so new briefs are verification of numerics for owner decisions (4130) and CI evidence. Tooling bug: a skipped `codex-review.sh start` is silent when run under nohup, and writing the draft with `mkdir -p .cache/review/current` then makes `reconcile` wait 40 min for a session that will never exist. The review recipe should write the draft only after confirming `current` is a symlink (logged in PROCESS-LOG). Reviews triggered only by Codex test merges add little; wait for a visual merge or tag.
+
+**New priorities:** order unchanged; Claude lanes unblocked: V-bluehole-silhouette (two-sided lip), V-eight-sites-lit (Axial chimney scale), V-monterey-apron, V-endurance-spawn (after owner answer), P2-globe-bright. Codex queue: 4090-4110 running or queued, plus 4120 (difficulty-mode bug hunt), 4130 (Endurance clearance numbers), 4140 (CI after 4090-4110).
+
+**Stage:** about 85% to 1.0; ~5 weeks (not cross-checked with Sol).
+
+**Needs owner:** (1) delete the four S-collision expected-failure cases?; (2) ~85 m Endurance opening OK or richer hull; (3) phone retest on the newest build.
+
 ## 2026-10-24 (night, targeted review: Codex starved for 2 h, empty queue)
 
 - Cause: not a scheduling fault. The Codex week hit 6% (about 64%/day burn with weekly pacing off until Nov 2), so the dispatch floor held everything. usage.csv shows global refills every 1-3 days (last Oct 23 13:00), so the wait should end on its own. The real gap was an empty queue: when a refill lands, nothing would launch.

@@ -2,6 +2,9 @@
 
 Changes to how the work is done (tooling, scheduling, agent use), with the reason and the evidence. The owner delegated this on 2026-10-01; the only hard constraint is the usage floors.
 
+- **2026-10-25 — silent skipped Sol start stalls reconcile**
+  - **Problem:** `codex-review.sh start` exited 75 (Codex 5h 6%) with output sent to /dev/null; the draft was then written with `mkdir -p .cache/review/current`, which made a plain directory, so `reconcile` waited 40 min for a session that never came.
+  - **Change:** none to tools yet; run `tools/codex-review.sh start` once in the foreground for its exit code (it returns instantly when skipped), and only write the draft into `current` if it is a symlink.
 - **2026-10-11 — one plan (owner)**
   - **Problem:** forward work came from several places that disagreed. DIRECTOR.md had 15 stacked "current/previous priorities" sections, RESUME-PROMPT picked packages from PHASE-F-PLAN §3 (waves already finished), there was a separate phone-feedback package table and a new simplification plan, and codex-refill read a 2026-10-06 note. The owner asked that the plan and all runs come from one source, to avoid disjointed development.
   - **Change:** DIRECTOR.md now holds one ordered Backlog with stable item IDs and lanes, plus the simplicity rules every package must meet. History moved to `plan/archive/DIRECTOR-HISTORY-2026-10.md`, and the simplification review was archived as evidence. RESUME-PROMPT §2, REVIEW-PROMPT step 4, `tools/codex-refill.sh` and `tools/codex-review.sh` read only DIRECTOR.md. Briefs, branches, progress notes and commits name the item ID. PHASE-F-PLAN and PHONE-FEEDBACK carry "reference only" banners.
