@@ -8,6 +8,12 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-24 (night, targeted review: Codex starved for 2 h, empty queue)
+
+- Cause: not a scheduling fault. The Codex week hit 6% (about 64%/day burn with weekly pacing off until Nov 2), so the dispatch floor held everything. usage.csv shows global refills every 1-3 days (last Oct 23 13:00), so the wait should end on its own. The real gap was an empty queue: when a refill lands, nothing would launch.
+- Fix: queued 3930 (coral cost verify, re-run of the empty 3910), 3940 (S-resolve pure resolver foundation, from hold), 3950 (settings-apply bug hunt). All report-only or non-visual. No tooling change; pacing stays off per the owner's pledge window.
+- No change to stage (~85%) or Needs owner.
+
 ## 2026-10-24 (afternoon) comprehensive review, Claude alone (golden 2026-10-24-165922)
 
 **Sol did not review:** Codex 5h is 4% (`codex-review.sh start` skipped, below the gate). Scores are mine and may run ~0.2 high. Challenger, Lost City and Blue Hole opening frames viewed against the midday set; no new live play captures.
