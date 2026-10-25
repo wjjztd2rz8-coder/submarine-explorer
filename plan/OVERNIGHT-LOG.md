@@ -1928,3 +1928,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Codex week refilled (92%); dispatch launched 3960, 3970, 3980 (3930-3950 launched earlier), all running round 1, nothing finished to collect. Claude 5h 100%, week 68%. No Claude package (next art step is the Axial chimney scale; gains ~0.1). No tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-25 02:57 CDT headless run 135 (Claude): collection
+
+- Merged and pushed (smoke + project-base green): Codex 3960 fix (delayed free-dive placement now reads the live mode; D1 from 3950) with tests, plus clean/report notes 3910, 3950, 3970 (synthetic shark floor/ceiling conflict, no shipped-site impact), 3980. Rejected 3940 (overloaded resolveEffective signature breaks the simplicity rules); worktree discarded. Queued and launched 4000 (shark floor fix), 4010 (stale-mode bug hunt), 4020 (CI evidence; gh run list works from here). Claude 5h 99%, week 68%; no Claude package (next art step is the Axial chimney scale; gains ~0.1). No tag (f64 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
