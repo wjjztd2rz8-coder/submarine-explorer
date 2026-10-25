@@ -11,6 +11,8 @@ import type { FrameState } from '../../src/app/System.js';
 import type { GameContext } from '../../src/app/context.js';
 import { DEFAULT_CONFIG, makeConfig } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
+import { ProgressSave } from '../../src/core/Save.js';
+import { Progress } from '../../src/game/Progress.js';
 import type { FetchJson } from '../../src/game/ContentPath.js';
 import {
   nextScanObjective,
@@ -574,6 +576,43 @@ describe('MissionRouter completion timing', () => {
     scan('primary');
     expect(router.endDive()).toBe(true);
     expect(events().filter((name) => name === 'mission:complete')).toHaveLength(1);
+  });
+
+  it('refreshes an open star preview after a bonus without restarting its dismissal timer', async () => {
+    // A photo or animal scan while the banner is open must match the eventual debrief rating.
+    for (const kind of ['photo', 'species'] as const) {
+      router.dispose();
+      const save = new ProgressSave(null);
+      const progress = new Progress(save);
+      router = new MissionRouter({
+        ...options,
+        stars: () => progress.previewStars(router.mission.objectives),
+        rating: () => progress.finish('reef', router.mission.objectives),
+      });
+      await Promise.resolve();
+      scan('primary');
+      scan('optional');
+      advance(router, DEFAULT_CONFIG.mission.completeDelayS);
+      expect(control(router.panel.root, 'obj-banner-stars').textContent).toBe('★★☆');
+      progress.award(kind, kind === 'photo' ? 'reef/primary' : 'ray');
+      frame(router);
+      expect(control(router.panel.root, 'obj-banner-stars').textContent).toBe('★★★');
+      expect(control(router.panel.root, 'obj-banner-stars').attributes['aria-label']).toBe(
+        '3 of 3 stars',
+      );
+      advance(router, DEFAULT_CONFIG.mission.completionBannerS - 0.25);
+      expect(router.panel.bannerOpen).toBe(false);
+      expect(router.endDive()).toBe(true);
+      expect(control(router.debrief!.root, 'debrief-stars').textContent).toBe('★★★');
+      expect(new Progress(save).rating('reef')).toBe(3);
+      expect(save.get().awarded).toEqual([
+        `${kind}:${kind === 'photo' ? 'reef/primary' : 'ray'}`,
+        'primary:reef',
+        'rating:reef/1',
+        'rating:reef/2',
+        'rating:reef/3',
+      ]);
+    }
   });
 
   it('Dive again after abort reloads a fresh run whose logged objectives must be scanned again', async () => {

@@ -541,6 +541,7 @@ export class MissionRouter {
       return;
     }
     if (!this.panel.bannerOpen) return;
+    this.panel.setBannerStars(this.opts.stars?.());
     this.bannerLeft -= dt;
     if (this.bannerLeft <= 0) this.keepExploring();
   }
