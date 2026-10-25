@@ -301,6 +301,43 @@ describe('rooted animals and crawlers', () => {
 });
 
 describe('steering stability', () => {
+  it('keeps a swimming shark above the seabed when a shoal makes the water limits conflict', () => {
+    const habitat: SimEnv = { groundAt: (x) => -Math.max(0.25, 15 + 0.3 * x) };
+    const sim = new LifeSim({
+      tier: LIFE_TIERS.high,
+      table: parseLifeDoc(lifeJson).sites['great-blue-hole']!,
+      env: habitat,
+      seed: 7,
+      rand: mulberry32(7),
+    });
+    const sub = makeSub({ y: -8, lightsOn: false });
+    const dt = 1 / 60;
+    sim.update(dt, sub);
+    const shark = sim.pool.find((a) => a.alive && a.def.id === 'reef-shark')!;
+    expect(shark).toBeDefined();
+    const group = shark.group;
+    const startX = shark.x;
+    const length = bodyLen(shark);
+    const ceiling = -0.6 - length * 0.2;
+    expect(habitat.groundAt(shark.x, shark.z) + Math.max(0.12, length * 0.25)).toBeLessThan(
+      ceiling,
+    );
+    let crossedShoal = false;
+    for (let frame = 1; frame < 7200; frame++) {
+      sim.update(dt, sub);
+      expect(shark.alive && !shark.leaving && shark.group === group).toBe(true);
+      const ground = habitat.groundAt(shark.x, shark.z);
+      const floor = ground + Math.max(0.12, length * 0.25);
+      expect(Number.isFinite(shark.y)).toBe(true);
+      expect(shark.y, `seabed clearance at frame ${frame}`).toBeGreaterThanOrEqual(floor);
+      if (floor <= ceiling) expect(shark.y).toBeLessThanOrEqual(ceiling);
+      // Reach terrain where the old ceiling clamp would bury even the animal's centre.
+      if (ground > ceiling) crossedShoal = true;
+    }
+    expect(crossedShoal).toBe(true);
+    expect(Math.abs(shark.x - startX)).toBeGreaterThan(30);
+  });
+
   it('keeps every animal finite, above the seabed and below the surface under hard flying', () => {
     const sim = makeSim('high', 31);
     const sub = makeSub({ y: -450 });
