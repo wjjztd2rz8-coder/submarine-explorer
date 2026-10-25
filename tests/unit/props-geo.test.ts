@@ -417,6 +417,135 @@ describe('procedural:geo features', () => {
   });
 });
 
+describe('coral mound material bindings', () => {
+  const definitions = ['blake-plateau-corals', 'hudson-canyon'].map((site) =>
+    parsePropsDoc(
+      JSON.parse(readFileSync(`data/landmarks/${site}/props.json`, 'utf8')),
+      cfg,
+    ).props.find((def) => def.feature === 'coral-mound')!,
+  );
+  // Reuse the standard CPU callback fixture: inspect bindings, never compile a GPU program.
+  const binding = (material: THREE.MeshStandardMaterial) => {
+    const shader = {
+      ...THREE.ShaderLib.standard,
+      uniforms: { ...THREE.ShaderLib.standard.uniforms },
+    };
+    material.onBeforeCompile(
+      shader as Parameters<typeof material.onBeforeCompile>[0],
+      {} as THREE.WebGLRenderer,
+    );
+    return {
+      key: material.customProgramCacheKey(),
+      floors: [
+        ...shader.fragmentShader.matchAll(/mix\(vColor\.rgb, vec3\(1\.0\), ([\d.]+)\)/g),
+      ].map((match) => Number(match[1])),
+      color: material.color.toArray(),
+      emissive: material.emissive.toArray(),
+      intensity: material.emissiveIntensity,
+      vertexColors: material.vertexColors,
+    };
+  };
+  const material = (mesh: THREE.Mesh) => mesh.material as THREE.MeshStandardMaterial;
+  const evidence = (built: ReturnType<typeof buildGeo>) => {
+    const values: ReturnType<typeof binding>[] = [];
+    for (const root of [built.full, built.impostor])
+      root.traverse((object) => {
+        if (object instanceof THREE.Mesh) values.push(binding(material(object)));
+      });
+    return values;
+  };
+
+  for (const tier of ['low', 'medium', 'high']) {
+    it(`${tier}: lights authored bodies and colonies while isolating defaults and independent builds`, () => {
+      const built: ReturnType<typeof buildGeo>[] = [];
+      const make = (def: PropDef) => {
+        const result = PROCEDURAL_BUILDERS.geo({
+          def,
+          dims: def.dimensionsM!,
+          seed: hashString(def.id),
+          cfg,
+          tier,
+          groundHeight: () => undefined,
+        });
+        built.push(result);
+        return result;
+      };
+      const control = (feature: GeoFeatureId) => {
+        const result = build(feature, tier);
+        built.push(result);
+        return result;
+      };
+      try {
+        const controls = [control('smoker-cluster'), control('pillow-field')];
+        const before = controls.map(evidence);
+        for (const def of definitions) {
+          const reference = make(def);
+          const body = reference.full.children.find(
+            (object) => object instanceof THREE.Mesh && !(object instanceof THREE.InstancedMesh),
+          ) as THREE.Mesh;
+          const colonies = reference.full.children.filter((object) =>
+            object.name.startsWith('colonies-'),
+          ) as THREE.InstancedMesh[];
+          expect(colonies.length).toBeGreaterThan(0);
+          for (const colony of colonies) {
+            expect(colony.count).toBeGreaterThan(0);
+            expect(colony.instanceColor).not.toBeNull();
+          }
+          const lit = [body, ...colonies].map((mesh) => {
+            const state = binding(material(mesh));
+            expect(state.emissive.every(Number.isFinite)).toBe(true);
+            expect(state.emissive.every((channel) => channel >= 0)).toBe(true);
+            expect(state.emissive.some((channel) => channel > 0)).toBe(true);
+            expect(Number.isFinite(state.intensity)).toBe(true);
+            expect(state.intensity).toBeGreaterThan(0);
+            expect(state.vertexColors).toBe(true);
+            expect(mesh.geometry.getAttribute('color').count).toBe(
+              mesh.geometry.getAttribute('position').count,
+            );
+            expect(state.floors).toHaveLength(1);
+            expect(state.floors[0]).toBeGreaterThanOrEqual(0);
+            expect(state.floors[0]).toBeLessThanOrEqual(1);
+            return state;
+          });
+          // Different floor bindings must not accidentally reuse a cached program.
+          for (const a of lit)
+            for (const b of lit) if (a.floors[0] !== b.floors[0]) expect(a.key).not.toBe(b.key);
+
+          const sponges = reference.full.getObjectByName('sponges') as THREE.InstancedMesh;
+          expect(sponges.count).toBeGreaterThan(0);
+          expect(sponges.instanceColor).not.toBeNull();
+          for (const mesh of [sponges, reference.impostor as THREE.Mesh]) {
+            const mat = material(mesh);
+            expect(mat.emissive.toArray()).toEqual([0, 0, 0]);
+            expect(mat.vertexColors).toBe(false);
+            expect(mat.onBeforeCompile).toBe(THREE.Material.prototype.onBeforeCompile);
+            expect(mat.customProgramCacheKey).toBe(THREE.Material.prototype.customProgramCacheKey);
+          }
+
+          const baseline = evidence(reference);
+          const independent = make(def);
+          expect(evidence(independent)).toEqual(baseline);
+          // A build may share its colony material internally, but cannot own a peer's state.
+          for (const mesh of independent.full.children) {
+            if (!(mesh instanceof THREE.Mesh)) continue;
+            const mat = material(mesh);
+            mat.emissive.setScalar(8);
+            mat.onBeforeCompile = () => {};
+            mat.customProgramCacheKey = () => 'mutated-fixture';
+          }
+          expect(evidence(reference)).toEqual(baseline);
+          expect(evidence(make(def))).toEqual(baseline);
+          expect(controls.map(evidence)).toEqual(before);
+        }
+        expect([control('smoker-cluster'), control('pillow-field')].map(evidence)).toEqual(before);
+        expect(controls.map(evidence)).toEqual(before);
+      } finally {
+        for (const result of built) disposeProp(result);
+      }
+    });
+  }
+});
+
 describe('Beebe mineral finish', () => {
   const beebe = parsePropsDoc(
     JSON.parse(readFileSync('data/landmarks/beebe-vent-field/props.json', 'utf8')),

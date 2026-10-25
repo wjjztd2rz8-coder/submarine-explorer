@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import blakeProps from '../../data/landmarks/blake-plateau-corals/props.json';
+import hudsonProps from '../../data/landmarks/hudson-canyon/props.json';
 import type { GameContext } from '../../src/app/context.js';
 import { propsSystem } from '../../src/app/systems/props.js';
 import * as manifests from '../../src/core/SiteManifest.js';
@@ -20,6 +22,7 @@ import {
   type PropsHeightField,
 } from '../../src/world/Props.js';
 import { makeSyntheticTile } from './helpers.js';
+import { PROCEDURAL_BUILDERS, type BuiltProp } from '../../src/world/props/builders/index.js';
 
 const cfg = DEFAULT_CONFIG.props;
 const { meta } = makeSyntheticTile({ cols: 40, rows: 40, cellsizeDeg: 0.001 });
@@ -518,6 +521,146 @@ describe('loaded prop scatter policy', () => {
 });
 
 describe('prop resource lifetime', () => {
+  it.each([
+    { site: 'blake-plateau-corals', doc: blakeProps },
+    { site: 'hudson-canyon', doc: hudsonProps },
+  ])(
+    '$site retains coral bindings through LOD and terrain rebuilds, releasing only owned resources',
+    async ({ site, doc }) => {
+      const authored = doc.props.find((p) => p.feature === 'coral-mound')!;
+      const { meta: localMeta } = makeSyntheticTile({
+        centerLat: authored.lat,
+        centerLon: authored.lon,
+      });
+      const props = new Props(localMeta, slope, cfg, 'low');
+      const survivor = new Props(localMeta, slope, cfg, 'low');
+      // Observe the real registry boundary before placement can alter a builder's bindings.
+      const observe = (built: BuiltProp) => {
+        const resources = new Set<THREE.BufferGeometry | THREE.Material | THREE.InstancedMesh>();
+        const meshes: THREE.Mesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>[] = [];
+        for (const root of [built.full, built.impostor])
+          root.traverse((object) => {
+            if (!(object instanceof THREE.Mesh)) return;
+            resources.add(object.geometry);
+            for (const m of Array.isArray(object.material) ? object.material : [object.material])
+              resources.add(m);
+            if (object instanceof THREE.InstancedMesh) resources.add(object);
+            if (
+              root === built.full &&
+              (!(object instanceof THREE.InstancedMesh) || /^colonies-/.test(object.name))
+            )
+              meshes.push(object);
+          });
+        const colonies = meshes.filter((m) => m instanceof THREE.InstancedMesh);
+        expect(colonies.length).toBeGreaterThan(1);
+        expect(new Set(colonies.map((m) => m.material)).size).toBe(1);
+        expect(meshes.some((m) => !(m instanceof THREE.InstancedMesh))).toBe(true);
+        const bindings = meshes.map((mesh) => ({
+          mesh,
+          material: mesh.material,
+          emissive: mesh.material.emissive.clone(),
+          compile: mesh.material.onBeforeCompile,
+          cacheKey: mesh.material.customProgramCacheKey,
+          key: mesh.material.customProgramCacheKey(),
+        }));
+        return {
+          built,
+          resources,
+          disposals: [...resources].map((r) => vi.spyOn(r, 'dispose')),
+          checkBindings() {
+            for (const b of bindings) {
+              expect(b.mesh.material).toBe(b.material);
+              expect(b.material.emissive).toEqual(b.emissive);
+              expect(b.material.onBeforeCompile).toBe(b.compile);
+              expect(b.material.customProgramCacheKey).toBe(b.cacheKey);
+              expect(b.material.customProgramCacheKey()).toBe(b.key);
+              expect(b.mesh.parent).toBe(built.full);
+            }
+          },
+        };
+      };
+      const builds: ReturnType<typeof observe>[] = [];
+      const build = PROCEDURAL_BUILDERS.geo;
+      const registry = vi.spyOn(PROCEDURAL_BUILDERS, 'geo').mockImplementation((input) => {
+        const built = build(input);
+        builds.push(observe(built));
+        return built;
+      });
+      try {
+        for (const system of [props, survivor]) {
+          await system.load('props.json', site, async () => ({ props: [authored] }));
+          expect(system.loaded).toBe(true);
+          expect(system.stats.failed).toBe(0);
+          expect(system.placed).toHaveLength(1);
+          expect(system.placed[0].def.dimensionsM).toEqual(authored.dimensions_m);
+        }
+        const [initial, peer] = builds;
+        const p = props.placed[0];
+        expect(p.full).toBe(initial.built.full);
+        initial.checkBindings();
+        peer.checkBindings();
+        for (const resource of initial.resources) expect(peer.resources.has(resource)).toBe(false);
+        const cam = new THREE.PerspectiveCamera(60, 1, 0.5, 60000);
+        const look = (distance: number, lod: 'full' | 'impostor' | 'hidden') => {
+          cam.position.copy(p.sphere.center).add(new THREE.Vector3(0, 0, distance));
+          cam.lookAt(p.sphere.center);
+          props.update(cam);
+          expect(p.lod).toBe(lod);
+          expect(p.root.visible).toBe(lod !== 'hidden');
+          expect(p.full.visible).toBe(lod === 'full');
+          expect(p.impostor.visible).toBe(lod === 'impostor');
+        };
+        const near = p.sphere.radius + p.def.lodDistanceM / 2;
+        const far = p.sphere.radius + p.def.lodDistanceM * 1.5;
+        look(near, 'full');
+        look(far, 'impostor');
+        look(
+          p.sphere.radius + Math.max(cfg.cullDistanceM, p.def.lodDistanceM * cfg.cullLodFactor) + 1,
+          'hidden',
+        );
+        look(near, 'full');
+        initial.checkBindings();
+        for (const dispose of initial.disposals) expect(dispose).not.toHaveBeenCalled();
+
+        look(far, 'impostor');
+        p.def.headingDeg += 15;
+        await props.replace(p);
+        expect(builds).toHaveLength(3);
+        const rebuilt = builds[2];
+        expect(p.full).toBe(rebuilt.built.full);
+        expect(p.full).not.toBe(initial.built.full);
+        expect(initial.built.full.parent).toBeNull();
+        expect(initial.built.impostor.parent).toBeNull();
+        expect(p.lod).toBe('impostor');
+        expect(p.full.visible).toBe(false);
+        expect(p.impostor.visible).toBe(true);
+        rebuilt.checkBindings();
+        look(p.sphere.radius + p.def.lodDistanceM / 2, 'full');
+        rebuilt.checkBindings();
+        for (const dispose of initial.disposals) expect(dispose).toHaveBeenCalledOnce();
+        for (const dispose of [...rebuilt.disposals, ...peer.disposals])
+          expect(dispose).not.toHaveBeenCalled();
+
+        props.dispose();
+        props.dispose();
+        for (const dispose of [...initial.disposals, ...rebuilt.disposals])
+          expect(dispose).toHaveBeenCalledOnce();
+        peer.checkBindings();
+        expect(survivor.placed[0].full).toBe(peer.built.full);
+        for (const dispose of peer.disposals) expect(dispose).not.toHaveBeenCalled();
+        survivor.dispose();
+        survivor.dispose();
+        for (const dispose of peer.disposals) expect(dispose).toHaveBeenCalledOnce();
+      } finally {
+        props.dispose();
+        survivor.dispose();
+        registry.mockRestore();
+        for (const observed of builds)
+          for (const dispose of observed.disposals) dispose.mockRestore();
+      }
+    },
+  );
+
   it('teardown releases procedural geometry/materials and removes collision and scene ownership', async () => {
     const props = new Props(meta, slope, cfg, 'low');
     const scene = new THREE.Scene();
