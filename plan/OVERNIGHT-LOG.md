@@ -1953,3 +1953,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: no Codex task running; 4030, 4040, 4050 queued and waiting for Codex 5h 20% (13%, resets 06:30). Held worktrees unchanged, main clean. Claude 5h 94%, week 67%. No Claude package (next art step is the Axial chimney scale; gains ~0.1). No tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-25 06:45 CDT headless run 140 (Claude): collection
+
+- Merged and pushed (docs only): Codex 4050 evidence note; newest fully green main is `164da7fe` (45/45 jobs, Pages deployed). 4030 and 4040 still running round 1 (near the full-suite check), so not collected. Queued 4060 (scan/sonar after floor change), 4070 (start clearance on shipped sites), 4080 (CI after 4040). Claude 5h 94%, week 67%. No Claude package (next art step is the Axial chimney scale; gains ~0.1). No tag (f64 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
