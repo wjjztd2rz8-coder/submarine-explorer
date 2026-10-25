@@ -1958,3 +1958,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged and pushed (docs only): Codex 4050 evidence note; newest fully green main is `164da7fe` (45/45 jobs, Pages deployed). 4030 and 4040 still running round 1 (near the full-suite check), so not collected. Queued 4060 (scan/sonar after floor change), 4070 (start clearance on shipped sites), 4080 (CI after 4040). Claude 5h 94%, week 67%. No Claude package (next art step is the Axial chimney scale; gains ~0.1). No tag (f64 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
+
+## 2026-10-25 07:56 CDT headless run 141 (Claude): collection
+
+- Merged and pushed (smoke + project-base green on main): Codex 4030 (life integrates after all population passes so births obey water limits; 796 shipped-site runs, zero feasible-water violations; Great Blue Hole whale sharks and Hunga Tonga humpbacks hit impossible shallow columns, left as is), 4040 (dive rating now ignores unresolved mission objectives, with test), 4060 (clean audit, scan positions after floor fix). Worktrees removed. 4070, 4080 still running. Queued 4090 (hull unlock/rating bug hunt), 4100 (life budgets low tier), 4110 (CI after these merges). No Claude package (next art step is the Axial chimney scale; gains ~0.1). No tag (f64 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK or richer hull; phone retest.
