@@ -1988,3 +1988,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Collected report-only notes 4120 (difficulty/mode switching: no leak found), 4130 (Endurance 85 m opening would put the first target 15 m inside the 100 m Arcade scan radius; altitude barely changes; hull measures 47.9 x 9.8 x 11.0 m, chase view span +13%), 4140 (hosted CI unreachable from the Codex sandbox; no new evidence). Worktrees removed. 4150, 4160, 4170 still running. Queued 4180 (save migration), 4190 (audio state), 4200 (Journal scans). Main `b7f3ca59` has green CI and Pages, so tagged and pushed `f65`. Claude 5h 100%, week 66%. No Claude package (next art step: Blue Hole two-sided lip or Axial chimney scale; gains ~0.1).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK (4130 says Arcade scan exclusion would break, so it needs a shorter first-target range rule or a richer hull); phone retest.
+
+## 2026-10-25 12:45 CDT headless run 147 (Claude): collection
+
+- Collected report-only notes 4150 (opening life), 4160 (rooted prop masks), 4170 (life instance sync: 5,650 checks pass), 4180 (save migration: duplicate coverage, no defect). No defects found; no code changed. Worktrees removed, pushed. 4190, 4200 still running; queue empty (auto-refill writes briefs). Claude 5h 98%, week 66%; Codex 5h 40%. No Claude package (next art step: Blue Hole two-sided lip or Axial chimney scale; gains ~0.1). No tag (f65 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK (needs a shorter first-target range rule or richer hull); phone retest.
