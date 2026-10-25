@@ -301,6 +301,48 @@ describe('rooted animals and crawlers', () => {
 });
 
 describe('steering stability', () => {
+  it('enforces water limits on the birth frame of replenished and rare movers', () => {
+    const habitat: SimEnv = {
+      groundAt: (x, z) => -700 + Math.min(100, Math.hypot(x + 20, z) * 2),
+    };
+    const sim = new LifeSim({
+      tier: LIFE_TIERS.high,
+      table,
+      env: habitat,
+      seed: 81,
+      rand: mulberry32(81),
+    });
+    const sub = makeSub({ x: -20, y: -650, lightsOn: false });
+    let rareSeen = false;
+    let replenishedSeen = false;
+    const initial = new Set<number>();
+    // New groups can be admitted after the existing animals have integrated.
+    // Inspect every returned frame, including animals whose fade is still zero.
+    for (let frame = 0; frame < 300; frame++) {
+      sim.update(1 / 30, sub);
+      for (const a of sim.pool) {
+        if (!a.alive || a.def.archetype === 'sessile') continue;
+        if (frame === 0) initial.add(a.group.id);
+        else if (!initial.has(a.group.id)) {
+          if (a.group.rare) rareSeen = true;
+          else replenishedSeen = true;
+        }
+        const ground = habitat.groundAt(a.x, a.z);
+        if (a.def.archetype === 'crawler') {
+          expect(a.y).toBe(ground);
+          continue;
+        }
+        const length = bodyLen(a);
+        const floor = ground + Math.max(0.12, length * 0.25);
+        const ceiling = -0.6 - length * 0.2;
+        expect(a.y, `${a.def.id} floor at frame ${frame}`).toBeGreaterThanOrEqual(floor);
+        if (floor <= ceiling) expect(a.y).toBeLessThanOrEqual(ceiling);
+      }
+    }
+    expect(rareSeen).toBe(true);
+    expect(replenishedSeen).toBe(true);
+  });
+
   it('keeps a swimming shark above the seabed when a shoal makes the water limits conflict', () => {
     const habitat: SimEnv = { groundAt: (x) => -Math.max(0.25, 15 + 0.3 * x) };
     const sim = new LifeSim({

@@ -178,11 +178,6 @@ export class LifeSim {
     }
     if (this.tickAcc > TICK * 3) this.tickAcc = 0;
 
-    for (const a of this.pool) {
-      if (!a.alive) continue;
-      if (!integrate(a, this.env, dt)) this.release(a);
-    }
-
     this.spawnAcc += dt;
     if (this.spawnAcc >= 0.3) {
       this.spawnAcc = 0;
@@ -199,6 +194,12 @@ export class LifeSim {
     if (this.rareAcc >= 1) {
       this.rareAcc = 0;
       this.rareTick(sub);
+    }
+
+    // Include births from every population pass in this frame's water limits.
+    for (const a of this.pool) {
+      if (!a.alive) continue;
+      if (!integrate(a, this.env, dt)) this.release(a);
     }
   }
 
