@@ -50,7 +50,7 @@ if ! codex_ok && (( $(running) == 0 )) && codex_stale; then
 fi
 # Empty queue, spare slots and budget: let Codex draft the next briefs (<= every 2 h).
 if ! ls .cache/codex/queue/*.md >/dev/null 2>&1 && (( $(running) < MAX )) && codex_ok && \
-   [[ -z "$(find .cache/codex/refill.log -mmin -120 2>/dev/null)" ]]; then
+   [[ -z "$(find .cache/codex/refill.log -mmin -45 2>/dev/null)" ]]; then
   tools/codex-refill.sh
 fi
 port=4370

@@ -1,3 +1,10 @@
+# Reviews
+
+## 2026-10-25 evening, targeted review (Codex starved 2 h)
+
+- Cause: empty queue; only standing audits remained and they find nothing; refill cooldown 2 h. Fixed in tools (cooldown 45 min, no repeat audits) and DIRECTOR (items 5b, 5c). Queued/launched 4270 (lock teardown fix), 4280 (Aa text size), 4290 (CI evidence).
+- No art or stage change; comprehensive scores stand. Needs owner: unchanged (S-collision cases, Endurance 85 m, phone retest).
+
 ## 2026-10-23 (late, targeted review: Claude idle at >=50% for 2 h)
 
 - Cause: the resume.sh "no new work" skip (3 h) idled Claude at 76-79% with unblocked Sonnet items. Window cut to 90 min (PROCESS-LOG).

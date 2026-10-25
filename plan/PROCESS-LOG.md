@@ -296,3 +296,6 @@ Creating `.cache/review/current` as a directory before `codex-review.sh start` m
 - Finding: Claude idled 14-28 h of the last 24 h at 100% 5h: runs 105-111 ended "collection only/no-op" without starting a package although Backlog items 1-6 were unblocked. Cause was run judgment, not a gate (skip window already 90 min).
 - Fix: rule in the run notes, not tooling: any run with Claude 5h >= 45% and week on pace starts one Sonnet package after collecting. Gates on a loaded machine take 20-40 min; run them backgrounded.
 - Codex bug hunts: ~1 real defect in 25 audits; shift briefs to verifying new visual packages and CI.
+
+## 2026-10-25 targeted review: Codex starved
+- Cause: the only Codex-lane item was the standing verify/bug-hunt item, whose last 14+ briefs found no defects, and the refill cooldown was 2 h. Fix: added real Codex items (5b P2-text-size, 5c S-fix-lock-teardown), cooldown 45 min, refill prompt told not to repeat audits. Briefs 4270-4290 launched.
