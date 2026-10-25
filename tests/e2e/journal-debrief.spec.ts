@@ -256,8 +256,9 @@ freshTest.describe('mission progression and Home Journal', () => {
     // Regression guard: primary completion ended the dive early or debrief/Journal navigation lost progress and focus.
     test('primaries complete -> keep exploring -> secondary -> surface -> debrief actions', async ({
       page,
-    }) => {
-      test.setTimeout(150_000);
+    }, testInfo) => {
+      // Keep the shared software-rendering budget when CI allows more time for this long flow.
+      test.setTimeout(Math.max(testInfo.timeout, 150_000));
       const errors = collectErrors(page);
       await seed(page);
       await loadDive(page, DIVE);
