@@ -209,6 +209,98 @@ test.describe('settings screen', () => {
             expect(await applied()).toEqual({ saved: scale, persisted: scale, css: scale / 100 });
           }
         });
+
+        if (viewport.touch) {
+          test(`scale survives quality and mode combinations from ${surface}`, async ({ page }) => {
+            // Guards stale scale variables after unrelated edits, reload and rotation,
+            // including the Advanced controls absent from the Aa-only smoke coverage.
+            await pauseClockBeforeNavigation(page);
+            await page.goto(surface === 'home' ? '/' : '/?tile=titanic', {
+              waitUntil: 'domcontentloaded',
+            });
+            await clockFramesUntil(page, () => window.__gameReady === true);
+            const dialog = page.locator('.settings');
+            const cycle = dialog.getByRole('button', { name: 'Aa: cycle UI scale' });
+            const slider = dialog.getByLabel('UI scale', { exact: true });
+            for (const tier of ['low', 'medium', 'high']) {
+              await openSettings(page);
+              await dialog.getByLabel('Graphics tier').selectOption(tier);
+              await slider.focus();
+              await page.keyboard.press('End');
+              await page.reload({ waitUntil: 'domcontentloaded' });
+              await clockFramesUntil(page, () => window.__gameReady === true);
+              await openSettings(page);
+              expect(
+                await page.evaluate(() => (window.__game as { perf: { tier: string } }).perf.tier),
+              ).toBe(tier);
+              await expect(dialog.locator('.settings-scale-value')).toHaveText('150%');
+              await dialog.getByRole('button', { name: 'Advanced', exact: true }).click();
+              for (const mode of ['arcade', 'realistic', 'custom']) {
+                if (mode === 'custom') {
+                  await dialog.getByRole('switch', { name: 'Currents', exact: true }).click();
+                } else {
+                  await dialog
+                    .getByRole('radio', {
+                      name: mode === 'arcade' ? 'Arcade' : 'Realistic',
+                      exact: true,
+                    })
+                    .check();
+                }
+                for (const scale of [150, 80, 100]) {
+                  if (scale === 100) {
+                    for (let step = 0; step < 4; step++) await cycle.click();
+                  } else {
+                    await slider.focus();
+                    await page.keyboard.press(scale === 150 ? 'End' : 'Home');
+                  }
+                  const saved = await page.evaluate(() => {
+                    const settings = (
+                      window.__game as {
+                        save: { get(): { uiScale: number; gameplayMode: string } };
+                      }
+                    ).save.get();
+                    return {
+                      scale: settings.uiScale,
+                      mode: settings.gameplayMode,
+                      persisted: JSON.parse(localStorage.getItem('subexplorer.settings.v3')!)
+                        .uiScale,
+                      css: Number(
+                        document.documentElement.style.getPropertyValue('--ui-user-scale'),
+                      ),
+                    };
+                  });
+                  expect(saved).toEqual({ scale, mode, persisted: scale, css: scale / 100 });
+                  const overflow = await dialog.locator('.settings-panel').evaluate((panel) =>
+                    [
+                      ...panel.querySelectorAll<HTMLElement>('.mode-selector, .mode-advanced'),
+                      panel,
+                    ]
+                      .filter((el) => el.checkVisibility())
+                      .filter((el) => el.scrollWidth > el.clientWidth + 1)
+                      .map((el) => el.className),
+                  );
+                  expect(overflow).toEqual([]);
+                }
+              }
+              await slider.focus();
+              await page.keyboard.press('End');
+              await page.setViewportSize({ width: viewport.height, height: viewport.width });
+              await page.clock.fastForward(50);
+              expect(
+                await page.evaluate(() =>
+                  document.documentElement.style.getPropertyValue('--ui-user-scale'),
+                ),
+              ).toBe('1.5');
+              await page.setViewportSize({ width: viewport.width, height: viewport.height });
+              await page.clock.fastForward(50);
+              await page.keyboard.press('Escape');
+              if (surface === 'dive') {
+                await page.keyboard.press('Escape');
+                await page.clock.fastForward(50);
+              }
+            }
+          });
+        }
       }
     });
   }
