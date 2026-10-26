@@ -30,6 +30,9 @@ export const MONTEREY_RUBBLE = {
   fragmentRunout: [0.08, 1.75],
   blockRadius: [1.0, 2.4],
   fragmentRadius: [0.3, 1.8],
+  /** Share of the non-block rocks that are pebbles and cobbles, and their radius range. */
+  pebbleShare: 0.5,
+  pebbleRadius: [0.24, 0.5],
   separationRadii: 0.6,
   placementAttempts: 32,
   radiusSkew: 2.6,
