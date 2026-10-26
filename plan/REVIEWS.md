@@ -1222,3 +1222,7 @@ Diagnosis: false positive. The trigger counted all-time FAIL lines in Codex resu
 **New priorities:** see DIRECTOR.md (Blue Hole spawn, Lost City, Beebe plumes, Monterey canyon, Titanic lift). Codex: 440 CI fix, 450 attribution footer, 460 snow audit added to 410/420/430/rebrand/site-triage.
 
 **Needs owner:** nothing blocking. Optional: a real logo/mark for Bathyline (the share image still uses the draft mark).
+
+## 2026-10-25 targeted review (Claude): red CI x3
+
+- Cause: every red run failed only the prettier gate on `plan/OVERNIGHT-LOG.md` (an entry appended without a blank line before its heading). Unit, attribution, build and project-base all passed. Fixed by running prettier on plan/*.md. Hosted CI is the only place this showed, since log edits come after the last local gate: run `npx prettier --write plan/*.md` before committing any log entry.
