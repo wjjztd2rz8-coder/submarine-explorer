@@ -285,28 +285,14 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const win = smooth(0.46 * H, 0.5 * H, y) * (1 - smooth(0.66 * H, 0.7 * H, y));
     const lipZone = smooth(0.5, 0.95, -z / D) * win;
     const chip = (fbm3(x * 0.3, y * 0.5, seed + 83, seed + 12, 3) - 0.34) * 2.4;
-    // Raised bays also draw back, so each step reads as an overhang over the one below.
-    const draw = hood ? (shelfStep(x) * 0.12 - 0.09 * overhangAt(x)) * D * roofZone(y, z, x) : 0;
-    // The roof nose juts out past the recessed underside in blocks of uneven reach, so a dark
-    // undercut shows beneath it. The underside itself stays put for the pendants.
+    // The roof nose juts continuously past the recessed underside by an uneven reach, so a dark
+    // undercut shows beneath a thin edge. The underside itself stays put for the pendants.
     const jut = hood
-      ? 0.1 * D * noseAt(x) * smooth(0.6 * H, 0.66 * H, y) * smooth(0.5, 0.9, -z / D)
+      ? 0.07 * D * noseAt(x) * smooth(0.6 * H, 0.66 * H, y) * smooth(0.5, 0.9, -z / D)
       : 0;
-    return disp(x, y, z) - lipZone * Math.max(0, chip) * 4.5 * scale + draw - jut;
+    return disp(x, y, z) - lipZone * Math.max(0, chip) * (hood ? 11 : 4.5) * scale - jut;
   };
 
-  /**
-   * Roof shelves: the lip and roof top step up in plateaus along x (sharp risers between them),
-   * so the silhouette is stacked slabs and overhangs rather than one rolled tube. The underside
-   * stays put, so the pendants keep hanging from it. 0..1 per x.
-   */
-  const shelfStep = (x: number, phase = 0): number => {
-    // Warped in x and curved in height, so plateau widths and riser heights are never an even stair.
-    const xw = x + 7 * Math.sin(x * 0.13 + seed * 0.01 + phase);
-    const q = 5 * fbm3(xw * 0.05 + 9 + phase, 4, seed + 97 + phase, seed + 14, 3);
-    const level = (Math.floor(q) + smooth(0.78, 1, q - Math.floor(q))) / 5;
-    return Math.pow(level, 1.45);
-  };
   /**
    * Narrow fissures running across the roof: 0..1 per x, peaked on thin ridged lines at uneven
    * spacing. They cut the roof top down and darken the face and underside beneath them.
@@ -315,58 +301,20 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const ridge = 1 - Math.abs(2 * fbm3(x * 0.11 + 21, 6, seed + 41, seed + 19, 3) - 1);
     return smooth(0.8, 0.92, ridge);
   };
-  /** Blocky nose reach 0..1 per x: some blocks project far, some hardly at all. */
-  const noseAt = (x: number): number => {
-    const q = fbm3(x * 0.16 + 33, 8, seed + 53, seed + 23, 3);
-    const block = Math.floor(q * 7) / 7 + smooth(0.6, 1, q * 7 - Math.floor(q * 7)) / 7;
-    return smooth(0.25, 0.8, block) * (1 - smooth(0.6, 1, endRatio(x, W)));
-  };
+  /** Continuous nose reach 0..1 per x: the edge overhangs far in places and hardly at all in others. */
+  const noseAt = (x: number): number =>
+    smooth(0.2, 0.8, fbm3(x * 0.16 + 33, 8, seed + 53, seed + 23, 3)) *
+    (1 - smooth(0.6, 1, endRatio(x, W)));
   const roofZone = (y: number, z: number, x: number): number =>
     smooth(0.56 * H, 0.64 * H, y) *
     smooth(0.25, 0.8, -z / D) *
     (1 - smooth(0.6, 1, endRatio(x, W)));
-  /**
-   * Three drop-offs where the roof steps down (a missing slab) and the neighbouring block overhangs
-   * the gap: 0 outside, 1 in the notch, with near-sharp sides. Positions are fractions of the width.
-   */
-  const NOTCHES: readonly (readonly [number, number])[] = [
-    [-0.27, 0.05],
-    [-0.12, 0.022],
-    [0.08, 0.04],
-    [0.19, 0.018],
-    [0.31, 0.055],
-  ];
-  const notchAt = (x: number): number => {
-    let n = 0;
-    for (const [f, hw] of NOTCHES) {
-      const dx = Math.abs(x - f * W) / (hw * W);
-      n = Math.max(n, 1 - smooth(0.85, 1.05, dx));
-    }
-    return n;
-  };
-  /** The blocks flanking each notch jut out over the gap. */
-  const overhangAt = (x: number): number => {
-    let n = 0;
-    for (const [f, hw] of NOTCHES) {
-      const dx = Math.abs(x - f * W) / (hw * W);
-      n = Math.max(n, smooth(1.05, 1.25, dx) * (1 - smooth(1.9, 2.4, dx)));
-    }
-    return n;
-  };
-  /** Front-lip thickness 0..1 per x: thin plateau fronts alternate with thick ones. */
-  const lipThick = (x: number): number => 0.12 + 0.88 * shelfStep(x * 1.3 + 40, 53);
+  /** Roof top: a low, smoothly varying crown cut by fissures; the lip stays a thin edge. */
   const roofRise = (x: number, y: number, z: number): number => {
     if (!hood) return 0;
-    const zone = roofZone(y, z, x);
-    const body = H * (0.2 * shelfStep(x) + 0.12 * shelfStep(x, 31) * smooth(0.6 * H, 0.66 * H, y));
-    // Thin the front lip where the plateau is thin; the roof top behind keeps its full height.
-    const lip = 1 - smooth(0.63 * H, 0.68 * H, y);
-    const thin = 1 - lip * (1 - lipThick(x)) * 0.85;
-    const drop = H * 0.13 * notchAt(x) * smooth(0.58 * H, 0.64 * H, y);
-    const crack = H * 0.15 * crackAt(x) * smooth(0.58 * H, 0.64 * H, y);
-    // Fine chipping along the nose breaks the outline between the plateau steps.
-    const chip = H * 0.05 * (fbm3(x * 0.55 + 5, 2, seed + 67, seed + 29, 3) - 0.45) * lip;
-    return zone * (body * thin - drop - crack + chip * smooth(0.58 * H, 0.64 * H, y));
+    const top = smooth(0.58 * H, 0.64 * H, y);
+    const crown = 0.1 * H * fbm3(x * 0.05 + 9, 4, seed + 97, seed + 14, 3);
+    return roofZone(y, z, x) * top * (crown - H * 0.15 * crackAt(x));
   };
 
   // --- the wall
@@ -443,7 +391,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     // and the underside is shadowed and mottled in the same way (floors keep it readable).
     if (hood) {
       const roof = smooth(0.46 * H, 0.56 * H, y) * (1 - 0.6 * smooth(0.45, 0.8, endRatio(x, W)));
-      const plateau = 0.78 + 0.34 * shelfStep(x, 31);
+      const plateau = 0.95;
       const mottle = 0.62 + 0.6 * fbm3(x * 0.35, y * 0.3, z * 0.35, seed ^ 0x2f, 4);
       const under = ny < -0.3 ? 0.7 : 1;
       const crackTone =
@@ -682,16 +630,17 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
         (1.4 + rnd() * rnd() * 0.36 * H) *
         (main ? 1.35 : 0.55 + rnd() * 0.5) *
         (0.6 + 0.4 * scaleAt(x));
-      const len = hood
-        ? Math.min(H * (main ? 0.27 + rnd() * 0.17 : 0.065 + rnd() * 0.13), yTop - gnd(x, z) - 0.7)
-        : generatedLength;
+      // Hood: a clump noise decides where pendants are long; most stay short stubs.
+      const clump = smooth(0.35, 0.65, fbm3(x * 0.09 + 12, 3, seed + 47, seed + 15, 3));
+      const hoodLength = H * (0.04 + 0.4 * clump * clump * (0.4 + 0.6 * (main ? 1 : rnd())));
+      const len = hood ? Math.min(hoodLength, yTop - gnd(x, z) - 0.7) : generatedLength;
       if (hood && len < 0.5) continue;
       // Thick, uneven columns: some stout, some slender, so no two read alike.
       // Variation draws use their own stream, so the placement of the original gallery is unchanged.
       const lean = main ? 0 : 0.05 + vr() * 0.14;
       const leanDir = vr() * 6.28;
       const r = len * 0.12 + 0.22;
-      const girth = 1 + vr() * 1.4;
+      const girth = (1 + vr() * 1.4) * (hood ? 1 + 1.2 * clump : 1);
       parts.push(
         place(
           pendant({
