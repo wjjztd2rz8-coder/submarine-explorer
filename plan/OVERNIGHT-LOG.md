@@ -2052,3 +2052,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - 4330 (journeys second leg) is still running in its worktree; nothing else to collect. Held worktrees unchanged, main clean. Hosted CI for cc180123 pending. Claude 5h 96%, week 64%; Codex 5h 71%. No Claude package (next art step gains ~0.1); queue left empty on purpose (no new audit duplicates). No tag.
 - **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button is new).
+
+## 2026-10-26 01:16 CDT targeted review (Claude)
+
+- CI red x3 = one spec (settings Aa at 150% clipped); fix is in 4330 worktree. Codex-starved trigger tightened. No packages. **Needs owner:** unchanged.

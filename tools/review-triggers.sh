@@ -38,7 +38,7 @@ try:
     rows=list(csv.DictReader(open('.cache/metrics/usage.csv')))[-4:]
     num=lambda v: float(v) if v not in ('','-') else -1
     if len(rows)==4 and claude_week_ok() and all(num(r['claude5h'])>=50 and r['run']=='0' for r in rows) and not any(now-os.path.getmtime(os.path.join('.cache',f))<2*3600 for f in os.listdir('.cache') if f.startswith('resume-2')): why['targeted'].append('Claude idle at >=50% for 2 h')
-    if len(rows)==4 and all(num(r['codex5h'])>=30 and int(r['codex_running'] or 0)<2 and int(r['codex_queued'] or 0)==0 for r in rows): why['targeted'].append('Codex starved for 2 h (empty queue)')
+    if len(rows)==4 and all(num(r['codex5h'])>=30 and int(r['codex_running'] or 0)==0 and int(r['codex_queued'] or 0)==0 for r in rows): why['targeted'].append('Codex starved for 2 h (empty queue)')
 except Exception: pass
 fails=sh('find .cache/codex -name "*-result.md" -mtime -2 -print0 2>/dev/null | xargs -0 -r grep -h "^FAIL" 2>/dev/null | sort | uniq -c | sort -rn | head -1').split()
 if fails and int(fails[0])>=4: why['targeted'].append(f'gate "{" ".join(fails[2:3])}" failing repeatedly')

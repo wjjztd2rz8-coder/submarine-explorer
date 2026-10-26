@@ -303,3 +303,6 @@ Creating `.cache/review/current` as a directory before `codex-review.sh start` m
 ## 2026-10-25 targeted review: Codex starved
 
 - Cause: the only Codex-lane item was the standing verify/bug-hunt item, whose last 14+ briefs found no defects, and the refill cooldown was 2 h. Fix: added real Codex items (5b P2-text-size, 5c S-fix-lock-teardown), cooldown 45 min, refill prompt told not to repeat audits. Briefs 4270-4290 launched.
+
+## 2026-10-26
+- review-triggers.sh: "Codex starved" now requires zero running tasks (was <2); an intentionally empty, rationed queue with one task running is not starvation. Red CI traced to 4280's Aa spec at 150% scale; fix rides with 4330.
