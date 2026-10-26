@@ -241,7 +241,7 @@
   outline-offset: 2px;
 }
 
-/* Settings: UI scale as − / slider / + and a separate readout that is wide
+/* Settings: UI scale as − / slider / Aa and a separate readout that is wide
    enough for "150%" at every UI scale, so nothing overlaps the value. */
 .settings-scale {
   display: flex;
@@ -257,7 +257,8 @@
 }
 .settings-scale-step {
   flex: none;
-  min-width: 2.2em;
+  min-width: max(44px, 2.2em);
+  min-height: 44px;
   font-weight: 700;
   text-align: center;
 }

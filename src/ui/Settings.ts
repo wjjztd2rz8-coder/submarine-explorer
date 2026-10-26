@@ -44,7 +44,7 @@ export function clampUiScale(value: number): number {
   return Math.max(UI_SCALE_MIN, Math.min(UI_SCALE_MAX, Math.round(value)));
 }
 
-/** The − / + buttons: the next multiple of 5 in that direction, clamped. */
+/** The next multiple of 5 in that direction, clamped. */
 export function stepUiScale(value: number, dir: -1 | 1): number {
   const v = clampUiScale(value);
   const next =
@@ -582,7 +582,7 @@ export class SettingsScreen {
 
   /**
    * The old number box clipped its last digit
-   * behind the spinner at 100% and above. Now − / slider / + and a separate
+   * behind the spinner at 100% and above. Keep a separate
    * readout sized for "150%", so nothing overlaps at any scale.
    */
   private uiScaleRow(): HTMLDivElement {
@@ -606,7 +606,10 @@ export class SettingsScreen {
       const b = el('button', 'settings-scale-step', text);
       b.type = 'button';
       b.setAttribute('aria-label', label);
-      b.addEventListener('click', () => commit(stepUiScale(this.opts.save.get().uiScale, dir)));
+      b.addEventListener('click', () => {
+        const value = this.opts.save.get().uiScale;
+        commit(dir > 0 && value === UI_SCALE_MAX ? UI_SCALE_MIN : stepUiScale(value, dir));
+      });
       return b;
     };
     this.controls.set('uiScale', range);
@@ -614,7 +617,9 @@ export class SettingsScreen {
     row.classList.add('settings-scale-row');
     const group = el('div', 'settings-scale');
     range.replaceWith(group);
-    group.append(step(-1, '−', 'Decrease UI scale'), range, step(1, '+', 'Increase UI scale'), out);
+    const cycle = step(1, 'Aa', 'Aa: cycle UI scale');
+    cycle.title = 'Increase UI scale; after 150%, return to 80%';
+    group.append(step(-1, '−', 'Decrease UI scale'), range, cycle, out);
     out.htmlFor.add(range.id);
     return row;
   }

@@ -976,6 +976,28 @@ function settings(onResetProgress?: () => 'cleared' | 'sessionOnly') {
   return { screen, input, save };
 }
 
+it('Aa replaces the increase button, cycles saved steps and stays synced after reset', () => {
+  const { screen, save } = settings();
+  const buttons = [...screen.root.querySelectorAll('button')];
+  const cycle = buttons.find((b) => b.getAttribute('aria-label') === 'Aa: cycle UI scale')!;
+  const value = screen.root.querySelector<HTMLOutputElement>('.settings-scale-value')!;
+  expect(cycle.textContent).toBe('Aa');
+  expect(buttons.some((b) => b.getAttribute('aria-label') === 'Increase UI scale')).toBe(false);
+  for (const scale of [105, 110, 115, 120, 125, 130, 135, 140, 145, 150, 80, 85, 90, 95, 100]) {
+    cycle.dispatchEvent(new Event('click'));
+    expect(save.get().uiScale).toBe(scale);
+    expect(value.value).toBe(`${scale}%`);
+  }
+  // Older saves and the fine slider may hold a value between button steps.
+  save.save({ uiScale: 137 });
+  cycle.dispatchEvent(new Event('click'));
+  expect(save.get().uiScale).toBe(140);
+  save.reset();
+  expect(value.value).toBe('100%');
+  cycle.dispatchEvent(new Event('click'));
+  expect(save.get().uiScale).toBe(105);
+});
+
 it.each(['cleared', 'sessionOnly'] as const)(
   'cancels the pending %s discoveries reload when Settings is disposed',
   (result) => {

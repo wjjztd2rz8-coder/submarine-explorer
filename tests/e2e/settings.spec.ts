@@ -2,6 +2,7 @@ import { waitForFrames } from './helpers/frames.js';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from './helpers/unlocked.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
+import { reviewScreenshot, reviewShot } from './helpers/render.js';
 
 /**
  * Settings screen (docs/settings.md), end to end:
@@ -74,6 +75,110 @@ async function probe(page: Page): Promise<Probe> {
 }
 
 test.describe('settings screen', () => {
+  for (const viewport of [
+    { name: 'desktop', width: 1280, height: 800, touch: false },
+    { name: 'phone-portrait', width: 390, height: 844, touch: true },
+    { name: 'phone-landscape', width: 844, height: 390, touch: true },
+  ]) {
+    test.describe(viewport.name, () => {
+      test.use({
+        viewport: { width: viewport.width, height: viewport.height },
+        hasTouch: viewport.touch,
+      });
+      for (const surface of ['home', 'dive'] as const) {
+        test(`Aa cycles and persists UI scale from ${surface}`, async ({ page }) => {
+          // Guards a cosmetic-only Aa button, lost scale on reload, and a clipped
+          // readout or unreachable touch target at the largest saved size.
+          await boot(page, surface === 'home' ? '/?tier=low' : '/?tile=titanic&tier=low');
+          const layout = () =>
+            page.evaluate((surface) => {
+              const root = document.querySelector<HTMLElement>(
+                surface === 'home' ? '.home-menu' : '.hud-regions',
+              )!;
+              const canvas = document.querySelector('canvas')!;
+              return {
+                areas: getComputedStyle(root).gridTemplateAreas,
+                canvasWidth: canvas.width,
+                canvasHeight: canvas.height,
+                overflow: document.documentElement.scrollWidth > innerWidth,
+              };
+            }, surface);
+          const before = await layout();
+          expect(before.overflow).toBe(false);
+          await openSettings(page);
+          const dialog = page.getByRole('dialog', { name: 'Settings' });
+          const cycle = dialog.getByRole('button', { name: 'Aa: cycle UI scale' });
+          const value = dialog.locator('.settings-scale-value');
+          const fontSize = () => dialog.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+          const initialFont = await fontSize();
+          const applied = () =>
+            page.evaluate(() => ({
+              saved: (window.__game as { save: { get(): { uiScale: number } } }).save.get().uiScale,
+              persisted: JSON.parse(localStorage.getItem('subexplorer.settings.v3')!).uiScale,
+              css: Number(document.documentElement.style.getPropertyValue('--ui-user-scale')),
+            }));
+          await expect(cycle).toHaveText('Aa');
+          await expect(value).toHaveText('100%');
+          for (let scale = 105; scale <= 150; scale += 5) {
+            await cycle.click();
+            await expect(value).toHaveText(`${scale}%`);
+            expect(await applied()).toEqual({ saved: scale, persisted: scale, css: scale / 100 });
+          }
+          expect(await fontSize()).toBeGreaterThan(initialFont);
+          await cycle.scrollIntoViewIfNeeded();
+          const metrics = await cycle.evaluate((button) => {
+            const box = button.getBoundingClientRect();
+            const row = button.closest('.settings-scale-row')!;
+            const out = row.querySelector<HTMLElement>('output')!;
+            const panel = row.closest('.settings-panel')!;
+            const output = out.getBoundingClientRect();
+            return {
+              width: box.width,
+              height: box.height,
+              clipped: out.scrollWidth > out.clientWidth || panel.scrollWidth > panel.clientWidth,
+              overlaps: [...row.querySelectorAll('button, input')].some((el) => {
+                const r = el.getBoundingClientRect();
+                return (
+                  r.left < output.right &&
+                  r.right > output.left &&
+                  r.top < output.bottom &&
+                  r.bottom > output.top
+                );
+              }),
+              reachable:
+                document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2) === button,
+            };
+          });
+          expect(metrics.width).toBeGreaterThanOrEqual(44);
+          expect(metrics.height).toBeGreaterThanOrEqual(44);
+          expect(metrics).toMatchObject({ clipped: false, overlaps: false, reachable: true });
+          await reviewShot(page, `settings-aa-${surface}-${viewport.name}-150`);
+          await dialog.getByRole('button', { name: 'Close (Esc)' }).click();
+          if (surface === 'dive') await page.keyboard.press('Escape');
+          expect(await layout()).toEqual(before);
+          await reviewShot(page, `aa-${surface}-${viewport.name}-150`);
+          await page.reload({ waitUntil: 'domcontentloaded' });
+          await page.waitForFunction(() => window.__gameReady === true);
+          expect(await applied()).toEqual({ saved: 150, persisted: 150, css: 1.5 });
+          await openSettings(page);
+          await expect(value).toHaveText('150%');
+          // The same focused button also cycles with the keyboard after reload.
+          await cycle.focus();
+          await page.keyboard.press('Enter');
+          await expect(value).toHaveText('80%');
+          expect(await applied()).toEqual({ saved: 80, persisted: 80, css: 0.8 });
+          await page.keyboard.press('Space');
+          await expect(value).toHaveText('85%');
+          for (const scale of [90, 95, 100]) {
+            await cycle.click();
+            await expect(value).toHaveText(`${scale}%`);
+            expect(await applied()).toEqual({ saved: scale, persisted: scale, css: scale / 100 });
+          }
+        });
+      }
+    });
+  }
+
   test('Pause settings freezes; changes apply and persist; conflicts survive reload', async ({
     page,
   }) => {
@@ -114,7 +219,7 @@ test.describe('settings screen', () => {
     p = await probe(page);
     expect(p.ahead).toEqual(['KeyS', 'ArrowUp']);
     expect(p.thrustReverse).toEqual(['ArrowDown']);
-    await page.screenshot({ path: 'tests/e2e/screenshots/settings.png' });
+    await reviewScreenshot(page, { path: 'tests/e2e/screenshots/settings.png' });
 
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
@@ -239,7 +344,7 @@ test.describe('settings screen', () => {
     await dialog.getByLabel('Reduce motion').check();
     await dialog.getByRole('button', { name: 'Reset discoveries' }).click();
     await expect(dialog).toContainText('Your settings and key bindings stay saved');
-    await page.screenshot({ path: 'test-results-settings-closeout/settings-confirm.png' });
+    await reviewScreenshot(page, { path: 'test-results-settings-closeout/settings-confirm.png' });
     const axe = await new AxeBuilder({ page }).include('.settings').analyze();
     expect(axe.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
     await dialog.getByRole('button', { name: 'Cancel' }).click();
@@ -276,7 +381,7 @@ test.describe('settings screen', () => {
     await dialog.getByRole('button', { name: 'Advanced' }).click();
     await expect(dialog.getByLabel('Simulation speed')).toHaveCount(0);
     await dialog.getByRole('button', { name: 'Apply and reload' }).scrollIntoViewIfNeeded();
-    await page.screenshot({ path: 'test-results-settings-closeout/settings-apply.png' });
+    await reviewScreenshot(page, { path: 'test-results-settings-closeout/settings-apply.png' });
     const reloaded = page.waitForEvent('load');
     await dialog.getByRole('button', { name: 'Apply and reload' }).click();
     await reloaded;
