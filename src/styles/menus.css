@@ -241,9 +241,10 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
 .field-guide {
   z-index: 95;
 }
+/* The Journal covers the menu it was opened from; hide that menu so it cannot ghost through. */
 body:has(.field-guide:not([hidden])) .home-screen,
 body:has(.field-guide:not([hidden])) .pause-menu {
-  pointer-events: none;
+  visibility: hidden;
 }
 
 .pause-credits {

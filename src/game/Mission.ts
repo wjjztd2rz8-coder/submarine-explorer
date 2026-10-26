@@ -389,6 +389,12 @@ export class Mission {
     return this.objectives.filter((o) => o.primary && o.resolved);
   }
 
+  /** Resolvable primaries done and in all. */
+  primaryCounts(): { completed: number; total: number } {
+    const p = this.requiredPrimaries();
+    return { completed: p.filter((o) => o.complete).length, total: p.length };
+  }
+
   /** True when every resolvable primary objective is complete (and there is one). */
   get primaryComplete(): boolean {
     const p = this.requiredPrimaries();

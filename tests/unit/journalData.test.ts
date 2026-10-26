@@ -854,30 +854,37 @@ describe('Journal content model', () => {
 describe('debrief wording', () => {
   it('distinguishes primaries done from every objective done without claiming all stars', () => {
     const c = { completed: 3, total: 4 };
-    expect(debriefText('surface', true, c, 75)).toEqual({
+    expect(debriefText('surface', { completed: 2, total: 2 }, c, 75)).toEqual({
       title: 'Primaries complete',
-      subtitle: 'All primary objectives · 3 of 4 objectives · 1:15',
+      subtitle: '2 of 2 primary objectives · 1:15',
     });
-    expect(debriefText('all', true, { completed: 4, total: 4 }, 75)).toEqual({
+    expect(debriefText('all', { completed: 2, total: 2 }, { completed: 4, total: 4 }, 75)).toEqual({
       title: 'All objectives complete',
       subtitle: 'Every objective · 4 of 4 objectives · 1:15',
     });
-    expect(debriefText('surface', false, { completed: 1, total: 4 }, 5)).toEqual({
+    expect(
+      debriefText('surface', { completed: 0, total: 2 }, { completed: 1, total: 4 }, 5),
+    ).toEqual({
       title: 'Back at the surface',
       subtitle: 'You found 1 of 4 — the rest are still down there. · 1 of 4 objectives · 0:05',
     });
-    const none = debriefText('surface', false, { completed: 0, total: 4 }, 5);
+    const none = debriefText('surface', { completed: 0, total: 2 }, { completed: 0, total: 4 }, 5);
     expect(none.title).toBe('Back at the surface');
     expect(none.subtitle).toMatch(/^Nothing logged this time/);
     expect(none.subtitle).not.toMatch(/fail|unfinished|ended/i);
-    expect(debriefText('abort', false, { completed: 1, total: 4 }, 5, -1180)).toEqual({
+    expect(
+      debriefText('abort', { completed: 0, total: 2 }, { completed: 1, total: 4 }, 5, -1180),
+    ).toEqual({
       title: 'Dive aborted',
       subtitle: 'Hull failure at 1,180 m · emergency ascent completed · 1 of 4 objectives · 0:05',
     });
-    expect(debriefText('abort', true, c, 5, -1180).title).toBe('Dive aborted');
-    expect(debriefText('abort', true, { completed: 4, total: 4 }, 5, 0, 'power').title).toBe(
+    expect(debriefText('abort', { completed: 2, total: 2 }, c, 5, -1180).title).toBe(
       'Dive aborted',
     );
+    expect(
+      debriefText('abort', { completed: 2, total: 2 }, { completed: 4, total: 4 }, 5, 0, 'power')
+        .title,
+    ).toBe('Dive aborted');
   });
 });
 

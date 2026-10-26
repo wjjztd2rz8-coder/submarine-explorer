@@ -327,7 +327,7 @@ export const HULL_FAILURE_ALERT = 'HULL FAILURE — EMERGENCY ASCENT';
 /** Debrief heading and subtitle for how the dive ended. Pure, for tests. */
 export function debriefText(
   reason: 'surface' | 'all' | 'abort',
-  primaryComplete: boolean,
+  primaries: { completed: number; total: number },
   counts: { completed: number; total: number },
   durationS: number,
   failedAtM = 0,
@@ -348,8 +348,12 @@ export function debriefText(
   }
   if (reason === 'all')
     return { title: 'All objectives complete', subtitle: `Every objective · ${tally}` };
-  if (primaryComplete) {
-    return { title: 'Primaries complete', subtitle: `All primary objectives · ${tally}` };
+  if (primaries.total > 0 && primaries.completed === primaries.total) {
+    // The tally counts the primaries only, so the optional ones left over do not read as a miss.
+    return {
+      title: 'Primaries complete',
+      subtitle: `${primaries.completed} of ${primaries.total} primary objectives · ${formatDuration(durationS)}`,
+    };
   }
   // Partial dive: warm, not a failure. The tally cell carries the numbers.
   const line =
@@ -604,7 +608,7 @@ export class MissionRouter {
     const counts = m.counts();
     const { title, subtitle } = debriefText(
       reason,
-      m.primaryComplete,
+      m.primaryCounts(),
       counts,
       m.durationS ?? m.elapsedS,
       this.failedAt,

@@ -309,7 +309,7 @@ it('bakes only the selected cosmetic frame into a new capture and keeps stock ca
     expect(canvasThumbnail(source)).toBe(encoded);
     expect(context.strokeRect).not.toHaveBeenCalled();
     expect(canvasThumbnail(source, undefined, undefined, 'gold')).toBe(encoded);
-    expect(context.drawImage).toHaveBeenLastCalledWith(source, 0, 0, 640, 360);
+    expect(context.drawImage).toHaveBeenLastCalledWith(source, 0, 0, 1280, 720, 0, 0, 640, 360);
     expect(context.strokeStyle).toBe('#d4b46b');
     expect(context.strokeRect).toHaveBeenCalledExactlyOnceWith(4, 4, 632, 352);
   } finally {
@@ -337,7 +337,16 @@ it.each([
       const source = { width, height } as HTMLCanvasElement;
       expect(canvasThumbnail(source)).toBe('data:image/jpeg;base64,YQ==');
       expect([output.width, output.height]).toEqual(expected);
-      expect(context.drawImage).toHaveBeenCalledExactlyOnceWith(source, 0, 0, ...expected);
+      expect(context.drawImage).toHaveBeenCalledExactlyOnceWith(
+        source,
+        0,
+        0,
+        width,
+        height,
+        0,
+        0,
+        ...expected,
+      );
       expect(output.toDataURL).toHaveBeenCalledExactlyOnceWith('image/jpeg', 0.76);
     } finally {
       vi.unstubAllGlobals();
@@ -369,6 +378,32 @@ it.each(['context', 'encoder', 'empty canvas'])(
     }
   },
 );
+
+it('crops a portrait frame to a 4:3 band around the subject and keeps it in the frame', () => {
+  const context = { drawImage: vi.fn() };
+  const output = {
+    width: 0,
+    height: 0,
+    getContext: () => context,
+    toDataURL: () => 'data:image/jpeg;base64,band',
+  };
+  vi.stubGlobal('document', { createElement: () => output });
+  try {
+    const source = { width: 400, height: 800 } as HTMLCanvasElement;
+    canvasThumbnail(source, undefined, undefined, 'stock', 0.5);
+    expect(context.drawImage).toHaveBeenLastCalledWith(source, 0, 250, 400, 300, 0, 0, 400, 300);
+    canvasThumbnail(source, undefined, undefined, 'stock', 0.05);
+    expect(context.drawImage).toHaveBeenLastCalledWith(source, 0, 0, 400, 300, 0, 0, 400, 300);
+    canvasThumbnail(source, undefined, undefined, 'stock', 0.99);
+    expect(context.drawImage).toHaveBeenLastCalledWith(source, 0, 500, 400, 300, 0, 0, 400, 300);
+    // A landscape frame is already wider than 4:3 allows: it is never cropped.
+    const wide = { width: 1280, height: 720 } as HTMLCanvasElement;
+    canvasThumbnail(wide, undefined, undefined, 'stock', 0.5);
+    expect(context.drawImage).toHaveBeenLastCalledWith(wide, 0, 0, 1280, 720, 0, 0, 640, 360);
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});
 
 it.each(PHOTO_FRAMES)('captures the selected $id photo frame', (frame) => {
   const context = { drawImage: vi.fn(), strokeRect: vi.fn(), strokeStyle: '', lineWidth: 0 };

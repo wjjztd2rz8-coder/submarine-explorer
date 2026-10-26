@@ -7,7 +7,7 @@
  * Journal entry opens with a picture.
  */
 
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { PHOTO_LIMIT, PhotoStore, poiInPhoto } from '../../game/PhotoStore.js';
 import type { PlacedPoi } from '../../game/Pois.js';
 import { PhotoGallery } from '../../ui/PhotoGallery.js';
@@ -26,7 +26,8 @@ export function createPhotoSystem(): GameSystem {
   let photoAnimal: { id: string; name: string } | null = null;
   let lastCaptureMs = -Infinity;
   /** A first scan waiting for the next draw to be read as its Journal still. */
-  let scanStill: { id: string; name: string } | null = null;
+  let scanStill: { id: string; name: string; at: THREE.Vector3 | null } | null = null;
+  const subject = new THREE.Vector3();
 
   const enterPhotoMode = (ctx: GameContext): void => {
     const { journal, rig, sub, photoMode, input } = ctx;
@@ -80,13 +81,21 @@ export function createPhotoSystem(): GameSystem {
   /** Files the canvas as a quiet, unannounced photo of what was just scanned. */
   const captureScanStill = (ctx: GameContext, target: THREE.Vector3): void => {
     if (!scanStill) return;
-    const { id, name } = scanStill;
+    const { id, name, at } = scanStill;
     scanStill = null;
+    // Where the subject sits in the frame, so a tall (portrait) still crops around it.
+    let subjectY: number | undefined;
+    if (at) {
+      ctx.rig.camera.updateMatrixWorld();
+      subject.copy(at).project(ctx.rig.camera);
+      if (subject.z < 1) subjectY = (1 - subject.y) / 2;
+    }
     const image = canvasThumbnail(
       ctx.renderer.domElement,
       undefined,
       undefined,
       ctx.progress.cosmetics.frame,
+      subjectY ?? 0.5,
     );
     if (!image) return;
     const saved = ctx.photos.save({
@@ -146,7 +155,8 @@ export function createPhotoSystem(): GameSystem {
             ? SPECIES_BY_ID.get(poiId.slice(LIFE_ID_PREFIX.length))
             : undefined;
           const name = poi?.name ?? animal?.common;
-          if (name) scanStill = { id: poiId, name };
+          const at = poi?.position ?? ctx.life?.targets.find((t) => t.id === poiId)?.position;
+          if (name) scanStill = { id: poiId, name, at: at?.clone() ?? null };
         }),
       );
       cleanup.add(

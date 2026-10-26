@@ -15,22 +15,30 @@ const PHOTO_JPEG_QUALITY = 0.76;
  * A JPEG data URL of `source` scaled to at most `width` pixels wide. Call it
  * in the same task as the render that drew `source` (the WebGL drawing buffer
  * is only guaranteed until the frame is composited). Null if the browser
- * cannot encode.
+ * cannot encode. With `subjectY` (0 top to 1 bottom) a frame taller than 4:3 is
+ * cropped to a 4:3 band centred on the subject, so a portrait still is not mostly empty water.
  */
 export function canvasThumbnail(
   source: HTMLCanvasElement,
   width = PHOTO_WIDTH_PX,
   quality = PHOTO_JPEG_QUALITY,
   frame: CosmeticSelection['frame'] = 'stock',
+  subjectY?: number,
 ): string | null {
   const w = Math.min(width, source.width);
-  const h = Math.max(1, Math.round((source.height * w) / Math.max(1, source.width)));
+  const band =
+    subjectY === undefined ? source.height : Math.min(source.height, source.width * 0.75);
+  const sy = Math.max(
+    0,
+    Math.min(source.height - band, (subjectY ?? 0.5) * source.height - band / 2),
+  );
+  const h = Math.max(1, Math.round((band * w) / Math.max(1, source.width)));
   const out = document.createElement('canvas');
   out.width = w;
   out.height = h;
   const ctx = out.getContext('2d');
   if (!ctx || w < 1) return null;
-  ctx.drawImage(source, 0, 0, w, h);
+  ctx.drawImage(source, 0, sy, source.width, band, 0, 0, w, h);
   const color = PHOTO_FRAMES.find((def) => def.id === frame)?.color;
   if (color) {
     ctx.strokeStyle = color;
