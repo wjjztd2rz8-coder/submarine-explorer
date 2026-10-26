@@ -2101,3 +2101,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-eight-sites-lit g (Kamaʻehuakanaloa mission opening 200 to 130 m, data + one test expectation; shot reads slightly better, subject still a dark silhouette, ~3.0). Axial left unchanged: a 75 m opening makes the chimneys readable but falls inside the 100 m scan radius (guarded by a composition test, not loosened). Gates smoke + project-base pass on main. Claude 5h ~85%, week 62%. Codex idle by design (no non-visual backlog; refill runs on starvation).
 - **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button, High Lost City plume); Axial: allow a smaller scan radius at that site, or a lit-chimney treatment?
+
+## 2026-10-26 11:28 CDT comprehensive review (Claude + Sol) and one Sonnet package
+
+- Joint review done (REVIEWS.md, STATUS.md, DIRECTOR.md Backlog rewritten, old backlog archived). Stage ~83%, 4-6 weeks. Main CI is red on two moving specs (journeys second leg, settings Aa timeouts): queued 4380, 4390 and 4400 (Codex 5h was 7% after Sol's review, so the dispatcher launches them as it refills).
+- Merged V-journal-polish (Sonnet): Journal panel opaque, home menu hidden behind it, portrait photo crops around the subject, debrief tally reads primaries. Gates smoke + project-base pass on main. Portrait crop is unit-tested only (staged screenshots could not show a real subject): check on the phone.
+- **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button, High Lost City plume, Journal photo).
