@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running (2026-10-26). Codex queue: 4380 (R-ci-green journeys), 4390 (R-ci-green settings), 4400 (S-verify eight-site subject size).
+- V-monterey-apron IN FLIGHT (Sonnet, 2026-10-26, worktree subexp-wt/V-monterey-apron). Codex queue: 4380 (R-ci-green journeys), 4390 (R-ci-green settings), 4400 (S-verify eight-site subject size).
 
 ## Backlog
 
