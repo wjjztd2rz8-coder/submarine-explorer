@@ -260,6 +260,8 @@ export interface RockOpts {
     fragmentRunout: readonly [number, number];
     blockRadius: readonly [number, number];
     fragmentRadius: readonly [number, number];
+    pebbleShare: number;
+    pebbleRadius: readonly [number, number];
     radiusSkew: number;
     separationRadii: number;
     placementAttempts: number;
@@ -289,6 +291,8 @@ export function placeRocks(
     if (reach < 2) continue;
     const block = rnd() < (o.blocks ?? 0.04);
     const scatter = o.scatter;
+    // Pebbles and cobbles give the apron small-scale texture between the blocks.
+    const pebble = !block && !!scatter && rnd() < scatter.pebbleShare;
     const u = scatter
       ? THREE.MathUtils.lerp(...(block ? scatter.blockRunout : scatter.fragmentRunout), rnd())
       : block
@@ -309,10 +313,12 @@ export function placeRocks(
     const r =
       o.size *
       (scatter
-        ? THREE.MathUtils.lerp(
-            ...(block ? scatter.blockRadius : scatter.fragmentRadius),
-            Math.pow(rnd(), scatter.radiusSkew),
-          )
+        ? pebble
+          ? THREE.MathUtils.lerp(...scatter.pebbleRadius, rnd())
+          : THREE.MathUtils.lerp(
+              ...(block ? scatter.blockRadius : scatter.fragmentRadius),
+              Math.pow(rnd(), scatter.radiusSkew),
+            )
         : block
           ? 2.6 + rnd() * 1.8
           : (0.3 + rnd() * rnd() * 1.9) * (0.7 + 0.8 * u));
