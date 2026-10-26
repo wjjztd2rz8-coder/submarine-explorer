@@ -2066,3 +2066,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - 4330 (journeys second leg + Aa-clipping CI fix) is still running (Codex round 3, e2e); nothing to collect. Main clean; the last two hosted CI runs on main are red (the Aa spec, fix waits in 4330). Claude 5h 93%, week 63%; Codex 5h 84%. No Claude package (next art step gains ~0.1); queue left empty on purpose. No tag.
 - **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button is new).
+
+## 2026-10-26 04:27 CDT targeted review 2 (Claude)
+
+- Landed the Aa-clipping CI fix from the 4330 worktree (settings specs 14/14, smoke gates green) and pushed. Journeys spec still failing one row; queued 4340. Claude 5h 100%.
+- **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button is new).

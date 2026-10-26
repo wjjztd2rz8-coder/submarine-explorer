@@ -1,5 +1,10 @@
 # Reviews
 
+## 2026-10-26 (04:30) targeted review, CI red x3 follow-up
+
+- 4330 had finished with a failing full e2e (its own new journeys row, titanic 844x390). I landed only its Aa-clipping fix (settings.css + settings.spec; 14/14 settings specs pass, smoke gates green) and pushed, which should turn hosted CI green. The journeys spec stays uncommitted in the 4330 worktree; queued 4340 to finish it.
+- **Needs owner:** unchanged.
+
 ## 2026-10-26 targeted review (CI red x3, Codex "starved")
 
 - **CI red:** all three runs fail on one spec, `settings.spec.ts:89` "Aa cycles and persists UI scale", 4 of its variants (desktop dive, phone portrait home and dive, phone landscape dive): at 150% the Aa row reports `clipped: true` (output or panel scrollWidth > clientWidth). Cause: 4280 merged (run 153) without a local full e2e; the other failing shard jobs are the same spec. The fix is already in the 4330 worktree (uncommitted `settings.css` + spec edits, "enlarged-text overflow"); collect it when 4330 finishes and gates pass. No separate brief (would conflict on settings.css).
