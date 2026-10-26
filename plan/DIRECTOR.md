@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- V-monterey-apron IN FLIGHT (Sonnet, 2026-10-26, worktree subexp-wt/V-monterey-apron). Codex queue: 4380 (R-ci-green journeys), 4390 (R-ci-green settings), 4400 (S-verify eight-site subject size).
+- No Claude package running (2026-10-26). Codex queue: 4380 (R-ci-green journeys), 4390 (R-ci-green settings), 4400 (S-verify eight-site subject size).
 
 ## Backlog
 
@@ -84,7 +84,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 3. **V-bluehole-silhouette [Sonnet]:** (first pass NOT merged 2026-10-21, kept as tag `parked/V-bluehole-silhouette`; ~3.0 beautiful, weakest hero with Lost City) colour is right; the defect is shape. Target composition from the first-scan pose: the gallery lip is a thin irregular undercut edge (not a terraced dome or rolled slab), pendants vary in length and clump, a soft light shaft falls through the opening. Silhouette only. Keep the Class B spawn and overlap numerics; permission to loosen the pendant-envelope test.
 4. **V-lostcity-towers [Sonnet]:** (~3.0) the carbonate towers read as folded, segmented sheets in the detail view (`lost-city-3.png`). Target: Poseidon reads as one tall fluted tower with a smooth flowstone skirt and a lit white top; fewer, larger facets, no visible fold seams. Do not raise the High plume budget (4350 capped it).
 5. **V-eight-sites-lit [Sonnet]:** (a-g done; Axial/Kama still ~3.0) Decision (director, rules can bend, 2026-10-26): no owner decision needed. Axial gets a lit-chimney treatment through site data and the shared `vertexGlow`, and may use a smaller scan radius at that site if the lit chimneys alone stay small (a per-site value in data, no site branch). Then Hunga's dark subject, then Kama. 4400 reports the numerics.
-6. **V-monterey-apron [Sonnet, small]:** (~3.5) the apron reads as a smooth slope; swap some rocks for pebbles at the same instance count (update instance-count tests). Right-bank crest untouched. Also: in the opening the sub overlaps the wall as a half-transparent shape; check sub framing.
+6. **V-monterey-apron [Sonnet, small]:** DONE 2026-10-26 (30e16290: pebble share in the rubble table, modest gain ~3.6; sub-overlap is the wall's translucent skirt near the camera, a wall-material fix, left open; delete at the next review). (~3.5) the apron reads as a smooth slope; swap some rocks for pebbles at the same instance count (update instance-count tests). Right-bank crest untouched. Also: in the opening the sub overlaps the wall as a half-transparent shape; check sub framing.
 7. **V-endurance-hull [Sonnet, small]:** (~3.0) hull is only 44 x 8 m, so altitude cannot enlarge it. Target: a richer hull (rails, masts, rubble skirt) or a lit subject; remove the white speckle noise along the hull edge in `endurance-1.png`.
 8. **P2-phone-accept [owner + Codex]:** Low-tier acceptance on a real phone with the current build (Aa button, journeys, High Lost City plume). Codex prepares a one-page checklist and the Pages URL; the owner runs it.
 9. **S-verify / S-bughunt [Codex, standing]:** after each visual merge, verify numerics and hunt bugs; bind captured images, manifests and SHA together before accepting evidence (stale PNGs can sit beside fresh JSON, Sol 2026-10-26). 4400 queued.

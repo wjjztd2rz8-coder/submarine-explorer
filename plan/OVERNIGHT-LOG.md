@@ -2112,3 +2112,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged 4380 (journeys spec: stable POI poses, held scans, 175 lines shorter) and 4390 (settings spec: one reload per case, paused rendering, 60 s budgets). Both test-only; Codex could not run browsers (sandbox EPERM), so only hosted CI will tell. Smoke + project-base pass on main. 4400 (subject-size verification) produced no result (Codex hit its 5h limit); discarded, not re-queued. Main CI had been red on these specs for 6+ runs; the 4380 rewrite drops the 'unaided pilot' route from the journey, so if it passes, judge whether that lost coverage matters. No Claude package. Claude 5h ~72%, Codex 5h 5%.
 - **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button, High Lost City plume, Journal photo).
+
+## 2026-10-26 12:48 CDT headless run 167 (Claude): one Sonnet package
+
+- Merged V-monterey-apron (30e16290): 50% of non-block apron rocks are now pebbles/cobbles (same instance count, two fields in the Monterey rubble table); modest gain, ~3.6. Sub-overlap in the opening is the wall's translucent skirt near the camera (a wall-material change), left open. Gates smoke + project-base pass on main (a full unit run in the worktree showed 5 timeout-like failures under load; they pass on main). Hosted CI for run 166 still pending at last check. Old stale worktrees (2980, 3050, 3310, 3320, 3340, 3380) are not collected. Codex 5h was at 5%, queue empty. No tag.
+- **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button, High Lost City plume, Journal photo).
