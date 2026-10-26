@@ -2107,3 +2107,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Joint review done (REVIEWS.md, STATUS.md, DIRECTOR.md Backlog rewritten, old backlog archived). Stage ~83%, 4-6 weeks. Main CI is red on two moving specs (journeys second leg, settings Aa timeouts): queued 4380, 4390 and 4400 (Codex 5h was 7% after Sol's review, so the dispatcher launches them as it refills).
 - Merged V-journal-polish (Sonnet): Journal panel opaque, home menu hidden behind it, portrait photo crops around the subject, debrief tally reads primaries. Gates smoke + project-base pass on main. Portrait crop is unit-tested only (staged screenshots could not show a real subject): check on the phone.
 - **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button, High Lost City plume, Journal photo).
+
+## 2026-10-26 11:40 CDT headless run 166 (Claude): collection
+
+- Merged 4380 (journeys spec: stable POI poses, held scans, 175 lines shorter) and 4390 (settings spec: one reload per case, paused rendering, 60 s budgets). Both test-only; Codex could not run browsers (sandbox EPERM), so only hosted CI will tell. Smoke + project-base pass on main. 4400 (subject-size verification) produced no result (Codex hit its 5h limit); discarded, not re-queued. Main CI had been red on these specs for 6+ runs; the 4380 rewrite drops the 'unaided pilot' route from the journey, so if it passes, judge whether that lost coverage matters. No Claude package. Claude 5h ~72%, Codex 5h 5%.
+- **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button, High Lost City plume, Journal photo).
