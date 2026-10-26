@@ -2117,3 +2117,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-monterey-apron (30e16290): 50% of non-block apron rocks are now pebbles/cobbles (same instance count, two fields in the Monterey rubble table); modest gain, ~3.6. Sub-overlap in the opening is the wall's translucent skirt near the camera (a wall-material change), left open. Gates smoke + project-base pass on main (a full unit run in the worktree showed 5 timeout-like failures under load; they pass on main). Hosted CI for run 166 still pending at last check. Old stale worktrees (2980, 3050, 3310, 3320, 3340, 3380) are not collected. Codex 5h was at 5%, queue empty. No tag.
 - **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button, High Lost City plume, Journal photo).
+
+## 2026-10-26 13:50 CDT headless run 168 (Claude): one Sonnet package
+
+- Merged 4410 (P2 phone-retest checklist, docs only) and V-bluehole-silhouette second pass (a7702911; undercut lip from noise instead of plateaus, clumped pendant lengths, envelope test rewritten, snapshots re-baselined; ~3.6 from ~3.2 by my read of east-2, roof top still a broad slab, no light shaft). Gates smoke + project-base pass on main (after a log Prettier fix); pushed. Hosted CI for recent pushes still running, no tag. Queued and launched Codex 4420 (verify Blue Hole numerics), 4430 (Journal/debrief bug hunt), 4440 (CI flake audit, NET). Claude 5h ~48%.
+- **Needs owner:** delete four S-collision expected-failure cases?; phone retest using plan/progress/4410-P2-phone-accept-checklist.md (Aa button, High Lost City plume, Journal photo, Blue Hole shape).
