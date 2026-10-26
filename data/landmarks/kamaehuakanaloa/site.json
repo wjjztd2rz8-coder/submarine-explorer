@@ -18,7 +18,7 @@
   },
   "opening": {
     "mission": {
-      "rangeM": 200,
+      "rangeM": 130,
       "destinationLabel": "Hiolo North"
     },
     "freeDive": {

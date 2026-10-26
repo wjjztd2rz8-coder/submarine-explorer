@@ -36,7 +36,7 @@ it('every authored site retains its mission approach distance', () => {
     endurance: 110,
     'axial-seamount-ashes': 110,
     'hudson-canyon': 112,
-    kamaehuakanaloa: 200,
+    kamaehuakanaloa: 130,
     'beebe-vent-field': 220,
     'great-blue-hole': 150,
     bismarck: 110,
