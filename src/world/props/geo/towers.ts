@@ -54,8 +54,7 @@ const SEABED = new THREE.Color(0x8e9284); // what the apron fades into: cool oli
 
 /**
  * Breaks the lathe-smooth trunk in place (local column frame, y up from the base):
- * noise-varied radius, vertical ridges, notched and broken ledges, and a pocket
- * where the side orifice sits. Vertex count is unchanged.
+ * broad noise-varied radius and a pocket where the side orifice sits. Vertex count is unchanged.
  */
 function roughenTrunk(g: THREE.BufferGeometry, s: SpireOpts, seed: number, pocket: boolean): void {
   const p = g.getAttribute('position');
@@ -74,30 +73,8 @@ function roughenTrunk(g: THREE.BufferGeometry, s: SpireOpts, seed: number, pocke
     const w = smooth(0.0, 0.08, t) * (1 - smooth(0.9, 0.99, t));
     const big = fbm3(ca * 1.6 + 4, y * 0.07, sa * 1.6 + 4, seed ^ 0x2a1, 3) - 0.5;
     const mid = fbm3(ca * 4.5 + 1, y * 0.25, sa * 4.5 + 1, seed ^ 0x2a2, 2) - 0.5;
-    // Ridges that wander and pinch out along the height.
-    const ridgePhase = a * 7 + big * 5 + y * 0.05;
-    const ridge = Math.pow(0.5 + 0.5 * Math.sin(ridgePhase), 2) * smooth(0.3, 0.6, mid + 0.5 + big);
-    // Ledges: stepped horizontal bands, broken by noise so they stop and start.
-    const band = y / Math.max(2.5, s.h / 9) + big * 1.5;
-    const frac = band - Math.floor(band);
-    const broken = smooth(0.35, 0.6, mid + 0.5 + Math.sin(a * 3 + Math.floor(band)) * 0.2);
-    const ledge = smooth(0.7, 0.96, frac) * (1 - smooth(0.96, 1, frac)) * broken;
-    const undercut = smooth(0.0, 0.25, frac) * (1 - smooth(0.25, 0.5, frac)) * broken;
-    // Fine flowstone pitting and rib crests (small, high-frequency) on top of the broad relief.
-    const pit = fbm3(ca * 9 + 3, y * 0.9, sa * 9 + 3, seed ^ 0x2a3, 2) - 0.5;
-    // Scalloped flowstone sheets: broad plates with soft shoulders that break up the flat wall
-    // between the ribs.
-    const sheet =
-      smooth(0.38, 0.62, fbm3(ca * 3.2 + 7, y * 0.32, sa * 3.2 + 7, seed ^ 0x2a4, 2)) - 0.5;
-    let k =
-      1 +
-      big * 0.6 +
-      mid * 0.4 +
-      ridge * 0.16 +
-      ledge * 0.17 -
-      undercut * 0.12 +
-      pit * 0.07 +
-      sheet * 0.14;
+    // Broad, low-frequency relief only: fine pits, ledges and plates read as folded sheets.
+    let k = 1 + big * 0.3 + mid * 0.1;
     // Orifice pocket.
     const da = Math.atan2(Math.sin(a - orA), Math.cos(a - orA)) * rad;
     const dy = y - 0.8 * s.h;
@@ -162,10 +139,10 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       segs: 40 * dens + 4,
       rings: (h / 0.9) * dens + 8,
       tiers: Math.max(2, Math.round(h / (main ? 6.5 : 5))),
-      ledge: main ? 0.12 : 0.1,
+      ledge: 0.06,
       wobble: 0.1,
       rough: 0.035,
-      ridges: main ? 9 : 6,
+      ridges: main ? 7 : 5,
       ridgeAmp: main ? 0.13 : 0.1,
       flare: main ? 0.7 : 0.5,
       lip: 0.1,
@@ -245,7 +222,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     tips.push({ x: s.x, y: s.y + s.h, z: s.z });
     // Drooping flanges on the column: wide shelves on the main tower, one or two elsewhere.
     // Saucer flanges read as plates, so only an occasional small one remains on lesser spires.
-    const nf = lone ? 0 : i === 0 ? 3 : rnd() < 0.3 ? 1 : 0;
+    const nf = lone ? 0 : i === 0 ? 2 : 0;
     for (let f = 0; f < nf; f++) {
       const t =
         i === 0 ? 0.12 + (f / nf) * 0.6 + rnd() * 0.06 : 0.1 + (f / nf) * 0.6 + rnd() * 0.08;
@@ -270,7 +247,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   // and side chimneys; they break the single-cone silhouette.
   const fingerRnd = mulberry32(seed ^ 0xf1f1);
   for (const [i, s] of spires.entries()) {
-    const nFing = lone ? 2 : i === 0 ? 6 : 2;
+    const nFing = lone ? 2 : i === 0 ? 3 : 1;
     for (let k = 0; k < nFing; k++) {
       const t = 0.1 + (k / nFing) * 0.55 + fingerRnd() * 0.1;
       const a = fingerRnd() * 6.283;
@@ -456,6 +433,8 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       const line = 0.65 * fine + 0.35 * fine2;
       out.multiplyScalar(1 + line * 0.14 * wall);
       out.lerp(FRINGE, smooth(0.55, 0.95, line) * 0.1 * wall * smooth(0.1, 0.5, ly / sp.h));
+      // A lit white crown: the top fifth of each column is fresh carbonate.
+      out.lerp(LIVE, smooth(0.7, 0.95, ly / sp.h) * 0.8);
       out.lerp(BIOFILM, (1 - cc) * 0.3 * (1 - smooth(0, 0.35, ly / sp.h)) * smooth(0.4, 0.6, n1));
       break;
     }
