@@ -463,6 +463,59 @@ function automaticStillFixture() {
 
 describe('automatic scan still handoff', () => {
   it.each(['poi', 'animal'] as const)(
+    'projects the %s into the crop at both vertical frame edges',
+    (kind) => {
+      const fixture = automaticStillFixture();
+      const dive = fixture.createDive();
+      const { ctx, runner, f } = dive;
+      const target = dive[kind];
+      Object.assign(ctx, { life: { targets: [dive.animal] } });
+      const camera = ctx.rig.camera;
+      camera.fov = 90;
+      camera.aspect = 0.5;
+      camera.updateProjectionMatrix();
+      camera.position.set(0, 0, 0);
+      camera.lookAt(0, 0, -1);
+      try {
+        for (const [y, expected] of [
+          [9, 0.05],
+          [-9, 0.95],
+          [0, 0.5],
+        ]) {
+          target.position.set(0, y, -10);
+          ctx.bus.emit('scan:complete', {
+            poiId: target.id,
+            landmarkId: 'titanic',
+            firstTime: true,
+          });
+          runner.frame(f);
+          expect(fixture.thumbnail.mock.lastCall?.[4]).toBeCloseTo(expected);
+          expect(ctx.photos.photos[0]?.poiId).toBe(target.id);
+        }
+      } finally {
+        fixture.dispose();
+      }
+    },
+  );
+
+  it('keeps a discovery when its still is unavailable and captures a later subject', () => {
+    const fixture = automaticStillFixture();
+    const dive = fixture.createDive();
+    fixture.thumbnail.mockReturnValueOnce(null);
+    try {
+      dive.complete(dive.poi);
+      expect(dive.discoveries.isDiscovered('titanic', dive.poi.id)).toBe(true);
+      expect(dive.ctx.photos.photos).toEqual([]);
+      expect(dive.ctx.journal.refresh).not.toHaveBeenCalled();
+      dive.complete(dive.animal);
+      expect(dive.ctx.photos.photos[0]?.poiId).toBe(dive.animal.id);
+      expect(dive.ctx.journal.refresh).toHaveBeenCalledOnce();
+    } finally {
+      fixture.dispose();
+    }
+  });
+
+  it.each(['poi', 'animal'] as const)(
     'files one quiet %s still at capture with real completion metadata and repeat semantics',
     (kind) => {
       const fixture = automaticStillFixture();

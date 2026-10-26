@@ -25,6 +25,7 @@ export function canvasThumbnail(
   frame: CosmeticSelection['frame'] = 'stock',
   subjectY?: number,
 ): string | null {
+  if (source.width < 1 || source.height < 1) return null;
   const w = Math.min(width, source.width);
   const band =
     subjectY === undefined ? source.height : Math.min(source.height, source.width * 0.75);
@@ -38,15 +39,20 @@ export function canvasThumbnail(
   out.height = h;
   const ctx = out.getContext('2d');
   if (!ctx || w < 1) return null;
-  ctx.drawImage(source, 0, sy, source.width, band, 0, 0, w, h);
-  const color = PHOTO_FRAMES.find((def) => def.id === frame)?.color;
-  if (color) {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = Math.max(2, Math.round(w / 80));
-    ctx.strokeRect(ctx.lineWidth / 2, ctx.lineWidth / 2, w - ctx.lineWidth, h - ctx.lineWidth);
+  try {
+    ctx.drawImage(source, 0, sy, source.width, band, 0, 0, w, h);
+    const color = PHOTO_FRAMES.find((def) => def.id === frame)?.color;
+    if (color) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = Math.max(2, Math.round(w / 80));
+      ctx.strokeRect(ctx.lineWidth / 2, ctx.lineWidth / 2, w - ctx.lineWidth, h - ctx.lineWidth);
+    }
+    const url = out.toDataURL('image/jpeg', quality);
+    return url.startsWith('data:image/jpeg;base64,') ? url : null;
+  } catch {
+    // An unavailable drawing buffer or refused readback must not stop the render loop.
+    return null;
   }
-  const url = out.toDataURL('image/jpeg', quality);
-  return url.startsWith('data:image/jpeg;base64,') ? url : null;
 }
 
 export class PhotoMode {

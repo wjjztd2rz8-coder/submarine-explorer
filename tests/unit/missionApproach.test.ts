@@ -5,7 +5,11 @@ import { Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
 import { defaultSettings } from '../../src/core/Save.js';
 import { resolveEffective } from '../../src/game/EffectiveSettings.js';
-import { resolveScanRadius } from '../../src/game/Scanner.js';
+import { Scanner, resolveScanRadius } from '../../src/game/Scanner.js';
+import { EventBus } from '../../src/core/EventBus.js';
+import { Mission, nextScanObjective } from '../../src/game/Mission.js';
+import { Submarine } from '../../src/sub/Submarine.js';
+import { FROZEN_INPUT } from '../../src/game/MissionRouter.js';
 import { siteManifest } from '../../src/core/SiteManifest.js';
 import {
   MISSION_APPROACH_M,
@@ -15,7 +19,9 @@ import {
 import { composedMissionSpawn } from '../../src/game/DeepOpeningSpawn.js';
 import { parseMission } from '../../src/game/Mission.js';
 import { parsePois, placePois } from '../../src/game/Pois.js';
+import { scanAim } from '../e2e/helpers/scanAim.js';
 import { Props } from '../../src/world/Props.js';
+import { PropContact } from '../../src/world/props/Wiring.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
@@ -53,7 +59,18 @@ for (const site of sites.landmarks) {
   for (const { tier, mode } of (['low', 'medium', 'high'] as const).flatMap((tier) =>
     modes.map((mode) => ({ tier, mode })),
   )) {
-    it(`${site} ${tier} ${mode}: first primary has a clear, hull-safe approach and visible navigation`, async () => {
+    const pilotCases =
+      tier === 'low' && mode === 'arcade' && ['titanic', 'great-blue-hole'].includes(site)
+        ? [false, true]
+        : [false];
+    it.each(
+      pilotCases.map((pilotRoute) => ({
+        pilotRoute,
+        capability: pilotRoute
+          ? 'pilots from the opening through two primary scans without teleporting'
+          : 'first primary has a clear, hull-safe approach and visible navigation',
+      })),
+    )(`${site} ${tier} ${mode}: $capability`, async ({ pilotRoute }) => {
       const config = makeConfig();
       const saved = defaultSettings(config);
       const effective = resolveEffective({ ...saved, gameplayMode: mode }, mode, null, config);
@@ -154,6 +171,103 @@ for (const site of sites.landmarks) {
           expect(Math.abs(contact.y)).toBeLessThan(1);
           expect(contact.z).toBeGreaterThan(-1);
           expect(contact.z).toBeLessThan(1);
+        }
+        if (pilotRoute) {
+          // 4380 removed actual transit from the browser journeys. Retain a
+          // bounded two-leg capability through shipped terrain, physics and scan
+          // gates. Only the opening is placed; neither leg teleports or awards scans.
+          const bus = new EventBus();
+          const run = new Mission({ def: mission, bus });
+          const scanner = new Scanner(effective.scan, bus);
+          for (const poi of pois) {
+            poi.radius = resolveScanRadius(
+              (primaries.includes(poi) ? missionApproachScanRadius(site, poi.radius) : poi.radius) *
+                effective.sensor.scanRadiusMultiplier,
+              effective.scan,
+            );
+          }
+          scanner.setTargets(pois);
+          run.resolve(pois.map((poi) => poi.id));
+          run.start(site);
+          const sub = new Submarine(effective.submarine, terrain);
+          const contact = new PropContact(props, bus, config.props, settings.hullRadius);
+          sub.setHullClass(mission.hull_class!);
+          sub.setSimSpeed(1);
+          if (site === 'great-blue-hole') {
+            const target = primaries[1];
+            scanner.setObjective(target.id);
+            const aimAt = (p: { x: number; y: number; z: number }) => {
+              const aim = scanAim(p, target.position, effective.submarine.maxPitch);
+              sub.reset(p.x, p.y, p.z, aim.yaw);
+              sub.pitch = aim.pitch;
+              scanner.update(0, sub.position, sub.getForward(), false);
+            };
+            // Match the journey's observation pose inside the bowl. The actual
+            // scanner and physics must accept it without widening any scan gate.
+            const inside = { x: target.position.x, y: 0, z: target.position.z - 40 };
+            inside.y = Math.max(
+              target.position.y + 16,
+              terrain.sampleHeight(inside.x, inside.z) +
+                settings.hullRadius +
+                settings.seabedClearance +
+                16,
+            );
+            aimAt(inside);
+            expect(scanner.view.candidateId).toBe(target.id);
+            for (let frame = 0; frame < 2; frame++) {
+              sub.step(FROZEN_INPUT, 1 / 60);
+              contact.resolve(sub, 1 / 60);
+              scanner.update(0, sub.position, sub.getForward(), false);
+              expect(scanner.view.candidateId).toBe(target.id);
+            }
+          }
+          sub.reset(pose!.x, pose!.y, pose!.z, pose!.yaw);
+          const clamp = (n: number) => Math.max(-1, Math.min(1, n));
+          try {
+            for (const target of primaries.slice(0, 2)) {
+              expect(nextScanObjective(run.objectives)?.poiId).toBe(target.id);
+              scanner.setObjective(target.id);
+              const start = sub.position.clone();
+              let ticks = 0;
+              for (; ticks < 300 * 60 && !scanner.isScanned(site, target.id); ticks++) {
+                scanner.update(
+                  0,
+                  sub.position,
+                  sub.getForward(),
+                  scanner.view.phase === 'scanning',
+                );
+                const cue = scanner.view;
+                const ready = cue.candidateId === target.id;
+                // Turn/range and relative depth are the waypoint's public cues.
+                // Keep clearance above a seabed contact and brake before the beam.
+                const input = {
+                  ...FROZEN_INPUT,
+                  yaw: clamp(cue.objectiveTurnDeg / 20),
+                  ballast: clamp((target.position.y + 16 - sub.position.y) / 8 - sub.velocity.y),
+                  throttle:
+                    !ready &&
+                    Math.abs(cue.objectiveTurnDeg) < 15 &&
+                    cue.objectiveDistance > cue.objectiveRadius * 0.8
+                      ? 0.5
+                      : 0,
+                  scan: ready,
+                };
+                sub.step(input, 1 / 60);
+                contact.resolve(sub, 1 / 60);
+                scanner.update(1 / 60, sub.position, sub.getForward(), input.scan);
+              }
+              expect(ticks, `${site}: reach and scan ${target.id}`).toBeLessThan(300 * 60);
+              expect(sub.position.distanceTo(start)).toBeGreaterThan(10);
+              expect(sub.hullBreached).toBe(false);
+              expect(scanner.view.lastCompleteId).toBe(target.id);
+            }
+            expect(scanner.view.completed).toBe(2);
+            expect(
+              run.objectives.filter((objective) => objective.primary && objective.complete),
+            ).toHaveLength(2);
+          } finally {
+            run.dispose();
+          }
         }
       } finally {
         mesh.dispose();
