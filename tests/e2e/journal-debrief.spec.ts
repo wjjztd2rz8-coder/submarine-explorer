@@ -1536,24 +1536,34 @@ freshTest.describe('Home to scan and return journey', () => {
         serviceWorkers: 'block',
       });
       for (const site of ['titanic', 'great-blue-hole']) {
-        // Regression guard: a Home journey must reach its first scan through real
-        // piloting and retain the reward in Journal/debrief on desktop and phones.
-        test(`${site}: Home -> pilot -> first scan -> Journal -> debrief`, async ({ page }) => {
+        // Regression guard: both primary objectives must be reachable by following
+        // visible guidance, with both rewards retained in Journal and debrief.
+        test(`${site}: Home -> pilot -> first scan -> Journal -> second scan -> Journal -> debrief`, async ({
+          page,
+        }, info) => {
           test.setTimeout(360_000);
-          const directory = '.cache/codex/shots/journeys';
+          const directory = `${env.FLOW_AUDIT_SHOTS ?? '.cache/codex/shots/journeys'}/round-${info.repeatEachIndex + 1}`;
           const prefix = `${site}-${size}`;
           const planned = [
             'home',
+            'settings-aa',
             'pick-mission',
             'briefing',
             'dive-start',
             'approach',
             'scan-ready',
             'first-scan',
+            'first-scan-next-frame',
             'journal',
+            'second-approach',
+            'second-scan-ready',
+            'second-scan',
+            'second-scan-next-frame',
+            'second-journal',
             'debrief',
           ];
           const steps: unknown[] = [];
+          const pilotTrace: unknown[] = [];
           const failures: { step: string; error: string }[] = [];
           const errors: string[] = [];
           const startedAt = new Date().toISOString();
@@ -1570,7 +1580,7 @@ freshTest.describe('Home to scan and return journey', () => {
                   layout: size,
                   tier: 'low',
                   input: layout.touch ? 'touch' : 'keyboard',
-                  route: 'Home mission selection; forward, steering by the nav turn cue',
+                  route: 'Home mission selection; forward, following visible turn/depth guidance',
                   clock: 'real game frames, at most 250 ms per advance; no direct simulation calls',
                   startedAt,
                   status: failures.length
@@ -1580,6 +1590,7 @@ freshTest.describe('Home to scan and return journey', () => {
                       : 'running',
                   planned,
                   steps,
+                  pilotTrace,
                   failures,
                   errors,
                 },
@@ -1607,7 +1618,13 @@ freshTest.describe('Home to scan and return journey', () => {
                 text: el.innerText,
                 rect: el.getBoundingClientRect().toJSON(),
               });
-              const modal = ['.home-screen', '.briefing', '.journal', '.mission-debrief']
+              const modal = [
+                '.settings',
+                '.home-screen',
+                '.briefing',
+                '.journal',
+                '.mission-debrief',
+              ]
                 .map((selector) => document.querySelector<HTMLElement>(selector))
                 .find((el) => el && visible(el));
               const hudPanels = modal
@@ -1676,6 +1693,17 @@ freshTest.describe('Home to scan and return journey', () => {
                 appState: g?.appState,
                 tier: g?.perf?.tier,
                 elapsedS: g?.discovery?.stats.elapsedS,
+                guidance: document.querySelector<HTMLElement>('.guidance-slot')?.innerText,
+                navigation: document.querySelector<HTMLElement>('.obj-nav')?.innerText,
+                navigationVisible:
+                  document
+                    .querySelector<HTMLElement>('.obj-nav')
+                    ?.checkVisibility({ checkVisibilityCSS: true, checkOpacity: true }) ?? false,
+                waypoint: (() => {
+                  const el = document.querySelector<HTMLElement>('.d-scan-edge');
+                  return el && visible(el) ? el.innerText : null;
+                })(),
+                readouts: document.querySelector<HTMLElement>('.hud-readouts')?.innerText,
                 stats: g?.discovery?.stats.snapshot(),
                 debugSpawn: g?.discovery?.spawnedAt,
                 scanner: g?.discovery ? { ...g.discovery.scanner.view } : null,
@@ -1696,6 +1724,7 @@ freshTest.describe('Home to scan and return journey', () => {
                 touchTargets,
                 panels: [
                   '.home-screen',
+                  '.settings',
                   '.guidance-slot',
                   '.briefing',
                   '.journal',
@@ -1751,54 +1780,212 @@ freshTest.describe('Home to scan and return journey', () => {
           };
           // Native held controls only. In particular, do not use completeScan:
           // this journey must exercise the normal input, physics and scan frame loop.
-          // `work` may steer the held control: -1 turns left, 1 right, 0 straight on.
+          // Follow the turn cue and visible depth readouts through ordinary input.
           const held = async (
             control: 'forward' | 'scan',
-            work: (steer: (turn: -1 | 0 | 1) => Promise<void>) => Promise<void>,
+            work: (
+              steer: (turn: -1 | 0 | 1, vertical?: -1 | 0 | 1, throttle?: 0 | 1) => Promise<void>,
+            ) => Promise<void>,
           ): Promise<void> => {
             if (!layout.touch) {
               const key = control === 'forward' ? 'w' : 'g';
               let side: -1 | 0 | 1 = 0;
-              await page.keyboard.down(key);
+              let ballast: -1 | 0 | 1 = 0;
+              let thrust: 0 | 1 = 0;
+              if (control === 'scan') await page.keyboard.down(key);
               try {
-                await work(async (turn) => {
-                  if (turn === side) return;
-                  if (side) await page.keyboard.up(side < 0 ? 'a' : 'd');
-                  if (turn) await page.keyboard.down(turn < 0 ? 'a' : 'd');
+                await work(async (turn, vertical = 0, throttle = 0) => {
+                  if (throttle !== thrust) {
+                    if (thrust) await page.keyboard.up('w');
+                    if (throttle) await page.keyboard.down('w');
+                  }
+                  if (turn !== side) {
+                    if (side) await page.keyboard.up(side < 0 ? 'a' : 'd');
+                    if (turn) await page.keyboard.down(turn < 0 ? 'a' : 'd');
+                  }
+                  if (vertical !== ballast) {
+                    if (ballast) await page.keyboard.up(ballast > 0 ? 'Space' : 'c');
+                    if (vertical) await page.keyboard.down(vertical > 0 ? 'Space' : 'c');
+                  }
                   side = turn;
+                  ballast = vertical;
+                  thrust = throttle;
                 });
               } finally {
                 if (side) await page.keyboard.up(side < 0 ? 'a' : 'd');
-                await page.keyboard.up(key);
+                if (ballast) await page.keyboard.up(ballast > 0 ? 'Space' : 'c');
+                if (thrust) await page.keyboard.up('w');
+                if (control === 'scan') await page.keyboard.up(key);
               }
               return;
             }
-            const target = page.locator(control === 'forward' ? '.tc-stick' : '.tc-btn-scan');
+            const target = page.locator('.tc-stick');
             await expect(target).toBeVisible();
             const box = (await target.boundingBox())!;
+            const slider = (await page.locator('.tc-slider').boundingBox())!;
+            const scan =
+              control === 'scan' ? (await page.locator('.tc-btn-scan').boundingBox())! : null;
+            const points = (turn: number, vertical: number, throttle = 0) => [
+              {
+                id: 1,
+                x: box.x + box.width / 2 + (turn * box.width) / 3,
+                y: box.y + box.height * (0.5 - throttle * 0.4),
+              },
+              {
+                id: 2,
+                x: slider.x + slider.width / 2,
+                y: slider.y + slider.height * (0.5 - vertical * 0.4),
+              },
+              ...(scan ? [{ id: 3, x: scan.x + scan.width / 2, y: scan.y + scan.height / 2 }] : []),
+            ];
             const session = await page.context().newCDPSession(page);
             try {
               await session.send('Input.dispatchTouchEvent', {
                 type: 'touchStart',
-                touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }],
+                touchPoints: points(0, 0),
               });
-              if (control === 'forward')
+              await work(async (turn, vertical = 0, throttle = 0) => {
                 await session.send('Input.dispatchTouchEvent', {
                   type: 'touchMove',
-                  touchPoints: [{ x: box.x + box.width / 2, y: box.y + 1 }],
-                });
-              await work(async (turn) => {
-                await session.send('Input.dispatchTouchEvent', {
-                  type: 'touchMove',
-                  touchPoints: [
-                    { x: box.x + box.width / 2 + (turn * box.width) / 3, y: box.y + 1 },
-                  ],
+                  touchPoints: points(turn, vertical, throttle),
                 });
               });
             } finally {
               await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
               await session.detach();
             }
+          };
+          const reward = async (step: string): Promise<void> => {
+            await expect(page.locator('.guidance-slot')).toContainText('New Journal entry');
+            for (const name of [step, `${step}-next-frame`]) {
+              if (name !== step) await page.clock.fastForward(17);
+              const direction = await page.locator('.guidance-slot .guidance-hint').innerText();
+              if (/TURN \d|RISE TOWARD|SINK TOWARD|DIVE DEEPER|\d+ m AHEAD/.test(direction)) {
+                // Compare every waypoint name the player can see. On touch,
+                // the hidden desktop nav may select a different optional POI.
+                const waypoints = await page
+                  .locator('.obj-nav-target, .d-scan-edge-name')
+                  .evaluateAll((els) =>
+                    els
+                      .filter((el) =>
+                        el.checkVisibility({ checkVisibilityCSS: true, checkOpacity: true }),
+                      )
+                      .map((el) =>
+                        (el as HTMLElement).innerText.replace(/^(?:OPTIONAL )?→\s*/, '').trim(),
+                      ),
+                  );
+                expect(
+                  waypoints.length,
+                  'Directional rewards need a visible waypoint',
+                ).toBeGreaterThan(0);
+                for (const waypoint of waypoints)
+                  expect(
+                    direction.toUpperCase(),
+                    'Reward directions must agree with the waypoint',
+                  ).toContain(`${waypoint.toUpperCase()} ·`);
+              }
+              await shot(name);
+            }
+          };
+          const hoverDepth = new Map<string, number>();
+          const pilot = async (leg: string) => {
+            const cues = await page.evaluate(() => {
+              const visibleText = (selector: string): string => {
+                const el = document.querySelector<HTMLElement>(selector);
+                return el?.checkVisibility({ checkVisibilityCSS: true, checkOpacity: true })
+                  ? el.innerText
+                  : '';
+              };
+              const g = window.__game as unknown as Game;
+              return {
+                elapsedS: g.discovery.stats.elapsedS,
+                position: g.sub.position.toArray(),
+                yaw: g.sub.yaw,
+                velocity: g.sub.velocity.toArray(),
+                guidance: visibleText('.guidance-slot'),
+                turnCue: visibleText('.obj-nav-turn'),
+                targetDepth: visibleText('.obj-nav-depth'),
+                depth: visibleText('.hud-value[data-field="depth"]'),
+                speed: visibleText('.hud-value[data-field="speed"]'),
+                waypoint: visibleText('.d-scan-edge-info'),
+              };
+            });
+            // The desktop nav panel is hidden on touch. Never use its hidden
+            // turn/depth values to give the touch pilot information a player lacks.
+            const ready =
+              !/OPTIONAL/i.test(cues.guidance) && /HOLD .* TO SCAN/i.test(cues.guidance);
+            const turnText = cues.turnCue || cues.guidance;
+            const turn: -1 | 0 | 1 = /STBD|STARBOARD/.test(turnText)
+              ? 1
+              : /PORT/.test(turnText)
+                ? -1
+                : 0;
+            const depth = parseFloat(cues.depth.replaceAll(',', ''));
+            expect(Number.isFinite(depth), 'The pilot needs a visible depth readout').toBe(true);
+            const delta = cues.waypoint.match(/([↑↓])(\d+) m/);
+            if (cues.targetDepth)
+              hoverDepth.set(leg, Number(cues.targetDepth.replace(/[^\d.]/g, '')) - 16);
+            else if (delta)
+              hoverDepth.set(leg, depth + (delta[1] === '↓' ? 1 : -1) * Number(delta[2]) - 16);
+            else if (ready && !hoverDepth.has(leg))
+              // If an optional contact hid the label throughout the approach,
+              // leave five metres below this first ready depth for buoyancy.
+              hoverDepth.set(leg, depth + 5);
+            // The label disappears under a touch scan card. Remember only the
+            // rounded depth it already displayed, and keep hull clearance above
+            // a seabed POI instead of descending all the way to its position.
+            // Sixteen metres leaves room above the hull's twelve-metre contact
+            // clearance, rather than continually pressing against the bottom.
+            const depthError = (hoverDepth.get(leg) ?? depth) - depth;
+            const vertical: -1 | 0 | 1 = /SEABED PROXIMITY|RISE TOWARD TARGET/.test(cues.guidance)
+              ? 1
+              : /SINK TOWARD TARGET|DIVE DEEPER/.test(cues.guidance)
+                ? -1
+                : Math.abs(depthError) > 3
+                  ? depthError > 0
+                    ? -1
+                    : 1
+                  : 0;
+            const speed = parseFloat(cues.speed) / 1.94384;
+            expect(Number.isFinite(speed), 'The pilot needs a visible speed readout').toBe(true);
+            // An optional scan card hides the waypoint label but still displays
+            // the objective's distance in its AHEAD hint. Slow down from either.
+            const distance = parseFloat(
+              cues.waypoint || cues.guidance.match(/(\d+) m AHEAD/)?.[1] || 'Infinity',
+            );
+            const desiredSpeed = ready || turn ? 0 : distance < 150 ? 2 : 8;
+            // Slow the approach early, then let drag settle the sub before
+            // scanning. A full-speed handoff can select a passing animal.
+            const throttle: 0 | 1 = speed < desiredSpeed - 0.4 ? 1 : 0;
+            pilotTrace.push({
+              leg,
+              ...cues,
+              hoverDepthM: hoverDepth.get(leg),
+              depthError,
+              turn,
+              vertical,
+              throttle,
+            });
+            return { ...cues, turn, vertical, throttle, ready, speed };
+          };
+          const scan = async (leg: string, completed: number): Promise<void> => {
+            await held('scan', async (steer) => {
+              await expect
+                .poll(
+                  async () => {
+                    // Keep following depth/turn guidance while holding the beam;
+                    // hands-off buoyancy can cross a shallow scan's depth limit.
+                    const cues = await pilot(leg);
+                    await steer(cues.turn, cues.vertical, 0);
+                    await page.clock.fastForward(250);
+                    return page.evaluate(
+                      () => (window.__game as unknown as Game).discovery.scanner.view.completed,
+                    );
+                  },
+                  { timeout: 60_000, intervals: [20] },
+                )
+                .toBe(completed);
+            });
           };
           try {
             await persist();
@@ -1807,8 +1994,17 @@ freshTest.describe('Home to scan and return journey', () => {
             await page.goto('/?tier=low', { waitUntil: 'domcontentloaded' });
             await homeReady(page, true);
             await shot(current);
-            current = 'pick-mission';
             const home = page.locator('.home-screen');
+            current = 'settings-aa';
+            await act(home.getByRole('button', { name: 'Settings', exact: true }), layout.touch);
+            const settings = page.getByRole('dialog', { name: 'Settings' });
+            await act(settings.getByRole('button', { name: 'Aa: cycle UI scale' }), layout.touch);
+            await expect(settings.locator('.settings-scale-value')).toHaveText('105%');
+            await shot(current);
+            await act(settings.getByRole('button', { name: 'Decrease UI scale' }), layout.touch);
+            await expect(settings.locator('.settings-scale-value')).toHaveText('100%');
+            await act(settings.locator('.settings-close'), layout.touch);
+            current = 'pick-mission';
             await act(home.getByRole('button', { name: 'Dive sites', exact: true }), layout.touch);
             await openSiteList(page, layout.touch, true);
             const choice = home.locator(`.mission-item[data-mission="${site}"]`);
@@ -1838,6 +2034,7 @@ freshTest.describe('Home to scan and return journey', () => {
               ),
             ).toBe('low');
             await shot(current);
+            await firstActions(page, layout.touch);
             const start = await page.evaluate(() => {
               const g = window.__game as unknown as Game;
               return {
@@ -1848,11 +2045,10 @@ freshTest.describe('Home to scan and return journey', () => {
             expect(start.target).toBeTruthy();
             current = 'approach';
             await held('forward', async (steer) => {
-              for (let frame = 0; frame < 1200; frame++) {
+              for (let frame = 0; ; frame++) {
                 await page.clock.fastForward(250);
-                // Follow the nav line's turn cue ("35° STBD" / "10° PORT" / "AHEAD").
-                const cue = (await page.locator('.obj-nav-turn').textContent()) ?? '';
-                await steer(/STBD/.test(cue) ? 1 : /PORT/.test(cue) ? -1 : 0);
+                const cues = await pilot('first');
+                await steer(cues.turn, cues.vertical, cues.throttle);
                 if (frame === 3) await shot('approach');
                 const motion = await page.evaluate((origin) => {
                   const g = window.__game as unknown as Game;
@@ -1863,14 +2059,19 @@ freshTest.describe('Home to scan and return journey', () => {
                 }, start.position);
                 // Follow the visible ready-to-scan cue, without hidden target coordinates
                 // or an autopilot. A bad opening route remains a recorded failure.
-                const guidance = await page.locator('.guidance-slot').innerText();
+                const guidance = cues.guidance;
                 if (
                   motion.movedM > 1 &&
+                  cues.speed <= 0.8 &&
+                  cues.turn === 0 &&
                   !/OPTIONAL/i.test(guidance) &&
                   /HOLD .* TO SCAN/i.test(guidance)
                 )
                   return;
-                if (motion.elapsedS >= 300) break;
+                if (motion.elapsedS >= 300) {
+                  await shot('five-minute-first-leg');
+                  break;
+                }
               }
               throw new Error('No visible scan prompt within the first five simulation minutes');
             });
@@ -1888,14 +2089,7 @@ freshTest.describe('Home to scan and return journey', () => {
             ).toBeGreaterThan(1);
             await shot(current);
             current = 'first-scan';
-            await held('scan', async () => {
-              await clockFramesUntil(
-                page,
-                () => (window.__game as unknown as Game).discovery.scanner.view.completed === 1,
-                250,
-                60_000,
-              );
-            });
+            await scan('first', 1);
             const result = await page.evaluate(() => {
               const g = window.__game as unknown as Game;
               return {
@@ -1910,8 +2104,7 @@ freshTest.describe('Home to scan and return journey', () => {
             expect(result.id).toBe(start.target);
             expect(result.first).toBe(true);
             expect(result.elapsedS).toBeLessThanOrEqual(300);
-            await expect(page.locator('.guidance-slot')).toContainText('New Journal entry');
-            await shot(current);
+            await reward(current);
             current = 'journal';
             await pause(page, layout.touch);
             await act(
@@ -1928,12 +2121,92 @@ freshTest.describe('Home to scan and return journey', () => {
             ).toBe(result.entry);
             await shot(current);
             await closeJournal(page, layout.touch);
+            await act(
+              page.locator('.pause-menu').getByRole('button', { name: 'Resume', exact: true }),
+              layout.touch,
+            );
+            await page.clock.runFor(34);
+            const second = await page.evaluate(() => {
+              const g = window.__game as unknown as Game;
+              return {
+                target: g.discovery.scanner.view.objectiveId,
+                elapsedS: g.discovery.stats.elapsedS,
+              };
+            });
+            expect(second.target).toBeTruthy();
+            expect(second.target).not.toBe(start.target);
+            current = 'second-approach';
+            await shot(current);
+            await held('forward', async (steer) => {
+              for (;;) {
+                await page.clock.fastForward(250);
+                const cues = await pilot('second');
+                await steer(cues.turn, cues.vertical, cues.throttle);
+                if (cues.speed <= 0.8 && cues.turn === 0 && cues.ready) return;
+                if (cues.elapsedS - second.elapsedS >= 300) {
+                  // Capture with controls still held, at the deadline, before
+                  // cleanup or a failure assertion can alter the evidence.
+                  await shot('five-minute-second-leg');
+                  break;
+                }
+              }
+              throw new Error('No second-objective scan prompt within five simulation minutes');
+            });
+            current = 'second-scan-ready';
+            expect(
+              await page.evaluate(
+                () => (window.__game as unknown as Game).discovery.scanner.view.candidateId,
+              ),
+            ).toBe(second.target);
+            await shot(current);
+            current = 'second-scan';
+            await scan('second', 2);
+            const secondResult = await page.evaluate(() => {
+              const g = window.__game as unknown as Game;
+              const view = g.discovery.scanner.view;
+              return {
+                id: view.lastCompleteId,
+                first: view.lastCompleteFirstTime,
+                entry: g.discovery.pois.find((p) => p.id === view.lastCompleteId)?.guideEntry,
+                elapsedS: g.discovery.stats.elapsedS,
+              };
+            });
+            expect(secondResult.id).toBe(second.target);
+            expect(secondResult.first).toBe(true);
+            expect(secondResult.elapsedS - second.elapsedS).toBeLessThanOrEqual(300);
+            await reward(current);
+            await clockFramesUntil(
+              page,
+              () => {
+                const banner = document.querySelector<HTMLElement>('.obj-banner');
+                return !!banner?.checkVisibility({ checkVisibilityCSS: true });
+              },
+              250,
+            );
+            const keep = page.locator('.obj-banner .is-keep');
+            await expect(keep).toBeVisible();
+            await act(keep, layout.touch);
+            current = 'second-journal';
+            await pause(page, layout.touch);
+            await act(
+              page.locator('.pause-menu').getByRole('button', { name: 'Journal', exact: true }),
+              layout.touch,
+            );
+            await expect(journal).toBeVisible();
+            await expect(journal.locator('.jr-body .jr-locked')).toHaveCount(0);
+            await expect(journal.locator('.jr-body .jr-title')).toBeVisible();
+            await expect(journal.locator('.jr-body .jr-title')).not.toHaveText('Undiscovered');
+            expect(
+              await page.evaluate(() => (window.__game as unknown as Game).journal.selectedId),
+            ).toBe(secondResult.entry);
+            await shot(current);
+            await closeJournal(page, layout.touch);
             current = 'debrief';
             await act(page.locator('.pause-surface'), layout.touch);
             const debrief = page.locator('.mission-debrief');
             await expect(debrief).toBeVisible();
             await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText(
-              '1',
+              '2',
             );
             await expect(debrief.locator('.debrief-highlight')).toContainText('Scanned');
             await shot(current);
