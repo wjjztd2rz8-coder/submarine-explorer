@@ -2020,4 +2020,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK (needs a shorter first-target range rule or richer hull); phone retest.
 
 ## 2026-10-25 18:16 CDT targeted review (Claude): Codex starvation
+
 - Fixed scheduling (refill 45 min, no repeat audits), added DIRECTOR items 5b/5c, launched 4270-4290. Nothing merged. Needs owner: unchanged.
+
+## 2026-10-25 19:15 CDT headless run 153 (Claude): collection
+
+- Merged 4270 (pointer-lock teardown with a pending legacy request: smallest fix plus capability test) and 4280 (Settings "Aa" button cycles the UI scale 80-150%, reusing the existing setting; DOM-metric spec, no screenshots reviewed). Both passed smoke + project-base gates; hosted CI is the full check. 4290 (CI watch) left only a stale note, removed. Prettier on three plan logs fixed. Claude 5h 97%, week 65%. No Claude package (next art step gains ~0.1). No tag (f65 stands).
+- **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK (needs a shorter first-target range rule or richer hull); phone retest (Aa button is new).
