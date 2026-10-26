@@ -61,15 +61,14 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
 | No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
-Stage (review 2026-10-25, Claude alone; unchanged from 2026-10-24): about 84% to 1.0; ~5 weeks. Beautiful: Titanic 3.7, Lost City 3.6, Blue Hole 3.4, Beebe 3.6, Monterey 3.8, Challenger 3.6, Endurance 3.0. Blockers in order: (1) first-five-minute journeys verified on phones; (2) green hosted CI on a quiet SHA and a tag (f63 on 66c9147, 2026-10-23: done; keep tagging); (3) heroes consistently at beauty 4 (Blue Hole silhouette, Lost City foot); (4) eight-site acceptance.
+Stage (review 2026-10-25 night, joint with Sol): about 83% to 1.0; ~5 weeks (4-6). Beautiful: Titanic 3.5, Lost City 3, Blue Hole 3, Beebe 3.5, Monterey 3.5, Challenger 3.5, Endurance 3. Blockers in order: (1) journeys through the second objective on desktop and phones, incl. Aa; (2) Blue Hole and Lost City silhouettes (heroes consistently at 4); (3) eight-site spawn acceptance (Kama, Hunga, Axial); (4) green hosted CI on the accepted SHA and a tag; (5) Low-tier phone acceptance.
 
 ## Needs owner
 
 The newest items go first.
 
 - Delete the four S-collision expected-failure cases? (Sol 3330 proposes it; neither 2980 nor 3050 should be collected.)
-- ~85 m Endurance opening OK, or a richer hull model.
-
+- (Endurance 85 m opening is no longer a blocker: coherence only, per the 2026-10-25 joint review.)
 - A short phone retest once the P2 items below land (boost gone, scan range, anchored events, Your sub screen).
 
 ## In flight

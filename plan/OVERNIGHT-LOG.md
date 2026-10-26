@@ -2032,3 +2032,6 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: no Codex task running, queue empty, held worktrees unchanged. Main clean; CI for the latest push is pending. Claude 5h 96%, week 65%; Codex 5h 49%. No Claude package (next art step gains ~0.1). No tag (f65 stands).
 - **Needs owner:** delete the four S-collision expected-failure cases?; ~85 m Endurance opening OK (needs a shorter first-target range rule or richer hull); phone retest (Aa button is new).
+## 2026-10-25 21:11 CDT comprehensive review (Claude + Sol)
+- Joint review recorded in plan/REVIEWS.md; stage ~83%. Queued Codex 4300-4320. Fixed codex-review.sh stale-dir bug. No Claude package this run (art gains ~0.1; next V-bluehole-silhouette).
+- **Needs owner:** delete four S-collision expected-failure cases?; phone retest.

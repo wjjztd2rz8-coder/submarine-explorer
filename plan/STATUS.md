@@ -1,30 +1,27 @@
-# Status (2026-10-25, review by Claude alone)
+# Status (2026-10-25 night, joint review with Sol)
 
-**Stage:** about 85% to 1.0; ~5 weeks (Sol skipped, Codex 5h low; last joint view 80-83%). Since the last review only Codex fixes merged (shark floor, mission start, life births, dive rating); no visual change. Tag f64 (green CI) on 2026-10-24; Blake got a graded water backdrop (~3.4); Lost City 3.6, Monterey ~3.8, Endurance 3.0. Claude capacity limits art; Codex runs verification and CI.
+**Stage:** about 83% to 1.0; ~5 weeks (4-6 range). Since the last review only small merges (pointer-lock teardown, Settings "Aa" text size, banner stars fix); no visual change. Tag f65 stands.
 
 ## 1.0 table
 
-| Requirement                               | State                                                                                                                                                             |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.5-3.8, Lost City 3-3.4, Blue Hole 3-3.4, Beebe 3.5-3.6, Monterey 3.5-3.75                                                       |
-| Other eight sites coherent                | Challenger 3.4, Endurance 3.4; mission-spawn review done (2.6-3.2), follow-ups queued; acceptance acceptance for all eight not certified (V-spawn-capture queued) |
-| New player understands first five minutes | Owner phone test: scan range, boost and events confuse; P2-scan-range and P2-boost-cut queued, then V-journeys                                                    |
-| Acceptable Low-tier phone performance     | iPhone 17 Pro: Low great; High (opt-in only) stutters at Lost City; weaker phones untested                                                                        |
-| Hosted CI green, releases tagged          | Main red on the latest runs from stale specs; most repaired 2026-10-20, one wildlife fixture still red (R-ci-green-f); deploy waits for green CI                  |
-| Code simple enough                        | Standing S-verify / S-bughunt; R-merge-verify queued so smoke-only gates can't hide a red e2e                                                                     |
+| Requirement                               | State                                                                                                          |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Five heroes beautiful (4 of 5)            | None at 4 on beauty: Titanic 3.5, Lost City 3, Blue Hole 3, Beebe 3.5, Monterey 3.5 (readable 3.5-4)           |
+| Other eight sites coherent                | Challenger 3.5, Endurance 3, Blake 3.5; Kama subject, Hunga and Axial chimneys still weak                      |
+| New player understands first five minutes | Journey tests stop after one discovery; re-run through the second objective queued (4310), phone retest needed |
+| Acceptable Low-tier phone performance     | iPhone 17 Pro: Low great; weaker phones untested                                                               |
+| Hosted CI green, releases tagged          | Latest tag f65; CI check of newest main queued (4300); Pages needs green CI                                    |
+| Code simple enough                        | Standing S-verify items; S-collision seam fix queued (4320)                                                    |
 
 ## Done recently
 
-Boost cut, 100 m scan floor, anchored optional events, quieter ambience, Lost City perf cap, deploy waits for green CI, spawn captures, copy fixes (P2-copy), stale touch specs fixed. Titanic opening (hull fills the frame; plate tint varied by lanes), Beebe flank (crust ridges catch warm light), owner phone test written up as P2 items, red CI fixed.
+Aa text-size button in Settings, pointer-lock teardown fix, shark floor, mission start position, life-birth water limits, dive rating ignoring unresolved objectives, clean audits of scan, startup rollback and tile georeferencing.
 
 ## Left
 
-Unaided journeys at 1280x720 and phones (queued with Codex), CI triage (28/38 shards red on one run; latest run pending), Class A hull clipping, Beebe Low caps. First-five-minute scanning and guidance (agreed top blocker), deploy gating, phone defects (Class A clipping, Beebe Low caps), Lost City tower, Titanic plating patchwork, Monterey bands, Challenger seabed, Blue Hole hood and overlap, eight-site acceptance.
+Blue Hole and Lost City silhouettes (next Claude art package), Kama/Hunga/Axial readability, Journal reward photo hidden by the sub on phones, journeys through objective two, phone retest, green CI tag.
 
 ## Needs owner
 
-- Accept deleting the four S-collision expected-failure cases (3330 proposal).
-- OK for an ~85 m Endurance opening, or a richer hull model.
-
-- None for budget: the Claude reset is already used, so the Claude week (resets Oct 22) is paced by the run gate and Codex carries more work (dispatch head start widened to 30%).
-- A short phone retest once the P2 items land.
+- Delete the four S-collision expected-failure cases?
+- A short phone retest on the newest build (Aa button, first five minutes).

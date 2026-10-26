@@ -1,5 +1,25 @@
 # Reviews
 
+## 2026-10-25 night comprehensive review, joint with Sol (golden 2026-10-26-014523)
+
+**Joint review:** Sol reviewed independently, then one reconcile round. Scores below are Sol's where it was harsher and the evidence held (close crops of `lost-city-3.png` and `great-blue-hole-east-2.png` show folded, segmented geometry my first read called smeared texture).
+
+**Changed since the last review:** 4270 (pointer-lock teardown), 4280 (Settings "Aa" cycles UI scale) and 4090 (completion-banner stars fix; Sol's correction, I had missed it). No scene change, so goldens match apart from pose drift. Sol notes `golden-compare` rejects Titanic's moved pose before comparing pixels, so "match" is by eye.
+
+**Scores, readable / beautiful (agreed):** Titanic 4 / 3.5; Lost City 3.5 / 3; Blue Hole 3.5 / 3; Beebe 4 / 3.5; Monterey 4 / 3.5; Challenger 3.5 / 3.5; Endurance 3 / 3; Blake 3.5 / 3.5. Coarse judgments, not tenth-point measurements; earlier Claude-alone reviews ran about 0.2-0.5 high.
+
+**Biggest gaps (agreed order):** (1) current journeys through the second objective on desktop and phones, including Aa discoverability (existing journey tests stop after one discovery); (2) Blue Hole and Lost City silhouettes, still the weakest heroes; (3) eight-site spawn acceptance: Kama subject unreadable, Hunga a dark wedge, Axial chimneys small; (4) green hosted CI on the accepted SHA (Pages needs green CI); (5) Low-tier phone acceptance on current build. Also found by Sol: the Journal reward photo can be covered by the sub (`journeys/great-blue-hole-390x844-08-journal.png`).
+
+**Disputes settled:** Endurance 85 m is not a top blocker (Sol and I agree: it needs coherence, not hero 4, and 85 m starts inside the 100 m scan radius); my "Axial is the remaining non-hero problem" was too narrow (Kama and Hunga too, accepted); my idle-hours figure is a sample-count extrapolation, not measured idle time (accepted; efficiency.sh wording to be treated as an estimate). Still disputed: stage point estimate, Sol 80-85%, me 85%; reported as ~83%.
+
+**Process:** Codex week 47% at ~49%/day, so briefs are rationed to three. A stale `.cache/review/current` directory (left by the previous Claude-alone review) made `start` fail silently on `rm -f`; fixed to `rm -rf` in `tools/codex-review.sh` (PROCESS-LOG). Claude is idle much of the day because the remaining art items yield ~0.1 each; next art run takes V-bluehole-silhouette with a target composition.
+
+**New priorities:** Backlog order stands, with V-eight-sites-lit widened to Kama/Hunga/Axial. Codex queued: 4300 (R-ci-green after 4280), 4310 (V-journeys-current re-run incl. Aa), 4320 (S-collision seam fix). Claude lanes unblocked: V-bluehole-silhouette, V-eight-sites-lit, V-monterey-apron, P2-globe-bright, V-bluehole-hood.
+
+**Stage:** about 83% to 1.0; ~5 weeks (4-6 planning range), agreed with Sol except the point estimate.
+
+**Needs owner:** (1) delete the four S-collision expected-failure cases?; (2) phone retest on the newest build (Aa button, journeys); Endurance 85 m is no longer a blocker.
+
 ## 2026-10-25 evening, targeted review (Codex starved 2 h)
 
 - Cause: empty queue; only standing audits remained and they find nothing; refill cooldown 2 h. Fixed in tools (cooldown 45 min, no repeat audits) and DIRECTOR (items 5b, 5c). Queued/launched 4270 (lock teardown fix), 4280 (Aa text size), 4290 (CI evidence).

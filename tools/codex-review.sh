@@ -28,7 +28,7 @@ case "${1:-}" in
 start)
   golden=${2:?golden dir}; prev=${3:-}
   # A skipped start must not leave the previous review behind for reconcile to reuse.
-  rm -f .cache/review/current
+  rm -rf .cache/review/current
   # Codex floor (owner): 5h >= 5%; leave room for the running tasks.
   if ! ai-limits --json 2>/dev/null | python3 -c '
 import json,sys; c=json.load(sys.stdin).get("codex",{})

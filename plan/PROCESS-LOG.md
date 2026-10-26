@@ -2,6 +2,9 @@
 
 Changes to how the work is done (tooling, scheduling, agent use), with the reason and the evidence. The owner delegated this on 2026-10-01; the only hard constraint is the usage floors.
 
+- **2026-10-25 (night) — stale `current` dir blocks Sol start**
+  - **Problem:** a plain directory at `.cache/review/current` (from the earlier Claude-alone review) made `rm -f` fail and `ln -sfn` nest a link inside it.
+  - **Change:** `tools/codex-review.sh start` now uses `rm -rf .cache/review/current`. Treat efficiency.sh idle hours as sample-count estimates (Sol, 2026-10-25).
 - **2026-10-25 — silent skipped Sol start stalls reconcile**
   - **Problem:** `codex-review.sh start` exited 75 (Codex 5h 6%) with output sent to /dev/null; the draft was then written with `mkdir -p .cache/review/current`, which made a plain directory, so `reconcile` waited 40 min for a session that never came.
   - **Change:** none to tools yet; run `tools/codex-review.sh start` once in the foreground for its exit code (it returns instantly when skipped), and only write the draft into `current` if it is a symlink.
