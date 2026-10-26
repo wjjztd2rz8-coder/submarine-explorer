@@ -2,18 +2,27 @@
 
 ## What changed
 
-Data only, in `MONTEREY_RUBBLE` (`src/core/config/monterey.ts`): smaller block and scar-fall radius ceilings (blocks 3.2 to 2.4, fragments 2.2 to 1.8, scar blocks 2.8 to 1.8) and a steeper radius skew (1.8 to 2.6), so most apron rocks are small and only a few are large. The 160-instance count is unchanged (so the instance-count tests did not move); the pebble floor stayed at 0.3 because `montereyBoulders` (exposure > 0.25 m) and `montereyRubble1320` (nearest neighbour > 0.25 m) need rocks of about that size. A first try with a lower floor broke both tests. No code change, no site branch. Right-bank crest untouched. Rebaselined the canyon medium/high scarp hashes in `scarpTerrain.test.ts` (rubble matrices only changed).
+- `MONTEREY_RUBBLE` (`src/core/config/monterey.ts`) gains `pebbleShare` (0.5) and `pebbleRadius`; `placeRocks` (`talus.ts`) gives that share of the non-block rocks a small pebble/cobble radius. Same instance count: pebbles replace ordinary fragments, so the apron has fewer mid-size rocks and many small ones. Only presets with the `scatter` policy (Monterey) are affected; the right-bank crest is untouched.
+- Sub framing: not patched. In the opening the "half-transparent shape" beside the sub is the wall's pale translucent skirt (wall shading/fade near the camera), not a camera or spawn offset; the sub itself renders opaque. Fixing it means touching wall material, which is not a data-level change.
 
-Net simpler: no new code or settings, four constants retuned.
+## Screenshots (`.cache/codex/shots/V-monterey-apron/`)
 
-## Before / after (golden, monterey opening, desktop)
+`before/` and `after/` (`GOLDEN_SITES=monterey`), poses `monterey-canyon-1..3`.
 
-Before: a run of large round boulders along the foot beside the sub. After: the biggest boulders are smaller and the foot reads as a mix of sizes with more small fragments, but the change is modest; the slope itself is still smooth, and true pebbles would need a size-tier or a lower floor with new test thresholds.
+## Tests
 
-## Score
+No instance-count test encodes the split; counts are unchanged. Gates: see the final report.
 
-Beautiful about 3.75 to 3.85. Not a step to 4.
+## Simplicity rules
 
-## Gates
+- 1 net simpler: two table fields and one branch in the existing placement loop; no new module or setting.
+- 4 no site branches: the data lives in the existing Monterey rubble table.
+- 6 tests: existing capability specs, none loosened.
+- 7 no package numbers in code.
 
-`PW_PORT=4871 tools/gates.sh`: python, content, build, unit, e2e, e2e-base, attribution PASS. prettier FAIL on `plan/PROCESS-LOG.md` only (pre-existing, not touched here).
+## Remaining issues
+
+- The seabed between rock patches is still smooth sand; pebbles only appear where the rockfall patches are. A separate seabed-texture pass would be needed for more.
+- Pebbles are small at the approach distance; texture reads mainly in the close pose.
+- Translucent wall skirt beside the sub in the opening is unresolved.
+- Own rating: about 3.6 (small improvement, apron less ramp-of-boulders).
