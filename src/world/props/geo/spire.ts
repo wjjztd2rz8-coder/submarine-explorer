@@ -108,8 +108,8 @@ export function rimDrop(o: SpireOpts, ang: number): number {
   // One smooth broad scoop plus soft teeth: quantised steps and narrow bites cut the rim into
   // planar sheets at the ring spacing, so the trunk crown keeps a rounded, eroded outline.
   const drop =
-    Math.pow(smooth(0.35, 0.7, broad), 1.5) * (o.trunk ? 0.6 : 1.6) +
-    smooth(0.5, 0.8, teeth) * (o.trunk ? 0.15 : 0.5);
+    Math.pow(smooth(0.35, 0.7, broad), 1.5) * (o.trunk ? 0.3 : 1.6) +
+    smooth(0.5, 0.8, teeth) * (o.trunk ? 0.05 : 0.5);
   return o.r0 * o.topFrac * drop;
 }
 
@@ -148,7 +148,7 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
           (fbm3(Math.cos(ang) * 1.1 + 2, y * 0.04, Math.sin(ang) * 1.1 + 2, o.seed + 19, 2) - 0.5) *
             1.6;
         const fj = uj - Math.floor(uj);
-        const strength = 0.15 + 1.1 * hash1(Math.floor(uj) + o.seed);
+        const strength = 0.1 + 0.5 * hash1(Math.floor(uj) + o.seed);
         const shelf =
           (o.ledge ?? 0.14) * smooth(0, 0.08, fj) * Math.pow(1 - fj, 2.2) * strength * 0.7;
         const m = fbm3(
@@ -162,10 +162,7 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
         f = plain * (1 + shelf * smooth(0.4, 0.62, m) * 1.5);
         // Slow swells and waists along the whole trunk.
         f *=
-          1 +
-          irr *
-            (0.15 * Math.sin(t * TAU * 1.35 + o.seed * 0.7 + Math.cos(ang - o.seed) * 0.6) +
-              0.1 * Math.sin(t * TAU * 3.3 + o.seed * 1.9 - Math.sin(ang) * 0.9));
+          1 + irr * 0.12 * Math.sin(t * TAU * 1.35 + o.seed * 0.7 + Math.cos(ang - o.seed) * 0.6);
       } else {
         const u = t * (o.tiers ?? 0);
         const m = fbm3(
@@ -180,11 +177,11 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
         f = plain === 0 ? 0 : plain * (1 + (f / plain - 1) * smooth(0.25, 0.7, m) * 1.7);
       }
       // Elliptical, twisting cross-section plus broad lumps: no lathe-like symmetry.
-      f *= 1 + irr * (o.trunk ? 0.3 : 0.22) * Math.cos(2 * (ang - t * 2.4 - o.seed * 0.37));
+      f *= 1 + irr * (o.trunk ? 0.1 : 0.22) * Math.cos(2 * (ang - t * 2.4 - o.seed * 0.37));
       f *=
         1 +
         irr *
-          0.5 *
+          (o.trunk ? 0.2 : 0.5) *
           (fbm3(Math.cos(ang) * 2.4 + 1, y * 0.05, Math.sin(ang) * 2.4 + 1, o.seed + 77, 2) - 0.5);
     }
     f *= 1 + (n - 0.5) * 2 * wob;
@@ -201,9 +198,15 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
           2 *
           o.rough;
     if (irr) {
-      // Meandering flow ridges: sharp crests, broad troughs, phase drifting with height.
+      // Meandering flow ridges, phase drifting with height. The trunk's flutes are a smooth
+      // low-frequency swell (no creases to catch the light as fold seams); sulfide stacks keep
+      // sharp crests.
       const crest = trunkCrest(ang, y, n, flutes, o.seed);
-      f *= 1 + amp * 2.2 * (crest * crest - 0.35);
+      f *=
+        1 +
+        (o.trunk
+          ? amp * 1.2 * (Math.sin((crest * Math.PI) / 2) ** 2 - 0.5)
+          : amp * 2.2 * (crest * crest - 0.35));
     } else f *= 1 + amp * Math.sin(ang * flutes + n * 5 + t * 2.5);
     // The top cap's centre vertex sinks to make a crater: the vent orifice.
     // Irregular carbonate sinks deeper so the dark vent opening reads as a funnel.
