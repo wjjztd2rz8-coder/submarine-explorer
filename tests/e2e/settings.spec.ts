@@ -89,7 +89,14 @@ test.describe('settings screen', () => {
         test(`Aa cycles and persists UI scale from ${surface}`, async ({ page }, info) => {
           // Guards a cosmetic-only Aa button, lost scale on reload, and a clipped
           // readout or unreachable touch target at the largest saved size.
-          await boot(page, surface === 'home' ? '/?tier=low' : '/?tile=titanic&tier=low');
+          test.setTimeout(60_000);
+          // Only boot and explicit observations need game frames. Continuous
+          // software WebGL can starve every input round trip on hosted runners.
+          await pauseClockBeforeNavigation(page);
+          await page.goto(surface === 'home' ? '/?tier=low' : '/?tile=titanic&tier=low', {
+            waitUntil: 'domcontentloaded',
+          });
+          await clockFramesUntil(page, () => window.__gameReady === true);
           const act = async (target: Locator): Promise<void> => {
             if (viewport.touch) await target.tap();
             else await target.click();
@@ -189,10 +196,11 @@ test.describe('settings screen', () => {
                 .tap();
             else await page.keyboard.press('Escape');
           }
+          await page.clock.fastForward(50);
           expect(await layout()).toEqual(before);
           await reviewShot(page, `aa-${surface}-${viewport.name}-150`);
           await page.reload({ waitUntil: 'domcontentloaded' });
-          await page.waitForFunction(() => window.__gameReady === true);
+          await clockFramesUntil(page, () => window.__gameReady === true);
           expect(await applied()).toEqual({ saved: 150, persisted: 150, css: 1.5 });
           await open();
           await expect(value).toHaveText('150%');
@@ -211,18 +219,23 @@ test.describe('settings screen', () => {
         });
 
         if (viewport.touch) {
-          test(`scale survives quality and mode combinations from ${surface}`, async ({ page }) => {
-            // Guards stale scale variables after unrelated edits, reload and rotation,
-            // including the Advanced controls absent from the Aa-only smoke coverage.
-            await pauseClockBeforeNavigation(page);
-            await page.goto(surface === 'home' ? '/' : '/?tile=titanic', {
-              waitUntil: 'domcontentloaded',
-            });
-            await clockFramesUntil(page, () => window.__gameReady === true);
-            const dialog = page.locator('.settings');
-            const cycle = dialog.getByRole('button', { name: 'Aa: cycle UI scale' });
-            const slider = dialog.getByLabel('UI scale', { exact: true });
-            for (const tier of ['low', 'medium', 'high']) {
+          for (const tier of ['low', 'medium', 'high']) {
+            test(`scale survives ${tier} quality and mode combinations from ${surface}`, async ({
+              page,
+            }) => {
+              test.setTimeout(60_000);
+              // Guards stale scale variables after unrelated edits, reload and rotation,
+              // including the Advanced controls absent from the Aa-only smoke coverage.
+              await pauseClockBeforeNavigation(page);
+              await page.goto(surface === 'home' ? '/' : '/?tile=titanic', {
+                waitUntil: 'domcontentloaded',
+              });
+              await clockFramesUntil(page, () => window.__gameReady === true);
+              const dialog = page.locator('.settings');
+              const cycle = dialog.getByRole('button', { name: 'Aa: cycle UI scale' });
+              const slider = dialog.getByLabel('UI scale', { exact: true });
+              // One tier per session: its single reload proves boot persistence,
+              // while mode/scale combinations below are all live settings edits.
               await openSettings(page);
               await dialog.getByLabel('Graphics tier').selectOption(tier);
               await slider.focus();
@@ -293,13 +306,8 @@ test.describe('settings screen', () => {
               ).toBe('1.5');
               await page.setViewportSize({ width: viewport.width, height: viewport.height });
               await page.clock.fastForward(50);
-              await page.keyboard.press('Escape');
-              if (surface === 'dive') {
-                await page.keyboard.press('Escape');
-                await page.clock.fastForward(50);
-              }
-            }
-          });
+            });
+          }
         }
       }
     });
@@ -478,7 +486,7 @@ test.describe('settings screen', () => {
       await page.evaluate(() => localStorage.getItem('subexplorer.discoveries.v1')),
     ).not.toBeNull();
     await dialog.getByRole('button', { name: 'Reset discoveries' }).click();
-    const reloaded = page.waitForEvent('load');
+    const reloaded = page.waitForEvent('domcontentloaded');
     await dialog.getByRole('button', { name: 'Clear discoveries' }).click();
     await reloaded;
     await page.waitForFunction(() => window.__gameReady === true);
@@ -508,7 +516,7 @@ test.describe('settings screen', () => {
     await expect(dialog.getByLabel('Simulation speed')).toHaveCount(0);
     await dialog.getByRole('button', { name: 'Apply and reload' }).scrollIntoViewIfNeeded();
     await reviewScreenshot(page, { path: 'test-results-settings-closeout/settings-apply.png' });
-    const reloaded = page.waitForEvent('load');
+    const reloaded = page.waitForEvent('domcontentloaded');
     await dialog.getByRole('button', { name: 'Apply and reload' }).click();
     await reloaded;
     await page.waitForFunction(() => window.__gameReady === true);
