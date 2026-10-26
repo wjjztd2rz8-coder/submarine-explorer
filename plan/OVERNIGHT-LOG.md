@@ -2081,3 +2081,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged 4340 (journeys second-leg driver fix, test-only; codex-task full gate PASS, smoke + project-base re-run here; I could not run the spec alone locally, preview start timed out). Hosted CI for the Aa fix (bfcacdfd) is green, so tagged f66 and pushed. Removed the 4330/4340 worktrees. Claude 5h 97%, week 63%; Codex 5h ~69%, week 95%. No Claude package (next art step gains ~0.1); queue left empty on purpose. 
 - **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button is new).
+
+## 2026-10-26 06:46 CDT targeted review 3 (Claude)
+
+- Codex starved: queued 4350 (P2-lostcity-perf), 4360 (eight-site numerics), 4370 (Aa/settings bug hunt). No Claude package. Claude 5h 96%, Codex 5h 100%, week 95%.
+- **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button is new).

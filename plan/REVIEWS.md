@@ -1,5 +1,9 @@
 # Reviews
 
+## 2026-10-26 06:50 CDT targeted review 3 (Claude)
+
+- Trigger: Codex starved 2 h. Cause: the Codex lane had no open items (earlier runs left the queue empty on purpose, but the Codex week is 95% left). Queued 4350 (P2-lostcity-perf measurement + cap), 4360 (eight-site spawn numerics) and 4370 (bug hunt over Aa/settings); the 15-min dispatcher launches them. Hosted CI for the 4340 merge still pending. **Needs owner:** unchanged.
+
 ## 2026-10-26 (04:30) targeted review, CI red x3 follow-up
 
 - 4330 had finished with a failing full e2e (its own new journeys row, titanic 844x390). I landed only its Aa-clipping fix (settings.css + settings.spec; 14/14 settings specs pass, smoke gates green) and pushed, which should turn hosted CI green. The journeys spec stays uncommitted in the 4330 worktree; queued 4340 to finish it.
