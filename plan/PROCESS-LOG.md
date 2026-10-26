@@ -312,3 +312,7 @@ Creating `.cache/review/current` as a directory before `codex-review.sh start` m
 
 - Main CI was red for four pushes on two specs whose failing case changes per run; runs were being logged "CI pending" without triage. Triage by failing spec name is now Backlog item 1 (R-ci-green), with briefs 4380 and 4390. Reason: a red main hides new breakages and blocks Pages deploys.
 - `.cache/review/current` reconcile needs a 50-minute foreground timeout, but the Bash tool caps at 10 minutes: the call is auto-backgrounded and its output file read afterwards. No tooling change needed.
+
+## 2026-10-26 targeted review (Codex starved)
+
+- Starvation was the Codex 5h budget (5-7% after the Sol review; dispatcher needs 20%), not an empty queue. Refill found no unblocked non-visual Backlog item. Unblocked S-collision (director decision) and queued 4450. No tooling change: the pacing gate worked as designed.

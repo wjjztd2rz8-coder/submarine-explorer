@@ -2122,3 +2122,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged 4410 (P2 phone-retest checklist, docs only) and V-bluehole-silhouette second pass (a7702911; undercut lip from noise instead of plateaus, clumped pendant lengths, envelope test rewritten, snapshots re-baselined; ~3.6 from ~3.2 by my read of east-2, roof top still a broad slab, no light shaft). Gates smoke + project-base pass on main (after a log Prettier fix); pushed. Hosted CI for recent pushes still running, no tag. Queued and launched Codex 4420 (verify Blue Hole numerics), 4430 (Journal/debrief bug hunt), 4440 (CI flake audit, NET). Claude 5h ~48%.
 - **Needs owner:** delete four S-collision expected-failure cases?; phone retest using plan/progress/4410-P2-phone-accept-checklist.md (Aa button, High Lost City plume, Journal photo, Blue Hole shape).
+
+## 2026-10-26 14:16 CDT targeted review (Claude): Codex starved
+
+- No code merged. Diagnosed starvation (Codex 5h budget, not scheduling); decided S-collision (fix, not delete) and queued 4450. 4420/4430/4440 running. Details in REVIEWS.md.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.

@@ -88,7 +88,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 7. **V-endurance-hull [Sonnet, small]:** (~3.0) hull is only 44 x 8 m, so altitude cannot enlarge it. Target: a richer hull (rails, masts, rubble skirt) or a lit subject; remove the white speckle noise along the hull edge in `endurance-1.png`.
 8. **P2-phone-accept [owner + Codex]:** checklist ready in `plan/progress/4410-P2-phone-accept-checklist.md` (2026-10-26); owner runs it. Low-tier acceptance on a real phone with the current build (Aa button, journeys, High Lost City plume). Codex prepares a one-page checklist and the Pages URL; the owner runs it.
 9. **S-verify / S-bughunt [Codex, standing]:** after each visual merge, verify numerics and hunt bugs; bind captured images, manifests and SHA together before accepting evidence (stale PNGs can sit beside fresh JSON, Sol 2026-10-26). 4400 queued.
-10. **S-collision [Codex, owner decision pending]:** four expected-failure Monterey scarp collision cases remain (worktrees 2980, 3050). Deleting tests would not fix the behaviour; leave until the owner decides.
+10. **S-collision [Codex]:** IN FLIGHT 2026-10-26 (4450). Director decision (rules can bend): fix the Monterey scarp hull collision and convert the four `it.fails` cases to normal tests, re-baselining derived snapshots only with a per-baseline explanation. Do not delete the tests.
 11. **R-release [Haiku]:** tag the latest green-CI main after each review (f66 is the newest); check the Pages deploy.
 12. **P2-globe-bright [Sonnet, demoted]:** brighter globe, only if the lanes above are blocked. **V-bluehole-hood [Sonnet, demoted]:** east hood sheet facets.
 

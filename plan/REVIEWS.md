@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-10-26 14:20 CDT targeted review: Codex starved
+
+- Trigger: Codex starved 2 h with an empty queue. Cause: not a scheduling fault. Codex 5h sat at 5-7% after Sol's review (dispatcher requires 20%), so nothing launched 10:00-13:50 (4380/4390 launched at 09:45, 4400 died at its limit). Since 13:50 three tasks (4420, 4430, 4440) are running; Codex 5h is 43%, week 71%.
+- Real gap: the Codex lane had no fix/feature item (refill wrote 0 briefs at 13:00 because the Backlog only held audits and an owner-blocked item). Fix: S-collision is no longer owner-blocked (director decision under rules-can-bend: fix the behaviour, do not delete tests); brief 4450 queued. Visual items stay Claude-only, so the Codex lane remains thin until the next comprehensive review adds non-visual feature items.
+- Needs owner: phone retest (Aa button, High Lost City plume, Journal photo, Blue Hole shape). The S-collision question is closed.
+
 ## 2026-10-26 comprehensive review, joint with Sol (golden 2026-10-26-142430)
 
 **Joint review:** Sol reviewed independently, then one reconcile round. Corrections accepted from Sol: my claim that journey captures were stale was wrong (six Oct 26 local manifests run through two scans, Journal and debrief; they lack a recorded SHA); the sonar/tutorial overlap I reported is not general; "failures move between viewports" does not prove harmless flakiness; Pages deploys only a green SHA so live may lag main. Sol's additions: Journal cyan rectangle over the photo and portrait photo crop, stale PNGs beside fresh JSON in `opening-framing/live`, Hunga's dark subject belongs with Axial and Kama. Claude's additions: the specific two red specs, ghost text behind the Journal (confirmed in `round-1/great-blue-hole-1280x720-10-journal.png`), debrief headline "Primaries complete" over "2 of 4 objectives, 1 star".
