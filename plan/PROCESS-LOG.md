@@ -316,3 +316,7 @@ Creating `.cache/review/current` as a directory before `codex-review.sh start` m
 ## 2026-10-26 targeted review (Codex starved)
 
 - Starvation was the Codex 5h budget (5-7% after the Sol review; dispatcher needs 20%), not an empty queue. Refill found no unblocked non-visual Backlog item. Unblocked S-collision (director decision) and queued 4450. No tooling change: the pacing gate worked as designed.
+
+## 2026-10-26 evening review
+
+- Codex review script exited 75 (Codex 5h 5%): reviewed alone and said so in REVIEWS.md. No tooling change; Codex weekly burn (~55%/day) is the limit, not scheduling. Golden set has no Axial/Kama/Hunga captures; added as first step of V-eight-sites-lit.

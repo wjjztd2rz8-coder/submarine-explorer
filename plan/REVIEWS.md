@@ -1,5 +1,23 @@
 # Reviews
 
+## 2026-10-26 evening comprehensive review (Claude alone; Sol skipped, Codex 5h at 5%, script exit 75)
+
+**Changed since the morning review (golden 2026-10-26-142430 to 213811):** 4380/4390 spec rewrites, V-monterey-apron, V-bluehole-silhouette pass 2, 4410 phone checklist, 4430 (canvasThumbnail null guard), 4440 (CI flake audit), 4420 (numerics report), 4450 (scarp collision fixed, expected-failure cases now ordinary tests), V-lostcity-towers. **Hosted CI is green on fde5c15d (run 169) with Pages deployed; tagged f67.** This is the first green main since f66.
+
+**Scores (readable / beautiful; my read only, coarse):** Titanic 4 / 3.5; Lost City 3.5 / 3.5 (+0.5: Poseidon is one fluted tower, but the ridge behind is bare streaky olive); Blue Hole 3.5 / 3.6 (undercut lip and pendants read; roof is still a broad slab, no light shaft; wall banding flat); Beebe 4 / 3.5 (unchanged); Monterey 4 / 3.6 (apron less smooth; sub still half-transparent against the wall skirt); Challenger 3.5 / 3.5; Endurance 3.5 / 3 (speckle gone, sandy flat empty). No hero at 4 yet.
+
+**Biggest gaps:** (1) heroes sit at 3.5-3.6; the next 0.4 needs surroundings (Lost City talus, Blue Hole light shaft), not subject geometry; (2) Axial, Kama, Hunga have no golden captures at all, so their state is judged from numerics only (added to the Backlog as the first step of V-eight-sites-lit); (3) real-phone acceptance still pending; (4) the unaided-pilot journey leg was dropped by 4380 (4480 restores it).
+
+**Play check:** not re-captured this run; relied on the morning review's journeys (Journal opaque panel and debrief tally merged since, unverified on phone).
+
+**Process:** CI red streak ended. Codex budget (5h at 5%, week 65% left, ~55%/day burn) is the binding constraint, so three briefs are queued but will launch only when the 5h window refills. Claude week 56% at ~9%/day: on pace. No scheduling faults found. Stale worktrees (2980, 3050, 3310, 3320, 3340, 3380) are still uncollected: leave them, they cost nothing.
+
+**New priorities:** Backlog rewritten: V-bluehole-roof, V-lostcity-surround, V-eight-sites-lit, V-endurance-hull, V-monterey-wall-skirt, V-beebe-flow (all Sonnet, unblocked); Codex 4480 (R-ci-green), 4490 (S-verify), 4500 (S-bughunt).
+
+**Stage:** about 85% to 1.0; 4-5 weeks. Not agreed with Sol (skipped for budget); the morning joint figure was 83%, 4-6 weeks.
+
+**Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (also Lost City towers and Blue Hole shape).
+
 ## 2026-10-26 14:20 CDT targeted review: Codex starved
 
 - Trigger: Codex starved 2 h with an empty queue. Cause: not a scheduling fault. Codex 5h sat at 5-7% after Sol's review (dispatcher requires 20%), so nothing launched 10:00-13:50 (4380/4390 launched at 09:45, 4400 died at its limit). Since 13:50 three tasks (4420, 4430, 4440) are running; Codex 5h is 43%, week 71%.
