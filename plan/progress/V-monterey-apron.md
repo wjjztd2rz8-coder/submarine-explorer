@@ -11,7 +11,7 @@
 
 ## Tests
 
-No instance-count test encodes the split; counts are unchanged. Gates: see the final report.
+Instance counts are unchanged (no test encodes the split). `scarpTerrain` canyon-medium and canyon-high placement hashes re-baselined (intended placement change). Pebble radius floor set so the existing buried-rock and rock-gap assertions pass unchanged. `tools/gates.sh` (smoke + project-base) passes.
 
 ## Simplicity rules
 
