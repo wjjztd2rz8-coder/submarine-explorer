@@ -108,6 +108,9 @@ builders use the same biome through the terrain material factory.
   instanced life (tubeworms or shrimp, coral colonies, sponges, boulders, bacterial mats) and
   compound colliders. Detail follows the quality tier (`geo/detail.ts`: instance counts, mesh
   density, branching depth, texture size, bump map). Face is local −Z; heading picks the direction.
+  Carbonate plume emitters contain 25/49/49 points on Low/Medium/High: High shares Medium's
+  transparent fill budget while keeping its solid geometry detail. Mouth fringes are unchanged.
+  Other smoke/shimmer counts use density multipliers Low 0.35, Medium 0.7 and High 1.
   A feature on a `procedural:chimney` keeps the vent preset's smoke, glow and shimmer (the preset
   looks for chimney props); use that for vent pieces. Preview: `/preview/geo.html` on the dev server.
   - `smoker-cluster`: sulfide mound + 3–7 black smokers, `variant: "shrimp"` swaps tubeworms for

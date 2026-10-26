@@ -8,8 +8,10 @@
 export interface GeoDetail {
   /** Multiplier on instanced life (coral colonies, tubeworms, sponges, fringe). */
   growth: number;
-  /** Multiplier on smoke and shimmer particle counts (0 = none). */
+  /** Multiplier on other smoke and shimmer particle counts (0 = none). */
   plume: number;
+  /** Points per carbonate emitter; High shares Medium's transparent fill budget. */
+  carbonatePlumeParticles: number;
   /** Icosphere subdivision for lumps and pillows (0-3). */
   sphereDetail: number;
   /** Multiplier on grid and ring counts of walls and columns. */
@@ -28,6 +30,7 @@ export const GEO_DETAIL: Record<string, GeoDetail> = {
   low: {
     growth: 0.25,
     plume: 0.35,
+    carbonatePlumeParticles: 25,
     sphereDetail: 1,
     meshDensity: 0.55,
     branchDepth: 2,
@@ -38,6 +41,7 @@ export const GEO_DETAIL: Record<string, GeoDetail> = {
   medium: {
     growth: 0.6,
     plume: 0.7,
+    carbonatePlumeParticles: 49,
     sphereDetail: 2,
     meshDensity: 0.8,
     branchDepth: 3,
@@ -48,6 +52,7 @@ export const GEO_DETAIL: Record<string, GeoDetail> = {
   high: {
     growth: 1,
     plume: 1,
+    carbonatePlumeParticles: 49,
     sphereDetail: 2,
     meshDensity: 1,
     branchDepth: 3,

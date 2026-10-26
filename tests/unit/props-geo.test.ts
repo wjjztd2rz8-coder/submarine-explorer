@@ -613,6 +613,28 @@ describe('Beebe mineral finish', () => {
 });
 
 describe('plumes', () => {
+  // Guard transparent fill without dropping emitters or changing the phone tier.
+  it.each([
+    ['low', 25],
+    ['medium', 49],
+    ['high', 49],
+  ] as const)('%s caps each carbonate plume at %i particles', (tier, count) => {
+    const tower = build('carbonate-tower', tier);
+    try {
+      const plumes: THREE.Points[] = [];
+      tower.full.traverse((object) => {
+        if (object instanceof THREE.Points && object.name === 'plume') plumes.push(object);
+      });
+      expect(plumes).toHaveLength(3);
+      for (const plume of plumes) {
+        expect(plume.geometry.getAttribute('position').count).toBe(count);
+        expect(plume.geometry.getAttribute('aSeed').count).toBe(count);
+      }
+    } finally {
+      disposeProp(tower);
+    }
+  });
+
   it('build a shader-animated point cloud sized by the count, or nothing when tiny', () => {
     const p = makePlume({
       height: 10,

@@ -581,7 +581,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   for (const k of hazeFor) {
     const tip = tips[k]!;
     const ph = lone ? 3 : Math.min(14, spires[k]!.h * 0.28 + 3);
-    const haze = shimmerPlume(ph, spires[k]!.r0 * 0.2, Math.round(70 * d.plume), seed + 700 + k);
+    const haze = shimmerPlume(ph, spires[k]!.r0 * 0.2, d.carbonatePlumeParticles, seed + 700 + k);
     if (!haze) continue;
     haze.position.set(tip.x, tip.y, tip.z);
     full.add(haze);

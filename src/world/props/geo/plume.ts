@@ -3,7 +3,7 @@
  * runs entirely in the vertex shader (rise, swirl, widening, current drift), so
  * an animated plume costs no CPU per frame beyond one uniform write from the
  * mesh's `onBeforeRender`. Built on PointsMaterial, so scene fog applies like
- * everything else. Counts scale with the quality tier (`GeoDetail.plume`).
+ * everything else. Counts follow the quality tier's budgets (`GeoDetail`).
  */
 
 import * as THREE from 'three';

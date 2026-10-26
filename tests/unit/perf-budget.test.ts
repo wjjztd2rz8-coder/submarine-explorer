@@ -13,6 +13,7 @@ import { latLonToWorld } from '../../src/util/geo.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import { Currents } from '../../src/world/Currents.js';
 import { PresetSystem } from '../../src/world/presets/Presets.js';
+import * as geo from '../../src/world/props/geo/detail.js';
 
 /**
  * Conservative static prop cost: every prop at once, with BOTH internal LOD
@@ -280,23 +281,13 @@ describe('Lost City transparent effect fill budget', () => {
         DEFAULT_CONFIG.terrain,
         tier,
       );
-      const props = new Props(meta, terrain, DEFAULT_CONFIG.props, tier);
+      let props: Props | undefined;
       const mission = JSON.parse(readFileSync('data/landmarks/lost-city/mission.json', 'utf8'));
       const scene = new THREE.Scene();
       const currents = new Currents('lost-city', 'lost-city', async () => null);
       await currents.ready;
       let presets: PresetSystem | undefined;
       try {
-        await props.load('props.json', 'lost-city', async () =>
-          JSON.parse(readFileSync('data/landmarks/lost-city/props.json', 'utf8')),
-        );
-        expect(props.stats.failed).toBe(0);
-        expect(props.stats.skipped).toBe(0);
-        expect(props.placed).toHaveLength(12);
-        for (const prop of props.placed) scene.add(prop.root);
-        const hero = props.placed.find((p) => p.def.id === 'poseidon-tower')!;
-        // The existing golden close/approach direction, aimed at the orifice.
-        const target = hero.root.localToWorld(new THREE.Vector3(0, 60, 0));
         const camera = new THREE.PerspectiveCamera(
           DEFAULT_CONFIG.camera.fovDeg,
           1280 / 720,
@@ -305,6 +296,29 @@ describe('Lost City transparent effect fill budget', () => {
         );
         const measurements = [];
         for (const baseline of [true, false]) {
+          props = new Props(meta, terrain, DEFAULT_CONFIG.props, tier);
+          // Reconstruct the old uncapped High workload as well as its redundant
+          // preset layer, so the original fill regression keeps its full baseline.
+          const original =
+            baseline && tier === 'high'
+              ? vi
+                  .spyOn(geo, 'geoDetail')
+                  .mockReturnValue({ ...geo.geoDetail(tier), carbonatePlumeParticles: 70 })
+              : undefined;
+          try {
+            await props.load('props.json', 'lost-city', async () =>
+              JSON.parse(readFileSync('data/landmarks/lost-city/props.json', 'utf8')),
+            );
+          } finally {
+            original?.mockRestore();
+          }
+          expect(props.stats.failed).toBe(0);
+          expect(props.stats.skipped).toBe(0);
+          expect(props.placed).toHaveLength(12);
+          scene.add(props.group);
+          const hero = props.placed.find((p) => p.def.id === 'poseidon-tower')!;
+          // The existing golden close/approach direction, aimed at the orifice.
+          const target = hero.root.localToWorld(new THREE.Vector3(0, 60, 0));
           presets = new PresetSystem({
             scene,
             bus: new EventBus(),
@@ -364,6 +378,8 @@ describe('Lost City transparent effect fill budget', () => {
           measurements.push(samples);
           presets.dispose();
           presets = undefined;
+          props.dispose();
+          props = undefined;
         }
         if (diagnostics) {
           mkdirSync('.cache/perf-budget', { recursive: true });
@@ -393,13 +409,13 @@ describe('Lost City transparent effect fill budget', () => {
         for (const sample of measurements[1]) {
           expect(Object.keys(sample.layers).sort()).toEqual(['plume', 'vent-fringe']);
           expect(sample.layers.plume.draws).toBe(14);
-          expect(sample.layers.plume.points).toBe(tier === 'low' ? 350 : 980);
+          expect(sample.layers.plume.points).toBe(tier === 'low' ? 350 : 686);
           expect(sample.layers['vent-fringe'].draws).toBe(12);
           expect(sample.layers['vent-fringe'].points).toBe(392);
           expect(sample.layers['vent-fringe'].squareM2).toBeCloseTo(250.88, 6);
           expect(sample.pixels).toBeGreaterThan(8_000); // No blank scene can pass.
           if (tier === 'high') {
-            expect(sample.pixels).toBeLessThanOrEqual(140_000);
+            expect(sample.pixels).toBeLessThanOrEqual(120_000);
           }
         }
         if (tier === 'high') {
@@ -409,6 +425,10 @@ describe('Lost City transparent effect fill budget', () => {
             expect(measurements[0][i].layers.ventShimmer.squareM2).toBe(2916);
             expect(measurements[1][i].pixels).toBeLessThan(measurements[0][i].pixels * 0.65);
             expect(measurements[1][i].peakOverlap).toBeLessThan(measurements[0][i].peakOverlap);
+            // Isolate the density cap's benefit from the earlier shimmer removal.
+            const before = measurements[0][i].layers;
+            const uncappedPixels = before.plume.pixels + before['vent-fringe'].pixels;
+            expect(measurements[1][i].pixels).toBeLessThan(uncappedPixels * 0.9);
           }
         }
         // Permanent marine snow is separate from site effects; preserve its
@@ -417,6 +437,7 @@ describe('Lost City transparent effect fill budget', () => {
         expect(DEFAULT_CONFIG.water.snowMaxSizePx).toBe(3);
       } finally {
         presets?.dispose();
+        props?.dispose();
         terrain.dispose();
       }
     });
