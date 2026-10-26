@@ -60,7 +60,8 @@ export function createHomeSystems(): GameSystem<
             !ctx.settingsScreen.isOpen &&
             !ctx.globe.isOpen &&
             !ctx.controlsCard.isOpen &&
-            (!ctx.journal.isOpen || ctx.journal.isTop)
+            // A covering dialog (including Your sub) owns shortcuts until it closes.
+            (ctx.journal.isOpen ? ctx.journal.isTop : ctx.home.isTop)
           )
             ctx.journal.toggle();
         },

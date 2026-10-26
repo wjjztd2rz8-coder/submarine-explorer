@@ -182,6 +182,10 @@ export class Home {
     return this.trap.active;
   }
 
+  get isTop(): boolean {
+    return this.trap.isTop;
+  }
+
   get sitesOpen(): boolean {
     return !this.sites.hidden;
   }

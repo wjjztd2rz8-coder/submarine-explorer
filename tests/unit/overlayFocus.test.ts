@@ -59,6 +59,7 @@ import { buildJournalSite } from '../../src/game/JournalData.js';
 import { ObjectivesPanel } from '../../src/ui/ObjectivesPanel.js';
 import { hudSystem } from '../../src/app/systems/hud.js';
 import { createHomeSystems } from '../../src/app/homeStartup.js';
+import { journalSystem } from '../../src/app/systems/journal.js';
 
 vi.mock('three', async (original) => {
   const actual = await original<typeof import('three')>();
@@ -1161,6 +1162,77 @@ function shell() {
 }
 
 describe('overlay policies across the app', () => {
+  it.each(
+    (['home', 'pause', 'dive'] as const).flatMap((source) =>
+      (['Escape', 'touch close'] as const).map((dismiss) => ({ source, dismiss })),
+    ),
+  )(
+    'Journal returns to $source after $dismiss without changing pause state',
+    ({ source, dismiss }) => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
+      const guide = journal();
+      const store = new DiscoveryStore(null);
+      const ctx = {
+        bus: new EventBus(),
+        index: [],
+        meta: { id: 'reef' },
+        route: null,
+        contentLandmark: 'reef',
+        save: new Save({ config: DEFAULT_CONFIG, storage: null }),
+        app: { state: source, lastSite: null },
+        expose: vi.fn(),
+        journal: guide,
+        discoveries: store,
+        discovery: { guide, store, debrief: { isOpen: false } },
+        settingsScreen: { isOpen: false },
+        globe: { isOpen: false },
+      } as unknown as GameContext;
+      const runner = new SystemRunner(ctx);
+      cleanup.push(() => runner.dispose());
+      runner.init([shellSystem, journalSystem, shellKeysSystem]);
+      ctx.setAppState(source);
+      const menu = source === 'home' ? ctx.home : ctx.pause;
+      const opener =
+        source === 'dive'
+          ? element()
+          : (menu.root as unknown as Element)
+              .querySelectorAll('button')
+              .find((button) => button.textContent === 'Journal')!;
+      opener.focus();
+      if (source === 'dive') guide.toggle();
+      else opener.dispatchEvent(new Event('click'));
+      expect(guide.viewKey).toBe(source === 'home' ? 'front' : 'reef');
+      const gate = () => {
+        const f = { sampled: { throttle: 1 }, realSteps: 3, dt: 1 / 60 } as FrameState;
+        shellSystem.frame!['gate.shell']!(f, ctx);
+        inputGateSystem.frame!['gate.input']!(f, ctx);
+        return f;
+      };
+      expect(gate().steps).toBe(0);
+      for (let i = 0; i < 5; i++) {
+        press('Tab', { shiftKey: i > 2 });
+        expect(guide.root.contains(document.activeElement)).toBe(true);
+      }
+      press('Escape', { repeat: true });
+      expect(guide.isOpen).toBe(true);
+      if (dismiss === 'Escape') press('Escape');
+      else
+        (guide.root as unknown as Element)
+          .querySelector('.jr-close')!
+          .dispatchEvent(new Event('click'));
+      expect(guide.isOpen).toBe(false);
+      expect(ctx.app.state).toBe(source);
+      expect(ctx.home.isOpen).toBe(source === 'home');
+      expect(ctx.pause.isOpen).toBe(source === 'pause');
+      expect(active()).toBe(opener);
+      expect(gate().steps).toBe(source === 'dive' ? 3 : 0);
+      if (source === 'pause') {
+        press('Escape');
+        expect(ctx.app.state).toBe('dive');
+      }
+    },
+  );
+
   it.each(['journal', 'settings', 'controls', 'globe', 'debrief', 'briefing', 'photo'])(
     'leaves wheel scrolling and range shortcuts to the %s overlay above expanded sonar',
     (modal) => {
@@ -2431,6 +2503,82 @@ describe('overlay policies across the app', () => {
 });
 
 describe('overlay host teardown', () => {
+  it.each(['keyboard', 'gamepad'] as const)(
+    'Home ignores the Journal %s shortcut while Your sub owns focus',
+    (device) => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
+      // The preview is independent of keyboard ownership and needs no WebGL here.
+      vi.spyOn(
+        SubScreen.prototype as unknown as { startPreview(token: number): Promise<void> },
+        'startPreview',
+      ).mockResolvedValue();
+      const guide = journal();
+      const input = new Input({ storage: null });
+      Object.assign(document, { addEventListener: vi.fn(), removeEventListener: vi.fn() });
+      input.attach();
+      cleanup.push(() => input.dispose());
+      const buttons = Array.from({ length: 16 }, () => ({ pressed: false, value: 0 }));
+      vi.stubGlobal('navigator', {
+        getGamepads: () => [{ connected: true, index: 0, axes: [0, 0, 0, 0], buttons }],
+      });
+      const ctx = {
+        bus: new EventBus(),
+        index: [],
+        route: null,
+        save: new Save({ config: DEFAULT_CONFIG, storage: null }),
+        progress: new Progress(new ProgressSave(null)),
+        app: { state: 'home', lastSite: null },
+        expose: vi.fn(),
+        journal: guide,
+        discoveries: { isDiscovered: () => false },
+        input,
+        controlsCard: { isOpen: false },
+        settingsScreen: { isOpen: false },
+        globe: { isOpen: false },
+      } as unknown as GameContext;
+      const runner = new SystemRunner(ctx);
+      cleanup.push(() => runner.dispose());
+      runner.init([shellSystem, shellKeysSystem]);
+      ctx.setAppState('home');
+      const opener = (ctx.home.root as unknown as Element)
+        .querySelectorAll('button')
+        .find((button) => button.textContent === 'Your sub')!;
+      opener.focus();
+      opener.dispatchEvent(new Event('click'));
+      const sub = body.querySelector('.sub-screen')!;
+      press('Tab');
+      const subControl = active();
+      expect(sub.contains(subControl)).toBe(true);
+      const menu = createHomeSystems().find((system) => system.name === 'menuData')!;
+      const frame = () => {
+        input.sample();
+        menu.frame!['scan.discovery']!({ dt: 0, nowMs: 0, frozen: true }, ctx);
+        input.endFrame();
+      };
+      const toggle = () => {
+        if (device === 'keyboard') press('KeyJ', { target: html(active()) });
+        else buttons[14] = { pressed: true, value: 1 };
+        frame();
+      };
+      toggle();
+      expect(guide.isOpen).toBe(false);
+      expect(active()).toBe(subControl);
+      press('Escape');
+      expect(sub.hidden).toBe(true);
+      expect(active()).toBe(opener);
+      frame(); // An ignored edge cannot open Journal after the covering overlay closes.
+      expect(guide.isOpen).toBe(false);
+      press('KeyJ', { repeat: true, target: html(active()) });
+      buttons[14] = { pressed: false, value: 0 };
+      frame();
+      toggle();
+      expect(guide.isOpen).toBe(true);
+      press('Escape');
+      expect(guide.isOpen).toBe(false);
+      expect(active()).toBe(opener);
+    },
+  );
+
   it.each([
     { device: 'keyboard', focused: '.controls-card-tab' },
     { device: 'keyboard', focused: '.controls-card-rebind' },
@@ -2512,6 +2660,7 @@ describe('overlay host teardown', () => {
       input,
       journal: guide,
       controlsCard: card,
+      home,
       settingsScreen: { isOpen: false },
       globe: { isOpen: false },
     } as unknown as GameContext;
