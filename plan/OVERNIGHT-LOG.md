@@ -2096,3 +2096,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged 4350 (High carbonate plume 70 to 49 points per emitter; no rendered perf measurement possible in the Codex sandbox, so judge on the phone), 4370 (Aa/settings and overlay-focus tests, no defect found) and 4360 (eight-site numerics report; Axial, Endurance, Challenger and Kamaʻehuakanaloa subjects fall below the hero framing floor, noted on V-eight-sites-lit, Sonnet lane, judge by screenshot). Gates: smoke + project-base on each worktree and main, all pass (a log Prettier fix went in first). Worktrees 4350/4360/4370 still to remove. No Claude package. Queue empty; refill will run when Codex starves.
 - **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button, High Lost City plume).
+
+## 2026-10-26 09:24 CDT headless run 164 (Claude): one Sonnet package
+
+- Merged V-eight-sites-lit g (Kamaʻehuakanaloa mission opening 200 to 130 m, data + one test expectation; shot reads slightly better, subject still a dark silhouette, ~3.0). Axial left unchanged: a 75 m opening makes the chimneys readable but falls inside the 100 m scan radius (guarded by a composition test, not loosened). Gates smoke + project-base pass on main. Claude 5h ~85%, week 62%. Codex idle by design (no non-visual backlog; refill runs on starvation).
+- **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button, High Lost City plume); Axial: allow a smaller scan radius at that site, or a lit-chimney treatment?
