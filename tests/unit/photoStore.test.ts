@@ -354,7 +354,7 @@ it.each([
   },
 );
 
-it.each(['context', 'encoder', 'empty canvas'])(
+it.each(['context', 'encoder', 'empty canvas', 'empty height'])(
   'reports a missing capture when the %s is unavailable',
   (missing) => {
     const drawImage = vi.fn();
@@ -369,10 +369,37 @@ it.each(['context', 'encoder', 'empty canvas'])(
       expect(
         canvasThumbnail({
           width: missing === 'empty canvas' ? 0 : 1280,
-          height: 720,
+          height: missing === 'empty height' ? 0 : 720,
         } as HTMLCanvasElement),
       ).toBeNull();
       if (missing !== 'encoder') expect(drawImage).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  },
+);
+
+it.each(['draw', 'encode'] as const)(
+  'returns a missing capture after a browser %s exception and allows the next capture',
+  (failure) => {
+    const drawImage = vi.fn();
+    const toDataURL = vi.fn(() => 'data:image/jpeg;base64,YQ==');
+    const output = { width: 0, height: 0, getContext: () => ({ drawImage }), toDataURL };
+    vi.stubGlobal('document', { createElement: () => output });
+    try {
+      const source = { width: 400, height: 800 } as HTMLCanvasElement;
+      const fail = () => {
+        throw new DOMException(
+          'Readback unavailable',
+          failure === 'draw' ? 'InvalidStateError' : 'SecurityError',
+        );
+      };
+      if (failure === 'draw') drawImage.mockImplementationOnce(fail);
+      else toDataURL.mockImplementationOnce(fail);
+      expect(canvasThumbnail(source, undefined, undefined, 'stock', 0.99)).toBeNull();
+      expect(canvasThumbnail(source, undefined, undefined, 'stock', 0.99)).toBe(
+        'data:image/jpeg;base64,YQ==',
+      );
     } finally {
       vi.unstubAllGlobals();
     }

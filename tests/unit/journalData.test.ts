@@ -852,6 +852,15 @@ describe('Journal content model', () => {
 });
 
 describe('debrief wording', () => {
+  it.each([
+    { completed: 0, total: 0 },
+    { completed: 1, total: 2 },
+  ])('does not claim primary completion when no primaries resolve: %j', (counts) => {
+    const result = debriefText('surface', { completed: 0, total: 0 }, counts, 75);
+    expect(result.title).toBe('Back at the surface');
+    expect(result.subtitle).toContain(`${counts.completed} of ${counts.total} objectives · 1:15`);
+  });
+
   it('distinguishes primaries done from every objective done without claiming all stars', () => {
     const c = { completed: 3, total: 4 };
     expect(debriefText('surface', { completed: 2, total: 2 }, c, 75)).toEqual({
