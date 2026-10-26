@@ -18,8 +18,7 @@ vi.mock('../../src/world/TerrainBiome.js', async (importOriginal) => {
   };
 });
 
-// Known upper-wall gaps remain pending the scarp collision repair. Keep fixture
-// validation outside the expected failure so a missing mesh cannot masquerade as it.
+// Validate contacts against exposed survey-backed wall triangles at every tier.
 describe.each([
   { tier: 'medium', bank: 'east', x: -111.36363636363637, y: 167.02843730848141 },
   { tier: 'high', bank: 'west', x: -18.181818181818187, y: 126.9591006339439 },
@@ -70,9 +69,7 @@ describe.each([
     }
   }, 60_000); // builds a real tile and prop set; slow hosted runners need headroom
 
-  // Promote to a normal test when collision coverage is repaired; an unexpected
-  // pass deliberately fails the suite so this known defect cannot disappear silently.
-  it.fails('known gap: the hull must collide at the exposed triangle', () => {
+  it('the hull must collide at the exposed triangle', () => {
     expect(collides).toBe(true);
   });
 });
