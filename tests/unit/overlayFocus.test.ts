@@ -998,6 +998,94 @@ it('Aa replaces the increase button, cycles saved steps and stays synced after r
   expect(save.get().uiScale).toBe(105);
 });
 
+it.each(
+  [390, 844].flatMap((width) =>
+    (['low', 'medium', 'high'] as const).flatMap((tier) =>
+      (['arcade', 'realistic', 'custom'] as const).map((mode) => ({ width, tier, mode })),
+    ),
+  ),
+)(
+  'keeps scale consumers synced across quality/mode edits and reload at $width/$tier/$mode',
+  ({ width, tier, mode }) => {
+    Object.assign(window, {
+      innerWidth: width,
+      innerHeight: width === 390 ? 844 : 390,
+      matchMedia: () => Object.assign(new EventTarget(), { matches: false }),
+    });
+    const records = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => records.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        records.set(key, value);
+      },
+      removeItem: (key: string) => {
+        records.delete(key);
+      },
+    };
+    const css = new Map<string, string>();
+    vi.spyOn(document.documentElement.style, 'setProperty').mockImplementation((key, value) => {
+      css.set(key, value ?? '');
+    });
+    for (let session = 0; session < 2; session++) {
+      const save = new Save({ config: DEFAULT_CONFIG, storage });
+      const input = new Input({ storage: null });
+      const ctx = {
+        config: DEFAULT_CONFIG,
+        settings: save.get(),
+        save,
+        input,
+        tier,
+        quality: { setting: tier, urlForced: false, detected: { tier } },
+        globe: { isOpen: false },
+        renderer: { setSize: vi.fn() },
+        expose: vi.fn(),
+      } as unknown as GameContext;
+      const homeSystems = createHomeSystems();
+      settingsSystem.init!(ctx);
+      homeSystems.find((system) => system.name === 'titleRender')!.init!(ctx);
+      const dispose = () => {
+        homeSystems.find((system) => system.name === 'menuData')!.dispose!();
+        settingsSystem.dispose?.();
+        input.dispose();
+      };
+      cleanup.push(dispose);
+      const root = ctx.settingsScreen.root;
+      const value = root.querySelector<HTMLOutputElement>('.settings-scale-value')!;
+      const slider = root.querySelector<HTMLInputElement>('[data-setting="uiScale"]')!;
+      const cycle = [...root.querySelectorAll('button')].find(
+        (button) => button.getAttribute('aria-label') === 'Aa: cycle UI scale',
+      )!;
+      if (session === 0) {
+        slider.value = '150';
+        slider.dispatchEvent(new Event('change'));
+        const quality = root.querySelector<HTMLSelectElement>('[data-setting="graphicsTier"]')!;
+        quality.value = tier;
+        quality.dispatchEvent(new Event('change'));
+        save.setGameplayMode(mode === 'custom' ? 'realistic' : mode);
+        if (mode === 'custom') save.setGameplayOption('visualHints', true);
+      }
+      expect(save.get()).toMatchObject({ uiScale: 150, graphicsTier: tier, gameplayMode: mode });
+      expect(value.value).toBe('150%');
+      expect(css.get('--ui-user-scale')).toBe('1.5');
+      expect(css.get('--ui-auto-scale')).toBe('0.8');
+      window.dispatchEvent(new Event('resize'));
+      expect(css.get('--ui-user-scale')).toBe('1.5');
+      if (session === 1) {
+        cycle.dispatchEvent(new Event('click'));
+        expect(save.get().uiScale).toBe(80);
+        expect(value.value).toBe('80%');
+        expect(css.get('--ui-user-scale')).toBe('0.8');
+        root.querySelector('.settings-reset')!.dispatchEvent(new Event('click'));
+        expect(value.value).toBe('100%');
+        expect(css.get('--ui-user-scale')).toBe('1');
+        expect(new Save({ config: DEFAULT_CONFIG, storage }).get().uiScale).toBe(100);
+      }
+      dispose();
+      cleanup.pop();
+    }
+  },
+);
+
 it.each(['cleared', 'sessionOnly'] as const)(
   'cancels the pending %s discoveries reload when Settings is disposed',
   (result) => {
