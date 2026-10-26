@@ -952,10 +952,37 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     liftAt: (x, y) => (y === undefined ? liftAt(x) : lift(x, y)),
     sinkAt,
   });
+  const wallBoxCount = colliders.length;
   colliders.push(...talusColliders(talus, W));
+  const impostor = impostorFromBoxes(colliders, bounds, P.base.getHex());
+  // The slice heights use the segment's lowest taper and average ground lift.
+  // At those heights the rock can belong to a different profile interval.
+  // Clip the already deformed mesh sections instead of reconstructing its shape;
+  // widen only depth, retaining the tapered tops and open undercuts. Capture the
+  // distant stand-in first so collision coverage cannot reshape visible rock.
+  const pos = wall.getAttribute('position');
+  const sections = Array.from({ length: nx + 1 }, (_, i) =>
+    Array.from({ length: ny + 1 }, (_, j): [number, number] => {
+      const n = i * (ny + 1) + j;
+      return [pos.getY(n), pos.getZ(n)];
+    }),
+  );
+  for (const box of colliders.slice(0, wallBoxCount)) {
+    for (let i = 0; i <= nx; i++) {
+      const x = pos.getX(i * (ny + 1));
+      if (x < box.min.x || x > box.max.x) continue;
+      const section = sections[i]!;
+      const zs = [...crossings(section, box.min.y), ...crossings(section, box.max.y)];
+      for (const [y, z] of section) if (y >= box.min.y && y <= box.max.y) zs.push(z);
+      for (const z of zs) {
+        box.min.z = Math.min(box.min.z, z);
+        box.max.z = Math.max(box.max.z, z);
+      }
+    }
+  }
   return {
     full,
-    impostor: impostorFromBoxes(colliders, bounds, P.base.getHex()),
+    impostor,
     bounds,
     colliders,
   };

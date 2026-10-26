@@ -85,3 +85,31 @@ describe('wall colliders follow the rendered wall', () => {
     });
   }
 });
+
+it.each(['tuff-cliff', 'canyon-ledge', 'hadal-scarp'] as const)(
+  '%s: a ground offset translates collision boxes without reshaping them',
+  (feature) => {
+    const make = (offset: number) =>
+      buildGeo({
+        def: { feature, raw: {} } as unknown as PropDef,
+        dims: DIMS[feature]!,
+        seed: hashString(`t-${feature}`),
+        cfg,
+        tier: 'high',
+        groundHeight: () => (x, z) => 0.045 * x + 0.025 * z + offset,
+      });
+    const base = make(0);
+    const shifted = make(37);
+    expect(shifted.colliders).toHaveLength(base.colliders!.length);
+    for (let i = 0; i < base.colliders!.length; i++) {
+      for (const side of ['min', 'max'] as const) {
+        const a = base.colliders![i]![side];
+        const b = shifted.colliders![i]![side];
+        expect(b.x).toBe(a.x);
+        // Rendered sections are Float32; compare at their metre precision.
+        expect(b.z).toBeCloseTo(a.z, 4);
+        expect(b.y - a.y).toBeCloseTo(37, 10);
+      }
+    }
+  },
+);
