@@ -1,5 +1,25 @@
 # Reviews
 
+## 2026-10-26 comprehensive review, joint with Sol (golden 2026-10-26-142430)
+
+**Joint review:** Sol reviewed independently, then one reconcile round. Corrections accepted from Sol: my claim that journey captures were stale was wrong (six Oct 26 local manifests run through two scans, Journal and debrief; they lack a recorded SHA); the sonar/tutorial overlap I reported is not general; "failures move between viewports" does not prove harmless flakiness; Pages deploys only a green SHA so live may lag main. Sol's additions: Journal cyan rectangle over the photo and portrait photo crop, stale PNGs beside fresh JSON in `opening-framing/live`, Hunga's dark subject belongs with Axial and Kama. Claude's additions: the specific two red specs, ghost text behind the Journal (confirmed in `round-1/great-blue-hole-1280x720-10-journal.png`), debrief headline "Primaries complete" over "2 of 4 objectives, 1 star".
+
+**Changed since the last review:** Aa clipping fix, 4340 journeys driver, 4350 Lost City plume cap, 4370 Aa bug hunt (clean), 4360 eight-site numerics, V-eight-sites-lit g (Kama 130 m). Goldens match by eye (pose drift only except the Lost City plume).
+
+**Scores, readable / beautiful (agreed):** Titanic 4 / 3.5; Lost City 3.5 / 3; Blue Hole 3.5 / 3; Beebe 4 / 3.5; Monterey 4 / 3.5; Challenger 3.5 / 3.5; Endurance 3 / 3. Coarse bands, not tenth-point measurements.
+
+**Biggest gaps (agreed order):** (1) hosted CI: `journal-debrief.spec.ts:1541` journeys and `settings.spec.ts` Aa cases fail on a different case each run (4 of the last 5 runs); (2) Blue Hole and Lost City silhouettes; (3) eight-site spawns: Axial, Kama, Hunga; (4) real-phone Low-tier acceptance; (5) Journal compositing and the debrief headline.
+
+**Disputed:** Sol would treat Axial as not needing an owner decision (lighting can proceed); I agree and decided it (rules can bend). Cause of the CI failures is not established (timing vs driver vs product); Sol insists on diagnosing before demoting journeys, and 4380 does that. Nothing else disputed.
+
+**Process:** efficiency.sh estimates are sample-count extrapolations (Claude idle ~21-42 h per 24 h is mostly "no worthwhile art item", not a scheduling fault). Codex week 88% left at ~47%/day, so briefs stay rationed. Main CI has been red for four pushes with no signal until the next run, so CI triage is now item 1 of the Backlog. The Backlog was rewritten (old text in `plan/archive/DIRECTOR-HISTORY-2026-10-26-backlog.md`).
+
+**New priorities:** Codex queued 4380 (R-ci-green journeys), 4390 (R-ci-green settings), 4400 (eight-site subject size report). Claude lanes unblocked: V-journal-polish, V-bluehole-silhouette, V-lostcity-towers, V-eight-sites-lit (Axial lit chimneys), V-monterey-apron, V-endurance-hull.
+
+**Stage:** about 83% to 1.0; 4-6 weeks, agreed with Sol.
+
+**Needs owner:** (1) delete the four S-collision expected-failure cases?; (2) phone retest on the newest build.
+
 ## 2026-10-26 06:50 CDT targeted review 3 (Claude)
 
 - Trigger: Codex starved 2 h. Cause: the Codex lane had no open items (earlier runs left the queue empty on purpose, but the Codex week is 95% left). Queued 4350 (P2-lostcity-perf measurement + cap), 4360 (eight-site spawn numerics) and 4370 (bug hunt over Aa/settings); the 15-min dispatcher launches them. Hosted CI for the 4340 merge still pending. **Needs owner:** unchanged.

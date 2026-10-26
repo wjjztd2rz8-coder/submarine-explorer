@@ -307,3 +307,8 @@ Creating `.cache/review/current` as a directory before `codex-review.sh start` m
 ## 2026-10-26
 
 - review-triggers.sh: "Codex starved" now requires zero running tasks (was <2); an intentionally empty, rationed queue with one task running is not starvation. Red CI traced to 4280's Aa spec at 150% scale; fix rides with 4330.
+
+## 2026-10-26 comprehensive review
+
+- Main CI was red for four pushes on two specs whose failing case changes per run; runs were being logged "CI pending" without triage. Triage by failing spec name is now Backlog item 1 (R-ci-green), with briefs 4380 and 4390. Reason: a red main hides new breakages and blocks Pages deploys.
+- `.cache/review/current` reconcile needs a 50-minute foreground timeout, but the Bash tool caps at 10 minutes: the call is auto-backgrounded and its output file read afterwards. No tooling change needed.
