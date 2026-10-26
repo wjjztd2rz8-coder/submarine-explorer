@@ -1,6 +1,6 @@
 import { waitForFrames } from './helpers/frames.js';
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from './helpers/unlocked.js';
+import { expect, test, type Page, type Locator } from './helpers/unlocked.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { reviewScreenshot, reviewShot } from './helpers/render.js';
 
@@ -86,10 +86,23 @@ test.describe('settings screen', () => {
         hasTouch: viewport.touch,
       });
       for (const surface of ['home', 'dive'] as const) {
-        test(`Aa cycles and persists UI scale from ${surface}`, async ({ page }) => {
+        test(`Aa cycles and persists UI scale from ${surface}`, async ({ page }, info) => {
           // Guards a cosmetic-only Aa button, lost scale on reload, and a clipped
           // readout or unreachable touch target at the largest saved size.
           await boot(page, surface === 'home' ? '/?tier=low' : '/?tile=titanic&tier=low');
+          const act = async (target: Locator): Promise<void> => {
+            if (viewport.touch) await target.tap();
+            else await target.click();
+          };
+          const open = async (): Promise<void> => {
+            if (surface === 'home') {
+              await act(page.locator('.home-menu').getByRole('button', { name: 'Settings' }));
+            } else {
+              if (viewport.touch) await page.locator('.tc-btn-pause').tap();
+              else await page.keyboard.press('Escape');
+              await act(page.locator('.pause-menu').getByRole('button', { name: 'Settings' }));
+            }
+          };
           const layout = () =>
             page.evaluate((surface) => {
               const root = document.querySelector<HTMLElement>(
@@ -105,7 +118,7 @@ test.describe('settings screen', () => {
             }, surface);
           const before = await layout();
           expect(before.overflow).toBe(false);
-          await openSettings(page);
+          await open();
           const dialog = page.getByRole('dialog', { name: 'Settings' });
           const cycle = dialog.getByRole('button', { name: 'Aa: cycle UI scale' });
           const value = dialog.locator('.settings-scale-value');
@@ -120,7 +133,7 @@ test.describe('settings screen', () => {
           await expect(cycle).toHaveText('Aa');
           await expect(value).toHaveText('100%');
           for (let scale = 105; scale <= 150; scale += 5) {
-            await cycle.click();
+            await act(cycle);
             await expect(value).toHaveText(`${scale}%`);
             expect(await applied()).toEqual({ saved: scale, persisted: scale, css: scale / 100 });
           }
@@ -147,20 +160,41 @@ test.describe('settings screen', () => {
               }),
               reachable:
                 document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2) === button,
+              overflow: [...panel.querySelectorAll<HTMLElement>('*')]
+                .filter((el) => el.checkVisibility() && el.scrollWidth > el.clientWidth)
+                .map((el) => ({
+                  tag: el.tagName,
+                  className: el.className,
+                  width: el.clientWidth,
+                  scrollWidth: el.scrollWidth,
+                })),
             };
+          });
+          await info.attach('scale-geometry', {
+            body: JSON.stringify(metrics, null, 2),
+            contentType: 'application/json',
           });
           expect(metrics.width).toBeGreaterThanOrEqual(44);
           expect(metrics.height).toBeGreaterThanOrEqual(44);
           expect(metrics).toMatchObject({ clipped: false, overlaps: false, reachable: true });
           await reviewShot(page, `settings-aa-${surface}-${viewport.name}-150`);
-          await dialog.getByRole('button', { name: 'Close (Esc)' }).click();
-          if (surface === 'dive') await page.keyboard.press('Escape');
+          await act(dialog.getByRole('button', { name: 'Close (Esc)' }));
+          if (surface === 'dive') {
+            // A keyboard Escape deliberately switches to the desktop HUD.
+            // Keep the original input modality when comparing scale layouts.
+            if (viewport.touch)
+              await page
+                .locator('.pause-menu')
+                .getByRole('button', { name: 'Resume', exact: true })
+                .tap();
+            else await page.keyboard.press('Escape');
+          }
           expect(await layout()).toEqual(before);
           await reviewShot(page, `aa-${surface}-${viewport.name}-150`);
           await page.reload({ waitUntil: 'domcontentloaded' });
           await page.waitForFunction(() => window.__gameReady === true);
           expect(await applied()).toEqual({ saved: 150, persisted: 150, css: 1.5 });
-          await openSettings(page);
+          await open();
           await expect(value).toHaveText('150%');
           // The same focused button also cycles with the keyboard after reload.
           await cycle.focus();
@@ -170,7 +204,7 @@ test.describe('settings screen', () => {
           await page.keyboard.press('Space');
           await expect(value).toHaveText('85%');
           for (const scale of [90, 95, 100]) {
-            await cycle.click();
+            await act(cycle);
             await expect(value).toHaveText(`${scale}%`);
             expect(await applied()).toEqual({ saved: scale, persisted: scale, css: scale / 100 });
           }
