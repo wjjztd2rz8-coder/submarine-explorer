@@ -37,18 +37,10 @@ export function lostCitySlopeTint(
   const slope = smooth(0.002, 0.045, 1 - normalY);
   const bed = lostCityBedTint(x, y, z, LOST_CITY_STRATA.periodM, LOST_CITY_STRATA.amount * slope);
   // Sediment variation: dark organic-rich silt pockets and pale carbonate-flour drifts,
-  // balanced about 1.0 so the slope keeps its overall brightness.
+  // balanced about 1.0 so the slope keeps its overall brightness. Broad only: finer noise
+  // reads as streaks when the slope is seen at a grazing angle.
   const broad = fbm3(x * 0.045, 11, z * 0.045, 611, 3);
-  const fine = fbm3(x * 0.3, 13, z * 0.3, 613, 2);
-  // Boulder-field patches on a warped lattice, so the slope never repeats.
-  const wx = x + (fbm3(x * 0.1, 19, z * 0.1, 619, 2) - 0.5) * 6;
-  const wz = z + (fbm3(x * 0.1, 23, z * 0.1, 623, 2) - 0.5) * 6;
-  const cobble = fbm3(wx * 0.22, 29, wz * 0.22, 629, 2);
-  const silt =
-    0.84 +
-    0.3 * smooth(0.3, 0.7, broad) +
-    0.1 * (fine - 0.5) +
-    0.45 * (smooth(0.3, 0.7, cobble) - 0.5) * (0.6 + slope);
+  const silt = 0.84 + 0.3 * smooth(0.3, 0.7, broad);
   const warm = 1 + 0.08 * (fbm3(x * 0.09, 17, z * 0.09, 617, 2) - 0.5);
   // Cool olive-grey cast: the silt reads grey-green, not tan, under the warm lamps and fog.
   return [bed[0] * silt * warm * 0.84, bed[1] * silt * 0.97, (bed[2] * silt * 1.04) / warm];

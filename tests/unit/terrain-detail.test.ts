@@ -93,7 +93,10 @@ function ridgedTile(cols = 40, rows = 34) {
 }
 
 describe('terrain terrace capability', () => {
-  const profile = base.fidelity!['lost-city'];
+  // Lost City ships flat (no shelves); the capability stays covered through an explicit profile.
+  const shelved = structuredClone(base);
+  shelved.fidelity!['lost-city'].terrace = { periodM: 24, amount: 0.3 };
+  const profile = shelved.fidelity!['lost-city'];
   const tile = (id = 'lost-city', flat = false) =>
     makeSyntheticTile({
       id,
@@ -104,21 +107,21 @@ describe('terrain terrace capability', () => {
       cellsizeDeg: 0.0001,
       height: (c, r) => -850 + (flat ? 0 : c * 5 + r * 3),
     });
-  const withoutTerraces = structuredClone(base);
+  const withoutTerraces = structuredClone(shelved);
   delete withoutTerraces.fidelity!['lost-city'].terrace;
 
   for (const tier of ['low', 'medium', 'high'] as const) {
     it(`${tier}: bounds and repeats shelves, gates them by slope/focus/strength, and preserves Low`, () => {
-      const before = JSON.stringify(base);
-      const current = new Terrain(tile(), base, tier);
+      const before = JSON.stringify(shelved);
+      const current = new Terrain(tile(), shelved, tier);
       const legacy = new Terrain(tile(), withoutTerraces, tier);
-      const flat = new Terrain(tile('lost-city', true), base, tier);
+      const flat = new Terrain(tile('lost-city', true), shelved, tier);
       const flatLegacy = new Terrain(tile('lost-city', true), withoutTerraces, tier);
-      const pure = new Terrain(tile(), { ...base, detailStrength: 0 }, tier);
+      const pure = new Terrain(tile(), { ...shelved, detailStrength: 0 }, tier);
       const renamed = new Terrain(
         tile('terraced-fixture'),
         {
-          ...base,
+          ...shelved,
           fidelity: { 'terraced-fixture': profile },
         },
         tier,
@@ -135,7 +138,7 @@ describe('terrain terrace capability', () => {
           expect(renamed.detailHeight(x, z)).toBe(height);
           expect(renamed.sampleHeight(x, z)).toBe(current.sampleHeight(x, z));
           expect(Math.abs(delta)).toBeLessThanOrEqual(
-            profile.terrace!.periodM * profile.terrace!.amount * base.detailStrength * 0.5,
+            profile.terrace!.periodM * profile.terrace!.amount * shelved.detailStrength * 0.5,
           );
           expect(flat.detailHeight(x, z)).toBe(flatLegacy.detailHeight(x, z));
           expect(pure.detailHeight(x, z)).toBe(0);
@@ -161,7 +164,7 @@ describe('terrain terrace capability', () => {
           expect(Math.min(...deltas)).toBeLessThan(-0.3);
           expect(Math.max(...deltas)).toBeGreaterThan(0.1);
         }
-        expect(JSON.stringify(base)).toBe(before);
+        expect(JSON.stringify(shelved)).toBe(before);
       } finally {
         for (const t of [current, legacy, flat, flatLegacy, pure, renamed]) t.dispose();
       }
@@ -170,7 +173,7 @@ describe('terrain terrace capability', () => {
 
   for (const tier of ['medium', 'high'] as const) {
     it(`${tier}: terrace triangles agree with physics between vertices and across chunk seams`, () => {
-      const terrain = new Terrain(tile(), base, tier);
+      const terrain = new Terrain(tile(), shelved, tier);
       const ray = new THREE.Raycaster();
       const seen = new Map<string, number>();
       let shared = 0;

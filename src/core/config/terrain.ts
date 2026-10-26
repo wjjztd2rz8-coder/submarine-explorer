@@ -152,7 +152,7 @@ export const LOST_CITY_FIDELITY: TerrainFidelity = {
   reliefBed: 0,
   rillStretch: 1,
   // Dark sediment drapes the massif into broad rounded slopes; only faint shelves survive.
-  terrace: { periodM: 24, amount: 0.3 },
+  terrace: { periodM: 24, amount: 0 },
   normalStrength: 0.2,
 };
 

@@ -395,7 +395,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     out.b *= tint[2];
     // Toward the outline the rubble thins into the surrounding seabed colour, patchily.
     const rn = rim(x, z) + (n1 - 0.5) * 0.35 + (n2 - 0.5) * 0.12;
-    out.lerp(SEABED, smooth(0.5, 1.05, rn) * (1 - up * 0.5));
+    out.lerp(SEABED, smooth(0.8, 1.1, rn) * (1 - up * 0.5));
     // Mineral variation: white brucite/aragonite crust, cream, and grey-blue carbonate,
     // drifting in broad patches that stretch vertically with the flow.
     const mineral = fbm3(x * 0.32, y * 0.045, z * 0.32, seed ^ 0x3b1, 3);
@@ -457,7 +457,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     // Mottling: broad grey and ochre patches break the white wall; the foot is dirtier.
     const mottle = 0.5 + 2 * (fbm3(x * 0.11 + 5, y * 0.09, z * 0.11 + 5, seed ^ 0x6d1, 3) - 0.5);
     const foot = 1 - smooth(0.04, 0.4, (y - gnd(x, z)) / H);
-    out.lerp(TROUGH, Math.min(1, smooth(0.55, 0.68, mottle) * 0.7 + foot * 0.5));
+    out.lerp(TROUGH, Math.min(1, smooth(0.55, 0.68, mottle) * 0.7 + foot * 0.15));
     out.lerp(OCHRE, (1 - smooth(0.2, 0.36, mottle)) * 0.45);
     // Faint blue-green biofilm: damp, sheltered lower walls and under ledges.
     const film = fbm3(x * 0.22, y * 0.12, z * 0.22, seed ^ 0xb10, 3);
