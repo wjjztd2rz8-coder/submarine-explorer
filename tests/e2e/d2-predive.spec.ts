@@ -237,13 +237,13 @@ test('Settings: mode on top of Gameplay, separate waypoint toggles, hull warning
   expect(s.hullWarningStyle).toBe('gauge');
   expect(s.gameplayMode).toBe('arcade');
 
-  // UI scale: − / slider / + and a readout that is never clipped.
+  // UI scale: − / slider / Aa and a readout that is never clipped.
   const row = dialog.locator('.settings-scale-row');
   const value = row.locator('.settings-scale-value');
   const slider = dialog.getByLabel('UI scale', { exact: true });
   await expect(slider).toHaveAttribute('type', 'range');
   await expect(value).toHaveText('100%');
-  await row.getByRole('button', { name: 'Increase UI scale' }).click();
+  await row.getByRole('button', { name: 'Aa: cycle UI scale' }).click();
   await expect(value).toHaveText('105%');
   await row.getByRole('button', { name: 'Decrease UI scale' }).click();
   await row.getByRole('button', { name: 'Decrease UI scale' }).click();
