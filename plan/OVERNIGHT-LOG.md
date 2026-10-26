@@ -2091,3 +2091,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - 4350/4360/4370 Codex tasks running (3/3), nothing to collect. Main clean and pushed. Claude 5h 95%, week 63%; Codex 5h 63%, week 89%. No Claude package (next art step gains ~0.1). No tag.
 - **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button is new).
+
+## 2026-10-26 08:35 CDT headless run 163 (Claude): collection
+
+- Merged 4350 (High carbonate plume 70 to 49 points per emitter; no rendered perf measurement possible in the Codex sandbox, so judge on the phone), 4370 (Aa/settings and overlay-focus tests, no defect found) and 4360 (eight-site numerics report; Axial, Endurance, Challenger and Kamaʻehuakanaloa subjects fall below the hero framing floor, noted on V-eight-sites-lit, Sonnet lane, judge by screenshot). Gates: smoke + project-base on each worktree and main, all pass (a log Prettier fix went in first). Worktrees 4350/4360/4370 still to remove. No Claude package. Queue empty; refill will run when Codex starves.
+- **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button, High Lost City plume).
