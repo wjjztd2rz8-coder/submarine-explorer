@@ -2042,3 +2042,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: no Codex task running (Codex 5h 19%, below the 20% dispatch gate until the 22:00 reset; briefs 4300-4320 stay queued). Held worktrees unchanged, main clean. Claude 5h 93%, week 64%. No Claude package (next art step V-bluehole-silhouette gains ~0.1). No tag (f65 stands).
 - **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button is new).
+
+## 2026-10-25 23:26 CDT headless run 156 (Claude): collection
+
+- Collected Codex 4300 (CI audit blocked by sandbox DNS), 4310 (journey table extended through the second objective; my browser run: 3/6 rows fail at the second scan prompt) and 4320 (vertical lift-bound sampling for the S-collision seam also rejected; nothing changed). Only notes merged. Mistake: I removed the 4310 worktree with its change uncommitted, so the spec extension is lost; queued 4330 to redo it and diagnose the failing rows. Hosted CI for the Prettier fix (ba229871) was still running. Claude 5h 99%, week 64%; Codex 5h 82%. No Claude package (next art step gains ~0.1). No tag.
+- **Needs owner:** delete four S-collision expected-failure cases?; phone retest (Aa button is new).
