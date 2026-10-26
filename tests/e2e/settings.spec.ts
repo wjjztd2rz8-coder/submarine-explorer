@@ -247,7 +247,11 @@ test.describe('settings screen', () => {
                 await page.evaluate(() => (window.__game as { perf: { tier: string } }).perf.tier),
               ).toBe(tier);
               await expect(dialog.locator('.settings-scale-value')).toHaveText('150%');
-              await dialog.getByRole('button', { name: 'Advanced', exact: true }).click();
+              // The disclosure's CSS arrow contributes to its accessible name.
+              const advanced = dialog.getByRole('button', { name: /^Advanced(?: [▾▴])?$/ });
+              await advanced.click();
+              await expect(advanced).toHaveAttribute('aria-expanded', 'true');
+              await expect(dialog.locator('.mode-advanced')).toBeVisible();
               for (const mode of ['arcade', 'realistic', 'custom']) {
                 if (mode === 'custom') {
                   await dialog.getByRole('switch', { name: 'Currents', exact: true }).click();

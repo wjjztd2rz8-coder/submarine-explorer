@@ -1792,11 +1792,27 @@ freshTest.describe('Home to scan and return journey', () => {
               );
               const pose = await page.evaluate((id) => {
                 const g = window.__game as unknown as Game & {
-                  config: { submarine: { maxPitch: number } };
+                  config: {
+                    submarine: { maxPitch: number; hullRadius: number; seabedClearance: number };
+                  };
+                  terrain: { sampleHeight(x: number, z: number): number };
                 };
                 const from = g.discovery.spawnPose(id);
                 const target = g.discovery.pois.find((poi) => poi.id === id);
                 if (!from || !target) throw new Error(`No POI pose for ${id}`);
+                if (id === 'great-blue-hole-stalactites-east') {
+                  // The generic south bearing lands on the shallow reef rim.
+                  // Observe this gallery from inside the bowl, at a hull-safe depth.
+                  from.x = target.position.x;
+                  from.z = target.position.z - 40;
+                  from.y = Math.max(
+                    target.position.y + 16,
+                    g.terrain.sampleHeight(from.x, from.z) +
+                      g.config.submarine.hullRadius +
+                      g.config.submarine.seabedClearance +
+                      16,
+                  );
+                }
                 return { from, target: target.position, maxPitch: g.config.submarine.maxPitch };
               }, id);
               const aim = scanAim(pose.from, pose.target, pose.maxPitch);
