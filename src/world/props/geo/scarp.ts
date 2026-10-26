@@ -171,7 +171,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     bedding: 'eroded',
     fidelity: MONTEREY_FIDELITY,
     rockfall: MONTEREY_RUBBLE,
-    glow: { wall: [0.27, 0x8fc0c6, 0.4], rubble: [0.16, 0x8fc0c6, 0.35] },
+    glow: { wall: [0.18, 0x8fc0c6, 0.4], rubble: [0.16, 0x8fc0c6, 0.35] },
     decoration: 'wall-life',
     tex: 'strata',
     profile: [
