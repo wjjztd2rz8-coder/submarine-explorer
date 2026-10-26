@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Vector3 } from 'three';
+import { PerspectiveCamera, Vector3 } from 'three';
 import { createPhotoSystem } from '../../src/app/systems/photo.js';
 import type { GameContext } from '../../src/app/context.js';
 import { SystemRunner, type FrameState } from '../../src/app/System.js';
@@ -400,7 +400,7 @@ function automaticStillFixture() {
       renderer: { domElement: {} },
       audio: { playShutter: vi.fn() },
       expose: vi.fn(),
-      rig: { exitPhotoMode: vi.fn() },
+      rig: { exitPhotoMode: vi.fn(), camera: new PerspectiveCamera() },
       input: { state: { lookDx: 0, lookDy: 0 }, wheelDelta: 0 },
       setAppState: (state: 'dive' | 'pause' | 'home') => bus.emit('app:state', { state }),
     } as unknown as GameContext;
@@ -491,6 +491,7 @@ describe('automatic scan still handoff', () => {
           undefined,
           undefined,
           'stock',
+          expect.any(Number), // where the subject sits, for the portrait crop
         );
         expect(ctx.photos.photos).toEqual([
           expect.objectContaining({
