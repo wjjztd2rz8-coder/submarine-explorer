@@ -54,6 +54,10 @@ const separatedWreckOpenings: Record<string, readonly string[]> = {
   titanic: ['mission'],
   endurance: ['mission', 'free'],
 };
+// Small vent mounds must remain visible beside the invented scenic geology.
+const missionSightlineSubjects: Record<string, string> = {
+  kamaehuakanaloa: 'hiolo-north-chimney-1',
+};
 afterAll(() => {
   if (captureAudit) writeFileSync('.cache/spawn-audit.json', JSON.stringify(audit, null, 2) + '\n');
 });
@@ -296,6 +300,19 @@ function screenBounds(root: Object3D, rig: CameraRig): Box2 {
   return bounds;
 }
 
+/** Transparent plumes and hidden LODs do not obstruct a solid subject. */
+function solidMeshes(root: Object3D): Mesh[] {
+  const meshes: Mesh[] = [];
+  root.updateMatrixWorld(true);
+  root.traverseVisible((object) => {
+    if (!(object instanceof Mesh)) return;
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    if (materials.every((material) => material.visible && material.opacity >= 0.95))
+      meshes.push(object);
+  });
+  return meshes;
+}
+
 it.each(
   sites.flatMap((site) => (['low', 'medium', 'high'] as const).map((tier) => ({ site, tier }))),
 )(
@@ -357,6 +374,7 @@ it.each(
       const clearances: Record<string, number> = {};
       const wrecks: Record<string, number[]> = {};
       const silhouetteWitnesses: Record<string, number[]> = {};
+      const sightlines: unknown[] = [];
       for (const [kind, opening, hull] of [
         ['mission', pose, missionHull],
         ['free', free, freeHull],
@@ -375,6 +393,55 @@ it.each(
         expect(position.y).toBeGreaterThanOrEqual(
           config.submarine.hullClasses[hull].ratedDepth + settings.hullRadius,
         );
+        const subjectId = missionSightlineSubjects[site];
+        if (kind === 'mission' && subjectId) {
+          const subject = props.placed.find((p) => p.def.id === subjectId)!;
+          expect(subject).toBeDefined();
+          for (const [width, height] of [
+            [1600, 900],
+            [390, 844],
+            [844, 390],
+          ]) {
+            const rig = new CameraRig(effective.camera, width / height, terrain);
+            rig.setPhoneLandscape(width === 844);
+            rig.snap(position, opening.yaw, 0);
+            terrain.update(rig.camera);
+            props.update(rig.camera);
+            expect(subject.root.visible).toBe(true);
+            const subjectMeshes = solidMeshes(subject.root);
+            const solids = [
+              ...solidMeshes(terrain.group),
+              ...solidMeshes(props.group),
+              ...solidMeshes(mesh.vehicle.root),
+            ];
+            const ray = new Raycaster();
+            const centre = subject.localBounds.getCenter(new Vector3());
+            // Check the lower body, centre and upper body, not just an exposed tip.
+            for (const fraction of [0.25, 0.5, 0.75]) {
+              const point = centre.clone();
+              point.y =
+                subject.localBounds.min.y +
+                (subject.localBounds.max.y - subject.localBounds.min.y) * fraction;
+              point.applyMatrix4(subject.root.matrixWorld);
+              const ndc = point.clone().project(rig.camera);
+              expect(Math.abs(ndc.x), `${subjectId}: in horizontal frame`).toBeLessThan(1);
+              expect(Math.abs(ndc.y), `${subjectId}: in vertical frame`).toBeLessThan(1);
+              expect(ndc.z).toBeGreaterThan(-1);
+              expect(ndc.z).toBeLessThan(1);
+              ray.setFromCamera(new Vector2(ndc.x, ndc.y), rig.camera);
+              const hit = ray.intersectObjects(solids, false)[0];
+              expect(hit, `${subjectId}: solid body at ${fraction}`).toBeDefined();
+              const hitProp = props.placed.find((p) =>
+                solidMeshes(p.root).includes(hit.object as Mesh),
+              );
+              sightlines.push({ width, height, fraction, hitProp: hitProp?.def.id });
+              expect(
+                subjectMeshes.includes(hit.object as Mesh),
+                `${width}x${height} ${subjectId} at ${fraction}: blocked by ${hitProp?.def.id ?? hit.object.name}`,
+              ).toBe(true);
+            }
+          }
+        }
         const hero = props.placed.find(
           (p) => p.def.id === siteManifest(site)?.opening?.freeDive?.hero,
         );
@@ -505,6 +572,7 @@ it.each(
         minimumClearance,
         wreckEnvelopeOverlapPx2: wrecks,
         silhouetteWitnesses,
+        sightlines,
       });
       expect(completedAt, 'navigate from the opening and complete the real scan').not.toBeNull();
       expect(completedAt!).toBeGreaterThan(target.scanSeconds);
