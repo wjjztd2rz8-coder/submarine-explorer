@@ -7,7 +7,7 @@
 | Requirement                               | State                                                                                                                  |
 | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | Five heroes beautiful (4 of 5)            | None at 4: Titanic 3.6, Lost City 3.7, Blue Hole 3.7, Beebe 3.8, Monterey 3.7 (readable 3.7-4)                         |
-| Other eight sites coherent                | Challenger 3.5, Endurance 3; Hunga 40 m view ~4.5 but opening dim; Kama opening still tiny; Axial ~3.5                                     |
+| Other eight sites coherent                | Challenger 3.5, Endurance 3; Hunga 40 m view ~4.5 but opening dim; Kama opening still tiny; Axial ~3.5                 |
 | New player understands first five minutes | Journeys run through two scans, Journal and debrief; Journal panel opaque now; unaided-pilot leg being restored (4480) |
 | Acceptable Low-tier phone performance     | iPhone 17 Pro: Low great; High Lost City unmeasured after the plume cap; weaker phones untested                        |
 | Hosted CI green, releases tagged          | f67 tagged; latest main CI pending at review time                                                                      |
