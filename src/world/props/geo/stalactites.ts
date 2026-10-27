@@ -600,13 +600,12 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
   }
 
   /** One soft pale shaft angling through the widest roof gap into the bay: nested additive cones. */
-  const lightShaft = (): THREE.Group => {
+  const lightShaft = (): THREE.Mesh => {
     const cx = gapCentres[0]!;
     const yTop = liftAt(cx) + 0.68 * H * scaleAt(cx);
     const zTop = footAt(cx) - 0.55 * D;
     const yBot = Math.max(gnd(cx + 0.1 * W, zTop + 0.4 * D), yTop - 0.7 * H);
-    const shaft = new THREE.Group();
-    shaft.name = 'grotto-light-shaft';
+    const cones: THREE.BufferGeometry[] = [];
     for (const k of [1, 0.75, 0.52, 0.3]) {
       const g = new THREE.CylinderGeometry(1, 1, 1, 12, 4, true);
       const pos = g.getAttribute('position');
@@ -625,19 +624,20 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
         col.set([v * 0.75, v * 0.9, v], i * 3);
       }
       g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-      const m = new THREE.Mesh(
-        g,
-        new THREE.MeshBasicMaterial({
-          vertexColors: true,
-          transparent: true,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-          side: THREE.DoubleSide,
-        }),
-      );
-      m.frustumCulled = false;
-      shaft.add(m);
+      cones.push(g);
     }
+    const shaft = new THREE.Mesh(
+      mergeAll(cones),
+      new THREE.MeshBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      }),
+    );
+    shaft.name = 'grotto-light-shaft';
+    shaft.frustumCulled = false;
     return shaft;
   };
 

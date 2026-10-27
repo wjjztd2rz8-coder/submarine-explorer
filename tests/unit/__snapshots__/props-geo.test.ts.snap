@@ -314,12 +314,12 @@ exports[`authored prop geometry golden > great-blue-hole high: retains buffers, 
   },
   {
     "budget": {
-      "draws": 4,
-      "triangles": 70416,
+      "draws": 5,
+      "triangles": 61140,
     },
-    "buffers": "8728e94573650826eacba391783a16c9d73a51036bb1e2d0b66dc310a3596949",
+    "buffers": "66871b21af9d60d25b9bd38bd27cd9d830c0df206a5ca97494508bad4ddbe7df",
     "id": "karst-grotto-east",
-    "placement": "088096ca50f7eca59b336c672c2324f38c940792639cf3f4fdbbcf0b8694c7e5",
+    "placement": "a81881e1771e01ed48bfbbbc6640679a5241d5d728ec5d2041b28e785b192197",
     "ventTop": undefined,
   },
 ]
@@ -339,12 +339,12 @@ exports[`authored prop geometry golden > great-blue-hole low: retains buffers, m
   },
   {
     "budget": {
-      "draws": 3,
-      "triangles": 9896,
+      "draws": 4,
+      "triangles": 8120,
     },
-    "buffers": "c868d8123dd331bd74d8d28868e2b8831612488308012602b8a83d5f5c8589e3",
+    "buffers": "78ff7f30bfc9ed9313e0e22027bad8b1024a706bdb6f96d18149324f135ae9c4",
     "id": "karst-grotto-east",
-    "placement": "530c51e950930c86ac968a7dea108ba61d41919a8bab1feb1b8606e4db92e7e4",
+    "placement": "0817381869291e9eab2908a6107ebab57fbd58f29a56dba859727cfc5ebcb3af",
     "ventTop": undefined,
   },
 ]
@@ -364,12 +364,12 @@ exports[`authored prop geometry golden > great-blue-hole medium: retains buffers
   },
   {
     "budget": {
-      "draws": 4,
-      "triangles": 45450,
+      "draws": 5,
+      "triangles": 39786,
     },
-    "buffers": "61b4d0a97a2b142ab58886c68827ab31d4be4398b2e491024fc857cc20720669",
+    "buffers": "9c91e3ec98e3b2830c9531e2f09567926c5de6bb75f50bd10ca12f11adf749ca",
     "id": "karst-grotto-east",
-    "placement": "74e92edbf0c235622f0ec1ef24fff026b720e3041da5fc52789e6b7cbe254891",
+    "placement": "b184f89dee77d8b88e5bf4e0c941264cc7398fd8499f84dc053a77671cdf6f40",
     "ventTop": undefined,
   },
 ]
