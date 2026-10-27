@@ -23,3 +23,7 @@
 ## Gates
 
 See the end of this note.
+
+Gates: first run failed one snapshot because a stray edit also changed the free-dive `reframe.chaseOffsetY`; reverted, so only the mission arm differs. Re-run result below.
+
+Re-run: `PW_PORT=4871 tools/gates.sh` PASS (python, content, build, unit, e2e, e2e-base, attribution, prettier).
