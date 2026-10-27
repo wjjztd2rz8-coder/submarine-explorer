@@ -3,7 +3,7 @@
  * user-gesture handler, so the engine unlocks on the first keydown or
  * pointerdown rather than at load. `terrain` already satisfies the audio
  * module's minimal TerrainSampler interface (sampleHeight). Audio pauses
- * outside a dive.
+ * with the shell and its modals.
  */
 
 import type { SoundSite } from '../../audio/Soundscape.js';
@@ -45,6 +45,8 @@ export const audioSystem: GameSystem = {
   },
   frame: {
     'play.audio': (f, ctx) => {
+      // Photo mode freezes physics but keeps its shutter and ambience available.
+      ctx.audio.setPaused(f.shellFrozen || ctx.discovery.debrief.isOpen);
       if (f.frozen) {
         ctx.audio.idle();
         return;

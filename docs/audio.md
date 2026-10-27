@@ -27,8 +27,9 @@ when the first touch occurs on the paused home screen. Later gestures recover
 browser-interrupted audio; gestures during an already unlocked pause keep the
 clock suspended. Capture handlers cover pointer press/release, touch end and
 keyboard input; rejected resumes release their warmup and retry on a later
-gesture. The app shell suspends the context outside a dive, and hidden
-tabs suspend independently of shell pause. The master is silenced immediately
+gesture. The app shell suspends the context outside a dive and behind shell
+modals (Settings, briefing, debrief and Journal). Photo mode keeps its shutter
+and ambience available. Hidden tabs suspend independently of shell pause. The master is silenced immediately
 while suspension completes; returning to a paused tab keeps it silent.
 If AudioContext construction fails, the system stays locked and a later gesture
 can retry with the current saved settings.

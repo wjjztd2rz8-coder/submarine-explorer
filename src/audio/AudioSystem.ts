@@ -176,6 +176,7 @@ export class AudioSystem {
 
   /** Suspend continuous audio while the app shell has frozen the dive. */
   setPaused(paused: boolean): void {
+    if (this.paused === paused) return;
     this.paused = paused;
     if (!this.engine || this.disposed) return;
     this.syncPlayback();
