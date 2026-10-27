@@ -7,7 +7,7 @@
 
 import * as THREE from 'three';
 import { geoDetail } from './detail.js';
-import { geoMaterial, LIFE_TINT } from './materials.js';
+import { geoMaterial, LIFE_TINT, vertexGlow } from './materials.js';
 import { shimmerPlume } from './plume.js';
 import {
   boxCH,
@@ -108,7 +108,11 @@ export function buildPillowField(input: GeoBuildInput): BuiltProp {
   geom.computeBoundingSphere();
   const full = new THREE.Group();
   full.name = 'pillow-field';
-  full.add(new THREE.Mesh(geom, geoMaterial('pillow', d, { roughness: 0.55, bumpScale: 1.6 })));
+  // Basalt glass is near black: a faint warm self-lit lift (as on the smokers) keeps the heap
+  // readable beyond the headlight beams.
+  const pillowMat = geoMaterial('pillow', d, { roughness: 0.55, bumpScale: 1.6 });
+  vertexGlow(pillowMat, 0.5, 0xd0a080, 0.45);
+  full.add(new THREE.Mesh(geom, pillowMat));
 
   // Orange iron-bacteria mats draped between the pillows.
   const mats: InstanceSpec[] = [];
@@ -137,6 +141,9 @@ export function buildPillowField(input: GeoBuildInput): BuiltProp {
         disc,
         new THREE.MeshStandardMaterial({
           color: LIFE_TINT,
+          // Iron-bacteria mats are the lit accent of the field.
+          emissive: FE_MAT,
+          emissiveIntensity: 1.2,
           roughness: 0.85,
           polygonOffset: true,
           polygonOffsetFactor: -2,
