@@ -26,6 +26,7 @@
  * GOLDEN_LAYOUTS=desktop,portrait captures 1600×900 and 390×844 at the same authored poses.
  * GOLDEN_TIER=low selects Low (default high); GOLDEN_LAYOUTS=portrait,landscape adds 844×390.
  * GOLDEN_SITES=all includes all 13 catalog sites plus the east Blue Hole gallery.
+ * With no GOLDEN_SITES, the default set is the ten hero sites in defaultHeroes (Kama, Hunga and Axial included).
  * Monterey uses tools/monterey-poses.json, rather than geometry-dependent wall-life patch selection.
  * Chromium uses SwiftShader so the tool also works without a physical GPU.
  */
@@ -46,6 +47,7 @@ import beebePoses from './beebe-poses.json' with { type: 'json' };
 import lostCityPoses from './lostcity-poses.json' with { type: 'json' };
 import titanicPoses from './titanic-poses.json' with { type: 'json' };
 import montereyPoses from './monterey-poses.json' with { type: 'json' };
+import lowTierPoses from './lowtier-poses.json' with { type: 'json' };
 
 async function main() {
   const args = process.argv.slice(2);
@@ -93,6 +95,15 @@ async function main() {
     ['monterey-canyon', 'canyon-wall-ledge', 'monterey-canyon', montereyPoses.wall],
     ['challenger-deep', 'leggo-lander-marker'],
     ['endurance', 'main-hull'],
+    // Mission openings for the three sites the default set used to miss; same heroes and poses as the GOLDEN_SITES path (golden-options.mjs).
+    ['kamaehuakanaloa', 'hiolo-north-pillows', 'kamaehuakanaloa', lowTierPoses.kamaehuakanaloa],
+    ['axial-seamount-ashes', 'mushroom-chimney'],
+    [
+      'hunga-tonga-caldera',
+      'caldera-tuff-wall',
+      'hunga-tonga-caldera',
+      lowTierPoses['hunga-tonga-caldera'],
+    ],
   ];
   const catalog = JSON.parse(
     await readFile(new URL('../data/landmarks/index.json', import.meta.url), 'utf8'),
