@@ -2167,3 +2167,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-bluehole-roof slice 4 (Sonnet; ragged roof with gaps, varied pendants, one merged soft light shaft, ~3.7 by my read of east-2; Low draw pin 6 to 7 for the shaft; gates smoke + project-base pass on main, pushed). Removed nine stale/empty worktrees (2980, 3050, 3310, 3320, 3340, 3380, 4460, 4480, 4520); their diffs are in .cache/shelved/. 4460's scarp widening was shelved (complex, +0.5 s build, speculative); 4480's gates.sh/pilot changes shelved (full-unit stalled). 4540-4560 running in Codex; queued 4570-4590. No tag (hosted CI unverified).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (also Blue Hole roof and shaft).
+
+## 2026-10-27 01:10 CDT headless run 175 (Claude): collection only
+
+- Merged 4550 (Kama pillow field moved 10.5 m east so it no longer hides the first chimney; sightline test added, three free-dive snapshots refreshed), plus report-only notes 4540 (Axial glow bounds fine), 4560 (Hunga opening: subject visible, tuff albedo ~0.013 so a subject-only material lift is the next visual step) and 4570-beebe (flow delta clean). Gates smoke + project-base pass on main, pushed. 4570-bluehole, 4580 (mobile gestures) and 4590 (save state) still running in Codex with uncommitted work. No Claude package (gates took most of the run). No tag.
+- Note: tools/gates.sh takes over 10 min under Codex load; run it via systemd-run, since background shells get killed.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
