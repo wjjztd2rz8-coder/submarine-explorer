@@ -36,7 +36,7 @@ const DIMS: Record<WreckId, [number, number, number]> = {
   'bismarck-field': [60, 60, 3],
   'bismarck-landslide': [200, 45, 4],
   'endurance-rigging': [35, 35, 3],
-  'endurance-stern': [4, 4, 2],
+  'endurance-stern': [18, 18, 2],
 };
 const TIERS = ['low', 'medium', 'high'] as const;
 

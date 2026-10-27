@@ -42,7 +42,7 @@
       "snap_to_seabed": true,
       "heading_deg": 0,
       "scale": 1,
-      "dimensions_m": [4, 4, 2],
+      "dimensions_m": [18, 18, 2],
       "lod_distance_m": 400,
       "collision": "none",
       "reconstruction": true,

@@ -966,7 +966,7 @@ const KITS: Record<WreckScatterId, Kit> = {
           geom: 'plank',
           mat: 'wood',
           big: true,
-          count: 18,
+          count: 44,
           size: [
             [0.8, 1.3],
             [1, 1.5],
@@ -974,13 +974,43 @@ const KITS: Record<WreckScatterId, Kit> = {
           ],
           pose: 'lie',
           sink: 0.2,
+          cluster: 0.5,
+        },
+        {
+          // Silt banked against the hull: a low rubble skirt the lamps catch.
+          name: 'mounds',
+          geom: 'mudBlock',
+          mat: 'sediment',
+          count: 30,
+          size: [
+            [2, 5],
+            [0.8, 1.5],
+            [2, 5],
+          ],
+          pose: 'upright',
+          sink: 0.2,
+          cluster: 0.4,
+          tints: [0xd2c29c, 0xc4b48e, 0xdccca6],
+        },
+        {
+          // A cluster of rounded stones for the sub lights to pick out.
+          name: 'stones',
+          geom: 'coal',
+          mat: 'fitting',
+          count: 60,
+          size: [0.3, 0.8],
+          pose: 'tumble',
+          sink: 0.35,
+          cluster: 0.8,
+          small: true,
+          gain: 1.6,
         },
         {
           name: 'timbers',
           geom: 'spar',
           mat: 'wood',
           big: true,
-          count: 3,
+          count: 8,
           size: [
             [0.3, 0.45],
             [0.3, 0.45],
