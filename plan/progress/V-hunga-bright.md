@@ -22,3 +22,5 @@
 ## Gates
 
 See the end of this note.
+
+Gates: first run failed only the three Hunga Low-sweep snapshots (headlight numbers from the new lamps); rebaselined those three intentionally. Re-run `PW_PORT=4881 tools/gates.sh` PASS (python, content, build, unit, e2e, e2e-base, attribution, prettier).
