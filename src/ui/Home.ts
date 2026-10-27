@@ -1,6 +1,6 @@
 import { APP_NAME, APP_TAGLINE } from '../core/Brand.js';
 import mark from '../../public/bathyline-mark.svg?raw';
-import { FocusTrap } from './FocusTrap.js';
+import { FocusTrap, observeOverlayOpen } from './FocusTrap.js';
 import { ModeSelector, type GameplaySettingsSource } from './ModeSelector.js';
 
 export interface HomeActions {
@@ -44,6 +44,8 @@ export class Home {
   private readonly grab: HTMLButtonElement;
   /** The last pointer gesture was a swipe, so the click that follows it must not toggle again. */
   private swiped = false;
+  private sheetSwipe: { target: HTMLElement; id: number; y: number } | null = null;
+  private readonly disposers: Array<() => void> = [];
   private readonly trap: FocusTrap;
 
   constructor(
@@ -166,6 +168,17 @@ export class Home {
     this.sites.append(grab, sitesHead, this.sitesSlot);
     this.bindSheetSwipe(sitesHead);
     this.bindSheetSwipe(grab);
+    const cancel = (): void => this.cancelSheetSwipe();
+    const onVisibility = (): void => {
+      if (document.hidden) cancel();
+    };
+    window.addEventListener('blur', cancel);
+    document.addEventListener('visibilitychange', onVisibility);
+    this.disposers.push(
+      observeOverlayOpen(cancel),
+      () => window.removeEventListener('blur', cancel),
+      () => document.removeEventListener('visibilitychange', onVisibility),
+    );
 
     this.root.append(panel, hero, globeWrap, this.sites);
     parent.append(this.root);
@@ -202,12 +215,14 @@ export class Home {
   }
 
   hide(): void {
+    this.cancelSheetSwipe();
     if (!this.isOpen) return;
     this.trap.hide();
   }
 
   dispose(): void {
     this.hide();
+    for (const dispose of this.disposers.splice(0)) dispose();
     this.trap.dispose();
     this.modeSelector?.dispose();
     this.root.remove();
@@ -247,6 +262,7 @@ export class Home {
   }
 
   showSites(freeDive: boolean, origin?: HTMLButtonElement): void {
+    this.cancelSheetSwipe();
     this.sitesOrigin = origin ?? (freeDive ? this.freeDiveButton : this.diveSitesButton);
     this.sites.hidden = false;
     this.setSheetOpen(false);
@@ -267,24 +283,36 @@ export class Home {
 
   /** A vertical swipe of at least 24 px opens (up) or collapses (down) the sheet. */
   private bindSheetSwipe(target: HTMLElement): void {
-    let startY: number | null = null;
     target.addEventListener('pointerdown', (e) => {
+      if (this.sheetSwipe || !this.isOpen || !this.sitesOpen || document.hidden) return;
       if ((e.target as HTMLElement).closest('.home-sites-head button')) return;
-      startY = e.clientY;
+      this.sheetSwipe = { target, id: e.pointerId, y: e.clientY };
       this.swiped = false;
       target.setPointerCapture(e.pointerId);
     });
     target.addEventListener('pointerup', (e) => {
-      if (startY === null) return;
-      const dy = e.clientY - startY;
-      startY = null;
+      const swipe = this.sheetSwipe;
+      if (!swipe || swipe.target !== target || swipe.id !== e.pointerId) return;
+      const dy = e.clientY - swipe.y;
+      this.cancelSheetSwipe();
       this.swiped = Math.abs(dy) >= 24;
       if (this.swiped) this.setSheetOpen(dy < 0);
     });
-    target.addEventListener('pointercancel', () => (startY = null));
+    const cancel = (e: PointerEvent): void => {
+      if (this.sheetSwipe?.id === e.pointerId) this.cancelSheetSwipe();
+    };
+    target.addEventListener('pointercancel', cancel);
+    target.addEventListener('lostpointercapture', cancel);
+  }
+
+  private cancelSheetSwipe(): void {
+    const swipe = this.sheetSwipe;
+    this.sheetSwipe = null;
+    if (swipe?.target.hasPointerCapture(swipe.id)) swipe.target.releasePointerCapture(swipe.id);
   }
 
   closeSites(): void {
+    this.cancelSheetSwipe();
     this.sites.hidden = true;
     this.panel.classList.remove('is-sites');
     this.menu.hidden = false;

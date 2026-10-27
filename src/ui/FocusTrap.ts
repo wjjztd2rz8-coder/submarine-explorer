@@ -22,7 +22,16 @@ const stack: FocusTrap[] = [];
 let listening = false;
 let keyboardOwners = 0;
 const observers = new Set<(event: KeyboardEvent) => void>();
+const openObservers = new Set<() => void>();
 const fallbacks = new Set<(event: KeyboardEvent) => void>();
+
+/** Cancel gestures immediately, even when an overlay opens and closes between frames. */
+export function observeOverlayOpen(observer: () => void): () => void {
+  openObservers.add(observer);
+  return () => {
+    openObservers.delete(observer);
+  };
+}
 
 /** Passive device detection runs even when the top overlay consumes the key. */
 export function observeKeyboard(observer: (event: KeyboardEvent) => void): () => void {
@@ -144,6 +153,7 @@ export class FocusTrap {
     const i = stack.indexOf(this);
     if (i >= 0) stack.splice(i, 1);
     stack.push(this);
+    for (const observer of openObservers) observer();
     listen();
     const a = asEl(document.activeElement);
     if (a && a !== document.body && !this.root.contains(a)) a.blur();

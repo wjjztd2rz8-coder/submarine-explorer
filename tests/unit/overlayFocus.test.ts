@@ -160,7 +160,16 @@ class Element extends EventTarget {
     this.append(child);
     this.children.unshift(this.children.pop()!);
   }
-  setPointerCapture() {}
+  private captures = new Set<number>();
+  setPointerCapture(id: number) {
+    this.captures.add(id);
+  }
+  hasPointerCapture(id: number) {
+    return this.captures.has(id);
+  }
+  releasePointerCapture(id: number) {
+    this.captures.delete(id);
+  }
   appendChild(child: Element) {
     this.append(child);
     return child;
@@ -244,16 +253,19 @@ beforeEach(() => {
   vi.stubGlobal('HTMLButtonElement', Element);
   vi.stubGlobal('HTMLInputElement', Element);
   vi.stubGlobal('getComputedStyle', (el: Element) => ({ visibility: el.visibility }));
-  vi.stubGlobal('document', {
-    body,
-    documentElement: new Element('HTML'),
-    activeElement: body,
-    createElement: (tag: string) => new Element(tag.toUpperCase()),
-    createElementNS: (_ns: string, tag: string) => new Element(tag.toUpperCase()),
-    createTextNode: (text: string) => Object.assign(new Element('#TEXT'), { textContent: text }),
-    querySelector: (selector: string) => body.querySelector(selector),
-    exitPointerLock: vi.fn(),
-  });
+  vi.stubGlobal(
+    'document',
+    Object.assign(new EventTarget(), {
+      body,
+      documentElement: new Element('HTML'),
+      activeElement: body,
+      createElement: (tag: string) => new Element(tag.toUpperCase()),
+      createElementNS: (_ns: string, tag: string) => new Element(tag.toUpperCase()),
+      createTextNode: (text: string) => Object.assign(new Element('#TEXT'), { textContent: text }),
+      querySelector: (selector: string) => body.querySelector(selector),
+      exitPointerLock: vi.fn(),
+    }),
+  );
 });
 afterEach(() => {
   for (const dispose of cleanup.splice(0).reverse()) dispose();

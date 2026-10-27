@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Input } from '../../src/core/Input.js';
 import { TouchControls } from '../../src/ui/TouchControls.js';
+import { Home } from '../../src/ui/Home.js';
+import { FocusTrap } from '../../src/ui/FocusTrap.js';
+import { Globe } from '../../src/ui/Globe.js';
 import { ScanOverlay } from '../../src/ui/ScanOverlay.js';
 import type { ScanView } from '../../src/game/Scanner.js';
 import { Scanner } from '../../src/game/Scanner.js';
@@ -18,26 +21,72 @@ class TouchElement extends EventTarget {
   style = { touchAction: '', transform: '', top: '', setProperty: vi.fn() };
   offsetWidth = 40;
   offsetHeight = 40;
-  private classes = new Set<string>();
+  constructor(readonly tagName = 'DIV') {
+    super();
+  }
+  parentElement: TouchElement | null = null;
+  private captures = new Set<number>();
   classList = {
-    add: (name: string) => this.classes.add(name),
-    remove: (name: string) => this.classes.delete(name),
-    contains: (name: string) => this.classes.has(name),
-    toggle: (name: string, on: boolean) =>
-      on ? this.classes.add(name) : this.classes.delete(name),
+    add: (name: string) => this.classList.toggle(name, true),
+    remove: (name: string) => this.classList.toggle(name, false),
+    contains: (name: string) => this.className.split(' ').includes(name),
+    toggle: (name: string, on = !this.classList.contains(name)) => {
+      const classes = new Set(this.className.split(' ').filter(Boolean));
+      if (on) classes.add(name);
+      else classes.delete(name);
+      this.className = [...classes].join(' ');
+      return on;
+    },
   };
   append(...children: TouchElement[]): void {
+    for (const child of children) child.parentElement = this;
     this.children.push(...children);
   }
   appendChild(child: TouchElement): TouchElement {
     this.append(child);
     return child;
   }
-  setAttribute(): void {}
-  querySelector(): null {
-    return null;
+  replaceChildren(...children: TouchElement[]): void {
+    this.children = [];
+    this.append(...children);
   }
-  setPointerCapture(): void {}
+  setAttribute(): void {}
+  removeAttribute(): void {}
+  closest(selector: string): TouchElement | null {
+    if (
+      selector
+        .split(', ')
+        .some((part) =>
+          part.startsWith('.')
+            ? this.classList.contains(part.slice(1))
+            : this.tagName === part.toUpperCase(),
+        )
+    )
+      return this;
+    return this.parentElement?.closest(selector) ?? null;
+  }
+  querySelector(selector: string): TouchElement | null {
+    return (
+      this.querySelectorAll().find((child) =>
+        selector.startsWith('.')
+          ? child.classList.contains(selector.slice(1))
+          : child.tagName === selector.toUpperCase(),
+      ) ?? null
+    );
+  }
+  contains(child: TouchElement): boolean {
+    return child === this || this.children.some((entry) => entry.contains(child));
+  }
+  focus(): void {}
+  setPointerCapture(id: number): void {
+    this.captures.add(id);
+  }
+  hasPointerCapture(id: number): boolean {
+    return this.captures.has(id);
+  }
+  releasePointerCapture(id: number): void {
+    this.captures.delete(id);
+  }
   remove(): void {}
   getBoundingClientRect() {
     return { left: 0, top: 0, width: 120, height: 160 };
@@ -49,8 +98,11 @@ class TouchElement extends EventTarget {
 
 function pointer(target: TouchElement, type: string, pointerId: number, x = 60, y = 0): void {
   const event = new Event(type, { cancelable: true });
-  Object.assign(event, { pointerId, pointerType: 'touch', clientX: x, clientY: y });
+  Object.assign(event, { pointerId, pointerType: 'touch', button: 0, clientX: x, clientY: y });
+  if (type === 'lostpointercapture') target.releasePointerCapture(pointerId);
   target.dispatchEvent(event);
+  // Native pointerup/cancel implicitly release capture after dispatch.
+  if (type === 'pointerup' || type === 'pointercancel') target.releasePointerCapture(pointerId);
 }
 
 function fixture(canvasTouchAction = '', realInput?: Input) {
@@ -60,7 +112,7 @@ function fixture(canvasTouchAction = '', realInput?: Input) {
     hidden: false,
     documentElement: new TouchElement(),
     querySelector: () => null,
-    createElement: () => new TouchElement(),
+    createElement: (tag: string) => new TouchElement(tag.toUpperCase()),
     createElementNS: () => new TouchElement(),
   });
   const win = Object.assign(new EventTarget(), {
@@ -70,6 +122,7 @@ function fixture(canvasTouchAction = '', realInput?: Input) {
     clearTimeout: globalThis.clearTimeout.bind(globalThis),
     matchMedia: () => ({ matches: true }),
   });
+  vi.stubGlobal('HTMLElement', TouchElement);
   vi.stubGlobal('document', doc);
   vi.stubGlobal('window', win);
   vi.stubGlobal('screen', { width: 844, height: 390 });
@@ -1076,5 +1129,246 @@ it.each(
     expect(f.input.touchLook).not.toHaveBeenCalled();
   } finally {
     f.controls.dispose();
+  }
+});
+
+describe('phone home gestures', () => {
+  function homeFixture() {
+    const f = fixture();
+    const home = new Home({
+      dive: vi.fn(),
+      journal: vi.fn(),
+      subScreen: vi.fn(),
+      settings: vi.fn(),
+      controls: vi.fn(),
+    });
+    home.show();
+    home.showSites(false);
+    const sites = (home.root as unknown as TouchElement).children[3];
+    return { ...f, home, sites, grab: sites.children[0], header: sites.children[1] };
+  }
+
+  it.each(['same handle', 'other handle'])(
+    'keeps the first swipe owner when another finger touches the %s',
+    (handle) => {
+      const f = homeFixture();
+      try {
+        pointer(f.grab, 'pointerdown', 1, 60, 100);
+        const second = handle === 'same handle' ? f.grab : f.header;
+        pointer(second, 'pointerdown', 2, 60, 200);
+        pointer(second, 'pointerup', 2, 60, 150);
+        pointer(f.grab, 'pointercancel', 99);
+        pointer(f.grab, 'lostpointercapture', 99);
+        expect(f.sites.classList.contains('is-collapsed')).toBe(true);
+        pointer(f.grab, 'pointerup', 1, 60, 60);
+        expect(f.sites.classList.contains('is-collapsed')).toBe(false);
+      } finally {
+        f.home.dispose();
+        f.controls.dispose();
+      }
+    },
+  );
+
+  it.each([
+    'pointercancel',
+    'lostpointercapture',
+    'blur',
+    'visibilitychange',
+    'close sites',
+    'hide home',
+    'modal',
+  ])('drops the old sheet swipe after %s and accepts a fresh swipe', (interruption) => {
+    const f = homeFixture();
+    try {
+      pointer(f.grab, 'pointerdown', 1, 60, 100);
+      if (interruption === 'modal') {
+        const modal = new FocusTrap(f.canvas as unknown as HTMLElement);
+        modal.show();
+        modal.dispose();
+      } else if (interruption === 'close sites') {
+        f.home.closeSites();
+        f.home.showSites(false);
+      } else if (interruption === 'hide home') {
+        f.home.hide();
+        f.home.show();
+      } else if (interruption === 'visibilitychange') {
+        f.doc.hidden = true;
+        f.doc.dispatchEvent(new Event(interruption));
+        f.doc.hidden = false;
+      } else if (interruption === 'blur') f.win.dispatchEvent(new Event(interruption));
+      else pointer(f.grab, interruption, 1);
+      pointer(f.grab, 'pointerup', 1, 60, 50);
+      expect(f.sites.classList.contains('is-collapsed')).toBe(true);
+      expect(f.grab.hasPointerCapture(1)).toBe(false);
+      pointer(f.grab, 'pointerdown', 2, 60, 100);
+      pointer(f.grab, 'pointerup', 2, 60, 50);
+      expect(f.sites.classList.contains('is-collapsed')).toBe(false);
+    } finally {
+      f.home.dispose();
+      f.controls.dispose();
+    }
+  });
+
+  function globeFixture() {
+    const f = fixture();
+    // Exercise the real DOM input listeners without creating a WebGL context.
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const globe = new Globe({
+      config: makeConfig().globe,
+      tileIds: [],
+      catalog: Promise.resolve({ sites: [], missions: [], pending: [] }),
+      embedded: true,
+    });
+    globe.open();
+    return { ...f, globe, root: globe.root as unknown as TouchElement };
+  }
+
+  it('does not hand a globe drag to a second finger', () => {
+    const f = globeFixture();
+    try {
+      const lon = f.globe.orbit.lon;
+      pointer(f.root, 'pointerdown', 1);
+      pointer(f.root, 'pointerdown', 2);
+      pointer(f.root, 'pointermove', 2, 80);
+      expect(f.globe.orbit.lon).toBe(lon);
+      pointer(f.root, 'pointerup', 2);
+      pointer(f.root, 'pointercancel', 2);
+      pointer(f.root, 'lostpointercapture', 2);
+      pointer(f.root, 'pointermove', 1, 80);
+      expect(f.globe.orbit.lon).toBeLessThan(lon);
+    } finally {
+      f.globe.dispose();
+      f.controls.dispose();
+    }
+  });
+
+  it.each(['pointercancel', 'lostpointercapture', 'blur', 'visibilitychange', 'close', 'modal'])(
+    'ends globe drag without a fling after %s and ignores stale motion',
+    (interruption) => {
+      const f = globeFixture();
+      try {
+        pointer(f.root, 'pointerdown', 1);
+        pointer(f.root, 'pointermove', 1, 80);
+        const lon = f.globe.orbit.lon;
+        if (interruption === 'modal') {
+          const modal = new FocusTrap(f.canvas as unknown as HTMLElement);
+          modal.show();
+          modal.dispose();
+        } else if (interruption === 'close') {
+          f.globe.close();
+          f.globe.open();
+        } else if (interruption === 'visibilitychange') {
+          f.doc.hidden = true;
+          f.doc.dispatchEvent(new Event(interruption));
+          f.doc.hidden = false;
+        } else if (interruption === 'blur') f.win.dispatchEvent(new Event(interruption));
+        else pointer(f.root, interruption, 1);
+        expect(f.root.classList.contains('is-dragging')).toBe(false);
+        expect(f.root.hasPointerCapture(1)).toBe(false);
+        pointer(f.root, 'pointermove', 1, 100);
+        f.globe.orbit.update(0.01);
+        expect(f.globe.orbit.lon).toBe(lon);
+        pointer(f.root, 'pointerdown', 2);
+        pointer(f.root, 'pointermove', 2, 80);
+        expect(f.globe.orbit.lon).toBeLessThan(lon);
+      } finally {
+        f.globe.dispose();
+        f.controls.dispose();
+      }
+    },
+  );
+});
+
+it.each(['paused canvas', 'lostpointercapture', 'photo closes'])(
+  'requires a fresh camera gesture after %s',
+  (interruption) => {
+    const f = fixture();
+    const send = (type: string, id: number, x = 60) => {
+      const event = new Event(type);
+      Object.assign(event, { pointerId: id, pointerType: 'touch', clientX: x, clientY: 60 });
+      Object.defineProperty(event, 'target', { value: f.canvas });
+      f.win.dispatchEvent(event);
+    };
+    try {
+      if (interruption === 'paused canvas') f.controls.update(false, false);
+      if (interruption === 'photo closes') f.controls.update(false, true);
+      send('pointerdown', 1);
+      if (interruption === 'lostpointercapture') send(interruption, 1);
+      f.controls.update(true, false);
+      send('pointermove', 1, 80);
+      expect(f.input.touchLook).not.toHaveBeenCalled();
+      send('pointerdown', 2);
+      send('pointermove', 2, 70);
+      expect(f.input.touchLook).toHaveBeenCalledExactlyOnceWith(10, 0);
+    } finally {
+      f.controls.dispose();
+    }
+  },
+);
+
+it('releases flight, scan and camera ownership when a modal opens and closes between frames', () => {
+  const f = fixture();
+  const modal = new FocusTrap(new TouchElement() as unknown as HTMLElement);
+  const send = (type: string, x: number) => {
+    const event = new Event(type);
+    Object.assign(event, { pointerId: 4, pointerType: 'touch', clientX: x, clientY: 60 });
+    Object.defineProperty(event, 'target', { value: f.canvas });
+    f.win.dispatchEvent(event);
+  };
+  try {
+    pointer(f.stick, 'pointerdown', 1);
+    pointer(f.slider, 'pointerdown', 2);
+    pointer(f.scan, 'pointerdown', 3);
+    send('pointerdown', 60);
+    modal.show();
+    modal.hide();
+    pointer(f.stick, 'pointermove', 1);
+    pointer(f.slider, 'pointermove', 2);
+    send('pointermove', 80);
+    expect(f.input.touchAxes).toEqual({ throttle: 0, yaw: 0, pitch: 0, ballast: 0 });
+    expect(f.input.touchHeld.size).toBe(0);
+    expect(f.input.touchLook).not.toHaveBeenCalled();
+    expect(f.stick.hasPointerCapture(1)).toBe(false);
+    expect(f.slider.hasPointerCapture(2)).toBe(false);
+    expect(f.scan.hasPointerCapture(3)).toBe(false);
+    pointer(f.scan, 'pointerdown', 5);
+    pointer(f.scan, 'pointerup', 3);
+    expect(f.input.touchHeld.has('scan')).toBe(true);
+  } finally {
+    modal.dispose();
+    f.controls.dispose();
+  }
+});
+
+it('discards queued touch edges and camera deltas when a modal opens between frames', () => {
+  const input = new Input({ storage: null });
+  const f = fixture('', input);
+  const modal = new FocusTrap(new TouchElement() as unknown as HTMLElement);
+  try {
+    const lights = (f.controls.root as unknown as TouchElement).children[2].children[1];
+    pointer(lights, 'pointerdown', 1);
+    const send = (type: string, id: number, x: number) => {
+      const event = new Event(type);
+      Object.assign(event, { pointerId: id, pointerType: 'touch', clientX: x, clientY: 60 });
+      Object.defineProperty(event, 'target', { value: f.canvas });
+      f.win.dispatchEvent(event);
+    };
+    send('pointerdown', 2, 60);
+    send('pointermove', 2, 70);
+    send('pointerdown', 3, 100);
+    send('pointermove', 3, 120);
+    expect(input.state.lookDx).toBe(10);
+    expect(input.wheelDelta).toBeLessThan(0);
+    modal.show();
+    modal.hide();
+    expect(input.sample()).toMatchObject({ lookDx: 0, lookDy: 0, toggleLights: false });
+    expect(input.wheelDelta).toBe(0);
+    pointer(lights, 'pointerdown', 4);
+    expect(input.sample().toggleLights).toBe(true);
+  } finally {
+    modal.dispose();
+    f.controls.dispose();
+    input.dispose();
   }
 });
