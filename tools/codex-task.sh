@@ -105,7 +105,8 @@ run_codex() {  # run_codex <round-log> <prompt> [images...]
 }
 
 session="${SESSION:-}"   # SESSION=<id> resumes an earlier Codex session (follow-up fixes)
-run_codex "$dir/$name-r1.log" "$browser_note$(cat "$brief")"
+run_codex "$dir/$name-r1.log" "For behaviour changes, grep tests/e2e for specs touching the changed capability and run them with npx playwright test <spec> -g '<test name>' before reporting.
+$browser_note$(cat "$brief")"
 round=1; status=FAIL
 while :; do
   gates=$("${gate_cmd[@]}" 2>&1); gstat=$?
