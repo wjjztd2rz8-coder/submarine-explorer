@@ -10,7 +10,7 @@
 | Other eight sites coherent                | Challenger 3.5, Endurance 3; Axial, Kama, Hunga weak and not yet in the golden set                                     |
 | New player understands first five minutes | Journeys run through two scans, Journal and debrief; Journal panel opaque now; unaided-pilot leg being restored (4480) |
 | Acceptable Low-tier phone performance     | iPhone 17 Pro: Low great; High Lost City unmeasured after the plume cap; weaker phones untested                        |
-| Hosted CI green, releases tagged          | f67 tagged; latest main CI pending at review time                                                                                          |
+| Hosted CI green, releases tagged          | f67 tagged; latest main CI pending at review time                                                                      |
 | Code simple enough                        | Standing S-verify items; S-collision fixed                                                                             |
 
 ## Done recently
