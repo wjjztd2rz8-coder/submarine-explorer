@@ -322,3 +322,77 @@ test('a full photo store reports the dropped oldest; quota failure is explained'
   await page.keyboard.press('Escape');
   await expect(page.locator('.photo-mode')).toBeHidden();
 });
+
+// Guards deletion retries growing the phone article with duplicate errors; the full grid stays reachable.
+test('a full phone gallery keeps photo order, exports and recovers from failed deletion', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript((key) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 640;
+    canvas.height = 360;
+    const image = canvas.toDataURL('image/jpeg');
+    const photos = Array.from({ length: 24 }, (_, i) => ({
+      id: `retained-${i}`,
+      image,
+      siteId: 'titanic',
+      siteName: 'RMS Titanic',
+      poiId: 'titanic-bow',
+      poiName: 'Bow section',
+      at: new Date(Date.UTC(2026, 8, 24, 23 - i)).toISOString(),
+      depthM: 3790,
+    }));
+    localStorage.setItem(key, JSON.stringify({ version: 1, photos }));
+  }, PHOTOS_KEY);
+  await pauseClockBeforeNavigation(page);
+  await page.goto(`${DIVE}&tier=low`);
+  await ready(page, true);
+  await page.keyboard.press('j');
+  await page.clock.runFor(34);
+  const journal = page.locator('.journal');
+  await expect(journal).toHaveClass(/is-phone/);
+  await page.evaluate(() =>
+    (window.__game as { journal: { show(key: string): void } }).journal.show('front'),
+  );
+  await expect(journal.locator('.jr-site-card')).toHaveCount(13);
+  await journal.locator('.jr-row.is-photos').click();
+  const cards = journal.locator('.jr-photo-card');
+  const ids = Array.from({ length: 24 }, (_, i) => `retained-${i}`);
+  expect(
+    await cards.evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-photo-id'))),
+  ).toEqual(ids);
+  const article = journal.locator('.jr-body');
+  await cards.last().scrollIntoViewIfNeeded();
+  await expect(cards.last()).toBeInViewport();
+  expect(await article.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
+  expect(await article.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(
+    1,
+  );
+  await cards.last().click();
+  const download = page.waitForEvent('download');
+  await journal.getByRole('button', { name: 'Download', exact: true }).click();
+  expect((await download).suggestedFilename()).toBe('rms-titanic-bow-section-2026-09-24.jpg');
+  await page.evaluate((key) => {
+    const write = Storage.prototype.setItem;
+    let failures = 2;
+    Storage.prototype.setItem = function (name: string, value: string) {
+      if (name === key && failures-- > 0) throw new DOMException('Denied', 'SecurityError');
+      write.call(this, name, value);
+    };
+  }, PHOTOS_KEY);
+  const remove = journal.getByRole('button', { name: 'Delete photo' });
+  await remove.click();
+  await remove.click();
+  await expect(journal.locator('.jr-photo-error')).toHaveCount(1);
+  expect((await storedPhotos(page))?.photos).toHaveLength(24);
+  await remove.click();
+  await expect(cards).toHaveCount(23);
+  expect(
+    await cards.evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-photo-id'))),
+  ).toEqual(ids.slice(0, -1));
+  await expect(journal.locator('.jr-photo-error')).toHaveCount(0);
+  const archive = page.waitForEvent('download');
+  await journal.getByRole('button', { name: 'Download all' }).click();
+  expect((await archive).suggestedFilename()).toBe('journal-photos.zip');
+});

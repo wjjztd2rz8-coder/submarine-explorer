@@ -15,7 +15,9 @@ export function photoFilename(photo: Pick<Photo, 'siteName' | 'poiName' | 'at'>)
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '') || 'photo';
-  const date = Number.isNaN(Date.parse(photo.at)) ? 'undated' : photo.at.slice(0, 10);
+  // Legacy saves can contain parseable dates with slashes; ZIP names must stay flat.
+  const instant = Date.parse(photo.at);
+  const date = Number.isNaN(instant) ? 'undated' : new Date(instant).toISOString().slice(0, 10);
   return `${slug(photo.siteName)}-${slug(photo.poiName ?? 'photo')}-${date}.jpg`;
 }
 
@@ -163,9 +165,10 @@ export class PhotoGallery {
     const detail = el('p', 'jr-photo-detail', photoDetail(photo));
     const remove = el('button', 'jr-photo-delete', 'Delete photo');
     remove.type = 'button';
+    const error = el('p', 'jr-photo-error', 'Could not delete this photo.');
     remove.addEventListener('click', () => {
       if (this.store.delete(photo.id)) this.onChange();
-      else remove.after(el('p', 'jr-photo-error', 'Could not delete this photo.'));
+      else if (!error.parentElement) remove.after(error);
     });
     const actions = el('div', 'jr-photo-actions');
     const single = el('button', 'd2-photo-download', 'Download');

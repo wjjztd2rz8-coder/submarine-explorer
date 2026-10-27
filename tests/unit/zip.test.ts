@@ -30,6 +30,13 @@ class Element extends EventTarget {
     this.append(...children);
   }
   setAttribute() {}
+  focus() {}
+  after(child: Element) {
+    if (!this.parentElement) return;
+    const siblings = this.parentElement.children;
+    child.parentElement = this.parentElement;
+    siblings.splice(siblings.indexOf(this) + 1, 0, child);
+  }
   remove() {
     if (this.parentElement)
       this.parentElement.children = this.parentElement.children.filter((child) => child !== this);
@@ -200,7 +207,7 @@ function retainedPhotos() {
       siteName,
       poiId: poiName === null ? null : 'caption',
       poiName,
-      at: `${day}T${String(23 - i).padStart(2, '0')}:00:00Z`,
+      at: i === 0 ? '10/21/2026 23:00:00 GMT' : `${day}T${String(23 - i).padStart(2, '0')}:00:00Z`,
       depthM: 100 + i,
       image: `data:image/jpeg;base64,${Buffer.from(data).toString('base64')}`,
     };
@@ -250,9 +257,73 @@ describe('photo ZIP export', () => {
       photoFilename({ siteName: 'Titanic', poiName: 'Bow section', at: '2026-09-24T11:00:00Z' }),
     ).toBe('titanic-bow-section-2026-09-24.jpg');
   });
+
+  // Legacy dates accepted by PhotoStore must remain flat, portable ZIP filenames.
+  it.each(['09/24/2026 12:00:00 GMT', 'September 24, 2026 12:00:00 GMT', '2026-09-24T11:00:00Z'])(
+    'normalizes the accepted capture date %s for downloads',
+    (at) => {
+      expect(photoFilename({ siteName: 'Titanic', poiName: 'Bow section', at })).toBe(
+        'titanic-bow-section-2026-09-24.jpg',
+      );
+    },
+  );
 });
 
 describe('gallery download action', () => {
+  // A failed deletion can be retried without duplicating status or losing the saved image.
+  it('shows one delete failure through retries and refreshes after storage recovers', () => {
+    downloadFixture();
+    const { store, storage, values, discoveries } = retainedPhotos();
+    const before = [...values];
+    const beforeDiscoveries = discoveries.snapshot();
+    const container = new Element();
+    const onChange = vi.fn(() => gallery.render(container as unknown as HTMLElement, store.photos));
+    const gallery = new PhotoGallery(store, onChange);
+    const find = (className: string): Element[] => {
+      const walk = (node: Element): Element[] =>
+        node.children.flatMap((child) => [child, ...walk(child)]);
+      return walk(container).filter((node) => node.className === className);
+    };
+    try {
+      gallery.render(container as unknown as HTMLElement, store.photos);
+      const ids = find('jr-photo-card').map((node) => node.dataset.photoId);
+      expect(ids).toEqual(store.photos.map((photo) => photo.id));
+      const deleted = store.photos.at(-1)!;
+      find('jr-photo-card').at(-1)!.click();
+      const remove = find('jr-photo-delete')[0];
+      const write = vi.spyOn(storage, 'setItem').mockImplementation(() => {
+        throw new DOMException('Storage temporarily denied', 'SecurityError');
+      });
+      remove.click();
+      remove.click();
+      expect(find('jr-photo-error').map((node) => node.textContent)).toEqual([
+        'Could not delete this photo.',
+      ]);
+      expect(onChange).not.toHaveBeenCalled();
+      expect([...values]).toEqual(before);
+      expect(new PhotoStore(storage).photos).toEqual(store.photos);
+      write.mockRestore();
+      remove.click();
+      expect(onChange).toHaveBeenCalledOnce();
+      expect(find('jr-photo-error')).toHaveLength(0);
+      expect(find('jr-photo-card').map((node) => node.dataset.photoId)).toEqual(ids.slice(0, -1));
+      expect(new PhotoStore(storage).photos.some((photo) => photo.id === deleted.id)).toBe(false);
+      for (const id of ids.slice(0, -1)) {
+        find('jr-photo-card')
+          .find((node) => node.dataset.photoId === id)!
+          .click();
+        find('jr-photo-delete')[0].click();
+      }
+      expect(find('jr-photo-card')).toHaveLength(0);
+      expect(find('d2-photo-download-all')).toHaveLength(0);
+      expect(find('jr-empty')[0].textContent).toMatch(/^No photos yet\./);
+      expect(new PhotoStore(storage).photos).toEqual([]);
+      expect(discoveries.snapshot()).toEqual(beforeDiscoveries);
+    } finally {
+      gallery.dispose();
+    }
+  });
+
   it('round-trips every retained JPEG with unique names and leaves photos/discoveries unchanged', async () => {
     const fixture = downloadFixture();
     const { store, storage, values, discoveries, payloads } = retainedPhotos();
