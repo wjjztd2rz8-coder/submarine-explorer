@@ -86,7 +86,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 6. **V-beebe-flow [Sonnet]:** (~3.5) plumes are tall uniform columns; add flow variation and a lit hot-water haze through the existing vent shader (data, no new system).
 7. **R-ci-green [Codex]:** hosted CI green on fde5c15d (f67 tagged). Keep it green; 4480 restores the dropped unaided-pilot journey leg. Triage any red run by failing spec.
 8. **S-verify / S-bughunt [Codex, standing]:** 4490 (Lost City towers numerics and perf), 4500 (Axial/Kama/Hunga geometry). After each visual merge, verify numerics; bind captured images, manifests and SHA together before accepting evidence.
-8b. **S-dead / S-bughunt [Codex]:** 4510 (verify Lost City surround and Monterey wall lift), 4520 (delete unused terrace support in Terrain.ts), 4530 (first-minute flow audit).
+   8b. **S-dead / S-bughunt [Codex]:** 4510 (verify Lost City surround and Monterey wall lift), 4520 (delete unused terrace support in Terrain.ts), 4530 (first-minute flow audit).
 9. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build (Aa button, Journal photo, High Lost City plume, Blue Hole and Lost City shapes).
 10. **R-release [Haiku]:** tag the latest green-CI main after each review (f67 is the newest); check the Pages deploy.
 11. **P2-globe-bright [Sonnet, demoted]:** brighter globe, only if the lanes above are blocked. **V-bluehole-hood [Sonnet, demoted]:** east hood sheet facets (folds into item 1).
