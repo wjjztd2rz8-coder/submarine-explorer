@@ -19,8 +19,8 @@
   "opening": {
     "mission": {
       "rangeM": 110,
-      "chaseRadius": 35,
-      "chaseOffsetY": 100,
+      "chaseRadius": 60,
+      "chaseOffsetY": -20,
       "destinationLabel": "Hiolo North"
     },
     "freeDive": {
@@ -35,7 +35,7 @@
       "altitude": 18,
       "yawOffset": 0,
       "chaseOffsetX": 0,
-      "chaseOffsetY": -10
+      "chaseOffsetY": -20
     }
   },
   "atmosphere": {
