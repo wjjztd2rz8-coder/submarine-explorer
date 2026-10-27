@@ -12,6 +12,9 @@ import { DEEP_OPENINGS } from '../core/config/deepOpenings.js';
 
 /** Depth (m, negative) of the lander floor; the gradient starts a few metres above it. */
 const FLOOR_Y = -10935;
+/** Lander position (world m) used to keep its lit pool unchanged. */
+const LANDER_X = -468;
+const LANDER_Z = 510;
 const WALL_RISE_M = 260;
 const SHOULDER_SHADOW = DEEP_OPENINGS['challenger-deep'].slopeShadow;
 
@@ -32,14 +35,22 @@ export function challengerSlopeTint(
   const patch = Math.sin(x * 0.021 + Math.sin(z * 0.017) * 1.6) * Math.sin(z * 0.026 - x * 0.011);
   const drift = Math.sin((x * 0.62 + z * 0.78) * 0.9 + Math.sin(x * 0.05 - z * 0.04) * 2.4);
   const floorW = 1 - up;
-  const tone = 1 + floorW * (0.09 * patch + 0.035 * drift * (0.5 + 0.5 * patch));
+  // Mid-ground silt: 60-120 m lighter and darker swaths beyond the lander pool, so the seabed keeps tone variation as the lamps fade.
+  const away = smooth(40, 110, Math.hypot(x - LANDER_X, z - LANDER_Z));
+  const swath =
+    away * Math.sin(x * 0.052 + Math.sin(z * 0.043) * 1.9) * Math.sin(z * 0.061 - x * 0.037);
+  const tone = 1 + floorW * (0.09 * patch + 0.11 * swath + 0.035 * drift * (0.5 + 0.5 * patch));
   // The measured floor rises gently north of the lander. Shade that lower shoulder,
   // easing back to the existing lit wall above it; no new contour or geometry.
   const shoulder =
     smooth(SHOULDER_SHADOW.startY, SHOULDER_SHADOW.fullY, y) *
     (1 - smooth(SHOULDER_SHADOW.fadeY, SHOULDER_SHADOW.endY, y));
+  // Where the rise meets the dark water, a faint pale crest lifts just above the shaded shoulder so the horizon grades softly.
+  const crest =
+    smooth(SHOULDER_SHADOW.fadeY, SHOULDER_SHADOW.endY, y) *
+    (1 - smooth(SHOULDER_SHADOW.endY, SHOULDER_SHADOW.endY + 25, y));
   const g =
-    (1 + 0.5 * up) *
+    (1 + 0.5 * up + 0.35 * crest) *
     band *
     (1 - 0.1 * slope * (1 - up)) *
     tone *
