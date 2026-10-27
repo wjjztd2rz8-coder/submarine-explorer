@@ -53,16 +53,19 @@ export function createPhotoSystem(): GameSystem {
       photoMode.toast('This browser could not create the photo.', true);
       return;
     }
+    const poiId = photoPoi?.id ?? photoAnimal?.id ?? null;
     const result = photos.save({
       id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
       image,
       siteId: contentLandmark,
       siteName: journal.siteName(contentLandmark),
-      poiId: photoPoi?.id ?? photoAnimal?.id ?? null,
+      poiId,
       poiName: photoPoi?.name ?? photoAnimal?.name ?? null,
       at: new Date().toISOString(),
       depthM: Math.round(Math.max(0, -target.y) * 10) / 10,
     });
+    // Surface can open the debrief before another frame runs.
+    if (result.saved && poiId) ctx.progress.award('photo', `${contentLandmark}/${poiId}`);
     if (!result.saved) photoMode.toast(result.error, true);
     else if (result.dropped) {
       photoMode.shutter();
@@ -108,7 +111,10 @@ export function createPhotoSystem(): GameSystem {
       at: new Date().toISOString(),
       depthM: Math.round(Math.max(0, -target.y) * 10) / 10,
     });
-    if (saved.saved) ctx.journal.refresh();
+    if (saved.saved) {
+      ctx.progress.award('photo', `${ctx.contentLandmark}/${id}`);
+      ctx.journal.refresh();
+    }
   };
 
   return {
