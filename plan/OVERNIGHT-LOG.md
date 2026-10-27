@@ -2265,3 +2265,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-hunga-bright (Sonnet; Hunga site data gets lamps, no shared code; rim and lamp pool visibly brighter, ~3.8 by my read vs agent's 4.0; three lowSweep snapshots rebaselined). Gates all passed on the branch; the post-merge main rerun passed through e2e, then my 590 s timeout cut e2e-base (merge only added notes). Queue 50-52 still waits on Codex 5h reset (19:30). Next: V-bluehole-roof-slab, V-endurance-accent. No tag (hosted CI unverified).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-27 17:05 CDT headless run 191 (Claude): two small packages
+
+- Merged V-golden-set (Haiku; default golden set now covers all ten sites). V-endurance-accent (Sonnet) made no change: per-site lamps don't reach the hull, so only a note merged; DIRECTOR item updated with the emissive-tint route. Gates: branch smoke + project-base passed for golden-set; main rerun hit my 500 s timeout after build (tools/notes-only merge). Codex weekly at 7%, so 4730-4750 worktrees (uncommitted) and queue 50-52 wait for the Nov 2 reset. Next: V-bluehole-roof-slab. No tag (hosted CI unverified).
+- Small fix idea: golden.sh readiness loop accepted another worktree's preview on a busy port.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
