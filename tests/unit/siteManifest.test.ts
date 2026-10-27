@@ -791,6 +791,10 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
         ...(id === 'beebe-vent-field'
           ? { lamps: { intensity: 0.45, distance: 1, fillIntensity: 0.35, fillDistance: 1 } }
           : {}),
+        // Hunga's dim tuff slope gets stronger lamps so the rim and glow read on a phone.
+        ...(id === 'hunga-tonga-caldera'
+          ? { lamps: { intensity: 3, distance: 1.2, fillIntensity: 3.5, fillDistance: 1.4 } }
+          : {}),
         tiers: Object.fromEntries(
           tiers.map((tier) => [
             tier,
