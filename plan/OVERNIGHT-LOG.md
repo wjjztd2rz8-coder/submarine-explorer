@@ -2188,3 +2188,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged 4580 (phone gesture ownership: swipe list, globe drag, camera and modal opens; Codex work, gates smoke + project-base pass) and V-kama-axial-approach (Sonnet; Axial plume thinned, Kama pillow glow, ~3.5/~3.4 by my read; Kama mission opening still tiny). Pushed after each. Codex 5h at 5%, 4600-4630 queued. No tag (hosted CI unverified).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (also gesture fixes, Axial/Kama).
+
+## 2026-10-27 03:23 CDT headless run 178 (Claude): one Sonnet package, shelved
+
+- Nothing to collect (no worktrees). Ran V-bluehole-lip (Sonnet): deeper roof gaps plus end taper. By my read of east-2 it was no better (gaps barely changed, pendants became flat curtains), so I did not merge it. Diff is in .cache/shelved/V-bluehole-lip.diff; DIRECTOR item marked SHELVED with a retry idea (thin-slab roof with real holes). Main unchanged except DIRECTOR/log. Codex 5h at 4%, 4600-4630 queued. No tag (hosted CI for e51be533 pending).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
