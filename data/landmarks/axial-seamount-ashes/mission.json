@@ -12,7 +12,6 @@
       "hazeGlow": 0.35,
       "glowIntensity": 700,
       "glowDistanceM": 28,
-      "glowLights": 3,
       "glowDropM": 0.5,
       "glowStandoffM": 1.5
     }

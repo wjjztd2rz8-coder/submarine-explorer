@@ -704,6 +704,15 @@ describe('shared scalar maths', () => {
 // Guard the complete mission -> preset -> reusable atmosphere sample path, including
 // Low's particle-free update and a missing mission/type for an unknown site.
 describe('per-site preset atmosphere', () => {
+  // Vent glow lights as authored in each mission's overrides (defaults elsewhere).
+  const authoredGlow: Record<
+    string,
+    { drop: number; standoff: number; distance: number; intensity: number }
+  > = {
+    default: { drop: 4, standoff: 0, distance: 60, intensity: 260 },
+    'beebe-vent-field': { drop: 12, standoff: 6, distance: 60, intensity: 3000 },
+    'axial-seamount-ashes': { drop: 0.5, standoff: 1.5, distance: 28, intensity: 700 },
+  };
   const sites = (
     JSON.parse(readFileSync('data/tiles/index.json', 'utf8')).tiles as { id: string }[]
   )
@@ -812,22 +821,21 @@ describe('per-site preset atmosphere', () => {
               expect(lights).toHaveLength(count);
               expect(system.preset!.stats.lights).toBe(count);
               expect(new Set(lights.map((light) => light.name)).size).toBe(count);
+              const glow = authoredGlow[site] ?? authoredGlow.default!;
               expect(system.params).toMatchObject({
-                glowDropM: site === 'beebe-vent-field' ? 12 : 4,
-                glowStandoffM: site === 'beebe-vent-field' ? 6 : 0,
+                glowDropM: glow.drop,
+                glowStandoffM: glow.standoff,
               });
               for (const [i, light] of lights.entries()) {
                 const delta = light.position.clone().sub(ventPois[i]!.position);
                 expect(delta.toArray().every(Number.isFinite)).toBe(true);
-                expect(delta.y).toBe(site === 'beebe-vent-field' ? -12 : -4);
-                expect(Math.hypot(delta.x, delta.z)).toBeCloseTo(
-                  site === 'beebe-vent-field' ? 6 : 0,
-                );
-                expect(light.distance).toBe(60);
+                expect(delta.y).toBe(-glow.drop);
+                expect(Math.hypot(delta.x, delta.z)).toBeCloseTo(glow.standoff);
+                expect(light.distance).toBe(glow.distance);
                 expect(light.decay).toBe(2);
                 expect(light.castShadow).toBe(false);
                 const elapsed = frame / 60;
-                const base = site === 'beebe-vent-field' ? 3000 : 260;
+                const base = glow.intensity;
                 expect(light.intensity).toBeCloseTo(
                   base *
                     (1 +

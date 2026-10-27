@@ -650,7 +650,7 @@ it('binds each authored prop profile once in its owning content pack', () => {
       seen.add(id);
     }
   }
-  expect(seen.size).toBe(6);
+  expect(seen.size).toBe(11);
 });
 
 describe('site manifest atmosphere validation', () => {
