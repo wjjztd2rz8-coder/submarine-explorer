@@ -306,7 +306,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     smooth(0.2, 0.8, fbm3(x * 0.16 + 33, 8, seed + 53, seed + 23, 3)) *
     (1 - smooth(0.6, 1, endRatio(x, W)));
   /** Two or three breaks in the thin roof: 0..1 per x, the first being the widest. */
-  const gapCentres = [-0.17, 0.2, 0.36].map((u) => u * W);
+  const gapCentres = [-0.12, 0.175, -0.4].map((u) => u * W);
   const gapAt = (x: number): number => {
     let g = 0;
     gapCentres.forEach((c, i) => {
@@ -687,7 +687,7 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
       const hoodLength =
         H * (0.03 + 0.5 * clump * clump * clump * (0.3 + 0.7 * (main ? 1 : rnd())));
       const len = hood ? Math.min(hoodLength, yTop - gnd(x, z) - 0.7) : generatedLength;
-      if (hood && (len < 0.5 || gapAt(x) > 0.5)) continue;
+      if (hood && (len < 0.5 || gapAt(x) > 0.02)) continue;
       // Thick, uneven columns: some stout, some slender, so no two read alike.
       // Variation draws use their own stream, so the placement of the original gallery is unchanged.
       const lean = main ? 0 : 0.05 + vr() * 0.14;
