@@ -3,10 +3,11 @@
 ## 2026-10-27 targeted review: CI red on main for 3 runs
 
 **Diagnosis (all five failing shards, runs 183-185):** two stale e2e expectations, no product bug.
+
 1. `journal-debrief` legacy-save persistence (3 fixtures): Codex 4590 (a16db2d9) deliberately made boot credit Journal discoveries on every start, so `awarded` gains secret/sample/species tokens. Its package updated the unit tests but not this e2e spec. Spec now checks archived fields exactly and `awarded` with `arrayContaining`.
 2. `f3-audio` modal gestures (desktop and touch): Codex 4650 compared Web Audio float32 gains to saved doubles with `toMatchObject`. Now `toBeCloseTo`.
-Both reproduce locally; the legacy fix passes. The audio spec fails earlier locally on a suspended-state poll (local headless audio differs from CI, which got as far as the gain check), so hosted CI is the check.
-**Process:** Codex packages that change behaviour covered by e2e only ran smoke gates, and merges did not wait for CI, so the red persisted 3 runs. Fix: 4690 and future Codex briefs must grep `tests/e2e` for specs touching the changed capability and run them (`npx playwright test <spec> -g`) before reporting.
+   Both reproduce locally; the legacy fix passes. The audio spec fails earlier locally on a suspended-state poll (local headless audio differs from CI, which got as far as the gain check), so hosted CI is the check.
+   **Process:** Codex packages that change behaviour covered by e2e only ran smoke gates, and merges did not wait for CI, so the red persisted 3 runs. Fix: 4690 and future Codex briefs must grep `tests/e2e` for specs touching the changed capability and run them (`npx playwright test <spec> -g`) before reporting.
 
 ## 2026-10-27 midday comprehensive review (Claude alone; Sol skipped, Codex week 26%, script said budget too low)
 
