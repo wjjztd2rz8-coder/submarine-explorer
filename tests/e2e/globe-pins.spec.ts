@@ -1,4 +1,5 @@
 import { expect, test, type Page } from './helpers/unlocked.js';
+import { swipeSiteList } from './helpers/home.js';
 
 /**
  * Globe pins (docs/globe.md): every pin is drawn at its projected location (no
@@ -140,11 +141,7 @@ test.describe('globe pins on touch', () => {
       await expect(sheet).toHaveClass(/is-collapsed/);
       await page.keyboard.press('Shift+Tab');
       await expect(grab).toBeFocused();
-      const box = (await grab.boundingBox())!;
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2 - 70, { steps: 4 });
-      await page.mouse.up();
+      await swipeSiteList(page);
       await expect(grab).toHaveAttribute('aria-expanded', 'true');
       await grab.focus();
       await page.keyboard.press('Enter');

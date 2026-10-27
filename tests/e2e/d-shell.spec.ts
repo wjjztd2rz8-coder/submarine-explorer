@@ -4,10 +4,16 @@ import { test as freshTest } from '@playwright/test';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { homeReady, openSiteList } from './helpers/home.js';
 
-for (const touch of [false, true]) {
-  freshTest.describe(`Home Journal shortcut ${touch ? '390x844 touch' : 'desktop'}`, () => {
+for (const layout of [
+  { width: 1280, height: 800, touch: false },
+  { width: 390, height: 844, touch: true },
+  { width: 844, height: 390, touch: true },
+]) {
+  const { touch } = layout;
+  const label = `${layout.width}x${layout.height} ${touch ? 'touch' : 'desktop'}`;
+  freshTest.describe(`Home Journal shortcut ${label}`, () => {
     freshTest.use({
-      viewport: touch ? { width: 390, height: 844 } : { width: 1280, height: 800 },
+      viewport: { width: layout.width, height: layout.height },
       hasTouch: touch,
       isMobile: touch,
       storageState: { cookies: [], origins: [] },

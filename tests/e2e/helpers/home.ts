@@ -19,3 +19,27 @@ export async function openSiteList(page: Page, touch = false, pausedClock = fals
     await expect(page.locator('.home-sites-grab')).toHaveAttribute('aria-expanded', 'true');
   }
 }
+
+/** Exercise the sheet's touch gesture rather than substituting a mouse drag. */
+export async function swipeSiteList(page: Page): Promise<void> {
+  const grab = page.locator('.home-sites-grab');
+  const box = (await grab.boundingBox())!;
+  const cdp = await page.context().newCDPSession(page);
+  const x = box.x + box.width / 2;
+  const y = box.y + box.height / 2;
+  try {
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchStart',
+      touchPoints: [{ x, y }],
+    });
+    for (const dy of [20, 40, 60, 80])
+      await cdp.send('Input.dispatchTouchEvent', {
+        type: 'touchMove',
+        touchPoints: [{ x, y: y - dy }],
+      });
+  } finally {
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await cdp.detach();
+  }
+  await expect(grab).toHaveAttribute('aria-expanded', 'true');
+}
