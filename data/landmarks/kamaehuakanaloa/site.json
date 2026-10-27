@@ -18,7 +18,9 @@
   },
   "opening": {
     "mission": {
-      "rangeM": 130,
+      "rangeM": 110,
+      "chaseRadius": 35,
+      "chaseOffsetY": 100,
       "destinationLabel": "Hiolo North"
     },
     "freeDive": {

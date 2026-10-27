@@ -15,7 +15,7 @@
   },
   "opening": {
     "mission": {
-      "rangeM": 160,
+      "rangeM": 120,
       "destinationLabel": "the volcanic rim slope"
     },
     "freeDive": {

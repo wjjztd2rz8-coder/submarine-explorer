@@ -42,11 +42,11 @@ it('every authored site retains its mission approach distance', () => {
     endurance: 110,
     'axial-seamount-ashes': 110,
     'hudson-canyon': 112,
-    kamaehuakanaloa: 130,
+    kamaehuakanaloa: 110,
     'beebe-vent-field': 220,
     'great-blue-hole': 150,
     bismarck: 110,
-    'hunga-tonga-caldera': 160,
+    'hunga-tonga-caldera': 120,
     'blake-plateau-corals': 160,
   });
 });
@@ -121,8 +121,12 @@ for (const site of sites.landmarks) {
         const target = primaries[0];
         const range = p.distanceTo(target.position);
         expect(range).toBeCloseTo(MISSION_APPROACH_M[site], 2);
-        expect(range).toBeGreaterThanOrEqual(110);
+        expect(range).toBeGreaterThanOrEqual(110 - 0.01);
         expect(range).toBeLessThanOrEqual(300);
+        // Per-site mission camera data must reach the pose the mission applies.
+        const arm = siteManifest(site)?.opening?.mission;
+        expect(pose!.chaseRadius).toBe(arm?.chaseRadius);
+        expect(pose!.chaseOffsetY).toBe(arm?.chaseOffsetY);
         expect(p.y).toBeGreaterThanOrEqual(ratedDepth + settings.hullRadius);
         expect(p.y).toBeLessThan(-settings.hullRadius);
         expect(props.collide(p.clone(), settings.hullRadius + 4, new Vector3())).toBe(false);

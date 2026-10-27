@@ -212,6 +212,10 @@ export interface SiteManifest {
       destinationLabel?: string;
       localAltitudeWeight?: number;
       yawOffset?: number;
+      /** Opening chase arm, same meaning as the free-dive fields. */
+      chaseRadius?: number;
+      chaseOffsetX?: number;
+      chaseOffsetY?: number;
     };
     freeDive?: OpeningPose & {
       modes?: { arcade?: OpeningMode; realistic?: OpeningMode; custom?: OpeningMode };
@@ -302,7 +306,7 @@ const openingCheck = fields(
   {
     mission: fields(
       { rangeM: aboveZero },
-      { destinationLabel: text, localAltitudeWeight: finite, yawOffset: finite },
+      { destinationLabel: text, localAltitudeWeight: finite, yawOffset: finite, ...cameraFields },
     ),
     freeDive: fields(
       { hero: text, bearing: finite, range: aboveZero },

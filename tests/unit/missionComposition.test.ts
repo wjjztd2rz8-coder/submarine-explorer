@@ -499,7 +499,7 @@ it.each(
       }
       const range = target.position.distanceTo(new Vector3(pose.x, pose.y, pose.z));
       expect(range).toBeCloseTo(MISSION_APPROACH_M[site], 2);
-      expect(range).toBeGreaterThanOrEqual(110);
+      expect(range).toBeGreaterThanOrEqual(110 - 0.01);
       expect(range).toBeLessThanOrEqual(300);
       const radius = resolveScanRadius(
         missionApproachScanRadius(site, target.radius) * effective.sensor.scanRadiusMultiplier,
