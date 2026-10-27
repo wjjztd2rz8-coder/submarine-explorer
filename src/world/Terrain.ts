@@ -189,7 +189,8 @@ export class Terrain {
       tier,
       biome: this.biome,
       exaggeration: this.exaggeration,
-      rockDetailStrength: tier === 'low' ? undefined : this.fidelity?.normalStrength,
+      rockDetailStrength:
+        tier === 'low' || this.biome.smoothRock ? undefined : this.fidelity?.normalStrength,
     });
     this.material = built.material;
     this.textures = built.textures;

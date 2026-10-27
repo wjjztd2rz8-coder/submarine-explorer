@@ -96,6 +96,8 @@ export interface Biome {
   depthShade?: { startM: number; endM: number; tint: number };
   /** Horizontal rock banding on slopes: band thickness (m) and strength 0..1 (limestone strata). */
   strata?: { periodM: number; amount: number };
+  /** Skip the shader's fine rock lamination and grain; beds are baked or the rock is smooth. */
+  smoothRock?: boolean;
   /** Extra abyssal distance fade to fog; leaves the near seabed unchanged. */
   abyssFadeM?: readonly [number, number];
   /** Ease the distant seabed to the fog colour at any camera depth (soft horizon, no hard terrain edge). */
@@ -383,6 +385,7 @@ export const BIOMES: Record<string, Biome> = {
     depthShade: { startM: 30, endM: 105, tint: 0x3f6a82 },
     // Beds are baked into vertex colour (blueHoleTint), with riser ambient occlusion; no fragment striping.
     vertexTint: blueHoleTint,
+    smoothRock: true,
     // Across the 320 m bowl the reef should already dissolve into water haze.
     horizonFadeM: [80, 260],
     scatter: [
