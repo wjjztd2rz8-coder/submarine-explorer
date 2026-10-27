@@ -72,13 +72,13 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running (2026-10-27 evening review). Codex: 4730-4750 running or queued; queue 50-52 (R-ci-green confirm, S-verify Kama/Hunga, S-bughunt Journal) waits behind the dispatcher gate.
+- No Claude package running (2026-10-27 13:30). Codex: 4730-4750 running or queued; queue 50-52 (R-ci-green confirm, S-verify Kama/Hunga, S-bughunt Journal) waits behind the dispatcher gate.
 
 ## Backlog
 
 One list, ordered by player impact and dependencies; lane in brackets. Evidence: reviews 2026-10-27 (Claude alone, Sol skipped for Codex budget) and 2026-10-26 in `plan/REVIEWS.md`; earlier item histories in [archive/DIRECTOR-HISTORY-2026-10-26-backlog.md](archive/DIRECTOR-HISTORY-2026-10-26-backlog.md). Art gains per package are ~0.1-0.2, so each V-* names a target composition, not a geometry list. Owner phone decisions: [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md). Done this cycle (removed): V-hunga-subject, V-kama-axial-approach, V-monterey-banding, V-bluehole-roof, V-lostcity-surround, V-monterey-wall-skirt, V-beebe-flow, V-lostcity-towers, V-bluehole-silhouette, V-monterey-apron.
 
-1. **V-titanic-lift [Sonnet]:** (~3.6, lowest hero) the bow reads but the hull is a uniform dark brown against a black upper half (`titanic-1.png`). Target: documentary still, a soft sub-light pool on the bow and a faint horizon gradient so the upper frame isn't dead black; no new draws, High and Low share the change.
+1. **V-titanic-lift [Sonnet]:** DONE 2026-10-27 (by my read ~3.9: bow light pool and faint teal horizon work, aft hull still dark; phone/Low not re-shot). (~3.6, lowest hero) the bow reads but the hull is a uniform dark brown against a black upper half (`titanic-1.png`). Target: documentary still, a soft sub-light pool on the bow and a faint horizon gradient so the upper frame isn't dead black; no new draws, High and Low share the change.
 2. **V-kama-hull-frame [Sonnet, small]:** the Kama opening (110 m, raised arm) leaves the hull below frame on desktop. Target: sub fully in frame with the pillow field above it; a pose/camera-offset change through per-site mission data only.
 3. **V-hunga-bright [Sonnet, small]:** Hunga opening rim is legible but dim (~3.6). Target: rim and glow readable on a phone at default brightness via a small shared-shader or material lift, no per-site branch.
 4. **V-bluehole-roof-slab [Sonnet]:** retry of V-bluehole-lip with a thin-slab roof mesh with real holes (not depth tweaks); `great-blue-hole-1.png` shows stalactite gallery readable but the surrounding wall still reads as stacked terraces. Do not touch the shaft or the Low draw pin.
