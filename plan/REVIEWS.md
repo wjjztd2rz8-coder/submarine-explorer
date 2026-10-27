@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-10-26 19:32 CDT targeted review: Codex starved (empty queue)
+
+- Cause: queue emptied after 4480/4490/4500 finished; Codex 5h had recovered to 44% (week 56%, on pace) but nothing was queued. The Backlog's Codex lane held only standing items.
+- Fix: added Backlog item 8b and queued 4510 (verify Lost City surround and Monterey wall lift), 4520 (S-dead: delete unused terrace support) and 4530 (first-minute flow bug hunt); all three launched by the dispatcher. Visual lanes unchanged (six Sonnet items).
+- Needs owner: phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
 ## 2026-10-26 evening comprehensive review (Claude alone; Sol skipped, Codex 5h at 5%, script exit 75)
 
 **Changed since the morning review (golden 2026-10-26-142430 to 213811):** 4380/4390 spec rewrites, V-monterey-apron, V-bluehole-silhouette pass 2, 4410 phone checklist, 4430 (canvasThumbnail null guard), 4440 (CI flake audit), 4420 (numerics report), 4450 (scarp collision fixed, expected-failure cases now ordinary tests), V-lostcity-towers. **Hosted CI is green on fde5c15d (run 169) with Pages deployed; tagged f67.** This is the first green main since f66.
