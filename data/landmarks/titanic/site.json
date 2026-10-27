@@ -16,5 +16,19 @@
       "chaseOffsetX": -70,
       "chaseOffsetY": -24
     }
+  },
+  "atmosphere": {
+    "hemisphere": {
+      "name": "titanicFill",
+      "sky": 4876922,
+      "ground": 2761240,
+      "intensity": 2.0
+    },
+    "lamps": {
+      "intensity": 3.0,
+      "distance": 1.2,
+      "fillIntensity": 2.5,
+      "fillDistance": 1.3
+    }
   }
 }
