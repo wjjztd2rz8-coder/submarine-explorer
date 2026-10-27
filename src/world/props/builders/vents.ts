@@ -10,7 +10,7 @@ import { propManifest } from '../../../core/SiteManifest.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { ChimneyMaterial, PropsConfig } from '../../../core/Config.js';
 import { geoDetail } from '../geo/detail.js';
-import { geoMaterial, mineralCrust } from '../geo/materials.js';
+import { geoMaterial, mineralCrust, vertexGlow } from '../geo/materials.js';
 import { buildGeo } from '../geo/index.js';
 import { buildCarbonateChimney } from '../geo/towers.js';
 import { buildCrustedChimney } from '../geo/crustChimney.js';
@@ -191,6 +191,14 @@ export const VENT_BUILDERS = {
       mineralCrust(body.geometry, input.seed, input.cfg.chimneyCrust);
       body.material.bumpScale = input.cfg.chimneyCrust.bumpScale;
     }
+    const glow = propManifest(input.def.id)?.bodyGlow;
+    if (!input.def.feature && glow)
+      vertexGlow(
+        (built.full as THREE.Mesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>).material,
+        glow,
+        0xff9a68,
+        0.5,
+      );
     return addBeebeSeabed(built, input);
   },
 } satisfies Record<'chimney', ProceduralBuilder>;

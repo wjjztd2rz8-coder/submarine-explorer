@@ -45,5 +45,22 @@
         "intensity": 14
       }
     }
+  },
+  "props": {
+    "mushroom-chimney": {
+      "bodyGlow": 0.5
+    },
+    "inferno-chimney": {
+      "bodyGlow": 0.5
+    },
+    "hell-chimney": {
+      "bodyGlow": 0.5
+    },
+    "phoenix-chimney": {
+      "bodyGlow": 0.5
+    },
+    "virgin-chimney": {
+      "bodyGlow": 0.5
+    }
   }
 }

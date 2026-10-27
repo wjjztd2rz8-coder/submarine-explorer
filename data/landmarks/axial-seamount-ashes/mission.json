@@ -5,7 +5,19 @@
   "title": "ASHES vent field dive, Axial Seamount",
   "hull_class": "B",
   "environment": {
-    "preset": "vent"
+    "preset": "vent",
+    "overrides": {
+      "smokeOpacitySulfide": 0.9,
+      "smokeColorSulfide": 1841688,
+      "ambientFill": 6,
+      "hullLight": 0.5,
+      "hazeGlow": 0.6,
+      "glowIntensity": 3000,
+      "glowDistanceM": 60,
+      "glowLights": 3,
+      "glowDropM": 3,
+      "glowStandoffM": 4
+    }
   },
   "species_file": "species.json",
   "spawn": {

@@ -138,6 +138,8 @@ export interface PropManifest {
   habitat?: boolean;
   seabed?: { biome: string };
   mineralCrust?: boolean;
+  /** Warm self-lit lift on a plain chimney body (strength in (0, 1]), so small vents read in dark water. */
+  bodyGlow?: number;
   smoker?: SmokerProfile;
   chimney?: Record<(typeof chimneyVariationKeys)[number], number> & { shape: ChimneyShape };
 }
@@ -444,6 +446,7 @@ const propCheck = fields(
     habitat: flag,
     seabed: fields({ biome: text }),
     mineralCrust: flag,
+    bodyGlow: positiveFraction,
     smoker: fields(
       {
         ...numericFields(chimneyShapeKeys, aboveZero),

@@ -17,7 +17,13 @@ export function goldenOptions(env = process.env) {
       const [width, height] = sizes[name];
       return { name, width, height };
     });
-  const aliases = { 'blue-hole': 'great-blue-hole', monterey: 'monterey-canyon' };
+  const aliases = {
+    'blue-hole': 'great-blue-hole',
+    monterey: 'monterey-canyon',
+    axial: 'axial-seamount-ashes',
+    kama: 'kamaehuakanaloa',
+    hunga: 'hunga-tonga-caldera',
+  };
   const only = env.GOLDEN_SITES?.split(',').map((site) => {
     const id = site.trim();
     return Object.hasOwn(aliases, id) ? aliases[id] : id;
