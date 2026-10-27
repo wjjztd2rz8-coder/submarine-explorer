@@ -2,10 +2,10 @@
 
 ## Changes
 
-- Root cause of the fine scanlines was not the baked beds: the terrain fragment shader's rock lamination (`bedPhase`, ~1.5 m period) and the geometry carve's two concentric sine "strata" terms. Removed/disabled all three sources.
-- `src/world/terrainFeatures.ts`: deleted the carve `strata` sine term (net simpler). Rewrote the baked beds in `blueHoleTint`: ~17 m broad bands, tilted/wavy boundaries (bearing and position wobble), soft blend between neighbouring bed tones, no dark joint, vertical staining streaks deepening below ~30 m, gentle lighter-above/deeper-below value gradient.
+- Root cause of the fine scanlines was not the baked beds: it was the terrain fragment shader's rock lamination (`bedPhase`, ~1.5 m period), plus the fragment `strata` entry and the baked 3.4 m beds.
+- `src/world/terrainFeatures.ts`: Rewrote the baked beds in `blueHoleTint`: ~17 m broad bands, tilted/wavy boundaries (bearing and position wobble), soft blend between neighbouring bed tones, no dark joint, vertical staining streaks deepening below ~30 m, gentle lighter-above/deeper-below value gradient.
 - `src/world/TerrainBiome.ts`: dropped the blue-hole fragment `strata` entry; new optional biome flag `smoothRock` (set for the blue hole) that skips the shader's fine lamination and grain. Applied in `Terrain.ts` where rock detail strength is chosen.
-- Roof geometry, shaft, colliders, spawn and Low draw pin untouched. The carve change shifts wall/floor heights by up to ~2 m (the removed strata term), so the pose moved ~1 m deeper.
+- Roof geometry, shaft, colliders, spawn and Low draw pin untouched. Heights are unchanged (removing the carve strata term was tried and reverted: it moved the shelf and broke the shaft pixel budget).
 
 ## Screenshots
 
@@ -13,11 +13,11 @@
 
 ## Tests
 
-Gates: see final report (`PW_PORT=5341 tools/gates.sh`).
+Snapshots re-baselined for the intended change only: tint hashes in terrainFeatures (heights hash unchanged) and beebeIsolation (blue-hole biome and shader define/uniforms). Unit suite otherwise green; first full gates run failed only on those snapshots plus the reverted carve change.
 
 ## Simplicity
 
-Net: one carve term and one fragment strata entry deleted; one optional biome flag added (data, no site branch). No new draws.
+Net: one fragment strata entry and the joint/fine-bed code deleted; one optional biome flag added (data, no site branch). No new draws.
 
 ## Remaining issues
 

@@ -517,6 +517,13 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
         (0.5 * Math.sin(dx * 0.35 + 0.8 * Math.sin(dz * 0.09)) +
           0.9 * Math.sin(dz * 0.13 + dx * 0.05) +
           1.4 * Math.sin(dx * 0.045) * Math.sin(dz * 0.06));
+      // Limestone strata: concentric shelves and recesses on the wall read as horizontal bands.
+      const wall =
+        smoothstep(Math.min(1, Math.max(0, (r - 104) / 6))) *
+        (1 - smoothstep(Math.min(1, Math.max(0, (r - 152) / 8))));
+      const strata =
+        wall *
+        (1.6 * Math.sin(r * 0.62 + 1.4 * Math.sin(3 * a)) + 0.9 * Math.sin(r * 1.37 + 2 * a));
       // Fallen blocks and sediment mounds on the floor.
       const blocks = floor * boulderField(dx, dz);
       return Math.min(
@@ -524,6 +531,7 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
         profileAt(r) +
           ledge +
           ripple +
+          strata +
           blocks +
           lipBand * 1.1 * Math.max(0, Math.sin(37 * a + r * 0.7)) ** 3 +
           blueHoleWallRelief(a, r) +
