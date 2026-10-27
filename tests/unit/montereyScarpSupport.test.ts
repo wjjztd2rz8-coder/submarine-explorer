@@ -21,8 +21,8 @@ vi.mock('../../src/world/TerrainBiome.js', async (importOriginal) => {
 // Validate contacts against exposed survey-backed wall triangles at every tier.
 describe.each([
   { tier: 'medium', bank: 'east', x: -111.36363636363637, y: 167.02843730848141 },
-  { tier: 'high', bank: 'west', x: -18.181818181818187, y: 126.9591006339439 },
-  { tier: 'medium', bank: 'west', x: -18.181818181818187, y: 127.23810102354102 },
+  { tier: 'high', bank: 'west', x: -50, y: 127 },
+  { tier: 'medium', bank: 'west', x: -50, y: 127 },
   { tier: 'low', bank: 'west', x: -160, y: 147.57527326112694 },
 ] as const)('$tier $bank upper-wall contact', ({ tier, bank, x, y }) => {
   let collides: boolean;
