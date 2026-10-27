@@ -567,7 +567,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       bedHard.push(Math.min(1, 0.55 * thick + 0.6 * Math.pow(bedRnd(), 1.6)));
       const pal = MONTEREY_STRATA.bedPalette;
       const c = new THREE.Color(pal[Math.floor(bedRnd() * pal.length) % pal.length]);
-      c.multiplyScalar(0.78 + 0.4 * bedRnd());
+      c.multiplyScalar(MONTEREY_STRATA.bedTone[0] + MONTEREY_STRATA.bedTone[1] * bedRnd());
       bedColour.push(c);
     }
   }
@@ -700,9 +700,16 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     );
     if (bc > 1) {
       // Thin laminae inside each bed, a sharp shadow line under every ledge, and fine grain.
-      const s4 = s * 4.3 + fbm3(x * 0.08, 3, seed + 12, seed, 2) * 0.8;
-      const lam = fbm3(Math.floor(s4) * 2.3 + 0.5, 1.5, seed + 31, seed + 8, 1);
-      const lipDark = 1 - 0.34 * (1 - smooth(0, 0.07, saw));
+      // Eroded beds warp the laminae in x and y and mix each with local noise, so no tone
+      // runs unbroken along the wall (a long uniform stripe aliases into moire).
+      const warp = erodedBeds ? MONTEREY_STRATA.laminaWarp : 0.8;
+      const s4 = s * 4.3 + (fbm3(x * 0.08, y * 0.12, seed + 12, seed, 2) - 0.5) * 2 * warp;
+      const laminaTone = fbm3(Math.floor(s4) * 2.3 + 0.5, 1.5, seed + 31, seed + 8, 1);
+      const lam = erodedBeds
+        ? laminaTone +
+          MONTEREY_STRATA.laminaBreak *
+            (fbm3(x * 0.2, y * 0.35, z * 0.2, seed + 37, 2) - laminaTone)
+        : laminaTone;
       const lipLit = 1 + 0.2 * smooth(0.86, 0.98, saw) * (1 - smooth(0.98, 1, saw));
       const rill =
         1 - Math.abs(2 * fbm3(x * P.gullyFreq, y * 0.03, seed + 1, seed, gullyOctaves) - 1);
@@ -710,8 +717,13 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       const grain = 0.88 + 0.24 * fbm3(x * 1.7, y * 2.2, z * 1.7, seed + 66, 2);
       // Laminae fade in and out along the wall rather than ruling every bed the same way.
       const lamFade = erodedBeds
-        ? smooth(0.25, 0.7, fbm3(x * 0.035, y * 0.05, seed + 55, seed + 19, 2))
+        ? smooth(0.4, 0.75, fbm3(x * 0.035, y * 0.05, seed + 55, seed + 19, 2))
         : 1;
+      // The shadow line under a ledge fades where the laminae do, so joints are not ruled evenly.
+      const lipShare = erodedBeds
+        ? MONTEREY_STRATA.lipFloor + (1 - MONTEREY_STRATA.lipFloor) * lamFade
+        : 1;
+      const lipDark = 1 - 0.34 * (1 - smooth(0, 0.07, saw)) * lipShare;
       out.multiplyScalar(
         (1 + (0.84 + 0.32 * lam - 1) * lamFade) * lipDark * lipLit * gullyShade * grain,
       );
