@@ -160,6 +160,20 @@ function shell(savedSite: string | null = null, inDive = false, reuse?: ShellCon
   };
 }
 
+it('browser history traversal reloads the selected route and releases its listener on teardown', () => {
+  const fixture = shell(null, true);
+  const reload = vi.fn();
+  Object.assign(window.location, { reload });
+  fixture.ctx.setAppState('home');
+  window.dispatchEvent(new Event('popstate'));
+  expect(reload).toHaveBeenCalledOnce();
+  window.dispatchEvent(new Event('popstate'));
+  expect(reload).toHaveBeenCalledTimes(2);
+  shellSystem.dispose?.();
+  window.dispatchEvent(new Event('popstate'));
+  expect(reload).toHaveBeenCalledTimes(2);
+});
+
 describe('Home announced destination', () => {
   it.each([null, 'great-blue-hole', 'removed-site'])(
     'keeps pending and resolved launch consistent with saved site %s',

@@ -56,11 +56,13 @@ export const discoverySystem: GameSystem = {
       ctx.discovery.scanner.setObjective(
         nextScanObjective(ctx.missionRouter?.mission.objectives)?.poiId ?? null,
       );
-      // An open Journal freezes piloting, but its pad button must still close it.
+      // Journal shortcuts remain available to the top Journal or Home overlay,
+      // including Home reached by cancelling or leaving this dive runtime.
       const input =
         !globalThis.document?.hidden &&
-        ctx.discovery.guide.isOpen &&
-        ctx.discovery.guide.isTop &&
+        (ctx.discovery.guide.isOpen
+          ? ctx.discovery.guide.isTop
+          : ctx.app.state === 'home' && ctx.home.isTop) &&
         f.sampled.toggleGuide
           ? { ...f.state, toggleGuide: true }
           : f.state;

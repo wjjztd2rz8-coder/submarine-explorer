@@ -1,10 +1,98 @@
 import { expect, test, type Page } from './helpers/unlocked.js';
 import { waitForFrames } from './helpers/frames.js';
+import { test as freshTest } from '@playwright/test';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
+import { homeReady, openSiteList } from './helpers/home.js';
+
+for (const touch of [false, true]) {
+  freshTest.describe(`Home Journal shortcut ${touch ? '390x844 touch' : 'desktop'}`, () => {
+    freshTest.use({
+      viewport: touch ? { width: 390, height: 844 } : { width: 1280, height: 800 },
+      hasTouch: touch,
+      isMobile: touch,
+      storageState: { cookies: [], origins: [] },
+      serviceWorkers: 'block',
+    });
+
+    freshTest(
+      'Journal shortcut survives cancelling a briefing and respects covering dialogs',
+      async ({ page }) => {
+        // Regression guard: the dive input gate swallowed Home's Journal shortcut after cancellation.
+        await pauseClockBeforeNavigation(page);
+        await page.goto('/?tier=low', { waitUntil: 'domcontentloaded' });
+        await homeReady(page, true);
+        const journal = page.locator('.journal');
+        const shortcut = async () => {
+          await page.keyboard.press('j');
+          await page.clock.runFor(50);
+        };
+        await shortcut();
+        await expect(journal).toBeVisible();
+        await page.keyboard.press('Escape');
+        const sites = page.locator('.home-menu').getByRole('button', { name: 'Dive sites' });
+        if (touch) await sites.tap();
+        else await sites.click();
+        await openSiteList(page, touch, true);
+        const site = page.locator('.home-sites [data-mission="titanic"]');
+        await Promise.all([
+          page.waitForURL(/[?&]mission=titanic\b/, { waitUntil: 'domcontentloaded' }),
+          touch ? site.tap() : site.click(),
+        ]);
+        await clockFramesUntil(page, () => window.__gameReady === true && !!window.__game?.mission);
+        const cancel = page.locator('.briefing-cancel');
+        if (touch) await cancel.tap();
+        else await cancel.click();
+        await homeReady(page, true);
+        await shortcut();
+        await expect(journal).toBeVisible();
+        await expect(page.locator('body')).toHaveAttribute('data-app-state', 'home');
+        await shortcut();
+        await expect(journal).toBeHidden();
+
+        // A covering modal keeps ownership of J, and closing it must not replay the key.
+        await page
+          .locator('.home-menu')
+          .getByRole('button', { name: 'Settings', exact: true })
+          .click();
+        await shortcut();
+        await expect(journal).toBeHidden();
+        await page.keyboard.press('Escape');
+        await page.clock.runFor(50);
+        await expect(journal).toBeHidden();
+        await shortcut();
+        await expect(journal).toBeVisible();
+        await page.keyboard.press('Escape');
+        await expect(journal).toBeHidden();
+        await expect(page.locator('.home-screen')).toBeVisible();
+      },
+    );
+  });
+}
 
 async function boot(page: Page, url: string): Promise<void> {
   await page.goto(url, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
 }
+
+test('browser Back and Forward resolve the URL after quitting to Home', async ({ page }) => {
+  // Regression guard: Back restored a mission URL while Home retained its disposed mission runtime.
+  await boot(page, '/?mission=titanic&tier=low');
+  await page.locator('.briefing-begin').click();
+  await expect(page.locator('.briefing')).toBeHidden();
+  await page.keyboard.press('Escape');
+  await page.locator('.pause-menu').getByRole('button', { name: 'Quit to home' }).click();
+  await expect(page.locator('.home-screen')).toBeVisible();
+  await page.goBack({ waitUntil: 'domcontentloaded' });
+  await expect(page.locator('.briefing')).toBeVisible();
+  await expect(page.locator('.home-screen')).toBeHidden();
+  await expect(page.locator('body')).toHaveAttribute('data-app-state', 'dive');
+  await expect(page).toHaveURL(/[?&]mission=titanic\b/);
+  await page.goForward({ waitUntil: 'domcontentloaded' });
+  await expect(page.locator('.home-screen')).toBeVisible();
+  await expect(page.locator('.briefing')).toHaveCount(0);
+  await expect(page.locator('body')).toHaveAttribute('data-app-state', 'home');
+  await expect(page).not.toHaveURL(/[?&]mission=/);
+});
 
 test('returning Home and selecting another site keeps one HUD and touch control tree', async ({
   page,

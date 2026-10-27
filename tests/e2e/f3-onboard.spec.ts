@@ -394,6 +394,28 @@ test.describe('touch viewport', () => {
     ).toBeFocused();
   });
 
+  test('keyboard Escape from touch Pause keeps tutorial labels and control mode consistent', async ({
+    page,
+  }) => {
+    // Regression guard: modal Escape changed coaching to keyboard while leaving touch controls active.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await boot(page, '&touch=1');
+    await page.locator('.tc-btn-pause').tap();
+    await expect(page.locator('.pause-menu')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.pause-menu')).toBeHidden();
+    await expect(page.locator('.tc-root')).toBeHidden();
+    await expect(page.locator('html')).not.toHaveClass(/is-touch/);
+    await expect(page.locator(GUIDANCE.tutorial)).toContainText('Hold W');
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => (window.__game as { controlsCard: { device: string } }).controlsCard.device,
+        ),
+      )
+      .toBe('keyboard');
+  });
+
   test('Journal returns to Pause without switching out of touch mode', async ({ page }) => {
     await boot(page, '&touch=1');
     await dismissTutorial(page, true);

@@ -66,6 +66,9 @@ export const shellSystem: GameSystem = {
 export function initializeShell(ctx: ShellContext): void {
   const { index, meta, route, bus, save, journal, discoveries, app } = ctx;
   let disposed = false;
+  // Returning Home disposes the mission. History traversal must boot the
+  // selected URL again rather than leave that discarded runtime behind it.
+  cleanup.listen(window, 'popstate', () => window.location.reload());
   const missionSelect = new MissionSelect(index, {
     currentTileId: meta?.id,
     currentMissionId: route?.missionId,
