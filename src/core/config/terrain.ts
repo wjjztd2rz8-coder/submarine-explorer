@@ -104,8 +104,6 @@ export interface TerrainFidelity {
   /** Parallel-bed corrugation share (default 0.35) and rill stretch along z (default 0.35; 1 = round). */
   reliefBed?: number;
   rillStretch?: number;
-  /** Broken shelves on rock slopes: bed thickness (m) and how far treads and risers pull the surface (0..1). */
-  terrace?: { periodM: number; amount: number };
   /**
    * Current scour around a large object lying on soft bed: a moat that dips toward the footprint
    * (a rectangle centred on `lat`/`lon`, `headingDeg` along its length) and a silty rim beyond it.
@@ -151,8 +149,6 @@ export const LOST_CITY_FIDELITY: TerrainFidelity = {
   // Parallel sine beds and z-stretched rills read as stretched stripes on the slope.
   reliefBed: 0,
   rillStretch: 1,
-  // Dark sediment drapes the massif into broad rounded slopes; only faint shelves survive.
-  terrace: { periodM: 24, amount: 0 },
   normalStrength: 0.2,
 };
 

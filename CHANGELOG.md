@@ -25,6 +25,8 @@ without an entry here is not done.
 
 ### Removed
 
+- **S-dead:** delete unused terrain fidelity terrace displacement, its config field and its dedicated tests. No shipped site enabled it; terrain geometry and contact behavior are unchanged.
+
 - **P2-copy:** the Settings Controls (key bindings) button and pane are hidden on touch devices. Reason: touch has no rebindable keys, so the entry only led to a dead end.
 
 - **P2-boost-cut:** remove boost from touch, Shift and gamepad RT, including its reserve/recovery logic, thrust multiplier, power surcharge and tuning. Reason: the owner phone test found no useful perceived effect; fewer controls simplify piloting. X remains camera reset.
