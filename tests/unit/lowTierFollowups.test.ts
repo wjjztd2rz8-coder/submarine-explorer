@@ -194,15 +194,36 @@ for (const tier of ['low', 'medium', 'high'] as const) {
       );
       const primaries = pois.filter((p) => p.primary);
       const settings = spawnSettings(config);
-      for (const pose of [
-        composedFreeDiveSpawn(site, meta, terrain, props, settings, -6500, config.camera),
-        composedMissionSpawn(site, primaries, meta, terrain, props, settings, -6500, config.camera),
-      ]) {
+      for (const [kind, pose] of [
+        ['free', composedFreeDiveSpawn(site, meta, terrain, props, settings, -6500, config.camera)],
+        [
+          'mission',
+          composedMissionSpawn(
+            site,
+            primaries,
+            meta,
+            terrain,
+            props,
+            settings,
+            -6500,
+            config.camera,
+          ),
+        ],
+      ] as const) {
         expect(pose).not.toBeNull();
         const position = new Vector3(pose!.x, pose!.y, pose!.z);
         const forward = new Vector3(Math.sin(pose!.yaw), 0, -Math.cos(pose!.yaw));
         const facing = forward.dot(ventCentre.clone().sub(position).setY(0).normalize());
         expect(facing).toBeGreaterThan(0.98);
+        if (kind === 'free') {
+          // Moving the scenic anchor can raise the opening on the slope and
+          // take the vent out of the level scan beam despite a correct yaw.
+          const scanner = new Scanner(config.scan, new EventBus());
+          scanner.setTargets(pois);
+          scanner.update(0, position, forward, false);
+          expect(scanner.view.nearestDistance).toBeLessThanOrEqual(120);
+          expect(scanner.view.candidateId).toBe('kh-hiolo-north');
+        }
         expect(props.collide(position.clone(), config.submarine.hullRadius, new Vector3())).toBe(
           false,
         );

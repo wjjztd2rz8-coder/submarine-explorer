@@ -664,10 +664,10 @@ exports[`free-dive openings on actual survey terrain and procedural hero geometr
     "chaseOffsetY": -10,
     "chaseRadius": undefined,
     "portraitChaseOffset": undefined,
-    "x": -189.3327543472543,
-    "y": -1282.2602079964668,
-    "yaw": 0.8311465036540616,
-    "z": 524.4667646362323,
+    "x": -180.95044798743803,
+    "y": -1275.644927349169,
+    "yaw": 0.8142620254655577,
+    "z": 518.2032974560203,
   },
 }
 `;
@@ -688,10 +688,10 @@ exports[`free-dive openings on actual survey terrain and procedural hero geometr
     "chaseOffsetY": -10,
     "chaseRadius": undefined,
     "portraitChaseOffset": undefined,
-    "x": -189.3327543472543,
-    "y": -1282.2602079964668,
-    "yaw": 0.8311465036540616,
-    "z": 524.4667646362323,
+    "x": -180.95044798743803,
+    "y": -1275.644927349169,
+    "yaw": 0.8142620254655577,
+    "z": 518.2032974560203,
   },
 }
 `;
@@ -712,10 +712,10 @@ exports[`free-dive openings on actual survey terrain and procedural hero geometr
     "chaseOffsetY": -10,
     "chaseRadius": undefined,
     "portraitChaseOffset": undefined,
-    "x": -189.3327543472543,
-    "y": -1282.2602079964668,
-    "yaw": 0.8311465036540616,
-    "z": 524.4667646362323,
+    "x": -180.95044798743803,
+    "y": -1275.644927349169,
+    "yaw": 0.8142620254655577,
+    "z": 518.2032974560203,
   },
 }
 `;
