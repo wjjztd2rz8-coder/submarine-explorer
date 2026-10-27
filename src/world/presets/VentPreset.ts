@@ -167,12 +167,13 @@ export class VentPreset implements EnvPreset {
     const seed = new Float32Array(n * 4);
     const vari = new Float32Array(n * 4);
     const pace = new Float32Array(n);
+    const swing = new Float32Array(n);
     const rnd = mulberry(0x5e17);
     // Per-vent variety (deterministic from the vent's position): height, width, opacity and
     // lean scales, a lean-angle offset, and a small white-smoker wisp beside the orifice.
     const wispN = carbonate ? 0 : Math.floor(per * 0.16);
     let k = 0;
-    for (const s of this.sources) {
+    this.sources.forEach((s, si) => {
       const v = ventVariety(s.top);
       for (let i = 0; i < per; i++, k++) {
         const wisp = i < wispN;
@@ -185,13 +186,16 @@ export class VentPreset implements EnvPreset {
         seed.set([rnd(), rnd() * Math.PI * 2, Math.sqrt(rnd()), rnd()], k * 4);
         vari.set([v.height, v.width, v.opacity, wisp ? -v.lean : v.lean], k * 4);
         pace[k] = v.pace;
+        // Neighbouring vents (tallest first) bend opposite ways instead of all downstream.
+        swing[k] = si % 2;
       }
-    }
+    });
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(origin, 3));
     geo.setAttribute('aSeed', new THREE.BufferAttribute(seed, 4));
     geo.setAttribute('aVar', new THREE.BufferAttribute(vari, 4));
     geo.setAttribute('aPace', new THREE.BufferAttribute(pace, 1));
+    geo.setAttribute('aSwing', new THREE.BufferAttribute(swing, 1));
 
     const riseH = num(p.riseHeightM, 70);
     const riseMps = Math.max(0.05, num(p.riseMps, 1.2));
@@ -397,6 +401,7 @@ uniform vec2  uDrift;
 attribute vec4 aSeed; // phase, angle, radial, jitter
 attribute vec4 aVar; // per-vent height, width, opacity scale, lean (negative = wisp)
 attribute float aPace; // per-vent rise-rate scale
+attribute float aSwing; // 1 = this vent bends the other way
 uniform vec3 uWisp;
 varying vec3 vColor;
 varying float vAlpha;
@@ -420,7 +425,9 @@ void main() {
   float lobe = 0.72 + 0.34 * sin(h * 0.21 + cph * 5.0 + uTime * 0.08)
                     + 0.18 * sin(h * 0.53 - aSeed.y * 3.0 + cph);
   float bias = mix(0.55, 1.0, aSeed.w) * (aSeed.w > 0.93 ? 1.35 : 1.0);
-  float r = uSpread * ws * (0.06 + 0.94 * pow(t, 1.35)) * aSeed.z * max(0.35, lobe) * bias;
+  // The column thins toward its top (cooled, dispersing fluid) instead of staying a dense pillar.
+  float taper = 1.0 - 0.65 * smoothstep(0.2, 0.9, t);
+  float r = uSpread * ws * (0.06 + 0.94 * pow(t, 1.35)) * aSeed.z * max(0.35, lobe) * bias * taper;
   float a = aSeed.y + sin(uTime * 0.35 + aSeed.w * 12.0) * 0.6 * t;
   vec3 w = position + vec3(cos(a) * r, h, sin(a) * r);
   // The whole column meanders (phase per chimney) and bends downstream with the current.
@@ -430,7 +437,7 @@ void main() {
   // Bends with height: the column starts upright and leans further the higher it goes.
   float bend = wisp ? 0.6 : lean;
   vec2 dd = uDrift * bend;
-  float la = (aVar.x - 0.8) * 0.9;
+  float la = (aVar.x - 0.8) * 0.9 + aSwing * 2.4;
   dd = mat2(cos(la), sin(la), -sin(la), cos(la)) * dd;
   w.xz += dd * pow(t, 1.7) * (wisp ? 0.35 : 1.0);
   // Turbulent wobble grows with height.
@@ -438,11 +445,11 @@ void main() {
   w.z += cos(uTime * 0.7 + aSeed.w * 23.0 + h * 0.15) * (0.8 + 1.4 * t) * t;
 
   // Puffs bloom quickly near the source, then keep swelling slowly.
-  float size = mix(uSize0, uSize1, sqrt(t)) * (0.7 + 0.6 * aSeed.w) * (wisp ? 0.3 : sqrt(aVar.y));
+  float size = mix(uSize0, uSize1, sqrt(t)) * (0.7 + 0.6 * aSeed.w) * (wisp ? 0.3 : sqrt(aVar.y)) * taper;
   float dist = placePoint(w, size);
   // Lit by the headlights, plus the warm orifice glow for the first few metres.
   vColor = (wisp ? uWisp : uColor) * presetLight(w) + uGlow * exp(-h / 5.0);
-  vAlpha = uOpacity * (wisp ? 0.4 : aVar.z) * smoothstep(0.0, 0.04, t) * (1.0 - smoothstep(0.5, 1.0, t));
+  vAlpha = uOpacity * (wisp ? 0.4 : aVar.z) * smoothstep(0.0, 0.04, t) * (1.0 - smoothstep(0.2, 0.9, t));
   vFog = presetFog(dist);
   vSeed = aSeed.w + aSeed.y;
   vRot = aSeed.y + uTime * 0.12 * (aSeed.z - 0.6);
