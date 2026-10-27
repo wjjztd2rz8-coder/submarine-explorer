@@ -2255,3 +2255,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-titanic-lift (Sonnet; Titanic lamp/fill via site data, lifted abyss horizon in shared atmosphere config; by my read ~3.9 vs agent's 4.2, aft hull still dark). Endurance fallback and lowSweep snapshots rebaselined. Gates smoke + project-base passed on branch (first run hit the 10 min tool limit, rerun clean). 4730-4750 worktrees idle with uncommitted work: Codex 5h at 4% until 14:00 reset; queue 50-52 waits. Next: V-kama-hull-frame, V-hunga-bright. No tag (hosted CI unverified).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-27 14:37 CDT headless run 189 (Claude): one Sonnet package
+
+- Merged V-kama-hull-frame (Sonnet; two numbers in Kama site.json mission opening, hull fully in frame on desktop and portrait, ~3.8 by my read; High not captured). Gates smoke + project-base pass on main. Codex 4730-4750 worktrees still hold uncommitted work, queue 50-52 waits for the dispatcher (Codex 5h reset 14:00). Next: V-hunga-bright. No tag (hosted CI unverified).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
