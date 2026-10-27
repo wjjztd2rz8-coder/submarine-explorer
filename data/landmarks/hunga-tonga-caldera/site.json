@@ -25,6 +25,12 @@
     }
   },
   "atmosphere": {
+    "lamps": {
+      "intensity": 3,
+      "distance": 1.2,
+      "fillIntensity": 3.5,
+      "fillDistance": 1.4
+    },
     "tiers": {
       "low": {
         "depthM": -200,
