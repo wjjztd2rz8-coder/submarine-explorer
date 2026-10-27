@@ -205,7 +205,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
         halfX: pw / 2,
         halfZ: pd / 2,
         count: Math.round((lone ? 12 : 130) * d.growth ** 0.5),
-        size: Math.max(1, main.r0 * 0.1),
+        size: Math.max(1, main.r0 * 0.15),
         detail: Math.min(d.sphereDetail, 1),
         seed: seed + 419,
       }),
@@ -395,7 +395,10 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     out.b *= tint[2];
     // Toward the outline the rubble thins into the surrounding seabed colour, patchily.
     const rn = rim(x, z) + (n1 - 0.5) * 0.35 + (n2 - 0.5) * 0.12;
-    out.lerp(SEABED, smooth(0.8, 1.1, rn) * (1 - up * 0.5));
+    out.lerp(SEABED, smooth(0.95, 1.25, rn) * (1 - up * 0.5));
+    // Pale talus: the apron and its blocks stay bright carbonate until the rim, so the columns
+    // read as grown out of a debris pile rather than set on dark floor.
+    out.lerp(OLD, (1 - up) * (1 - smooth(0.8, 1.15, rn)) * 0.85);
     // Mineral variation: white brucite/aragonite crust, cream, and grey-blue carbonate,
     // drifting in broad patches that stretch vertically with the flow.
     const mineral = fbm3(x * 0.32, y * 0.045, z * 0.32, seed ^ 0x3b1, 3);
