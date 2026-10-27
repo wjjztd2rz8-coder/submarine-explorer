@@ -567,7 +567,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       bedHard.push(Math.min(1, 0.55 * thick + 0.6 * Math.pow(bedRnd(), 1.6)));
       const pal = MONTEREY_STRATA.bedPalette;
       const c = new THREE.Color(pal[Math.floor(bedRnd() * pal.length) % pal.length]);
-      c.multiplyScalar(0.78 + 0.4 * bedRnd());
+      c.multiplyScalar(MONTEREY_STRATA.bedTone[0] + MONTEREY_STRATA.bedTone[1] * bedRnd());
       bedColour.push(c);
     }
   }

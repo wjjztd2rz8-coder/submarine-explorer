@@ -1,7 +1,7 @@
 /** Irregular mudstone beds, local slump scars and pale sediment on exposed shelves. */
 export const MONTEREY_STRATA = {
   /** Bed thickness range (relative); drawn with a skew so thin beds dominate and a few are massive. */
-  thickness: [0.3, 3.4],
+  thickness: [0.7, 3.4],
   thicknessSkew: 2.2,
   /** Muted bed albedos: olive-grey, tan, cool grey, dark olive, pale buff. */
   bedPalette: [0x8f8c72, 0xa58f6c, 0x7d8284, 0x5f6250, 0xb0a585],
@@ -16,6 +16,8 @@ export const MONTEREY_STRATA = {
   toneDrift: 0.9,
   faintBedAmount: 0.45,
   /** Lamina wobble (in laminae) and the share of each lamina's tone replaced by local noise, to break long stripes. */
+  /** Per-bed albedo multiplier: floor and swing. */
+  bedTone: [0.86, 0.26],
   laminaWarp: 1.6,
   laminaBreak: 0.65,
   /** Share of the ledge shadow line kept where laminae fade out. */
