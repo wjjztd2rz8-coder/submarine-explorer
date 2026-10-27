@@ -132,7 +132,16 @@ export function composedMissionSpawn(
       localAltitude * (siteManifest(siteId)?.opening?.mission?.localAltitudeWeight ?? 0);
     if (score < bestScore) {
       bestScore = score;
-      best = { x: p.x, y: p.y, z: p.z, yaw };
+      const arm = siteManifest(siteId)?.opening?.mission;
+      best = {
+        x: p.x,
+        y: p.y,
+        z: p.z,
+        yaw,
+        chaseRadius: arm?.chaseRadius,
+        chaseOffsetX: arm?.chaseOffsetX,
+        chaseOffsetY: arm?.chaseOffsetY,
+      };
     }
   }
   return best;
