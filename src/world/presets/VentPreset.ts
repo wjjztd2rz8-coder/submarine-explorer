@@ -48,6 +48,8 @@ interface VentVariety {
   lean: number;
   wispX: number;
   wispZ: number;
+  /** Rise-rate scale: fast vents stream, slow ones billow. */
+  pace: number;
 }
 
 /** Deterministic per-vent plume variation from the orifice position (stable across runs). */
@@ -61,10 +63,11 @@ export function ventVariety(top: THREE.Vector3): VentVariety {
   const a = r() * Math.PI * 2;
   const d = 0.9 + r() * 1.4;
   return {
-    height: 0.7 + r() * 0.55,
-    width: 0.55 + r() * 1.0,
+    height: 0.55 + r() * 0.85,
+    width: 0.55 + r() * 1.25,
     opacity: 0.55 + r() * 0.5,
-    lean: 0.45 + r() * 1.2,
+    lean: 0.3 + r() * 1.5,
+    pace: 0.7 + r() * 0.6,
     wispX: Math.cos(a) * d,
     wispZ: Math.sin(a) * d,
   };
@@ -163,6 +166,7 @@ export class VentPreset implements EnvPreset {
     const origin = new Float32Array(n * 3);
     const seed = new Float32Array(n * 4);
     const vari = new Float32Array(n * 4);
+    const pace = new Float32Array(n);
     const rnd = mulberry(0x5e17);
     // Per-vent variety (deterministic from the vent's position): height, width, opacity and
     // lean scales, a lean-angle offset, and a small white-smoker wisp beside the orifice.
@@ -180,12 +184,14 @@ export class VentPreset implements EnvPreset {
         );
         seed.set([rnd(), rnd() * Math.PI * 2, Math.sqrt(rnd()), rnd()], k * 4);
         vari.set([v.height, v.width, v.opacity, wisp ? -v.lean : v.lean], k * 4);
+        pace[k] = v.pace;
       }
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(origin, 3));
     geo.setAttribute('aSeed', new THREE.BufferAttribute(seed, 4));
     geo.setAttribute('aVar', new THREE.BufferAttribute(vari, 4));
+    geo.setAttribute('aPace', new THREE.BufferAttribute(pace, 1));
 
     const riseH = num(p.riseHeightM, 70);
     const riseMps = Math.max(0.05, num(p.riseMps, 1.2));
@@ -214,7 +220,7 @@ export class VentPreset implements EnvPreset {
         },
         uOpacity: { value: opacity },
         uDrift: { value: new THREE.Vector2() },
-        uWisp: { value: new THREE.Color(carbonate ? 0xe4ebe6 : 0x8a847c) },
+        uWisp: { value: new THREE.Color(carbonate ? 0xe4ebe6 : 0x6c665f) },
       },
       vertexShader: SMOKE_VERT,
       fragmentShader: PUFF_FRAG,
@@ -273,6 +279,7 @@ export class VentPreset implements EnvPreset {
     if (strength <= 0) return;
     const pos: number[] = [];
     const seed: number[] = [];
+    const scale: number[] = [];
     this.sources.forEach((s, i) => {
       const v = ventVariety(s.top);
       for (let j = 0; j < 3; j++) {
@@ -282,12 +289,15 @@ export class VentPreset implements EnvPreset {
           s.top.y + rise,
           s.top.z + this.hazeLean.y * rise * 0.05 * (1 + j),
         );
-        seed.push((i * 3 + j) * 1.7 + v.width * 0.0);
+        seed.push((i * 3 + j) * 1.7);
+        // Wide vents carry a broader glow; it also swells a little with each step up.
+        scale.push((0.6 + 0.5 * v.width) * (1 + 0.25 * j));
       }
     });
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     geo.setAttribute('aSeed', new THREE.Float32BufferAttribute(seed, 1));
+    geo.setAttribute('aScale', new THREE.Float32BufferAttribute(scale, 1));
     this.haze = new THREE.ShaderMaterial({
       uniforms: {
         ...commonUniforms(this.look),
@@ -295,7 +305,7 @@ export class VentPreset implements EnvPreset {
         uStrength: { value: strength },
         uTint: { value: new THREE.Color(num(this.params.glowColor, 0xff9a4a)) },
       },
-      vertexShader: SHIMMER_VERT,
+      vertexShader: HAZE_VERT,
       fragmentShader: HAZE_FRAG,
       transparent: true,
       depthWrite: false,
@@ -386,6 +396,7 @@ uniform float uOpacity;
 uniform vec2  uDrift;
 attribute vec4 aSeed; // phase, angle, radial, jitter
 attribute vec4 aVar; // per-vent height, width, opacity scale, lean (negative = wisp)
+attribute float aPace; // per-vent rise-rate scale
 uniform vec3 uWisp;
 varying vec3 vColor;
 varying float vAlpha;
@@ -395,12 +406,12 @@ varying float vSeed;
 varying float vRot;
 
 void main() {
-  float t = fract(uTime / uLife + aSeed.x);
+  float t = fract(uTime * aPace / uLife + aSeed.x);
   // Buoyant plume: fast out of the orifice, slowing and spreading as it rises.
   bool wisp = aVar.w < 0.0;
   float lean = abs(aVar.w);
-  float hs = wisp ? aVar.x * 0.3 : aVar.x;
-  float ws = wisp ? 0.22 : aVar.y;
+  float hs = wisp ? aVar.x * (0.22 + 0.2 * aPace) : aVar.x;
+  float ws = wisp ? 0.14 + 0.2 * aVar.y : aVar.y;
   float h = uRiseH * hs * (1.0 - pow(1.0 - t, 1.8));
   // A narrow stem that billows outward: radius grows faster than linearly.
   // Irregular outline: a per-chimney, height-dependent lobe term and a per-puff bias keep
@@ -513,6 +524,20 @@ void main() {
             sin(uv.x * 29.0 - t * 3.9 + uv.y * 7.0);
   float env = (1.0 - r * r) * vFade;
   gl_FragColor = vec4(vec3(1.0 + uStrength * w * env), 1.0);
+}
+`;
+
+const HAZE_VERT = /* glsl */ `
+${COMMON_VERT}
+uniform float uSize;
+attribute float aSeed;
+attribute float aScale;
+varying float vSeed;
+varying float vFade;
+void main() {
+  float dist = placePoint(position, uSize * aScale);
+  vSeed = aSeed;
+  vFade = (1.0 - presetFog(dist)) * (1.0 - smoothstep(120.0, 260.0, dist));
 }
 `;
 

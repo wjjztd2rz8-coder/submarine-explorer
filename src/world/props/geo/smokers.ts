@@ -12,7 +12,7 @@ import * as THREE from 'three';
 import { propManifest } from '../../../core/SiteManifest.js';
 import { geoDetail } from './detail.js';
 import { geoMaterial, LIFE_TINT, mineralCrust, vertexGlow } from './materials.js';
-import { shimmerPlume, smokePlume } from './plume.js';
+import { shimmerPlume, smokePlume, smokePlumeReach, smokePlumeTop } from './plume.js';
 import { paintCrust } from './crust.js';
 import { flange, tieredSpire } from './spire.js';
 import {
@@ -553,9 +553,10 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   // two extra ones, each with its sideways spread and drift.
   for (const s of byHeight.slice(0, 3)) {
     const ph = THREE.MathUtils.clamp(s.h * 2.6 + 4, 7, 34);
-    const reach = Math.max(1.6, ph * 0.2) * 1.6 * 1.45 + ph * 0.34 * 1.6;
-    bounds.expandByPoint(new THREE.Vector3(s.x - reach, s.y + s.h + ph, s.z - reach));
-    bounds.expandByPoint(new THREE.Vector3(s.x + reach, s.y + s.h + ph, s.z + reach));
+    const reach = smokePlumeReach(ph);
+    const top = s.y + s.h + smokePlumeTop(ph);
+    bounds.expandByPoint(new THREE.Vector3(s.x - reach, top, s.z - reach));
+    bounds.expandByPoint(new THREE.Vector3(s.x + reach, top, s.z + reach));
   }
 
   // ---- colliders and impostor.
