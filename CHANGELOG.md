@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Challenger Deep seabed keeps broad silt tone swaths in the mid-ground and a faint pale crest where the far rise meets the dark water, so the horizon grades softly instead of fading to flat olive (baked vertex tint only; no new draw calls).
+
 - Home globe is brighter: deeper ocean reads clearly blue, land is lifted, and mission pins carry a pale ring so they read at a glance on phones (P2-globe-bright).
 
 - **V-eight-sites-lit (b):** Blake Plateau and Hunga Tonga fade their distant seabed into the water (per-biome `horizonFadeM`, no hard edge) and lift the site ambient (6 to 11 and 9) so the opening bed is readable on every tier; Blake's carbonate-rubble bed is lighter.
