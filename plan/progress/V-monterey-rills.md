@@ -19,3 +19,5 @@
 ## Gates
 
 `PW_PORT=4471 tools/gates.sh`: first run failed only on the two canyon hashes and the prettier warning on plan/STATUS.md; both fixed. Final result below.
+
+Final: `PW_PORT=4471 tools/gates.sh` passes (python, content, build, unit, e2e smoke, e2e-base, attribution, prettier). The west upper-wall contact probes in `tests/unit/montereyScarpSupport.test.ts` were re-picked (x -50, y 127) because the new rills made the old probe triangles shallower than the steep-facet assertion; the assertions are unchanged.
