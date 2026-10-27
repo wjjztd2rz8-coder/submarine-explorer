@@ -9,14 +9,14 @@
     "overrides": {
       "smokeOpacitySulfide": 0.9,
       "smokeColorSulfide": 1841688,
-      "ambientFill": 6,
+      "ambientFill": 3,
       "hullLight": 0.5,
-      "hazeGlow": 0.6,
-      "glowIntensity": 3000,
+      "hazeGlow": 0.45,
+      "glowIntensity": 1500,
       "glowDistanceM": 60,
       "glowLights": 3,
       "glowDropM": 3,
-      "glowStandoffM": 4
+      "glowStandoffM": 2
     }
   },
   "species_file": "species.json",
