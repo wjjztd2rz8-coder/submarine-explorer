@@ -32,6 +32,22 @@ export interface PlumeOpts {
   billow?: boolean;
   /** Colour of the dense core near the orifice (billow only). */
   core?: number;
+  /** Additive blending: a lit glow that brightens what is behind it instead of tinting it. */
+  additive?: boolean;
+}
+
+/** Widest per-vent scatter `smokePlume` applies (heights, widths, lean), for culling bounds. */
+const SMOKE_MAX = { height: 1, width: 1.6, lean: 1.6 } as const;
+
+/** Horizontal reach (m) of a `smokePlume` of nominal height `h`, widest variation, for bounds. */
+export function smokePlumeReach(h: number): number {
+  const hh = h * SMOKE_MAX.height;
+  return Math.max(1.6, hh * 0.2) * SMOKE_MAX.width * 1.45 + hh * 0.34 * SMOKE_MAX.lean;
+}
+
+/** Tallest a `smokePlume` of nominal height `h` can rise (m), for bounds. */
+export function smokePlumeTop(h: number): number {
+  return h * SMOKE_MAX.height;
 }
 
 /**
@@ -40,26 +56,32 @@ export interface PlumeOpts {
  * Animation is entirely in the vertex shader; `count` already includes the tier factor.
  */
 export function smokePlume(
-  height: number,
+  nominalHeight: number,
   baseRadius: number,
   count: number,
   seed: number,
 ): THREE.Points | null {
-  // Per-vent variety, deterministic from the seed: width, opacity, and lean strength.
+  // Per-vent variety, deterministic from the seed: height, width, opacity, lean strength and
+  // rise pace, so neighbouring vents read as different flows instead of identical columns.
   const v = mulberry32(seed * 7 + 13);
-  const widthK = 0.7 + v() * 0.75;
+  const widthK = 0.6 + v() * (SMOKE_MAX.width - 0.6);
   const opacityK = 0.65 + v() * 0.4;
-  const leanK = 0.7 + v() * 0.9;
+  const leanK = 0.5 + v() * (SMOKE_MAX.lean - 0.5);
+  const heightK = 0.6 + v() * (SMOKE_MAX.height - 0.6);
+  const paceK = 0.75 + v() * 0.6;
+  const height = nominalHeight * heightK;
+  // Cooler vents run paler, hotter ones darker and browner.
+  const smokeTone = new THREE.Color(0x3c3834).lerp(new THREE.Color(0x6a6560), v()).getHex();
   const smoke = makePlume({
     height,
     baseRadius,
     spread: Math.max(1.6, height * 0.2) * widthK,
     count,
-    color: 0x5a5651,
+    color: smokeTone,
     core: 0x141211,
     opacity: 0.8 * opacityK,
     size: Math.max(1.3, height * 0.12) * Math.sqrt(widthK),
-    speed: 0.08 + 1.1 / Math.max(6, height),
+    speed: (0.08 + 1.1 / Math.max(6, height)) * paceK,
     drift: height * 0.34 * leanK,
     seed,
     billow: true,
@@ -81,6 +103,26 @@ export function smokePlume(
     glint.name = 'plume-orifice-shimmer';
     glint.renderOrder = 3;
     smoke.add(glint);
+  }
+  // Lit hot-water haze: a warm additive glow hugging the mouth, where the fluid is hottest,
+  // so the base of the column reads as glowing flow and the smoke above it as cooled plume.
+  const haze = makePlume({
+    height: Math.max(2.5, height * 0.22),
+    baseRadius: Math.max(0.15, baseRadius),
+    spread: Math.max(1.2, height * 0.08) * Math.sqrt(widthK),
+    count: Math.round(count * 0.18),
+    color: 0xff9a4a,
+    opacity: 0.2,
+    size: Math.max(1.4, height * 0.1),
+    speed: 0.3 * paceK,
+    drift: height * 0.06 * leanK,
+    seed: seed + 11,
+    additive: true,
+  });
+  if (haze) {
+    haze.name = 'plume-hot-haze';
+    haze.renderOrder = 3;
+    smoke.add(haze);
   }
   return smoke;
 }
@@ -151,6 +193,7 @@ export function makePlume(o: PlumeOpts): THREE.Points | null {
     opacity: o.opacity,
     depthWrite: false,
     fog: true,
+    blending: o.additive ? THREE.AdditiveBlending : THREE.NormalBlending,
   });
   const uniforms = {
     uTime: { value: 0 },

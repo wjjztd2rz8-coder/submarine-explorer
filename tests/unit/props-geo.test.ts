@@ -15,7 +15,13 @@ import {
   isGeoFeature,
   type GeoFeatureId,
 } from '../../src/world/props/geo/index.js';
-import { billowRadius, makePlume, smokePlume } from '../../src/world/props/geo/plume.js';
+import {
+  billowRadius,
+  makePlume,
+  smokePlume,
+  smokePlumeReach,
+  smokePlumeTop,
+} from '../../src/world/props/geo/plume.js';
 import { hashString } from '../../src/world/props/geo/shared.js';
 import { tieredSpire } from '../../src/world/props/geo/spire.js';
 import { parsePropsDoc, validatePropEntry, type PropDef } from '../../src/world/PropLoader.js';
@@ -666,6 +672,21 @@ describe('plumes', () => {
 });
 
 describe('smoke plume', () => {
+  it('varies per vent and carries a warm additive hot-water haze at the mouth', () => {
+    const plumes = [3, 4, 5, 6, 7, 8].map((seed) => smokePlume(20, 0.5, 150, seed)!);
+    const bound = (p: THREE.Points) => p.geometry.boundingSphere!.radius;
+    expect(new Set(plumes.map((p) => bound(p).toFixed(2))).size).toBeGreaterThan(3);
+    for (const p of plumes) {
+      expect(bound(p)).toBeLessThanOrEqual(smokePlumeReach(20) + smokePlumeTop(20));
+      const haze = p.getObjectByName('plume-hot-haze') as THREE.Points<
+        THREE.BufferGeometry,
+        THREE.PointsMaterial
+      >;
+      expect(haze.material.blending).toBe(THREE.AdditiveBlending);
+      expect(haze.geometry.boundingSphere!.radius).toBeLessThan(bound(p));
+    }
+  });
+
   it('billows: irregular outline, orifice shimmer, count follows the tier', () => {
     const p = smokePlume(20, 0.5, 150, 7)!;
     expect(p.geometry.getAttribute('aSeed').count).toBe(150);

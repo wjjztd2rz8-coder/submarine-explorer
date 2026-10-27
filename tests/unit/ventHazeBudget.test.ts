@@ -104,6 +104,14 @@ describe('vent haze draw budget and site overrides', () => {
       expect(
         Array.from({ length: variety.count }, (_, i) => variety.getW(i)).some((v) => v < 0),
       ).toBe(true); // White-smoker wisps still share the smoke draw.
+      // Each vent streams at its own pace and its haze glows at its own width.
+      const pace = Array.from(smoke.geometry.getAttribute('aPace').array as Float32Array);
+      expect(new Set(pace).size).toBe(2);
+      expect(Math.min(...pace)).toBeGreaterThanOrEqual(0.7);
+      expect(Math.max(...pace)).toBeLessThanOrEqual(1.3);
+      expect(new Set(Array.from(haze.geometry.getAttribute('aScale').array)).size).toBeGreaterThan(
+        3,
+      );
     } finally {
       preset.exit();
     }
