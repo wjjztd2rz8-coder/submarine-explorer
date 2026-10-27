@@ -14,6 +14,9 @@ import { Terrain } from '../../src/world/Terrain.js';
 import { Currents } from '../../src/world/Currents.js';
 import { PresetSystem } from '../../src/world/presets/Presets.js';
 import * as geo from '../../src/world/props/geo/detail.js';
+import { composedFreeDiveSpawn, chooseFreeDiveHull, spawnSettings } from '../../src/game/Spawn.js';
+import { CameraRig } from '../../src/sub/CameraRig.js';
+import blueHolePoses from '../../tools/blue-hole-poses.json';
 
 /**
  * Conservative static prop cost: every prop at once, with BOTH internal LOD
@@ -94,7 +97,7 @@ afterAll(() => {
 describe('catalog site static prop budgets', () => {
   for (const site of sites) {
     const tiers =
-      site === 'lost-city' || site === 'beebe-vent-field'
+      site === 'lost-city' || site === 'beebe-vent-field' || site === 'great-blue-hole'
         ? (['low', 'medium', 'high'] as const)
         : diagnostics
           ? (['low', 'high'] as const)
@@ -134,7 +137,7 @@ describe('catalog site static prop budgets', () => {
           if (diagnostics) rows.push({ site, tier, ...totals });
           expect(totals.calls).toBeGreaterThan(0);
           expect(totals.triangles).toBeGreaterThan(0);
-          if (tier === 'low') {
+          if (tier === 'low' || site === 'great-blue-hole') {
             // Reserve 300 calls / 300k triangles of the frame budget for the rest
             // of the scene; the e2e guard checks the actual full-frame budget.
             expect(totals.calls).toBeLessThanOrEqual(1200);
@@ -439,6 +442,171 @@ describe('Lost City transparent effect fill budget', () => {
       } finally {
         presets?.dispose();
         props?.dispose();
+        terrain.dispose();
+      }
+    });
+  }
+});
+
+/** Project and clip actual triangles; count all faces before opaque depth rejection. */
+function transparentMeshPixels(mesh: THREE.Mesh, camera: THREE.PerspectiveCamera): number {
+  const geometry = mesh.geometry;
+  const position = geometry.getAttribute('position');
+  const index = geometry.index;
+  const matrix = new THREE.Matrix4()
+    .multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)
+    .multiply(mesh.matrixWorld);
+  let area = 0;
+  for (let i = 0; i < (index?.count ?? position.count); i += 3) {
+    let polygon = [0, 1, 2].map((j) => {
+      const vertex = new THREE.Vector3().fromBufferAttribute(
+        position,
+        index ? index.getX(i + j) : i + j,
+      );
+      return new THREE.Vector4(vertex.x, vertex.y, vertex.z, 1).applyMatrix4(matrix);
+    });
+    for (const plane of [
+      (p: THREE.Vector4) => p.w + p.x,
+      (p: THREE.Vector4) => p.w - p.x,
+      (p: THREE.Vector4) => p.w + p.y,
+      (p: THREE.Vector4) => p.w - p.y,
+      (p: THREE.Vector4) => p.w + p.z,
+      (p: THREE.Vector4) => p.w - p.z,
+    ]) {
+      const clipped: THREE.Vector4[] = [];
+      for (let j = 0; j < polygon.length; j++) {
+        const a = polygon[j],
+          b = polygon[(j + 1) % polygon.length];
+        const da = plane(a),
+          db = plane(b);
+        if (da >= 0) clipped.push(a);
+        if (da >= 0 !== db >= 0) clipped.push(a.clone().lerp(b, da / (da - db)));
+      }
+      polygon = clipped;
+    }
+    if (polygon.length < 3) continue;
+    let twiceArea = 0;
+    for (let j = 0; j < polygon.length; j++) {
+      const a = polygon[j],
+        b = polygon[(j + 1) % polygon.length];
+      twiceArea += (a.x * b.y - b.x * a.y) / (a.w * b.w);
+    }
+    area += (Math.abs(twiceArea) * 1280 * 720) / 8;
+  }
+  return area;
+}
+
+// Guard the merged shaft's actual transparent passes, not just its mesh count.
+describe('Blue Hole transparent shaft budget', () => {
+  for (const tier of ['low', 'medium', 'high'] as const) {
+    it(`${tier}: keeps one additive pass with bounded projected fill and normal depth sorting`, async () => {
+      const meta = validateMeta(
+        JSON.parse(readFileSync('data/tiles/great-blue-hole/meta.json', 'utf8')),
+        'great-blue-hole',
+      );
+      const bytes = readFileSync('data/tiles/great-blue-hole/heightmap.bin');
+      const terrain = new Terrain(
+        { meta, heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows) },
+        DEFAULT_CONFIG.terrain,
+        tier,
+      );
+      const props = new Props(meta, terrain, DEFAULT_CONFIG.props, tier);
+      try {
+        await props.placeAll(
+          JSON.parse(readFileSync('data/landmarks/great-blue-hole/props.json', 'utf8')),
+          'great-blue-hole',
+        );
+        const hero = props.placed.find((p) => p.def.id === 'karst-grotto-east')!;
+        const shaft = hero.full.getObjectByName('grotto-light-shaft') as THREE.Mesh;
+        const material = shaft.material as THREE.MeshBasicMaterial;
+        expect(material.transparent).toBe(true);
+        expect(material.blending).toBe(THREE.AdditiveBlending);
+        expect(material.side).toBe(THREE.DoubleSide);
+        expect(material.forceSinglePass).toBe(true);
+        expect(material.depthTest).toBe(true);
+        expect(material.depthWrite).toBe(false);
+        expect(material.opacity).toBe(1);
+        expect(shaft.renderOrder).toBe(0);
+        expect(shaft.frustumCulled).toBe(false);
+        expect(shaft.geometry.groups).toEqual([]);
+        expect(staticCost(shaft)).toEqual({ calls: 1, triangles: 384 });
+        const transparent: THREE.Object3D[] = [];
+        for (const p of props.placed)
+          p.full.traverse((o) => {
+            if (o instanceof THREE.Mesh && !Array.isArray(o.material) && o.material.transparent)
+              transparent.push(o);
+          });
+        expect(transparent).toEqual([shaft]);
+        expect(
+          props.placed
+            .find((p) => p.def.id === 'karst-grotto')!
+            .full.getObjectByName('grotto-light-shaft'),
+        ).toBeUndefined();
+        const colors = shaft.geometry.getAttribute('color');
+        expect(Math.max(...Array.from(colors.array))).toBeCloseTo(0.03, 7);
+        expect(Math.min(...Array.from(colors.array))).toBeGreaterThanOrEqual(0);
+        // Three sorts this one object by its bounding-sphere centre; nested faces
+        // can overlap freely because additive blending is order-independent.
+        shaft.geometry.computeBoundingSphere();
+        const center = shaft.geometry.boundingSphere!.center;
+        expect(center.length()).toBeGreaterThan(1);
+        const camera = new THREE.PerspectiveCamera(
+          DEFAULT_CONFIG.camera.fovDeg,
+          1280 / 720,
+          0.1,
+          5000,
+        );
+        const hull = chooseFreeDiveHull(
+          DEFAULT_CONFIG.submarine.hullClasses,
+          meta.min_m,
+          DEFAULT_CONFIG.submarine.freeDiveHullMarginM,
+        )!;
+        const pose = composedFreeDiveSpawn(
+          'great-blue-hole',
+          meta,
+          terrain,
+          props,
+          spawnSettings(DEFAULT_CONFIG),
+          hull.hull.ratedDepth,
+          DEFAULT_CONFIG.camera,
+          'arcade',
+        )!;
+        const rig = new CameraRig(DEFAULT_CONFIG.camera, 1280 / 720, terrain);
+        rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
+        rig.snap(new THREE.Vector3(pose.x, pose.y, pose.z), pose.yaw, 0);
+        const samples = [{ view: 'opening', pixels: transparentMeshPixels(shaft, rig.camera) }];
+        const target = hero.root.localToWorld(
+          new THREE.Vector3().fromArray(blueHolePoses.east.target),
+        );
+        const direction = new THREE.Vector3().fromArray(blueHolePoses.east.direction);
+        for (const range of [55, 42, 10]) {
+          camera.position.copy(target).addScaledVector(direction, range);
+          camera.position.y = hero.root.position.y + blueHolePoses.east.above;
+          camera.lookAt(target);
+          camera.updateMatrixWorld(true);
+          samples.push({ view: `${range}m`, pixels: transparentMeshPixels(shaft, camera) });
+        }
+        for (const sample of samples) {
+          expect(sample.pixels).toBeGreaterThanOrEqual(0);
+          const ceiling =
+            sample.view === '55m' ? 42_000 : sample.view === '42m' ? 70_000 : 1_050_000;
+          expect(sample.pixels).toBeLessThan(ceiling);
+        }
+        expect(samples[0].pixels).toBe(0); // The free-dive opening faces the west gallery.
+        expect(samples.filter((s) => s.view !== 'opening').every((s) => s.pixels > 100)).toBe(true);
+        if (diagnostics) {
+          mkdirSync('.cache/perf-budget', { recursive: true });
+          writeFileSync(
+            `.cache/perf-budget/blue-hole-shaft-${tier}.json`,
+            JSON.stringify(
+              { cost: staticCost(shaft), sphereCenter: center.toArray(), samples },
+              null,
+              2,
+            ),
+          );
+        }
+      } finally {
+        props.dispose();
         terrain.dispose();
       }
     });

@@ -26,7 +26,7 @@ afterAll(() => {
 });
 
 describe('770 Blue Hole opening on actual terrain and procedural scenery', () => {
-  for (const tier of ['low', 'medium'] as const) {
+  for (const tier of ['low', 'medium', 'high'] as const) {
     it(`${tier}: first scan is within 110 m, ready to reward and safely framed`, async () => {
       const config = makeConfig();
       const meta = json(`data/tiles/${site}/meta.json`) as TileMeta;
@@ -40,6 +40,9 @@ describe('770 Blue Hole opening on actual terrain and procedural scenery', () =>
         meta.min_m,
         config.submarine.freeDiveHullMarginM,
       )!;
+      expect(hull.classId).toBe('B');
+      expect(hull.hull.ratedDepth).toBe(-6500);
+      expect(settings.hullRadius).toBe(8);
       const poiDoc = json(`data/landmarks/${site}/pois.json`);
       const pois = withArcadeReach(placePois(parsePois(poiDoc), meta, terrain, config.scan, site));
       try {
@@ -104,6 +107,8 @@ describe('770 Blue Hole opening on actual terrain and procedural scenery', () =>
             mode,
             firstTarget: first.id,
             distance: position.distanceTo(first.position),
+            hull: hull.classId,
+            groundClearance: pose.y - terrain.sampleHeight(pose.x, pose.z),
             pose,
           });
         }
