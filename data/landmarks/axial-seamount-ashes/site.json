@@ -48,19 +48,19 @@
   },
   "props": {
     "mushroom-chimney": {
-      "bodyGlow": 0.5
+      "bodyGlow": 0.6
     },
     "inferno-chimney": {
-      "bodyGlow": 0.5
+      "bodyGlow": 0.6
     },
     "hell-chimney": {
-      "bodyGlow": 0.5
+      "bodyGlow": 0.6
     },
     "phoenix-chimney": {
-      "bodyGlow": 0.5
+      "bodyGlow": 0.6
     },
     "virgin-chimney": {
-      "bodyGlow": 0.5
+      "bodyGlow": 0.6
     }
   }
 }
