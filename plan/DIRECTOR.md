@@ -80,7 +80,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 
 1. **V-kama-opening [Sonnet, small]:** (~3.4) Kama mission opening at 130 m shows tiny pillows. Target: first sighting shows the pillow field filling ~10% of frame height at a lit accent, still outside scan range. Poses from Codex 4670 (`plan/progress/4670-S-verify-kama-opening.md`).
 2. **V-hunga-opening [Sonnet, small]:** (~3.4) the 40 m view reads (~4.5) but the opening is dim. Target: caldera rim legible at the opening pose; a distance-aware lift only if it is a small shared-shader change, otherwise move the opening closer (4670 numbers).
-3. **V-monterey-rills [Sonnet, small]:** (~3.7) wall banding is broken up but centre rills and ledge geometry still stripe (`monterey-canyon-3.png`). Target: rills follow the wall noise, no parallel stripes.
+3. **V-monterey-rills [Sonnet, small]:** DONE 2026-10-27 (claude/V-monterey-rills; centre stripes gone, ~3.9). Original: wall banding is broken up but centre rills and ledge geometry still stripe (`monterey-canyon-3.png`). Target: rills follow the wall noise, no parallel stripes.
 4. **V-bluehole-lip [Sonnet]:** SHELVED pass 1 (diff in .cache/shelved/V-bluehole-lip.diff). Retry only with a different approach: a thin-slab roof mesh with real holes, not depth tweaks. Do not touch the shaft or the Low draw pin (7).
 5. **V-endurance-hull [Sonnet, small]:** (~3.4: the hull reads well in `endurance-2.png`) next target is a richer scene around it: rubble skirt, a lit accent, less empty sand.
 6. **V-beebe-trunk [Sonnet, small]:** (~3.7) the trunk plume is still a dense column; thin it toward the top and add the second weaker plume lean.
