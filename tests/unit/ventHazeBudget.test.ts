@@ -109,6 +109,9 @@ describe('vent haze draw budget and site overrides', () => {
       expect(new Set(pace).size).toBe(2);
       expect(Math.min(...pace)).toBeGreaterThanOrEqual(0.7);
       expect(Math.max(...pace)).toBeLessThanOrEqual(1.3);
+      // Neighbouring vents bend opposite ways.
+      const swing = Array.from(smoke.geometry.getAttribute('aSwing').array as Float32Array);
+      expect(new Set(swing)).toEqual(new Set([0, 1]));
       expect(new Set(Array.from(haze.geometry.getAttribute('aScale').array)).size).toBeGreaterThan(
         3,
       );
