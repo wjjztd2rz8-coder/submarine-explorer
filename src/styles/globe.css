@@ -90,7 +90,7 @@
 .globe-pin.is-mission .globe-pin-dot,
 .globe-legend-item.is-mission .globe-legend-dot {
   background: var(--b1-cyan);
-  box-shadow: 0 0 0 1.5px rgba(1, 5, 9, 0.9);
+  box-shadow: 0 0 0 1.5px rgba(1, 5, 9, 0.9), 0 0 0 3px rgba(235, 250, 252, 0.85);
 }
 
 .globe-pin.is-tile .globe-pin-dot,
