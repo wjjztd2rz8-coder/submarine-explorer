@@ -2215,3 +2215,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged 4650 (audio now suspends behind modal freezes, regression rows in audioLifecycle), 4660 (legacy photo dates no longer make nested ZIP paths; failed deletes show one error) and report notes 4630 (Hunga glow: no cross-site effect) and 4640 (Monterey: Low draws unchanged; the banding merge's "placement hashes unchanged" claim was wrong for Low). Merged V-endurance-hull (Sonnet, second pass after I sent back flat green mounds and an empty foreground; sand skirt and pale stones now on the camera flank, ~3.6; no warm lit accent yet). Gates on branch: all pass except prettier on the log file (fixed on main); main pushed. 4670-4690 still queued for Codex (Codex 5h at 9%). No tag (hosted CI unverified).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-27 07:32 CDT headless run 183 (Claude): one Sonnet package
+
+- Merged V-beebe-trunk (Sonnet; vent smoke tapers and fades earlier, odd vents lean the other way, shared shader, no new draws; ~3.8 from ~3.7 by my read of beebe-vent-field-1). Gates all pass on main except prettier on the progress note (fixed). Low tier not re-shot. Codex 5h at 9%, 4670-4690 queued. V-kama-opening waits on 4670 poses. No tag (hosted CI unverified).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
