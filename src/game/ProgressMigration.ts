@@ -33,11 +33,13 @@ export async function creditPreviousDives(
   photos: readonly Pick<Photo, 'siteId' | 'poiId'>[],
   fetchJson?: FetchJson,
 ): Promise<void> {
-  if (progress.legacyCredited) return;
+  // Journal and reward writes are separate. Repair missing discovery credit on
+  // every boot, even after legacy migration, without inferring finished dives.
   const keys = discoveries.keys();
   for (const key of keys) progress.creditDiscovery(key);
   for (const photo of photos)
     if (photo.poiId) progress.credit('photo', `${photo.siteId}/${photo.poiId}`);
+  if (progress.legacyCredited) return;
   const sites =
     progress.legacyPending ??
     [...new Set(keys.map((key) => key.split('/')[0]))].map((site): LegacyEvidence => ({

@@ -52,6 +52,66 @@ const photo: Photo = {
 const legacySettingsKey = 'subexplorer.settings.v1';
 const damaged = [null, '', '{broken', '{"version":1,"discovered":', 'null', '[]', '42'];
 
+it.each(['quota', 'dropped write', 'interrupted reward'])(
+  'repairs modern discovery credit after a partial save caused by %s without finishing the mission',
+  async (failure) => {
+    const storage = new MemoryStorage();
+    const progress = new Progress(new ProgressSave(storage));
+    progress.completeLegacyCredit();
+    progress.finish('previous-site', [{ primary: true, complete: true }]);
+    const before = progress.snapshot();
+    const original = storage.getItem(PROGRESS_STORAGE_KEY);
+    const write = vi.spyOn(storage, 'setItem').mockImplementation((key, value) => {
+      if (key === PROGRESS_STORAGE_KEY) {
+        if (failure === 'quota') throw new DOMException('Full', 'QuotaExceededError');
+        return;
+      }
+      storage.data.set(key, value);
+    });
+    const discoveries = new DiscoveryStore(storage, now);
+    for (const subject of ['bow', 'life:shark', 'secret:cabin', 'sample:rust', 'event:whale']) {
+      discoveries.record('titanic', subject);
+      if (failure !== 'interrupted reward') progress.creditDiscovery(`titanic/${subject}`);
+    }
+    expect(new PhotoStore(storage).save(photo).saved).toBe(true);
+    if (failure !== 'interrupted reward') progress.award('photo', 'titanic/bow');
+    expect(storage.getItem(PROGRESS_STORAGE_KEY)).toBe(original);
+    const journalBytes = storage.getItem(DISCOVERY_STORAGE_KEY);
+    const photoBytes = storage.getItem(PHOTO_STORAGE_KEY);
+    write.mockRestore();
+
+    vi.stubGlobal('localStorage', storage);
+    const fetch = vi.fn(() => {
+      throw new Error('Modern discoveries must not trigger legacy mission credit');
+    });
+    vi.stubGlobal('fetch', fetch);
+    try {
+      const restored = await loadSavedProgress();
+      expect(restored.snapshot().awarded).toEqual([
+        ...before.awarded,
+        'poi:titanic/bow',
+        'species:shark',
+        'secret:titanic/cabin',
+        'sample:titanic/rust',
+        'photo:titanic/bow',
+      ]);
+      expect(restored.snapshot().ratings).toEqual(before.ratings);
+      expect(restored.snapshot().cosmeticGrants).toEqual(before.cosmeticGrants);
+      expect(restored.bonus).toBe(false);
+      expect(restored.divePoints).toBe(0);
+      expect(fetch).not.toHaveBeenCalled();
+      expect(new ProgressSave(storage).get()).toEqual(restored.snapshot());
+      const repairedBytes = storage.getItem(PROGRESS_STORAGE_KEY);
+      expect((await loadSavedProgress()).snapshot()).toEqual(restored.snapshot());
+      expect(storage.getItem(PROGRESS_STORAGE_KEY)).toBe(repairedBytes);
+      expect(storage.getItem(DISCOVERY_STORAGE_KEY)).toBe(journalBytes);
+      expect(storage.getItem(PHOTO_STORAGE_KEY)).toBe(photoBytes);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  },
+);
+
 describe('save schema soak', () => {
   it.each(['legacy', 'partial'])(
     'keeps Journal namespaces through a %s migration and reload',
@@ -576,13 +636,29 @@ it.each([
     for (const [key, record] of Object.entries(fixture.records))
       storage.setItem(key, JSON.stringify(record));
     const original = new Map(storage.data);
+    const migrated = new ProgressSave(storage).get();
+    const expected = {
+      ...migrated,
+      awarded: [
+        ...new Set([
+          ...migrated.awarded,
+          'poi:titanic/titanic-bow',
+          'secret:titanic/find-1',
+          'sample:titanic/sample-1',
+          'species:shark',
+        ]),
+      ],
+    };
     vi.stubGlobal('localStorage', storage);
     try {
       const progress = await loadSavedProgress();
-      expect(progress.snapshot()).toEqual(new ProgressSave(storage).get());
-      // Reading a previously credited save must neither backfill rewards again nor
-      // mutate its archived bytes before the player actually saves an edit.
-      expect(storage.data).toEqual(original);
+      // Recovery may fill missing discovery tokens, but must preserve every
+      // migrated balance, rating, upgrade, selection and historical grant.
+      expect(progress.snapshot()).toEqual(expected);
+      expect(new ProgressSave(storage).get()).toEqual(expected);
+      expect(storage.data.size).toBe(original.size);
+      for (const key of [DISCOVERY_STORAGE_KEY, DAILY_STORAGE_KEY])
+        expect(storage.getItem(key)).toBe(original.get(key));
       expect(progress.selectCosmetic('paint', 'stock')).toBe(true);
       const edited = progress.snapshot();
       expect(JSON.parse(storage.getItem(PROGRESS_STORAGE_KEY)!)).toEqual(edited);
