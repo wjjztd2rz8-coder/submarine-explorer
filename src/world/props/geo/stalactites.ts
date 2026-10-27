@@ -305,6 +305,16 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   const noseAt = (x: number): number =>
     smooth(0.2, 0.8, fbm3(x * 0.16 + 33, 8, seed + 53, seed + 23, 3)) *
     (1 - smooth(0.6, 1, endRatio(x, W)));
+  /** Two or three breaks in the thin roof: 0..1 per x, the first being the widest. */
+  const gapCentres = [-0.17, 0.2, 0.36].map((u) => u * W);
+  const gapAt = (x: number): number => {
+    let g = 0;
+    gapCentres.forEach((c, i) => {
+      const w = (i === 0 ? 0.075 : 0.04) * W;
+      g = Math.max(g, 1 - smooth(0.45 * w, w, Math.abs(x - c)));
+    });
+    return hood ? g * (1 - smooth(0.6, 1, endRatio(x, W))) : 0;
+  };
   const roofZone = (y: number, z: number, x: number): number =>
     smooth(0.56 * H, 0.64 * H, y) *
     smooth(0.25, 0.8, -z / D) *
@@ -314,7 +324,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     if (!hood) return 0;
     const top = smooth(0.58 * H, 0.64 * H, y);
     const crown = 0.1 * H * fbm3(x * 0.05 + 9, 4, seed + 97, seed + 14, 3);
-    return roofZone(y, z, x) * top * (crown - H * 0.15 * crackAt(x));
+    return roofZone(y, z, x) * top * (crown - H * 0.15 * crackAt(x) - H * 0.3 * gapAt(x));
   };
 
   // --- the wall
@@ -589,6 +599,48 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
     if (spots.length) full.add(rocks);
   }
 
+  /** One soft pale shaft angling through the widest roof gap into the bay: nested additive cones. */
+  const lightShaft = (): THREE.Group => {
+    const cx = gapCentres[0]!;
+    const yTop = liftAt(cx) + 0.68 * H * scaleAt(cx);
+    const zTop = footAt(cx) - 0.55 * D;
+    const yBot = Math.max(gnd(cx + 0.1 * W, zTop + 0.4 * D), yTop - 0.7 * H);
+    const shaft = new THREE.Group();
+    shaft.name = 'grotto-light-shaft';
+    for (const k of [1, 0.62, 0.34]) {
+      const g = new THREE.CylinderGeometry(1, 1, 1, 12, 4, true);
+      const pos = g.getAttribute('position');
+      const col = new Float32Array(pos.count * 3);
+      for (let i = 0; i < pos.count; i++) {
+        const t = 0.5 - pos.getY(i); // 0 at the roof gap, 1 at the foot of the shaft
+        const a = Math.atan2(pos.getZ(i), pos.getX(i));
+        const r = (0.05 + 0.13 * t) * W * 0.5 * k;
+        pos.setXYZ(
+          i,
+          cx + Math.cos(a) * r + t * 0.1 * W,
+          yTop + (yBot - yTop) * t,
+          zTop + Math.sin(a) * r * 0.7 + t * 0.4 * D,
+        );
+        const v = 0.07 * Math.sin(Math.PI * Math.min(1, 0.15 + 0.85 * t) ** 0.8);
+        col.set([v * 0.75, v * 0.9, v], i * 3);
+      }
+      g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+      const m = new THREE.Mesh(
+        g,
+        new THREE.MeshBasicMaterial({
+          vertexColors: true,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        }),
+      );
+      m.frustumCulled = false;
+      shaft.add(m);
+    }
+    return shaft;
+  };
+
   // --- stalactites: clusters of fluted pendants hung from the underside of the shelf
   const wallBoxes = (rise?: typeof roofRise): THREE.Box3[] =>
     wallColliders(profile, W, D, H, 12, gnd, {
@@ -632,15 +684,16 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
         (0.6 + 0.4 * scaleAt(x));
       // Hood: a clump noise decides where pendants are long; most stay short stubs.
       const clump = smooth(0.35, 0.65, fbm3(x * 0.09 + 12, 3, seed + 47, seed + 15, 3));
-      const hoodLength = H * (0.04 + 0.4 * clump * clump * (0.4 + 0.6 * (main ? 1 : rnd())));
+      const hoodLength =
+        H * (0.03 + 0.5 * clump * clump * clump * (0.3 + 0.7 * (main ? 1 : rnd())));
       const len = hood ? Math.min(hoodLength, yTop - gnd(x, z) - 0.7) : generatedLength;
-      if (hood && len < 0.5) continue;
+      if (hood && (len < 0.5 || gapAt(x) > 0.5)) continue;
       // Thick, uneven columns: some stout, some slender, so no two read alike.
       // Variation draws use their own stream, so the placement of the original gallery is unchanged.
       const lean = main ? 0 : 0.05 + vr() * 0.14;
       const leanDir = vr() * 6.28;
       const r = len * 0.12 + 0.22;
-      const girth = (1 + vr() * 1.4) * (hood ? 1 + 1.2 * clump : 1);
+      const girth = (1 + vr() * 1.4) * (hood ? 1 + 0.5 * clump : 1);
       parts.push(
         place(
           pendant({
@@ -687,6 +740,7 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
     gallery.name = 'stalactite-gallery';
     full.add(gallery);
   }
+  if (hood) full.add(lightShaft());
   longest.sort((a, b) => b.len - a.len);
   for (const s of longest.slice(0, 7)) {
     colliders.push(boxCH(s.x, s.y - s.len * 0.42, s.z, s.r * 0.7, s.len * 0.42, s.r * 0.7));
