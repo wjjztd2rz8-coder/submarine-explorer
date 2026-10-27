@@ -2193,3 +2193,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect (no worktrees). Ran V-bluehole-lip (Sonnet): deeper roof gaps plus end taper. By my read of east-2 it was no better (gaps barely changed, pendants became flat curtains), so I did not merge it. Diff is in .cache/shelved/V-bluehole-lip.diff; DIRECTOR item marked SHELVED with a retry idea (thin-slab roof with real holes). Main unchanged except DIRECTOR/log. Codex 5h at 4%, 4600-4630 queued. No tag (hosted CI for e51be533 pending).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-27 04:30 CDT headless run 179 (Claude): one Sonnet package
+
+- Merged V-monterey-banding (Sonnet; warped laminae, fewer thicker beds, calmer tone; ~3.8 from ~3.6 by my read of monterey-canyon-3; centre rills and ledge geometry still stripe, next step per-bed lateral pinch-out). Unit hashes/snapshots regenerated, Low draw pin unchanged. Gates smoke + project-base pass on main (first run hit a port clash, rerun clean), pushed. Codex 5h at 4%, 4600-4630 queued. No tag (hosted CI unverified).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
