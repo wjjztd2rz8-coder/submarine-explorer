@@ -125,6 +125,7 @@ const REAR: [number, number][] = [
 const PRESETS: Record<ScarpPresetId, Preset> = {
   tuff: {
     bedding: 'regular',
+    glow: { wall: [0.19, 0xb4b09a, 0.25], rubble: [0.15, 0xb4b09a, 0.25] },
     decoration: 'seeps',
     tex: 'strata',
     profile: [
