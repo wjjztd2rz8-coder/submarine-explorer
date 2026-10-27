@@ -381,9 +381,7 @@ export const BIOMES: Record<string, Biome> = {
     rockBias: 0.3,
     // Lower walls fall away to deep blue-grey (the real hole is dark below the ledge) but stay readable.
     depthShade: { startM: 30, endM: 105, tint: 0x3f6a82 },
-    // Geometry supplies the bed edges; fine joints stay subordinate to the ledges.
-    // Beds are baked into vertex colour instead (blueHoleTint), with riser ambient occlusion.
-    strata: { periodM: 3.4, amount: 0.32 },
+    // Beds are baked into vertex colour (blueHoleTint), with riser ambient occlusion; no fragment striping.
     vertexTint: blueHoleTint,
     // Across the 320 m bowl the reef should already dissolve into water haze.
     horizonFadeM: [80, 260],

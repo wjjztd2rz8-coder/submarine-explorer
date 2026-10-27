@@ -316,17 +316,24 @@ export function blueHoleTint(
   const slope = smoothstep(clamp01((1 - normalY - 0.01) / 0.18));
   const wallR = smoothstep(clamp01((r - 92) / 8)) * (1 - smoothstep(clamp01((r - 205) / 10)));
   const rock = Math.max(slope, 0.55 * wallR);
-  // Beds: uneven tone per bed, a thin dark joint between them.
-  const wob = 1.6 * Math.sin(3 * a + depth * 0.02) + 0.7 * Math.sin(8 * a + 1.3);
-  const bandT = depth / 3.4 + wob;
+  // Beds: a few broad bands of differing tone with wavy, tilted, soft boundaries (weathered
+  // limestone, not stacked terraces), plus vertical staining that deepens toward the base.
+  const tilt =
+    1.1 * Math.sin(3 * a + depth * 0.025) +
+    0.6 * Math.sin(7 * a + 1.3) +
+    0.3 * Math.sin(x * 0.045 + z * 0.037);
+  const bandT = depth / 17 + tilt;
   const bi = Math.floor(bandT);
-  const bh = 0.5 + 0.5 * Math.sin(bi * 12.9898 + 4.1) * Math.cos(bi * 7.233);
-  const joint = smoothstep(clamp01((bandT - bi) / 0.12));
-  const bed = (0.72 + 0.56 * bh) * (0.62 + 0.38 * joint);
+  const bedTone = (i: number) => 0.5 + 0.5 * Math.sin(i * 12.9898 + 4.1) * Math.cos(i * 7.233);
+  const bh = lerp(bedTone(bi), bedTone(bi + 1), smoothstep(clamp01((bandT - bi - 0.55) / 0.45)));
+  const streak =
+    0.5 + 0.5 * Math.sin(a * 53 + 2 * Math.sin(a * 17 + depth * 0.03)) * Math.sin(a * 29 + 1.7);
+  const stain = 1 - 0.3 * streak * smoothstep(clamp01((depth - 30) / 60));
+  const bed = (0.8 + 0.4 * bh) * stain * (1.08 - 0.16 * smoothstep(clamp01(depth / 90)));
   const k = rock * 0.85;
-  tr *= lerp(1, bed * lerp(1.06, 0.92, bh), k);
+  tr *= lerp(1, bed * lerp(1.05, 0.94, bh), k);
   tg *= lerp(1, bed, k);
-  tb *= lerp(1, bed * lerp(0.9, 1.06, bh), k);
+  tb *= lerp(1, bed * lerp(0.92, 1.05, bh), k);
   // Ambient occlusion: the tread just inside each riser foot, and the riser's lower face.
   let ao = 1;
   if (r < 186 && r > 90) {
@@ -510,13 +517,6 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
         (0.5 * Math.sin(dx * 0.35 + 0.8 * Math.sin(dz * 0.09)) +
           0.9 * Math.sin(dz * 0.13 + dx * 0.05) +
           1.4 * Math.sin(dx * 0.045) * Math.sin(dz * 0.06));
-      // Limestone strata: concentric shelves and recesses on the wall read as horizontal bands.
-      const wall =
-        smoothstep(Math.min(1, Math.max(0, (r - 104) / 6))) *
-        (1 - smoothstep(Math.min(1, Math.max(0, (r - 152) / 8))));
-      const strata =
-        wall *
-        (1.6 * Math.sin(r * 0.62 + 1.4 * Math.sin(3 * a)) + 0.9 * Math.sin(r * 1.37 + 2 * a));
       // Fallen blocks and sediment mounds on the floor.
       const blocks = floor * boulderField(dx, dz);
       return Math.min(
@@ -524,7 +524,6 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
         profileAt(r) +
           ledge +
           ripple +
-          strata +
           blocks +
           lipBand * 1.1 * Math.max(0, Math.sin(37 * a + r * 0.7)) ** 3 +
           blueHoleWallRelief(a, r) +
