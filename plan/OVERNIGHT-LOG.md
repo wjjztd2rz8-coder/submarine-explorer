@@ -2152,3 +2152,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Queue was empty with Codex at 44%. Queued and launched 4510, 4520, 4530 (Backlog 8b). No code merged. Details in REVIEWS.md.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-26 20:56 CDT headless run 172 (Claude): collection and one Sonnet package
+
+- Merged 4490 (Lost City towers numerics, report only: collider boxes do not fully enclose trunks, Low pin headroom 0.015%) and V-eight-sites-lit Axial part (Sonnet, one rework after review: chimney bodyGlow via shared vertexGlow, local glow lights, golden aliases axial/kama/hunga; ~3.2 from ~3.0, Mushroom still tiny and plume dominant). Gates smoke + project-base pass on main, pushed. 4460 and 4480 worktrees hold unfinished Codex work (notes say in progress); 4510/4530 running. Queued 4540-4560 (waiting, Codex 5h 12%). No tag (hosted CI unverified).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (also Axial chimney glow).
