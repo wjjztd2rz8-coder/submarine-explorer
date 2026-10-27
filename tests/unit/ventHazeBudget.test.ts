@@ -109,7 +109,9 @@ describe('vent haze draw budget and site overrides', () => {
       expect(new Set(pace).size).toBe(2);
       expect(Math.min(...pace)).toBeGreaterThanOrEqual(0.7);
       expect(Math.max(...pace)).toBeLessThanOrEqual(1.3);
-      expect(new Set(Array.from(haze.geometry.getAttribute('aScale').array)).size).toBeGreaterThan(3);
+      expect(new Set(Array.from(haze.geometry.getAttribute('aScale').array)).size).toBeGreaterThan(
+        3,
+      );
     } finally {
       preset.exit();
     }
