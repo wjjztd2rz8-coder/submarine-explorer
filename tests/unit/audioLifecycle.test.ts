@@ -9,6 +9,10 @@ import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { Save } from '../../src/core/Save.js';
 import { CaptionBus, type AudioFrameInput } from '../../src/audio/events.js';
+import { audioSystem } from '../../src/app/systems/audio.js';
+import { shellSystem } from '../../src/app/systems/shell.js';
+import type { GameContext } from '../../src/app/context.js';
+import type { FrameState } from '../../src/app/System.js';
 
 class Param {
   value = 1;
@@ -127,6 +131,114 @@ afterEach(() => {
 });
 
 describe('audio lifecycle', () => {
+  it.each(['settings', 'briefing', 'debrief'] as const)(
+    'suspends the graph behind %s and restores saved gains after gestures and restart',
+    async (overlay) => {
+      // Modal freezes leave app.state at dive: idling thrusters alone must not
+      // leave music playing or advance its clock behind the overlay.
+      const records = new Map<string, string>();
+      const storage = {
+        getItem: (key: string) => records.get(key) ?? null,
+        setItem: (key: string, value: string) => {
+          records.set(key, value);
+        },
+        removeItem: (key: string) => {
+          records.delete(key);
+        },
+      };
+      for (let run = 0; run < 2; run++) {
+        const save = new Save({ config: DEFAULT_CONFIG, storage });
+        const audio = system();
+        audio.setSettings(save.get());
+        const off = save.onChange((next) => audio.setSettings(next));
+        const ctx = {
+          audio,
+          app: { state: 'dive' },
+          settingsScreen: { isOpen: overlay === 'settings' },
+          missionRouter: { frozen: overlay === 'briefing' },
+          globe: { isOpen: false },
+          discovery: { guide: { isOpen: false }, debrief: { isOpen: overlay === 'debrief' } },
+          props: { placed: [] },
+        } as unknown as GameContext;
+        const f = {
+          sub: { depth: -100, speed: 0 },
+          state: { throttle: 0, ballast: 0 },
+          pilotPosition: { x: 0, y: -100, z: 0 },
+          pilotForward: { x: 0, y: 0, z: -1 },
+        } as FrameState;
+        const frame = () => {
+          shellSystem.frame!['gate.shell']!(f, ctx);
+          audioSystem.frame!['play.audio']!(f, ctx);
+        };
+        try {
+          frame();
+          // The first touch may be a briefing or Settings control.
+          audio.unlock();
+          await flush();
+          expect(audio.diagnostics).toMatchObject({ state: 'suspended', masterGain: 0 });
+          const suspends = context().suspend.mock.calls.length;
+          frame();
+          frame();
+          expect(context().suspend).toHaveBeenCalledTimes(suspends);
+          if (run === 0)
+            save.save({ masterVolume: 0.43, sfxVolume: 0, musicVolume: 0.19, muted: true });
+          audio.unlock(); // Press/release while paused must preserve the saved mix.
+          await flush();
+          expect(audio.diagnostics).toMatchObject({ state: 'suspended', masterGain: 0 });
+          Object.assign(ctx.settingsScreen, { isOpen: false });
+          Object.assign(ctx.missionRouter!, { frozen: false });
+          Object.assign(ctx.discovery.debrief, { isOpen: false });
+          ctx.app.state = 'pause';
+          frame();
+          audio.unlock();
+          await flush();
+          expect(audio.diagnostics).toMatchObject({ state: 'suspended', masterGain: 0 });
+          ctx.app.state = 'dive';
+          frame();
+          await flush();
+          expect(audio.diagnostics).toMatchObject({
+            state: 'running',
+            masterGain: 0,
+            sfxGain: 0,
+            musicGain: 0.19,
+            muted: true,
+          });
+          save.save({ muted: false });
+          expect(audio.diagnostics.masterGain).toBe(0.43);
+          if (run === 0) save.save({ muted: true });
+        } finally {
+          off();
+          audio.dispose();
+        }
+      }
+      expect(Context.instances).toHaveLength(2);
+    },
+  );
+
+  it('keeps the photo shutter available when only photo mode freezes physics', async () => {
+    const audio = system();
+    const ctx = {
+      audio,
+      discovery: { debrief: { isOpen: false } },
+    } as unknown as GameContext;
+    const captions = vi.fn();
+    audio.captions.on(captions);
+    try {
+      audio.unlock();
+      await flush();
+      audioSystem.frame!['play.audio']!({ frozen: true, shellFrozen: false } as FrameState, ctx);
+      audio.playShutter();
+      expect(audio.diagnostics.state).toBe('running');
+      expect(captions).toHaveBeenCalledExactlyOnceWith({
+        id: 'shutter',
+        text: 'Camera shutter',
+        durationS: 1,
+      });
+    } finally {
+      audio.dispose();
+    }
+  });
+
   it.each([false, true])(
     'restores live volume edits and mute=%s in a new audio graph after reload',
     async (muted) => {
