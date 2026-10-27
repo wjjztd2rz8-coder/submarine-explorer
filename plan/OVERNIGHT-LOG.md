@@ -2220,3 +2220,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-beebe-trunk (Sonnet; vent smoke tapers and fades earlier, odd vents lean the other way, shared shader, no new draws; ~3.8 from ~3.7 by my read of beebe-vent-field-1). Gates all pass on main except prettier on the progress note (fixed). Low tier not re-shot. Codex 5h at 9%, 4670-4690 queued. V-kama-opening waits on 4670 poses. No tag (hosted CI unverified).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-27 08:18 CDT headless run 184 (Claude): one Sonnet package
+
+- Merged V-lostcity-talus (Sonnet; towers.ts apron blends toward carbonate colour, larger foot blocks, no new draws; ~3.8 from ~3.7 by my read of lost-city-1). Four Lost City digests regenerated. Gates pass on branch. Codex 5h at 9%, 4670-4690 still queued. V-kama-opening/V-hunga-opening wait on 4670. No tag (hosted CI unverified).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
