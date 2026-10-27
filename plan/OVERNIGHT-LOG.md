@@ -2203,3 +2203,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged 4600 (S-dead: unused terrain terrace support deleted, CHANGELOG entry), 4610 (S-bughunt: photo reward credit awarded at save instead of by a frame poll) and 4620 (report: Blue Hole shaft fits Low pin exactly with 0 draws headroom; Hunga/Kama changes are emission only). Gates smoke + project-base pass on main, pushed. 4630 still running in Codex; queued 4640-4660. No Claude package (Claude 5h window resets 05:10; gates took most of the run). No tag (hosted CI unverified).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-27 06:25 CDT comprehensive review run (Claude alone; Sol skipped, Codex budget low)
+- Review entry in plan/REVIEWS.md, STATUS.md and DIRECTOR.md Backlog refreshed (stage ~88%). Queued Codex 4670-4690.
+- Merged V-monterey-rills (centre stripes gone, ~3.9); gates PASS on main, pushed.
+- Codex 4630-4660 still running. Note: tools/golden.sh silently captures a stale server if port 4298 is taken (use GOLDEN_PORT).
+- Needs owner: phone retest (checklist 4410).
