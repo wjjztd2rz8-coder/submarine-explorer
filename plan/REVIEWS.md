@@ -1,5 +1,23 @@
 # Reviews
 
+## 2026-10-27 midday comprehensive review (Claude alone; Sol skipped, Codex week 26%, script said budget too low)
+
+**Changed since the 01:40 review (golden 2026-10-27-061028 to 094529):** V-hunga-subject (tuff glow), V-kama-axial-approach (Axial plume thinned, Kama pillow glow), V-monterey-banding, Codex 4600 (S-dead), 4610 (S-bughunt debrief), 4620 (S-verify Blue Hole/Hunga). V-bluehole-lip was tried and shelved.
+
+**Scores, readable / beautiful (my read only, coarse):** Titanic 4 / 3.6; Lost City 4 / 3.7 (two clear towers, talus still weak); Blue Hole 3.7 / 3.7 (stalactites read; HUD target card sits over them); Beebe 4 / 3.8 (best hero: lit trunk, second plume); Monterey 4 / 3.7 (stripes broken, centre rills still stripe); Challenger 3.5 / 3.5; Endurance 3.5 / 3.4. Axial, Kama and Hunga are not in the default golden set. `golden-compare` refused the pair (poses changed), so the comparison is by eye.
+
+**Biggest gaps:** (1) still no hero at 4; gains are 0.1 per package; (2) Kama and Hunga openings; (3) real-phone retest pending.
+
+**Play check:** not re-captured; Codex 4680 (Home, site pick, first 60 s on touch) is queued for it.
+
+**Process:** Codex week 26% at ~69%/day burn, so Sol was skipped and briefs launch only through the dispatcher gate. Claude week 41%, resets Thu 29. The queue was empty, so 4670-4690 were added. No scheduling fault.
+
+**New priorities:** Claude lane: V-kama-opening, V-hunga-opening, V-monterey-rills, V-bluehole-lip (retry), V-endurance-hull, V-beebe-trunk, V-lostcity-talus. Codex: 4670 (S-verify), 4680 (S-bughunt), 4690 (R-ci-green).
+
+**Stage:** about 88% to 1.0; about 4 weeks. Not agreed with Sol.
+
+**Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
 ## 2026-10-27 01:40 CDT comprehensive review (Claude alone; Sol skipped, Codex 5h at 5%)
 
 **Changed since the last review (golden 2026-10-26-213811 to 2026-10-27-061028):** ten merges: 4470 (home shortcut respects dialogs), 4530 (first-minute bug hunt), V-monterey-wall-skirt, V-lostcity-surround, V-eight-sites-lit (Axial glow), V-beebe-flow, V-bluehole-roof (ragged roof, one soft shaft), 4550 (Kama pillows moved off the first chimney), plus report-only 4490, 4510, 4540, 4560, 4570-beebe.
