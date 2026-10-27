@@ -700,8 +700,16 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     );
     if (bc > 1) {
       // Thin laminae inside each bed, a sharp shadow line under every ledge, and fine grain.
-      const s4 = s * 4.3 + fbm3(x * 0.08, 3, seed + 12, seed, 2) * 0.8;
-      const lam = fbm3(Math.floor(s4) * 2.3 + 0.5, 1.5, seed + 31, seed + 8, 1);
+      // Eroded beds warp the laminae in x and y and mix each with local noise, so no tone
+      // runs unbroken along the wall (a long uniform stripe aliases into moire).
+      const warp = erodedBeds ? MONTEREY_STRATA.laminaWarp : 0.8;
+      const s4 = s * 4.3 + (fbm3(x * 0.08, y * 0.12, seed + 12, seed, 2) - 0.5) * 2 * warp;
+      const laminaTone = fbm3(Math.floor(s4) * 2.3 + 0.5, 1.5, seed + 31, seed + 8, 1);
+      const lam = erodedBeds
+        ? laminaTone +
+          MONTEREY_STRATA.laminaBreak *
+            (fbm3(x * 0.2, y * 0.35, z * 0.2, seed + 37, 2) - laminaTone)
+        : laminaTone;
       const lipDark = 1 - 0.34 * (1 - smooth(0, 0.07, saw));
       const lipLit = 1 + 0.2 * smooth(0.86, 0.98, saw) * (1 - smooth(0.98, 1, saw));
       const rill =

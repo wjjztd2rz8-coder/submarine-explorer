@@ -15,6 +15,9 @@ export const MONTEREY_STRATA = {
   toneDriftFrequency: [0.018, 0.022],
   toneDrift: 0.9,
   faintBedAmount: 0.45,
+  /** Lamina wobble (in laminae) and the share of each lamina's tone replaced by local noise, to break long stripes. */
+  laminaWarp: 1.6,
+  laminaBreak: 0.65,
   /** Height of the silt-banked wall foot (fraction of wall height) and apron silt touching the wall. */
   footBlendH: 0.45,
   /** Extra apron thickness at the wall foot, so talus climbs the face as a slope. */
