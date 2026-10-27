@@ -2157,3 +2157,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged 4490 (Lost City towers numerics, report only: collider boxes do not fully enclose trunks, Low pin headroom 0.015%) and V-eight-sites-lit Axial part (Sonnet, one rework after review: chimney bodyGlow via shared vertexGlow, local glow lights, golden aliases axial/kama/hunga; ~3.2 from ~3.0, Mushroom still tiny and plume dominant). Gates smoke + project-base pass on main, pushed. 4460 and 4480 worktrees hold unfinished Codex work (notes say in progress); 4510/4530 running. Queued 4540-4560 (waiting, Codex 5h 12%). No tag (hosted CI unverified).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (also Axial chimney glow).
+
+## 2026-10-26 22:22 CDT headless run 173 (Claude): collection and one Sonnet package
+
+- Merged 4530 (first-minute bug hunt: home Journal shortcut after cancel, popstate reload over disposed mission, touch controls see modal-consumed keys), 4510 (Lost City surround / Monterey wall numerics, report only) and V-beebe-flow (Sonnet; per-vent plume variation plus warm mouth haze, ~3.7 from ~3.5 by my read of beebe-vent-field-2; trunk plume still dense). Gates smoke + project-base pass on main, pushed. 4460 and 4480 worktrees hold unfinished Codex work (Codex 5h 12%, resets 22:15); 4520 empty; 4540-4560 queued. No tag (hosted CI unverified).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (also Beebe plumes).
