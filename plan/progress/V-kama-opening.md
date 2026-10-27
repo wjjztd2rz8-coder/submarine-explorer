@@ -25,3 +25,5 @@ Numbers from [4670](4670-S-verify-kama-opening.md).
 
 - Unit specs `missionApproach`, `missionComposition`, `siteManifest`: pass.
 - `tools/gates.sh` (smoke + project-base): see the end of this note.
+
+Gates: `tools/gates.sh` (smoke + project-base) passed on the branch. Director read: Kama pillow field clear (~3.8) but the hull is below frame on desktop; Hunga rim legible, still dim (~3.6).
