@@ -2183,3 +2183,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged 4590 (migration now repairs discovery/photo reward credit on every boot; save-soak extended), 4570-bluehole (hood collision rebuilt from rendered triangles, shaft single draw, numerics note) and V-hunga-subject (Sonnet; tuff `glow` in scarp.ts; 40 m view reads well ~4.5, mission opening still dim ~3.4 by my read). Gates smoke + project-base pass on main (prettier-only fixes), pushed. 4580 (mobile gestures) remains unfinished in its worktree with no note (Codex 5h at 5%). Queued 4630 beside 4600-4620. No tag (hosted CI unverified).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-27 02:51 CDT headless run 177 (Claude): collection and one Sonnet package
+
+- Merged 4580 (phone gesture ownership: swipe list, globe drag, camera and modal opens; Codex work, gates smoke + project-base pass) and V-kama-axial-approach (Sonnet; Axial plume thinned, Kama pillow glow, ~3.5/~3.4 by my read; Kama mission opening still tiny). Pushed after each. Codex 5h at 5%, 4600-4630 queued. No tag (hosted CI unverified).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (also gesture fixes, Axial/Kama).
