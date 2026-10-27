@@ -89,7 +89,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 9. **S-verify / S-bughunt / S-dead [Codex, standing]:** 4580 (mobile gestures, unfinished) and 4630-4660 running; 4670 (Kama opening numerics), 4680 (Home/site-pick bug hunt), 4690 (CI triage) queued. Merged 4600-4620 (run 180). Earlier: 4600 (S-dead: delete unused terrace support in Terrain.ts), 4610 (S-bughunt: debrief, rewards and objective flow), 4620 (S-verify: Blue Hole roof shaft and Hunga material numerics). After each visual merge, verify numerics; bind captured images, manifests and SHA together before accepting evidence.
 10. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build (Aa button, Journal photo, High Lost City plume, Blue Hole, Lost City, Axial, Beebe).
 11. **R-release [Haiku]:** tag the latest green-CI main after each review (f67 is the newest); check the Pages deploy.
-12. **P2-globe-bright [Sonnet, demoted]:** brighter globe, only if the lanes above are blocked.
+12. **P2-globe-bright [Sonnet, demoted]:** DONE 2026-10-27 (ocean gain 3, land 0.4, ringed pins; desktop ~8/10, shelf slightly saturated, phone shot not re-read at final gain).
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16), Titanic per-plate blockiness (accepted ~3.7). Codex weekly burn is ~60%/day, so briefs stay rationed.
 

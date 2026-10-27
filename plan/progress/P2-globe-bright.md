@@ -1,6 +1,7 @@
 # P2-globe-bright
 
 Changed (constants only, no new draw calls/settings):
+
 - src/core/config/ui.ts: landDim 0.22 -> 0.4, oceanGain 1.15 -> 3.
 - src/ui/Globe.ts: limb darkening 0.45+0.55*ndv -> 0.6+0.4*ndv.
 - src/styles/globe.css: mission pin gets a pale outer ring (box-shadow).

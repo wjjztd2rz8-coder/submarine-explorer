@@ -2225,3 +2225,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-lostcity-talus (Sonnet; towers.ts apron blends toward carbonate colour, larger foot blocks, no new draws; ~3.8 from ~3.7 by my read of lost-city-1). Four Lost City digests regenerated. Gates pass on branch. Codex 5h at 9%, 4670-4690 still queued. V-kama-opening/V-hunga-opening wait on 4670. No tag (hosted CI unverified).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-27 09:13 CDT headless run 185 (Claude): one Sonnet package
+
+- Merged P2-globe-bright (Sonnet; Home globe brighter ocean/land, ringed mission pins; desktop clearly better by my read, phone not re-checked at final gain). Gates pass on main except prettier on the progress note (fixed). V-kama-opening/V-hunga-opening still wait on Codex 4670 (queued; Codex 5h ~9%). Hosted CI for run 183 failed in e2e shard 7/38 (logs unreadable while run in flight); 4690 will triage. No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (also the brighter globe).
