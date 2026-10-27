@@ -1309,6 +1309,70 @@ describe('overlay policies across the app', () => {
     }
   });
 
+  it.each(['keyboard', 'gamepad'] as const)(
+    'retained dive runtime accepts the Home Journal %s shortcut only for the top overlay',
+    (device) => {
+      vi.spyOn(Journal.prototype, 'load').mockResolvedValue();
+      const guide = journal();
+      const home = new Home({
+        dive: vi.fn(),
+        journal: () => guide.open(),
+        subScreen: vi.fn(),
+        controls: vi.fn(),
+        settings: vi.fn(),
+      });
+      cleanup.push(() => home.dispose());
+      home.show();
+      const { screen } = settings();
+      const buttons = Array.from({ length: 16 }, () => ({ pressed: false, value: 0 }));
+      vi.stubGlobal('navigator', {
+        getGamepads: () =>
+          device === 'gamepad' ? [{ connected: true, index: 0, axes: [0, 0, 0, 0], buttons }] : [],
+      });
+      const input = new Input({ storage: null });
+      const ctx = {
+        app: { state: 'home' },
+        home,
+        discovery: {
+          guide,
+          scanner: { setObjective: vi.fn() },
+          update: vi.fn((_a, _b, _c, _d, state) => {
+            if (state.toggleGuide) guide.toggle();
+          }),
+        },
+        rig: {},
+      } as unknown as GameContext;
+      const frame = () => {
+        const f = { sampled: input.sample(), frozen: true, realSteps: 3, dt: 1 / 60 } as FrameState;
+        inputGateSystem.frame!['gate.input']!(f, ctx);
+        discoverySystem.frame!['scan.discovery']!(f, ctx);
+        expect(f.steps).toBe(0);
+        expect(f.state.throttle).toBe(0);
+        input.clear();
+      };
+      const shortcut = () => {
+        if (device === 'keyboard') input.injectKey('KeyJ', true);
+        else buttons[14] = { pressed: true, value: 1 };
+        frame();
+        if (device === 'keyboard') input.injectKey('KeyJ', false);
+        else buttons[14] = { pressed: false, value: 0 };
+        frame();
+      };
+      shortcut();
+      expect(guide.isOpen).toBe(true);
+      shortcut();
+      expect(guide.isOpen).toBe(false);
+      screen.open();
+      shortcut();
+      expect(guide.isOpen).toBe(false);
+      screen.close();
+      frame();
+      expect(guide.isOpen).toBe(false);
+      shortcut();
+      expect(guide.isOpen).toBe(true);
+    },
+  );
+
   it('ignores the Journal pad button beneath Settings, then closes once and returns to Pause', () => {
     const pause = pauseMenu();
     pause.open();

@@ -5,6 +5,7 @@ import { createTouchSystem } from '../../src/app/systems/touch.js';
 import type { Input } from '../../src/core/Input.js';
 import { TOUCH_SEEN_KEY } from '../../src/core/Touch.js';
 import { TouchControls } from '../../src/ui/TouchControls.js';
+import { FocusTrap } from '../../src/ui/FocusTrap.js';
 
 // Minimal DOM surface; native EventTarget dispatch exercises real mode-switch listeners.
 class Element extends EventTarget {
@@ -102,6 +103,30 @@ function setup(hardwareTouch = false) {
     win.dispatchEvent(Object.assign(new Event('pointerdown'), { pointerType: type }));
   return { values, root, input, opts, win, create, pointer };
 }
+
+it('keyboard dismissal of a modal updates touch mode even when Escape is consumed', () => {
+  const { root, input, opts, win, create } = setup(true);
+  const trap = new FocusTrap(opts.canvas, { onEscape: () => trap.hide() });
+  try {
+    trap.show();
+    const touch = create();
+    touch.update(true, false);
+    expect(input.touchActive).toBe(true);
+    const event = Object.assign(new Event('keydown', { cancelable: true }), {
+      code: 'Escape',
+      key: 'Escape',
+    });
+    win.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(trap.active).toBe(false);
+    expect(input.touchActive).toBe(false);
+    expect(root.classList.contains('is-touch')).toBe(false);
+    touch.update(true, false);
+    expect(touch.root.hidden).toBe(true);
+  } finally {
+    trap.dispose();
+  }
+});
 
 it.each(['hardware', 'pointer', 'forced'])(
   'restores %s touch layout immediately after a game reboot',

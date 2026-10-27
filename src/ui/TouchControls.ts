@@ -14,6 +14,7 @@
  */
 
 import { elWithClass as el } from './dom.js';
+import { observeKeyboard } from './FocusTrap.js';
 
 import type { Input } from '../core/Input.js';
 import {
@@ -208,10 +209,13 @@ export class TouchControls {
         this.setTouchMode(false);
       }
     });
-    on('keydown', (e) => {
-      if (['ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight'].includes(e.code)) return;
-      if (this.touchMode) this.setTouchMode(false);
-    });
+    // Use the same passive observer as coaching, even when a modal owns the key.
+    this.disposers.push(
+      observeKeyboard((e) => {
+        if (['ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight'].includes(e.code)) return;
+        if (this.touchMode) this.setTouchMode(false);
+      }),
+    );
     // Rotation moves the controls beneath held fingers. Start the next gesture
     // from the new geometry rather than retaining thrust or old look positions.
     const resetLayout = (): void => {
