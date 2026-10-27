@@ -1,5 +1,23 @@
 # Reviews
 
+## 2026-10-27 01:40 CDT comprehensive review (Claude alone; Sol skipped, Codex 5h at 5%)
+
+**Changed since the last review (golden 2026-10-26-213811 to 2026-10-27-061028):** ten merges: 4470 (home shortcut respects dialogs), 4530 (first-minute bug hunt), V-monterey-wall-skirt, V-lostcity-surround, V-eight-sites-lit (Axial glow), V-beebe-flow, V-bluehole-roof (ragged roof, one soft shaft), 4550 (Kama pillows moved off the first chimney), plus report-only 4490, 4510, 4540, 4560, 4570-beebe.
+
+**Scores, readable / beautiful (my read only, coarse):** Titanic 4 / 3.5; Lost City 4 / 3.7 (one big readable Poseidon with a smaller second chimney; talus still weak); Blue Hole 3.7 / 3.7 (roof is now a broken ceiling with a shaft; gaps are dents); Beebe 4 / 3.7 (per-vent variation visible, trunk plume dense); Monterey 4 / 3.6 (sub solid; wall has banding streaks); Challenger 3.5 / 3.5; Endurance 3.5 / 3.4 (ship silhouette reads well, sand is empty). Axial, Kama, Hunga now have golden aliases but were not in this default set. No hero at 4 yet.
+
+**Biggest gaps:** (1) no hero at 4; remaining gains are small (lip ends, banding, talus); (2) Hunga's subject is nearly black (albedo ~0.013); (3) real-phone retest still pending; (4) hosted CI on the latest main was still running.
+
+**Play check:** not re-captured; the 4530 hunt covered the first minute and found three bugs, all merged.
+
+**Process:** Codex week 36% left at ~64%/day burn, 5h at 5%: the binding constraint, so Sol review skipped and Codex briefs 4600-4620 are queued behind the dispatcher gate. Claude week 45% (~19%/day). `tools/gates.sh` runs over 10 min under Codex load; run it via systemd-run. No scheduling fault.
+
+**New priorities:** Backlog rewritten (seven Sonnet items: V-hunga-subject, V-kama-axial-approach, V-bluehole-lip, V-monterey-banding, V-endurance-hull, V-beebe-trunk, V-lostcity-talus); Codex queued 4600 (S-dead), 4610 (S-bughunt debrief), 4620 (S-verify).
+
+**Stage:** about 87% to 1.0; about 4 weeks. Not agreed with Sol.
+
+**Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
 ## 2026-10-26 19:32 CDT targeted review: Codex starved (empty queue)
 
 - Cause: queue emptied after 4480/4490/4500 finished; Codex 5h had recovered to 44% (week 56%, on pace) but nothing was queued. The Backlog's Codex lane held only standing items.

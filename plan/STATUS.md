@@ -1,25 +1,25 @@
-# Status (2026-10-26 evening, Claude-only review)
+# Status (2026-10-27, Claude-only review)
 
-**Stage:** about 85% to 1.0; 4-5 weeks (morning joint figure with Sol was 83%, 4-6 weeks). Hosted CI is green on fde5c15d and tag **f67** is pushed (Pages deployed). Since the morning: Lost City towers redrawn as one fluted tower, Blue Hole undercut lip, Monterey pebble apron, scarp collision fix, CI flake fixes.
+**Stage:** about 87% to 1.0; about 4 weeks (Claude alone; Sol skipped for Codex budget). Hosted CI is green on fde5c15d and tag **f67** is pushed (Pages deployed). Since the morning: Lost City towers redrawn as one fluted tower, Blue Hole undercut lip, Monterey pebble apron, scarp collision fix, CI flake fixes.
 
 ## 1.0 table
 
 | Requirement                               | State                                                                                                                  |
 | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Five heroes beautiful (4 of 5)            | None at 4: Titanic 3.5, Lost City 3.5, Blue Hole 3.6, Beebe 3.5, Monterey 3.6 (readable 3.5-4)                         |
+| Five heroes beautiful (4 of 5)            | None at 4: Titanic 3.5, Lost City 3.7, Blue Hole 3.7, Beebe 3.7, Monterey 3.6 (readable 3.7-4)                         |
 | Other eight sites coherent                | Challenger 3.5, Endurance 3; Axial, Kama, Hunga weak and not yet in the golden set                                     |
 | New player understands first five minutes | Journeys run through two scans, Journal and debrief; Journal panel opaque now; unaided-pilot leg being restored (4480) |
 | Acceptable Low-tier phone performance     | iPhone 17 Pro: Low great; High Lost City unmeasured after the plume cap; weaker phones untested                        |
-| Hosted CI green, releases tagged          | GREEN on fde5c15d, f67 tagged                                                                                          |
+| Hosted CI green, releases tagged          | f67 tagged; latest main CI pending at review time                                                                                          |
 | Code simple enough                        | Standing S-verify items; S-collision fixed                                                                             |
 
 ## Done recently
 
-Lost City tower rewrite, Blue Hole silhouette pass 2, Monterey apron, scarp collision fix, CI stabilisation, canvasThumbnail guard, Journal opaque panel, f67.
+Blue Hole roof and shaft, Lost City surround, Monterey wall skirt, Beebe plume flow, Axial chimney glow, Kama pillow move, first-minute bug fixes.
 
 ## Left
 
-Blue Hole roof light shaft, Lost City surround, Axial/Kama/Hunga lighting, Beebe plume flow, Monterey wall skirt, Endurance hull, real-phone Low-tier retest.
+Hunga subject lift, Kama/Axial approach, Blue Hole lip, Monterey banding, Endurance surroundings, Beebe trunk plume, Lost City talus, real-phone Low-tier retest.
 
 ## Needs owner
 

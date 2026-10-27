@@ -320,3 +320,7 @@ Creating `.cache/review/current` as a directory before `codex-review.sh start` m
 ## 2026-10-26 evening review
 
 - Codex review script exited 75 (Codex 5h 5%): reviewed alone and said so in REVIEWS.md. No tooling change; Codex weekly burn (~55%/day) is the limit, not scheduling. Golden set has no Axial/Kama/Hunga captures; added as first step of V-eight-sites-lit.
+
+## 2026-10-27 review
+
+- Sol review skipped (Codex 5h 5%). No tooling change; tools/gates.sh runtime under Codex load (>10 min) noted, run via systemd-run. Reason: nothing wasted found by efficiency.sh beyond budget-gate skips.
