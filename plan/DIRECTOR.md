@@ -72,7 +72,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running (2026-10-27 13:30). Codex: 4730-4750 running or queued; queue 50-52 (R-ci-green confirm, S-verify Kama/Hunga, S-bughunt Journal) waits behind the dispatcher gate.
+- No Claude package running (2026-10-27 17:55). Codex: 4730-4750 running or queued; queue 50-52 (R-ci-green confirm, S-verify Kama/Hunga, S-bughunt Journal) waits behind the dispatcher gate.
 
 ## Backlog
 
@@ -83,7 +83,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 3. **V-hunga-bright [Sonnet, small] DONE 2026-10-27 (merge):** Hunga opening rim is legible but dim (~3.6). Target: rim and glow readable on a phone at default brightness via a small shared-shader or material lift, no per-site branch.
 4. **V-bluehole-roof-slab [Sonnet]:** retry of V-bluehole-lip with a thin-slab roof mesh with real holes (not depth tweaks); `great-blue-hole-1.png` shows stalactite gallery readable but the surrounding wall still reads as stacked terraces. Do not touch the shaft or the Low draw pin.
 5. **V-endurance-accent [Sonnet, small]:** TRIED 2026-10-27, no change merged: per-site lamps never reach the hull (20 m+ from the sub). Next route: a per-site emissive tint in `src/world/props/wrecks/materials.ts` via site data (see plan/progress/V-endurance-accent.md); consider demoting. (~3.4) hull and rubble now read; add one warm lit accent (lamp pool or lit hull section) so the frame has a focal point.
-6. **V-challenger-horizon [Sonnet, small]:** (~3.5) the lander is a good subject but the seabed fades to flat dark olive; add subtle sediment variation and a lit rim at the far edge, no new draws.
+6. **V-challenger-horizon [Sonnet, small]:** DONE 2026-10-27 (merge; subtle silt swaths + faint far crest, ~3.5-3.6 by my read, a lit rim needs distance shading, demote further work). (~3.5) the lander is a good subject but the seabed fades to flat dark olive; add subtle sediment variation and a lit rim at the far edge, no new draws.
 7. **V-golden-set [Haiku]:** DONE 2026-10-27 (merge; golden.sh readiness loop can accept a foreign preview on a busy port, worth a small fix). add Kama, Hunga and Axial openings to the default `tools/golden.sh` set so reviews see all ten sites (they were absent from every review's contact sheet).
 8. **R-ci-green [Codex]:** red since run 183 from two stale e2e specs (fixed 2026-10-27, see REVIEWS.md); confirm the next hosted run is green, then tag. Briefs that change behaviour must run the e2e specs touching it.
 9. **S-verify / S-bughunt / S-dead [Codex, standing]:** 4730-4750 running; queue 51 (Kama/Hunga verification, incl. hull-in-frame numbers for V-kama-hull-frame) and 52 (Journal after a second site) queued. Merged 4600-4720.
