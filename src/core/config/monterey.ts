@@ -22,6 +22,9 @@ export const MONTEREY_STRATA = {
   laminaBreak: 0.65,
   /** Share of the ledge shadow line kept where laminae fade out. */
   lipFloor: 0.45,
+  /** Rill domain warp (m) and vertical frequency: more of both break up straight channels. */
+  rillWarp: 14,
+  rillStretch: 0.075,
   /** Height of the silt-banked wall foot (fraction of wall height) and apron silt touching the wall. */
   footBlendH: 0.45,
   /** Extra apron thickness at the wall foot, so talus climbs the face as a slope. */

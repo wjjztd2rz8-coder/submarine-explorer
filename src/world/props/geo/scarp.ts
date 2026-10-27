@@ -611,12 +611,30 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     return v;
   };
 
+  // Rills: ridged noise whose coordinates are warped by slower noise, so channels wander, fork
+  // and fade along the face instead of running as evenly spaced vertical stripes.
+  const rillAt = (x: number, y: number): number => {
+    if (!fidelity)
+      return 1 - Math.abs(2 * fbm3(x * P.gullyFreq, y * 0.03, seed + 1, seed, gullyOctaves) - 1);
+    const wx =
+      (fbm3(x * 0.05, y * 0.06, seed + 21, seed + 5, 2) - 0.5) * 2 * MONTEREY_STRATA.rillWarp;
+    const base = fbm3(
+      (x + wx) * P.gullyFreq,
+      y * MONTEREY_STRATA.rillStretch,
+      seed + 1,
+      seed,
+      gullyOctaves,
+    );
+    return (
+      (1 - Math.abs(2 * base - 1)) * (0.45 + 0.7 * fbm3(x * 0.04, y * 0.07, seed + 61, seed + 3, 2))
+    );
+  };
+
   // --- displacement: gullies, dipping strata ledges, joints; zero at the apron join.
   const disp = (x: number, y: number, z: number): number => {
     const env = smooth(joinY, joinY + 0.15 * H, y);
     // Ridged noise: sharp-edged vertical rills cut into the face rather than soft swells.
-    const rill =
-      1 - Math.abs(2 * fbm3(x * P.gullyFreq, y * 0.03, seed + 1, seed, gullyOctaves) - 1);
+    const rill = rillAt(x, y);
     const gully = (Math.pow(rill, 3) - 0.3) * -2.4 * P.gully * scale * 1.6;
     const s = bedPhase(x, y);
     const saw = s - Math.floor(s);
@@ -711,8 +729,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
             (fbm3(x * 0.2, y * 0.35, z * 0.2, seed + 37, 2) - laminaTone)
         : laminaTone;
       const lipLit = 1 + 0.2 * smooth(0.86, 0.98, saw) * (1 - smooth(0.98, 1, saw));
-      const rill =
-        1 - Math.abs(2 * fbm3(x * P.gullyFreq, y * 0.03, seed + 1, seed, gullyOctaves) - 1);
+      const rill = rillAt(x, y);
       const gullyShade = 1 - 0.3 * smooth(0.55, 0.9, rill); // erosion gullies read as dark runnels
       const grain = 0.88 + 0.24 * fbm3(x * 1.7, y * 2.2, z * 1.7, seed + 66, 2);
       // Laminae fade in and out along the wall rather than ruling every bed the same way.
