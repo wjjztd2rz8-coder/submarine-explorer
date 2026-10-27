@@ -2210,3 +2210,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged V-monterey-rills (centre stripes gone, ~3.9); gates PASS on main, pushed.
 - Codex 4630-4660 still running. Note: tools/golden.sh silently captures a stale server if port 4298 is taken (use GOLDEN_PORT).
 - Needs owner: phone retest (checklist 4410).
+
+## 2026-10-27 07:07 CDT headless run 182 (Claude): collection and one Sonnet package
+
+- Merged 4650 (audio now suspends behind modal freezes, regression rows in audioLifecycle), 4660 (legacy photo dates no longer make nested ZIP paths; failed deletes show one error) and report notes 4630 (Hunga glow: no cross-site effect) and 4640 (Monterey: Low draws unchanged; the banding merge's "placement hashes unchanged" claim was wrong for Low). Merged V-endurance-hull (Sonnet, second pass after I sent back flat green mounds and an empty foreground; sand skirt and pale stones now on the camera flank, ~3.6; no warm lit accent yet). Gates on branch: all pass except prettier on the log file (fixed on main); main pushed. 4670-4690 still queued for Codex (Codex 5h at 9%). No tag (hosted CI unverified).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
