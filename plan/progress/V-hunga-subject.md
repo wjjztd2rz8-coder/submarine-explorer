@@ -9,6 +9,7 @@ site-specific branches, no draw/triangle changes. Net simpler: yes, no new code 
 to flat tan; (2) 0.19/0.15 floor 0.25 keeps strata contrast at 40 m.
 
 **Before/after (golden, high tier):**
+
 - before: `.cache/golden/2026-10-27-062021` (mission) and `2026-10-27-062210` (free dive)
 - after: `.cache/golden/2026-10-27-062558` (mission) and `2026-10-27-062746` (free dive)
 - rejected too-bright try: `2026-10-27-062311`, `2026-10-27-062501`

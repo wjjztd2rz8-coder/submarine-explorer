@@ -72,13 +72,13 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running (2026-10-27 review). Codex: 4570-bluehole, 4580, 4590 running; 4600-4620 queued.
+- No Claude package running (2026-10-27 review). Codex: 4580 unfinished (worktree, no note); 4600-4630 queued.
 
 ## Backlog
 
 One list, ordered by player impact and dependencies; lane in brackets. Evidence: reviews 2026-10-27 (Claude alone, Sol skipped for Codex budget) and 2026-10-26 in `plan/REVIEWS.md`; earlier item histories in [archive/DIRECTOR-HISTORY-2026-10-26-backlog.md](archive/DIRECTOR-HISTORY-2026-10-26-backlog.md). Art gains per package are ~0.1-0.2, so each V-* names a target composition, not a geometry list. Owner phone decisions: [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md). Done this cycle (removed): V-bluehole-roof, V-lostcity-surround, V-monterey-wall-skirt, V-beebe-flow, V-lostcity-towers, V-bluehole-silhouette, V-monterey-apron.
 
-1. **V-hunga-subject [Sonnet, small]:** (~3.0) 4560 found the tuff albedo ~0.013, so the subject is nearly black. Target: a subject-only material lift (data plus shared material, no site branch) so Hunga's caldera rim reads at 40 m like Kama's pillows. Needs the `hunga` golden alias.
+1. **V-hunga-subject [Sonnet, small]:** DONE 2026-10-27 (d38a92f3; tuff `glow` in scarp.ts: 40 m view ~4.5, opening still dim ~3.4; a distance-aware lift would need shared shader work, only if cheap). Original item: (~3.0) 4560 found the tuff albedo ~0.013, so the subject is nearly black. Target: a subject-only material lift (data plus shared material, no site branch) so Hunga's caldera rim reads at 40 m like Kama's pillows. Needs the `hunga` golden alias.
 2. **V-kama-axial-approach [Sonnet]:** (~3.2) approach framing for Axial chimneys and Kama pillows: first sighting at 80-100 m shows the subject and a lit accent. Judge from `axial`/`kama` golden captures.
 3. **V-bluehole-lip [Sonnet, small]:** (~3.7) roof gaps read as dents, lip ends are blocky. Target `great-blue-hole-east-2.png`: gaps become true openings with light, lip ends taper. Do not touch the shaft or the Low draw pin (7).
 4. **V-monterey-banding [Sonnet, small]:** (~3.6) the wall now has opaque material but horizontal moire-like banding streaks across the whole face (`monterey-canyon-3.png`). Target: break stripe frequency with the shared wall noise, keep the sub solid.

@@ -2178,3 +2178,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Sol skipped (Codex budget). New golden 2026-10-27-061028; Backlog rewritten (seven Sonnet items), Codex 4600-4620 queued. No code merged. Details in REVIEWS.md and STATUS.md.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-27 02:00 CDT headless run 176 (Claude): collection and one Sonnet package
+
+- Merged 4590 (migration now repairs discovery/photo reward credit on every boot; save-soak extended), 4570-bluehole (hood collision rebuilt from rendered triangles, shaft single draw, numerics note) and V-hunga-subject (Sonnet; tuff `glow` in scarp.ts; 40 m view reads well ~4.5, mission opening still dim ~3.4 by my read). Gates smoke + project-base pass on main (prettier-only fixes), pushed. 4580 (mobile gestures) remains unfinished in its worktree with no note (Codex 5h at 5%). Queued 4630 beside 4600-4620. No tag (hosted CI unverified).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
