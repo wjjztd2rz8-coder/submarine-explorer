@@ -17,4 +17,4 @@ About 3.8 (from 3.6). Banding is reduced, not eliminated; the vertical rill patt
 
 ## Gates
 
-The first gates run failed unit specs that hash Monterey wall geometry and colours (scarp equivalence, Low buffers, opening snapshot). The wall geometry and vertex colours changed on purpose, so I regenerated those hashes and snapshots. Draw counts (30) and triangles (284010) in the Low pin are unchanged; the placement hash is unchanged. Final gates result is in the report.
+The first gates run failed unit specs that hash Monterey wall geometry and colours (scarp equivalence, Low buffers, opening snapshot). The wall geometry and vertex colours changed on purpose, so I regenerated those hashes and snapshots. Draw counts (30) and triangles (284010) in the Low pin are unchanged; the placement hash is unchanged. Rerun: all gates pass (python, content, build, unit, e2e smoke, e2e-base, attribution, prettier).
