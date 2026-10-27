@@ -2234,3 +2234,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 ## 2026-10-27 10:24 CDT targeted review (Claude): CI red x3
 
 - Diagnosed: two stale e2e specs (journal-debrief legacy-save awarded list after 4590; f3-audio float32 gains after 4650). Fixed both, queued 4695 guard brief. See plan/REVIEWS.md. No Claude package this run. Needs owner: phone retest (checklist 4410).
+
+## 2026-10-27 11:38 CDT headless run 186 (Claude): collection and one Sonnet package
+
+- Merged Codex reports 4670-4720 (all report-only; 4720 says the Lost City talus "colour-only/Low untouched" wording was too strong, not a reopen) and 4680 (first-minute audit repairs, touch swipe helper; no live browser acceptance, Codex sandbox blocked it). 4690's spec fixes were already on main, only its note merged. Merged V-kama-opening + V-hunga-opening (Sonnet; Kama 110 m with raised 35 m arm through per-site mission data, ~3.8 but the hull is below frame on desktop; Hunga 120 m, rim legible but still dim ~3.6). Gates smoke + project-base pass on the branch and the pushes followed. 4695 still running; queued and launched 4730-4750. No tag (hosted CI unverified).
+- Follow-up if wanted: keep the Kama hull in frame on desktop; Hunga opening brightness.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
