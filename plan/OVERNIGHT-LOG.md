@@ -2162,3 +2162,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged 4530 (first-minute bug hunt: home Journal shortcut after cancel, popstate reload over disposed mission, touch controls see modal-consumed keys), 4510 (Lost City surround / Monterey wall numerics, report only) and V-beebe-flow (Sonnet; per-vent plume variation plus warm mouth haze, ~3.7 from ~3.5 by my read of beebe-vent-field-2; trunk plume still dense). Gates smoke + project-base pass on main, pushed. 4460 and 4480 worktrees hold unfinished Codex work (Codex 5h 12%, resets 22:15); 4520 empty; 4540-4560 queued. No tag (hosted CI unverified).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (also Beebe plumes).
+
+## 2026-10-26 23:44 CDT headless run 174 (Claude): cleanup and one Sonnet package
+
+- Merged V-bluehole-roof slice 4 (Sonnet; ragged roof with gaps, varied pendants, one merged soft light shaft, ~3.7 by my read of east-2; Low draw pin 6 to 7 for the shaft; gates smoke + project-base pass on main, pushed). Removed nine stale/empty worktrees (2980, 3050, 3310, 3320, 3340, 3380, 4460, 4480, 4520); their diffs are in .cache/shelved/. 4460's scarp widening was shelved (complex, +0.5 s build, speculative); 4480's gates.sh/pilot changes shelved (full-unit stalled). 4540-4560 running in Codex; queued 4570-4590. No tag (hosted CI unverified).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (also Blue Hole roof and shaft).

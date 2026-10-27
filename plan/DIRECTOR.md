@@ -72,13 +72,13 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running (2026-10-26 evening). Codex queue: 4480 (R-ci-green), 4490 (S-verify), 4500 (S-bughunt).
+- No Claude package running (2026-10-26 night). Codex: 4540-4560 running; 4570-4590 queued.
 
 ## Backlog
 
 One list, ordered by player impact and dependencies; lane in brackets. Evidence: reviews 2026-10-26 (joint with Sol) and 2026-10-26 evening (Claude alone, Codex budget low) in `plan/REVIEWS.md`; earlier item histories in [archive/DIRECTOR-HISTORY-2026-10-26-backlog.md](archive/DIRECTOR-HISTORY-2026-10-26-backlog.md). Art gains per package are ~0.1-0.2, so each V-* names a target composition, not a geometry list. Owner phone decisions: [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md).
 
-1. **V-bluehole-roof [Sonnet]:** (~3.6) after two silhouette passes the gallery top is still a broad slab and no light falls through the opening. Target from `great-blue-hole-east-2.png`: the roof reads as a thin broken ceiling with a soft light shaft; the flat tan horizontal banding on the wall is reduced by breaking the stripe frequency. Silhouette and one shaft only; keep the Class B spawn numerics.
+1. **V-bluehole-roof [Sonnet] DONE 2026-10-26 (d4bbfcd1; ~3.7: ragged roof with gaps, varied pendants, one soft shaft; lip ends still blocky, gaps are dents not holes):** (~3.6) after two silhouette passes the gallery top is still a broad slab and no light falls through the opening. Target from `great-blue-hole-east-2.png`: the roof reads as a thin broken ceiling with a soft light shaft; the flat tan horizontal banding on the wall is reduced by breaking the stripe frequency. Silhouette and one shaft only; keep the Class B spawn numerics.
 2. **V-lostcity-surround [Sonnet] DONE 2026-10-26 (db495bb0; ~3.7: streaks gone, two taller chimneys; talus skirt still weak, terrace support in Terrain.ts now has no shipped user: delete candidate):** (~3.5) Poseidon now reads as one tower; the surrounding slope is still a bare dark-olive ridge with streaky texture. Target `lost-city-3.png`: a pale carbonate rubble and talus skirt at the tower base, a second and third smaller chimney in mid-ground, no streak texture on the ridge. Do not raise the High plume budget.
 3. **V-eight-sites-lit [Sonnet] Axial part DONE 2026-10-26 (~3.2; chimney bodyGlow via vertexGlow, golden aliases axial/kama/hunga; next: Hunga, Kama, Axial approach framing):** (Axial/Kama ~3.0, no golden for them yet: add `axial`, `kama`, `hunga` to GOLDEN_SITES first) Axial lit-chimney treatment through site data and shared `vertexGlow`; then Hunga's dark subject, then Kama. 4500 reports the numerics.
 4. **V-endurance-hull [Sonnet, small]:** (~3.0 to 3.2: speckle is gone from the new capture, hull has planks and decks) next target is a richer silhouette (masts, rails, rubble skirt) or a lit subject; the sandy flat is empty.
