@@ -2260,3 +2260,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-kama-hull-frame (Sonnet; two numbers in Kama site.json mission opening, hull fully in frame on desktop and portrait, ~3.8 by my read; High not captured). Gates smoke + project-base pass on main. Codex 4730-4750 worktrees still hold uncommitted work, queue 50-52 waits for the dispatcher (Codex 5h reset 14:00). Next: V-hunga-bright. No tag (hosted CI unverified).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-27 16:34 CDT headless run 190 (Claude): one Sonnet package
+
+- Merged V-hunga-bright (Sonnet; Hunga site data gets lamps, no shared code; rim and lamp pool visibly brighter, ~3.8 by my read vs agent's 4.0; three lowSweep snapshots rebaselined). Gates all passed on the branch; the post-merge main rerun passed through e2e, then my 590 s timeout cut e2e-base (merge only added notes). Queue 50-52 still waits on Codex 5h reset (19:30). Next: V-bluehole-roof-slab, V-endurance-accent. No tag (hosted CI unverified).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
