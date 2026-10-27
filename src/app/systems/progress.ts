@@ -17,7 +17,6 @@ export async function loadSavedProgress(): Promise<Progress> {
 
 export function createProgressSystem(): GameSystem {
   const cleanup = new Disposables();
-  let lastPhotos: unknown = null;
   return {
     name: 'progress',
     init(ctx) {
@@ -54,19 +53,7 @@ export function createProgressSystem(): GameSystem {
     },
     start(ctx) {
       initializeProgressMenus(ctx, cleanup);
-      lastPhotos = ctx.photos.photos;
       ctx.expose({ progressMigrationReady: () => true });
-    },
-    frame: {
-      'play.mission': (_f, ctx) => {
-        if (lastPhotos === ctx.photos.photos) return;
-        const previous = lastPhotos as readonly { id: string }[];
-        const ids = new Set(previous.map((p) => p.id));
-        for (const photo of ctx.photos.photos)
-          if (!ids.has(photo.id) && photo.poiId)
-            ctx.progress.award('photo', `${photo.siteId}/${photo.poiId}`);
-        lastPhotos = ctx.photos.photos;
-      },
     },
     dispose() {
       cleanup.dispose();

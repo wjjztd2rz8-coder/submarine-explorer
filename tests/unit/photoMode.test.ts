@@ -1,10 +1,14 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PerspectiveCamera, Vector3 } from 'three';
 import { createPhotoSystem } from '../../src/app/systems/photo.js';
+import { createProgressSystem } from '../../src/app/systems/progress.js';
 import type { GameContext } from '../../src/app/context.js';
 import { SystemRunner, type FrameState } from '../../src/app/System.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
+import { ProgressSave } from '../../src/core/Save.js';
+import { Mission, parseMission } from '../../src/game/Mission.js';
+import { Progress } from '../../src/game/Progress.js';
 import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
 import { Scanner, type ScanTarget } from '../../src/game/Scanner.js';
 import { parsePois, placePois } from '../../src/game/Pois.js';
@@ -347,10 +351,11 @@ it('on touch the capture button and tips name no keys', () => {
 function automaticStillFixture() {
   vi.stubGlobal('document', {
     body: new Element(),
-    documentElement,
+    documentElement: { ...documentElement, dataset: { reduceMotion: 'true' } },
     createElement: () => new Element(),
   });
   vi.stubGlobal('window', {
+    setTimeout: vi.fn(),
     clearTimeout: vi.fn(),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
@@ -359,7 +364,7 @@ function automaticStillFixture() {
   const image = 'data:image/jpeg;base64,/9j/2Q==';
   const thumbnail = vi.mocked(canvasThumbnail).mockReturnValue(image);
   const dives: Array<{ runner: SystemRunner }> = [];
-  function createDive() {
+  function createDive(withRewards = false) {
     const data = new Map<string, string>();
     const storage = {
       getItem: (key: string) => data.get(key) ?? null,
@@ -396,7 +401,9 @@ function automaticStillFixture() {
         siteName: vi.fn(() => 'RMS Titanic'),
         refresh: vi.fn(),
       },
-      progress: { cosmetics: { frame: 'stock' } },
+      progress: new Progress(new ProgressSave(null)),
+      missionSelect: { setProgress: vi.fn() },
+      homeSites: { setProgress: vi.fn() },
       renderer: { domElement: {} },
       audio: { playShutter: vi.fn() },
       expose: vi.fn(),
@@ -415,6 +422,7 @@ function automaticStillFixture() {
     const system = createPhotoSystem();
     const runner = new SystemRunner(ctx);
     runner.init([
+      ...(withRewards ? [createProgressSystem()] : []),
       {
         name: 'scan-driver',
         frame: {
@@ -462,6 +470,135 @@ function automaticStillFixture() {
 }
 
 describe('automatic scan still handoff', () => {
+  // Regression: render.capture saved the photo after the reward poll, so ending
+  // before the next frame lost the third star despite a successful capture.
+  it.each(['automatic', 'manual'] as const)(
+    'credits a successful %s capture before immediate surfacing and preserves repeat/abort ratings',
+    (capture) => {
+      const fixture = automaticStillFixture();
+      const dive = fixture.createDive(true);
+      let captureMs = 0;
+      const now = vi.spyOn(performance, 'now').mockImplementation(() => (captureMs += 500));
+      const { ctx, runner, f, poi, scanner } = dive;
+      const mission = new Mission({
+        bus: ctx.bus,
+        def: parseMission(
+          {
+            spawn: { lat: 0, lon: 0 },
+            objectives: [{ id: 'primary', poi: poi.id }],
+          },
+          'titanic',
+        )!,
+      });
+      const finish = vi.fn(() =>
+        ctx.progress.finish('titanic', mission.objectives, mission.endReason === 'abort'),
+      );
+      const off = ctx.bus.on('mission:ended', finish);
+      const photograph = () => {
+        ctx.photoMode.setActive(true);
+        f.sampled.capturePhoto = true;
+        runner.frame(f);
+        f.sampled.capturePhoto = false;
+        ctx.photoMode.setActive(false);
+      };
+      try {
+        if (capture === 'manual') fixture.thumbnail.mockReturnValueOnce(null);
+        mission.start('titanic');
+        dive.complete(poi, false);
+        runner.frame(f); // Persist the automatic still at render.capture.
+        if (capture === 'manual') photograph();
+        expect(ctx.photos.photos).toHaveLength(1);
+        expect(mission.end()).toBe(true); // No intervening frame to credit the photo.
+        expect(finish.mock.results.at(-1)?.value).toEqual({ stars: 3, best: 3, points: 0 });
+        expect(new Progress(ctx.progress.save).rating('titanic')).toBe(3);
+        const earned = ctx.progress.snapshot().awarded;
+
+        // Journal scans persist, but a return dive must earn its own bonus.
+        mission.restart();
+        scanner.resetDive();
+        mission.start('titanic');
+        dive.complete(poi, false);
+        runner.frame(f);
+        expect(ctx.photos.photos).toHaveLength(1);
+        expect(mission.end()).toBe(true);
+        expect(finish.mock.results.at(-1)?.value).toEqual({ stars: 2, best: 3, points: 0 });
+        expect(ctx.progress.snapshot().awarded).toEqual(earned);
+
+        mission.restart();
+        scanner.resetDive();
+        mission.start('titanic');
+        dive.complete(poi, false);
+        // A repeat photo earns this dive's bonus without duplicating its token.
+        photograph();
+        expect(ctx.progress.bonus).toBe(true);
+        mission.abort('power');
+        expect(mission.end()).toBe(true);
+        expect(finish.mock.results.at(-1)?.value).toEqual({ stars: 0, best: 3, points: 0 });
+        expect(ctx.progress.snapshot().awarded).toEqual(earned);
+      } finally {
+        now.mockRestore();
+        off();
+        mission.dispose();
+        fixture.dispose();
+      }
+    },
+  );
+
+  it.each(['automatic', 'manual'] as const)(
+    'does not credit a failed %s capture, and credits recovery without waiting for a frame',
+    (capture) => {
+      const fixture = automaticStillFixture();
+      const dive = fixture.createDive(true);
+      const { ctx, runner, f, poi, storage } = dive;
+      const save = storage.setItem.getMockImplementation()!;
+      let captureMs = 0;
+      const now = vi.spyOn(performance, 'now').mockImplementation(() => (captureMs += 500));
+      try {
+        for (const failure of ['readback', 'storage', 'none'] as const) {
+          fixture.thumbnail.mockReturnValue(failure === 'readback' ? null : fixture.image);
+          storage.setItem.mockImplementation(
+            failure === 'storage'
+              ? () => {
+                  throw new DOMException('Full', 'QuotaExceededError');
+                }
+              : save,
+          );
+          if (capture === 'automatic') {
+            ctx.bus.emit('scan:complete', {
+              poiId: poi.id,
+              landmarkId: 'titanic',
+              firstTime: true,
+            });
+          } else {
+            ctx.photoMode.setActive(true);
+            f.sampled.capturePhoto = true;
+          }
+          runner.frame(f);
+          f.sampled.capturePhoto = false;
+          ctx.photoMode.setActive(false);
+          expect(ctx.photos.photos).toHaveLength(failure === 'none' ? 1 : 0);
+          expect(ctx.progress.bonus).toBe(failure === 'none');
+          expect(
+            ctx.progress.snapshot().awarded.filter((token) => token.startsWith('photo:')),
+          ).toEqual(failure === 'none' ? [`photo:titanic/${poi.id}`] : []);
+        }
+        if (capture === 'manual') {
+          ctx.progress.beginDive();
+          ctx.discovery.pois.length = 0;
+          ctx.photoMode.setActive(true);
+          f.sampled.capturePhoto = true;
+          runner.frame(f);
+          expect(ctx.photos.photos).toHaveLength(2);
+          expect(ctx.photos.photos[0].poiId).toBeNull();
+          expect(ctx.progress.bonus).toBe(false);
+        }
+      } finally {
+        now.mockRestore();
+        fixture.dispose();
+      }
+    },
+  );
+
   it.each(['poi', 'animal'] as const)(
     'projects the %s into the crop at both vertical frame edges',
     (kind) => {
