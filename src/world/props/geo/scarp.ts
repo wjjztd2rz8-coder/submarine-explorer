@@ -710,7 +710,6 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
           MONTEREY_STRATA.laminaBreak *
             (fbm3(x * 0.2, y * 0.35, z * 0.2, seed + 37, 2) - laminaTone)
         : laminaTone;
-      const lipDark = 1 - 0.34 * (1 - smooth(0, 0.07, saw));
       const lipLit = 1 + 0.2 * smooth(0.86, 0.98, saw) * (1 - smooth(0.98, 1, saw));
       const rill =
         1 - Math.abs(2 * fbm3(x * P.gullyFreq, y * 0.03, seed + 1, seed, gullyOctaves) - 1);
@@ -718,8 +717,13 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       const grain = 0.88 + 0.24 * fbm3(x * 1.7, y * 2.2, z * 1.7, seed + 66, 2);
       // Laminae fade in and out along the wall rather than ruling every bed the same way.
       const lamFade = erodedBeds
-        ? smooth(0.25, 0.7, fbm3(x * 0.035, y * 0.05, seed + 55, seed + 19, 2))
+        ? smooth(0.4, 0.75, fbm3(x * 0.035, y * 0.05, seed + 55, seed + 19, 2))
         : 1;
+      // The shadow line under a ledge fades where the laminae do, so joints are not ruled evenly.
+      const lipShare = erodedBeds
+        ? MONTEREY_STRATA.lipFloor + (1 - MONTEREY_STRATA.lipFloor) * lamFade
+        : 1;
+      const lipDark = 1 - 0.34 * (1 - smooth(0, 0.07, saw)) * lipShare;
       out.multiplyScalar(
         (1 + (0.84 + 0.32 * lam - 1) * lamFade) * lipDark * lipLit * gullyShade * grain,
       );
