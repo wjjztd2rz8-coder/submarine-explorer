@@ -2240,3 +2240,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged Codex reports 4670-4720 (all report-only; 4720 says the Lost City talus "colour-only/Low untouched" wording was too strong, not a reopen) and 4680 (first-minute audit repairs, touch swipe helper; no live browser acceptance, Codex sandbox blocked it). 4690's spec fixes were already on main, only its note merged. Merged V-kama-opening + V-hunga-opening (Sonnet; Kama 110 m with raised 35 m arm through per-site mission data, ~3.8 but the hull is below frame on desktop; Hunga 120 m, rim legible but still dim ~3.6). Gates smoke + project-base pass on the branch and the pushes followed. 4695 still running; queued and launched 4730-4750. No tag (hosted CI unverified).
 - Follow-up if wanted: keep the Kama hull in frame on desktop; Hunga opening brightness.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-27 11:56 CDT headless run 187 (Claude): collection only
+
+- Merged 4695 (Codex task prompt now tells builders to grep and run matching e2e specs; gates smoke + project-base pass on branch). 4730-4750 still running in Codex (5h ~20%). No Claude package: the previous run just finished two. No tag (hosted CI unverified).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
