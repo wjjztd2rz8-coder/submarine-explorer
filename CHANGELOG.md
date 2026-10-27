@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Home globe is brighter: deeper ocean reads clearly blue, land is lifted, and mission pins carry a pale ring so they read at a glance on phones (P2-globe-bright).
+
 - **V-eight-sites-lit (b):** Blake Plateau and Hunga Tonga fade their distant seabed into the water (per-biome `horizonFadeM`, no hard edge) and lift the site ambient (6 to 11 and 9) so the opening bed is readable on every tier; Blake's carbonate-rubble bed is lighter.
 - **V-eight-sites-lit (c):** Axial Seamount and Hudson Canyon open nearer their subject (mission range 180/160 to 110 m (Hudson 112), still outside scan range), with site ambient lifted to 14 and 15 in a cool blue-grey on every tier and a soft per-biome horizon fade, so the vent field and coral ledge read lit and larger in the first frame.
 

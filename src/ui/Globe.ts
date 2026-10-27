@@ -135,7 +135,7 @@ void main() {
   vec3 land = mix(vec3(lum), c, uLandSat) * uLandDim;
   vec3 col = mix(land, c * uOceanGain, ocean);
   float ndv = max(dot(normalize(vNormalW), normalize(vViewDir)), 0.0);
-  col *= 0.45 + 0.55 * ndv;
+  col *= 0.6 + 0.4 * ndv;
   if (uGratOpacity > 0.0) {
     vec2 g = vec2(vUv.x * 360.0, vUv.y * 180.0) / uGratStep;
     vec2 d = abs(fract(g - 0.5) - 0.5) / max(fwidth(g), vec2(1e-4));
