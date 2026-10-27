@@ -8,6 +8,7 @@
  */
 
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { propManifest } from '../../../core/SiteManifest.js';
 import { geoDetail } from './detail.js';
 import { geoMaterial as baseGeoMaterial, vertexGlow } from './materials.js';
@@ -177,6 +178,49 @@ function pendant(o: {
   }
   g.computeVertexNormals();
   return g;
+}
+
+/** Conservative columns of the rendered hood, including its cut roof and bent pendants. */
+function hoodColliders(mesh: THREE.BufferGeometry): THREE.Box3[] {
+  const positions = mesh.getAttribute('position');
+  const index = mesh.index;
+  const cells = new Map<string, THREE.Box3>();
+  const cellM = 1;
+  for (let i = 0; i < (index?.count ?? positions.count); i += 3) {
+    const triangle = [0, 1, 2].map((j) =>
+      new THREE.Vector3().fromBufferAttribute(positions, index ? index.getX(i + j) : i + j),
+    );
+    const bounds = new THREE.Box3().setFromPoints(triangle);
+    for (let x = Math.floor(bounds.min.x / cellM); x <= Math.floor(bounds.max.x / cellM); x++) {
+      for (let z = Math.floor(bounds.min.z / cellM); z <= Math.floor(bounds.max.z / cellM); z++) {
+        let polygon = triangle;
+        // Clip before taking heights: neighbouring high roof faces must not fill a lowered gap.
+        for (const [axis, edge, sign] of [
+          ['x', x * cellM, 1],
+          ['x', (x + 1) * cellM, -1],
+          ['z', z * cellM, 1],
+          ['z', (z + 1) * cellM, -1],
+        ] as const) {
+          const clipped: THREE.Vector3[] = [];
+          for (let j = 0; j < polygon.length; j++) {
+            const a = polygon[j],
+              b = polygon[(j + 1) % polygon.length];
+            const da = sign * (a[axis] - edge),
+              db = sign * (b[axis] - edge);
+            if (da >= 0) clipped.push(a);
+            if (da >= 0 !== db >= 0) clipped.push(a.clone().lerp(b, da / (da - db)));
+          }
+          polygon = clipped;
+        }
+        if (!polygon.length) continue;
+        const key = `${x},${z}`;
+        const box = cells.get(key) ?? new THREE.Box3();
+        for (const point of polygon) box.expandByPoint(point);
+        cells.set(key, box);
+      }
+    }
+  }
+  return [...cells.values()];
 }
 
 export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
@@ -626,12 +670,17 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
       g.setAttribute('color', new THREE.BufferAttribute(col, 3));
       cones.push(g);
     }
+    // The rock merge helper strips colour attributes before painting; keep the shaft's fade.
+    const geometry = mergeGeometries(cones, false)!;
+    for (const cone of cones) cone.dispose();
     const shaft = new THREE.Mesh(
-      mergeAll(cones),
+      geometry,
       new THREE.MeshBasicMaterial({
         vertexColors: true,
         transparent: true,
         blending: THREE.AdditiveBlending,
+        // Additive faces commute and never write depth; both sides can share one pass.
+        forceSinglePass: true,
         depthWrite: false,
         side: THREE.DoubleSide,
       }),
@@ -642,19 +691,17 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
   };
 
   // --- stalactites: clusters of fluted pendants hung from the underside of the shelf
-  const wallBoxes = (rise?: typeof roofRise): THREE.Box3[] =>
-    wallColliders(profile, W, D, H, 12, gnd, {
-      disp: wallDisp,
-      edgeStart: EDGE_START,
-      plan,
-      liftAt,
-      sinkAt,
-      rise,
-    });
-  const colliders = wallBoxes();
+  const colliders = wallColliders(profile, W, D, H, 12, gnd, {
+    disp: wallDisp,
+    edgeStart: EDGE_START,
+    plan,
+    liftAt,
+    sinkAt,
+  });
   const wallBoxCount = colliders.length;
   colliders.push(...talusColliders(talus, W));
   const parts: THREE.BufferGeometry[] = [];
+  let galleryGeometry: THREE.BufferGeometry | undefined;
   const longest: { x: number; z: number; y: number; len: number; r: number }[] = [];
   const clusters = Math.max(4, Math.round((hood ? 10 : 8) * Math.sqrt(d.growth)));
   for (let k = 0; k < clusters; k++) {
@@ -719,6 +766,7 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
   }
   if (parts.length) {
     const stal = mergeAll(parts);
+    galleryGeometry = stal;
     // Cream at the tips, amber-stained toward the ceiling where each flares into the shelf.
     paint(stal, (x, y, z, ny, out) => {
       const n = fbm3(x * 0.8, y * 0.4, z * 0.8, seed ^ 0x44, 3);
@@ -750,7 +798,14 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
   bounds.min.y = Math.min(bounds.min.y, -0.1 * H);
   // The distant visual proxy keeps its authored shape; only physics follows the roof rise.
   const impostor = impostorFromBoxes(colliders, bounds, 0x8f8878);
-  if (hood) colliders.splice(0, wallBoxCount, ...wallBoxes(roofRise));
+  if (hood) {
+    colliders.splice(
+      0,
+      wallBoxCount,
+      ...hoodColliders(wall),
+      ...(galleryGeometry ? hoodColliders(galleryGeometry) : []),
+    );
+  }
   return {
     full,
     impostor,

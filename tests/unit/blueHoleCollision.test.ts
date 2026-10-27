@@ -12,6 +12,8 @@ import doc from '../../data/landmarks/great-blue-hole/props.json';
 const evidence: unknown[] = [];
 afterAll(() => {
   const env = (globalThis as { process?: { env?: Record<string, string> } }).process?.env;
+  if (env?.BLUEHOLE_ROOF_AUDIT === '1')
+    writeFileSync('.cache/bluehole-roof-collision.json', JSON.stringify(evidence, null, 2) + '\n');
   if (env?.VERIFY_1495 === '1')
     writeFileSync('.cache/1495/clearance.json', JSON.stringify(evidence, null, 2) + '\n');
 });
@@ -30,19 +32,19 @@ function actualTerrain(tier: 'low' | 'medium' | 'high') {
 /** Independently measure the sphere against EVERY transformed rendered triangle. */
 function renderedTriangles(apron: THREE.Mesh): THREE.Triangle[] {
   const positions = apron.geometry.getAttribute('position');
-  const index = apron.geometry.index!;
+  const index = apron.geometry.index;
   const triangles: THREE.Triangle[] = [];
-  for (let i = 0; i < index.count; i += 3)
+  for (let i = 0; i < (index?.count ?? positions.count); i += 3)
     triangles.push(
       new THREE.Triangle(
         new THREE.Vector3()
-          .fromBufferAttribute(positions, index.getX(i))
+          .fromBufferAttribute(positions, index ? index.getX(i) : i)
           .applyMatrix4(apron.matrixWorld),
         new THREE.Vector3()
-          .fromBufferAttribute(positions, index.getX(i + 1))
+          .fromBufferAttribute(positions, index ? index.getX(i + 1) : i + 1)
           .applyMatrix4(apron.matrixWorld),
         new THREE.Vector3()
-          .fromBufferAttribute(positions, index.getX(i + 2))
+          .fromBufferAttribute(positions, index ? index.getX(i + 2) : i + 2)
           .applyMatrix4(apron.matrixWorld),
       ),
     );
@@ -118,6 +120,83 @@ for (const tier of ['low', 'medium', 'high'] as const) {
     }
   });
 
+  it(`${tier}: roof gaps and varied pendants retain hull collision coverage`, async () => {
+    const terrain = actualTerrain(tier);
+    const config = makeConfig();
+    const radius = config.submarine.hullRadius;
+    const props = new Props(terrain.meta, terrain, config.props, tier);
+    try {
+      await props.placeAll(doc, 'great-blue-hole');
+      const hero = props.placed.find((p) => p.def.id === 'karst-grotto-east')!;
+      const rows = [];
+      for (const name of ['grotto-overhang', 'stalactite-gallery']) {
+        const mesh = hero.full.getObjectByName(name) as THREE.Mesh;
+        const triangles = renderedTriangles(mesh);
+        let missed = 0,
+          contacts = 0,
+          minClearance = Infinity,
+          maxStable = 0;
+        const stride = Math.max(1, Math.floor(triangles.length / 120));
+        for (let i = 0; i < triangles.length; i += stride) {
+          const triangle = triangles[i];
+          const normal = triangle.getNormal(new THREE.Vector3());
+          if (normal.lengthSq() < 0.5) continue;
+          for (const sign of [-1, 1]) {
+            const p = triangle
+              .getMidpoint(new THREE.Vector3())
+              .addScaledVector(normal, sign * (radius - 0.4));
+            if (!props.collide(p, radius, new THREE.Vector3())) missed++;
+            minClearance = Math.min(minClearance, distance(triangles, p));
+            const repeated = p.clone();
+            props.collide(repeated, radius, new THREE.Vector3());
+            maxStable = Math.max(maxStable, repeated.distanceTo(p));
+            contacts++;
+          }
+        }
+        rows.push({ name, contacts, missed, minClearance, maxStable });
+      }
+      const roof = hero.full.getObjectByName('grotto-overhang') as THREE.Mesh;
+      const gaps = [];
+      for (const u of [-0.12, 0.175, -0.4]) {
+        const x = u * hero.def.dimensionsM![0];
+        for (const z of [-8, -14, -20]) {
+          const origin = new THREE.Vector3(x, 100, z).applyMatrix4(roof.matrixWorld);
+          const hit = new THREE.Raycaster(origin, new THREE.Vector3(0, -1, 0)).intersectObject(
+            roof,
+          )[0];
+          if (!hit) continue;
+          const local = roof.worldToLocal(hit.point.clone());
+          const tops = hero
+            .localColliders!.filter(
+              (b) => b.min.x <= x && b.max.x >= x && b.min.z <= z && b.max.z >= z,
+            )
+            .map((b) => b.max.y);
+          gaps.push({ x, z, meshTop: local.y, colliderTop: Math.max(...tops) });
+        }
+      }
+      evidence.push({ tier, coverage: rows, gaps, colliderCount: hero.colliders.length });
+      for (const row of rows) {
+        expect(row.contacts).toBeGreaterThan(200);
+        expect(row.missed).toBe(0);
+        expect(row.minClearance).toBeGreaterThanOrEqual(radius - 1e-4);
+        expect(row.maxStable).toBeLessThan(1e-4);
+      }
+      // The two interior cuts must lower the collision ceiling with the mesh.
+      // The outer cut is buried in the pinched terrain join and can meet talus boxes.
+      expect(gaps).toHaveLength(8);
+      const interiorCuts = gaps.filter((g) => g.x > -20 && g.z === -14);
+      expect(interiorCuts).toHaveLength(2);
+      for (const gap of interiorCuts) {
+        expect(gap.colliderTop).toBeGreaterThanOrEqual(gap.meshTop - 1e-4);
+        expect(gap.colliderTop - gap.meshTop).toBeLessThan(1);
+        expect(gap.colliderTop).toBeLessThan(9);
+      }
+    } finally {
+      props.dispose();
+      terrain.dispose();
+    }
+  });
+
   it(`1495 ${tier}: both galleries clear shallow/deep contacts and retain open water`, async () => {
     const terrain = actualTerrain(tier);
     const config = makeConfig();
@@ -137,7 +216,8 @@ for (const tier of ['low', 'medium', 'high'] as const) {
         let minimumClearance = Infinity;
         let maximumVolumePenetration = 0;
         // Spread probes across the full apron, including its wall join and buried rim.
-        const stride = Math.max(1, Math.floor(triangles.length / 160));
+        // Denser coverage retains enough clear-water probes after covering every pendant.
+        const stride = Math.max(1, Math.floor(triangles.length / 320));
         for (let i = 0; i < triangles.length; i += stride) {
           const seat = triangles[i].getMidpoint(new THREE.Vector3());
           for (const above of [radius - 0.4, radius - 2.5, 1]) {
@@ -152,6 +232,7 @@ for (const tier of ['low', 'medium', 'high'] as const) {
             ).toBeGreaterThanOrEqual(radius - 1e-4);
             minimumClearance = Math.min(minimumClearance, clearance);
             for (const c of volumes) {
+              if (p.distanceToSquared(c.center) > (c.boundRadius + radius) ** 2) continue;
               const depth =
                 c.kind === 'box'
                   ? pushOutOfBox(p.clone(), radius, c, 0, new THREE.Vector3())
@@ -183,7 +264,7 @@ for (const tier of ['low', 'medium', 'high'] as const) {
             openWater++;
           }
         }
-        expect(contacts).toBeGreaterThan(200);
+        expect(contacts).toBeGreaterThan(400);
         expect(openWater).toBeGreaterThan(10);
         evidence.push({
           tier,
