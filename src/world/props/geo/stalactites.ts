@@ -607,7 +607,7 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
     const yBot = Math.max(gnd(cx + 0.1 * W, zTop + 0.4 * D), yTop - 0.7 * H);
     const shaft = new THREE.Group();
     shaft.name = 'grotto-light-shaft';
-    for (const k of [1, 0.62, 0.34]) {
+    for (const k of [1, 0.75, 0.52, 0.3]) {
       const g = new THREE.CylinderGeometry(1, 1, 1, 12, 4, true);
       const pos = g.getAttribute('position');
       const col = new Float32Array(pos.count * 3);
@@ -621,7 +621,7 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
           yTop + (yBot - yTop) * t,
           zTop + Math.sin(a) * r * 0.7 + t * 0.4 * D,
         );
-        const v = 0.07 * Math.sin(Math.PI * Math.min(1, 0.15 + 0.85 * t) ** 0.8);
+        const v = 0.03 * Math.sin(Math.PI * t) ** 0.7;
         col.set([v * 0.75, v * 0.9, v], i * 3);
       }
       g.setAttribute('color', new THREE.BufferAttribute(col, 3));
