@@ -1,5 +1,23 @@
 # Reviews
 
+## 2026-10-27 evening comprehensive review (Claude alone; Sol skipped, Codex 5h at 6%, script exit 75)
+
+**Changed since the midday review (golden 094529 to 165655):** V-monterey-rills, V-endurance-hull, V-beebe-trunk, V-lostcity-talus, P2-globe-bright, V-kama-opening, V-hunga-opening; Codex 4650/4660/4680/4695 and reports 4630-4720; two stale e2e specs fixed (CI red x3, see the targeted entry below).
+
+**Scores, readable / beautiful (my read, coarse; golden 2026-10-27-165655):** Titanic 4 / 3.6 (bow lit, upper frame dead black); Lost City 4 / 3.8 (two towers with a paler apron); Blue Hole 3.7 / 3.7 (gallery reads under the roof; walls still terraced stacks); Beebe 4 / 3.8 (lit trunk, thinner plume, still the best); Monterey 4 / 3.9 (stripes gone, strata read; closest to 4); Challenger 3.5 / 3.5 (lander is a good subject, seabed fades flat); Endurance 3.6 (rubble and sand now frame the hull, no warm accent). Kama, Hunga, Axial are still not in the default golden set (new item V-golden-set).
+
+**Biggest gaps:** (1) no hero at 4, each package adds ~0.1; (2) Titanic is the lowest hero and its upper half is empty; (3) Hunga opening dim, Kama hull below frame; (4) real-phone retest pending.
+
+**Play check:** not re-captured; Codex 4680 audited Home, site pick and the first minute and its repairs merged; no live-browser acceptance was possible in the Codex sandbox.
+
+**Process:** Codex week 7% at ~72%/day burn (runs out first), so Sol is skipped and Codex is the binding constraint; the dispatcher gate handles it. Claude week 33% (~26%/day, resets Thu 29), so Claude packages are ration-limited too. 224 watchdog trips are expected Codex-floor stops. CI: runs 183-186 red or cancelled from the stale specs; 4695 now makes Codex briefs run matching e2e. No scheduling fault.
+
+**New priorities:** Claude lane: V-titanic-lift, V-kama-hull-frame, V-hunga-bright, V-bluehole-roof-slab, V-endurance-accent, V-challenger-horizon, V-golden-set (Haiku). Codex queue: R-ci-green confirm (50), S-verify Kama/Hunga (51), S-bughunt Journal (52).
+
+**Stage:** about 89% to 1.0; about 4 weeks. Claude's estimate, not agreed with Sol.
+
+**Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (includes the brighter globe).
+
 ## 2026-10-27 targeted review: CI red on main for 3 runs
 
 **Diagnosis (all five failing shards, runs 183-185):** two stale e2e expectations, no product bug.
