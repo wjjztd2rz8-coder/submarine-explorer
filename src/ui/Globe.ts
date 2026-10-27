@@ -26,7 +26,7 @@ import * as THREE from 'three';
 import type { GlobeConfig } from '../core/Config.js';
 import type { GameEvents } from '../core/EventBus.js';
 import { el } from './dom.js';
-import { FocusTrap } from './FocusTrap.js';
+import { FocusTrap, observeOverlayOpen } from './FocusTrap.js';
 import {
   clusterPins,
   distanceToSeparate,
@@ -366,8 +366,7 @@ export class Globe {
     this.root.hidden = true;
     this.heldKeys.clear();
     this.orbit.setHeld(0, 0);
-    this.drag = null;
-    this.orbit.endDrag();
+    this.endDrag();
     this.hovered = null;
     this.closeChooser();
     if (!this.opts.embedded) this.trap.hide();
@@ -848,7 +847,7 @@ export class Globe {
 
   private bindPointer(): void {
     const onDown = (e: PointerEvent): void => {
-      if (!this.open_ || e.button !== 0) return;
+      if (!this.open_ || document.hidden || this.drag || e.button !== 0) return;
       const t = e.target as Element | null;
       if (t?.closest('button, a, .globe-card')) return;
       this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now() };
@@ -871,9 +870,7 @@ export class Globe {
     const onUp = (e: PointerEvent): void => {
       const d = this.drag;
       if (!d || d.id !== e.pointerId) return;
-      this.drag = null;
-      this.orbit.endDrag(e.type === 'pointercancel' ? Infinity : (performance.now() - d.t) / 1000);
-      this.root.classList.remove('is-dragging');
+      this.endDrag(e.type === 'pointerup' ? (performance.now() - d.t) / 1000 : Infinity);
     };
     const onWheel = (e: WheelEvent): void => {
       if (!this.open_) return;
@@ -886,7 +883,32 @@ export class Globe {
     this.root.addEventListener('pointermove', onMove);
     this.root.addEventListener('pointerup', onUp);
     this.root.addEventListener('pointercancel', onUp);
+    this.root.addEventListener('lostpointercapture', onUp);
+    const cancel = (): void => {
+      this.endDrag();
+      this.heldKeys.clear();
+      this.orbit.setHeld(0, 0);
+    };
+    const onVisibility = (): void => {
+      if (document.hidden) cancel();
+    };
+    window.addEventListener('blur', cancel);
+    document.addEventListener('visibilitychange', onVisibility);
+    this.disposers.push(
+      observeOverlayOpen(cancel),
+      () => window.removeEventListener('blur', cancel),
+      () => document.removeEventListener('visibilitychange', onVisibility),
+    );
     this.root.addEventListener('wheel', onWheel, { passive: false });
+  }
+
+  private endDrag(sinceLastMoveS = Infinity): void {
+    const drag = this.drag;
+    this.drag = null;
+    // Interrupted drags must not fling or resume from an old captured finger.
+    this.orbit.endDrag(sinceLastMoveS);
+    this.root.classList.remove('is-dragging');
+    if (drag && this.root.hasPointerCapture?.(drag.id)) this.root.releasePointerCapture(drag.id);
   }
 
   private applyHeld(): void {

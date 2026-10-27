@@ -89,7 +89,14 @@ beforeEach(() => {
     setItem: (key: string, value: string) => storage.set(key, value),
   });
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
-  vi.stubGlobal('document', { body, activeElement: body, createElement: () => new Element() });
+  vi.stubGlobal(
+    'document',
+    Object.assign(new EventTarget(), {
+      body,
+      activeElement: body,
+      createElement: () => new Element(),
+    }),
+  );
   home = new Home({
     dive,
     journal: vi.fn(),

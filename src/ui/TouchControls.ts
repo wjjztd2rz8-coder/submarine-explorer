@@ -14,7 +14,7 @@
  */
 
 import { elWithClass as el } from './dom.js';
-import { observeKeyboard } from './FocusTrap.js';
+import { observeKeyboard, observeOverlayOpen } from './FocusTrap.js';
 
 import type { Input } from '../core/Input.js';
 import {
@@ -133,6 +133,12 @@ export class TouchControls {
     };
     document.addEventListener('visibilitychange', onVisibility);
     this.disposers.push(() => document.removeEventListener('visibilitychange', onVisibility));
+    this.disposers.push(
+      observeOverlayOpen(() => {
+        this.releaseAll();
+        this.input.clear();
+      }),
+    );
     this.applyMode();
   }
 
@@ -156,6 +162,7 @@ export class TouchControls {
    */
   update(inDive: boolean, photo: boolean): void {
     if (this.disposed) return;
+    if (photo !== this.photoMode) this.releaseAll();
     this.photoMode = photo;
     const show = this.touchMode && inDive && !photo;
     // Photo mode already hides flight controls; pausing must still end its camera gesture.
@@ -275,7 +282,10 @@ export class TouchControls {
   }
 
   private releaseStick(): void {
+    const id = this.stickPointer;
     this.stickPointer = null;
+    if (id !== null && this.stickBase.hasPointerCapture?.(id))
+      this.stickBase.releasePointerCapture(id);
     this.stickKnob.style.transform = '';
     this.stickBase.classList.remove('is-held');
     this.input.touchAxes.throttle = 0;
@@ -316,7 +326,10 @@ export class TouchControls {
 
   /** The thumb springs back to neutral, like the stick. */
   private releaseSlider(): void {
+    const id = this.sliderPointer;
     this.sliderPointer = null;
+    if (id !== null && this.sliderTrack.hasPointerCapture?.(id))
+      this.sliderTrack.releasePointerCapture(id);
     this.sliderThumb.style.top = '';
     this.sliderTrack.classList.remove('is-held');
     this.input.touchAxes.ballast = 0;
@@ -400,6 +413,7 @@ export class TouchControls {
       return p ? Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y) : 0;
     };
     const down = (e: PointerEvent): void => {
+      if ((!this.shouldShow && !this.photoMode) || document.hidden) return;
       if (e.pointerType !== 'touch' || !accepts(e.target)) return;
       this.looks.set(e.pointerId, {
         x: e.clientX,
@@ -471,6 +485,7 @@ export class TouchControls {
       ['pointermove', move],
       ['pointerup', up],
       ['pointercancel', up],
+      ['lostpointercapture', up],
     ];
     for (const [type, fn] of w) {
       window.addEventListener(type, fn as EventListener);
@@ -484,7 +499,12 @@ export class TouchControls {
     this.releaseStick();
     this.releaseSlider();
     this.input.touchHeld.clear();
+    const scanPointers = [...this.heldPointers.keys()];
     this.heldPointers.clear();
+    const scan = this.root.querySelector('.tc-btn-scan');
+    for (const id of scanPointers) {
+      if (scan?.hasPointerCapture?.(id)) scan.releasePointerCapture(id);
+    }
     this.looks.clear();
     this.pinchDist = 0;
     // A tap before a layout/mode interruption cannot pair with the next gesture.

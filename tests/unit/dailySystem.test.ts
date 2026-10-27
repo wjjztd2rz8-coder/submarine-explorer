@@ -106,10 +106,13 @@ it('keeps the downloaded deep Daily accessible across mode changes and releases 
       this.children = children;
     }
   }
-  vi.stubGlobal('document', {
-    body: new HomeElement(),
-    createElement: () => new HomeElement(),
-  });
+  vi.stubGlobal(
+    'document',
+    Object.assign(new EventTarget(), {
+      body: new HomeElement(),
+      createElement: () => new HomeElement(),
+    }),
+  );
   ctx.home = new Home({
     dive: vi.fn(),
     journal: vi.fn(),
