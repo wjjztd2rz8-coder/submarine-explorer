@@ -328,25 +328,9 @@ export class Terrain {
     const bed = Math.sin(
       (u * 0.35 + v + valueNoise2(u * 0.3, v * 0.3, this.detail.seed)) * Math.PI * 2,
     );
-    let shelf = 0;
-    if (f.terrace) {
-      // Pull the survey surface toward stepped beds. The bed phase is warped so shelves wander,
-      // and each bed's strength varies so some treads break away to the plain slope.
-      const { periodM, amount } = f.terrace;
-      const level =
-        this.sampleDataHeight(x, z) / periodM +
-        (valueNoise2(x / 55, z / 55, this.detail.seed ^ 0x77) - 0.5) * 4;
-      const index = Math.floor(level);
-      const t = level - index;
-      const riser = THREE.MathUtils.smoothstep(t, 0.62, 0.95);
-      const bedAmount =
-        amount * (0.45 + 0.55 * valueNoise2(index * 3.1, 7, this.detail.seed ^ 0x79));
-      shelf = (riser - t) * periodM * bedAmount * 0.5;
-    }
     return (
       broad +
       scour.height +
-      shelf * rock * fade * this.detail.strength +
       (bed * (f.reliefBed ?? 0.35) - rill * rill * 0.65) *
         f.reliefM *
         rock *
