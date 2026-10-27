@@ -25,6 +25,18 @@
     }
   },
   "atmosphere": {
+    "hemisphere": {
+      "name": "hungaFill",
+      "sky": 5929616,
+      "ground": 3815986,
+      "intensity": 3.5
+    },
+    "lamps": {
+      "intensity": 3,
+      "distance": 1.2,
+      "fillIntensity": 3.5,
+      "fillDistance": 1.4
+    },
     "tiers": {
       "low": {
         "depthM": -200,
