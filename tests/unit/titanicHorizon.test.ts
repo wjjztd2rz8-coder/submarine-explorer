@@ -114,7 +114,7 @@ describe('Titanic far-field horizon', () => {
       const partial = sampleAtmosphere(config.water, -950);
       preset.update(0, { camera, atmo: partial } as PresetFrameContext);
       expect(partial.fogColor.r).toBeCloseTo(
-        sampleAtmosphere(config.water, -950).fogColor.r * 1.2,
+        sampleAtmosphere(config.water, -950).fogColor.r * (1 + ABYSS_HORIZON.fogLift * ((950 - 700) / (1200 - 700)) ** 2 * (3 - 2 * ((950 - 700) / (1200 - 700)))),
         7,
       );
       preset.exit();
