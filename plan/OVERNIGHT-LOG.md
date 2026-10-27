@@ -2198,3 +2198,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-monterey-banding (Sonnet; warped laminae, fewer thicker beds, calmer tone; ~3.8 from ~3.6 by my read of monterey-canyon-3; centre rills and ledge geometry still stripe, next step per-bed lateral pinch-out). Unit hashes/snapshots regenerated, Low draw pin unchanged. Gates smoke + project-base pass on main (first run hit a port clash, rerun clean), pushed. Codex 5h at 4%, 4600-4630 queued. No tag (hosted CI unverified).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-27 04:43 CDT headless run 180 (Claude): collection only
+
+- Merged 4600 (S-dead: unused terrain terrace support deleted, CHANGELOG entry), 4610 (S-bughunt: photo reward credit awarded at save instead of by a frame poll) and 4620 (report: Blue Hole shaft fits Low pin exactly with 0 draws headroom; Hunga/Kama changes are emission only). Gates smoke + project-base pass on main, pushed. 4630 still running in Codex; queued 4640-4660. No Claude package (Claude 5h window resets 05:10; gates took most of the run). No tag (hosted CI unverified).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
