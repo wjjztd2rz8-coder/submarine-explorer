@@ -2142,3 +2142,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Sol skipped (Codex budget). New golden set 2026-10-26-213811; Backlog rewritten (six Sonnet items), Codex 4480/4490/4500 queued, tag f67 pushed on green fde5c15d. No code merged. Details in REVIEWS.md and STATUS.md.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-26 19:31 CDT headless run 171 (Claude): collection and two Sonnet packages
+
+- Merged 4470 (home shortcut respects covering dialogs: J no longer opens a hidden Journal over Your sub), 4500 note (numerics only, no data change), V-monterey-wall-skirt (the 'skirt' was the wall's self-lit lift, 0.27 to 0.18; sub now solid, ~3.6-3.7) and V-lostcity-surround (ridge streaks removed, two taller mid-ground chimneys, ~3.7; pale talus skirt still weak). Gates smoke + project-base pass on main, pushed. 4460 (scarp collision verify) left unfinished in its worktree; 4480 and 4490 still running in Codex. Old stale worktrees (2980, 3050, 3310, 3320, 3340, 3380) still not collected. No tag (hosted CI unverified).
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (also Lost City surround, Monterey wall).
