@@ -2230,3 +2230,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged P2-globe-bright (Sonnet; Home globe brighter ocean/land, ringed mission pins; desktop clearly better by my read, phone not re-checked at final gain). Gates pass on main except prettier on the progress note (fixed). V-kama-opening/V-hunga-opening still wait on Codex 4670 (queued; Codex 5h ~9%). Hosted CI for run 183 failed in e2e shard 7/38 (logs unreadable while run in flight); 4690 will triage. No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (also the brighter globe).
+
+## 2026-10-27 10:24 CDT targeted review (Claude): CI red x3
+
+- Diagnosed: two stale e2e specs (journal-debrief legacy-save awarded list after 4590; f3-audio float32 gains after 4650). Fixed both, queued 4695 guard brief. See plan/REVIEWS.md. No Claude package this run. Needs owner: phone retest (checklist 4410).

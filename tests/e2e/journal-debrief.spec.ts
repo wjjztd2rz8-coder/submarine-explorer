@@ -87,10 +87,10 @@ freshTest.describe('legacy save persistence', () => {
           };
         });
       const before = await probe();
-      expect(before.progress).toMatchObject({
-        ...fixture.records['subexplorer.progress.v1'],
-        version: 2,
-      });
+      // Boot also credits Journal discoveries that the archived reward record lacks.
+      const { awarded, ...archived } = fixture.records['subexplorer.progress.v1'];
+      expect(before.progress).toMatchObject({ ...archived, version: 2 });
+      expect(before.progress.awarded).toEqual(expect.arrayContaining(awarded));
       expect(before.discoveries).toEqual(fixture.records['subexplorer.discoveries.v1']);
       expect(before.daily).toEqual(fixture.records['subexplorer.daily.v1']);
       expect(

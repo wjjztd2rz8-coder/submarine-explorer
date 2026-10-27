@@ -180,12 +180,11 @@ for (const touch of [false, true]) {
         expect(
           await page.evaluate(() => (window.__game as { perf: { tier: string } }).perf.tier),
         ).toBe('medium');
-        expect(await probe(page)).toMatchObject({
-          muted: true,
-          masterGain: 0,
-          sfxGain: saved.sfxVolume,
-          musicGain: saved.musicVolume,
-        });
+        const mix = await probe(page);
+        expect(mix).toMatchObject({ muted: true, masterGain: 0 });
+        // Web Audio gains are float32, so compare to the saved double loosely.
+        expect(mix.sfxGain).toBeCloseTo(saved.sfxVolume, 5);
+        expect(mix.musicGain).toBeCloseTo(saved.musicVolume, 5);
       };
       for (let run = 0; run < 2; run++) {
         await act(briefing.getByRole('radio', { name: 'Arcade', exact: true }));
