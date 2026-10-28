@@ -2313,3 +2313,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Claude-alone review (Sol skipped, Codex weekly 7%): golden set 9/10 sites (Hunga lost to timeout), backlog refilled (V-titanic-aft, V-bluehole-floor, V-lostcity-ground, V-monterey-flatten, T-golden-hunga), STATUS and REVIEWS updated, stage ~90%. No package launched (Claude week 25%).
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-28 02:06 CDT headless run 200 (Claude): one Sonnet package
+
+- Merged V-bluehole-floor (Sonnet; broader wall flutes, rubble hummocks deleted, softer apron mounds in terrainFeatures.ts, net fewer lines). Modest gain: my read ~3.8 vs agent's 4.3; foreground bottom corners still jagged. Cutting generic detail amplitude for smoothRock smoothed it but moved the mission spawn to the surface (unexplained dependency; reverted). Gates smoke + project-base passed on main. Codex weekly 7%: worktrees 4730-4750 and queue 50-52 wait for the Nov 2 reset. No tag.
+- Follow-up idea: understand the spawn-vs-detail-amplitude dependency before smoothing the foreground further.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
