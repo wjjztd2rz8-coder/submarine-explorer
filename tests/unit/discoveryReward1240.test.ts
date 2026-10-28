@@ -204,7 +204,7 @@ it.each([5, 6])(
       expect(stats.discoveries.map((d) => d.name)).toEqual(targets.map((t) => t.name));
       expect(stats.discoveries.at(-1)?.name).toBe('Stern section');
       // Mission banners count objectives, not all discoveries or lifetime Journal entries.
-      expect(mission.counts()).toEqual({ completed: 3, total: 4 });
+      expect(mission.counts()).toEqual({ completed: 3, total: titanicMission.objectives.length });
       expect(mission.primaryComplete).toBe(true);
       expect(mission.allComplete).toBe(false);
 
@@ -321,7 +321,7 @@ it.each([false, true])(
       const empty = discovery.showDebrief({ objectives: mission.counts() });
       expect(empty.discoveries).toEqual([]);
       expect(empty.newEntries).toEqual([]);
-      expect(empty.objectives).toEqual({ completed: 0, total: 4 });
+      expect(empty.objectives).toEqual({ completed: 0, total: titanicMission.objectives.length });
       expect(isEntryUnlocked(journal, entry, discovery.store)).toBe(false);
       expect(progress.finish('titanic', mission.objectives)).toEqual({
         stars: 0,
@@ -360,7 +360,7 @@ it.each([false, true])(
       mission.start('titanic');
       expect(discovery.stats.snapshot().discoveries).toEqual([]);
       expect(discovery.stats.snapshot().newEntries).toEqual([]);
-      expect(mission.counts()).toEqual({ completed: 0, total: 4 });
+      expect(mission.counts()).toEqual({ completed: 0, total: titanicMission.objectives.length });
       expect(isEntryUnlocked(journal, entry, discovery.store)).toBe(true);
       for (const target of discovery.pois) scan(target);
       expect(discovery.scanner.view.lastCompleteFirstTime).toBe(false);

@@ -1,3 +1,4 @@
+import { siteIds } from '../content.js';
 import {
   clamp,
   clamp01,
@@ -721,7 +722,8 @@ describe('per-site preset atmosphere', () => {
   const landmarks = JSON.parse(readFileSync('data/landmarks.json', 'utf8'));
 
   it('covers every shipped site with a neutral vent default', () => {
-    expect(sites).toHaveLength(13);
+    expect(sites.length).toBeGreaterThan(0);
+    expect([...sites].sort()).toEqual([...siteIds].sort());
     expect(DEFAULT_CONFIG.presets.vent.hullLight).toBe(1);
   });
 

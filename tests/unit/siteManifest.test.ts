@@ -650,7 +650,14 @@ it('binds each authored prop profile once in its owning content pack', () => {
       seen.add(id);
     }
   }
-  expect(seen.size).toBe(11);
+  expect(seen.size).toBeGreaterThan(0);
+  expect([...seen].sort()).toEqual(
+    ids
+      .flatMap((id) =>
+        Object.keys(JSON.parse(readFileSync(`data/landmarks/${id}/site.json`, 'utf8')).props ?? {}),
+      )
+      .sort(),
+  );
 });
 
 describe('site manifest atmosphere validation', () => {

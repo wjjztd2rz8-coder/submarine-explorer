@@ -1,3 +1,4 @@
+import { siteIds } from '../content.js';
 import { homeReady } from './helpers/home.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { scanWithKeyboard } from './helpers/scan.js';
@@ -334,7 +335,7 @@ test('all downloaded missions stay open in Realistic', async ({ page }) => {
   await page.goto('/');
   await homeReady(page, true);
   await page.locator('.home-menu').getByRole('button', { name: 'Dive sites', exact: true }).click();
-  await expect(page.locator('.home-sites .is-mission:not(:disabled)')).toHaveCount(13);
+  await expect(page.locator('.home-sites .is-mission:not(:disabled)')).toHaveCount(siteIds.length);
   await expect(page.locator('.upgrades')).toHaveCount(0);
 });
 

@@ -17,6 +17,7 @@ import * as geo from '../../src/world/props/geo/detail.js';
 import { composedFreeDiveSpawn, chooseFreeDiveHull, spawnSettings } from '../../src/game/Spawn.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import blueHolePoses from '../../tools/blue-hole-poses.json';
+import { propData, siteIds } from '../content.js';
 
 /**
  * Conservative static prop cost: every prop at once, with BOTH internal LOD
@@ -68,10 +69,6 @@ function staticCost(root: THREE.Object3D): { calls: number; triangles: number } 
   return { calls, triangles };
 }
 
-const sites = (
-  JSON.parse(readFileSync('data/landmarks/index.json', 'utf8')) as { landmarks: string[] }
-).landmarks;
-
 /** Read actual GLB geometry/materials; image decoding is irrelevant to this census. */
 async function localModel(url: string): Promise<THREE.Object3D> {
   const loader = new GLTFLoader();
@@ -95,7 +92,7 @@ afterAll(() => {
 });
 
 describe('catalog site static prop budgets', () => {
-  for (const site of sites) {
+  for (const site of siteIds) {
     const tiers =
       site === 'lost-city' || site === 'beebe-vent-field' || site === 'great-blue-hole'
         ? (['low', 'medium', 'high'] as const)
@@ -108,7 +105,7 @@ describe('catalog site static prop budgets', () => {
           JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')),
           site,
         );
-        const doc: unknown = JSON.parse(readFileSync(`data/landmarks/${site}/props.json`, 'utf8'));
+        const doc = propData(site);
         const props = new Props(
           meta,
           {
@@ -125,9 +122,16 @@ describe('catalog site static prop budgets', () => {
           const stats = await props.placeAll(doc, site);
           expect(stats.failed).toBe(0);
           expect(stats.skipped).toBe(0);
-          expect(stats.count).toBeGreaterThan(0);
-          if (site === 'blake-plateau-corals') expect(stats.models).toBe(2);
-          else expect(stats.models).toBe(0); // The other documents use procedural content.
+          // Default gates exercise the same declarations as the browser budget.
+          // Compare raw entries so a parser silently dropping content cannot pass.
+          expect(doc.props.length).toBeGreaterThan(0);
+          expect(stats.count).toBe(doc.props.length);
+          expect(props.placed.map((p) => p.def.id).sort()).toEqual(
+            doc.props.map((p) => p.id).sort(),
+          );
+          const declaredModels = doc.props.filter((p) => !p.model.startsWith('procedural:')).length;
+          expect(stats.models).toBe(declaredModels);
+          expect(stats.procedural).toBe(doc.props.length - declaredModels);
           const totals = { calls: 0, triangles: 0 };
           for (const placed of props.placed) {
             const cost = staticCost(placed.full);
@@ -317,7 +321,7 @@ describe('Lost City transparent effect fill budget', () => {
           }
           expect(props.stats.failed).toBe(0);
           expect(props.stats.skipped).toBe(0);
-          expect(props.placed).toHaveLength(12);
+          expect(props.placed).toHaveLength(propData('lost-city').props.length);
           scene.add(props.group);
           const hero = props.placed.find((p) => p.def.id === 'poseidon-tower')!;
           // The existing golden close/approach direction, aimed at the orifice.

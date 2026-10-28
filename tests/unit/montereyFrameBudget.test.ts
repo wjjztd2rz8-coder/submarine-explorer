@@ -1,3 +1,4 @@
+import { propData } from '../content.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
@@ -21,12 +22,11 @@ it('Monterey Medium inspection views include streamed scatter and reserve 225k w
   const props = new Props(meta, terrain, config.props, 'medium');
   let scatter: Scatter | undefined;
   try {
-    await props.placeAll(
-      JSON.parse(readFileSync(`data/landmarks/${site}/props.json`, 'utf8')),
-      site,
-    );
+    const doc = propData(site);
+    await props.placeAll(doc, site);
     expect(props.stats.failed).toBe(0);
-    expect(props.placed).toHaveLength(5);
+    expect(props.stats.skipped).toBe(0);
+    expect(props.placed).toHaveLength(doc.props.length);
     // Enable CPU scatter meshes without asking the terrain material to load browser textures.
     const normal = new THREE.Vector3();
     const tier = config.terrain.tiers.medium;

@@ -1,3 +1,4 @@
+import { propData } from '../content.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -211,11 +212,14 @@ describe('F-BUGHUNT-5 Lost City content audit', () => {
       );
       const props = new Props(meta, terrain, config.props, tier);
       try {
-        const stats = await props.placeAll(
-          JSON.parse(readFileSync('data/landmarks/lost-city/props.json', 'utf8')),
-          'lost-city',
-        );
-        expect(stats).toMatchObject({ count: 12, procedural: 12, failed: 0, skipped: 0 });
+        const doc = propData('lost-city');
+        const stats = await props.placeAll(doc, 'lost-city');
+        expect(stats).toMatchObject({
+          count: doc.props.length,
+          procedural: doc.props.filter((p) => p.model.startsWith('procedural:')).length,
+          failed: 0,
+          skipped: 0,
+        });
         for (const prop of props.placed) {
           expect(prop.localBounds.isEmpty()).toBe(false);
           for (const value of [

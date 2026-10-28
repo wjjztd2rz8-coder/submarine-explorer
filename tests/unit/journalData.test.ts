@@ -1,3 +1,4 @@
+import { siteIds } from '../content.js';
 /** D-FLOW: the Journal's content model and unlock rules (plan/PHASE-D-CONTRACTS.md §4). */
 
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
@@ -149,8 +150,8 @@ it.each(HERO_CONTENT_IDS)(
 it.each(nonHeroIds)(
   '%s: first primary scan unlocks its shipped Journal entry through reload without leaking sites',
   async (id) => {
-    expect(shippedIds).toHaveLength(13);
-    expect(nonHeroIds).toHaveLength(8);
+    expect(shippedIds).toEqual(siteIds);
+    expect(nonHeroIds.length).toBeGreaterThan(0);
     const sites = await loadJournalSites([], realContentFetch);
     expect(sites.map((site) => site.id)).toEqual(shippedIds);
     const current = sites.find((site) => site.id === id)!;
