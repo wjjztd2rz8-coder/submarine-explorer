@@ -52,6 +52,7 @@ export function composedMissionSpawn(
   const first = primaries[0];
   if (!first) return null;
   const target = new Vector3(first.position.x, first.position.y, first.position.z);
+  if (!target.toArray().every(Number.isFinite)) return null;
   const range = MISSION_APPROACH_M[siteId] ?? 220;
   const arm = siteManifest(siteId)?.opening?.mission;
   const authored = siteManifest(siteId)?.opening?.freeDive;
