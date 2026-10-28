@@ -415,11 +415,11 @@ export class MissionRouter {
   }
 
   /**
-   * True while the briefing or the debrief is up: main.ts runs no physics and
-   * ignores input, so "Keep exploring" resumes the exact pose.
+   * Freeze until Begin has applied the start pose, including pending content
+   * after the briefing closes, and while the debrief is up.
    */
   get frozen(): boolean {
-    return (this.briefing?.isOpen ?? false) || this.debriefOpen;
+    return this.mission.state === 'briefing' || this.debriefOpen;
   }
 
   /** True between `sub:emergencyBlow` and the end of the blow, during a dive. */

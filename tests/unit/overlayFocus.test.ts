@@ -3508,6 +3508,78 @@ it('Settings keyboard toggle retains typing and repeat guards in the shared disp
   expect(fallback).not.toHaveBeenCalled();
 });
 
+it.each(['Enter', 'button'] as const)(
+  'keeps the dive frozen after Begin via %s while mission content is pending',
+  async (control) => {
+    let resolve!: () => void;
+    const ready = new Promise<void>((done) => {
+      resolve = done;
+    });
+    const applyStart = vi.fn();
+    const def = parseMission(titanicMission, 'titanic')!;
+    const router = new MissionRouter({
+      config: DEFAULT_CONFIG,
+      bus: new EventBus(),
+      meta: { id: 'titanic' } as GameContext['meta'],
+      applyStart,
+      route: {
+        missionId: def.id,
+        tileId: def.tile,
+        landmarkId: def.landmark,
+        skipBriefing: false,
+        def,
+      },
+      discovery: {
+        ready,
+        pois: def.objectives.map((o) => ({
+          id: o.poi,
+          name: o.title,
+          position: new THREE.Vector3(),
+        })),
+        guide: { isOpen: false, open: vi.fn() },
+        stats: { snapshot: () => stats },
+      },
+    });
+    cleanup.push(() => router.dispose());
+    if (control === 'Enter') press('Enter');
+    else router.briefing!.root.querySelector('.briefing-begin')!.dispatchEvent(new Event('click'));
+    expect(router.briefing!.isOpen).toBe(false);
+    // Hiding the card must not admit physics, scans or dive time before the start pose exists.
+    const ctx = {
+      app: { state: 'dive' },
+      missionRouter: router,
+      globe: { isOpen: false },
+      settingsScreen: { isOpen: false },
+      discovery: { guide: { isOpen: false }, debrief: { isOpen: false } },
+    } as unknown as GameContext;
+    const f = { sampled: { scan: true, throttle: 1 }, realSteps: 8, dt: 0.25 } as FrameState;
+    shellSystem.frame!['gate.shell']!(f, ctx);
+    inputGateSystem.frame!['gate.input']!(f, ctx);
+    expect(f).toMatchObject({
+      frozen: true,
+      steps: 0,
+      clockDt: 0,
+      state: { scan: false, throttle: 0 },
+    });
+    expect(router.mission.state).toBe('briefing');
+    expect(applyStart).not.toHaveBeenCalled();
+    resolve();
+    await ready;
+    expect(applyStart).toHaveBeenCalledOnce();
+    expect(router.mission.state).toBe('diving');
+    expect(router.frozen).toBe(false);
+    expect(router.mission.emitted.map((e) => e.name)).toEqual(['mission:started']);
+    shellSystem.frame!['gate.shell']!(f, ctx);
+    inputGateSystem.frame!['gate.input']!(f, ctx);
+    expect(f).toMatchObject({
+      frozen: false,
+      steps: 8,
+      clockDt: 0.25,
+      state: { scan: true, throttle: 1 },
+    });
+  },
+);
+
 it.each([false, true])(
   'MissionRouter disposal cancels pending discovery/start callbacks (skip briefing: %s)',
   async (skipBriefing) => {
