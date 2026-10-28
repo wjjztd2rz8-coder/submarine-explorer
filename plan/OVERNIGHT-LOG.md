@@ -2395,3 +2395,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to merge: Codex 80 T-pin-fragility, 81 T-kama-pins and 82 S-bughunt-journal-home are still running (round 1); main clean. Claude week 17% left (resets Oct 29 07:00), remaining Claude items demoted, so no package. No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-28 14:43 CDT headless run 216 (Claude): Codex collect
+
+- Merged T-pin-fragility (prop/site counts derived from data; one conflict in f-perf-budget resolved to the data-derived version), T-kama-pins (capability-based Kama framing pins; unblocks the Kama art retry) and S-bughunt-journal-home (empty Journal catalogue no longer shows "Loading" forever). Also prettier-formatted three plan docs that were failing the gate. Gates smoke + project-base passed on main. Queued Codex 90-92. Claude week ~17% left (resets Oct 29 07:00), no Claude package. No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
