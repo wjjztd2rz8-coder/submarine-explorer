@@ -508,6 +508,48 @@ describe('MissionRouter completion timing', () => {
     vi.unstubAllGlobals();
   });
 
+  it.each([
+    { optional: false, completed: false, heading: 'Back at the surface' },
+    { optional: false, completed: true, heading: 'All objectives complete' },
+    { optional: true, completed: false, heading: 'Back at the surface' },
+    { optional: true, completed: true, heading: 'Primaries complete' },
+  ])(
+    'debrief primary progress with optional=$optional and completed=$completed survives reopening',
+    async ({ optional, completed, heading }) => {
+      // No shipped mission has zero optionals. Exercise that edge alongside
+      // unfinished optionals without deriving the expected metric from Mission.
+      router.dispose();
+      router = new MissionRouter({
+        ...options,
+        route: {
+          ...options.route,
+          def: {
+            ...options.route.def,
+            objectives: options.route.def.objectives.filter((o) => optional || o.primary),
+          },
+        },
+      });
+      await Promise.resolve();
+      if (completed) scan('primary');
+      for (let round = 0; round < 2; round++) {
+        expect(router.endDive()).toBe(true);
+        const debrief = router.debrief!;
+        expect(control(debrief.root, 'debrief-title').textContent).toBe(heading);
+        expect(debrief.last?.objectives).toEqual({ completed: Number(completed), total: 1 });
+        expect(debrief.last?.subtitle).toBeUndefined();
+        const metric = descendants(debrief.root).find((e) => e.dataset.field === 'objectives')!;
+        expect(metric.children.map((e) => e.textContent).join('')).toBe(
+          `${Number(completed)} of 1 primary objectives`,
+        );
+        expect(router.mission.emitted.at(-1)?.payload).toMatchObject({
+          completed: Number(completed),
+          total: optional ? 2 : 1,
+        });
+        router.keepExploring();
+      }
+    },
+  );
+
   function reach(boundary: Boundary): void {
     scan('primary');
     if (boundary.startsWith('all')) scan('optional');
