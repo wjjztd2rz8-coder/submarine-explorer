@@ -10,7 +10,7 @@ import type { Tile, TileMeta } from '../../src/util/types.js';
 import { DEFAULT_SENSOR_PRESETS } from '../../src/core/config/gameplay.js';
 import { EQUIPMENT } from '../../src/core/config/progress.js';
 
-export interface SyntheticTileOptions {
+interface SyntheticTileOptions {
   id?: string;
   cols?: number;
   rows?: number;

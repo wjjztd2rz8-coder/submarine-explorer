@@ -29,6 +29,8 @@ without an entry here is not done.
 
 ### Removed
 
+- **S-dead helper visibility:** remove the unused `vehicleSolids` and `SyntheticTileOptions` exports; their live local implementations and all consumed helper exports remain.
+
 - **S-dead config/export sweep:** remove the unused `WaterConfig` fields `fogDensityShallow`, `fogDensityDeep`, `fogDeepAt`, `deepColor` and top-level `ambientIntensity`; the atmosphere reads depth bands instead.
 - **S-dead config/export sweep:** remove the unconsumed `DRACO_DECODER_PATH` alias and its import from `PropLoader`; decoder setup already belongs to the asset service.
 - **S-dead config/export sweep:** delete the uncalled vehicle-kit `roundEnd`, `flipWinding`, `smooth` and scarp `interp` functions; no source, test or tool imports or calls them.
