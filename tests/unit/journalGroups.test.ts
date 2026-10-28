@@ -362,6 +362,18 @@ it('opens a focused scan even when its category was manually collapsed', () => {
   expect(journal.selectedId).toBe('entry');
 });
 
+it.each([false, true])('opens a wildlife scan after browsing another site (phone=%s)', (phone) => {
+  phoneQuery.matches = phone;
+  journal.setStore({ isDiscovered: () => true });
+  journal.show('wreck/poi/entry');
+  journal.close();
+  journal.focus('life/entry');
+  journal.open();
+  expect(journal.viewKey).toBe('reef/life/entry');
+  expect(journal.selectedId).toBeNull();
+  expect(find((el) => el.className === 'jr-title').textContent).toBe('life entry');
+});
+
 it('opens the front page from Home after quitting with an unread scan, then consumes that focus', () => {
   journal.close();
   journal.focus('entry');

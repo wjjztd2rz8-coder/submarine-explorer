@@ -182,6 +182,8 @@ it.each([5, 6])(
           true,
         );
         if (animal) discovery.onLifeScan(target.name, true, `life/${target.id.slice(5)}`);
+        if (animal)
+          expect(discovery.guide.focus).toHaveBeenLastCalledWith(`life/${target.id.slice(5)}`);
         expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(target.name, true, {
           scan: 'G',
           guide: 'J',
@@ -218,6 +220,7 @@ it.each([5, 6])(
         true,
       );
       discovery.onLifeScan(coral.name, false, 'life/golden-coral');
+      expect(discovery.guide.focus).toHaveBeenLastCalledWith('life/golden-coral');
       expect(discovery.scanner.view.completed).toBe(1);
       expect(discovery.scanner.view.lastCompleteFirstTime).toBe(false);
       expect(discovery.stats.snapshot().discoveries).toEqual([

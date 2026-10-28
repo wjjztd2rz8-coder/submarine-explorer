@@ -308,7 +308,7 @@ export class Journal {
     if (this.isOpen) this.render();
   }
 
-  /** The next `open()` without an explicit entry shows this current-site entry. */
+  /** Next open shows this current-site guide id or relative entry key (e.g. life/ray). */
   focus(entryId: string): void {
     this.pendingFocus = entryId;
   }
@@ -391,10 +391,12 @@ export class Journal {
     this.body.focus({ preventScroll: true });
   }
 
-  /** The focus id may be a site-level entry rather than a POI one. */
+  /** Scans supply either a guide id or a relative key for wildlife and other finds. */
   private fixEntryKey(siteId: string, id: string): void {
     const site = this.sites.find((s) => s.id === siteId);
-    const e = site?.entries.find((x) => isGuideEntry(x) && x.id === id);
+    const e = site?.entries.find(
+      (x) => x.key === `${siteId}/${id}` || (isGuideEntry(x) && x.id === id),
+    );
     if (e) {
       this.view = { kind: 'entry', key: e.key };
       this.revealView();
