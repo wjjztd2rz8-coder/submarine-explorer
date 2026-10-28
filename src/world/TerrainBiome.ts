@@ -323,11 +323,11 @@ export const BIOMES: Record<string, Biome> = {
     a: 'silt',
     b: 'basalt',
     colorA: 0x5e5c59,
-    colorB: 0x575553,
+    colorB: 0x5a5856,
     stain: 0x5a5048,
     mottle: 0.3,
     stainAmount: 0.15,
-    patch: 0.2,
+    patch: 0.08,
     rockBias: 0.1,
     // The rim slope ends at the tile edge; dissolve it into the water rather than a hard line.
     horizonFadeM: [250, 900],
