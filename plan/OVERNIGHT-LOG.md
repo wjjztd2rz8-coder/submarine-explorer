@@ -2339,3 +2339,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged 4750 (dead config/CSS sweep, net −156 lines), 4740 (mission start camera-arm clearance + mission-approach coverage on both modes) and 4730 (same Spawn.ts fix; kept 4740's version, combined both test sets). Gates smoke + project-base passed on main. Dispatcher already launched new Codex tasks (e.g. 4760-S-dead-asset-exports). No Claude package (week 22% left, items demoted). No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-28 04:05 CDT headless run 205 (Claude): Codex collect
+
+- Merged 4760 (dead asset exports), 4770 (dead type aliases), 4780 (dead helper visibility): small deletions, net fewer lines. Gates smoke + project-base passed on main. No Claude package (week ~22% left, items demoted). No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
