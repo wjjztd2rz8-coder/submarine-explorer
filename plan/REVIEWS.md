@@ -1,5 +1,23 @@
 # Reviews
 
+## 2026-10-28 04:45 comprehensive review (joint with Sol round 1; reconcile round failed, Codex 5h limit hit)
+
+**Changed since the earlier review today (golden 051524 to 2026-10-28-091604):** V-bluehole-floor, Journal wildlife-scan focus fix, mission-start camera-arm clearance (4730/4740), dead-code sweeps (4750-4780). Golden run captured all ten sites (Hunga back). CI green; f68 is still the newest tag.
+
+**Scores, beautiful (Claude / Sol):** Titanic 3.9 / 3.5 (bow lit, aft dark); Lost City 3.8 / 3.5 (towers read, upper frame empty); Blue Hole 3.7 / 3.0 (terraced walls, jagged floor corners); Beebe 3.9 / 3.5 (best, strong atmosphere); Monterey 3.9 / 3.5 (strata read, sand slab, banding repeats); Challenger 3.6; Endurance 3.6; Hunga 3.4 (isolated brown wedge); Kama 3.4 (brown egg lump); Axial 3.5. Nothing is at 4 on either read.
+
+**Biggest gaps:** (1) the blotchy orange/blue terrain splat on Hunga, Kama and Axial (both reviewers); (2) Hunga/Kama subjects do not read as the named feature; (3) no hero at 4; (4) rendered first-five-minutes acceptance is unestablished: journey captures mix dates and carry no build SHA (Sol); (5) debrief shows "2 of 4 objectives" after both primaries are done, and the primary-only subtitle in MissionRouter.ts:355 is never displayed (Sol, verified by me in Debrief.ts:183); (6) e2e shard weights date from Oct 15 (~9 serial hours, 38 shards; Sol).
+
+**Disputed:** scores. Sol rates heroes 0.3-0.7 lower and the stage at ~82% (4-6 weeks). I accept the stage ~85% / 4-5 weeks as the working figure and keep my scores for the three sites where I compared images directly (Titanic, Monterey, Beebe) but accept Sol's lower read for Blue Hole (the image shows stacked terraces). The reconcile round did not run (Sol hit the Codex usage limit until 06:45), so this is not a fully agreed view.
+
+**Process:** efficiency.sh: Claude weekly 22% (~19%/day, resets Oct 29 07:00), Codex weekly 89% (~29%/day); no failed timer runs in 24 h; idle metric reflects weekly pacing, not a scheduling fault. Golden run needed no timeout fix this time. Codex round-2 limit hit shows the Sol review costs more Codex 5h than the gate assumes (~485k tokens); no change, review cadence is already low.
+
+**New priorities:** V-terrain-blotch, V-hunga-kama-subject, V-titanic-aft, V-lostcity-ground, V-monterey-flatten, V-bluehole-floor-2 (Claude); Codex queue 60 R-debrief-objectives, 61 T-e2e-timings, 62 T-journey-acceptance.
+
+**Stage:** about 85% to 1.0; 4-5 weeks (Claude 90%, Sol 82%; I adopted the midpoint-low).
+
+**Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
 ## 2026-10-28 comprehensive review (Claude alone; Sol skipped, Codex weekly 7%)
 
 **Changed since the evening review (golden 165655 to 2026-10-28-051524):** V-titanic-lift, V-kama-hull-frame, V-hunga-bright, V-bluehole-roof-slab (backdrop wall), V-challenger-horizon, V-golden-set, d-modes spec fix, prettier fix. CI green on 73b5a5a3 and Pages deployed; **f68 tagged**.

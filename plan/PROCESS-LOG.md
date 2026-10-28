@@ -328,3 +328,7 @@ Creating `.cache/review/current` as a directory before `codex-review.sh start` m
 ## 2026-10-28
 
 - golden.sh (10 sites) exceeds a 550 s tool timeout and dies mid-set, losing Hunga. Queued as T-golden-hunga (per-site timeout, continue on failure). Sol review skipped: Codex weekly 7% until Nov 2.
+
+## 2026-10-28 review: Sol cost
+
+Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h limit before reconcile finished. No change made: comprehensive reviews already run only every ~8 merges. Reviewing: if reconcile fails again, the review entry records it as not fully agreed.
