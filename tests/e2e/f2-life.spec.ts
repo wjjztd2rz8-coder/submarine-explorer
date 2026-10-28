@@ -1,7 +1,9 @@
-import { openJournalCategory } from './helpers/journal.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from '@playwright/test';
+import type { Discovery } from '../../src/game/Discovery.js';
+import type { Journal } from '../../src/ui/Journal.js';
+import type { Progress } from '../../src/game/Progress.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 
@@ -120,7 +122,32 @@ test('animals spawn at a site and stay inside the low tier draw-call budget', as
 });
 
 test('an animal can be scanned: banner, Journal wildlife entry, persistence', async ({ page }) => {
+  test.setTimeout(150_000);
+  // Regression guard: a wildlife scan on the second site must replace a Journal
+  // selection from the first site, while retaining its saved discovery/reward.
+  await boot(page, '/?tile=titanic&skipBriefing=1&tier=low&tutorial=0');
+  await page.evaluate(async () => {
+    const g = window.__game as unknown as Game & { discovery: Discovery };
+    await g.discovery.ready;
+    const target = g.discovery.pois.find((p) => p.id === 'titanic-bow')!;
+    g.discovery.scanner.setTargets([target]);
+    // Advance the real scanner at the target; navigation geometry is covered separately.
+    g.discovery.scanner.update(
+      target.scanSeconds + 0.01,
+      target.position,
+      target.position.clone().set(0, 0, -1),
+      true,
+    );
+  });
   await boot(page);
+  await page.evaluate(async () => {
+    const { journal } = window.__game as unknown as { journal: Journal };
+    await journal.load();
+    journal.open();
+    journal.show('titanic/poi/bow');
+  });
+  await expect(page.locator('.jr-title')).toHaveText('The bow section');
+  await page.keyboard.press('Escape');
   await park(page, 120);
   const ok = await page.evaluate(() => {
     const g = window.__game as unknown as Game;
@@ -165,14 +192,34 @@ test('an animal can be scanned: banner, Journal wildlife entry, persistence', as
   await mkdir(shots, { recursive: true });
   await page.screenshot({ path: `${shots}/e2e-scan-banner.png` });
 
-  // The Journal's wildlife list now has it, with text and a source link.
+  // The newly scanned animal opens directly, replacing the previous site's article.
   await page.keyboard.press('j');
-  await openJournalCategory(page, 'monterey-canyon', 'life');
-  await page.locator('.jr-nav').getByRole('button', { name: 'Lobate comb jelly' }).click();
   await expect(page.locator('.jr-title')).toHaveText('Lobate comb jelly');
   await expect(page.locator('.jr-latin i')).toHaveText('Bolinopsis infundibulum');
   await expect(page.locator('.jr-sources a').first()).toHaveAttribute('href', /^https:\/\//);
   await page.screenshot({ path: `${shots}/e2e-journal-wildlife.png` });
+  const state = await page.evaluate(() => {
+    const g = window.__game as unknown as { discovery: Discovery; progress: Progress };
+    return {
+      first: g.discovery.store.isDiscovered('titanic', 'titanic-bow'),
+      scans: g.discovery.stats.snapshot().discoveries.map((scan) => scan.poiId),
+      awarded: g.progress.snapshot().awarded,
+    };
+  });
+  expect(state.first).toBe(true);
+  expect(state.scans).toEqual(['life:comb-jelly']);
+  expect(state.awarded.filter((token) => token === 'poi:titanic/titanic-bow')).toHaveLength(1);
+  expect(state.awarded.filter((token) => token === 'species:comb-jelly')).toHaveLength(1);
+
+  await page.keyboard.press('Escape');
+  await page.evaluate(() =>
+    (window.__game as unknown as { discovery: Discovery }).discovery.showDebrief(),
+  );
+  const debrief = page.getByRole('dialog', { name: 'Dive debrief' });
+  await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText('1');
+  await expect(debrief.locator('.debrief-highlight')).toHaveText('Scanned Lobate comb jelly.');
+  await debrief.getByRole('button', { name: 'Journal', exact: true }).click();
+  await expect(page.locator('.jr-title')).toHaveText('Lobate comb jelly');
 
   // It persists: after a reload the entry is still unlocked.
   await page.reload({ waitUntil: 'domcontentloaded' });
@@ -185,6 +232,15 @@ test('an animal can be scanned: banner, Journal wildlife entry, persistence', as
       ),
     ),
   ).toBe(true);
+  expect(
+    await page.evaluate(() => {
+      const g = window.__game as unknown as { discovery: Discovery; progress: Progress };
+      return {
+        awarded: g.progress.snapshot().awarded,
+        scans: g.discovery.stats.snapshot().discoveries,
+      };
+    }),
+  ).toEqual({ awarded: state.awarded, scans: [] });
 });
 
 test('photo mode names the animal in frame', async ({ page }) => {

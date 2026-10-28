@@ -211,6 +211,7 @@ export class Discovery {
    */
   onLifeScan(title: string, firstTime: boolean, entryId: string): void {
     if (firstTime) this.stats.noteNewEntry(entryId, title);
+    this.guide.focus(entryId);
     this.guide.refresh();
     this.overlay.showComplete(title, firstTime, this.keys());
   }
