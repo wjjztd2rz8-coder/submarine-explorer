@@ -28,12 +28,6 @@ import {
   type TextureOptions,
 } from './manifest.js';
 
-/** Legacy paths retained for the prop loader compatibility export. */
-export const DECODER_PATHS = {
-  draco: publicUrl('/assets/decoders/draco/'),
-  basis: publicUrl('/assets/decoders/basis/'),
-} as const;
-
 /** Resolve an asset URL under the deployment base (see the module header). */
 export function resolveAssetUrl(url: string, base = import.meta.env.BASE_URL): string {
   if (/^([a-z][a-z0-9+.-]*:|\/\/)/i.test(url)) return url; // http:, data:, blob:, //host

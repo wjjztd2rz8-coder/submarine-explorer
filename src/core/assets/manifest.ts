@@ -12,8 +12,6 @@ export interface TextureOptions {
   repeat?: number | readonly [number, number];
 }
 
-export type AssetKind = 'gltf' | 'texture';
-
 /** A plain glTF / GLB model. */
 export interface GltfRequest {
   kind: 'gltf';
