@@ -1,5 +1,4 @@
 import { expect, test, type Page } from '@playwright/test';
-import blueHole from '../../data/landmarks/great-blue-hole/props.json' with { type: 'json' };
 import type * as THREE from 'three';
 import type { Discovery } from '../../src/game/Discovery.js';
 import type { CameraRig } from '../../src/sub/CameraRig.js';
@@ -107,7 +106,6 @@ for (const tier of ['low', 'medium']) {
                 order: dome.renderOrder,
               }
             : null,
-          relief: g.props.placed.some((p) => p.def.id === 'blue-hole-wall-relief'),
           nearestId: g.discovery.scanner.view.nearestId,
           candidateId: g.discovery.scanner.view.candidateId,
         };
@@ -215,23 +213,3 @@ for (const tier of ['low', 'medium']) {
     });
   }
 }
-
-test('830 Low wall relief is present and leaves the opening scan clear', async ({ page }) => {
-  test.skip(
-    !blueHole.props.some((p) => p.id === 'blue-hole-wall-relief'),
-    '830 was deliberately reverted by 3f962b6; Low relief acceptance requires the director’s replacement geometry.',
-  );
-  await pauseClockBeforeNavigation(page);
-  await page.goto('/?tile=great-blue-hole&skipBriefing=1&tier=low&dynres=0', {
-    waitUntil: 'domcontentloaded',
-  });
-  await ready(page);
-  expect(
-    await page.evaluate(() =>
-      (window.__game as unknown as Game).props.placed.some(
-        (p) => p.def.id === 'blue-hole-wall-relief',
-      ),
-    ),
-  ).toBe(true);
-  await scanWithKeyboard(page, 'great-blue-hole-stalactites');
-});
