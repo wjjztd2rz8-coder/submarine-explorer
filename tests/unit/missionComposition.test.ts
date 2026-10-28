@@ -42,6 +42,7 @@ import { SubMesh } from '../../src/sub/SubMesh.js';
 import { hullClearance } from './helpers/hullClearance.js';
 import { siteManifest } from '../../src/core/SiteManifest.js';
 import { requiredHull } from '../../src/game/Progress.js';
+import { solidMeshes, subjectVisibility } from './helpers/subjectVisibility.js';
 
 const sites: string[] = readdirSync('data/landmarks').filter(
   (site: string) => !site.startsWith('_') && !site.endsWith('.json'),
@@ -55,9 +56,7 @@ const separatedWreckOpenings: Record<string, readonly string[]> = {
   endurance: ['mission', 'free'],
 };
 // Small vent mounds must remain visible beside the invented scenic geology.
-const missionSightlineSubjects: Record<string, string> = {
-  kamaehuakanaloa: 'hiolo-north-chimney-1',
-};
+const missionSightlineSites = ['kamaehuakanaloa'];
 afterAll(() => {
   if (captureAudit) writeFileSync('.cache/spawn-audit.json', JSON.stringify(audit, null, 2) + '\n');
 });
@@ -300,19 +299,6 @@ function screenBounds(root: Object3D, rig: CameraRig): Box2 {
   return bounds;
 }
 
-/** Transparent plumes and hidden LODs do not obstruct a solid subject. */
-function solidMeshes(root: Object3D): Mesh[] {
-  const meshes: Mesh[] = [];
-  root.updateMatrixWorld(true);
-  root.traverseVisible((object) => {
-    if (!(object instanceof Mesh)) return;
-    const materials = Array.isArray(object.material) ? object.material : [object.material];
-    if (materials.every((material) => material.visible && material.opacity >= 0.95))
-      meshes.push(object);
-  });
-  return meshes;
-}
-
 it.each(
   sites.flatMap((site) => (['low', 'medium', 'high'] as const).map((tier) => ({ site, tier }))),
 )(
@@ -393,10 +379,13 @@ it.each(
         expect(position.y).toBeGreaterThanOrEqual(
           config.submarine.hullClasses[hull].ratedDepth + settings.hullRadius,
         );
-        const subjectId = missionSightlineSubjects[site];
-        if (kind === 'mission' && subjectId) {
+        if (kind === 'mission' && missionSightlineSites.includes(site)) {
+          const authored = siteManifest(site)!.opening!;
+          const subjectId = authored.reframe?.aimHero ?? authored.freeDive!.hero;
           const subject = props.placed.find((p) => p.def.id === subjectId)!;
           expect(subject).toBeDefined();
+          // The authored subject must represent the first required contact, not remote scenery.
+          expect(subject.root.position.distanceTo(target.position)).toBeLessThan(target.radius);
           for (const [width, height] of [
             [1600, 900],
             [390, 844],
@@ -404,42 +393,30 @@ it.each(
           ]) {
             const rig = new CameraRig(effective.camera, width / height, terrain);
             rig.setPhoneLandscape(width === 844);
+            // The pilot view must see the contact from the opening; the authored
+            // chase arm is checked separately and can place the hull over a small vent.
+            rig.setMode('first-person');
             rig.snap(position, opening.yaw, 0);
             terrain.update(rig.camera);
             props.update(rig.camera);
             expect(subject.root.visible).toBe(true);
-            const subjectMeshes = solidMeshes(subject.root);
-            const solids = [
-              ...solidMeshes(terrain.group),
-              ...solidMeshes(props.group),
-              ...solidMeshes(mesh.vehicle.root),
-            ];
-            const ray = new Raycaster();
-            const centre = subject.localBounds.getCenter(new Vector3());
-            // Check the lower body, centre and upper body, not just an exposed tip.
-            for (const fraction of [0.25, 0.5, 0.75]) {
-              const point = centre.clone();
-              point.y =
-                subject.localBounds.min.y +
-                (subject.localBounds.max.y - subject.localBounds.min.y) * fraction;
-              point.applyMatrix4(subject.root.matrixWorld);
-              const ndc = point.clone().project(rig.camera);
-              expect(Math.abs(ndc.x), `${subjectId}: in horizontal frame`).toBeLessThan(1);
-              expect(Math.abs(ndc.y), `${subjectId}: in vertical frame`).toBeLessThan(1);
-              expect(ndc.z).toBeGreaterThan(-1);
-              expect(ndc.z).toBeLessThan(1);
-              ray.setFromCamera(new Vector2(ndc.x, ndc.y), rig.camera);
-              const hit = ray.intersectObjects(solids, false)[0];
-              expect(hit, `${subjectId}: solid body at ${fraction}`).toBeDefined();
-              const hitProp = props.placed.find((p) =>
-                solidMeshes(p.root).includes(hit.object as Mesh),
-              );
-              sightlines.push({ width, height, fraction, hitProp: hitProp?.def.id });
-              expect(
-                subjectMeshes.includes(hit.object as Mesh),
-                `${width}x${height} ${subjectId} at ${fraction}: blocked by ${hitProp?.def.id ?? hit.object.name}`,
-              ).toBe(true);
-            }
+            // A contact describes a vent site, so a neighbouring stack of the
+            // authored subject's kind can represent the same required contact.
+            const bodies = props.placed
+              .filter(
+                (p) =>
+                  p.def.model === subject.def.model &&
+                  p.root.position.distanceTo(target.position) < target.radius,
+              )
+              .flatMap((p) => solidMeshes(p.root).slice(0, 1));
+            const solids = [...solidMeshes(terrain.group), ...solidMeshes(props.group)];
+            const visible = bodies.map((body) => subjectVisibility(body, solids, rig.camera));
+            sightlines.push({ width, height, subjectId, visible });
+            expect(
+              visible.some((bands) => bands.every(Boolean)),
+              `${width}x${height} ${target.id}: a vent body is visible, not just its plume or tip; ${JSON.stringify(visible)}`,
+            ).toBe(true);
+            expect(props.collide(rig.camera.position.clone(), 1, new Vector3())).toBe(false);
           }
         }
         const hero = props.placed.find(
@@ -512,7 +489,16 @@ it.each(
       const bus = new EventBus();
       const contact = new PropContact(props, bus, config.props, settings.hullRadius);
       const scanner = new Scanner(effective.scan, bus);
-      scanner.setTargets([{ ...target, radius }]);
+      const routeTargets = missionSightlineSites.includes(site) ? primaries : [target];
+      scanner.setTargets(
+        routeTargets.map((p) => ({
+          ...p,
+          radius: resolveScanRadius(
+            missionApproachScanRadius(site, p.radius) * effective.sensor.scanRadiusMultiplier,
+            effective.scan,
+          ),
+        })),
+      );
       scanner.setObjective(target.id);
       scanner.update(0, sub.position, sub.getForward(), false);
       expect(scanner.view.objectiveTurnDeg).toBeCloseTo(
@@ -531,57 +517,85 @@ it.each(
       expect(scanner.view.candidateId).toBeNull();
       expect(scanner.view.progress).toBe(0);
       expect(scanner.isScanned(site, target.id)).toBe(false);
-      const input = { ...FROZEN_INPUT, scan: true };
-      let completedAt: number | null = null;
-      let contactFrames = 0;
-      let minimumClearance = Infinity;
-      for (let tick = 0; tick < 7200; tick++) {
-        const delta = target.position.clone().sub(sub.position);
-        const horizontal = Math.hypot(delta.x, delta.z);
-        const desiredYaw = Math.atan2(delta.x, -delta.z);
-        input.throttle = delta.length() > radius * 0.8 ? 1 : 0;
-        input.yaw = Math.max(
-          -1,
-          Math.min(1, Math.atan2(Math.sin(desiredYaw - sub.yaw), Math.cos(desiredYaw - sub.yaw))),
+      // Continue from the opening through every required contact at this site;
+      // standalone scannable poses do not prove the next leg is navigable.
+      for (const target of routeTargets) {
+        const radius = resolveScanRadius(
+          missionApproachScanRadius(site, target.radius) * effective.sensor.scanRadiusMultiplier,
+          effective.scan,
         );
-        input.pitch = Math.max(-1, Math.min(1, (Math.atan2(delta.y, horizontal) - sub.pitch) * 4));
-        input.ballast =
-          horizontal < radius * 0.8 ? Math.max(-1, Math.min(1, (delta.y + 16) / 10)) : 0;
-        sub.step(input, 1 / 60);
-        if (contact.resolve(sub, 1 / 60)) contactFrames++;
-        minimumClearance = Math.min(
-          minimumClearance,
-          sub.position.y - terrain.sampleHeight(sub.position.x, sub.position.z),
-        );
-        scanner.update(1 / 60, sub.position, sub.getForward(), true);
-        if (scanner.isScanned(site, target.id)) {
-          completedAt = (tick + 1) / 60;
-          break;
+        scanner.setObjective(target.id);
+        const input = { ...FROZEN_INPUT, scan: true };
+        let completedAt: number | null = null;
+        let contactFrames = 0;
+        let minimumClearance = Infinity;
+        for (let tick = 0; tick < 7200; tick++) {
+          const delta = target.position.clone().sub(sub.position);
+          const horizontal = Math.hypot(delta.x, delta.z);
+          const desiredYaw = Math.atan2(delta.x, -delta.z);
+          input.throttle = delta.length() > radius * 0.8 ? 1 : 0;
+          input.yaw = Math.max(
+            -1,
+            Math.min(1, Math.atan2(Math.sin(desiredYaw - sub.yaw), Math.cos(desiredYaw - sub.yaw))),
+          );
+          input.pitch = Math.max(
+            -1,
+            Math.min(1, (Math.atan2(delta.y, horizontal) - sub.pitch) * 4),
+          );
+          input.ballast =
+            horizontal < radius * 0.8 ? Math.max(-1, Math.min(1, (delta.y + 16) / 10)) : 0;
+          if (missionSightlineSites.includes(site)) {
+            scanner.update(0, sub.position, sub.getForward(), false);
+            const cue = scanner.view;
+            input.throttle =
+              cue.candidateId !== target.id &&
+              Math.abs(cue.objectiveTurnDeg) < 15 &&
+              delta.length() > radius * 0.8
+                ? 0.5
+                : 0;
+            input.yaw = Math.max(-1, Math.min(1, cue.objectiveTurnDeg / 20));
+            input.ballast = Math.max(
+              -1,
+              Math.min(1, (target.position.y + 16 - sub.position.y) / 8 - sub.velocity.y),
+            );
+          }
+          sub.step(input, 1 / 60);
+          if (contact.resolve(sub, 1 / 60)) contactFrames++;
+          minimumClearance = Math.min(
+            minimumClearance,
+            sub.position.y - terrain.sampleHeight(sub.position.x, sub.position.z),
+          );
+          scanner.update(1 / 60, sub.position, sub.getForward(), true);
+          if (scanner.isScanned(site, target.id)) {
+            completedAt = (tick + 1) / 60;
+            break;
+          }
         }
+        audit.push({
+          site,
+          tier,
+          targetId: target.id,
+          range,
+          radius,
+          missionHull,
+          freeHull,
+          clearances,
+          completedAt,
+          contactFrames,
+          minimumClearance,
+          wreckEnvelopeOverlapPx2: wrecks,
+          silhouetteWitnesses,
+          sightlines,
+        });
+        expect(completedAt, 'navigate from the opening and complete the real scan').not.toBeNull();
+        expect(completedAt!).toBeGreaterThan(target.scanSeconds);
+        expect(completedAt!).toBeLessThanOrEqual(120);
+        expect(contactFrames, `${target.id}: scan approach clears prop collisions`).toBe(0);
+        expect(sub.hullBreached).toBe(false);
+        expect(minimumClearance).toBeGreaterThanOrEqual(
+          settings.hullRadius + settings.seabedClearance - 1e-6,
+        );
       }
-      audit.push({
-        site,
-        tier,
-        range,
-        radius,
-        missionHull,
-        freeHull,
-        clearances,
-        completedAt,
-        contactFrames,
-        minimumClearance,
-        wreckEnvelopeOverlapPx2: wrecks,
-        silhouetteWitnesses,
-        sightlines,
-      });
-      expect(completedAt, 'navigate from the opening and complete the real scan').not.toBeNull();
-      expect(completedAt!).toBeGreaterThan(target.scanSeconds);
-      expect(completedAt!).toBeLessThanOrEqual(120);
-      expect(contactFrames, 'first scan approach clears prop collisions').toBe(0);
-      expect(sub.hullBreached).toBe(false);
-      expect(minimumClearance).toBeGreaterThanOrEqual(
-        settings.hullRadius + settings.seabedClearance - 1e-6,
-      );
     } finally {
       mesh.dispose();
       props.dispose();

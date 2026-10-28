@@ -1289,6 +1289,7 @@ freshTest.describe('catalog underwater and approach poses', () => {
     config: GameConfig;
     terrain: { sampleHeight(x: number, z: number): number };
     discovery: { loaded: boolean };
+    atmosphere: Atmosphere;
   }
   const sites = [
     { id: 'great-blue-hole', hero: 'karst-grotto', detail: true },
@@ -1302,7 +1303,7 @@ freshTest.describe('catalog underwater and approach poses', () => {
     { id: 'monterey-canyon', hero: 'canyon-wall-ledge', detail: false },
     { id: 'hudson-canyon', hero: 'coral-ledge-mound', detail: false },
     { id: 'axial-seamount-ashes', hero: 'mushroom-chimney', detail: false },
-    { id: 'kamaehuakanaloa', hero: 'hiolo-north-chimney-1', detail: false },
+    { id: 'kamaehuakanaloa', detail: false },
     { id: 'bismarck', hero: 'main-hull', detail: false },
   ];
 
@@ -1346,6 +1347,8 @@ freshTest.describe('catalog underwater and approach poses', () => {
     });
 
     for (const site of sites) {
+      const authored = siteData(site.id).opening!;
+      const heroId = site.hero ?? authored.reframe?.aimHero ?? authored.freeDive!.hero;
       // Regression guard: opening faced away from its hero or put the hull/camera through props, terrain or water surface.
       test(`${site.id}: underwater free-dive opening${site.detail ? ' and 15 m detail' : ''}`, async ({
         page,
@@ -1368,16 +1371,44 @@ freshTest.describe('catalog underwater and approach poses', () => {
           const hero = g.props.placed.find((p) => p.def.id === heroId)!;
           const centre = hero.root.localToWorld(hero.localBounds.getCenter(g.sub.position.clone()));
           const toHero = centre.clone().sub(g.sub.position).setY(0).normalize();
+          const body = hero.full.children.find((child) => 'isMesh' in child) as Mesh;
+          body.geometry.computeBoundingBox();
+          const screen = body
+            .localToWorld(body.geometry.boundingBox!.getCenter(g.sub.position.clone()))
+            .project(g.rig.camera);
           return {
+            subjectScreen: screen.toArray(),
             facing: g.sub.getForward(g.sub.position.clone()).dot(toHero),
+            cameraCollision: g.props.collide(
+              g.rig.camera.position.clone(),
+              1,
+              g.sub.position.clone(),
+            ),
+            illumination:
+              g.atmosphere.ambient.intensity *
+              (0.2126 * g.atmosphere.ambient.color.r +
+                0.7152 * g.atmosphere.ambient.color.g +
+                0.0722 * g.atmosphere.ambient.color.b),
             collision: g.props.collide(
               g.sub.position.clone(),
               g.config.submarine.hullRadius,
               g.sub.position.clone(),
             ),
           };
-        }, site.hero);
-        expect(opening.facing).toBeGreaterThan(0.98);
+        }, heroId);
+        if (site.hero) expect(opening.facing).toBeGreaterThan(0.98);
+        else {
+          expect(opening.facing).toBeCloseTo(
+            Math.cos(((authored.reframe?.yawOffset ?? 0) * Math.PI) / 180),
+            3,
+          );
+          expect(opening.illumination).toBeGreaterThan(0.8);
+          expect(Math.abs(opening.subjectScreen[0])).toBeLessThan(1);
+          expect(Math.abs(opening.subjectScreen[1])).toBeLessThan(1);
+          expect(opening.subjectScreen[2]).toBeGreaterThan(-1);
+          expect(opening.subjectScreen[2]).toBeLessThan(1);
+          expect(opening.cameraCollision).toBe(false);
+        }
         expect(opening.collision).toBe(false);
         await reviewScreenshot(page, { path: `${shots}/${site.id}-spawn.png` });
 
@@ -1424,7 +1455,7 @@ freshTest.describe('catalog underwater and approach poses', () => {
               target: { x: target.x, y: target.y, z: target.z },
               direction: { x: direction.x, z: direction.z },
             };
-          }, site.hero);
+          }, heroId);
           for (const range of [40, 15]) {
             await page.evaluate(
               ({ target, direction, range }) => {

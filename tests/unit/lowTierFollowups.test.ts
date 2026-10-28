@@ -1,6 +1,6 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
-import { Mesh, Raycaster, Vector2, Vector3 } from 'three';
+import { BoxGeometry, Mesh, MeshBasicMaterial, Raycaster, Vector2, Vector3 } from 'three';
 import { expect, test } from 'vitest';
 import { makeConfig } from '../../src/core/Config.js';
 import type { GraphicsTier } from '../../src/core/Config.js';
@@ -18,9 +18,14 @@ import poses from '../../tools/lowtier-poses.json';
 import blueHolePoses from '../../tools/blue-hole-poses.json';
 import titanicPoses from '../../tools/titanic-poses.json';
 import { withArcadeReach } from './helpers.js';
+import { siteManifest } from '../../src/core/SiteManifest.js';
+import { parseMission } from '../../src/game/Mission.js';
+import { siteLightWater } from '../../src/core/config/atmosphere.js';
+import { sampleAtmosphere } from '../../src/render/Atmosphere.js';
+import { solidMeshes, subjectVisibility } from './helpers/subjectVisibility.js';
 
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
-async function scene(site: string, tier: GraphicsTier = 'low') {
+async function scene(site: string, tier: GraphicsTier = 'low', content?: unknown) {
   const config = makeConfig();
   const meta = json(`data/tiles/${site}/meta.json`) as TileMeta;
   const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
@@ -30,7 +35,7 @@ async function scene(site: string, tier: GraphicsTier = 'low') {
     tier,
   );
   const props = new Props(meta, terrain, config.props, tier);
-  await props.placeAll(json(`data/landmarks/${site}/props.json`), site);
+  await props.placeAll(content ?? json(`data/landmarks/${site}/props.json`), site);
   props.group.updateMatrixWorld(true);
   terrain.group.updateMatrixWorld(true);
   return { config, meta, terrain, props };
@@ -93,169 +98,146 @@ test('d-scan Titanic fixture: extended sensors keep the logged bow ahead of the 
   }
 });
 
-test('Kamaehuakanaloa Low: opening and approach contain the full pillow mesh in portrait', async () => {
-  const site = 'kamaehuakanaloa';
-  const { config, meta, terrain, props } = await scene(site);
-  try {
-    const hero = props.placed.find((p) => p.def.id === 'hiolo-north-pillows')!;
-    const mesh = hero.full.children[0] as Mesh;
-    const opening = composedFreeDiveSpawn(
-      site,
-      meta,
-      terrain,
-      props,
-      spawnSettings(config),
-      -6500,
-      config.camera,
-    )!;
-    expect(opening).not.toBeNull();
-    const fixed = poses[site];
-    const target = hero.root.localToWorld(hero.localBounds.getCenter(new Vector3()));
-    const approach = target
-      .clone()
-      .addScaledVector(new Vector3().fromArray(fixed.direction), fixed.approachRange);
-    approach.y = hero.root.position.y + fixed.above;
-    for (const [name, position, yaw] of [
-      ['opening', new Vector3(opening.x, opening.y, opening.z), opening.yaw],
-      ['approach', approach, Math.atan2(target.x - approach.x, -(target.z - approach.z))],
-    ] as const) {
-      const rig = new CameraRig(config.camera, 390 / 844, terrain);
-      let pitch = 0;
-      if (name === 'opening')
-        rig.setChaseRadiusDefault(
-          opening.chaseRadius,
-          opening.chaseOffsetX,
-          opening.chaseOffsetY,
-          opening.portraitChaseOffset,
+for (const tier of ['low', 'medium', 'high'] as const) {
+  // Regression guard: scenic geology hid the vent; moving its anchor also raised
+  // the opening until the required contact fell outside the level scan beam.
+  test.each(['shipped', 'taller renamed subject'])(
+    `Kamaehuakanaloa ${tier} %s: free and mission openings frame a lit subject with a clear camera and scan approach`,
+    async (variant) => {
+      const site = 'kamaehuakanaloa';
+      const manifest = siteManifest(site)!;
+      const original = manifest.opening;
+      const content = json(`data/landmarks/${site}/props.json`);
+      if (variant !== 'shipped') {
+        // Exercise the art retry entirely in memory: neither a prop id, the old
+        // scenic anchor nor the pillow footprint should define this capability.
+        const vent = content.props.find(
+          (p: { feature?: string }) => p.feature === 'smoker-cluster',
         );
-      else {
-        pitch = Math.atan2(target.y - position.y, fixed.approachRange);
-        rig.setMode('first-person');
-        rig.snap(position, yaw, pitch);
-        const eye = rig.camera.position;
-        rig.lookElevation =
-          (Math.atan2(target.y - eye.y, Math.hypot(target.x - eye.x, target.z - eye.z)) - pitch) /
-          0.55;
+        expect(vent).toBeDefined();
+        vent.id = 'renamed-vent-subject';
+        vent.dimensions_m = [18, 16, 6];
+        manifest.opening = structuredClone(original);
+        manifest.opening!.reframe!.hero = vent.id;
+        manifest.opening!.reframe!.aimHero = vent.id;
       }
-      rig.snap(position, yaw, pitch);
-      rig.camera.updateMatrixWorld(true);
-      const vertices = mesh.geometry.getAttribute('position');
-      let maxX = 0;
-      for (let i = 0; i < vertices.count; i++) {
-        const p = new Vector3()
-          .fromBufferAttribute(vertices, i)
-          .applyMatrix4(mesh.matrixWorld)
-          .project(rig.camera);
-        maxX = Math.max(maxX, Math.abs(p.x));
-        expect(p.z, name).toBeGreaterThan(-1);
-        expect(p.z, name).toBeLessThan(1);
-      }
-      console.log('PILLOW', name, 'maxX', maxX, 'position', position.toArray());
-      expect(maxX, name).toBeLessThan(0.88);
-      expect(
-        props.collide(position.clone(), config.submarine.hullRadius, new Vector3()),
-        name,
-      ).toBe(false);
-      expect(props.collide(rig.camera.position.clone(), 1, new Vector3()), name).toBe(false);
-      const scanner = new Scanner(config.scan, new EventBus());
-      scanner.setTargets(
-        placePois(
+      const { config, meta, terrain, props } = await scene(site, tier, content);
+      try {
+        const authored = siteManifest(site)!.opening!;
+        const subjectId = authored.reframe?.aimHero ?? authored.freeDive!.hero;
+        const subject = props.placed.find((p) => p.def.id === subjectId)!;
+        expect(subject).toBeDefined();
+        const pois = placePois(
           parsePois(json(`data/landmarks/${site}/pois.json`)),
           meta,
           terrain,
           config.scan,
           site,
-        ),
-      );
-      scanner.update(0, position, new Vector3(Math.sin(yaw), 0, -Math.cos(yaw)), false);
-      expect(scanner.view.nearestDistance, name).toBeLessThanOrEqual(120);
-      expect(scanner.view.candidateId, name).not.toBeNull();
-    }
-  } finally {
-    terrain.dispose();
-  }
-});
-
-for (const tier of ['low', 'medium', 'high'] as const) {
-  test(`Kamaehuakanaloa ${tier}: pillow framing preserves the vent-facing opening for free dive and missions`, async () => {
-    const site = 'kamaehuakanaloa';
-    const { config, meta, terrain, props } = await scene(site, tier);
-    try {
-      const vent = props.placed.find((p) => p.def.id === 'hiolo-north-chimney-1')!;
-      const ventCentre = vent.root.localToWorld(vent.localBounds.getCenter(new Vector3()));
-      const pillows = props.placed.find((p) => p.def.id === 'hiolo-north-pillows')!;
-      const mesh = pillows.full.children[0] as Mesh;
-      const pois = placePois(
-        parsePois(json(`data/landmarks/${site}/pois.json`)),
-        meta,
-        terrain,
-        config.scan,
-        site,
-      );
-      const primaries = pois.filter((p) => p.primary);
-      const settings = spawnSettings(config);
-      for (const [kind, pose] of [
-        ['free', composedFreeDiveSpawn(site, meta, terrain, props, settings, -6500, config.camera)],
-        [
-          'mission',
-          composedMissionSpawn(
-            site,
-            primaries,
-            meta,
-            terrain,
-            props,
-            settings,
-            -6500,
-            config.camera,
-          ),
-        ],
-      ] as const) {
-        expect(pose).not.toBeNull();
-        const position = new Vector3(pose!.x, pose!.y, pose!.z);
-        const forward = new Vector3(Math.sin(pose!.yaw), 0, -Math.cos(pose!.yaw));
-        const facing = forward.dot(ventCentre.clone().sub(position).setY(0).normalize());
-        expect(facing).toBeGreaterThan(0.98);
-        if (kind === 'free') {
-          // Moving the scenic anchor can raise the opening on the slope and
-          // take the vent out of the level scan beam despite a correct yaw.
-          const scanner = new Scanner(config.scan, new EventBus());
-          scanner.setTargets(pois);
-          scanner.update(0, position, forward, false);
-          expect(scanner.view.nearestDistance).toBeLessThanOrEqual(120);
-          expect(scanner.view.candidateId).toBe('kh-hiolo-north');
-        }
-        expect(props.collide(position.clone(), config.submarine.hullRadius, new Vector3())).toBe(
-          false,
         );
-        for (const aspect of [390 / 844, 1280 / 720]) {
-          const rig = new CameraRig(config.camera, aspect, terrain);
-          rig.setChaseRadiusDefault(
-            pose!.chaseRadius,
-            pose!.chaseOffsetX,
-            pose!.chaseOffsetY,
-            pose!.portraitChaseOffset,
-          );
-          rig.snap(position, pose!.yaw, 0);
-          rig.camera.updateMatrixWorld(true);
-          const vertices = mesh.geometry.getAttribute('position');
-          let maxX = 0;
-          for (let i = 0; i < vertices.count; i++) {
-            const point = new Vector3()
-              .fromBufferAttribute(vertices, i)
-              .applyMatrix4(mesh.matrixWorld)
-              .project(rig.camera);
-            maxX = Math.max(maxX, Math.abs(point.x));
-            expect(point.z).toBeGreaterThan(-1);
-            expect(point.z).toBeLessThan(1);
+        const mission = parseMission(json(`data/landmarks/${site}/mission.json`), site)!;
+        const primaries = mission.objectives
+          .filter((o) => o.primary)
+          .map((o) => pois.find((p) => p.id === o.poi)!);
+        const target = primaries[0];
+        expect(subject.root.position.distanceTo(target.position)).toBeLessThan(target.radius);
+        const settings = spawnSettings(config);
+        const ratedDepth = config.submarine.hullClasses[mission.hull_class!].ratedDepth;
+        for (const [kind, pose] of [
+          [
+            'free',
+            composedFreeDiveSpawn(site, meta, terrain, props, settings, ratedDepth, config.camera),
+          ],
+          [
+            'mission',
+            composedMissionSpawn(
+              site,
+              primaries,
+              meta,
+              terrain,
+              props,
+              settings,
+              ratedDepth,
+              config.camera,
+            ),
+          ],
+        ] as const) {
+          expect(pose).not.toBeNull();
+          const position = new Vector3(pose!.x, pose!.y, pose!.z);
+          if (kind === 'free') {
+            const scanner = new Scanner(config.scan, new EventBus());
+            scanner.setTargets(pois);
+            scanner.update(
+              0,
+              position,
+              new Vector3(Math.sin(pose!.yaw), 0, -Math.cos(pose!.yaw)),
+              false,
+            );
+            expect(scanner.view.nearestDistance).toBeLessThanOrEqual(target.radius);
+            expect(scanner.view.candidateId).toBe(target.id);
           }
-          expect(maxX).toBeLessThan(0.88);
-          expect(props.collide(rig.camera.position.clone(), 1, new Vector3())).toBe(false);
+          expect(props.collide(position.clone(), config.submarine.hullRadius, new Vector3())).toBe(
+            false,
+          );
+          expect(position.y - terrain.sampleHeight(position.x, position.z)).toBeGreaterThanOrEqual(
+            settings.hullRadius + settings.seabedClearance,
+          );
+          for (const [width, height] of [
+            [390, 844],
+            [1280, 720],
+            [844, 390],
+          ]) {
+            const rig = new CameraRig(config.camera, width / height, terrain);
+            rig.setPhoneLandscape(width === 844);
+            rig.setChaseRadiusDefault(
+              pose!.chaseRadius,
+              pose!.chaseOffsetX,
+              pose!.chaseOffsetY,
+              pose!.portraitChaseOffset,
+            );
+            rig.snap(position, pose!.yaw, 0);
+            terrain.update(rig.camera);
+            props.update(rig.camera);
+            expect(subject.root.visible).toBe(true);
+            const body = solidMeshes(subject.root)[0];
+            expect(body).toBeDefined();
+            const solids = [...solidMeshes(terrain.group), ...solidMeshes(props.group)];
+            expect(
+              subjectVisibility(body, solids, rig.camera),
+              `${kind} ${width}x${height}: middle and upper body visible, not just plume or tip`,
+            ).toEqual([true, true]);
+            expect(props.collide(rig.camera.position.clone(), 1, new Vector3())).toBe(false);
+            expect(
+              rig.camera.position.y -
+                terrain.sampleHeight(rig.camera.position.x, rig.camera.position.z),
+            ).toBeGreaterThanOrEqual(config.camera.terrainClearance - 1e-6);
+            const light = sampleAtmosphere(siteLightWater(site, tier, config.water), position.y);
+            const c = light.ambientColor;
+            expect(
+              light.ambientIntensity * (0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b),
+              'readable subject fill at the opening depth',
+            ).toBeGreaterThan(0.8);
+            // An opaque foreground obstruction must still fail the capability pin.
+            const blocker = new Mesh(new BoxGeometry(1000, 1000, 1), new MeshBasicMaterial());
+            blocker.position
+              .copy(rig.camera.position)
+              .addScaledVector(rig.camera.getWorldDirection(new Vector3()), 2);
+            blocker.quaternion.copy(rig.camera.quaternion);
+            blocker.updateMatrixWorld(true);
+            expect(subjectVisibility(body, [...solids, blocker], rig.camera)).toEqual([
+              false,
+              false,
+            ]);
+            blocker.geometry.dispose();
+            blocker.material.dispose();
+          }
         }
+      } finally {
+        manifest.opening = original;
+        props.dispose();
+        terrain.dispose();
       }
-    } finally {
-      terrain.dispose();
-    }
-  });
+    },
+  );
 }
 
 test('Hunga Tonga Low: the detail pose centres the cliff rather than the sediment apron', async () => {
