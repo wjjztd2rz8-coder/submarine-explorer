@@ -1,7 +1,9 @@
 /** Guard depth-rated free-dive hull selection and safe shallow-tile spawning. */
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
+import * as manifests from '../../src/core/SiteManifest.js';
 import {
   applyFreeDiveHull,
   chooseFreeDiveHull,
@@ -10,6 +12,7 @@ import {
   spawnHeight,
   spawnSettings,
   nearSiteSpawnPose,
+  composedMissionSpawn,
   type SpawnGrid,
 } from '../../src/game/Spawn.js';
 
@@ -17,6 +20,50 @@ const HULLS = DEFAULT_CONFIG.submarine.hullClasses;
 const MARGIN = DEFAULT_CONFIG.submarine.freeDiveHullMarginM;
 const S = spawnSettings(DEFAULT_CONFIG);
 const R = S.hullRadius;
+
+it.each([true, false])(
+  'mission clearance follows the authored camera arm (authored arm blocked: %s)',
+  (blocked) => {
+    const range = 220;
+    const target = new Vector3(0, -480, 0);
+    const spawnY = target.y + S.hullRadius + S.seabedClearance + S.spawnClearanceM;
+    const manifest = vi.spyOn(manifests, 'siteManifest').mockReturnValue({
+      id: 'camera-clearance',
+      opening: { mission: { rangeM: range, chaseRadius: 35, chaseOffsetY: 100 } },
+    });
+    try {
+      const pose = composedMissionSpawn(
+        'camera-clearance',
+        [{ position: target }],
+        {
+          center: { lat: 0, lon: 0 },
+          bbox: { north: 0.01, south: -0.01, west: -0.01, east: 0.01 },
+        } as import('../../src/util/types.js').TileMeta,
+        { sampleHeight: () => -500 },
+        {
+          placed: [],
+          // A radial shelf intersects only the raised short arm; the outer
+          // obstruction intersects only the long default arm on every bearing.
+          collide: (p, radius) =>
+            radius === 6 &&
+            (blocked
+              ? p.y > spawnY + 25 && Math.hypot(p.x, p.z) < range + 30
+              : Math.hypot(p.x, p.z) > range + 50),
+        },
+        S,
+        -1000,
+      );
+      if (blocked) expect(pose).toBeNull();
+      else {
+        expect(pose).not.toBeNull();
+        expect(pose!.chaseRadius).toBe(35);
+        expect(pose!.chaseOffsetY).toBe(100);
+      }
+    } finally {
+      manifest.mockRestore();
+    }
+  },
+);
 
 describe('chooseFreeDiveHull', () => {
   it('fits the lowest class that clears the tile depth by the margin', () => {

@@ -53,7 +53,9 @@ export function composedMissionSpawn(
   if (!first) return null;
   const target = new Vector3(first.position.x, first.position.y, first.position.z);
   const range = MISSION_APPROACH_M[siteId] ?? 220;
-  const authored = siteManifest(siteId)?.opening?.freeDive;
+  const opening = siteManifest(siteId)?.opening;
+  const arm = opening?.mission;
+  const authored = opening?.freeDive;
   const hero = props.placed.find((p) => p.def.id === authored?.hero);
   let bearing = ((authored?.bearing ?? 180) * Math.PI) / 180;
   if (hero) {
@@ -70,6 +72,7 @@ export function composedMissionSpawn(
     sampleHeight: (x, z) => seabed.sampleHeight(x, z),
     getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
   });
+  rig.setChaseRadiusDefault(arm?.chaseRadius, arm?.chaseOffsetX, arm?.chaseOffsetY);
   let best: SpawnPose | null = null;
   let bestScore = Infinity;
   for (const turn of [0, 22.5, -22.5, 45, -45, 67.5, -67.5, 90, -90, 135, -135, 180]) {
@@ -116,8 +119,7 @@ export function composedMissionSpawn(
     }
     if (!clear) continue;
     const yaw =
-      Math.atan2(target.x - p.x, -(target.z - p.z)) +
-      ((siteManifest(siteId)?.opening?.mission?.yawOffset ?? 0) * Math.PI) / 180;
+      Math.atan2(target.x - p.x, -(target.z - p.z)) + ((arm?.yawOffset ?? 0) * Math.PI) / 180;
     rig.snap(p, yaw, 0);
     for (let step = 1; step <= 8; step++) {
       const eye = p.clone().lerp(rig.camera.position, step / 8);
@@ -129,10 +131,9 @@ export function composedMissionSpawn(
     const score =
       (p.y - target.y) * 3 +
       Math.abs(turn) * 0.12 +
-      localAltitude * (siteManifest(siteId)?.opening?.mission?.localAltitudeWeight ?? 0);
+      localAltitude * (arm?.localAltitudeWeight ?? 0);
     if (score < bestScore) {
       bestScore = score;
-      const arm = siteManifest(siteId)?.opening?.mission;
       best = {
         x: p.x,
         y: p.y,
