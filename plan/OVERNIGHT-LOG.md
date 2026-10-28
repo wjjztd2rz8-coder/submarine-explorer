@@ -2355,3 +2355,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to merge: no worktrees, main clean and pushed, Codex 5h at 0% (resets 06:45) with briefs 60-62 queued. Claude week 21% left, remaining items demoted, so no package. No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-28 07:57 CDT headless run 208 (Claude): Codex collect
+
+- Merged R-debrief-objectives (single objective-count source, net −30 lines) and T-e2e-timings (shard weights refreshed from cached hosted logs, importer gains --list-logs). Gates smoke + project-base passed on main; pushed. T-journey-acceptance still running (preview startup blocked by sandbox in its round 1). No Claude package (week ~21% left, items demoted). No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.

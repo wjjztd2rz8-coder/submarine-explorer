@@ -84,8 +84,8 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 4. **V-lostcity-ground [Sonnet, small]:** towers read (~3.8) but the upper two thirds is empty dark water; add distance shading or a faint ridge crest behind (shared terrain tint, no site branch).
 5. **V-monterey-flatten [Sonnet, small]:** Monterey is the closest hero (~3.9); the lower-right sand is a flat pale slab. Target: sand tint and ripple falloff so it matches the wall; then re-shoot.
 6. **V-bluehole-floor-2 [Sonnet, small]:** floor and wall strata still read as stacked terraces and the foreground bottom corners are jagged (Claude 3.7, Sol 3.0-3.5). Understand the spawn-vs-detail-amplitude dependency first (plan/OVERNIGHT-LOG run 200); target a smooth bowl, not more fluting.
-7. **R-debrief-objectives [Codex]:** queued 60: debrief says "2 of 4 objectives" after both primaries are done; subtitle in MissionRouter.ts:355 is dead.
-8. **T-e2e-timings [Codex]:** queued 61: refresh shard weights, report imbalance and queue-to-Pages latency.
+7. **R-debrief-objectives [Codex]:** DONE 2026-10-28 (4e084c5e) queued 60: debrief says "2 of 4 objectives" after both primaries are done; subtitle in MissionRouter.ts:355 is dead.
+8. **T-e2e-timings [Codex]:** DONE 2026-10-28 (4e084c5e) queued 61: refresh shard weights, report imbalance and queue-to-Pages latency.
 9. **T-journey-acceptance [Codex]:** queued 62: stamp journey captures with the build SHA, rerun Titanic and Blue Hole at three sizes, list confusions.
 10. **T-golden-hunga [Haiku, small]:** golden 2026-10-28-091604 captured all ten sites; keep golden.sh per-site timeout so one site cannot lose a run.
 11. **V-endurance-accent [Sonnet, small, demote if tried again]:** TRIED 2026-10-27, no change merged (see plan/progress/V-endurance-accent.md); next route is a per-site emissive tint in `src/world/props/wrecks/materials.ts` via site data.
