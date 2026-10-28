@@ -2292,3 +2292,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to merge. Hosted CI for the d-modes fix is still pending. Claude week 25% left and the remaining Claude items are demoted, so no package. Codex weekly 7%: worktrees 4730-4750 and queue 50-52 wait for the Nov 2 reset. No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-27 21:16 CDT headless run 196 (Claude): CI triage only
+
+- Hosted CI on run 195 was red only on the prettier check of plan/DIRECTOR.md (the d-modes fix is not the cause); reformatted. No package: Claude week 25% left, remaining Claude items demoted. Codex weekly 7%: 4730-4750 worktrees and queue 50-52 wait for the Nov 2 reset. No tag until CI is green.
+- Small fix idea: run prettier on plan/*.md before committing DIRECTOR edits.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
