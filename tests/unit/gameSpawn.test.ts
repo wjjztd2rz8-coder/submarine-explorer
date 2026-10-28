@@ -1,7 +1,10 @@
 /** Guard depth-rated free-dive hull selection and safe shallow-tile spawning. */
 
 import { describe, expect, it } from 'vitest';
+import { Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
+import { allSiteManifests } from '../../src/core/SiteManifest.js';
+import { CameraRig } from '../../src/sub/CameraRig.js';
 import {
   applyFreeDiveHull,
   chooseFreeDiveHull,
@@ -10,6 +13,7 @@ import {
   spawnHeight,
   spawnSettings,
   nearSiteSpawnPose,
+  composedMissionSpawn,
   type SpawnGrid,
 } from '../../src/game/Spawn.js';
 
@@ -17,6 +21,45 @@ const HULLS = DEFAULT_CONFIG.submarine.hullClasses;
 const MARGIN = DEFAULT_CONFIG.submarine.freeDiveHullMarginM;
 const S = spawnSettings(DEFAULT_CONFIG);
 const R = S.hullRadius;
+
+describe('mission camera clearance', () => {
+  const sites = allSiteManifests().filter(({ opening }) => {
+    const arm = opening?.mission;
+    return (
+      arm?.chaseRadius !== undefined ||
+      arm?.chaseOffsetX !== undefined ||
+      arm?.chaseOffsetY !== undefined
+    );
+  });
+  it.each(sites)('$id: rejects an obstacle on the authored arm', ({ id }) => {
+    const meta = {
+      center: { lat: 0, lon: 0 },
+      bbox: { north: 0.01, south: -0.01, west: -0.01, east: 0.01 },
+    } as import('../../src/util/types.js').TileMeta;
+    const terrain = {
+      sampleHeight: () => -500,
+      getNormal: (_x: number, _z: number, out = new Vector3()) => out.set(0, 1, 0),
+    };
+    const primaries = [{ position: new Vector3(0, -480, 0) }];
+    const props = { placed: [], collide: (_position: Vector3, _radius: number) => false };
+    const spawn = () => composedMissionSpawn(id, primaries, meta, terrain, props, S, -1000)!;
+    const eye = (pose: ReturnType<typeof spawn>) => {
+      const rig = new CameraRig(DEFAULT_CONFIG.camera, 16 / 9, terrain);
+      rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
+      rig.snap(new Vector3(pose.x, pose.y, pose.z), pose.yaw, 0);
+      return rig.camera.position;
+    };
+    const original = spawn();
+    expect(original).not.toBeNull();
+    const obstacle = eye(original);
+    props.collide = (position: Vector3, radius: number) =>
+      position.distanceTo(obstacle) < radius + 2;
+    const safe = spawn();
+    expect(safe).not.toBeNull();
+    expect(props.collide(eye(safe), 6), 'returned camera eye clears the obstacle').toBe(false);
+    expect(safe).not.toEqual(original);
+  });
+});
 
 describe('chooseFreeDiveHull', () => {
   it('fits the lowest class that clears the tile depth by the margin', () => {

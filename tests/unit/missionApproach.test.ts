@@ -26,6 +26,8 @@ import { Terrain } from '../../src/world/Terrain.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
 import { hullClearance } from './helpers/hullClearance.js';
+import { requiredHull } from '../../src/game/Progress.js';
+import { latLonToWorld } from '../../src/util/geo.js';
 import type { TileMeta } from '../../src/util/types.js';
 import sites from '../../data/landmarks/index.json';
 
@@ -52,10 +54,7 @@ it('every authored site retains its mission approach distance', () => {
 });
 
 for (const site of sites.landmarks) {
-  const modes =
-    site === 'axial-seamount-ashes' || site === 'hudson-canyon'
-      ? (['arcade', 'realistic'] as const)
-      : (['arcade'] as const);
+  const modes = ['arcade', 'realistic'] as const;
   for (const { tier, mode } of (['low', 'medium', 'high'] as const).flatMap((tier) =>
     modes.map((mode) => ({ tier, mode })),
   )) {
@@ -86,7 +85,8 @@ for (const site of sites.landmarks) {
       );
       const props = new Props(meta, terrain, config.props, tier);
       const mission = parseMission(json(`data/landmarks/${site}/mission.json`), site)!;
-      const mesh = new SubMesh({ length: 26, hullClass: mission.hull_class!, tier });
+      const missionHull = requiredHull(mission.briefing.depth_m ?? Math.abs(meta.min_m)).id;
+      const mesh = new SubMesh({ length: 26, hullClass: missionHull, tier });
       try {
         const content = json(`data/landmarks/${site}/props.json`);
         content.props = content.props.filter((p: { model: string }) =>
@@ -104,7 +104,7 @@ for (const site of sites.landmarks) {
         const primaries = mission.objectives
           .filter((o) => o.primary)
           .map((o) => pois.find((p) => p.id === o.poi)!);
-        const ratedDepth = config.submarine.hullClasses[mission.hull_class!].ratedDepth;
+        const ratedDepth = config.submarine.hullClasses[missionHull].ratedDepth;
         const settings = spawnSettings(config);
         const pose = composedMissionSpawn(
           site,
@@ -117,7 +117,15 @@ for (const site of sites.landmarks) {
           effective.camera,
         );
         expect(pose).not.toBeNull();
+        for (const value of [pose!.x, pose!.y, pose!.z, pose!.yaw])
+          expect(Number.isFinite(value), 'finite mission pose').toBe(true);
         const p = new Vector3(pose!.x, pose!.y, pose!.z);
+        const nw = latLonToWorld(meta, meta.bbox.north, meta.bbox.west);
+        const se = latLonToWorld(meta, meta.bbox.south, meta.bbox.east);
+        expect(p.x).toBeGreaterThanOrEqual(nw.x);
+        expect(p.x).toBeLessThanOrEqual(se.x);
+        expect(p.z).toBeGreaterThanOrEqual(nw.z);
+        expect(p.z).toBeLessThanOrEqual(se.z);
         const target = primaries[0];
         const range = p.distanceTo(target.position);
         expect(range).toBeCloseTo(MISSION_APPROACH_M[site], 2);
@@ -126,6 +134,7 @@ for (const site of sites.landmarks) {
         // Per-site mission camera data must reach the pose the mission applies.
         const arm = siteManifest(site)?.opening?.mission;
         expect(pose!.chaseRadius).toBe(arm?.chaseRadius);
+        expect(pose!.chaseOffsetX).toBe(arm?.chaseOffsetX);
         expect(pose!.chaseOffsetY).toBe(arm?.chaseOffsetY);
         expect(p.y).toBeGreaterThanOrEqual(ratedDepth + settings.hullRadius);
         expect(p.y).toBeLessThan(-settings.hullRadius);
@@ -164,8 +173,27 @@ for (const site of sites.landmarks) {
         }
         for (const aspect of [1280 / 720, 390 / 844, 844 / 390]) {
           const rig = new CameraRig(effective.camera, aspect, terrain);
+          rig.setPhoneLandscape(aspect === 844 / 390);
+          rig.setChaseRadiusDefault(
+            pose!.chaseRadius,
+            pose!.chaseOffsetX,
+            pose!.chaseOffsetY,
+            pose!.portraitChaseOffset,
+          );
           rig.snap(p, pose!.yaw, 0);
           rig.camera.updateMatrixWorld(true);
+          expect(rig.camera.position.toArray().every(Number.isFinite)).toBe(true);
+          expect(rig.camera.position.y).toBeLessThanOrEqual(-config.camera.surfaceClearance);
+          for (let step = 1; step <= 64; step++) {
+            const point = p.clone().lerp(rig.camera.position, step / 64);
+            expect(
+              point.y - terrain.sampleHeight(point.x, point.z),
+              'authored camera arm above terrain',
+            ).toBeGreaterThanOrEqual(config.camera.terrainClearance - 1e-6);
+            expect(props.collide(point, 6, new Vector3()), 'authored camera arm prop keepout').toBe(
+              false,
+            );
+          }
           expect(
             rig.camera.position.y -
               terrain.sampleHeight(rig.camera.position.x, rig.camera.position.z),
@@ -177,8 +205,7 @@ for (const site of sites.landmarks) {
           expect(contact.z).toBeLessThan(1);
         }
         if (pilotRoute) {
-          // 4380 removed actual transit from the browser journeys. Retain a
-          // bounded two-leg capability through shipped terrain, physics and scan
+          // Retain a bounded two-leg capability through shipped terrain, physics and scan
           // gates. Only the opening is placed; neither leg teleports or awards scans.
           const bus = new EventBus();
           const run = new Mission({ def: mission, bus });
@@ -195,7 +222,7 @@ for (const site of sites.landmarks) {
           run.start(site);
           const sub = new Submarine(effective.submarine, terrain);
           const contact = new PropContact(props, bus, config.props, settings.hullRadius);
-          sub.setHullClass(mission.hull_class!);
+          sub.setHullClass(missionHull);
           sub.setSimSpeed(1);
           if (site === 'great-blue-hole') {
             const target = primaries[1];
