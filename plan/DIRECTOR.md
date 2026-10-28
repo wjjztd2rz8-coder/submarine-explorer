@@ -61,7 +61,7 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
 | No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
-Stage (joint review 2026-10-28, Sol round 1 only): about 85% to 1.0 (Claude 90%, Sol 82%); 4-5 weeks. Beautiful: Titanic 3.6, Lost City 3.8, Blue Hole 3.7, Beebe 3.8, Monterey 3.9, Challenger 3.5, Endurance 3.6. Blockers: (1) no hero at 4 yet (Monterey is closest); (2) Hunga opening dim; (3) real-phone Low-tier acceptance.
+Stage (review 2026-10-28 evening, Claude + Sol; see REVIEWS.md): about 84% (range 82-86%) to 1.0; 4-6 weeks. Beautiful: Titanic 3.9, Lost City 3.8, Blue Hole 3.7, Beebe 3.8, Monterey 4.0, Challenger 3.5, Endurance 3.6. Blockers: (1) only Monterey at 4; (2) Kama subject unreadable; (3) real-phone Low-tier acceptance.
 
 ## Needs owner
 
@@ -72,28 +72,25 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running. Codex queue: 90 S-bughunt-mission-flow, 91 S-verify-journal-home, 92 S-dead-tests.
+- No Claude package running (Claude week ~16% left, resets Oct 29 07:00). queued 96 T-golden-mission; Codex running: 90 S-bughunt-mission-flow, 91 S-verify-journal-home, 92 S-dead-tests; queued: 93 R-journey-guidance, 94 R-journey-labels, 95 R-journal-repeat.
 
 ## Backlog
 
 One list, ordered by player impact and dependencies; lane in brackets. Evidence: reviews 2026-10-27 (Claude alone, Sol skipped for Codex budget) and 2026-10-26 in `plan/REVIEWS.md`; earlier item histories in [archive/DIRECTOR-HISTORY-2026-10-26-backlog.md](archive/DIRECTOR-HISTORY-2026-10-26-backlog.md). Art gains per package are ~0.1-0.2, so each V-* names a target composition, not a geometry list. Owner phone decisions: [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md). Done this cycle (removed): V-hunga-subject, V-kama-axial-approach, V-monterey-banding, V-bluehole-roof, V-lostcity-surround, V-monterey-wall-skirt, V-beebe-flow, V-lostcity-towers, V-bluehole-silhouette, V-monterey-apron.
 
-1. **V-terrain-blotch [Sonnet] DONE 2026-10-28 (dd6f63cd; Axial clearly calmer, Kama and Hunga modest, pale pools remain on Hunga):** golden 2026-10-28: Hunga, Kama and Axial grounds carry a blotchy two-colour (orange/blue) splat that reads as noise, not geology, and is the main reason those sites sit near 3.4-3.5 (joint review, Claude and Sol both flagged it). Target: one shared terrain-tint change (lower splat contrast, larger scale, grade toward the site's base rock) through site data; no per-site branch.
 2. **V-hunga-kama-subject [Sonnet] PARTLY DONE 2026-10-28 (aa928fa6; Hunga apron grounded, modest gain; Kama still opens on the pillow egg beside a tiny vent stack; a taller 18x16x6 cluster with re-aimed opening looked better in golden 2026-10-28-131853 but broke the mission line-of-sight and pillow-framing pins, so re-pin those tests and retry):** Hunga opens on an isolated brown wedge and Kama on a brown egg lump; neither reads as the named feature. Target: ground the Hunga rim into the slope (blend base, no hard skirt) and give Kama's Hiolo vent site a lit vent/chimney silhouette; reuse existing props.
 3. **V-titanic-aft [Sonnet]:** Titanic bow reads (~3.9, Sol ~3.5) but the aft hull and upper-left frame go dark and flat. Target: a second soft light pool or hull-side emissive tint through site data so the hull has a lit and a shaded half; no per-site branch.
 4. **V-lostcity-ground [Sonnet, small]:** towers read (~3.8) but the upper two thirds is empty dark water; add distance shading or a faint ridge crest behind (shared terrain tint, no site branch).
 5. **V-monterey-flatten [Sonnet, small]:** Monterey is the closest hero (~3.9); the lower-right sand is a flat pale slab. Target: sand tint and ripple falloff so it matches the wall; then re-shoot.
 6. **V-bluehole-floor-2 [Sonnet, small]:** floor and wall strata still read as stacked terraces and the foreground bottom corners are jagged (Claude 3.7, Sol 3.0-3.5). Understand the spawn-vs-detail-amplitude dependency first (plan/OVERNIGHT-LOG run 200); target a smooth bowl, not more fluting.
-7. **R-debrief-objectives [Codex]:** DONE 2026-10-28 (4e084c5e) queued 60: debrief says "2 of 4 objectives" after both primaries are done; subtitle in MissionRouter.ts:355 is dead.
-8. **T-e2e-timings [Codex]:** DONE 2026-10-28 (4e084c5e) queued 61: refresh shard weights, report imbalance and queue-to-Pages latency.
-9. **T-journey-acceptance [Codex]:** DONE 2026-10-28 (6608172b) queued 62: stamp journey captures with the build SHA, rerun Titanic and Blue Hole at three sizes, list confusions.
-10. **T-golden-hunga [Haiku, small]:** golden 2026-10-28-091604 captured all ten sites; keep golden.sh per-site timeout so one site cannot lose a run.
-11. **V-endurance-accent [Sonnet, small, demote if tried again]:** TRIED 2026-10-27, no change merged (see plan/progress/V-endurance-accent.md); next route is a per-site emissive tint in `src/world/props/wrecks/materials.ts` via site data.
-    11b. **T-pin-fragility [Codex]:** DONE 2026-10-28 (merged main) queued 80: CI was red 4 runs because f-perf-budget pinned Kama props at 4 (now 5); derive such counts from site data and guard them in gates.sh.
-    11c. **T-kama-pins [Codex]:** DONE 2026-10-28 (merged main) queued 81: make Kama line-of-sight/pillow-framing pins capability-based so the V-hunga-kama-subject retry (item 2) isn't blocked.
-12. **S-verify / S-bughunt / S-dead [Codex, standing]:** 4730-4780 merged 2026-10-28; keep rationing.
-13. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
-14. **R-release [Haiku]:** tag the latest green-CI main after each review (f68 is the newest); check the Pages deploy.
+7. **V-endurance-accent [Sonnet, small, demote if tried again]:** TRIED 2026-10-27, no change merged (see plan/progress/V-endurance-accent.md); next route is a per-site emissive tint in `src/world/props/wrecks/materials.ts` via site data.
+   12a. **R-journey-guidance [Codex]:** queued 93: Home button/caption name different sites, Blue Hole opening names the optional target, one-frame stale target after a scan (journey findings 1, 4, 10).
+   12b. **R-journey-labels [Codex]:** queued 94: waypoint/Journal label clipping and ellipsis, Settings Close off-screen on phones (findings 2, 3, 5, 6, 7).
+   12c. **R-journal-repeat [Codex]:** queued 95: second Blue Hole gallery scan repeats the same entry; THIS DIVE counters disagree with scan count (findings 8, 9).
+   12d. **T-golden-mission [Codex]:** queued 96: golden sets use free-dive poses, so there is no mission-spawn capture (Bismarck, Blake, Hudson unrated); capture the default mission's first frame per site and note the auto-selected phone tier (Sol, 2026-10-28).
+8. **S-verify / S-bughunt / S-dead [Codex, standing]:** 4730-4780 merged 2026-10-28; keep rationing.
+9. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
+10. **R-release [Haiku]:** tag the latest green-CI main after each review (f68 is the newest); check the Pages deploy.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16), Titanic per-plate blockiness (accepted ~3.7). Codex weekly burn is ~60%/day, so briefs stay rationed.
 

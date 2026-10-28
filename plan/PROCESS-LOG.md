@@ -337,3 +337,7 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 
 - Red CI x4 came from a pinned prop count in f-perf-budget that gates.sh doesn't exercise. Fix: spec updated; Codex 80 T-pin-fragility derives counts from data and adds a gates-level guard.
 - Codex queue sat empty after its 5h window recovered (runs 211-213 logged "empty on purpose"). Rule: no-op runs must re-check Codex 5h/week and refill to 3 briefs when healthy.
+
+## 2026-10-28 evening review
+- golden.sh takes ~25 min (over the tool timeout): run it in the background. Wait on its PID, not `pgrep -f golden.sh` (matches the Claude run's own command line). Start the Sol review only after the contact sheet (index.html) exists; an early start wasted a launch.
+- Codex queue had emptied after 90-92 launched; refilled 93-96 in the same review.

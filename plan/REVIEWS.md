@@ -1,5 +1,23 @@
 # Reviews
 
+## 2026-10-28 evening comprehensive review (joint with Sol, one reconcile round)
+
+**Changed since the morning review (golden 091604 to 194415):** V-terrain-blotch (Axial clearly calmer), V-hunga-kama-subject partly (Hunga apron grounded; Kama still a pillow beside a tiny vent), R-debrief-objectives, T-e2e-timings, T-journey-acceptance, T-pin-fragility, T-kama-pins, S-* sweeps, journal-home fix. All ten sites captured; f68 still the newest tag.
+
+**Scores, beautiful (Claude / Sol; both reads kept):** Titanic 3.9 / 3.5; Lost City 3.8 / 3.5; Blue Hole 3.7 / 3.0; Beebe 3.8 / 3.5; Monterey 4.0 / 3.5; Challenger ~3.5; Endurance ~3.5; Axial ~3.5; Hunga 3.5 / 3.0; Kama 3.3 / 3.0. No hero has a jointly defensible across-view 4; Monterey's opening is the best frame (Claude 4.0). Claude's own newer scores run generous (Sol). Bismarck, Blake and Hudson are unrated on current mission evidence.
+
+**Biggest gaps:** (1) first-journey confusions (Home button vs caption, Blue Hole optional-target guidance, clipped waypoint labels, repeated "New Journal entry", Settings Close off-screen), documented in T-journey-acceptance and now queued as 93-95; (2) no hero firmly at 4; (3) Kama/Hunga subjects; (4) goldens use free-dive poses, so there is no mission-spawn capture (Sol; queue 96); (5) strong phones can auto-select Medium, so manual Low acceptance misses that tier (Sol); (6) real-phone retest.
+
+**Settled on evidence:** Sol corrected me: the Kama vent is visible though small (kamaehuakanaloa-2.png); the T-journey-acceptance note does list ten confusions (my draft said none); the harness teleports and pauses time, so it shows assisted flow, not unaided play; the repeated reward is misleading wording, not lost progress (Discovery.ts:188). Sol accepted: the debrief count is fixed in current code. **Disputed:** beauty scores (bands above) and whether Kama leads the blocker list (Sol puts first-journey guidance first; I accept that ordering, since it hits every new player).
+
+**Process:** efficiency.sh: Claude week 16% (~13%/day), Codex week 65% (~32%/day); no failed timer runs in 24 h. Golden run takes ~25 min, over the 10-minute tool timeout, so run it in the background and poll (a `pgrep -f golden.sh` watcher matches the Claude process itself; watch the PID instead). Starting Sol before the golden set is complete wasted a start; start it only once the contact sheet exists. Codex queue had been empty after 90-92 launched; refilled with 93-96.
+
+**New priorities:** Codex 93 R-journey-guidance, 94 R-journey-labels, 95 R-journal-repeat, 96 T-golden-mission; Claude V-hunga-kama-subject retry, V-titanic-aft, V-lostcity-ground, V-monterey-flatten, V-bluehole-floor-2 (Claude week resets Oct 29 07:00).
+
+**Stage (agreed with Sol):** about 84% to 1.0 (range 82-86%); 4-6 calendar weeks with three parallel Codex tasks and limited Claude time.
+
+**Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include the auto-selected Medium tier).
+
 ## 2026-10-28 13:00 targeted review (red CI x3; Codex starved 2 h)
 
 **Red CI:** shard e2e (33/38) failed on runs 209, 211, 212, 213 with one spec: f-perf-budget "kamaehuakanaloa", `props.count` expected 4, got 5. Cause: V-hunga-kama-subject (aa928fa6) added a vent stack and the spec hard-codes the count; `tools/gates.sh` doesn't run that spec, so merges looked green. Fixed by hand (4 to 5) and queued Codex 80 (T-pin-fragility) to derive such counts from site data and guard them in gates.

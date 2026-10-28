@@ -1,25 +1,25 @@
-# Status (2026-10-28, joint review with Sol round 1)
+# Status (2026-10-28 evening, joint review with Sol)
 
-**Stage:** about 85% to 1.0; 4-5 weeks (Claude 90%, Sol 82%). Tag **f68** is the newest green release.
+**Stage:** about 84% to 1.0 (range 82-86%); 4-6 weeks. Tag **f68** is the newest green release.
 
 ## 1.0 table
 
-| Requirement                               | State                                                                                                                  |
-| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Five heroes beautiful (4 of 5)            | None at 4: Titanic 3.9, Lost City 3.8, Blue Hole 3.5-3.7, Beebe 3.9, Monterey 3.9 (Sol reads 0.3-0.7 lower)            |
-| Other eight sites coherent                | Hunga 3.4 and Kama 3.4 (subject does not read), Axial 3.5 (blotchy ground), Challenger 3.6, Endurance 3.6              |
-| New player understands first five minutes | Flow works; debrief shows "2 of 4 objectives" after both primaries; journey captures lack a build stamp (Codex 60, 62) |
-| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great; weaker phones untested                                                                        |
-| Hosted CI green, releases tagged          | f68 tagged; CI green; e2e shard weights stale (Codex 61)                                                               |
-| Code simple enough                        | Dead-code sweeps 4750-4780 merged; standing S-verify items                                                             |
+| Requirement                               | State                                                                                                                         |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Five heroes beautiful (4 of 5)            | None firmly at 4: Titanic 3.5-3.9, Lost City 3.5-3.8, Blue Hole 3.0-3.7, Beebe 3.5-3.8, Monterey 3.5-4.0 (Sol / Claude bands) |
+| Other eight sites coherent                | Axial ~3.5 (calmer), Hunga 3.0-3.5, Kama 3.0-3.3 (subject does not read), Challenger and Endurance ~3.5; three sites unrated  |
+| New player understands first five minutes | No dead ends; ten small confusions found (guidance, clipped labels, repeated reward) now queued as Codex 93-95                |
+| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great; Medium auto-tier and weaker phones untested                                                          |
+| Hosted CI green, releases tagged          | CI green at the last check; shard weights refreshed; f68 newest tag                                                           |
+| Code simple enough                        | Dead-code and test sweeps merged; standing S-* audits                                                                         |
 
 ## Done recently
 
-Blue Hole floor, mission-start camera clearance, Journal scan-focus fix, dead config/asset/type sweeps, golden set back to ten sites.
+Terrain blotch fix, Hunga apron, debrief objective count, journey acceptance captures, e2e shard weights, Kama/perf pin fragility fixes, Journal home fix, dead-dependency sweep.
 
 ## Left
 
-Shared terrain-tint fix for blotchy ground, Hunga and Kama subjects, Titanic aft light, Lost City upper frame, Monterey sand, Blue Hole floor, debrief objective count, e2e timings, journey acceptance, real-phone retest.
+Kama subject retry, Titanic aft light, Lost City upper frame, Monterey sand, Blue Hole floor, first-journey guidance/labels/Journal wording (Codex), mission-spawn golden captures (Codex), real-phone retest.
 
 ## Needs owner
 
