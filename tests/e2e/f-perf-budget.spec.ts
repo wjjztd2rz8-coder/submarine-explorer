@@ -33,7 +33,7 @@ const sites = [
   { id: 'hunga-tonga-caldera', props: 1 },
   { id: 'hudson-canyon', props: 1 },
   { id: 'axial-seamount-ashes', props: 6 },
-  { id: 'kamaehuakanaloa', props: 4 },
+  { id: 'kamaehuakanaloa', props: 5 },
   { id: 'bismarck', props: 4 },
   { id: 'blake-plateau-corals', props: 3 },
 ];

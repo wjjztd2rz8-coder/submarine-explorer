@@ -1,5 +1,13 @@
 # Reviews
 
+## 2026-10-28 13:00 targeted review (red CI x3; Codex starved 2 h)
+
+**Red CI:** shard e2e (33/38) failed on runs 209, 211, 212, 213 with one spec: f-perf-budget "kamaehuakanaloa", `props.count` expected 4, got 5. Cause: V-hunga-kama-subject (aa928fa6) added a vent stack and the spec hard-codes the count; `tools/gates.sh` doesn't run that spec, so merges looked green. Fixed by hand (4 to 5) and queued Codex 80 (T-pin-fragility) to derive such counts from site data and guard them in gates.
+
+**Codex starved:** the queue was empty on purpose (rationing during a 5h dip), but Codex is now 5h 99% / week 71%, on pace, with no refill. The Codex lane had only standing S-* items. Queued 80 T-pin-fragility, 81 T-kama-pins (unblocks the Kama retry) and 82 S-bughunt-journal-home.
+
+**Process:** a Claude review should refill the Codex queue whenever the 5h window is healthy and fewer than 3 briefs exist; the earlier "empty on purpose" no-op runs missed the recovery.
+
 ## 2026-10-28 04:45 comprehensive review (joint with Sol round 1; reconcile round failed, Codex 5h limit hit)
 
 **Changed since the earlier review today (golden 051524 to 2026-10-28-091604):** V-bluehole-floor, Journal wildlife-scan focus fix, mission-start camera-arm clearance (4730/4740), dead-code sweeps (4750-4780). Golden run captured all ten sites (Hunga back). CI green; f68 is still the newest tag.

@@ -72,7 +72,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running (2026-10-28 review). Codex: queue 60-62 waits behind the dispatcher gate.
+- No Claude package running (targeted review 2026-10-28). Codex queue: 80 T-pin-fragility, 81 T-kama-pins, 82 S-bughunt-journal-home.
 
 ## Backlog
 
@@ -89,6 +89,8 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 9. **T-journey-acceptance [Codex]:** DONE 2026-10-28 (6608172b) queued 62: stamp journey captures with the build SHA, rerun Titanic and Blue Hole at three sizes, list confusions.
 10. **T-golden-hunga [Haiku, small]:** golden 2026-10-28-091604 captured all ten sites; keep golden.sh per-site timeout so one site cannot lose a run.
 11. **V-endurance-accent [Sonnet, small, demote if tried again]:** TRIED 2026-10-27, no change merged (see plan/progress/V-endurance-accent.md); next route is a per-site emissive tint in `src/world/props/wrecks/materials.ts` via site data.
+11b. **T-pin-fragility [Codex]:** queued 80: CI was red 4 runs because f-perf-budget pinned Kama props at 4 (now 5); derive such counts from site data and guard them in gates.sh.
+11c. **T-kama-pins [Codex]:** queued 81: make Kama line-of-sight/pillow-framing pins capability-based so the V-hunga-kama-subject retry (item 2) isn't blocked.
 12. **S-verify / S-bughunt / S-dead [Codex, standing]:** 4730-4780 merged 2026-10-28; keep rationing.
 13. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
 14. **R-release [Haiku]:** tag the latest green-CI main after each review (f68 is the newest); check the Pages deploy.

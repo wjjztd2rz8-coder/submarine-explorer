@@ -332,3 +332,7 @@ Creating `.cache/review/current` as a directory before `codex-review.sh start` m
 ## 2026-10-28 review: Sol cost
 
 Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h limit before reconcile finished. No change made: comprehensive reviews already run only every ~8 merges. Reviewing: if reconcile fails again, the review entry records it as not fully agreed.
+
+## 2026-10-28 targeted review
+- Red CI x4 came from a pinned prop count in f-perf-budget that gates.sh doesn't exercise. Fix: spec updated; Codex 80 T-pin-fragility derives counts from data and adds a gates-level guard.
+- Codex queue sat empty after its 5h window recovered (runs 211-213 logged "empty on purpose"). Rule: no-op runs must re-check Codex 5h/week and refill to 3 briefs when healthy.
