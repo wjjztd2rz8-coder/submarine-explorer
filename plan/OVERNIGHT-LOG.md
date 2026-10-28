@@ -2365,3 +2365,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-hunga-kama-subject (Sonnet, one send-back): Hunga tuff apron now blends into the slope (modest gain); Kama gained only a small vent stack, so the opening is still the pillow egg. Item marked PARTLY DONE in DIRECTOR with the retry route (bigger cluster, re-pin the mission line-of-sight and framing tests). Gates smoke + project-base passed on main. Codex T-journey-acceptance still running; briefs 70-71 (S-verify debrief, S-bughunt start/save) queued. Claude week ~19% left, resets Oct 29 07:00. No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-28 10:11 CDT headless run 210 (Claude): Codex collect
+
+- Merged T-journey-acceptance, S-verify terrain mottle (clean), S-verify debrief e2e (timings keys pruned, router test) and S-bughunt start (NaN guard in Spawn.ts). Gates smoke + project-base passed on main; pushed. Dispatcher launched 72-74 (verify journey, saves migration bughunt, dead deps). No Claude package (week ~18% left, resets Oct 29 07:00). No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.

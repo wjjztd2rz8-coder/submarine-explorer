@@ -86,7 +86,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 6. **V-bluehole-floor-2 [Sonnet, small]:** floor and wall strata still read as stacked terraces and the foreground bottom corners are jagged (Claude 3.7, Sol 3.0-3.5). Understand the spawn-vs-detail-amplitude dependency first (plan/OVERNIGHT-LOG run 200); target a smooth bowl, not more fluting.
 7. **R-debrief-objectives [Codex]:** DONE 2026-10-28 (4e084c5e) queued 60: debrief says "2 of 4 objectives" after both primaries are done; subtitle in MissionRouter.ts:355 is dead.
 8. **T-e2e-timings [Codex]:** DONE 2026-10-28 (4e084c5e) queued 61: refresh shard weights, report imbalance and queue-to-Pages latency.
-9. **T-journey-acceptance [Codex]:** queued 62: stamp journey captures with the build SHA, rerun Titanic and Blue Hole at three sizes, list confusions.
+9. **T-journey-acceptance [Codex]:** DONE 2026-10-28 (6608172b) queued 62: stamp journey captures with the build SHA, rerun Titanic and Blue Hole at three sizes, list confusions.
 10. **T-golden-hunga [Haiku, small]:** golden 2026-10-28-091604 captured all ten sites; keep golden.sh per-site timeout so one site cannot lose a run.
 11. **V-endurance-accent [Sonnet, small, demote if tried again]:** TRIED 2026-10-27, no change merged (see plan/progress/V-endurance-accent.md); next route is a per-site emissive tint in `src/world/props/wrecks/materials.ts` via site data.
 12. **S-verify / S-bughunt / S-dead [Codex, standing]:** 4730-4780 merged 2026-10-28; keep rationing.
