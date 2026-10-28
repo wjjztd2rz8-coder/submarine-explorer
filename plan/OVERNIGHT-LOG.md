@@ -2375,3 +2375,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to merge: worktrees 72 (verify journey), 73 (saves migration bughunt) and 74 (unused deps) are still running in Codex; main clean and pushed. Claude week ~17% left (resets Oct 29 07:00), remaining Claude items demoted, so no package. Codex queue is empty on purpose: three tasks are running, Codex 5h is 19% left, and briefs stay rationed (DIRECTOR). No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-28 11:24 CDT headless run 212 (Claude): Codex collect
+
+- Merged S-dead-unused-deps (unused audio index and dead CSS, net −27 lines) and kept audit notes 72 (journey verify) and 73 (saves migration): no defects found; browser re-checks were blocked by the Codex sandbox (EPERM on loopback), so hosted CI is the browser check. Gates smoke + project-base passed on main. No Claude package (week ~17% left, resets Oct 29 07:00). Codex queue empty on purpose (5h window low). No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
