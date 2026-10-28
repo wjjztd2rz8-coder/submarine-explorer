@@ -2385,3 +2385,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to merge: no worktrees, no running Codex tasks, main clean. Claude week ~17% left (resets Oct 29 07:00), remaining Claude items demoted, so no package. Codex 5h 19% left (resets 11:45), queue empty on purpose (rationed). No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-28 13:00 CDT headless run 214 (Claude): targeted review
+- CI red x4 was the Kama prop pin in f-perf-budget (4 to 5 after the vent stack); fixed and pushed, local spec passes on a fresh build. Queued Codex 80 T-pin-fragility, 81 T-kama-pins, 82 S-bughunt-journal-home. Note: a stale dist makes local perf specs misleading; rebuild first. No Claude package, no tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
