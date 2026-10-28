@@ -1,5 +1,23 @@
 # Reviews
 
+## 2026-10-28 comprehensive review (Claude alone; Sol skipped, Codex weekly 7%)
+
+**Changed since the evening review (golden 165655 to 2026-10-28-051524):** V-titanic-lift, V-kama-hull-frame, V-hunga-bright, V-bluehole-roof-slab (backdrop wall), V-challenger-horizon, V-golden-set, d-modes spec fix, prettier fix. CI green on 73b5a5a3 and Pages deployed; **f68 tagged**.
+
+**Scores, readable / beautiful (my read, coarse; 9 of 10 sites captured, Hunga lost to a tool timeout):** Titanic 4 / 3.9 (bow lit, rust hull and horizon now read; aft half still dark); Lost City 4 / 3.8 (two towers clear, upper frame empty); Blue Hole 3.8 / 3.8 (stalactites and gallery read, floor lumpy, terraces softer); Beebe 4 / 3.8; Monterey 4 / 3.9 (strata and corals read, sand a flat slab); Challenger 3.5 / 3.5; Endurance 3.6. Kama and Axial captured, not re-scored in detail.
+
+**Biggest gaps:** (1) still no hero at 4, the best are Titanic and Monterey at ~3.9; (2) Hunga missing from this golden run; (3) real-phone retest pending.
+
+**Play check:** not re-captured this run; the 2026-10-27 audit (Codex 4680) stands.
+
+**Process:** Codex weekly 7% (burn ~30%/day) until the Nov 2 reset, so Sol skipped and queue 50-52 and worktrees 4730-4750 wait. Claude week 25%, ~20%/day, so only small packages. Golden run exceeded the tool timeout (new T-golden-hunga). 24 h: Claude idle 6-12 h by the metric but gated by weekly pacing, not a scheduling fault.
+
+**New priorities:** V-titanic-aft, V-bluehole-floor, V-lostcity-ground, V-monterey-flatten, T-golden-hunga, V-endurance-accent; Codex queue 50-52 unchanged.
+
+**Stage:** about 90% to 1.0; about 3.5 weeks. Claude's estimate, not agreed with Sol.
+
+**Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
 ## 2026-10-27 evening comprehensive review (Claude alone; Sol skipped, Codex 5h at 6%, script exit 75)
 
 **Changed since the midday review (golden 094529 to 165655):** V-monterey-rills, V-endurance-hull, V-beebe-trunk, V-lostcity-talus, P2-globe-bright, V-kama-opening, V-hunga-opening; Codex 4650/4660/4680/4695 and reports 4630-4720; two stale e2e specs fixed (CI red x3, see the targeted entry below).

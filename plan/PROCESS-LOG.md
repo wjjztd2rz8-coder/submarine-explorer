@@ -324,3 +324,7 @@ Creating `.cache/review/current` as a directory before `codex-review.sh start` m
 ## 2026-10-27 review
 
 - Sol review skipped (Codex 5h 5%). No tooling change; tools/gates.sh runtime under Codex load (>10 min) noted, run via systemd-run. Reason: nothing wasted found by efficiency.sh beyond budget-gate skips.
+
+## 2026-10-28
+
+- golden.sh (10 sites) exceeds a 550 s tool timeout and dies mid-set, losing Hunga. Queued as T-golden-hunga (per-site timeout, continue on failure). Sol review skipped: Codex weekly 7% until Nov 2.
