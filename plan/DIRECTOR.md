@@ -84,8 +84,8 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 4. **V-monterey-flatten [Sonnet, small]:** Monterey is the closest hero to 4 (~3.9); the lower-right sand is a flat pale slab. Target: sand tint and ripple falloff so it matches the wall; then re-shoot.
 5. **T-golden-hunga [Haiku]:** the 2026-10-28 golden run lost Hunga (`page.waitForFunction: browser closed` while loading props, a 550 s tool timeout; Axial and Kama captured). Make golden.sh run per-site with its own timeout and continue on failure, and fix the foreign-preview port check.
 6. **V-endurance-accent [Sonnet, small]:** TRIED 2026-10-27, no change merged: per-site lamps never reach the hull (20 m+ from the sub). Next route: a per-site emissive tint in `src/world/props/wrecks/materials.ts` via site data (see plan/progress/V-endurance-accent.md); consider demoting. (~3.4) hull and rubble now read; add one warm lit accent (lamp pool or lit hull section) so the frame has a focal point.
-7. **R-ci-green [Codex]:** CI green on 73b5a5a3, f68 tagged 2026-10-27; keep specs matched to behaviour changes.
-8. **S-verify / S-bughunt / S-dead [Codex, standing]:** 4730-4750 running; queue 51 (Kama/Hunga verification, incl. hull-in-frame numbers for V-kama-hull-frame) and 52 (Journal after a second site) queued. Merged 4600-4720.
+7. **R-ci-green [Codex]:** DONE 2026-10-28 (8af3ce20): post-4695 main CI green across four runs; keep specs matched to behaviour changes.
+8. **S-verify / S-bughunt / S-dead [Codex, standing]:** 4730-4750 relaunched 2026-10-28 02:25 (cut off by the Codex limit on Oct 27). Merged 4600-4720, S-verify-kama-hunga (keep the 60/-20 arm) and the Journal wildlife-scan focus fix (7576e51b).
 9. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build (Aa button, Journal photo, High Lost City plume, Blue Hole, Lost City, Axial, Beebe).
 10. **R-release [Haiku]:** tag the latest green-CI main after each review (f68 is the newest); check the Pages deploy.
 
