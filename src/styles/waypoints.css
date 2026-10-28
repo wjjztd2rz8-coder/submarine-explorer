@@ -1,4 +1,4 @@
-/* In-world waypoints and sonar markers.
+/* In-world waypoints.
    Split out of src/styles.css; the @import order there is the cascade order. */
 
 .scan-reticle.is-scanned .scan-reticle-corner {
@@ -79,19 +79,6 @@
 .d-scan-waypoints[data-hints='false'] .d-scan-world-marker.is-current {
   display: none;
 }
-.d-scan-sonar-marker {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  color: #2ed9d9;
-  font: bold 19px/1 monospace;
-  text-shadow: 0 0 3px #061018;
-  pointer-events: none;
-}
-.d-scan-sonar-marker.is-scanned {
-  color: #cde0e5;
-  opacity: 0.75;
-}
-body:has(.sonar[style*='display: none']) .d-scan-sonar-marker,
 body[data-app-state='home'] .d-scan-waypoints,
 body[data-app-state='pause'] .d-scan-waypoints {
   display: none;
@@ -108,15 +95,9 @@ body[data-app-state='pause'] .d-scan-waypoints {
   animation: none !important;
   transition: none !important;
 }
-body:has(.sonar) .d-scan-sonar-marker.is-current {
-  outline: 1px solid currentColor;
-  border-radius: 50%;
-}
-.d-scan-waypoints[data-palette='deuteranopia'],
-.sonar[data-scan-palette='deuteranopia'] .d-scan-sonar-marker {
+.d-scan-waypoints[data-palette='deuteranopia'] {
   color: #ffe36e;
 }
-.d-scan-waypoints[data-palette='highContrast'],
-.sonar[data-scan-palette='highContrast'] .d-scan-sonar-marker {
+.d-scan-waypoints[data-palette='highContrast'] {
   color: #fff;
 }

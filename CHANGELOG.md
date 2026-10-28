@@ -31,6 +31,8 @@ without an entry here is not done.
 
 ### Removed
 
+- **S-dead:** delete the unimported audio barrel and obsolete sonar-marker/home-caveat CSS; direct audio imports, waypoint palettes and the home caption remain live.
+
 - Debrief removes the unused normal-dive subtitle and its duplicate tally/time formatter. Its existing objective metric now counts and labels primary objectives; optional targets no longer make a completed mission read as unfinished.
 
 - **S-dead:** remove the unused `AssetKind` type and `DECODER_PATHS` compatibility constant/export; neither has a named consumer in source, tests, tools or data. Asset loading and decoder assets are unchanged.

@@ -72,11 +72,8 @@
   font-size: 12px;
   line-height: 1.4;
 }
-.home-scene-caption,
-.home-scene-caveat {
-  display: block;
-}
 .home-scene-caption {
+  display: block;
   color: var(--home-text);
   font-weight: 600;
 }
