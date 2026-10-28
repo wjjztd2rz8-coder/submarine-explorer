@@ -23,6 +23,30 @@ const MARGIN = DEFAULT_CONFIG.submarine.freeDiveHullMarginM;
 const S = spawnSettings(DEFAULT_CONFIG);
 const R = S.hullRadius;
 
+it.each(
+  (['x', 'y', 'z'] as const).flatMap((axis) =>
+    [NaN, Infinity, -Infinity].map((value) => ({ axis, value })),
+  ),
+)('mission spawn rejects a nonfinite first primary ($axis=$value)', ({ axis, value }) => {
+  const target = new Vector3(0, -480, 0);
+  target[axis] = value;
+  const meta = {
+    center: { lat: 0, lon: 0 },
+    bbox: { north: 0.01, south: -0.01, west: -0.01, east: 0.01 },
+  } as import('../../src/util/types.js').TileMeta;
+  expect(
+    composedMissionSpawn(
+      'titanic',
+      [{ position: target }],
+      meta,
+      { sampleHeight: () => -500 },
+      { placed: [], collide: () => false },
+      S,
+      -1000,
+    ),
+  ).toBeNull();
+});
+
 describe('mission camera clearance', () => {
   const sites = allSiteManifests().filter(({ opening }) => {
     const arm = opening?.mission;
