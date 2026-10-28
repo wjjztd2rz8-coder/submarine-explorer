@@ -261,18 +261,6 @@ export function loft(
   return g;
 }
 
-/** Smooth rounded end: 0 at the tip (t = 0) rising to 1 at t = 1 (quarter ellipse). */
-export function roundEnd(t: number): number {
-  const c = Math.min(1, Math.max(0, t));
-  return Math.sqrt(1 - (1 - c) * (1 - c));
-}
-
-/** Hermite smoothstep. */
-export function smooth(a: number, b: number, x: number): number {
-  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
-  return t * t * (3 - 2 * t);
-}
-
 // ---------------------------------------------------------------- detail
 
 let detail = 1;
@@ -408,25 +396,6 @@ export function sideProfile(
   );
   g.translate(-(thickness - 2 * bevel) / 2, 0, 0);
   return g;
-}
-
-/** Reverse triangle winding (after a mirroring transform). */
-export function flipWinding(g: THREE.BufferGeometry): THREE.BufferGeometry {
-  const gg = g.index ? g.toNonIndexed() : g;
-  for (const name of Object.keys(gg.attributes)) {
-    const a = gg.getAttribute(name) as THREE.BufferAttribute;
-    const n = a.itemSize;
-    const arr = a.array as Float32Array;
-    for (let i = 0; i < a.count; i += 3) {
-      for (let k = 0; k < n; k++) {
-        const t = arr[(i + 1) * n + k]!;
-        arr[(i + 1) * n + k] = arr[(i + 2) * n + k]!;
-        arr[(i + 2) * n + k] = t;
-      }
-    }
-    a.needsUpdate = true;
-  }
-  return gg;
 }
 
 /** A keyframe of a lofted body: z and the section values at that station. */

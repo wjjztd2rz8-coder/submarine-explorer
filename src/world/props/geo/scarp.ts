@@ -1227,19 +1227,6 @@ export function wallColliders(
   return out;
 }
 
-/** z of the profile at height y (first crossing). */
-export function interp(profile: [number, number][], y: number): number {
-  for (let i = 1; i < profile.length; i++) {
-    const [y0, z0] = profile[i - 1]!;
-    const [y1, z1] = profile[i]!;
-    if ((y >= y0 && y <= y1) || (y <= y0 && y >= y1)) {
-      const t = (y - y0) / (y1 - y0 || 1);
-      return z0 + (z1 - z0) * t;
-    }
-  }
-  return profile[profile.length - 1]![1];
-}
-
 export type SpongeKind = 0 | 1 | 2;
 
 /** Size and colour limits for wall sponges (metres, HSL), kept in one place for tests. */
