@@ -43,6 +43,7 @@ uniform vec3 uColC;
 uniform vec3 uStain;
 uniform float uStainAmount;
 uniform float uPatch;
+uniform float uMottle;          // 1 = full colour mottling; lower grades the ground toward its base rock
 uniform float uRipple;
 uniform float uRippleLen;
 uniform float uRippleReach;
@@ -298,9 +299,9 @@ float terrRough = 0.92;
   // --- shading modulations ----------------------------------------------
   alb *= 1.0 + burrowShade + rip * 0.09;
   alb *= 1.0 - 0.38 * max(cav, 0.0) + 0.08 * max(-cav, 0.0);
-  alb *= mix(0.74, 1.26, m1.x) * mix(0.9, 1.1, m2);
-  alb *= mix(vec3(1.04, 1.0, 0.95), vec3(0.96, 1.0, 1.05), m2);
-  float st = smoothstep(0.5, 0.78, terrainNoise(P.xz / 3.3 + 21.0).x * 0.55 + macro * 0.45);
+  alb *= mix(1.0, mix(0.74, 1.26, m1.x) * mix(0.9, 1.1, m2), uMottle);
+  alb *= mix(vec3(1.0), mix(vec3(1.04, 1.0, 0.95), vec3(0.96, 1.0, 1.05), m2), uMottle);
+  float st = smoothstep(0.5, 0.78, terrainNoise(P.xz / mix(11.0, 3.3, uMottle) + 21.0).x * 0.55 + macro * 0.45);
   st *= uStainAmount * (0.55 + 0.9 * rockT + 0.5 * max(cav, 0.0));
   alb = mix(alb, uStain * lum, clamp(st, 0.0, 0.85));
 

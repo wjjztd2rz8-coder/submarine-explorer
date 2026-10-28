@@ -72,6 +72,7 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
     uStain: { value: new THREE.Color(biome.stain) },
     uStainAmount: { value: biome.stainAmount },
     uPatch: { value: biome.patch },
+    uMottle: { value: biome.mottle ?? 1 },
     uRipple: { value: biome.ripple },
     uRippleReach: { value: biome.rippleReach ?? 0 },
     uRippleLen: { value: biome.rippleLenM },

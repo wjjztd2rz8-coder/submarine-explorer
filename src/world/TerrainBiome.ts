@@ -76,6 +76,8 @@ export interface Biome {
   stainAmount: number;
   /** Fraction of the flat bed covered by patch material B, 0..1. */
   patch: number;
+  /** Colour mottling of the ground, 0..1 (default 1): lower is flatter, larger-scale and closer to the base rock. */
+  mottle?: number;
   /** Current ripple strength on flat ground, 0..1, and crest wavelength (m). */
   ripple: number;
   rippleLenM: number;
@@ -282,7 +284,9 @@ export const BIOMES: Record<string, Biome> = {
   },
   'axial-seamount-ashes': {
     ...VOLCANIC,
-    colorB: 0x6a655c,
+    colorB: 0x4a4743,
+    stain: 0x5a4a3c,
+    mottle: 0.3,
     // The caldera wall ends at the tile edge; dissolve it into the water rather than a hard line.
     horizonFadeM: [200, 700],
   },
@@ -319,9 +323,11 @@ export const BIOMES: Record<string, Biome> = {
     a: 'silt',
     b: 'basalt',
     colorA: 0x5e5c59,
-    colorB: 0x4a4948,
+    colorB: 0x575553,
+    stain: 0x5a5048,
+    mottle: 0.3,
     stainAmount: 0.15,
-    patch: 0.3,
+    patch: 0.2,
     rockBias: 0.1,
     // The rim slope ends at the tile edge; dissolve it into the water rather than a hard line.
     horizonFadeM: [250, 900],
@@ -331,11 +337,12 @@ export const BIOMES: Record<string, Biome> = {
     ...VOLCANIC,
     a: 'silt',
     b: 'basalt',
-    stain: 0x6e3a1c,
+    stain: 0x7a5a44,
+    mottle: 0.3,
     colorA: 0x8a6b54,
     colorB: 0x7a6a5c,
     stainAmount: 0.12,
-    patch: 0.3,
+    patch: 0.2,
   },
   // Cold-water coral rubble on carbonate sand.
   'blake-plateau-corals': {
