@@ -33,19 +33,56 @@ export function measuredTimings(reports) {
   );
 }
 
+/** Hosted list logs survive in gh's cache after JSON artifacts expire. */
+export function reportsFromListLogs(logs) {
+  return logs.map((log) => {
+    const plain = log.replace(/\u001b\[[0-9;]*m/g, '');
+    // List output cannot reliably distinguish an interrupted attempt's marker.
+    // Require JSON for these shards rather than treating partial work as completed.
+    if (/^\S+Z\s+\d+ interrupted\b/m.test(plain))
+      throw new Error('Interrupted hosted run: use JSON timings instead');
+    const specs = new Map();
+    for (const line of plain.split('\n')) {
+      const match = line.match(
+        /^\S+Z\s+([✓✘×])\s+\d+\s+\[[^\]]+\] › tests\/e2e\/(.+?):\d+:\d+ › (.+?) (?:\(retry #\d+\) )?\(([\d.]+)(ms|s|m|h)\)\s*$/u,
+      );
+      if (!match) continue;
+      const [, status, file, title, value, unit] = match;
+      if (Number(value) === 0) continue;
+      const key = `${file} › ${title}`;
+      const spec = specs.get(key) ?? { file, title, tests: [{ results: [] }] };
+      // Sum completed attempts just as for JSON. Omit skips/interrupted attempts.
+      spec.tests[0].results.push({
+        status: status === '✓' ? 'passed' : 'failed',
+        duration: Number(value) * { ms: 1, s: 1000, m: 60_000, h: 3_600_000 }[unit],
+      });
+      specs.set(key, spec);
+    }
+    if (!specs.size) throw new Error('No completed tests in hosted list log');
+    return { suites: [{ title: '', specs: [...specs.values()] }] };
+  });
+}
+
 function main() {
-  const [source, ...paths] = process.argv.slice(2);
+  const args = process.argv.slice(2);
+  const listLogs = args[0] === '--list-logs';
+  if (listLogs) args.shift();
+  const [source, ...paths] = args;
   if (!source || !paths.length)
-    throw new Error('Usage: node tools/e2e-update-timings.mjs <run-url> <report.json>...');
+    throw new Error(
+      'Usage: node tools/e2e-update-timings.mjs [--list-logs] <run-url> <report-or-log>...',
+    );
   const url = new URL('./e2e-timings.json', import.meta.url);
   const previous = JSON.parse(readFileSync(url, 'utf8'));
-  const measured = measuredTimings(paths.map((path) => JSON.parse(readFileSync(path, 'utf8'))));
+  const contents = paths.map((path) => readFileSync(path, 'utf8'));
+  const measured = measuredTimings(
+    listLogs ? reportsFromListLogs(contents) : contents.map((content) => JSON.parse(content)),
+  );
   if (!Object.keys(measured).length) throw new Error('No completed timing samples');
   const updated = {
     ...previous,
     sources: [...new Set([...previous.sources, source])],
-    method:
-      'Latest hosted JSON durations in seconds, summed across completed attempts including retries. Multiple supplied reports of the same case are averaged. Timed-out attempts are conservative observed costs, not successful timings. Skipped, unexecuted and interrupted cases retain prior estimates/fallbacks. No local durations are used.',
+    method: `Latest hosted ${listLogs ? 'list-reporter durations (rounded by Playwright)' : 'JSON durations'} in seconds, summed across completed attempts including retries. Multiple supplied reports of the same case are averaged. Failed/timed-out attempts are observed costs, not successful timings. Skipped, unexecuted and interrupted cases retain prior estimates/fallbacks. No local durations are used.`,
     tests: Object.fromEntries(
       Object.entries({ ...previous.tests, ...measured }).sort(([a], [b]) =>
         a.localeCompare(b, 'en'),
