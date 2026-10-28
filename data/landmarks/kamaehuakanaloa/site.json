@@ -30,9 +30,9 @@
     },
     "reframe": {
       "hero": "hiolo-north-chimney-1",
-      "range": 30,
-      "altitude": 10,
-      "yawOffset": -22,
+      "range": 26,
+      "altitude": 9,
+      "yawOffset": -16,
       "chaseOffsetX": 0,
       "chaseOffsetY": -10
     }
