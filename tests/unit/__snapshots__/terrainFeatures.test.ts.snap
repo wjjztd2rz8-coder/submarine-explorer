@@ -7,8 +7,8 @@ exports[`terrain carve equivalence > great-blue-hole, shifted tile centre false:
     "z": -44.80193984705082,
   },
   "heightSamples": 105444,
-  "heights": "5eb190f5b8cb5d3303b69bffc8318686ffc0d0d8240fe549dc3fcfc5331fb2fa",
-  "tint": "99a5f796f4d0890ba3202ddb0c7d09d712575118e1dac5fc9e40380c1e9e9e3f",
+  "heights": "cb8c3102bfe23821fc0ccd1ee9a7d9c16d86e607043011a27b6031568934ecd3",
+  "tint": "04ca6a93cbdd5133724399dff3b1b78a7eed584c0d6eb098f6b230c2697549d2",
 }
 `;
 
@@ -19,8 +19,8 @@ exports[`terrain carve equivalence > great-blue-hole, shifted tile centre true: 
     "z": 66.51806015308523,
   },
   "heightSamples": 105444,
-  "heights": "fb12201857ce69d062af2ba9f4c2d64c173684d1d5c0a2daa51bf50ca3714d49",
-  "tint": "edae0247d2663db04b6c65360fbda14ccb1782fc9c3bece218fbf40fc760a461",
+  "heights": "298fbc8e443c640ec0fad506eae7497b1d2980df03977b456fa0a74a0ffa34cc",
+  "tint": "a58c3032ae690aac143f3080973f755d068d34d2405b3f8e3f013ecc89071bc9",
 }
 `;
 

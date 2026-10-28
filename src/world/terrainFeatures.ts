@@ -182,7 +182,7 @@ export function blueHoleApron(a: number, r: number): number {
     drop += height * smoothstep(clamp01((edge + wander - rr) / 2.2));
   });
   drop -=
-    1.3 * Math.max(0, Math.sin(0.5 * r + 6 * a)) * Math.max(0, Math.sin(19 * a + r * 0.16 + 1));
+    1.3 * Math.max(0, Math.sin(0.25 * r + 3 * a)) * Math.max(0, Math.sin(7 * a + r * 0.08 + 1));
   const ends = smoothstep(clamp01((r - 112) / 8)) * (1 - smoothstep(clamp01((r - 160) / 8)));
   return -drop * window * ends;
 }
@@ -250,14 +250,12 @@ export function blueHoleWallRelief(a: number, r: number): number {
     smoothstep(Math.max(0, Math.min(1, (r - 96) / 12))) *
     (1 - smoothstep(Math.max(0, Math.min(1, (r - 177) / 13))));
   const mouth = galleryMouth(a);
-  const flute = (0.5 + 0.5 * Math.sin(43 * a + 0.2 * Math.sin(r * 0.12))) ** 3;
+  // Broad flutes: finer ones aliased into sawtooth ridges at gallery range.
+  const flute = (0.5 + 0.5 * Math.sin(19 * a + 0.2 * Math.sin(r * 0.12))) ** 2;
   const bench = Math.exp(-(((r - 139 - 2 * Math.sin(9 * a)) / 3.5) ** 2));
   const lower = Math.exp(-(((r - 115 - 1.5 * Math.sin(7 * a)) / 2.8) ** 2));
   const broken = 0.6 + 0.4 * Math.sin(17 * a + r * 0.08) ** 2;
-  // Fine rubble hummocks at the foot of each broken bench, without a second
-  // surface or rock AABBs closing the navigable shaft.
-  const rubble = Math.max(0, Math.sin(61 * a + r * 0.9)) ** 4 * (bench + lower);
-  return ends * mouth * (1.4 * flute + 1.1 * (bench + lower) * broken + 0.7 * rubble);
+  return ends * mouth * (1.4 * flute + 1.1 * (bench + lower) * broken);
 }
 
 /** Centre of the carve, recorded when the carve is built; the vertex tint reads it. */
