@@ -141,7 +141,7 @@ export function clearance(a: Solid, b: Solid): number {
 }
 
 /** Capture pre-merge parts without changing production geometry or its placement. */
-export function vehicleSolids(id: string, tier: string) {
+function vehicleSolids(id: string, tier: string) {
   const captured = new Map<PartBuilder, Solid[]>();
   const add = PartBuilder.prototype.add;
   const thruster = parts.thruster;
