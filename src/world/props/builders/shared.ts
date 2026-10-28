@@ -9,7 +9,7 @@ import { lerp } from '../../../util/math.js';
 export { hashString, mulberry32 } from '../../../util/rng.js';
 
 import * as THREE from 'three';
-import type { ProceduralPropKind, PropsConfig } from '../../../core/Config.js';
+import type { PropsConfig } from '../../../core/Config.js';
 import type { PropDef } from '../../PropLoader.js';
 
 export interface BuiltProp {
@@ -128,6 +128,3 @@ export interface ProceduralBuildInput {
 
 /** One `procedural:<kind>` builder. Must be deterministic from `seed`. */
 export type ProceduralBuilder = (input: ProceduralBuildInput) => BuiltProp;
-
-/** A family's builders by kind (see `builders/index.ts`). */
-export type ProceduralBuilderMap = Partial<Record<ProceduralPropKind, ProceduralBuilder>>;
