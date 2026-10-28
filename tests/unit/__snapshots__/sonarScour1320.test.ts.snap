@@ -308,10 +308,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=default at DPR 1 zoom 250 1`] = `
 {
-  "contours": "470177c3cd5d27d381aa5fe7c402790a58c8dabbb34da7b0963a662fba1dc555",
+  "contours": "092edf941ca2118c231c4848455aca2fcbb33ad27933d7417ab2129bebbcde80",
   "height": 268,
-  "labels": "1a7a14c5331a13001823a1cb62874eeae05e958d07b0ff5f6ca7d4126a83438e",
-  "pixels": "ccae452eebed765d7914ac42f3606a0f4419c2178bf3fde4ab68303edd9b4cc1",
+  "labels": "5060416aff1fdfcd567e0368b39b5b3b9b357a53b6c1901ad7d233b156f6158d",
+  "pixels": "0433efd91ffe6d8b0bcd354e23bbc3ea3de9a978cf4a062c016a1cb365fc520f",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -325,10 +325,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=default at DPR 1 zoom 1000 1`] = `
 {
-  "contours": "e8de244b66127914bcba3ea993a7b63a9ecff7bbebc9cc54089e937bae94c7a8",
+  "contours": "acab3791c0503646f640f20df39a54bc939b834da71b5a40c531e6bbe01b4c04",
   "height": 268,
-  "labels": "fbd9127451aac1dde8963438e8c58b3205c4b199480f23b7ab5dd3f42598a203",
-  "pixels": "595851f9e80fcc70e2e3e254b4835f1e9a4031315c59f9b3e0eac4b4a5c45cac",
+  "labels": "92888a42acc7927a15ddf90fecb391d12da096c557952810980d5821f0b5a079",
+  "pixels": "ce5d9110561584afa1b3d7a4f6c488cb91052cc5ce9333116a0be65dd152c8ef",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -345,7 +345,7 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
   "contours": "86af013db87696e308fddd628d902880520e9a358e5e072cd221b15a22850ed3",
   "height": 220,
   "labels": "db69ec1b338f8beb6dd91d85a202afdfb5610d31adc3d922984153589c312056",
-  "pixels": "78031cda16f1fc8133f0b910f4f7c602dbb311535ef5547b7147185626fecad5",
+  "pixels": "4b6a7ecd89e24080cb07d800d914ad3d85e5552823000408098406f877433579",
   "relief": {
     "contourIntervalM": 200,
     "flatness": 0,
@@ -359,10 +359,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=default at DPR 2 zoom 250 1`] = `
 {
-  "contours": "49447d27a39b0ab7c9b226f87d3dc0eec372a54c821900daf2f13d37b04ec4b5",
+  "contours": "80cb66e8427884b72f903586527392bb763fc27e2850001174f438ea077ec930",
   "height": 536,
-  "labels": "94111f02e6edb01e139bb947a1583c0e2b98f61dd0c83660b2cdfed9dff1207e",
-  "pixels": "e03fa5362fcac84091ccd6ec2a22c82689df652f45d0317ffa14a3f4d0ac221d",
+  "labels": "1cd5da3ed81d6808037a0296541a2e44d217328b4b6bb1210ba8c2ac96396484",
+  "pixels": "c64faf008d31f868c4e1839f154525ca41b57d6059c7c3588985f7c430bb136f",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -376,10 +376,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=default at DPR 2 zoom 1000 1`] = `
 {
-  "contours": "848a228924b1da9515d67589ddcde6578fe5718bb51b2792c0953816e9f39fc5",
+  "contours": "d75d1852dd16e729192736c047bc0601a0457fb53e0ca9ee7c9713efe6d7bc11",
   "height": 536,
-  "labels": "f3855c5102b7d2f48e2ba1863695def63939884e2c97d5fb30c50bdd7b923d28",
-  "pixels": "f3af42ad762cdea5ec96c6b3b43b455c47af2a1b4d816cc29d93346b136fbfaa",
+  "labels": "80342654ac79ef6b2f57f45330974651c42b329e9efa958c82c30e3fbe4280bb",
+  "pixels": "d736c78f54262652ff2fb29e42d039f863f65f81c8d12c84152ff47c44e20703",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -396,7 +396,7 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
   "contours": "a3806dcb2648496578a302a084462cd34652b01d714d3fc893e15cf2030201bc",
   "height": 440,
   "labels": "a894341bd7a2ecbe8fa08a6473b8e30b885a11088b233baca697f2eee1cf4afd",
-  "pixels": "688bcc942cc9ae9ff9ccf08536c78f38d3a82bb547341a562373633c80c1fd16",
+  "pixels": "ce59c85c0c5500a4cd0c9085ebddacc408831ac083edfeccf746ee663745239e",
   "relief": {
     "contourIntervalM": 200,
     "flatness": 0,
@@ -410,10 +410,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=highContrast at DPR 1 zoom 250 1`] = `
 {
-  "contours": "853341e23ac1c7efd0d9f5d335d8039896813ba0f38607426504f1bc6f3ef870",
+  "contours": "b30e052812313e0b08a7f5b3fa116f9cda60bfb9588e238dcc2610bcf43497d8",
   "height": 268,
-  "labels": "1a7a14c5331a13001823a1cb62874eeae05e958d07b0ff5f6ca7d4126a83438e",
-  "pixels": "f9bc63ded0843824b0dd934b213440b81933af58772ab443883a646722acc45a",
+  "labels": "5060416aff1fdfcd567e0368b39b5b3b9b357a53b6c1901ad7d233b156f6158d",
+  "pixels": "16df3ff78833bbacac6a4d2cec67dbd8a5ecac56a20e939ad5d0e5e51de4d1b3",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -427,10 +427,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=highContrast at DPR 1 zoom 1000 1`] = `
 {
-  "contours": "9273de6685a061f39219f87fef7c9374187b932ca97a299e64bca8c5e23498c0",
+  "contours": "079e8646cf90dafddc7763e479b2ef9b631bee6bb32de89e83e9125eaa1d0e41",
   "height": 268,
-  "labels": "fbd9127451aac1dde8963438e8c58b3205c4b199480f23b7ab5dd3f42598a203",
-  "pixels": "5c2b7ce73df7784dfe3de0636330dcf6b39455c0b5ba9aebd52f30b35ef6e480",
+  "labels": "92888a42acc7927a15ddf90fecb391d12da096c557952810980d5821f0b5a079",
+  "pixels": "95f1f33aef7eaeacf27d7f9d684877c1205a0cf4c4f3fc700fcd80b71f1d15fc",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -447,7 +447,7 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
   "contours": "7f6dcb95cf9bcd27554dcdeeaefee5f9cbcca33e696b0925e0adce5168aacd0c",
   "height": 220,
   "labels": "db69ec1b338f8beb6dd91d85a202afdfb5610d31adc3d922984153589c312056",
-  "pixels": "25d45fbaaa5f00375f5a3cfb9c72d4ee7f7c293790989de47dc425550348eb7f",
+  "pixels": "3b2a753ccc40ee98198c3417257f69673a5068364bd3ac9bf18dbc5f60c6b342",
   "relief": {
     "contourIntervalM": 200,
     "flatness": 0,
@@ -461,10 +461,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=highContrast at DPR 2 zoom 250 1`] = `
 {
-  "contours": "2c308c638da062720a82015b61ea7cfad511fda54c97568bc015d47ebd3199f2",
+  "contours": "f8bd998f44594b8f8e34f6f45021860bdf22e5189443afb260053c84bfe06faf",
   "height": 536,
-  "labels": "94111f02e6edb01e139bb947a1583c0e2b98f61dd0c83660b2cdfed9dff1207e",
-  "pixels": "6103f13a85e6405f643a6897393714775ed0454f9e4ef70dff32d249fe2f33b9",
+  "labels": "1cd5da3ed81d6808037a0296541a2e44d217328b4b6bb1210ba8c2ac96396484",
+  "pixels": "21d3edbabd6d5aaca98eca009a73d9b948106c4d3e8676c2fc71270d997af3e7",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -478,10 +478,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=highContrast at DPR 2 zoom 1000 1`] = `
 {
-  "contours": "2d4716bfe6fe5b622287c3e02bd70391d38beb243a53d571690dd61b67b098c2",
+  "contours": "2706c0cdf7f0aad6f62a3e1e37e6ae782ffed44c4487693f670a77442da7e51b",
   "height": 536,
-  "labels": "f3855c5102b7d2f48e2ba1863695def63939884e2c97d5fb30c50bdd7b923d28",
-  "pixels": "26e46336a40cd8aec357aaea9e1c27d0063c47b376b7f36dccb88834f67c910b",
+  "labels": "80342654ac79ef6b2f57f45330974651c42b329e9efa958c82c30e3fbe4280bb",
+  "pixels": "9628d450c48dab7e9255776bc11d18a3b67e135ad424f5848390773d16f96e66",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -498,7 +498,7 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
   "contours": "b650355efcbe018d2eed8474a850bd334065ece6b947dbf62b6f642b93bdbb4f",
   "height": 440,
   "labels": "a894341bd7a2ecbe8fa08a6473b8e30b885a11088b233baca697f2eee1cf4afd",
-  "pixels": "91ec9e839b2716676e753539b9b6e70fde2cf559bf0d7d3d21e1a8f26551bc9f",
+  "pixels": "6bb152e3bbc2dfa9d3b8d3b86011c703758645619171313a0a5fa3e203fa712e",
   "relief": {
     "contourIntervalM": 200,
     "flatness": 0,
