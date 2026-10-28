@@ -160,6 +160,54 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+it.each(
+  [false, true].flatMap((phone) =>
+    ['empty', 'missing', 'corrupt', 'offline'].map((content) => ({ phone, content })),
+  ),
+)(
+  'finishes loading an unavailable Home catalogue ($content, phone=$phone) and stays closable',
+  async ({ phone, content }) => {
+    journal.close();
+    phoneQuery.matches = phone;
+    journal.setCurrentSite(null);
+    journal.setHomeMode(true);
+    Object.assign(journal, { sites: [] });
+    vi.mocked(journal.load).mockRestore();
+    let finish!: () => void;
+    const pending = new Promise<void>((resolve) => (finish = resolve));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        await pending;
+        if (content === 'offline') throw new Error('offline');
+        return {
+          ok: content !== 'missing',
+          text: async () => (content === 'corrupt' ? '{' : '{"version":1,"landmarks":[]}'),
+        };
+      }),
+    );
+    const opener = new Element('button');
+    (document.body as unknown as Element).append(opener);
+    opener.focus();
+    journal.open();
+    expect(find((el) => el.className === 'jr-empty').textContent).toBe('Loading the Journal…');
+    finish();
+    await journal.load();
+    expect(find((el) => el.className === 'jr-empty').textContent).toBe(
+      'No Journal sites available.',
+    );
+    expect(journal.viewKey).toBe('front');
+    find((el) => el.className === 'jr-close').dispatchEvent(new Event('click'));
+    expect(journal.isOpen).toBe(false);
+    expect(document.activeElement).toBe(opener);
+    journal.open();
+    await journal.load();
+    expect(find((el) => el.className === 'jr-empty').textContent).toBe(
+      'No Journal sites available.',
+    );
+  },
+);
+
 it('retains the Journal preview height cap without forcing an aspect ratio', () => {
   // Numeric style contract only; native CSS sizing and screenshot acceptance belong to browser QA.
   const css = readFileSync('src/styles/photo.css', 'utf8');

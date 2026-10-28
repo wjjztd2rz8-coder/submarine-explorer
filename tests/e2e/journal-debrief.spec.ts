@@ -479,6 +479,42 @@ freshTest.describe('mission progression and Home Journal', () => {
   });
 
   test.describe('Home Journal', () => {
+    for (const viewport of [
+      { width: 1280, height: 800 },
+      { width: 390, height: 844 },
+    ]) {
+      for (const content of ['empty', 'missing', 'corrupt'] as const) {
+        // Regression guard: a settled empty/failed catalogue left Home's Journal loading forever.
+        test(`unavailable Home Journal catalogue: ${content} at ${viewport.width}px`, async ({
+          page,
+        }) => {
+          await page.setViewportSize(viewport);
+          await page.route('**/data/landmarks/index.json', (route) =>
+            route.fulfill({
+              status: content === 'missing' ? 404 : 200,
+              contentType: 'application/json',
+              body: content === 'corrupt' ? '{' : '{"version":1,"landmarks":[]}',
+            }),
+          );
+          await seed(page);
+          await page.goto('/', { waitUntil: 'domcontentloaded' });
+          await homeReady(page);
+          const raw = await page.evaluate((k) => localStorage.getItem(k), STORAGE_KEY);
+          const opener = page.getByRole('button', { name: 'Journal', exact: true });
+          const journal = page.getByRole('dialog', { name: 'Journal', exact: true });
+          for (let round = 0; round < 2; round++) {
+            await opener.click();
+            await expect(journal.locator('.jr-empty')).toHaveText('No Journal sites available.');
+            await expect(journal.locator('.jr-site-card')).toHaveCount(0);
+            await page.keyboard.press('Escape');
+            await expect(journal).toBeHidden();
+            await expect(opener).toBeFocused();
+          }
+          expect(await page.evaluate((k) => localStorage.getItem(k), STORAGE_KEY)).toBe(raw);
+        });
+      }
+    }
+
     // Regression guard: primary completion ended the dive early or debrief/Journal navigation lost progress and focus.
     test('home front page, site entries, spoilers, reload', async ({ page }) => {
       const errors = collectErrors(page);
