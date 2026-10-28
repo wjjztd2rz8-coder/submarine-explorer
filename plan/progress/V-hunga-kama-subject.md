@@ -1,19 +1,18 @@
 # V-hunga-kama-subject
 
 ## What changed (data first, one shared preset tweak)
-- Hunga (`data/landmarks/hunga-tonga-caldera/props.json`): tuff wall dims [90,30,45] -> [150,60,28] (wider, lower).
-- Tuff preset in `src/world/props/geo/scarp.ts`: apron reach 0.6 -> 0.9, rubble glow raised, drape tone lightened toward the tan seabed so the apron fades into the slope instead of ending in a dark hard skirt. Only the tuff preset (Hunga) uses it.
-- Kama (`data/landmarks/kamaehuakanaloa`): both Hiolo chimneys use the existing `smoker-cluster` feature (north 18x16x6 m, tallest stack ~9 m; south 14x12x3.3 m); pillow field shrunk 36x30x5 -> 18x15x2.5 and moved ~50 m east-southeast of the vent so it leaves the opening frame; opening reframe heroes the vent (no aimHero), yaw -16, range 26, altitude 9.
-- Cut: none of the content; hiolo-north-chimney-2 kept as is.
+- Tuff preset in `src/world/props/geo/scarp.ts` (Hunga only): apron reach 0.6 -> 0.9, rubble glow raised, drape tone lightened toward the tan seabed so the apron fades into the slope instead of ending in a dark hard skirt. Wall dims unchanged: widening it ([150,60,28]) looked better but moved the hero centre beyond the 120 m scan-distance pins in phonePitch/eventsTerrain, so it was reverted.
+- Kama (`data/landmarks/kamaehuakanaloa/props.json`): new `hiolo-north-vent-stack` prop reusing the existing `smoker-cluster` feature (10x8x3.6 m, stacks ~5 m, smoke and fauna) beside the chimneys; pillow field shrunk 36x30x5 -> 20x16x3. Opening framing, chimney-1 and chimney-2 untouched. A taller 18x16x6 cluster and a re-aimed opening both looked better but broke the mission line-of-sight and pillow-framing pins, so they were dropped.
+- Test baselines refreshed for the tuff change: scarpTerrain hashes, terrainMerge1140, freeDiveComposition snapshots.
 
 ## Before / after
 - Before: /home/vijay/submarine-explorer/.cache/golden/2026-10-28-091604/{hunga-tonga-caldera,kamaehuakanaloa}-1.png
-- After: .cache/golden/2026-10-28-130044/hunga-tonga-caldera-1.png, .cache/golden/2026-10-28-131853/kamaehuakanaloa-1.png in 2026-10-28-131853 (worktree)
+- After (worktree): .cache/golden/2026-10-28-134236/{hunga-tonga-caldera,kamaehuakanaloa}-1.png. Intermediate Kama experiments: 2026-10-28-131853 (taller stack, re-aimed; best look, test-breaking).
 
 ## Honest rating
-- Hunga: modestly better (~+0.3). Apron now blends into the slope; still reads as a dark mound, not a clear caldera wall.
-- Kama (second pass): better. The pillow egg is now small at the frame edge; a taller vent cluster with dark smoke and fauna sits beside the sub. Still modest: the stack is next to the sub rather than 12-18 m ahead (camera/spawn pose did not respond to range tuning as expected), no warm light pool added. Not a hero shot.
-- Cut/bend: north stack ~9 m exceeds the earlier 5 m honesty cap on Hiolo chimneys (logged in CHANGELOG).
+- Hunga: modest gain. Apron is lighter and blends into the slope; the dark hard skirt is gone, but the wall still reads as a wedge on the opening frame.
+- Kama: not fixed at the opening. The vent stack is small and tucked beside the sub and the pillow heap is still a visible lump. The coordinator target (chimney hero 12-18 m ahead, warm light, centre-right) needs the opening/mission framing tests re-pinned; that is a follow-up.
+- Cut/bend: none.
 
 ## Simplicity check
 No siteId branches, no layout patches, no new specs, reuses existing props; net code change is three constants.

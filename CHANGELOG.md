@@ -14,7 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
-- Hunga rim wall is wider and lower with a lighter, longer apron that blends into the slope; Hiolo North vent is now an existing smoker-cluster (stack ~9 m, above the earlier 5 m cap, so it reads from the opening frame) and the pillow heap beside it is smaller and moved away from the opening view.
+- Hunga rim apron is longer and lighter so it blends into the slope; Hiolo North gains a small smoker-cluster vent stack and its pillow heap is smaller (opening framing unchanged).
 
 - Challenger Deep seabed keeps broad silt tone swaths in the mid-ground and a faint pale crest where the far rise meets the dark water, so the horizon grades softly instead of fading to flat olive (baked vertex tint only; no new draw calls).
 
