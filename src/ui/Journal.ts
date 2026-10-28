@@ -140,6 +140,7 @@ export class Journal {
   private sites: JournalSite[] = [];
   private tileSources = new Map<string, string>();
   private loading: Promise<void> | null = null;
+  private loaded = false;
   private currentSiteId: string | null = null;
   private homeMode = false;
   private spoilers_ = false;
@@ -325,6 +326,7 @@ export class Journal {
     ]).then(([sites, sources]) => {
       this.sites = sites;
       this.tileSources = sources;
+      this.loaded = true;
       this.refresh();
     });
     return this.loading;
@@ -519,7 +521,9 @@ export class Journal {
     }
     // --- D-PHOTO end ---
     if (!this.sites.length) {
-      this.body.append(el('p', 'jr-empty', 'Loading the Journal…'));
+      this.body.append(
+        el('p', 'jr-empty', this.loaded ? 'No Journal sites available.' : 'Loading the Journal…'),
+      );
       return;
     }
     if (entry && site) this.renderEntry(site, entry);
