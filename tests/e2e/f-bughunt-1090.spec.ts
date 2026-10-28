@@ -48,7 +48,6 @@ for (const layout of [
           !!process.env.CI,
           'reason: software-GL hosted runners cannot sustain the frame counts; covered by local full e2e',
         );
-        test.skip(!!process.env.CI, 'frame-rate dependent; software GL on hosted runners');
         test.setTimeout(180_000);
         const errors: string[] = [];
         page.on('pageerror', (e) => errors.push(e.message));

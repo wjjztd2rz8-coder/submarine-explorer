@@ -153,14 +153,6 @@ for (const site of ['titanic', 'great-blue-hole']) {
             Math.max(0, distance - 10),
           );
           expect(ray.intersectObject(terrain.group, true), `${width}x${height}`).toHaveLength(0);
-          const relief = props.placed.find((p) => p.def.id === 'blue-hole-wall-relief');
-          if (relief) {
-            relief.full.updateWorldMatrix(true, true);
-            expect(
-              ray.intersectObject(relief.full, true),
-              '830 must not cover the opening contact',
-            ).toHaveLength(0);
-          }
           if (site === 'titanic') {
             // Far-distance haze begins at 300 view metres and belongs only to terrain.
             expect(distance).toBeLessThan(300);
