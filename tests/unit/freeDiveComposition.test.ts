@@ -9,6 +9,8 @@ import { CameraRig } from '../../src/sub/CameraRig.js';
 import { Props } from '../../src/world/Props.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import type { TileMeta } from '../../src/util/types.js';
+import { siteManifest } from '../../src/core/SiteManifest.js';
+import { solidMeshes, subjectVisibility } from './helpers/subjectVisibility.js';
 
 const heroes: Record<string, string> = {
   titanic: 'bow-hull',
@@ -18,7 +20,7 @@ const heroes: Record<string, string> = {
   endurance: 'main-hull',
   'axial-seamount-ashes': 'mushroom-chimney',
   'hudson-canyon': 'coral-ledge-mound',
-  kamaehuakanaloa: 'hiolo-north-chimney-1',
+  kamaehuakanaloa: siteManifest('kamaehuakanaloa')!.opening!.freeDive!.hero,
   'beebe-vent-field': 'beebe-chimney-1',
   'great-blue-hole': 'karst-grotto',
   bismarck: 'main-hull',
@@ -79,7 +81,46 @@ describe('free-dive openings on actual survey terrain and procedural hero geomet
               0.001,
             );
           }
-          expect({ base, framed }).toMatchSnapshot(mode);
+          if (site === 'kamaehuakanaloa') {
+            // Re-aiming the subject is authored art. Guard the resulting frame
+            // and clearances rather than snapshotting its world coordinates.
+            const authored = siteManifest(site)!.opening!;
+            for (const [pose, subjectId] of [
+              [base!, authored.freeDive!.hero],
+              [framed!, authored.reframe?.aimHero ?? authored.freeDive!.hero],
+            ] as const) {
+              const position = new Vector3(pose.x, pose.y, pose.z);
+              const rig = new CameraRig(config.camera, 16 / 9, terrain);
+              rig.setChaseRadiusDefault(
+                pose.chaseRadius,
+                pose.chaseOffsetX,
+                pose.chaseOffsetY,
+                pose.portraitChaseOffset,
+              );
+              rig.snap(position, pose.yaw, 0);
+              terrain.update(rig.camera);
+              props.update(rig.camera);
+              const subject = props.placed.find((p) => p.def.id === subjectId)!;
+              expect(subject).toBeDefined();
+              const body = solidMeshes(subject.root)[0];
+              expect(body).toBeDefined();
+              expect(
+                subjectVisibility(
+                  body,
+                  [...solidMeshes(terrain.group), ...solidMeshes(props.group)],
+                  rig.camera,
+                ),
+              ).toEqual([true, true]);
+              expect(
+                props.collide(position.clone(), config.submarine.hullRadius, new Vector3()),
+              ).toBe(false);
+              expect(props.collide(rig.camera.position.clone(), 1, new Vector3())).toBe(false);
+              expect(
+                rig.camera.position.y -
+                  terrain.sampleHeight(rig.camera.position.x, rig.camera.position.z),
+              ).toBeGreaterThanOrEqual(config.camera.terrainClearance - 1e-6);
+            }
+          } else expect({ base, framed }).toMatchSnapshot(mode);
         }
         const pos = new Vector3(spawn!.x, spawn!.y, spawn!.z);
         if (site === 'great-blue-hole')
