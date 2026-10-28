@@ -4,14 +4,14 @@
 
 ## 1.0 table
 
-| Requirement                               | State                                                                                                                 |
-| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Five heroes beautiful (4 of 5)            | None at 4: Titanic 3.9, Lost City 3.8, Blue Hole 3.5-3.7, Beebe 3.9, Monterey 3.9 (Sol reads 0.3-0.7 lower)           |
-| Other eight sites coherent                | Hunga 3.4 and Kama 3.4 (subject does not read), Axial 3.5 (blotchy ground), Challenger 3.6, Endurance 3.6             |
+| Requirement                               | State                                                                                                                  |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Five heroes beautiful (4 of 5)            | None at 4: Titanic 3.9, Lost City 3.8, Blue Hole 3.5-3.7, Beebe 3.9, Monterey 3.9 (Sol reads 0.3-0.7 lower)            |
+| Other eight sites coherent                | Hunga 3.4 and Kama 3.4 (subject does not read), Axial 3.5 (blotchy ground), Challenger 3.6, Endurance 3.6              |
 | New player understands first five minutes | Flow works; debrief shows "2 of 4 objectives" after both primaries; journey captures lack a build stamp (Codex 60, 62) |
-| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great; weaker phones untested                                                                       |
-| Hosted CI green, releases tagged          | f68 tagged; CI green; e2e shard weights stale (Codex 61)                                                              |
-| Code simple enough                        | Dead-code sweeps 4750-4780 merged; standing S-verify items                                                            |
+| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great; weaker phones untested                                                                        |
+| Hosted CI green, releases tagged          | f68 tagged; CI green; e2e shard weights stale (Codex 61)                                                               |
+| Code simple enough                        | Dead-code sweeps 4750-4780 merged; standing S-verify items                                                             |
 
 ## Done recently
 
