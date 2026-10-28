@@ -120,8 +120,6 @@ export interface FrameState {
   debugLogDue: boolean;
 }
 
-export type FrameHook = (f: FrameState, ctx: GameContext) => void;
-
 export interface GameSystem<Context = GameContext, Frame = FrameState> {
   readonly name: string;
   init?(ctx: Context): void;
