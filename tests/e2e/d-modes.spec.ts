@@ -4,8 +4,11 @@ import { expect, test } from './helpers/unlocked.js';
 import { DEFAULT_SENSOR_PRESETS, DEFAULT_SPEED_PROFILES } from '../../src/core/config/gameplay.js';
 import { EQUIPMENT } from '../../src/core/config/progress.js';
 import titanicPois from '../../data/landmarks/titanic/pois.json' with { type: 'json' };
+import titanicSite from '../../data/landmarks/titanic/site.json' with { type: 'json' };
 
 const shots = '.cache/codex/shots/d-modes';
+// The site's lamp multipliers scale the mode's base light, so expectations follow the data.
+const lamps = titanicSite.atmosphere.lamps;
 const bowRadius = titanicPois.pois.find((poi) => poi.id === 'titanic-bow')!.radius_m;
 
 test('Arcade, Realistic and Custom apply live and survive reload', async ({ page }) => {
@@ -33,7 +36,7 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
   expect(initial).toEqual({
     mode: 'arcade',
     speed: 1,
-    light: 750,
+    light: 750 * lamps.intensity,
     scanRadius: Math.max(
       100,
       bowRadius * DEFAULT_SENSOR_PRESETS.extended.scanRadiusMultiplier * EQUIPMENT.scanDetail,
@@ -68,8 +71,8 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
   expect(realistic).toEqual({
     forwardCap: DEFAULT_SPEED_PROFILES.research.maxSpeed * EQUIPMENT.thrust,
     descentCap: 0.5,
-    light: 500,
-    fill: 12,
+    light: 500 * lamps.intensity,
+    fill: 12 * lamps.fillIntensity,
     scanRadius:
       bowRadius * DEFAULT_SENSOR_PRESETS.realistic.scanRadiusMultiplier * EQUIPMENT.scanDetail,
   });

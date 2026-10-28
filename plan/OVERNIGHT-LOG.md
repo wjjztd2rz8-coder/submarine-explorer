@@ -2282,3 +2282,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged V-bluehole-roof-slab slice, retargeted to the backdrop wall (Sonnet; fine rock lamination and 3.4 m strata replaced by broad wavy beds and staining via a per-biome `smoothRock` flag; wall reads as limestone rather than scanlines, ~3.8 by my read vs agent's 6.5/10; floor a bit lumpy, not tuned). Gates smoke + project-base passed on the branch (first runs hit port clash/tool timeouts). Codex weekly 7%: 4730-4750 worktrees and queue 50-52 wait for the Nov 2 reset. No tag (hosted CI unverified).
 - Follow-up if wanted: soften the lumpy Blue Hole floor.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-27 19:34 CDT headless run 194 (Claude): CI triage only
+
+- Hosted CI red on one spec: d-modes expected headlight 750 but Titanic site data (V-titanic-lift) triples lamp intensity. Spec now scales expectations by the site's lamp multipliers; passes locally on a rebuilt dist (stale dist had hidden it). No new package: Claude week 25% left and the remaining Claude items are demoted. Codex weekly 7%: 4730-4750 worktrees and queue 50-52 wait for the Nov 2 reset. No tag until CI is green.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
