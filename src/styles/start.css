@@ -1,16 +1,6 @@
 /* D-START: mission start position choice.
    Split out of src/styles.css; the @import order there is the cascade order. */
 
-.briefing-start {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px 18px;
-  margin-left: auto;
-}
-.briefing-start .briefing-section-title {
-  margin: 0;
-}
 .briefing-start-option {
   display: inline-flex;
   align-items: baseline;

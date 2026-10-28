@@ -83,19 +83,6 @@ export interface AtmosphereTier {
 }
 
 export interface WaterConfig {
-  // --- superseded by `bands`; kept so nothing that still reads them
-  // --- breaks. Safe to delete once no module references them.
-  /** @deprecated use {@link WaterConfig.bands}. */
-  fogDensityShallow: number;
-  /** @deprecated use {@link WaterConfig.bands}. */
-  fogDensityDeep: number;
-  /** @deprecated use {@link WaterConfig.bands}. */
-  fogDeepAt: number;
-  /** @deprecated use {@link WaterConfig.bands}. */
-  deepColor: number;
-  /** @deprecated use {@link WaterConfig.bands}. */
-  ambientIntensity: number;
-
   surfaceColor: number;
   headlightIntensity: number;
   headlightDistance: number;
@@ -157,16 +144,7 @@ export interface WaterConfig {
 }
 
 export const DEFAULT_WATER: WaterConfig = {
-  fogDensityShallow: 0.0006,
-  // Tuned so the seabed stays legible from the default chase camera: visual
-  // range is roughly 2/density, i.e. ~1.2 km in the deep.
-  fogDensityDeep: 0.0007,
-  fogDeepAt: -3000,
   surfaceColor: 0x2e6f96,
-  // Not black: the fog colour is also the horizon colour, and pure black
-  // makes the terrain silhouette disappear entirely.
-  deepColor: 0x17384a,
-  ambientIntensity: 2.4,
   // A softened distance falloff preserves close material colour while keeping
   // a navigable pool ahead. Gameplay presets override these standalone defaults.
   headlightIntensity: 500,

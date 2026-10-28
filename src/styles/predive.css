@@ -121,8 +121,7 @@
   flex: 1 1 360px;
   gap: 5px;
 }
-.mode-selector.is-briefing .mode-selector-label,
-.briefing-start-label {
+.mode-selector.is-briefing .mode-selector-label {
   color: var(--b3-cyan);
   font-size: 10px;
   font-weight: 400;
@@ -144,77 +143,9 @@
   font-size: 12px;
   opacity: 0.8;
 }
-.briefing-start {
-  flex: 0 1 auto;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 5px;
-  margin-left: 0;
-}
 .briefing-start-option {
   padding: 3px 0;
 }
-.briefing-more {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px 20px;
-  padding: 10px 12px;
-  border: 1px solid var(--b3-hair-dim);
-  border-radius: 2px;
-  font-size: 13px;
-}
-@media (max-width: 760px) {
-  .briefing-more {
-    grid-template-columns: 1fr;
-  }
-}
-.briefing-more[hidden] {
-  display: none;
-}
-.briefing-more-field {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-}
-.briefing-more-field.is-select {
-  gap: 10px;
-}
-.briefing-more-field input {
-  accent-color: #57d3dd;
-  margin: 0;
-}
-.briefing-more-field select,
-.briefing-more-toggle {
-  font: inherit;
-  color: var(--b3-text);
-  background: rgba(10, 30, 36, 0.9);
-  border: 1px solid var(--b3-hair);
-  border-radius: 2px;
-  padding: 3px 8px;
-  cursor: pointer;
-}
-.briefing-more-toggle {
-  padding: 7px 12px;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-}
-.briefing-more-toggle::after {
-  content: ' ▾';
-}
-.briefing-more-toggle[aria-expanded='true']::after {
-  content: ' ▴';
-}
-.briefing-more-toggle[hidden] {
-  display: none;
-}
-.briefing-more-toggle:hover,
-.briefing-more-field select:hover {
-  border-color: var(--b3-cyan);
-}
-.briefing-more-toggle:focus-visible,
-.briefing-more-field select:focus-visible,
-.briefing-more-field input:focus-visible,
 .briefing-start-option input:focus-visible {
   outline: 2px solid var(--b3-cyan);
   outline-offset: 2px;
@@ -328,20 +259,6 @@
   padding: 6px;
   font-size: 12px;
   color: var(--b3-text);
-}
-.briefing .briefing-start {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-}
-.briefing .briefing-start-segments {
-  display: flex;
-  border: 1px solid var(--b3-hair);
-  border-radius: 3px;
-  overflow: hidden;
 }
 .briefing .briefing-start-option {
   position: relative;

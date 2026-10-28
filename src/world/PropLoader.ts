@@ -13,7 +13,7 @@
  */
 
 import type * as THREE from 'three';
-import { DECODER_PATHS, assets } from '../core/assets/index.js';
+import { assets } from '../core/assets/index.js';
 import { publicUrl } from '../util/publicUrl.js';
 import type {
   ChimneyMaterial,
@@ -38,7 +38,6 @@ export const HULL_ENDS: readonly HullEnd[] = ['prow', 'cut', 'rounded'];
 export const CHIMNEY_MATERIALS: readonly ChimneyMaterial[] = ['basalt', 'carbonate', 'sulfide'];
 /** GLB/glTF models must live here (served from `public/assets/models`). */
 export const MODEL_URL_PREFIX = '/assets/models/';
-export const DRACO_DECODER_PATH = DECODER_PATHS.draco;
 
 /** A validated, defaults-filled props.json entry. */
 export interface PropDef {

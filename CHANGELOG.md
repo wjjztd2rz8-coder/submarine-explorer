@@ -29,6 +29,11 @@ without an entry here is not done.
 
 ### Removed
 
+- **S-dead config/export sweep:** remove the unused `WaterConfig` fields `fogDensityShallow`, `fogDensityDeep`, `fogDeepAt`, `deepColor` and top-level `ambientIntensity`; the atmosphere reads depth bands instead.
+- **S-dead config/export sweep:** remove the unconsumed `DRACO_DECODER_PATH` alias and its import from `PropLoader`; decoder setup already belongs to the asset service.
+- **S-dead config/export sweep:** delete the uncalled vehicle-kit `roundEnd`, `flipWinding`, `smooth` and scarp `interp` functions; no source, test or tool imports or calls them.
+- **S-dead config/export sweep:** delete the unproduced `.briefing-more`, `.briefing-more-field`, `.briefing-more-toggle`, `.briefing-start`, `.briefing-start-label`, `.briefing-start-segments` and `.settings-body` selectors; the current briefing and settings emit other classes. Live start-option and mode controls keep their styles.
+
 - **S-dead:** delete unused terrain fidelity terrace displacement, its config field and its dedicated tests. No shipped site enabled it; terrain geometry and contact behavior are unchanged.
 
 - **P2-copy:** the Settings Controls (key bindings) button and pane are hidden on touch devices. Reason: touch has no rebindable keys, so the entry only led to a dead end.
