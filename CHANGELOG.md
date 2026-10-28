@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Hunga rim apron is longer and lighter so it blends into the slope; Hiolo North gains a small smoker-cluster vent stack and its pillow heap is smaller (opening framing unchanged).
+
 - Challenger Deep seabed keeps broad silt tone swaths in the mid-ground and a faint pale crest where the far rise meets the dark water, so the horizon grades softly instead of fading to flat olive (baked vertex tint only; no new draw calls).
 
 - Home globe is brighter: deeper ocean reads clearly blue, land is lifted, and mission pins carry a pale ring so they read at a glance on phones (P2-globe-bright).

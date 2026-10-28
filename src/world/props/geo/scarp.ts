@@ -125,7 +125,7 @@ const REAR: [number, number][] = [
 const PRESETS: Record<ScarpPresetId, Preset> = {
   tuff: {
     bedding: 'regular',
-    glow: { wall: [0.19, 0xb4b09a, 0.25], rubble: [0.15, 0xb4b09a, 0.25] },
+    glow: { wall: [0.19, 0xb4b09a, 0.25], rubble: [0.35, 0xb4b09a, 0.45] },
     decoration: 'seeps',
     tex: 'strata',
     profile: [
@@ -142,7 +142,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
       ...REAR,
     ],
     join: 0.14,
-    reach: 0.6,
+    reach: 0.9,
     arc: -0.42,
     sbend: 0.05,
     sPhase: 0.6,
@@ -158,7 +158,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     base: new THREE.Color(0x8d7d63), // tan tuff
     band: new THREE.Color(0x56554a), // darker ash bands, greenish
     crest: new THREE.Color(0xa89679),
-    drape: new THREE.Color(0x7a6f5c),
+    drape: new THREE.Color(0xa89878),
     boulder: new THREE.Color(0x7f7461),
     boulders: 220,
     rockSize: 0.75,
