@@ -206,7 +206,8 @@ for (const tier of ['low', 'medium', 'high'] as const) {
     try {
       await props.placeAll(doc, 'great-blue-hole');
       expect(props.stats.failed).toBe(0);
-      expect(props.placed).toHaveLength(2);
+      expect(props.stats.skipped).toBe(0);
+      expect(props.placed).toHaveLength(doc.props.length);
       const volumes = props.placed.flatMap((p) => p.colliders.filter((c) => c.kind !== 'surface'));
       for (const hero of props.placed) {
         const apron = hero.full.getObjectByName('grotto-sediment-apron') as THREE.Mesh;

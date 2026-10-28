@@ -1,3 +1,4 @@
+import missionData from '../../data/landmarks/titanic/mission.json' with { type: 'json' };
 import { waitForFrames } from './helpers/frames.js';
 import { GUIDANCE } from './helpers/guidance.js';
 import { homeReady } from './helpers/home.js';
@@ -18,6 +19,10 @@ import { expect, test, type Page } from './helpers/unlocked.js';
  *
  * State is read through `window.__game.{mission, missionRouter, discovery, scanner}`.
  */
+
+const objectiveCount = missionData.objectives.length;
+const primaryCount = missionData.objectives.filter((o) => o.primary).length;
+const secondaryCount = objectiveCount - primaryCount;
 
 interface MissionProbe {
   state: string;
@@ -92,8 +97,8 @@ test.describe('B3 mission flow', () => {
     const briefing = page.locator('.briefing');
     await expect(briefing).toBeVisible();
     await expect(page.locator('.briefing-title')).toHaveText('Titanic dive');
-    await expect(page.locator('.briefing-objectives li.is-primary')).toHaveCount(2);
-    await expect(page.locator('.briefing-objectives li.is-secondary')).toHaveCount(2);
+    await expect(page.locator('.briefing-objectives li.is-primary')).toHaveCount(primaryCount);
+    await expect(page.locator('.briefing-objectives li.is-secondary')).toHaveCount(secondaryCount);
     await expect(page.locator('.briefing-section.is-hazards li')).not.toHaveCount(0);
     await expect(page.locator('.briefing-section.is-hazards li:visible')).toHaveCount(0);
     await expect(page.locator('.briefing-memorial')).toBeVisible();
@@ -147,7 +152,9 @@ test.describe('B3 mission flow', () => {
     const panel = page.locator('.objectives-panel');
     await expect(panel).toBeVisible();
     // D-FLOW: one compact line of progress; the full list is in the Esc menu.
-    await expect(panel.locator('.obj-progress')).toHaveText('0 of 4 objectives · 0 of 2 primary');
+    await expect(panel.locator('.obj-progress')).toHaveText(
+      `0 of ${objectiveCount} objectives · 0 of ${primaryCount} primary`,
+    );
     // Near-site start (D-START): the bow is close and dead ahead.
     await expect(panel.locator('.obj-nav-target')).toHaveText('→ BOW SECTION');
     const heading = await page.evaluate(
@@ -219,7 +226,9 @@ test.describe('B3 mission flow', () => {
     expect(m.objectives.find((o) => o.id === 'find-bow')?.complete).toBe(true);
     expect(m.emitted).toEqual(['mission:started', 'mission:objective']);
     const panel = page.locator('.objectives-panel');
-    await expect(panel.locator('.obj-progress')).toHaveText('1 of 4 objectives · 1 of 2 primary');
+    await expect(panel.locator('.obj-progress')).toHaveText(
+      `1 of ${objectiveCount} objectives · 1 of ${primaryCount} primary`,
+    );
     await expect(panel.locator('.obj-nav-target')).toHaveText('→ STERN SECTION');
     // Guards the desktop repeat of one "where next": while the stern is far, only the nav line
     // names it (no standing objective card), and the finished bow row has left the list.

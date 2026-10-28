@@ -1,3 +1,4 @@
+import { curiosityData, siteIds } from '../content.js';
 import type { EventContact, AnchoredEvents } from '../../src/game/Events.js';
 import { EXPLORE_CONFIG } from '../../src/core/config/explore.js';
 import { completeScan, scanWithKeyboard } from './helpers/scan.js';
@@ -101,12 +102,13 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
 }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
+  const secrets = curiosityData('monterey-canyon').secrets;
   await boot(page);
   const objectives = await page.evaluate(() =>
     (window.__game as unknown as Game).scanner.getTargets().map((t) => t.id),
   );
   const initial = await page.evaluate(() => (window.__game as unknown as Game).progress.points);
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < secrets.length; i++) {
     const id = await park(page, i, false, true);
     await page.waitForTimeout(150);
     expect(
@@ -147,7 +149,9 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
     g.journal.open();
     g.journal.show('monterey-canyon');
   });
-  await expect(page.locator('.jr-progress')).toContainText('3/5 secrets');
+  await expect(page.locator('.jr-progress')).toContainText(
+    `${secrets.length}/${secrets.length} secrets`,
+  );
   await page
     .locator('.jr-nav')
     .getByRole('button', { name: 'Lost instrument frame', exact: true })
@@ -161,7 +165,7 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
   );
   expect(
     await page.evaluate(() => (window.__game as unknown as Game).explore.summary().found),
-  ).toBe(3);
+  ).toBe(secrets.length);
   expect(errors).toEqual([]);
 });
 
@@ -323,20 +327,7 @@ test.describe('phone curiosity', () => {
   });
 });
 
-for (const site of [
-  'lost-city',
-  'axial-seamount-ashes',
-  'beebe-vent-field',
-  'challenger-deep',
-  'kamaehuakanaloa',
-  'hunga-tonga-caldera',
-  'hudson-canyon',
-  'blake-plateau-corals',
-  'great-blue-hole',
-  'titanic',
-  'bismarck',
-  'endurance',
-]) {
+for (const site of siteIds) {
   test(`curiosity content loads and sits on the seabed at ${site}`, async ({ page }) => {
     await boot(page, site);
     const stats = await page.evaluate(() => {
@@ -350,8 +341,9 @@ for (const site of [
         })),
       };
     });
-    expect(stats.secrets).toBe(3);
-    expect(stats.samples).toBe(2);
+    const declared = curiosityData(site);
+    expect(stats.secrets).toBe(declared.secrets.length);
+    expect(stats.samples).toBe(declared.samples.length);
     for (const d of stats.depths) {
       expect(d.depth).toBeGreaterThan(10);
       expect(d.lift).toBeCloseTo(2);

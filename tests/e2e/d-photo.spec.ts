@@ -1,3 +1,4 @@
+import { siteIds } from '../content.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
@@ -355,7 +356,7 @@ test('a full phone gallery keeps photo order, exports and recovers from failed d
   await page.evaluate(() =>
     (window.__game as { journal: { show(key: string): void } }).journal.show('front'),
   );
-  await expect(journal.locator('.jr-site-card')).toHaveCount(13);
+  await expect(journal.locator('.jr-site-card')).toHaveCount(siteIds.length);
   await journal.locator('.jr-row.is-photos').click();
   const cards = journal.locator('.jr-photo-card');
   const ids = Array.from({ length: 24 }, (_, i) => `retained-${i}`);

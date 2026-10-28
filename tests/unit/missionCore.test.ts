@@ -198,8 +198,8 @@ describe('manifest + loaders', () => {
     const files: Record<string, unknown> = { '/data/landmarks/index.json': landmarkIndex };
     const ids = Object.keys(docs).map((path) => path.split('/').at(-2)!);
     for (const [path, doc] of Object.entries(docs)) files[path.replace('../..', '')] = doc;
-    expect(landmarkIndex.landmarks).toHaveLength(13);
-    expect(new Set(landmarkIndex.landmarks).size).toBe(13);
+    expect(landmarkIndex.landmarks.length).toBeGreaterThan(0);
+    expect(new Set(landmarkIndex.landmarks).size).toBe(landmarkIndex.landmarks.length);
     expect([...landmarkIndex.landmarks].sort()).toEqual(ids.sort());
 
     const list = await loadMissionSummaries(fakeFetch(files), quiet);
@@ -602,6 +602,8 @@ describe('Titanic content (B2) against the mission loader', () => {
     m.resolve(pois.map((p) => p.id));
     expect(warnings).toEqual([]);
     expect(m.requiredPrimaries().map((o) => o.poiId)).toEqual(['titanic-bow', 'titanic-stern']);
-    expect(m.objectives.filter((o) => !o.primary)).toHaveLength(2);
+    expect(m.objectives.filter((o) => !o.primary)).toHaveLength(
+      titanicMission.objectives.filter((o) => !o.primary).length,
+    );
   });
 });

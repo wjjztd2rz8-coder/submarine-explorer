@@ -81,9 +81,13 @@ describe('Monterey opening habitat', () => {
             positions: g.members.map((a) => [a.x, a.y, a.z]),
           })),
         ).toMatchSnapshot();
-        expect(openingGroups.filter((g) => g.def.id === 'pacific-hake')).toHaveLength(2);
-        expect(openingGroups.filter((g) => g.def.id === 'sablefish')).toHaveLength(1);
-        expect(openingGroups.filter((g) => g.def.id === 'sea-pen')).toHaveLength(1);
+        const declared = json(`data/landmarks/${site}/site.json`).life.opening as GroupOpeningLife;
+        expect(openingGroups.map((g) => g.def.id).sort()).toEqual(
+          declared.groups
+            .filter((group) => (tier === 'low' ? group.low : group.count) > 0)
+            .map((group) => group.species)
+            .sort(),
+        );
         for (const id of ['pacific-hake', 'sablefish', 'sea-pen'])
           expect(sim.countOf(id), id).toBeGreaterThan(0);
         expect(sim.liveCount).toBeLessThanOrEqual(LIFE_TIERS[tier].maxAgents);

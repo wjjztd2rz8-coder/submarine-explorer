@@ -1,3 +1,4 @@
+import { curiosityData } from '../content.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -21,10 +22,13 @@ const sites = JSON.parse(readFileSync('data/landmarks/index.json', 'utf8')).land
 
 describe('curiosity placements on actual site terrain', () => {
   for (const site of sites) {
-    it(`${site}: three secrets and two samples stay scannable through normal physics`, () => {
-      const doc = parseSecrets(JSON.parse(readFileSync(`data/secrets/${site}.json`, 'utf8')));
-      expect(doc.secrets).toHaveLength(3);
-      expect(doc.samples).toHaveLength(2);
+    it(`${site}: all declared secrets and samples stay scannable through normal physics`, () => {
+      const raw = curiosityData(site);
+      const doc = parseSecrets(raw);
+      expect(raw.secrets.length).toBeGreaterThan(0);
+      expect(raw.samples.length).toBeGreaterThan(0);
+      expect(doc.secrets).toHaveLength(raw.secrets.length);
+      expect(doc.samples).toHaveLength(raw.samples.length);
       const meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;
       const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
       const heights = new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows);

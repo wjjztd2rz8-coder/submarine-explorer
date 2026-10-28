@@ -1,3 +1,4 @@
+import { siteIds } from '../content.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -33,7 +34,8 @@ const sites: string[] = readdirSync(root).filter(
 
 describe('mission pacing: required-target gaps', () => {
   it('finds the shipped sites', () => {
-    expect(sites.length).toBeGreaterThanOrEqual(13);
+    expect(sites.length).toBeGreaterThan(0);
+    expect([...sites].sort()).toEqual([...siteIds].sort());
   });
   for (const site of sites) {
     it(`${site}: consecutive required targets stay within range`, () => {

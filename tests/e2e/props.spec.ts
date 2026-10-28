@@ -1,4 +1,5 @@
 import { expect, test, type Page } from './helpers/unlocked.js';
+import { propData } from '../content.js';
 
 /**
  * Prop pipeline: boots the Titanic tile with the `_test` fixture folder
@@ -7,6 +8,8 @@ import { expect, test, type Page } from './helpers/unlocked.js';
  */
 
 const URL = '/?tile=titanic&landmark=_test&depth=3790&debugTerrain=0&at=41.7290,-49.9500,0';
+const fixture = propData('_test').props;
+const modelCount = fixture.filter((p) => !p.model.startsWith('procedural:')).length;
 
 interface PropsProbe {
   loaded: boolean;
@@ -68,15 +71,15 @@ test.describe('B4 props', () => {
     await page.goto(URL, { waitUntil: 'domcontentloaded' });
     const probe = await waitForProps(page);
 
-    expect(probe.stats.count).toBe(5);
-    expect(probe.stats.models).toBe(2);
-    expect(probe.stats.procedural).toBe(3);
+    expect(probe.stats.count).toBe(fixture.length);
+    expect(probe.stats.models).toBe(modelCount);
+    expect(probe.stats.procedural).toBe(fixture.length - modelCount);
     expect(probe.stats.failed).toBe(0);
     expect(probe.stats.skipped).toBe(0);
     const evt = await page.evaluate(
       () => (window as unknown as { __propsLoaded?: { count: number } }).__propsLoaded ?? null,
     );
-    expect(evt?.count).toBe(5);
+    expect(evt?.count).toBe(fixture.length);
 
     // Headlights on (they start on; press L if a future default changes that).
     const lightsOn = await page.evaluate(() => (window.__game!.headlights as { on: boolean }).on);
@@ -165,7 +168,7 @@ test.describe('B4 props', () => {
     await waitForProps(page);
     const panel = page.locator('.props-debug');
     await expect(panel).toBeVisible();
-    await expect(panel.locator('li')).toHaveCount(5);
+    await expect(panel.locator('li')).toHaveCount(fixture.length);
     await panel.locator('li', { hasText: '_test-hull' }).click();
     const json = panel.locator('.props-debug-json');
     await expect(json).toContainText('"id": "_test-hull"');

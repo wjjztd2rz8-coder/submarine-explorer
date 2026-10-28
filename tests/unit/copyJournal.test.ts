@@ -52,15 +52,20 @@ describe('shipped copy retains scan-to-Journal links', () => {
   }
 });
 
-describe('740 Journal content-tone audit across all thirteen sites', () => {
+describe('Journal content-tone audit across every shipped site', () => {
   const catalogue = parseJournalCatalogue(read('data/landmarks.json'));
   const life = parseLifeDoc(read('data/life/life.json'));
   const caveats =
     /\b(?:illustrative|reconstructed|recreations?|game additions?|authored interpretations)\b/i;
 
   it('covers the complete shipped catalogue', () => {
-    expect(index.landmarks).toHaveLength(13);
-    expect(new Set(index.landmarks).size).toBe(13);
+    expect(index.landmarks.length).toBeGreaterThan(0);
+    expect([...index.landmarks].sort()).toEqual(
+      Object.keys(import.meta.glob('../../data/landmarks/*/mission.json'))
+        .map((path) => path.split('/').at(-2)!)
+        .sort(),
+    );
+    expect(new Set(index.landmarks).size).toBe(index.landmarks.length);
   });
 
   for (const id of index.landmarks) {
@@ -80,7 +85,7 @@ describe('740 Journal content-tone audit across all thirteen sites', () => {
         life,
         secrets: secrets.secrets,
       });
-      expect(site.entries.filter((e) => e.kind === 'secret')).toHaveLength(3);
+      expect(site.entries.filter((e) => e.kind === 'secret')).toHaveLength(secrets.secrets.length);
       expect(site.entries.some((e) => e.kind === 'life')).toBe(true);
       expect(site.entries.filter((e) => e.kind === 'species').length).toBeGreaterThan(0);
       expect([site.summary, ...site.facts].join('\n')).not.toMatch(caveats);

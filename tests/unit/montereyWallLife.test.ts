@@ -1,3 +1,4 @@
+import { propData } from '../content.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -26,17 +27,15 @@ describe('Monterey wall life on surveyed terrain', () => {
       const terrain = new Terrain({ meta, heights }, config.terrain, tier);
       const props = new Props(meta, terrain, config.props, tier);
       try {
-        const doc = JSON.parse(readFileSync(`data/landmarks/${site}/props.json`, 'utf8'));
+        const doc = propData(site);
         await props.load('props.json', site, async () => doc);
         expect(props.stats.failed).toBe(0);
-        const pois = placePois(
-          parsePois(JSON.parse(readFileSync(`data/landmarks/${site}/pois.json`, 'utf8'))),
-          meta,
-          terrain,
-          config.scan,
-          site,
-        );
-        expect(pois).toHaveLength(5);
+        expect(props.stats.skipped).toBe(0);
+        expect(props.placed).toHaveLength(doc.props.length);
+        const poiDoc = JSON.parse(readFileSync(`data/landmarks/${site}/pois.json`, 'utf8'));
+        const pois = placePois(parsePois(poiDoc), meta, terrain, config.scan, site);
+        expect(pois.length).toBeGreaterThan(0);
+        expect(pois).toHaveLength(poiDoc.pois.length);
         for (const poi of pois) {
           const { x, y, z } = poi.position;
           const seabed = terrain.sampleHeight(x, z);
@@ -54,7 +53,8 @@ describe('Monterey wall life on surveyed terrain', () => {
           } else expect(y).toBeGreaterThanOrEqual(seabed);
         }
         const walls = props.placed.filter((prop) => prop.def.feature === 'canyon-ledge');
-        expect(walls).toHaveLength(4);
+        expect(walls.length).toBeGreaterThan(0);
+        expect(walls).toHaveLength(doc.props.filter((p) => p.feature === 'canyon-ledge').length);
         let apronChecks = 0;
         for (const hero of walls) {
           hero.root.updateMatrixWorld(true);

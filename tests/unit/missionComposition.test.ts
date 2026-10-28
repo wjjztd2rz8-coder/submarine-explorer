@@ -1,3 +1,4 @@
+import { siteIds } from '../content.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { afterAll, expect, it, vi } from 'vitest';
@@ -90,8 +91,9 @@ async function placeProps(props: Props, site: string): Promise<void> {
   }
 }
 
-it('covers all 13 authored mission sites', () => {
-  expect(sites).toHaveLength(13);
+it('covers every declared mission site', () => {
+  expect(sites.length).toBeGreaterThan(0);
+  expect([...sites].sort()).toEqual([...siteIds].sort());
 });
 
 it.each(sites)(

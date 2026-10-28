@@ -1,3 +1,5 @@
+import { siteData } from './helpers/site.js';
+import type { ApproachOpeningLife } from '../../src/core/SiteManifest.js';
 import { reviewShot } from './helpers/render.js';
 import type { WebGLRenderer } from 'three';
 import {
@@ -40,8 +42,7 @@ async function ready(page: Page, wildlife = false): Promise<void> {
 }
 
 test('1000 Journal site count excludes nested About the site entries', async ({ page }) => {
-  // Reproduce the 15 / 16 / 17 matches reported by the external gate while
-  // retaining the exact 13-site requirement and checking every site's identity.
+  // Nested entries must not inflate the declared site count; check every identity.
   for (const entries of [2, 3, 4]) {
     await page.setContent(
       `<ul class="jr-nav-list">${catalog.landmarks
@@ -62,8 +63,10 @@ test('1000 Journal site count excludes nested About the site entries', async ({ 
         )
         .join('')}</ul>`,
     );
-    await expect(page.locator('.jr-nav-item.is-site')).toHaveCount(13 + entries);
-    await expect(page.locator(journalSites)).toHaveCount(13);
+    await expect(page.locator('.jr-nav-item.is-site')).toHaveCount(
+      catalog.landmarks.length + entries,
+    );
+    await expect(page.locator(journalSites)).toHaveCount(catalog.landmarks.length);
     expect(
       await page
         .locator(journalSites)
@@ -130,7 +133,7 @@ for (const viewport of [
             expect(state.clearance).toBeGreaterThanOrEqual(state.floor - 0.05);
             await page.keyboard.press('j');
             await page.clock.fastForward(34);
-            await expect(await journalSiteRows(page)).toHaveCount(13);
+            await expect(await journalSiteRows(page)).toHaveCount(catalog.landmarks.length);
             await openJournalSite(page, site);
             await page.locator('.jr-site-more summary').click();
             await expect(page.locator('.jr-body')).toContainText(subject);
@@ -229,7 +232,7 @@ for (const viewport of [
 
             await page.keyboard.press('j');
             await page.clock.fastForward(34);
-            await expect(await journalSiteRows(page)).toHaveCount(13);
+            await expect(await journalSiteRows(page)).toHaveCount(catalog.landmarks.length);
             await openJournalSite(page, site);
             await page.locator('.jr-site-more summary').click();
             await expect(page.locator('.jr-body')).toContainText(subject);
@@ -244,10 +247,10 @@ for (const viewport of [
         );
       }
 
-      for (const [site, species, expectedCount] of [
-        ['challenger-deep', 'hadal-amphipod', tier === 'low' ? 12 : 18],
-        ['endurance', 'anemone', tier === 'low' ? 5 : 8],
-      ] as const) {
+      for (const site of ['challenger-deep', 'endurance']) {
+        const opening = siteData(site).life!.opening as ApproachOpeningLife;
+        const species = opening.species;
+        const expectedCount = tier === 'low' ? opening.low : opening.count;
         for (const continuous of [false, true]) {
           test(
             `${site} ${tier}: ${continuous ? 'first minute' : 'opening life'}, one Journal tag and life=0`,
@@ -350,7 +353,7 @@ for (const viewport of [
               }
               await page.keyboard.press('j');
               await page.clock.fastForward(34);
-              await expect(await journalSiteRows(page)).toHaveCount(13);
+              await expect(await journalSiteRows(page)).toHaveCount(catalog.landmarks.length);
               await page.locator('.jr-spoilers input').check();
               await openJournalCategory(page, site, 'life');
               await openJournalEntry(page, `${site}/life/${species}`);

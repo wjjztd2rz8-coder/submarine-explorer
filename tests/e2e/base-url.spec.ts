@@ -1,3 +1,4 @@
+import { propData } from '../content.js';
 import { expect, test } from './helpers/unlocked.js';
 import { titleAudit } from './helpers/titleAudit.js';
 
@@ -36,14 +37,20 @@ test('project-base build loads data, models, and globe texture', async ({ page }
     () => (window.__game?.props as { loaded?: boolean } | undefined)?.loaded === true,
   );
   const stats = await page.evaluate(() => {
-    const props = window.__game?.props as { stats: { models: number; failed: number } };
+    const props = window.__game?.props as {
+      stats: { count: number; models: number; failed: number; skipped: number };
+    };
     return { ...props.stats };
   });
-  expect(stats.models).toBe(2);
+  const fixture = propData('_test').props;
+  const models = fixture.filter((p) => !p.model.startsWith('procedural:')).length;
+  expect(stats.count).toBe(fixture.length);
+  expect(stats.models).toBe(models);
+  expect(stats.skipped).toBe(0);
   expect(stats.failed).toBe(0);
   await expect
     .poll(() => requests.filter(({ path }) => path.endsWith('.glb')).length)
-    .toBeGreaterThanOrEqual(2);
+    .toBeGreaterThanOrEqual(models);
   await page.screenshot({ path: testInfo.outputPath('project-base-dive.png') });
 
   for (const suffix of [

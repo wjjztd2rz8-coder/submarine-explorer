@@ -23,8 +23,21 @@ import {
 } from '../../src/world/Props.js';
 import { makeSyntheticTile } from './helpers.js';
 import { PROCEDURAL_BUILDERS, type BuiltProp } from '../../src/world/props/builders/index.js';
+import { propData, siteIds } from '../content.js';
 
 const cfg = DEFAULT_CONFIG.props;
+
+// Runs in default gates without a browser; rejected or capped entries must not
+// reduce the expected count used by the rendered-content checks.
+it.each([...siteIds, '_test'])('%s: every declared prop survives loading validation', (site) => {
+  const doc = propData(site);
+  const parsed = parsePropsDoc(doc, cfg);
+  expect(doc.props.length).toBeGreaterThan(0);
+  expect(parsed.errors).toEqual([]);
+  expect(parsed.warnings).toEqual([]);
+  expect(parsed.props.map((p) => p.id)).toEqual(doc.props.map((p) => p.id));
+});
+
 const { meta } = makeSyntheticTile({ cols: 40, rows: 40, cellsizeDeg: 0.001 });
 
 /** A plane rising 0.1 m per metre east: y = -3800 + 0.1 x. */

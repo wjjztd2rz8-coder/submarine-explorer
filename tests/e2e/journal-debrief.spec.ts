@@ -1,3 +1,5 @@
+import missionData from '../../data/landmarks/titanic/mission.json' with { type: 'json' };
+import fixtureGuide from '../../data/landmarks/_test/guide.json' with { type: 'json' };
 import { reviewScreenshot } from './helpers/render.js';
 import { expect, test as freshTest, type Page, type Locator } from '@playwright/test';
 import { test as experiencedTest } from './helpers/unlocked.js';
@@ -117,6 +119,10 @@ freshTest.describe('legacy save persistence', () => {
     });
   }
 });
+
+const objectiveCount = missionData.objectives.length;
+const primaryCount = missionData.objectives.filter((o) => o.primary).length;
+const secondaryCount = objectiveCount - primaryCount;
 
 freshTest.describe('mission progression and Home Journal', () => {
   const test = experiencedTest;
@@ -282,7 +288,9 @@ freshTest.describe('mission progression and Home Journal', () => {
         };
       });
       expect(start).toEqual({ logged: true, state: 'diving', anyComplete: false });
-      await expect(page.locator('.obj-progress')).toHaveText('0 of 4 objectives · 0 of 2 primary');
+      await expect(page.locator('.obj-progress')).toHaveText(
+        `0 of ${objectiveCount} objectives · 0 of ${primaryCount} primary`,
+      );
       await recordFlowEvents(page);
 
       await teleport(page, 'titanic-bow');
@@ -296,7 +304,7 @@ freshTest.describe('mission progression and Home Journal', () => {
       await expect(banner).toBeVisible({ timeout: 30_000 });
       await expect(banner.locator('.obj-banner-title')).toHaveText('Primary objectives complete');
       await expect(banner.locator('.obj-banner-detail')).toHaveText(
-        '2 of 4 objectives. 2 optional targets remain.',
+        `${primaryCount} of ${objectiveCount} objectives. ${secondaryCount} optional targets remain.`,
       );
       await expect(banner.locator('button')).toHaveText(['Keep exploring', 'Surface and debrief']);
       // The banner is the one completion presentation: it carries the stars earned so far.
@@ -320,7 +328,9 @@ freshTest.describe('mission progression and Home Journal', () => {
       await scan(page, 'boilers');
       p = await probe(page);
       expect(p.complete).toEqual(['find-bow', 'find-stern', 'boilers']);
-      await expect(page.locator('.obj-progress')).toHaveText('3 of 4 objectives · primaries done');
+      await expect(page.locator('.obj-progress')).toHaveText(
+        `3 of ${objectiveCount} objectives · primaries done`,
+      );
 
       // Surface from the pause menu: complete then ended, once each.
       await surfaceFromPause(page);
@@ -332,12 +342,16 @@ freshTest.describe('mission progression and Home Journal', () => {
         'mission:complete',
         'mission:ended',
       ]);
-      expect(events[0]?.payload).toEqual({ missionId: 'titanic', completed: 2, total: 4 });
+      expect(events[0]?.payload).toEqual({
+        missionId: 'titanic',
+        completed: primaryCount,
+        total: objectiveCount,
+      });
       expect(events[2]?.payload).toMatchObject({
         missionId: 'titanic',
         reason: 'surface',
         completed: 3,
-        total: 4,
+        total: objectiveCount,
       });
       await expect(debrief.locator('.debrief-title')).toHaveText('Primaries complete');
       await expect(debrief.locator('.debrief-next')).toHaveText(
@@ -457,7 +471,9 @@ freshTest.describe('mission progression and Home Journal', () => {
       expect(fresh.state).toBe('diving');
       expect(fresh.complete).toEqual([]);
       expect(fresh.emitted).toEqual(['mission:started']);
-      await expect(page.locator('.obj-progress')).toHaveText('0 of 4 objectives · 0 of 2 primary');
+      await expect(page.locator('.obj-progress')).toHaveText(
+        `0 of ${objectiveCount} objectives · 0 of ${primaryCount} primary`,
+      );
       await expect(page.locator('.mission-debrief')).toHaveCount(0);
       await page.waitForFunction(
         () =>
@@ -492,7 +508,7 @@ freshTest.describe('mission progression and Home Journal', () => {
       const journal = page.locator('.journal');
       await expect(journal).toBeVisible();
       await expect(journal.locator('.jr-honesty')).toContainText('real survey data');
-      await expect(journal.locator('.jr-site-card')).toHaveCount(13);
+      await expect(journal.locator('.jr-site-card')).toHaveCount(catalog.landmarks.length);
       await expect(
         journal.locator('.jr-site-card[data-target="titanic"] .jr-card-count'),
       ).toHaveText(
@@ -694,22 +710,23 @@ freshTest.describe('scan persistence and fixture debrief', () => {
       await expect(journal).toBeVisible();
       // The dive's own site opens first: its overview and the bow are logged.
       await expect(journal.locator('.jr-nav-item[data-target="_test"] .jr-nav-meta')).toHaveText(
-        'THIS DIVE · 2/3',
+        `THIS DIVE · 2/${fixtureGuide.entries.length}`,
       );
       await expect(journal.locator('.jr-body .jr-title')).toHaveText('Test site · Titanic tile');
       // The debris entry is still locked; the bow is unlocked.
       // It collapses into one quiet count row rather than a locked list item.
       await expect(journal.locator('.jr-site-entries li.is-locked')).toHaveCount(0);
       await expect(journal.locator('.jr-site-entries .jr-more-to-find')).toHaveText(
-        '1 more to find',
+        `${fixtureGuide.entries.length - 2} more to find`,
       );
       await journal.locator('.jr-nav-item[data-target="_test/poi/bow"]').click();
       await expect(journal.locator('.jr-body .jr-title')).toHaveText('The bow section');
       await expect(journal.locator('.jr-tag.is-recreation')).toHaveText('Recreation');
       // Guards the memorial note repeating on every entry: it belongs to the site page only.
       await expect(journal.locator('.jr-memorial')).toHaveCount(0);
-      await expect(journal.locator('.jr-facts tr')).toHaveCount(3);
-      await expect(journal.locator('.jr-sources a')).toHaveCount(1);
+      const bowEntry = fixtureGuide.entries.find((entry) => entry.id === 'bow')!;
+      await expect(journal.locator('.jr-facts tr')).toHaveCount(bowEntry.facts.length);
+      await expect(journal.locator('.jr-sources a')).toHaveCount(bowEntry.sources.length);
       // Scanning is suppressed while the Journal is open.
       expect(
         await page.evaluate(
@@ -2406,7 +2423,7 @@ freshTest.describe('catalog Journal additions', () => {
 
       // Regression guard: staged wildlife and secrets repeated addition caveats or clipped Journal titles.
 
-      test('all thirteen sites give secrets and staged wildlife exactly one addition tag', async ({
+      test('all declared sites give secrets and staged wildlife exactly one addition tag', async ({
         page,
       }, testInfo) => {
         test.setTimeout(240_000);
@@ -2419,7 +2436,7 @@ freshTest.describe('catalog Journal additions', () => {
           .getByRole('button', { name: 'Journal', exact: true });
         if (layout.touch) await homeJournal.tap();
         else await homeJournal.click();
-        await expect(page.locator('.jr-site-card')).toHaveCount(13);
+        await expect(page.locator('.jr-site-card')).toHaveCount(catalog.landmarks.length);
         await expect(page.locator('.jr-honesty')).toContainText('real survey data');
         await page.locator('.jr-spoilers input').check();
         for (const site of catalog.landmarks) {

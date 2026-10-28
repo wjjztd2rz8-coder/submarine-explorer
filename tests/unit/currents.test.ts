@@ -73,7 +73,7 @@ const grid: CurrentGrid = {
 
 describe('offline currents', () => {
   it('maps the complete real-site catalogue to current documents and leaves the demo optional', async () => {
-    expect(sites).toHaveLength(13);
+    expect(sites.length).toBeGreaterThan(0);
     expect(sites.map(({ tile }) => tile).sort()).toEqual(
       catalogue
         .filter(({ source }) => source === 'GMRT')

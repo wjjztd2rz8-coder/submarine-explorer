@@ -3,6 +3,7 @@ import type { WebGLRenderer } from 'three';
 import type { PerfStats } from '../../src/app/systems/quality.js';
 import type { Props } from '../../src/world/Props.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
+import { propData, siteIds } from '../content.js';
 
 interface Game {
   renderer: WebGLRenderer;
@@ -22,31 +23,15 @@ test.use({
   storageState: { cookies: [], origins: [] },
 });
 
-const sites = [
-  { id: 'titanic', props: 7 },
-  { id: 'lost-city', props: 12 },
-  { id: 'great-blue-hole', props: 2 },
-  { id: 'beebe-vent-field', props: 3 },
-  { id: 'monterey-canyon', props: 5 },
-  { id: 'challenger-deep', props: 2 },
-  { id: 'endurance', props: 3 },
-  { id: 'hunga-tonga-caldera', props: 1 },
-  { id: 'hudson-canyon', props: 1 },
-  { id: 'axial-seamount-ashes', props: 6 },
-  { id: 'kamaehuakanaloa', props: 4 },
-  { id: 'bismarck', props: 4 },
-  { id: 'blake-plateau-corals', props: 3 },
-];
-
-for (const site of sites) {
-  test(`${site.id} opening stays within the Low-tier frame geometry budget`, async ({ page }) => {
+for (const site of siteIds) {
+  test(`${site} opening stays within the Low-tier frame geometry budget`, async ({ page }) => {
     test.setTimeout(180_000);
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
     page.on('console', (message) => {
       if (message.type() === 'error') errors.push(message.text());
     });
-    await page.goto(`/?tile=${site.id}&tier=low&dynres=0&tutorial=0&lifeSeed=42`, {
+    await page.goto(`/?tile=${site}&tier=low&dynres=0&tutorial=0&lifeSeed=42`, {
       waitUntil: 'domcontentloaded',
     });
     await page.waitForFunction(() => {
@@ -85,7 +70,7 @@ for (const site of sites) {
     expect(errors).toEqual([]);
     expect(sample.tier).toBe('low');
     expect(sample.dynamicResolution).toBe(false);
-    expect(sample.props.count).toBe(site.props);
+    expect(sample.props.count).toBe(propData(site).props.length);
     expect(sample.props.failed).toBe(0);
     expect(sample.props.skipped).toBe(0);
     expect(sample.props.full).toBeGreaterThan(0);

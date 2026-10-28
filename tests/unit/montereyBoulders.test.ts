@@ -1,3 +1,4 @@
+import { propData } from '../content.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -21,11 +22,14 @@ describe('650 Monterey fractured boulders on surveyed seabed', () => {
       const terrain = new Terrain({ meta, heights }, config.terrain, tier);
       const props = new Props(meta, terrain, config.props, tier);
       try {
-        const doc = JSON.parse(readFileSync(`data/landmarks/${site}/props.json`, 'utf8'));
+        const doc = propData(site);
         await props.placeAll(doc, site);
         expect(props.stats.failed).toBe(0);
+        expect(props.stats.skipped).toBe(0);
+        expect(props.placed).toHaveLength(doc.props.length);
         const walls = props.placed.filter((p) => p.def.feature === 'canyon-ledge');
-        expect(walls).toHaveLength(4);
+        expect(walls.length).toBeGreaterThan(0);
+        expect(walls).toHaveLength(doc.props.filter((p) => p.feature === 'canyon-ledge').length);
         const instance = new Matrix4();
         const world = new Matrix4();
         const position = new Vector3();

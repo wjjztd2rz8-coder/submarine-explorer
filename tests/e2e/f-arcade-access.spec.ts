@@ -1,3 +1,4 @@
+import { siteIds } from '../content.js';
 import { homeReady } from './helpers/home.js';
 import { missionApproachRanges, siteData } from './helpers/site.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
@@ -101,7 +102,7 @@ test('Arcade opens every card on a phone; switching to Realistic restores locks'
       height: b.getBoundingClientRect().height,
     })),
   );
-  expect(sizes.length).toBeGreaterThanOrEqual(13);
+  expect(sizes).toHaveLength(siteIds.length);
   expect(sizes.every((size) => size.width >= 44 && size.height >= 44)).toBe(true);
   await sites.locator('[data-mission="titanic"]').scrollIntoViewIfNeeded();
   await shot(page, 'arcade-sites-phone');
@@ -113,7 +114,7 @@ test('Arcade opens every card on a phone; switching to Realistic restores locks'
   await expect(sites.locator('[data-mission="titanic"]')).toBeEnabled();
   await expect(sites.locator('[data-mission="challenger-deep"]')).toBeEnabled();
   await expect(sites.locator('.mission-lock')).toHaveCount(0);
-  await expect(sites.locator('.is-mission:not(:disabled)')).toHaveCount(13);
+  await expect(sites.locator('.is-mission:not(:disabled)')).toHaveCount(siteIds.length);
   await sites.locator('[data-mission="titanic"]').scrollIntoViewIfNeeded();
   await shot(page, 'realistic-sites-phone');
   await page.evaluate(() =>
