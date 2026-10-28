@@ -338,8 +338,9 @@ freshTest.describe('mission progression and Home Journal', () => {
       await expect(debrief.locator('.debrief-next')).toHaveText(
         'Next: Finish the optional objectives for 2 stars; some are a long transit away.',
       );
-      await expect(debrief.locator('[data-field="objectives"] .debrief-value')).toHaveText(
-        '3 of 4',
+      // Optional scans must not make a finished primary mission read as incomplete.
+      await expect(debrief.locator('[data-field="objectives"]')).toHaveText(
+        '2 of 2 primary objectives',
       );
       await expect(debrief.locator('.debrief-btn')).toHaveText([
         'Dive sites',
@@ -418,8 +419,9 @@ freshTest.describe('mission progression and Home Journal', () => {
       // One filled primary; at most two quiet links visible, the rest under More.
       await expect(debrief.locator('.debrief-btn.is-primary')).toHaveCount(1);
       await expect(debrief.locator('.debrief-secondary > .debrief-btn')).toHaveCount(2);
-      await expect(debrief.locator('[data-field="objectives"] .debrief-value')).toHaveText(
-        '1 of 4',
+      // Partial dives must count the unfinished primaries, excluding optional targets.
+      await expect(debrief.locator('[data-field="objectives"]')).toHaveText(
+        '1 of 2 primary objectives',
       );
       expect((await probe(page)).emitted).not.toContain('mission:complete');
       await shot(page, 'debrief-partial');
@@ -987,6 +989,7 @@ freshTest.describe('summary, disclosures and provenance', () => {
   type Game = {
     journal: Journal;
     discovery: Discovery;
+    mission: { primaryCounts(): { completed: number; total: number } };
     sub: Submarine;
     rig: CameraRig;
     save: { get(): { gameplayMode: string } };
@@ -1067,6 +1070,13 @@ freshTest.describe('summary, disclosures and provenance', () => {
             await contained(debrief.locator('.debrief-panel'));
             await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText(
               round === 1 ? '0' : '1',
+            );
+            // Primary progress stays explicit in the same compact row on every viewport.
+            const primary = await page.evaluate(() =>
+              (window.__game as unknown as Game).mission.primaryCounts(),
+            );
+            await expect(debrief.locator('[data-field="objectives"]')).toHaveText(
+              `${primary.completed} of ${primary.total} primary objectives`,
             );
             if (disclosures) {
               expect(

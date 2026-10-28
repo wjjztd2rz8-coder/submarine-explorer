@@ -96,7 +96,7 @@ export interface DebriefStats {
   /** Positive metres. */
   maxDepthM: number;
   elapsedS: number;
-  /** Mission objectives done this dive ("X of Y objectives"); absent in a free dive. */
+  /** Primary objectives done this dive ("X of Y primary objectives"); absent in a free dive. */
   objectives?: { completed: number; total: number };
   /** Distinct targets scanned this dive, in discovery order, including previously logged finds. */
   discoveries: Array<{ poiId: string; name: string }>;

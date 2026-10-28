@@ -60,9 +60,12 @@ it.each([0, 1, 5, 6])('renders %s scans from the per-dive discovery list', (coun
       String(count),
       count === 1 ? ' scan' : ' scans',
     ]);
+    // The count must identify primaries rather than imply optional targets are required.
     expect(
-      score.children.find((el) => el.dataset.field === 'objectives')!.children[0].textContent,
-    ).toBe('3 of 4');
+      score.children
+        .find((el) => el.dataset.field === 'objectives')!
+        .children.map((el) => el.textContent),
+    ).toEqual(['3 of 4', ' primary objectives']);
   } finally {
     debrief.dispose();
   }

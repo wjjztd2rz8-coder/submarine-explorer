@@ -853,47 +853,25 @@ describe('Journal content model', () => {
 
 describe('debrief wording', () => {
   it.each([
-    { completed: 0, total: 0 },
-    { completed: 1, total: 2 },
-  ])('does not claim primary completion when no primaries resolve: %j', (counts) => {
-    const result = debriefText('surface', { completed: 0, total: 0 }, counts, 75);
-    expect(result.title).toBe('Back at the surface');
-    expect(result.subtitle).toContain(`${counts.completed} of ${counts.total} objectives · 1:15`);
+    [0, 0, 'Back at the surface'],
+    [0, 2, 'Back at the surface'],
+    [1, 2, 'Back at the surface'],
+    [2, 2, 'Primaries complete'],
+  ])('keeps counts solely in the metric row (%s of %s primary)', (completed, total, title) => {
+    expect(debriefText('surface', { completed, total })).toEqual({ title });
   });
 
-  it('distinguishes primaries done from every objective done without claiming all stars', () => {
-    const c = { completed: 3, total: 4 };
-    expect(debriefText('surface', { completed: 2, total: 2 }, c, 75)).toEqual({
-      title: 'Primaries complete',
-      subtitle: '2 of 2 primary objectives · 1:15',
-    });
-    expect(debriefText('all', { completed: 2, total: 2 }, { completed: 4, total: 4 }, 75)).toEqual({
-      title: 'All objectives complete',
-      subtitle: 'Every objective · 4 of 4 objectives · 1:15',
-    });
-    expect(
-      debriefText('surface', { completed: 0, total: 2 }, { completed: 1, total: 4 }, 5),
-    ).toEqual({
-      title: 'Back at the surface',
-      subtitle: 'You found 1 of 4 — the rest are still down there. · 1 of 4 objectives · 0:05',
-    });
-    const none = debriefText('surface', { completed: 0, total: 2 }, { completed: 0, total: 4 }, 5);
-    expect(none.title).toBe('Back at the surface');
-    expect(none.subtitle).toMatch(/^Nothing logged this time/);
-    expect(none.subtitle).not.toMatch(/fail|unfinished|ended/i);
-    expect(
-      debriefText('abort', { completed: 0, total: 2 }, { completed: 1, total: 4 }, 5, -1180),
-    ).toEqual({
+  it('distinguishes all objectives and aborts without a second objective tally', () => {
+    const primaries = { completed: 2, total: 2 };
+    expect(debriefText('all', primaries)).toEqual({ title: 'All objectives complete' });
+    expect(debriefText('abort', primaries, -1180)).toEqual({
       title: 'Dive aborted',
-      subtitle: 'Hull failure at 1,180 m · emergency ascent completed · 1 of 4 objectives · 0:05',
+      subtitle: 'Hull failure at 1,180 m',
     });
-    expect(debriefText('abort', { completed: 2, total: 2 }, c, 5, -1180).title).toBe(
-      'Dive aborted',
-    );
-    expect(
-      debriefText('abort', { completed: 2, total: 2 }, { completed: 4, total: 4 }, 5, 0, 'power')
-        .title,
-    ).toBe('Dive aborted');
+    expect(debriefText('abort', primaries, 0, 'power')).toEqual({
+      title: 'Dive aborted',
+      subtitle: 'Supplies exhausted · safe ascent completed',
+    });
   });
 });
 

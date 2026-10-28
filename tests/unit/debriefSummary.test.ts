@@ -80,7 +80,7 @@ describe('compact dive summary', () => {
     expect(
       summarizeDive({
         ...scanned,
-        subtitle: 'Hull failure at 1,180 m · emergency ascent completed · 1 of 4 objectives · 0:05',
+        subtitle: 'Hull failure at 1,180 m',
       }),
     ).toEqual({
       highlight: 'Hull failure at 1,180 m.',

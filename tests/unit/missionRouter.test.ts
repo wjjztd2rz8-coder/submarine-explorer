@@ -644,7 +644,8 @@ describe('MissionRouter completion timing', () => {
     expect(nextScanObjective(router.mission.objectives)?.poiId).toBe('optional');
     expect(router.endDive()).toBe(true);
     expect(router.debrief?.last?.title).toBe('Primaries complete');
-    expect(router.debrief?.last?.objectives).toEqual({ completed: 1, total: 2 });
+    // Optional targets must not dilute primary progress in the debrief.
+    expect(router.debrief?.last?.objectives).toEqual({ completed: 1, total: 1 });
     router.keepExploring();
     bus.emit('scan:complete', { poiId: 'optional', landmarkId: 'reef', firstTime: false });
     advance(router, 3);
@@ -754,7 +755,8 @@ describe('MissionRouter completion timing', () => {
       expect(router.debriefOpen).toBe(false);
       frame(router, { emergencyBlow: false });
       expect(router.debrief?.last?.title).toBe('Dive aborted');
-      expect(router.debrief?.last?.objectives).toEqual({ completed: 1, total: 2 });
+      // Optional targets must not dilute primary progress in the debrief.
+      expect(router.debrief?.last?.objectives).toEqual({ completed: 1, total: 1 });
       expect(events()).toEqual([
         'mission:started',
         'mission:objective',
@@ -797,7 +799,8 @@ describe('MissionRouter completion timing', () => {
           expect(router.alert).toBeNull();
           expect(router.debriefOpen).toBe(true);
           expect(router.debrief?.last?.title).toBe('Dive aborted');
-          expect(router.debrief?.last?.objectives).toEqual({ completed: 2, total: 2 });
+          // Optional scans must not inflate primary progress after an abort.
+          expect(router.debrief?.last?.objectives).toEqual({ completed: 1, total: 1 });
           expect(router.panel.bannerOpen).toBe(false);
           expect(router.panel.root.hidden).toBe(true);
           expect(router.mission.canResume).toBe(false);

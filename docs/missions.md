@@ -105,7 +105,7 @@ seabed + hullRadius + seabedClearance + mission.spawnClearanceM]`. The
    `mission:complete {missionId, durationS}` once per dive, only when the
    primaries are done, then `mission:ended {missionId, reason:
 'surface'|'all'|'abort', completed, total, durationS}` on every debrief. The
-   debrief shows `X of Y objectives`, B1's session stats and the new Journal
+   debrief shows `X of Y primary objectives`, B1's session stats and the new Journal
    entries, and freezes the game. Its buttons: **Keep exploring** (Escape too;
    back to the same state and pose), **Dive again** (`mission:restart`, then a
    reload of the same URL: a fresh dive with the briefing unless the URL skips
@@ -119,13 +119,13 @@ seabed + hullRadius + seabedClearance + mission.spawnClearanceM]`. The
    `Mission.abort('crush')` emits `mission:aborted {missionId, reason:
 'crush'}`, then `Mission.end()` emits `mission:ended` (reason `abort`, no
    `mission:complete`) and the debrief opens as **Dive aborted** (amber, "Hull
-   failure at N m · emergency ascent completed · …") without Keep exploring.
+   failure at N m.") without Keep exploring.
    The game is frozen under it (`missionRouter.frozen`) and Escape does not
    dismiss it. Free dive keeps the
    Phase A behaviour (blow, then carry on).
 
-**Clock.** The mission clock (`Mission.elapsedS`, `durationS`) and the
-debrief's DIVE TIME count real (wall-clock) seconds of unfrozen play —
+**Clock.** The mission clock (`Mission.elapsedS`, `durationS`) counts real
+(wall-clock) seconds of unfrozen play —
 `time.frameDelta` while neither the briefing, the debrief nor a menu is up —
 not physics dt, which the 8-steps-per-frame cap in `Time.ts` shortens at low
 frame rates (QA-B #10). Scan progress still runs on physics time.

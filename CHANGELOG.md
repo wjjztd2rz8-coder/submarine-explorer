@@ -29,6 +29,8 @@ without an entry here is not done.
 
 ### Removed
 
+- Debrief removes the unused normal-dive subtitle and its duplicate tally/time formatter. Its existing objective metric now counts and labels primary objectives; optional targets no longer make a completed mission read as unfinished.
+
 - **S-dead:** remove the unused `AssetKind` type and `DECODER_PATHS` compatibility constant/export; neither has a named consumer in source, tests, tools or data. Asset loading and decoder assets are unchanged.
 
 - **S-dead:** remove the unused `FrameHook` and `ProceduralBuilderMap` type aliases, the map's documentation and its exclusive `ProceduralPropKind` import; no source, test, tool or data consumer uses either alias.

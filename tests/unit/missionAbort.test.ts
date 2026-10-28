@@ -24,7 +24,7 @@ describe('Mission.abort', () => {
     m.end();
     expect(seen).toEqual([{ missionId: 'titanic', reason: 'power' }]);
     expect(m.endReason).toBe('abort');
-    expect(debriefText('abort', m.primaryCounts(), m.counts(), 20, 0, 'power').subtitle).toContain(
+    expect(debriefText('abort', m.primaryCounts(), 0, 'power').subtitle).toContain(
       'Supplies exhausted',
     );
   });

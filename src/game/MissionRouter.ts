@@ -27,7 +27,7 @@ import type { GameConfig } from '../core/Config.js';
 import type { EventBus } from '../core/EventBus.js';
 import type { InputState } from '../core/Input.js';
 import { Briefing, type BriefingContent } from '../ui/Briefing.js';
-import { Debrief, formatDuration, type DebriefAction } from '../ui/Debrief.js';
+import { Debrief, type DebriefAction } from '../ui/Debrief.js';
 import { ObjectivesPanel, type NavReadout } from '../ui/ObjectivesPanel.js';
 import { headingFromForward, latLonToWorld, normalizeHeadingDeg } from '../util/geo.js';
 import type { TileMeta } from '../util/types.js';
@@ -324,43 +324,30 @@ export interface MissionHullState {
 /** Banner shown on the objectives panel while the emergency blow runs. */
 export const HULL_FAILURE_ALERT = 'HULL FAILURE — EMERGENCY ASCENT';
 
-/** Debrief heading and subtitle for how the dive ended. Pure, for tests. */
+/** Debrief heading and abort cause; the metric row owns objective counts. */
 export function debriefText(
   reason: 'surface' | 'all' | 'abort',
   primaries: { completed: number; total: number },
-  counts: { completed: number; total: number },
-  durationS: number,
   failedAtM = 0,
   abortCause: 'crush' | 'power' = 'crush',
-): { title: string; subtitle: string } {
-  const tally = `${counts.completed} of ${counts.total} objectives · ${formatDuration(durationS)}`;
+): { title: string; subtitle?: string } {
   if (reason === 'abort') {
-    if (abortCause === 'power')
-      return {
-        title: 'Dive aborted',
-        subtitle: `Supplies exhausted · safe ascent completed · ${tally}`,
-      };
-    const rating = Math.round(Math.abs(failedAtM)).toLocaleString('en-US');
     return {
       title: 'Dive aborted',
-      subtitle: `Hull failure at ${rating} m · emergency ascent completed · ${tally}`,
+      subtitle:
+        abortCause === 'power'
+          ? 'Supplies exhausted · safe ascent completed'
+          : `Hull failure at ${Math.round(Math.abs(failedAtM)).toLocaleString('en-US')} m`,
     };
   }
-  if (reason === 'all')
-    return { title: 'All objectives complete', subtitle: `Every objective · ${tally}` };
-  if (primaries.total > 0 && primaries.completed === primaries.total) {
-    // The tally counts the primaries only, so the optional ones left over do not read as a miss.
-    return {
-      title: 'Primaries complete',
-      subtitle: `${primaries.completed} of ${primaries.total} primary objectives · ${formatDuration(durationS)}`,
-    };
-  }
-  // Partial dive: warm, not a failure. The tally cell carries the numbers.
-  const line =
-    counts.completed > 0
-      ? `You found ${counts.completed} of ${counts.total} — the rest are still down there.`
-      : 'Nothing logged this time — the site is still waiting.';
-  return { title: 'Back at the surface', subtitle: `${line} · ${tally}` };
+  return {
+    title:
+      reason === 'all'
+        ? 'All objectives complete'
+        : primaries.total > 0 && primaries.completed === primaries.total
+          ? 'Primaries complete'
+          : 'Back at the surface',
+  };
 }
 
 export class MissionRouter {
@@ -605,20 +592,13 @@ export class MissionRouter {
     const { discovery, route } = this.opts;
     const m = this.mission;
     const reason = m.endReason ?? 'surface';
-    const counts = m.counts();
-    const { title, subtitle } = debriefText(
-      reason,
-      m.primaryCounts(),
-      counts,
-      m.durationS ?? m.elapsedS,
-      this.failedAt,
-      this.abortCause,
-    );
+    const primaries = m.primaryCounts();
+    const { title, subtitle } = debriefText(reason, primaries, this.failedAt, this.abortCause);
     const stats = discovery.stats.snapshot({
       title,
       subtitle,
       landmarkName: route.def.title,
-      objectives: counts,
+      objectives: primaries,
     });
     if (!this.debrief) {
       this.debrief = new Debrief({ parent: this.opts.parent });
