@@ -6,7 +6,12 @@ import { diveReady, loadDive } from './helpers/dive.js';
 import { advanceScan, completeScan, scanWithKeyboard } from './helpers/scan.js';
 import { scanAim } from './helpers/scanAim.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { execFile } from 'node:child_process';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { promisify } from 'node:util';
+import { readGoldenBuild } from '../../tools/golden-build.mjs';
 import { clockFramesUntil, pauseClockBeforeNavigation, withClockFrames } from './helpers/clock.js';
 import { type Discovery } from '../../src/game/Discovery.js';
 import { type MissionRouter } from '../../src/game/MissionRouter.js';
@@ -1542,8 +1547,12 @@ freshTest.describe('Home to scan and return journey', () => {
         test(`${site}: Home -> first scan -> Journal -> second scan -> Journal -> debrief`, async ({
           page,
         }, info) => {
-          const directory = `${env.FLOW_AUDIT_SHOTS ?? '.cache/codex/shots/journeys'}/round-${info.repeatEachIndex + 1}`;
           const prefix = `${site}-${size}`;
+          const directory = `${env.FLOW_AUDIT_SHOTS ?? '.cache/codex/shots/journeys'}/round-${info.repeatEachIndex + 1}/${prefix}`;
+          const sha = (
+            await promisify(execFile)('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' })
+          ).stdout.trim();
+          let build: ReturnType<typeof readGoldenBuild> | undefined;
           const planned = [
             'home',
             'settings-aa',
@@ -1568,12 +1577,17 @@ freshTest.describe('Home to scan and return journey', () => {
           let current = planned[0];
           let sequence = 0;
           page.on('pageerror', (error) => errors.push(error.message));
+          // Each case owns its directory; retries cannot retain an earlier build's PNGs.
+          await rm(directory, { recursive: true, force: true });
           await mkdir(directory, { recursive: true });
           const persist = async (): Promise<void> => {
             await writeFile(
-              `${directory}/${prefix}-manifest.json`,
+              `${directory}/manifest.json`,
               JSON.stringify(
                 {
+                  sha,
+                  build,
+                  capturedAt: startedAt,
                   site,
                   layout: size,
                   tier: 'low',
@@ -1598,6 +1612,11 @@ freshTest.describe('Home to scan and return journey', () => {
             );
           };
           const shot = async (step: string): Promise<void> => {
+            const served = readGoldenBuild(await page.content());
+            expect(served.sha, 'Capture must use the current checkout build').toBe(sha);
+            if (build)
+              expect(served, 'Build must stay the same throughout the journey').toEqual(build);
+            build = served;
             const path = `${directory}/${prefix}-${String(++sequence).padStart(2, '0')}-${step}.png`;
             const state = await page.evaluate((touch) => {
               const g = window.__game as unknown as Game & {
@@ -2096,7 +2115,7 @@ freshTest.describe('Home to scan and return journey', () => {
       // orientations. Dedicated HUD/credits/toast specs cover the viewport matrix.
       for (const site of sites.filter((site) => viewport.sites.includes(site))) {
         // Regression guard: Home-to-dive Journal/debrief journey lost navigation, unlocks or focus; map records uncertain bug attribution.
-        test(`${site}: Home -> opening -> Journal -> debrief -> Home`, async ({ page }) => {
+        test(`${site}: Home -> opening -> Journal -> debrief -> Home`, async ({ page }, info) => {
           test.setTimeout(captureSeconds > 10 ? 480_000 : 240_000);
           await pauseClockBeforeNavigation(page);
           await page.addInitScript(() => {
@@ -2106,15 +2125,33 @@ freshTest.describe('Home to scan and return journey', () => {
                 JSON.stringify({ version: 2, graphicsTier: 'low' }),
               );
           });
-          const directory = `${shots}/${size}/${site}`;
+          const directory = `${shots}/round-${info.repeatEachIndex + 1}/${size}/${site}`;
+          const sha = (
+            await promisify(execFile)('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' })
+          ).stdout.trim();
+          const capturedAt = new Date().toISOString();
+          let build: ReturnType<typeof readGoldenBuild> | undefined;
+          await rm(directory, { recursive: true, force: true });
           await mkdir(directory, { recursive: true });
           const errors: string[] = [];
           page.on('pageerror', (e) => errors.push(e.message));
           const records: unknown[] = [];
+          const persist = async (): Promise<void> => {
+            await writeFile(
+              `${directory}/manifest.json`,
+              JSON.stringify({ sha, build, capturedAt, steps: records }, null, 2),
+            );
+          };
+          await persist();
           const shot = async (name: string): Promise<void> => {
+            const served = readGoldenBuild(await page.content());
+            expect(served.sha, 'Capture must use the current checkout build').toBe(sha);
+            if (build)
+              expect(served, 'Build must stay the same throughout the journey').toEqual(build);
+            build = served;
             await page.clock.runFor(34);
             const path = `${directory}/${name}.png`;
-            await reviewScreenshot(page, { path });
+            await page.screenshot({ path });
             records.push({
               path,
               ...(await page.evaluate(() => {
@@ -2148,7 +2185,7 @@ freshTest.describe('Home to scan and return journey', () => {
                 };
               })),
             });
-            await writeFile(`${directory}/manifest.json`, JSON.stringify(records, null, 2));
+            await persist();
           };
           const touch = viewport.touch;
           await page.goto('/', { waitUntil: 'domcontentloaded' });

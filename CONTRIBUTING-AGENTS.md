@@ -107,6 +107,11 @@ PW_PORT=41xx PW_OUTDIR=dist-<you> npx playwright test tests/e2e/<spec>.spec.ts
 `playwright.config.ts`; `SMOKE_TILE=<id>` limits the smoke spec to one tile.
 `dist-*/` is gitignored.
 
+Stop only the PID or process group started by your own run. Global process-name
+cleanup (`pkill -f 'vite preview'`, `pkill -f playwright`, or `pkill -f tools/gates.sh`)
+kills other worktrees' owned previews and gates, causing connection failures in
+otherwise passing suites.
+
 Requirements and expectations:
 
 - **`npm run build` must pass with zero TypeScript errors.** Strict mode is on,
