@@ -29,4 +29,6 @@ for i in $(seq 1 30); do
   kill -0 "$srv" 2>/dev/null || { cat .cache/golden-preview.log; exit 1; }
   sleep 1
 done
+# Capture prints one advisory readability summary for this exact output set (no gate).
+# Full table: node tools/golden-readable.mjs .cache/golden/<stamp>
 node tools/golden-shots.mjs --base-url "http://127.0.0.1:$port/"
