@@ -411,11 +411,11 @@ export const BIOMES: Record<string, Biome> = {
     a: 'silt',
     b: 'sand',
     c: 'carbonate',
-    colorA: 0x5d564a,
-    colorB: 0x6d6454,
+    colorA: 0x4a443a,
+    colorB: 0x554d3e,
     colorC: 0x55524a,
     stain: 0x54503a,
-    stainAmount: 0.08,
+    stainAmount: 0.18,
     // Broad current-ripple fields and cobble-sand patches vary the floor between the wall rubble.
     patch: 0.55,
     ripple: 0.9,
@@ -423,8 +423,8 @@ export const BIOMES: Record<string, Biome> = {
     rippleDir: 1.4,
     burrow: 0.6,
     rockBias: 0.08,
-    contrast: 0.55,
-    detail: 0.5,
+    contrast: 0.8,
+    detail: 0.85,
     // The surveyed banks carry the same mudstone beds and dark face as the prop walls.
     vertexTint: montereySlopeTint,
     scatter: [

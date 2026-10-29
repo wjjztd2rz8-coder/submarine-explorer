@@ -166,7 +166,7 @@ exports[`1130: other sites retain byte-identical scatter geometry, placement, co
     },
   },
   "monterey-canyon": {
-    "meshes": "d4f48e04351f2aed9bd215d35155c1a120cbc877b13037b675a9531d058ce98d",
+    "meshes": "34a778cb9da54fd5c4641dde27c3bf4aa49ecb626b28b0d83ff04da54cdd97f9",
     "stats": {
       "cells": 21,
       "drawCalls": 7,
