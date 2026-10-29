@@ -87,7 +87,10 @@ describe('free-dive openings on actual survey terrain and procedural hero geomet
             const authored = siteManifest(site)!.opening!;
             for (const [pose, subjectId] of [
               [base!, authored.freeDive!.hero],
-              [framed!, authored.reframe?.aimHero ?? authored.freeDive!.hero],
+              [
+                framed!,
+                authored.reframe?.aimHero ?? authored.reframe?.hero ?? authored.freeDive!.hero,
+              ],
             ] as const) {
               const position = new Vector3(pose.x, pose.y, pose.z);
               const rig = new CameraRig(config.camera, 16 / 9, terrain);

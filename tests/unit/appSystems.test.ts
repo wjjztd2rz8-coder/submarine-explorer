@@ -344,7 +344,7 @@ describe('createSystems', () => {
     expect(at('audio')).toBeLessThan(at('shellKeys'));
   });
 
-  it('uses every frame stage that has a job, in the pre-F0 frame order', () => {
+  it('uses every frame stage and preserves simulation and HUD dependencies', () => {
     const runner = new SystemRunner({} as GameContext);
     runner.init(systems.map((s) => ({ name: s.name, frame: s.frame })));
     const stages = runner.order.map((e) => e.split(':')[0]);
@@ -363,6 +363,18 @@ describe('createSystems', () => {
     ]);
     expect(runner.order.indexOf('hud.feeds: power')).toBeLessThan(
       runner.order.indexOf('hud.feeds: currents'),
+    );
+    // A newly visible label must measure the completed HUD, including scan rewards.
+    for (const hook of ['hud.draw: hud', 'hud.draw: onboard', 'play.mission: mission'])
+      expect(runner.order.indexOf(hook)).toBeLessThan(
+        runner.order.indexOf('render.prepare: waypoints'),
+      );
+    // Tutorial and sonar still receive this frame's objective before drawing.
+    expect(runner.order.indexOf('guide.waypoints: waypoints')).toBeLessThan(
+      runner.order.indexOf('hud.draw: onboard'),
+    );
+    expect(runner.order.indexOf('render.prepare: waypoints')).toBeLessThan(
+      runner.order.indexOf('render.draw: render'),
     );
   });
 });

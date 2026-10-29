@@ -667,6 +667,7 @@ freshTest.describe('Journal scan rewards and counts', () => {
       await expect(page.locator('.guidance-slot .guidance-kicker')).toHaveText('New Journal entry');
       await expect(page.locator('.guidance-slot .guidance-name')).toHaveText(gallery.title);
       await page.keyboard.press('j');
+      await clockFramesUntil(page, () => (window.__game as unknown as Game).journal.isOpen);
       await expect(page.locator('.jr-body .jr-title')).toHaveText(gallery.title);
       await expect(page.locator('.jr-body .jr-tag.is-recreation')).toHaveText('Recreation');
       expect(await page.evaluate(() => (window.__game as unknown as Game).journal.selectedId)).toBe(
@@ -708,9 +709,17 @@ freshTest.describe('Journal scan rewards and counts', () => {
       await start(page, site, poi);
       await scanWithKeyboard(page, poi);
       await page.keyboard.press('j');
+      await clockFramesUntil(page, () => (window.__game as unknown as Game).journal.isOpen);
       for (const width of [1280, 390]) {
         await page.setViewportSize({ width, height: 844 });
-        await page.clock.runFor(34);
+        // Media-query change events can arrive after resize resolves. Wait for
+        // the actual reader layout before choosing its navigation controls.
+        await clockFramesUntil(
+          page,
+          width === 390
+            ? () => !!document.querySelector('.journal.is-phone')
+            : () => !!document.querySelector('.journal:not(.is-phone)'),
+        );
         await journalFront(page);
         await expect(page.locator('.jr-lead .jr-chip').first()).toHaveText(
           /^1\/\d+ points of interest$/,
@@ -752,6 +761,7 @@ freshTest.describe('Journal scan rewards and counts', () => {
       await clockFramesUntil(page, () => window.__gameReady === true);
       await clockFramesUntil(page, () => (window.__game as unknown as Game).discovery.loaded);
       await page.keyboard.press('j');
+      await clockFramesUntil(page, () => (window.__game as unknown as Game).journal.isOpen);
       await openJournalSite(page, site);
       await expect(page.locator('.jr-progress .jr-chip').first()).toHaveText(
         `1/${total} points of interest`,
