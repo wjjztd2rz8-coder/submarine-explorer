@@ -23,6 +23,223 @@ type Game = {
 const keyNames = /\b(Space|Enter|Esc|Escape|Ctrl|Shift|WASD)\b|\bpress [A-Z]\b/i;
 const touchControls = '.tc-stick, .tc-slider, .tc-btn, .hud-journal, .hud-reset-camera';
 
+for (const viewport of [
+  { width: 390, height: 844 },
+  { width: 1280, height: 800 },
+]) {
+  test.describe(`on-screen journey ${viewport.width}x${viewport.height}`, () => {
+    // Both sizes use native touch: desktop mouse/keyboard input hides the on-screen dock.
+    test.use({
+      viewport,
+      hasTouch: true,
+      isMobile: viewport.width < viewport.height,
+      storageState: { cookies: [], origins: [] },
+      serviceWorkers: 'block',
+    });
+
+    test('Home to first objective to debrief without teleporting', async ({ page }, info) => {
+      // Regression guard: pose-assisted scan tests miss blocked approaches and covered exits.
+      // Only readiness uses game probes; all piloting decisions read visible guidance.
+      test.setTimeout(600_000); // Software rendering may take longer than the simulated dive.
+      await pauseClockBeforeNavigation(page);
+      const errors: string[] = [];
+      const checkpoints: unknown[] = [];
+      const actions: unknown[] = [];
+      let phase = 'Home';
+      let diveMs = 0;
+      page.on('pageerror', (error) => errors.push(error.message));
+
+      const record = async (name: string): Promise<void> => {
+        const state = await page.evaluate(
+          (controls) => ({
+            url: location.href,
+            text: document.body.innerText,
+            controls: Array.from(document.querySelectorAll<HTMLElement>(controls))
+              .filter((element) => element.checkVisibility({ checkVisibilityCSS: true }))
+              .map((element) => {
+                const r = element.getBoundingClientRect();
+                const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+                return {
+                  label: element.getAttribute('aria-label') || element.innerText,
+                  rect: r.toJSON(),
+                  offscreen: r.x < 0 || r.y < 0 || r.right > innerWidth || r.bottom > innerHeight,
+                  coveredBy: hit && element.contains(hit) ? null : (hit?.outerHTML ?? 'no hit'),
+                };
+              }),
+          }),
+          `${touchControls}, button`,
+        );
+        checkpoints.push({ name, phase, diveMs, ...state });
+        const path = info.outputPath(`${checkpoints.length}-${name}.png`);
+        await page.screenshot({ path });
+        await info.attach(name, { path, contentType: 'image/png' });
+      };
+      const frames = async (count: number): Promise<void> => {
+        for (let i = 0; i < count; i++) {
+          diveMs += 100;
+          expect(diveMs, `five-minute budget at ${phase}`).toBeLessThanOrEqual(300_000);
+          // Render the normal loop, including physics and scanner time. A 100 ms
+          // frame stays below the engine's eight-physics-step backlog limit.
+          await page.clock.fastForward(100);
+        }
+      };
+      const tap = async (target: Locator): Promise<void> => {
+        await reachable(target);
+        await target.tap();
+      };
+      const session = await page.context().newCDPSession(page);
+      const gesture = async (
+        target: Locator,
+        dx: number,
+        dy: number,
+        count: number,
+        done?: () => Promise<boolean>,
+      ): Promise<void> => {
+        await reachable(target);
+        const r = (await target.boundingBox())!;
+        const x = r.x + r.width / 2;
+        const y = r.y + r.height / 2;
+        try {
+          await session.send('Input.dispatchTouchEvent', {
+            type: 'touchStart',
+            touchPoints: [{ x, y }],
+          });
+          await session.send('Input.dispatchTouchEvent', {
+            type: 'touchMove',
+            touchPoints: [{ x: x + dx * r.width, y: y + dy * r.height }],
+          });
+          for (let i = 0; i < count; i++) {
+            await frames(1);
+            if (await done?.()) break;
+          }
+        } finally {
+          await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+        }
+        await frames(1);
+      };
+
+      try {
+        await page.goto('/?tier=low&touch=1', { waitUntil: 'domcontentloaded' });
+        await homeReady(page, true);
+        await record('home');
+        phase = 'pick site';
+        await tap(page.locator('.home-menu').getByRole('button', { name: 'Dive sites' }));
+        const expand = page.getByRole('button', { name: 'Show all sites', exact: true });
+        if (await expand.isVisible()) {
+          await tap(expand);
+          await page.clock.fastForward(300);
+          await expect(page.locator('.home-sites-grab')).toHaveAttribute('aria-expanded', 'true');
+        }
+        const site = page.locator('.home-sites [data-mission="titanic"]');
+        await record('site-picker');
+        await tap(site);
+        await expect(page).toHaveURL((url) => url.searchParams.get('mission') === 'titanic');
+        const params = new URL(page.url()).searchParams;
+        for (const key of ['poi', 'at', 'depth', 'skipBriefing', 'debrief'])
+          expect(params.has(key), `ordinary mission URL has no ${key} probe`).toBe(false);
+        phase = 'briefing';
+        await clockFramesUntil(page, () => {
+          const g = window.__game as unknown as Game;
+          return !!(window.__gameReady && g.discovery?.loaded && g.props.loaded);
+        });
+        const briefing = page.getByRole('dialog', { name: 'Mission briefing' });
+        await expect(briefing.locator('.briefing-objectives li').first()).toContainText(
+          'Scan the bow',
+        );
+        await record('briefing');
+        await tap(briefing.locator('.briefing-begin'));
+        await frames(2);
+        await expect(briefing).toBeHidden();
+        phase = 'first objective approach';
+        await record('opening');
+        await expectHudClear(page, 'unassisted mission opening');
+        for (const control of await page.locator(touchControls).all()) await reachable(control);
+        const waypoint = page.locator('.d-scan-edge-info');
+        await expect(waypoint).toBeVisible();
+        expect(
+          parseFloat(await waypoint.innerText()),
+          'opening leaves a real transit',
+        ).toBeGreaterThan(100);
+
+        const guidance = page.locator('.guidance-slot');
+        const stick = page.locator('.tc-stick');
+        const slider = page.locator('.tc-slider');
+        const ready = async (): Promise<boolean> =>
+          (await guidance.isVisible()) &&
+          /Bow section/i.test(await guidance.innerText()) &&
+          /HOLD SCAN TO SCAN/i.test(await guidance.innerText());
+        for (let attempt = 0; attempt < 400 && !(await ready()); attempt++) {
+          await expect(guidance).toBeVisible();
+          const text = await guidance.innerText();
+          const step = await guidance.getAttribute('data-step');
+          const turn = text.match(/TURN (\d+)° (PORT|STARBOARD)/i);
+          actions.push({ diveMs, step, text });
+          if (step === 'move') await gesture(stick, 0, -0.4, 12);
+          else if (step === 'depth') await gesture(slider, 0, -0.4, 10);
+          else if (step === 'scan') {
+            // The scan lesson masks the objective's steering cue until a scan
+            // finishes. Use its visible Skip control to reveal that cue.
+            await tap(guidance.getByRole('button', { name: 'Skip', exact: true }));
+            await frames(1);
+          } else if (turn) await gesture(stick, (turn[2] === 'PORT' ? -1 : 1) * 0.35, 0, 5);
+          else if (/RISE TOWARD TARGET/i.test(text)) await gesture(slider, 0, -0.4, 5);
+          else if (/SINK TOWARD TARGET|DIVE DEEPER/i.test(text)) await gesture(slider, 0, 0.4, 5);
+          else if (/Get closer to scan/i.test(text)) await gesture(stick, 0, -0.4, 10);
+          else await frames(5); // Let a temporary wildlife/hazard message expire.
+        }
+        expect(await ready(), 'visible guidance must lead to a scannable bow').toBe(true);
+        await record('in-range');
+        await expectHudClear(page, 'unassisted approach reaches scan range');
+
+        phase = 'scan first objective';
+        const result = page.locator('.guidance-kicker');
+        await gesture(page.locator('.tc-btn-scan'), 0, 0, 80, async () =>
+          /New Journal entry/i.test(await result.innerText()),
+        );
+        await expect(result).toHaveText('New Journal entry');
+        await expect(page.locator('.guidance-name')).toHaveText('Bow section');
+        await expect(page.locator('.d-scan-world-marker[data-poi="titanic-bow"]')).toHaveClass(
+          /is-scanned/,
+        );
+        await record('first-objective');
+        await expectHudClear(page, 'first objective result');
+
+        phase = 'surface and debrief';
+        await tap(page.getByRole('button', { name: 'Pause', exact: true }));
+        await record('pause');
+        await tap(page.getByRole('button', { name: 'Surface and debrief', exact: true }));
+        const debrief = page.locator('.mission-debrief');
+        await expect(debrief).toBeVisible();
+        await expect(debrief.locator('[data-field="objectives"]')).toHaveText(
+          '1 of 2 primary objectives',
+        );
+        await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText('1');
+        await expect(debrief.locator('.debrief-highlight')).toHaveText('Scanned Bow section.');
+        await record('debrief');
+
+        phase = 'debrief exit';
+        await tap(debrief.getByRole('button', { name: 'More', exact: true }));
+        await tap(debrief.getByRole('button', { name: 'Home', exact: true }));
+        await homeReady(page, true);
+        await reachable(page.locator('.home-primary'));
+        await record('returned-home');
+        expect(errors).toEqual([]);
+        phase = 'complete';
+      } finally {
+        await session.detach();
+        if (!page.isClosed())
+          await record('last-state').catch((error: unknown) => {
+            checkpoints.push({ phase, diagnosticError: String(error) });
+          });
+        await info.attach('journey.json', {
+          body: JSON.stringify({ viewport, phase, diveMs, errors, actions, checkpoints }, null, 2),
+          contentType: 'application/json',
+        });
+      }
+    });
+  });
+}
+
 /** Measure before tapping: Playwright's automatic scroll must not conceal a clipped exit. */
 async function reachable(target: Locator): Promise<void> {
   await expect(target).toBeVisible();
