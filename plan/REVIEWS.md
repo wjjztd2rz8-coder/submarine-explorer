@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-10-29 13:10 targeted review (Claude alone): Codex starved again
+
+- Trigger: empty Codex queue ~2 h. Root cause this time is budget, not scheduling: Codex week is 12% left (resets Nov 4), far behind pace, so `codex-dispatch.sh` correctly holds launches. The trigger will refire every few hours until the reset.
+- Actions: found 100 S-hud-opening-dedupe finished but unmerged (Codex could not run e2e in its sandbox; gates FAIL was its own report). Ran smoke gates in its worktree (pass), merged it (three conflicts with the R-ci-green work; took main's side for the scan-edge CSS and the two spec waits). Queued 110 S-verify (HUD dedupe), 111 S-dead sweep, 112 S-bughunt first-five-minutes; they wait for the weekly pace.
+- No scores or stage change (see the 2026-10-29 joint review). Needs owner: phone retest (unchanged).
+
 ## 2026-10-29 comprehensive review (joint with Sol, one reconcile round)
 
 **Changed since the 2026-10-28 evening review (golden 194415 to 2026-10-29-112021):** R-journal-repeat, R-journey-guidance, R-journey-labels, T-golden-mission, P2-phone-accept-auto merged. No art merges, so hero views are unchanged (both reads agree). New: the golden set now holds a mission opening at all 13 sites (a clean combined set; Sol notes an earlier dirty-build run had captured all 13 in Low portrait). f68 is still the newest tag; hosted CI on main has been red since 2026-10-28 evening; the Codex repair (97 R-ci-green, 852 passed / 50 skipped in its worktree) is not merged yet. STATUS.md said CI was green; that was stale and is corrected.
