@@ -2470,3 +2470,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to merge: 97 R-ci-green, 98 V-hunga-kama-subject-pins and 99 P2-phone-accept-auto are still running in their worktrees. Main clean. Claude week 14% left (resets Oct 29 07:00), so no Claude package. No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-29 06:20 CDT headless run 231 (Claude): Codex collect
+
+- Merged P2-phone-accept-auto (tests/e2e/phone-accept.spec.ts automates the browser-checkable phone items; Settings Close reads "Close" on touch). Gates smoke + project-base passed (prettier fixed on DIRECTOR.md); pushed. Still running: 97 R-ci-green, 98 V-hunga-kama-subject-pins (round 2). Queue empty; Codex week 27% left, so no new briefs. No Claude package (week 14% left, resets 07:00). No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (browser-checkable items now automated).
