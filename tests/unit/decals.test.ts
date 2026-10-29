@@ -79,3 +79,21 @@ it.each(['A', 'B', 'C'])('%s markings face outward with right-handed UVs', (hull
   }
   for (const geometry of bp.parts.build().values()) geometry.dispose();
 });
+
+it.each(['A', 'B', 'C'])('%s deck markings sit above the hull surface, not inside it', (hull) => {
+  // Guards the Class A hull number being buried in the aft deck so only a
+  // sliver of the lettering showed.
+  const bp = blueprintFor(hull, false);
+  const parts = bp.parts.build();
+  const meshes = [...parts.entries()]
+    .filter(([slot]) => slot !== 'decal')
+    .map(([, g]) => new THREE.Mesh(g, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide })));
+  const ray = new THREE.Raycaster();
+  for (const spec of bp.decals.filter((d) => d.normal.y > 0.9)) {
+    ray.set(spec.pos.clone().setY(10), new THREE.Vector3(0, -1, 0));
+    const hit = ray.intersectObjects(meshes, false)[0];
+    expect(hit, spec.kind).toBeDefined();
+    expect(spec.pos.y, spec.kind).toBeGreaterThanOrEqual(hit!.point.y - 0.005);
+  }
+  for (const m of meshes) m.geometry.dispose();
+});

@@ -553,7 +553,14 @@ export function classA(low: boolean): Blueprint {
     decals.push({ kind: 'rating', pos: V(x, 0.12, 1.55), w: 0.55, h: 0.22, normal: n });
     decals.push({ kind: 'flag', pos: V(x, 0.12, -1.3), w: 0.32, h: 0.22, normal: n });
   }
-  decals.push({ kind: 'number', pos: V(0, 0.8 + 0.012, 1.45), w: 0.8, h: 0.3, normal: V(0, 1, 0) });
+  // Ahead of the deck fin, which would otherwise cut through the lettering.
+  decals.push({
+    kind: 'number',
+    pos: V(0, topY(deck(0.62), 0) + 0.012, 0.62),
+    w: 0.8,
+    h: 0.3,
+    normal: V(0, 1, 0),
+  });
 
   return {
     id: 'A',

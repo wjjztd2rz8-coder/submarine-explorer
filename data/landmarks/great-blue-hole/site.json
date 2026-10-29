@@ -10,6 +10,9 @@
   "opening": {
     "mission": {
       "rangeM": 150,
+      "chaseRadius": 46,
+      "chaseOffsetX": -16,
+      "chaseOffsetY": -30,
       "destinationLabel": "the stalactite gallery"
     },
     "freeDive": {
