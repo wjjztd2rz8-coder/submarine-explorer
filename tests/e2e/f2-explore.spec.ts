@@ -102,7 +102,7 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
 }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  const { secrets, samples } = curiosityData('monterey-canyon');
+  const { secrets } = curiosityData('monterey-canyon');
   await boot(page);
   const objectives = await page.evaluate(() =>
     (window.__game as unknown as Game).scanner.getTargets().map((t) => t.id),
@@ -149,8 +149,9 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
     g.journal.open();
     g.journal.show('monterey-canyon');
   });
+  // Samples share Finds, but the secret tally counts only hidden contacts.
   await expect(page.locator('.jr-progress')).toContainText(
-    `${secrets.length}/${secrets.length + samples.length} secrets`,
+    `${secrets.length}/${secrets.length} secrets`,
   );
   await page
     .locator('.jr-nav')
