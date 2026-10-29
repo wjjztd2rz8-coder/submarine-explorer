@@ -4,6 +4,61 @@ import type { Camera } from 'three';
 import type { Submarine } from '../../../src/sub/Submarine.js';
 import type { Save } from '../../../src/core/Save.js';
 
+/** Shared composed-HUD guard: world labels participate alongside fixed regions and controls. */
+export async function expectHudClear(page: Page, phase: string): Promise<void> {
+  const issues = await page.evaluate(() => {
+    const selectors = [
+      '.sonar',
+      '.objectives-panel',
+      '.hud-readouts',
+      '.guidance-slot',
+      '.d-scan-edge',
+      '.tc-stick',
+      '.tc-slider',
+      '.tc-btn-scan',
+      '.tc-btn-lights',
+      '.tc-btn-sonar',
+      '.tc-btn-photo',
+      '.tc-btn-pause',
+      '.hud-journal',
+      '.hud-reset-camera',
+    ];
+    const boxes = selectors.flatMap((selector) => {
+      const el = document.querySelector<HTMLElement>(selector);
+      return el?.checkVisibility({ checkVisibilityCSS: true })
+        ? [{ selector, box: el.getBoundingClientRect() }]
+        : [];
+    });
+    const issues: string[] = [];
+    for (const { selector, box } of boxes) {
+      if (box.x < 0 || box.y < 0 || box.right > innerWidth || box.bottom > innerHeight)
+        issues.push(`${selector} offscreen: ${JSON.stringify(box)}`);
+    }
+    for (const [i, a] of boxes.entries()) {
+      for (const b of boxes.slice(i + 1)) {
+        if (
+          a.box.left < b.box.right &&
+          b.box.left < a.box.right &&
+          a.box.top < b.box.bottom &&
+          b.box.top < a.box.bottom
+        )
+          issues.push(`${a.selector} overlaps ${b.selector}: ${JSON.stringify([a.box, b.box])}`);
+      }
+    }
+    for (const el of document.querySelectorAll<HTMLElement>(
+      '.d-scan-edge-name, .d-scan-edge-info',
+    )) {
+      if (
+        el.checkVisibility() &&
+        (el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1)
+      )
+        issues.push(`Clipped waypoint text: ${el.innerText}`);
+    }
+    return issues;
+  });
+  expect.soft(issues, phase).toEqual([]);
+}
+
 /** Phones have no objectives list: the guidance slot always names what to do or where to go. */
 export async function expectObjectiveGuidance(page: Page, touch: boolean): Promise<void> {
   if (touch) {

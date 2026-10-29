@@ -42,9 +42,8 @@
 }
 .jr-crumb {
   font-size: 1.1em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .jr-close,
 .jr-back,

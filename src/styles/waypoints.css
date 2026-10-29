@@ -30,7 +30,7 @@
 }
 .d-scan-edge {
   position: absolute;
-  transform: translate(-50%, -50%);
+  box-sizing: border-box;
   width: max-content;
   max-width: min(250px, 40vw); /* leaves the centre column to the sub on a narrow phone */
   padding: 6px 10px;
@@ -51,9 +51,7 @@
 .d-scan-edge-name,
 .d-scan-edge-info {
   display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 .d-scan-edge-name[hidden] {
   display: none;
@@ -64,12 +62,6 @@
 }
 .d-scan-edge.is-onscreen {
   border-color: rgba(46, 217, 217, 0.45);
-  /* Sit below the target so the centre scan bracket never crosses the text. */
-  transform: translate(-50%, calc(var(--scan-reticle-size, 44px) / 2 + 14px));
-}
-/* A target low in the view is where the sub is drawn: sit above it instead. */
-.d-scan-edge.is-onscreen.is-above {
-  transform: translate(-50%, calc(-100% - var(--scan-reticle-size, 44px) / 2 - 14px));
 }
 .d-scan-edge.is-onscreen::before {
   content: '◇';

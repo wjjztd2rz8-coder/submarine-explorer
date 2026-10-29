@@ -1371,7 +1371,9 @@ freshTest.describe('catalog underwater and approach poses', () => {
           const hero = g.props.placed.find((p) => p.def.id === heroId)!;
           const centre = hero.root.localToWorld(hero.localBounds.getCenter(g.sub.position.clone()));
           const toHero = centre.clone().sub(g.sub.position).setY(0).normalize();
-          const body = hero.full.children.find((child) => 'isMesh' in child) as Mesh;
+          // A prop may itself be the mesh, or contain it inside nested groups.
+          const body = hero.full.getObjectByProperty('isMesh', true) as Mesh | undefined;
+          if (!body) throw new Error(`Missing body mesh for opening subject ${heroId}`);
           body.geometry.computeBoundingBox();
           const screen = body
             .localToWorld(body.geometry.boundingBox!.getCenter(g.sub.position.clone()))
