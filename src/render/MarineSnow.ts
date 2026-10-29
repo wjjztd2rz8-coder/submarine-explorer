@@ -93,7 +93,10 @@ export function snowParticleAppearance(
   return {
     sizePx,
     alpha: Math.min(alpha, THREE.MathUtils.lerp(config.snowForegroundAlpha, 1, t)),
-    brightness: Math.min(brightness, THREE.MathUtils.lerp(config.snowForegroundBrightness, config.snowMaxBrightness, t)),
+    brightness: Math.min(
+      brightness,
+      THREE.MathUtils.lerp(config.snowForegroundBrightness, config.snowMaxBrightness, t),
+    ),
   };
 }
 
