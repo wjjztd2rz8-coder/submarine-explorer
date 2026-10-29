@@ -2450,3 +2450,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to merge: 96 T-golden-mission is still running (round 2, e2e) in its worktree. Main clean. Claude week 15% left (resets Oct 29 07:00), no Claude package. Queue is empty apart from 96; Codex week 37% left, so no new briefs added this run. No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-29 02:17 CDT headless run 227 (Claude): Codex collect
+
+- Merged T-golden-mission (default golden set now includes the mission opening at all 13 sites; Journal secret tally ignores samples). Conflicts with main's identical Journal fixes resolved in favour of main; one stale chip-text unit test fixed. Gates smoke + project-base passed (unit failure fixed afterwards, targeted test re-run green); pushed. No Codex tasks running, queue empty (Codex week 37% left, no new briefs queued; nothing unblocked in Codex lane). No Claude package (week ~15% left, resets Oct 29 07:00). No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
