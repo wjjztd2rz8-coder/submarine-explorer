@@ -2507,6 +2507,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
 
 ## 2026-10-29 13:51 targeted review run (Codex starved)
+
 - Merged S-hud-opening-dedupe (Codex 100; took main's side on 3 conflicts, fixed a lost `samples` binding). Smoke gates pass on main; hosted CI is the full check.
 - Codex week 12% left (resets Nov 4), so empty-queue trigger is budget noise. Queued 110 S-verify, 111 S-dead, 112 S-bughunt (wait for pace). No Claude package run.
 - Needs owner: phone retest (unchanged).
