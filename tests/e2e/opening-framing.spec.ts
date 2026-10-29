@@ -1371,7 +1371,9 @@ freshTest.describe('catalog underwater and approach poses', () => {
           const hero = g.props.placed.find((p) => p.def.id === heroId)!;
           const centre = hero.root.localToWorld(hero.localBounds.getCenter(g.sub.position.clone()));
           const toHero = centre.clone().sub(g.sub.position).setY(0).normalize();
-          const body = hero.full.children.find((child) => 'isMesh' in child) as Mesh;
+          // Props may be meshes themselves or contain meshes inside groups and LOD levels.
+          const body = hero.full.getObjectByProperty('isMesh', true) as Mesh | undefined;
+          if (!body) throw new Error(`Missing subject mesh: ${heroId}`);
           body.geometry.computeBoundingBox();
           const screen = body
             .localToWorld(body.geometry.boundingBox!.getCenter(g.sub.position.clone()))
@@ -1396,6 +1398,7 @@ freshTest.describe('catalog underwater and approach poses', () => {
             ),
           };
         }, heroId);
+        expect(opening.subjectScreen.every(Number.isFinite)).toBe(true);
         if (site.hero) expect(opening.facing).toBeGreaterThan(0.98);
         else {
           expect(opening.facing).toBeCloseTo(
