@@ -16,29 +16,25 @@
  * The submarine's physics step is frozen after loading to hold each exact pose.
  * A pose manifest records served-build SHA, dirty flag and Vite build mode.
  * Rebuild/restart Vite after tooling updates to stamp the served document.
- * Output: .cache/golden/<UTC YYYY-MM-DD-HHMMSS>/<site>-<1|2|3>.png + index.html.
+ * Output: .cache/golden/<UTC YYYY-MM-DD-HHMMSS>/ hero PNGs, <site>-1-mission.png and index.html.
  * GOLDEN_SITES=lost-city,beebe-vent-field limits the run to those sites.
  * GOLDEN_SITES=monterey is an alias for monterey-canyon.
  * GOLDEN_MODE=mission captures all 13 real mission openings and +10 s frames.
  * It defaults to desktop, portrait and landscape, using ?mission=<id>&skipBriefing=1.
  * Mission physics and chase cameras run normally; no free-dive poses are applied.
- * Without GOLDEN_MODE, captures still use free dive.
+ * Without GOLDEN_MODE, adds one first-loaded mission frame per catalog site to the hero set.
+ * GOLDEN_MODE=free-dive keeps only the authored hero captures.
  * GOLDEN_LAYOUTS=desktop,portrait captures 1600×900 and 390×844 at the same authored poses.
  * GOLDEN_TIER=low selects Low (default high); GOLDEN_LAYOUTS=portrait,landscape adds 844×390.
  * GOLDEN_SITES=all includes all 13 catalog sites plus the east Blue Hole gallery.
- * With no GOLDEN_SITES, the default set is the ten hero sites in defaultHeroes (Kama, Hunga and Axial included).
+ * With no GOLDEN_SITES, capture the ten hero sites in defaultHeroes plus all 13 missions.
  * Monterey uses tools/monterey-poses.json, rather than geometry-dependent wall-life patch selection.
  * Chromium uses SwiftShader so the tool also works without a physical GPU.
  */
 import { chromium } from '@playwright/test';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import {
-  goldenOptions,
-  goldenUrl,
-  selectGoldenHeroes,
-  selectGoldenMissions,
-} from './golden-options.mjs';
+import { goldenOptions, goldenUrl, goldenJobs } from './golden-options.mjs';
 import { readGoldenBuild } from './golden-build.mjs';
 import { goldenManifest, goldenContactSheet } from './golden-manifest.mjs';
 import { installGoldenFrames } from './golden-frames.mjs';
@@ -53,7 +49,7 @@ async function main() {
   const args = process.argv.slice(2);
   if (args.includes('--help') || args.includes('-h')) {
     console.log(
-      'Usage: node tools/golden-shots.mjs [base-url | --base-url URL] (default http://localhost:4173/)\nEnv: GOLDEN_TIER=low|medium|high, GOLDEN_LAYOUTS=desktop,portrait,landscape, GOLDEN_SITES=all|site,..., GOLDEN_MODE=free-dive|mission',
+      'Usage: node tools/golden-shots.mjs [base-url | --base-url URL] (default http://localhost:4173/)\nEnv: GOLDEN_TIER=low|medium|high, GOLDEN_LAYOUTS=desktop,portrait,landscape, GOLDEN_SITES=all|site,..., GOLDEN_MODE=all|free-dive|mission',
     );
     return;
   }
@@ -70,7 +66,7 @@ async function main() {
   const stamp = new Date().toISOString().slice(0, 19).replace('T', '-').replaceAll(':', '');
   const output = resolve('.cache/golden', stamp);
   const options = goldenOptions();
-  const { mode, tier, layouts } = options;
+  const { tier } = options;
   const closeOverride = process.env.GOLDEN_CLOSE ? JSON.parse(process.env.GOLDEN_CLOSE) : null; // dev: retune the west alcove close pose
   const defaultHeroes = [
     // Side-on from the starboard quarter, so the hull face fills the frame instead of a look down at the mud.
@@ -95,7 +91,7 @@ async function main() {
     ['monterey-canyon', 'canyon-wall-ledge', 'monterey-canyon', montereyPoses.wall],
     ['challenger-deep', 'leggo-lander-marker'],
     ['endurance', 'main-hull'],
-    // Mission openings for the three sites the default set used to miss; same heroes and poses as the GOLDEN_SITES path (golden-options.mjs).
+    // Free-dive heroes for the three sites the default set used to miss; same heroes and poses as the GOLDEN_SITES path (golden-options.mjs).
     ['kamaehuakanaloa', 'hiolo-north-pillows', 'kamaehuakanaloa', lowTierPoses.kamaehuakanaloa],
     ['axial-seamount-ashes', 'mushroom-chimney'],
     [
@@ -108,10 +104,7 @@ async function main() {
   const catalog = JSON.parse(
     await readFile(new URL('../data/landmarks/index.json', import.meta.url), 'utf8'),
   );
-  const heroes =
-    mode === 'mission'
-      ? selectGoldenMissions(catalog.landmarks, options)
-      : selectGoldenHeroes(defaultHeroes, catalog.landmarks, options);
+  const jobs = goldenJobs(defaultHeroes, catalog.landmarks, options);
   let provenance = { sha: null, dirty: null, buildMode: null };
   await mkdir(output, { recursive: true });
   const captures = [];
@@ -162,396 +155,429 @@ async function main() {
     for (const {
       layout: { name: layout, width, height },
       hero: [siteId, heroId, slug, fixed],
-    } of layouts.flatMap((layout) => heroes.map((hero) => ({ layout, hero })))) {
+      mode,
+    } of jobs) {
       const site = slug ?? siteId;
       stage = `${site}: create context`;
-      const context = await browser.newContext({
-        viewport: { width, height },
-        hasTouch: layout !== 'desktop',
-        isMobile: layout !== 'desktop',
-        deviceScaleFactor: 1,
-        serviceWorkers: 'block',
-      });
+      let context;
       try {
-        // Hold the last presented frame during capture so SwiftShader does not
-        // continually queue WebGL work ahead of Chromium's screenshot readback.
-        // Resume the queued callbacks afterwards; no game/render settings change.
-        await context.addInitScript(installGoldenFrames, { mission: mode === 'mission' });
-        const page = await context.newPage();
-        page.setDefaultTimeout(120_000);
-        const evaluate = (...args) => bounded(stage, page.evaluate(...args));
-        const errors = [];
-        page.on('pageerror', (error) => errors.push(error.message));
-        page.on('crash', () => errors.push('Chromium renderer crashed'));
-        stage = `${site}: navigate preview`;
-        // Vite returns a helpful link (rather than a redirect) at / when preview
-        // has a project base. Follow that link before waiting on game hooks.
-        if (!baseResolved) {
-          const response = await context.request.get(base.href, { timeout: 30_000 });
-          let body = await response.text();
-          if (body.includes('The server is configured with a public base URL')) {
-            const href = body.match(/<a\s[^>]*href=["']([^"']+)["']/i)?.[1];
-            if (!href) throw new Error('Preview base warning has no destination');
-            const destination = new URL(href, base);
-            if (destination.origin !== base.origin)
-              throw new Error('Preview base must stay on the same origin');
-            base = destination;
-            if (!base.pathname.endsWith('/')) base.pathname += '/';
-            const resolved = await context.request.get(base.href, { timeout: 30_000 });
-            if (!resolved.ok()) throw new Error(`Preview returned HTTP ${resolved.status()}`);
-            body = await resolved.text();
-            await resolved.dispose();
-          } else if (!response.ok()) {
-            throw new Error(`Preview returned HTTP ${response.status()} for ${base.href}`);
-          }
-          await response.dispose();
-          provenance = readGoldenBuild(body);
-          baseResolved = true;
-          console.log(`Preview base: ${base.href}`);
-        }
-        const url = goldenUrl(base, siteId, options, layout);
-        const loadStarted = Date.now();
-        const loaded = await page.goto(url.href, {
-          waitUntil: 'domcontentloaded',
-          timeout: 120_000,
-        });
-        if (!loaded?.ok())
-          throw new Error(`Preview returned HTTP ${loaded?.status()} for ${url.href}`);
-        const pageBuild = readGoldenBuild(await loaded.text());
-        for (const field of ['sha', 'dirty', 'buildMode'])
-          if (pageBuild[field] !== provenance[field])
-            throw new Error(`Served build ${field} changed during the capture run`);
-        stage = `${site}: load game and props`;
-        console.log(stage);
-        await page.waitForFunction(
-          () =>
-            window.__gameReady && window.__game?.props.loaded && window.__game?.discovery.loaded,
-          null,
-          { timeout: 120_000, ...(mode === 'mission' ? { polling: 100 } : {}) },
+        context = await bounded(
+          stage,
+          browser.newContext({
+            viewport: { width, height },
+            hasTouch: layout !== 'desktop',
+            isMobile: layout !== 'desktop',
+            deviceScaleFactor: 1,
+            serviceWorkers: 'block',
+          }),
+          10_000,
         );
-        if (mode === 'mission') {
-          stage = `${site}: first loaded mission frame`;
-          await page.waitForFunction(() => window.__goldenFrames.paused, null, { polling: 100 });
-          const missionId = await evaluate(() => window.__game.mission?.id);
-          if (missionId !== siteId) throw new Error(`Expected mission ${siteId}, got ${missionId}`);
-        } else {
-          await settle(page);
-          await evaluate(() => window.__game.terrain.texturesReady);
-          await evaluate(() => {
-            // Free-dive fixed poses retain the original physics freeze.
-            window.__game.sub.step = () => {};
-          });
-        }
-        const loadMs = Date.now() - loadStarted;
-        const capture = async (n, range, timeS = null) => {
-          stage = `${site}: capture ${n}`;
-          console.log(stage);
-          const frameTimes = mode === 'mission' ? null : await settle(page);
-          if (errors.length) throw new Error(`${site}: ${errors.join('; ')}`);
-          const filename = `${site}${layout === 'desktop' ? '' : `-${layout}`}-${n}${mode === 'mission' ? '-mission' : ''}.png`;
-          const pose = await evaluate(() => {
-            const g = window.__game;
-            return {
-              missionId: g.mission?.id ?? null,
-              missionElapsedS: g.mission?.elapsedS ?? null,
-              position: g.sub.position.toArray(),
-              yaw: g.sub.yaw,
-              pitch: g.sub.pitch,
-              camera: g.rig.camera.position.toArray(),
-              view: g.rig.mode,
-              tier: g.perf.tier,
-              hull: g.sub.getState().hullClass,
-              failedProps: g.props.stats.failed,
-              lookElevation: g.rig.lookElevation,
-              drawCalls: g.perf.drawCalls,
-              triangles: g.perf.triangles,
-              terrain: { ...g.terrain.stats },
-              heroGeometry: g.props.placed
-                .filter((p) => p.def.feature)
-                .map((p) => {
-                  const meshes = [];
-                  p.root.traverse((o) => {
-                    if (o.isMesh)
-                      meshes.push({
-                        name: o.name,
-                        vertices: o.geometry?.attributes.position?.count ?? 0,
-                        instances: o.count ?? 1,
-                      });
-                  });
-                  return { id: p.def.id, meshes };
-                }),
-              hud: [
-                '.hud-readouts',
-                '.hud-attribution',
-                '.guidance-slot',
-                '.sonar',
-                '.tc-stick',
-                '.tc-slider',
-                '.tc-buttons',
-                '.tc-btn-pause',
-                '.objectives-panel',
-              ].flatMap((selector) => {
-                const el = document.querySelector(selector);
-                if (!el || !el.checkVisibility()) return [];
-                const { x, y, width, height } = el.getBoundingClientRect();
-                return [{ selector, x, y, width, height }];
-              }),
-            };
-          });
-          if (pose.tier !== tier)
-            throw new Error(`${site}: expected ${tier} tier, got ${pose.tier}`);
-          if (pose.failedProps)
-            throw new Error(`${site}: ${pose.failedProps} props failed to load`);
-          await bounded(
-            'wait for fonts',
-            page.evaluate(() => document.fonts.ready.then(() => {})),
-          );
-          if (mode !== 'mission') await evaluate(() => window.__goldenFrames.pause());
-          let captureMethod = 'playwright';
-          let png;
-          try {
-            try {
-              png = await page.screenshot({
-                caret: 'initial',
-                timeout: 30_000,
-              });
-            } catch (error) {
-              if (page.isClosed() || errors.length) throw error;
-              console.warn(
-                `${filename}: normal screenshot failed; trying Chromium viewport capture (${error.message.split('\n')[0]})`,
-              );
-              const session = await context.newCDPSession(page);
-              try {
-                const { data } = await bounded(
-                  'Chromium viewport capture',
-                  session.send('Page.captureScreenshot', {
-                    format: 'png',
-                    fromSurface: false,
-                    captureBeyondViewport: false,
-                  }),
-                  90_000,
-                );
-                png = Buffer.from(data, 'base64');
-                captureMethod = 'cdp-viewport';
-              } finally {
-                await bounded('detach capture session', session.detach(), 5_000).catch(() => {});
+        await bounded(
+          `${site}: capture budget`,
+          (async () => {
+            // Hold the last presented frame during capture so SwiftShader does not
+            // continually queue WebGL work ahead of Chromium's screenshot readback.
+            // Resume the queued callbacks afterwards; no game/render settings change.
+            await context.addInitScript(installGoldenFrames, { mission: mode === 'mission' });
+            const page = await context.newPage();
+            page.setDefaultTimeout(120_000);
+            const evaluate = (...args) => bounded(stage, page.evaluate(...args));
+            const errors = [];
+            page.on('pageerror', (error) => errors.push(error.message));
+            page.on('crash', () => errors.push('Chromium renderer crashed'));
+            stage = `${site}: navigate preview`;
+            // Vite returns a helpful link (rather than a redirect) at / when preview
+            // has a project base. Follow that link before waiting on game hooks.
+            if (!baseResolved) {
+              const response = await context.request.get(base.href, { timeout: 30_000 });
+              let body = await response.text();
+              if (body.includes('The server is configured with a public base URL')) {
+                const href = body.match(/<a\s[^>]*href=["']([^"']+)["']/i)?.[1];
+                if (!href) throw new Error('Preview base warning has no destination');
+                const destination = new URL(href, base);
+                if (destination.origin !== base.origin)
+                  throw new Error('Preview base must stay on the same origin');
+                base = destination;
+                if (!base.pathname.endsWith('/')) base.pathname += '/';
+                const resolved = await context.request.get(base.href, { timeout: 30_000 });
+                if (!resolved.ok()) throw new Error(`Preview returned HTTP ${resolved.status()}`);
+                body = await resolved.text();
+                await resolved.dispose();
+              } else if (!response.ok()) {
+                throw new Error(`Preview returned HTTP ${response.status()} for ${base.href}`);
               }
+              await response.dispose();
+              provenance = readGoldenBuild(body);
+              baseResolved = true;
+              console.log(`Preview base: ${base.href}`);
             }
-          } finally {
-            if (mode !== 'mission')
-              await bounded(
-                'resume render loop',
-                page.evaluate(() => window.__goldenFrames.resume()),
-              );
-          }
-          if (errors.length) throw new Error(`${site}: ${errors.join('; ')}`);
-          if (
-            png.length < 24 ||
-            png.toString('hex', 0, 8) !== '89504e470d0a1a0a' ||
-            png.readUInt32BE(16) !== width ||
-            png.readUInt32BE(20) !== height
-          )
-            throw new Error(`${filename}: capture is not a ${width} × ${height} PNG`);
-          await writeFile(resolve(output, filename), png);
-          captures.push({
-            site,
-            heroId: heroId ?? null,
-            mode,
-            ...provenance,
-            url: url.href,
-            timeS,
-            filename,
-            range,
-            captureMethod,
-            layout,
-            viewport: [width, height],
-            loadMs,
-            frameTimes,
-            ...pose,
-          });
-          console.log(`${filename} (${pose.hull}, ${pose.tier})`);
-        };
-        if (mode === 'mission') {
-          await capture(1, null, 0);
-          stage = `${site}: advance mission by 10 seconds`;
-          await evaluate(() => window.__goldenFrames.advance(10));
-          await page.waitForFunction(() => window.__goldenFrames.paused, null, { polling: 100 });
-          await capture(2, null, 10);
-          continue;
-        }
-        if (site === siteId) await capture(1, null);
-        stage = `${site}: choose approach`;
-        const approach = await evaluate(
-          ({ propId, fixed }) => {
-            const g = window.__game;
-            const hero = g.props.placed.find((p) => p.def.id === propId);
-            if (!hero || hero.localBounds.isEmpty())
-              throw new Error(`Missing hero bounds: ${propId}`);
-            hero.root.updateMatrixWorld(true);
-            if (fixed) {
-              // Authored pose: stand over the hero's ledge on a fixed bearing, aim at its middle.
-              const mid = hero.root.localToWorld(
-                fixed.target
-                  ? g.sub.position.clone().fromArray(fixed.target)
-                  : hero.localBounds.getCenter(g.sub.position.clone()),
-              );
-              return {
-                target: mid.toArray(),
-                direction: fixed.direction,
-                above: fixed.above + hero.root.position.y - mid.y,
-                close: fixed.close
-                  ? { ...fixed.close, above: fixed.close.above + hero.root.position.y - mid.y }
-                  : null,
-              };
-            }
-            // Vent set pieces are framed from their axis; wall scarps from their footprint edge.
-            const axis = /^(?!.*(ledge|cliff|scarp)).+/.test(hero.def.feature ?? '');
-            const centre = hero.localBounds.getCenter(g.sub.position.clone());
-            const half = hero.localBounds.getSize(g.sub.position.clone()).multiplyScalar(0.5);
-            if (hero.def.model === 'procedural:chimney' && hero.def.dimensionsM?.[2])
-              centre.y = Math.max(hero.localBounds.min.y, 0) + hero.def.dimensionsM[2] * 0.45;
-            for (let i = 0; i < 16; i++) {
-              const angle = Math.PI / 4 + (i * Math.PI) / 8;
-              const dx = Math.sin(angle),
-                dz = -Math.cos(angle);
-              // Sprawling vent set pieces (a feature) are framed from their axis, not their footprint edge.
-              const edge = axis
-                ? 0
-                : Math.min(
-                    half.x / Math.max(Math.abs(dx), 1e-6),
-                    half.z / Math.max(Math.abs(dz), 1e-6),
-                  );
-              const target = hero.root.localToWorld(
-                centre.clone().add(g.sub.position.clone().set(dx * edge, 0, dz * edge)),
-              );
-              const direction = axis
-                ? hero.root
-                    .localToWorld(g.sub.position.clone().set(dx, 0, dz))
-                    .sub(hero.root.localToWorld(g.sub.position.clone().set(0, 0, 0)))
-                    .setY(0)
-                    .normalize()
-                : target.clone().sub(hero.root.localToWorld(centre.clone())).setY(0).normalize();
-              if (direction.lengthSq() < 0.5) continue;
-              const clear = (axis ? [40, 30] : [40, 15]).every((range) => {
-                const p = target.clone().addScaledVector(direction, range);
-                p.y = g.terrain.sampleHeight(p.x, p.z) + 15;
-                return (
-                  p.y < -g.config.submarine.hullRadius &&
-                  !g.props.collide(p.clone(), g.config.submarine.hullRadius, p.clone())
-                );
-              });
-              if (clear) return { target: target.toArray(), direction: direction.toArray() };
-            }
-            throw new Error(`No clear fixed approach for ${propId}`);
-          },
-          { propId: heroId, fixed: fixed ?? null },
-        );
-        // Wall scarps with wall-life (Monterey): aim at the densest sponge/coral patch, from the face side.
-        const lifeApproach = await evaluate((propId) => {
-          const g = window.__game;
-          const hero = g.props.placed.find((p) => p.def.id === propId);
-          if (!hero) return null;
-          hero.root.updateMatrixWorld(true);
-          const Matrix4 = hero.root.matrixWorld.constructor;
-          const m = new Matrix4();
-          const pts = [];
-          hero.root.traverse((o) => {
-            if (!o.isInstancedMesh || !/^wall-(sponges|corals)/.test(o.name)) return;
-            for (let i = 0; i < o.count; i++) {
-              o.getMatrixAt(i, m);
-              m.premultiply(o.matrixWorld);
-              pts.push([m.elements[12], m.elements[13], m.elements[14]]);
-            }
-          });
-          if (pts.length < 10) return null;
-          let best = null;
-          for (const p of pts) {
-            const near = pts.filter((q) => Math.hypot(q[0] - p[0], q[1] - p[1], q[2] - p[2]) < 9);
-            if (!best || near.length > best.near.length) best = { near };
-          }
-          const c = [0, 1, 2].map(
-            (k) => best.near.reduce((a, q) => a + q[k], 0) / best.near.length,
-          );
-          const o0 = hero.root.localToWorld(g.sub.position.clone().set(0, 0, 0));
-          const o1 = hero.root.localToWorld(g.sub.position.clone().set(0, 0, -1));
-          const face = o1.sub(o0).setY(0).normalize();
-          for (const turn of [0, 0.3, -0.3, 0.6, -0.6, 0.9, -0.9]) {
-            const dx = face.x * Math.cos(turn) - face.z * Math.sin(turn);
-            const dz = face.x * Math.sin(turn) + face.z * Math.cos(turn);
-            const ok = [40, 26].every((range) => {
-              const p = g.sub.position.clone().set(c[0] + dx * range, 0, c[2] + dz * range);
-              p.y = g.terrain.sampleHeight(p.x, p.z) + 15;
-              return (
-                p.y < -g.config.submarine.hullRadius &&
-                !g.props.collide(p.clone(), g.config.submarine.hullRadius, p.clone())
-              );
+            const url = goldenUrl(base, siteId, { ...options, mode }, layout);
+            const loadStarted = Date.now();
+            const loaded = await page.goto(url.href, {
+              waitUntil: 'domcontentloaded',
+              timeout: 120_000,
             });
-            if (ok) return { target: c, direction: [dx, 0, dz], count: best.near.length };
-          }
-          return null;
-        }, heroId);
-        if (lifeApproach && !fixed) {
-          console.log(`${site}: wall-life patch of ${lifeApproach.count} aimed`);
-          approach.target = lifeApproach.target;
-          approach.direction = lifeApproach.direction;
-        }
-        // A feature set piece is framed from its axis, so its close shot stays outside the spires.
-        const closeRange = fixed
-          ? (fixed.close?.range ?? 30)
-          : lifeApproach
-            ? 26
-            : await evaluate(
-                (propId) =>
-                  (
-                    window.__game.props.placed.find((p) => p.def.id === propId)?.def.feature ?? ''
-                  ).match(/^(?!.*(ledge|cliff|scarp)).+/)
-                    ? 30
-                    : 15,
-                heroId,
+            if (!loaded?.ok())
+              throw new Error(`Preview returned HTTP ${loaded?.status()} for ${url.href}`);
+            const pageBuild = readGoldenBuild(await loaded.text());
+            for (const field of ['sha', 'dirty', 'buildMode'])
+              if (pageBuild[field] !== provenance[field])
+                throw new Error(`Served build ${field} changed during the capture run`);
+            stage = `${site}: load game and props`;
+            console.log(stage);
+            await page.waitForFunction(
+              () =>
+                window.__gameReady &&
+                window.__game?.props.loaded &&
+                window.__game?.discovery.loaded,
+              null,
+              { timeout: 120_000, ...(mode === 'mission' ? { polling: 100 } : {}) },
+            );
+            if (mode === 'mission') {
+              stage = `${site}: first loaded mission frame`;
+              await page.waitForFunction(() => window.__goldenFrames.paused, null, {
+                polling: 100,
+              });
+              const missionId = await evaluate(() => window.__game.mission?.id);
+              if (missionId !== siteId)
+                throw new Error(`Expected mission ${siteId}, got ${missionId}`);
+            } else {
+              await settle(page);
+              await evaluate(() => window.__game.terrain.texturesReady);
+              await evaluate(() => {
+                // Free-dive fixed poses retain the original physics freeze.
+                window.__game.sub.step = () => {};
+              });
+            }
+            const loadMs = Date.now() - loadStarted;
+            const capture = async (n, range, timeS = null) => {
+              stage = `${site}: capture ${n}`;
+              console.log(stage);
+              const frameTimes = mode === 'mission' ? null : await settle(page);
+              if (errors.length) throw new Error(`${site}: ${errors.join('; ')}`);
+              const filename = `${site}${layout === 'desktop' ? '' : `-${layout}`}-${n}${mode === 'mission' ? '-mission' : ''}.png`;
+              const pose = await evaluate(() => {
+                const g = window.__game;
+                return {
+                  gameplayMode: g.save.get().gameplayMode,
+                  missionId: g.mission?.id ?? null,
+                  missionElapsedS: g.mission?.elapsedS ?? null,
+                  position: g.sub.position.toArray(),
+                  yaw: g.sub.yaw,
+                  pitch: g.sub.pitch,
+                  camera: g.rig.camera.position.toArray(),
+                  view: g.rig.mode,
+                  tier: g.perf.tier,
+                  hull: g.sub.getState().hullClass,
+                  failedProps: g.props.stats.failed,
+                  lookElevation: g.rig.lookElevation,
+                  drawCalls: g.perf.drawCalls,
+                  triangles: g.perf.triangles,
+                  terrain: { ...g.terrain.stats },
+                  heroGeometry: g.props.placed
+                    .filter((p) => p.def.feature)
+                    .map((p) => {
+                      const meshes = [];
+                      p.root.traverse((o) => {
+                        if (o.isMesh)
+                          meshes.push({
+                            name: o.name,
+                            vertices: o.geometry?.attributes.position?.count ?? 0,
+                            instances: o.count ?? 1,
+                          });
+                      });
+                      return { id: p.def.id, meshes };
+                    }),
+                  hud: [
+                    '.hud-readouts',
+                    '.hud-attribution',
+                    '.guidance-slot',
+                    '.sonar',
+                    '.tc-stick',
+                    '.tc-slider',
+                    '.tc-buttons',
+                    '.tc-btn-pause',
+                    '.objectives-panel',
+                  ].flatMap((selector) => {
+                    const el = document.querySelector(selector);
+                    if (!el || !el.checkVisibility()) return [];
+                    const { x, y, width, height } = el.getBoundingClientRect();
+                    return [{ selector, x, y, width, height }];
+                  }),
+                };
+              });
+              if (pose.tier !== tier)
+                throw new Error(`${site}: expected ${tier} tier, got ${pose.tier}`);
+              if (mode === 'mission' && (pose.view !== 'chase' || pose.gameplayMode !== 'arcade'))
+                throw new Error(`${site}: expected default Arcade mission chase camera`);
+              if (pose.failedProps)
+                throw new Error(`${site}: ${pose.failedProps} props failed to load`);
+              await bounded(
+                'wait for fonts',
+                page.evaluate(() => document.fonts.ready.then(() => {})),
               );
-        for (const [n, range] of [
-          [2, fixed?.approachRange ?? 40],
-          [3, closeRange],
-        ]) {
-          stage = `${site}: position ${n}`;
-          await evaluate(
-            ({ target, direction, range, above, close, n }) => {
+              if (mode !== 'mission') await evaluate(() => window.__goldenFrames.pause());
+              let captureMethod = 'playwright';
+              let png;
+              try {
+                try {
+                  png = await page.screenshot({
+                    caret: 'initial',
+                    timeout: 30_000,
+                  });
+                } catch (error) {
+                  if (page.isClosed() || errors.length) throw error;
+                  console.warn(
+                    `${filename}: normal screenshot failed; trying Chromium viewport capture (${error.message.split('\n')[0]})`,
+                  );
+                  const session = await context.newCDPSession(page);
+                  try {
+                    const { data } = await bounded(
+                      'Chromium viewport capture',
+                      session.send('Page.captureScreenshot', {
+                        format: 'png',
+                        fromSurface: false,
+                        captureBeyondViewport: false,
+                      }),
+                      90_000,
+                    );
+                    png = Buffer.from(data, 'base64');
+                    captureMethod = 'cdp-viewport';
+                  } finally {
+                    await bounded('detach capture session', session.detach(), 5_000).catch(
+                      () => {},
+                    );
+                  }
+                }
+              } finally {
+                if (mode !== 'mission')
+                  await bounded(
+                    'resume render loop',
+                    page.evaluate(() => window.__goldenFrames.resume()),
+                  );
+              }
+              if (errors.length) throw new Error(`${site}: ${errors.join('; ')}`);
+              if (
+                png.length < 24 ||
+                png.toString('hex', 0, 8) !== '89504e470d0a1a0a' ||
+                png.readUInt32BE(16) !== width ||
+                png.readUInt32BE(20) !== height
+              )
+                throw new Error(`${filename}: capture is not a ${width} × ${height} PNG`);
+              await writeFile(resolve(output, filename), png);
+              captures.push({
+                site,
+                heroId: heroId ?? null,
+                mode,
+                ...provenance,
+                url: url.href,
+                timeS,
+                filename,
+                range,
+                captureMethod,
+                layout,
+                viewport: [width, height],
+                loadMs,
+                frameTimes,
+                ...pose,
+              });
+              console.log(`${filename} (${pose.hull}, ${pose.tier})`);
+            };
+            if (mode === 'mission') {
+              await capture(1, null, 0);
+              if (options.mode !== 'mission') return;
+              stage = `${site}: advance mission by 10 seconds`;
+              await evaluate(() => window.__goldenFrames.advance(10));
+              await page.waitForFunction(() => window.__goldenFrames.paused, null, {
+                polling: 100,
+              });
+              await capture(2, null, 10);
+              return;
+            }
+            if (site === siteId) await capture(1, null);
+            stage = `${site}: choose approach`;
+            const approach = await evaluate(
+              ({ propId, fixed }) => {
+                const g = window.__game;
+                const hero = g.props.placed.find((p) => p.def.id === propId);
+                if (!hero || hero.localBounds.isEmpty())
+                  throw new Error(`Missing hero bounds: ${propId}`);
+                hero.root.updateMatrixWorld(true);
+                if (fixed) {
+                  // Authored pose: stand over the hero's ledge on a fixed bearing, aim at its middle.
+                  const mid = hero.root.localToWorld(
+                    fixed.target
+                      ? g.sub.position.clone().fromArray(fixed.target)
+                      : hero.localBounds.getCenter(g.sub.position.clone()),
+                  );
+                  return {
+                    target: mid.toArray(),
+                    direction: fixed.direction,
+                    above: fixed.above + hero.root.position.y - mid.y,
+                    close: fixed.close
+                      ? { ...fixed.close, above: fixed.close.above + hero.root.position.y - mid.y }
+                      : null,
+                  };
+                }
+                // Vent set pieces are framed from their axis; wall scarps from their footprint edge.
+                const axis = /^(?!.*(ledge|cliff|scarp)).+/.test(hero.def.feature ?? '');
+                const centre = hero.localBounds.getCenter(g.sub.position.clone());
+                const half = hero.localBounds.getSize(g.sub.position.clone()).multiplyScalar(0.5);
+                if (hero.def.model === 'procedural:chimney' && hero.def.dimensionsM?.[2])
+                  centre.y = Math.max(hero.localBounds.min.y, 0) + hero.def.dimensionsM[2] * 0.45;
+                for (let i = 0; i < 16; i++) {
+                  const angle = Math.PI / 4 + (i * Math.PI) / 8;
+                  const dx = Math.sin(angle),
+                    dz = -Math.cos(angle);
+                  // Sprawling vent set pieces (a feature) are framed from their axis, not their footprint edge.
+                  const edge = axis
+                    ? 0
+                    : Math.min(
+                        half.x / Math.max(Math.abs(dx), 1e-6),
+                        half.z / Math.max(Math.abs(dz), 1e-6),
+                      );
+                  const target = hero.root.localToWorld(
+                    centre.clone().add(g.sub.position.clone().set(dx * edge, 0, dz * edge)),
+                  );
+                  const direction = axis
+                    ? hero.root
+                        .localToWorld(g.sub.position.clone().set(dx, 0, dz))
+                        .sub(hero.root.localToWorld(g.sub.position.clone().set(0, 0, 0)))
+                        .setY(0)
+                        .normalize()
+                    : target
+                        .clone()
+                        .sub(hero.root.localToWorld(centre.clone()))
+                        .setY(0)
+                        .normalize();
+                  if (direction.lengthSq() < 0.5) continue;
+                  const clear = (axis ? [40, 30] : [40, 15]).every((range) => {
+                    const p = target.clone().addScaledVector(direction, range);
+                    p.y = g.terrain.sampleHeight(p.x, p.z) + 15;
+                    return (
+                      p.y < -g.config.submarine.hullRadius &&
+                      !g.props.collide(p.clone(), g.config.submarine.hullRadius, p.clone())
+                    );
+                  });
+                  if (clear) return { target: target.toArray(), direction: direction.toArray() };
+                }
+                throw new Error(`No clear fixed approach for ${propId}`);
+              },
+              { propId: heroId, fixed: fixed ?? null },
+            );
+            // Wall scarps with wall-life (Monterey): aim at the densest sponge/coral patch, from the face side.
+            const lifeApproach = await evaluate((propId) => {
               const g = window.__game;
-              // An authored close shot may stand off to one side and higher, looking across the alcove.
-              const c = n === 3 ? close : null;
-              const fixedY = above === undefined ? null : target[1] + (c?.above ?? above);
-              const side = c?.lateral ?? 0;
-              const x = target[0] + direction[0] * range - direction[2] * side;
-              const z = target[2] + direction[2] * range + direction[0] * side;
-              const y = fixedY ?? g.terrain.sampleHeight(x, z) + 15;
-              const yaw = Math.atan2(target[0] - x, -(target[2] - z));
-              g.sub.reset(x, y, z, yaw);
-              g.sub.pitch = Math.max(
-                -g.config.submarine.maxPitch,
-                Math.min(g.config.submarine.maxPitch, Math.atan2(target[1] - y, range)),
+              const hero = g.props.placed.find((p) => p.def.id === propId);
+              if (!hero) return null;
+              hero.root.updateMatrixWorld(true);
+              const Matrix4 = hero.root.matrixWorld.constructor;
+              const m = new Matrix4();
+              const pts = [];
+              hero.root.traverse((o) => {
+                if (!o.isInstancedMesh || !/^wall-(sponges|corals)/.test(o.name)) return;
+                for (let i = 0; i < o.count; i++) {
+                  o.getMatrixAt(i, m);
+                  m.premultiply(o.matrixWorld);
+                  pts.push([m.elements[12], m.elements[13], m.elements[14]]);
+                }
+              });
+              if (pts.length < 10) return null;
+              let best = null;
+              for (const p of pts) {
+                const near = pts.filter(
+                  (q) => Math.hypot(q[0] - p[0], q[1] - p[1], q[2] - p[2]) < 9,
+                );
+                if (!best || near.length > best.near.length) best = { near };
+              }
+              const c = [0, 1, 2].map(
+                (k) => best.near.reduce((a, q) => a + q[k], 0) / best.near.length,
               );
-              g.rig.resetView();
-              g.rig.setMode('first-person');
-              g.rig.snap(g.sub.position, yaw, g.sub.pitch);
-              const eye = g.rig.camera.position;
-              const pitch = Math.atan2(
-                target[1] - eye.y,
-                Math.hypot(target[0] - eye.x, target[2] - eye.z),
+              const o0 = hero.root.localToWorld(g.sub.position.clone().set(0, 0, 0));
+              const o1 = hero.root.localToWorld(g.sub.position.clone().set(0, 0, -1));
+              const face = o1.sub(o0).setY(0).normalize();
+              for (const turn of [0, 0.3, -0.3, 0.6, -0.6, 0.9, -0.9]) {
+                const dx = face.x * Math.cos(turn) - face.z * Math.sin(turn);
+                const dz = face.x * Math.sin(turn) + face.z * Math.cos(turn);
+                const ok = [40, 26].every((range) => {
+                  const p = g.sub.position.clone().set(c[0] + dx * range, 0, c[2] + dz * range);
+                  p.y = g.terrain.sampleHeight(p.x, p.z) + 15;
+                  return (
+                    p.y < -g.config.submarine.hullRadius &&
+                    !g.props.collide(p.clone(), g.config.submarine.hullRadius, p.clone())
+                  );
+                });
+                if (ok) return { target: c, direction: [dx, 0, dz], count: best.near.length };
+              }
+              return null;
+            }, heroId);
+            if (lifeApproach && !fixed) {
+              console.log(`${site}: wall-life patch of ${lifeApproach.count} aimed`);
+              approach.target = lifeApproach.target;
+              approach.direction = lifeApproach.direction;
+            }
+            // A feature set piece is framed from its axis, so its close shot stays outside the spires.
+            const closeRange = fixed
+              ? (fixed.close?.range ?? 30)
+              : lifeApproach
+                ? 26
+                : await evaluate(
+                    (propId) =>
+                      (
+                        window.__game.props.placed.find((p) => p.def.id === propId)?.def.feature ??
+                        ''
+                      ).match(/^(?!.*(ledge|cliff|scarp)).+/)
+                        ? 30
+                        : 15,
+                    heroId,
+                  );
+            for (const [n, range] of [
+              [2, fixed?.approachRange ?? 40],
+              [3, closeRange],
+            ]) {
+              stage = `${site}: position ${n}`;
+              await evaluate(
+                ({ target, direction, range, above, close, n }) => {
+                  const g = window.__game;
+                  // An authored close shot may stand off to one side and higher, looking across the alcove.
+                  const c = n === 3 ? close : null;
+                  const fixedY = above === undefined ? null : target[1] + (c?.above ?? above);
+                  const side = c?.lateral ?? 0;
+                  const x = target[0] + direction[0] * range - direction[2] * side;
+                  const z = target[2] + direction[2] * range + direction[0] * side;
+                  const y = fixedY ?? g.terrain.sampleHeight(x, z) + 15;
+                  const yaw = Math.atan2(target[0] - x, -(target[2] - z));
+                  g.sub.reset(x, y, z, yaw);
+                  g.sub.pitch = Math.max(
+                    -g.config.submarine.maxPitch,
+                    Math.min(g.config.submarine.maxPitch, Math.atan2(target[1] - y, range)),
+                  );
+                  g.rig.resetView();
+                  g.rig.setMode('first-person');
+                  g.rig.snap(g.sub.position, yaw, g.sub.pitch);
+                  const eye = g.rig.camera.position;
+                  const pitch = Math.atan2(
+                    target[1] - eye.y,
+                    Math.hypot(target[0] - eye.x, target[2] - eye.z),
+                  );
+                  g.rig.lookElevation = (pitch - g.sub.pitch) / 0.55;
+                  g.rig.snap(g.sub.position, yaw, g.sub.pitch);
+                },
+                { ...approach, range, n },
               );
-              g.rig.lookElevation = (pitch - g.sub.pitch) / 0.55;
-              g.rig.snap(g.sub.position, yaw, g.sub.pitch);
-            },
-            { ...approach, range, n },
-          );
-          await capture(n, range);
-        }
+              await capture(n, range);
+            }
+          })(),
+          180_000,
+        );
       } catch (error) {
-        failures.push({ site, layout, stage, message: error.message });
+        failures.push({ site, layout, mode, stage, message: error.message });
         console.error(`${stage}: ${error.message.split('\n')[0]}`);
       } finally {
-        await bounded('close site context', context.close(), 10_000).catch((error) => {
-          failures.push({ site, stage: 'close context', message: error.message });
-        });
+        if (context)
+          await bounded('close site context', context.close(), 10_000).catch((error) => {
+            failures.push({ site, stage: 'close context', message: error.message });
+          });
       }
     }
   } catch (error) {
@@ -568,7 +594,10 @@ async function main() {
       stamp,
       provenance,
       options,
-      heroes,
+      heroes: jobs
+        .filter((j) => j.mode === 'free-dive' && j.layout === options.layouts[0])
+        .map((j) => j.hero),
+      missions: [...new Set(jobs.filter((j) => j.mode === 'mission').map((j) => j.hero[0]))],
       failures,
       captures,
     });

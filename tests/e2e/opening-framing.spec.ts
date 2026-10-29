@@ -31,11 +31,10 @@ import { waitForFrames } from './helpers/frames.js';
 import { type GameConfig } from '../../src/core/Config.js';
 import type * as THREE from 'three';
 import catalog from '../../data/landmarks/index.json' with { type: 'json' };
-import { HERO_SITES } from '../../src/game/Cosmetics.js';
 // @ts-expect-error The existing golden URL builder is JavaScript.
 import { goldenUrl } from '../../tools/golden-options.mjs';
 
-freshTest.describe('non-hero mission spawn Low portrait capture', () => {
+freshTest.describe('catalog mission spawn Low portrait capture', () => {
   freshTest.use({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 1,
@@ -45,8 +44,8 @@ freshTest.describe('non-hero mission spawn Low portrait capture', () => {
     serviceWorkers: 'block',
   });
 
-  for (const site of catalog.landmarks.filter((id) => !HERO_SITES.some((hero) => hero === id))) {
-    // Regression guard: ordinary runs omitted non-hero mission-spawn evidence and its golden entry.
+  for (const site of catalog.landmarks) {
+    // Regression guard: ordinary runs omitted catalog mission-spawn evidence and its golden entry.
     freshTest(
       `${site}: persists spawn PNG and golden manifest`,
       async ({ page, baseURL }, info) => {
@@ -1371,7 +1370,9 @@ freshTest.describe('catalog underwater and approach poses', () => {
           const hero = g.props.placed.find((p) => p.def.id === heroId)!;
           const centre = hero.root.localToWorld(hero.localBounds.getCenter(g.sub.position.clone()));
           const toHero = centre.clone().sub(g.sub.position).setY(0).normalize();
-          const body = hero.full.children.find((child) => 'isMesh' in child) as Mesh;
+          // Heroes may be meshes themselves or contain meshes under nested LOD groups.
+          const body = hero.full.getObjectByProperty('isMesh', true) as Mesh | undefined;
+          if (!body) throw new Error(`No rendered mesh for ${heroId}`);
           body.geometry.computeBoundingBox();
           const screen = body
             .localToWorld(body.geometry.boundingBox!.getCenter(g.sub.position.clone()))

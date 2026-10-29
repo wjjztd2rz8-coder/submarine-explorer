@@ -63,7 +63,7 @@ export async function compareGoldenSets(beforeDir, afterDir) {
       !/^[a-f0-9]{40}$/.test(m.sha ?? '') ||
       typeof m.dirty !== 'boolean' ||
       m.buildMode !== 'production' ||
-      !['free-dive', 'mission'].includes(m.mode) ||
+      !['all', 'free-dive', 'mission'].includes(m.mode) ||
       !['low', 'medium', 'high'].includes(m.tier) ||
       !m.layouts?.length
     )

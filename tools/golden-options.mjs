@@ -1,10 +1,11 @@
-/** Opt-in capture settings; nightly defaults stay High / desktop / hero sites. */
+/** Nightly defaults: High / desktop heroes plus every catalog mission opening. */
 import bismarckPose from './bismarck-poses.json' with { type: 'json' };
 import lowTierPoses from './lowtier-poses.json' with { type: 'json' };
 
 export function goldenOptions(env = process.env) {
-  const mode = env.GOLDEN_MODE ?? 'free-dive';
-  if (!['free-dive', 'mission'].includes(mode)) throw new Error(`Unknown GOLDEN_MODE: ${mode}`);
+  const mode = env.GOLDEN_MODE ?? 'all';
+  if (!['all', 'free-dive', 'mission'].includes(mode))
+    throw new Error(`Unknown GOLDEN_MODE: ${mode}`);
   const tier = env.GOLDEN_TIER ?? 'high';
   if (!['low', 'medium', 'high'].includes(tier)) throw new Error(`Unknown GOLDEN_TIER: ${tier}`);
   const sizes = { desktop: [1600, 900], portrait: [390, 844], landscape: [844, 390] };
@@ -40,6 +41,26 @@ export function selectGoldenMissions(catalog, { only, allSites }) {
   const selected = catalog.filter((id) => !only || allSites || only.includes(id));
   if (!selected.length) throw new Error('Empty mission catalog');
   return selected.map((id) => [id]);
+}
+
+/** One shared runner handles authored heroes and unmodified mission openings. */
+export function goldenJobs(defaultHeroes, catalog, options) {
+  const heroes =
+    options.mode === 'mission' ? [] : selectGoldenHeroes(defaultHeroes, catalog, options);
+  const missions =
+    options.mode === 'free-dive'
+      ? []
+      : selectGoldenMissions(catalog, {
+          ...options,
+          only:
+            options.mode === 'all' && options.only && !options.allSites
+              ? [...new Set(heroes.map(([id]) => id))]
+              : options.only,
+        });
+  return options.layouts.flatMap((layout) => [
+    ...heroes.map((hero) => ({ layout, hero, mode: 'free-dive' })),
+    ...missions.map((hero) => ({ layout, hero, mode: 'mission' })),
+  ]);
 }
 
 export function goldenUrl(base, site, { mode, tier }, layout) {

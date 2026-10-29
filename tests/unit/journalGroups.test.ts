@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Journal } from '../../src/ui/Journal.js';
-import type { JournalEntry, JournalSite } from '../../src/game/JournalData.js';
+import {
+  buildJournalSite,
+  type JournalEntry,
+  type JournalSite,
+} from '../../src/game/JournalData.js';
 import { DiscoveryStore, DISCOVERY_STORAGE_KEY } from '../../src/game/DiscoveryStore.js';
 import { PhotoStore, type Photo } from '../../src/game/PhotoStore.js';
 import type { PhotoGallery } from '../../src/ui/PhotoGallery.js';
@@ -158,6 +162,35 @@ beforeEach(() => {
 afterEach(() => {
   journal.dispose();
   vi.unstubAllGlobals();
+});
+
+it.each([
+  { scanned: [], found: 0 },
+  { scanned: ['secret:arch'], found: 1 },
+  { scanned: ['sample:mud'], found: 0 },
+  { scanned: ['secret:arch', 'sample:mud'], found: 1 },
+])('counts only hidden secrets in site progress after scans $scanned', ({ scanned, found }) => {
+  // Regression: adding sample entries to Finds inflated both secret counts.
+  const reef = buildJournalSite({
+    id: 'reef',
+    guide: null,
+    pois: [],
+    species: null,
+    secrets: [{ id: 'arch', name: 'Arch', kind: 'rock', lat: 0, lon: 0, text: 'A hidden arch.' }],
+    samples: [{ id: 'mud', name: 'Sediment core', lat: 0, lon: 0 }],
+  });
+  Object.assign(journal, { sites: [reef] });
+  const store = new DiscoveryStore(null);
+  for (const id of scanned) store.record('reef', id);
+  journal.setStore(store);
+  journal.show('reef');
+  const chips = find((el) => el.className.split(' ').includes('jr-progress'));
+  expect(chips.children.map((el) => el.textContent)).toEqual(['0/0 entries', `${found}/1 secrets`]);
+  expect(reef.entries.filter((entry) => entry.kind === 'secret')).toHaveLength(2);
+  if (scanned.includes('sample:mud')) {
+    journal.show('reef/sample/mud');
+    expect(find((el) => el.className === 'jr-title').textContent).toBe('Sediment core');
+  }
 });
 
 it.each(

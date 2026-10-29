@@ -87,7 +87,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
    12a. **R-journey-guidance [Codex]:** queued 93: Home button/caption name different sites, Blue Hole opening names the optional target, one-frame stale target after a scan (journey findings 1, 4, 10).
    12b. **R-journey-labels [Codex]:** queued 94: waypoint/Journal label clipping and ellipsis, Settings Close off-screen on phones (findings 2, 3, 5, 6, 7).
    12c. **R-journal-repeat [Codex]:** queued 95: second Blue Hole gallery scan repeats the same entry; THIS DIVE counters disagree with scan count (findings 8, 9).
-   12d. **T-golden-mission [Codex]:** queued 96: golden sets use free-dive poses, so there is no mission-spawn capture (Bismarck, Blake, Hudson unrated); capture the default mission's first frame per site and note the auto-selected phone tier (Sol, 2026-10-28).
+   12d. **T-golden-mission [Codex] DONE 2026-10-29:** default runs include one mission opening at each of the 13 sites; external gates captured all 13. Corrected the two causes of six external E2E failures (nested/root mesh probes and samples inflating Journal secret counts); browser rerun and clean-tree default golden set pending outside sandbox. Strong-phone Auto selects Medium subject to reported hardware hints. Evidence: `plan/progress/T-golden-mission.md`.
 8. **S-verify / S-bughunt / S-dead [Codex, standing]:** 4730-4780 merged 2026-10-28; keep rationing.
 9. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
 10. **R-release [Haiku]:** tag the latest green-CI main after each review (f68 is the newest); check the Pages deploy.
@@ -107,7 +107,7 @@ If it fails, send it back to the same agent or Codex session with concrete feedb
 
 ## Golden screenshots
 
-`tools/golden.sh` captures the hero sites at fixed poses into `.cache/golden/<date>/`. Compare the newest set with the previous one after any visual merge. A merge must not make them worse.
+`tools/golden.sh` captures the hero sites at fixed poses plus the first loaded default mission frame at all 13 sites into `.cache/golden/<date>/`, with one shared `index.html` and build provenance. `GOLDEN_MODE=free-dive` limits a run to hero poses; `GOLDEN_MODE=mission` retains the three-layout mission opening/+10 s sweep. Compare the newest set with the previous one after any visual merge. A merge must not make them worse.
 
 Use `node tools/golden-compare.mjs <before-dir> <after-dir>` for numeric review:
 two RGB byte levels of tolerance, with larger differences limited to 0.1% of

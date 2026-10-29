@@ -785,7 +785,8 @@ export class Journal {
 
     const p = siteProgress(site, this.store);
     const wl = wildlifeProgress(site, this.store);
-    const secrets = site.entries.filter((e) => e.kind === 'secret');
+    // Samples share the Finds group, but are not hidden-secret discoveries.
+    const secrets = site.entries.filter((e) => e.kind === 'secret' && !e.id.startsWith('sample:'));
     const found = secrets.filter((e) => isEntryUnlocked(site, e, this.store)).length;
     const chips = [`${p.logged}/${p.total} entries`];
     if (p.speciesTotal) chips.push(`${p.species}/${p.speciesTotal} species`);
