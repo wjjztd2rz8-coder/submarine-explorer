@@ -6,7 +6,7 @@
       "id": "hiolo-north-chimney-1",
       "model": "procedural:chimney",
       "feature": "smoker-cluster",
-      "lat": 18.91268,
+      "lat": 18.91242,
       "lon": -155.26778,
       "snap_to_seabed": true,
       "heading_deg": 40,

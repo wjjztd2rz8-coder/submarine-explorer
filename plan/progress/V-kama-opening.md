@@ -7,14 +7,14 @@ Kamaʻehuakanaloa used the `seamount` environment preset, which only adds a fain
 ## Change (data only, no shared code)
 
 - `data/landmarks/kamaehuakanaloa/mission.json`: environment preset `vent` with a rust-brown, lighter plume and haze glow. The existing vent preset supplies smoke, shimmer and haze. Glow-light settings stay at the vent defaults (the per-site preset spec has a table for authored glow; a stronger glow would need a row there).
-- `data/landmarks/kamaehuakanaloa/props.json`: hiolo-north-chimney-1 moved ~35 m north to sit by the scan POI, so the stack is where the target marker points. The iron-stained mounds and pillows are kept.
+- `props.json` is unchanged: moving the chimney broke the free-dive opening framing checks, and the stack already sits under the scan marker.
 - `data/landmarks/kamaehuakanaloa/site.json` `opening.mission`: `yawOffset` 20 (existing shared opening table). Range stays 110 m: a 70 m try broke the approach-distance guards (110 m minimum) and was dropped.
 
 No new HUD, setting or code branch. Logged in CHANGELOG.md; nothing cut.
 
 ## Result
 
-Before/after Low-tier desktop shots in `.cache/codex/shots/V-kama-opening/{before,after}/`. After: a smoking rust-brown vent stack is visible mid-left above the scan marker, the pillow mound is mid-right, and the sub is centre. Readability scene/sub 0.170 (cutoff 0.125), pass. A yawOffset of -18 put the stack on the right but the frame was too dark (0.103, flagged), so a smaller offset was used, and +30 failed the high-tier first-person sightline check.
+Before/after Low-tier desktop shots in `.cache/codex/shots/V-kama-opening/{before,after}/`. After: a smoking rust-brown vent stack is visible mid-left under the scan marker, the pillow mound is mid-right, and the sub is centre. Readability scene/sub 0.170 (cutoff 0.125), pass. A yawOffset of -18 put the stack on the right but the frame was too dark (0.103, flagged), so a smaller offset was used, and +30 failed the high-tier first-person sightline check.
 
 Rating: 2.5 of 5. The vent reads as a smoking structure now, but it is small at 110 m, there is no visible glow, and the sub is centred rather than in the lower-left third.
 

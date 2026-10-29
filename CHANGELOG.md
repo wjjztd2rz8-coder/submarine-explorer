@@ -14,7 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
-- **V-kama-opening:** Kamaʻehuakanaloa now uses the vent environment preset (smoke, shimmer, haze) instead of seamount, and its mission opening is angled so the Hiolo North vent stack, moved next to the scan marker, is visible beside the sub. Site data only.
+- **V-kama-opening:** Kamaʻehuakanaloa now uses the vent environment preset (smoke, shimmer, haze) instead of seamount, and its mission opening is angled so the Hiolo North vent stack is visible beside the sub. Site data only.
 - **V-monterey-flatten:** Monterey Canyon seabed is darker and more textured through its biome data only: sand colours drop about 20 percent, contrast 0.55 to 0.8, detail 0.5 to 0.85, stain 0.08 to 0.18, so the lower-right floor reads closer to the wall instead of a pale flat slab. Opening scene brightness is unchanged in practice (readable check passes).
 
 - **V-opening-dark:** Titanic and Bismarck openings are lit through site data only (existing site ambient floor and hemisphere fill, no new code): Titanic gains an ambient floor of 6 on every tier and its fill goes 2 to 6; Bismarck lifts its ambient floor 6 to 18 in the cool tint other lifted sites use. The bow and main hull now read in the first frame and the readable ratio no longer flags (Titanic 0.120 to 0.133, Bismarck 0.099 to 0.154).
