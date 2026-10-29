@@ -2499,3 +2499,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Running: 97 R-ci-green (worktree still present), 100, 102, 103. Codex week 16% left, so no new briefs. No Claude package. No tag.
 - Process note: background Bash commands die at 10 min; run long gates with setsid nohup and poll the log.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
+
+## 2026-10-29 12:47 CDT headless run 236 (Claude): collect + two visual packages
+
+- Merged R-ci-green (97: waypoint stays measurable on touch, 44px journal reference targets; conflict in journal-debrief.spec.ts resolved to main's version), T-opening-readable (102) and T-golden-settle (103). Merged V-opening-dark (Sonnet): Titanic and Bismarck openings now readable via site atmosphere data, both above the 0.125 cutoff (0.133 / 0.154); Blue Hole camera hug and Blake lone mound still open. Merged V-monterey-flatten (Sonnet): darker, textured sand, modest gain; pale lamp-pool patch remains. Gates smoke + project-base passed on main each time; pushed each time. Hosted CI for the R-ci-green fix not yet checked; no tag.
+- Running: 100 S-hud-opening-dedupe (Codex). Codex week 13% left, so no new briefs queued. Claude week 96% left.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
