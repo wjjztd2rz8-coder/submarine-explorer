@@ -46,7 +46,6 @@ export function snowReadabilityUniforms(config: WaterConfig): Record<string, THR
     uForegroundSizePx: { value: config.snowForegroundSizePx },
     uForegroundAlpha: { value: config.snowForegroundAlpha },
     uForegroundBrightness: { value: config.snowForegroundBrightness },
-    uMaxBrightness: { value: config.snowMaxBrightness },
   };
 }
 
@@ -184,6 +183,7 @@ export class MarineSnow {
         uFadeEndM: { value: config.snowFadeEndM },
         uScale: { value: 500 },
         ...snowReadabilityUniforms(config),
+        uMaxBrightness: { value: config.snowMaxBrightness },
         uLampPos: { value: new THREE.Vector3() },
         uLampDir: { value: new THREE.Vector3(0, 0, -1) },
         uLampCos: { value: 0.8 },
