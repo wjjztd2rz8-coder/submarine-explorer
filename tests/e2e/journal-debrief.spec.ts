@@ -547,10 +547,7 @@ freshTest.describe('mission progression and Home Journal', () => {
       await expect(journal.locator('.jr-site-card')).toHaveCount(catalog.landmarks.length);
       await expect(
         journal.locator('.jr-site-card[data-target="titanic"] .jr-card-count'),
-      ).toHaveText(
-        // The bow, plus the site-level overview that opens with any scan there.
-        '2/8',
-      );
+      ).toHaveText('1/7');
       await expect(journal.locator('.jr-spoilers input')).not.toBeChecked();
       await shot(page, 'journal-home');
 
@@ -601,6 +598,170 @@ freshTest.describe('mission progression and Home Journal', () => {
   async function openMoreIfPresent(root: import('@playwright/test').Locator): Promise<void> {
     const toggle = root.locator('.debrief-more-toggle');
     if (await toggle.count()) await toggle.click();
+  }
+});
+
+freshTest.describe('Journal scan rewards and counts', () => {
+  const test = experiencedTest;
+  type Game = {
+    discovery: Discovery;
+    journal: Journal;
+    sub: Submarine;
+    rig: CameraRig;
+    terrain: { sampleHeight(x: number, z: number): number };
+    config: { submarine: { hullRadius: number; seabedClearance: number } };
+  };
+
+  async function start(page: Page, site: string, poi: string): Promise<void> {
+    await pauseClockBeforeNavigation(page);
+    await page.goto(`/?tile=${site}&poi=${poi}&tier=low`, { waitUntil: 'domcontentloaded' });
+    await clockFramesUntil(page, () => window.__gameReady === true);
+    await clockFramesUntil(
+      page,
+      () => (window.__game as unknown as Game).discovery.spawnedAt !== null,
+    );
+    await page.evaluate((id) => {
+      const g = window.__game as unknown as Game;
+      const target = g.discovery.pois.find((p) => p.id === id)!;
+      g.sub.pitch = Math.atan2(
+        target.position.y - g.sub.position.y,
+        Math.hypot(target.position.x - g.sub.position.x, target.position.z - g.sub.position.z),
+      );
+      g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
+    }, poi);
+    await page.clock.runFor(34);
+  }
+
+  // Regression guard: two gallery contacts used to promise new entries but open identical text.
+  test('consecutive gallery scans unlock distinct Journal entries', async ({ page }, info) => {
+    await start(page, 'great-blue-hole', 'great-blue-hole-stalactites');
+    let firstBody = '';
+    for (const [index, gallery] of [
+      { id: 'great-blue-hole-stalactites', entry: 'the-hole', title: 'Stalactite gallery' },
+      {
+        id: 'great-blue-hole-stalactites-east',
+        entry: 'eastern-gallery',
+        title: 'Eastern stalactite gallery',
+      },
+    ].entries()) {
+      if (index) {
+        await page.evaluate((id) => {
+          const g = window.__game as unknown as Game;
+          const target = g.discovery.pois.find((p) => p.id === id)!;
+          // View the eastern contact from inside the bowl, clear of the shallow rim.
+          const y = Math.max(
+            target.position.y + 16,
+            g.terrain.sampleHeight(target.position.x, target.position.z - 40) +
+              g.config.submarine.hullRadius +
+              g.config.submarine.seabedClearance +
+              16,
+          );
+          g.sub.reset(target.position.x, y, target.position.z - 40, Math.PI);
+          g.sub.pitch = Math.atan2(target.position.y - y, 40);
+          g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
+          g.discovery.stats.markTeleport();
+        }, gallery.id);
+        await page.clock.runFor(34);
+      }
+      await scanWithKeyboard(page, gallery.id);
+      await expect(page.locator('.guidance-slot .guidance-kicker')).toHaveText('New Journal entry');
+      await expect(page.locator('.guidance-slot .guidance-name')).toHaveText(gallery.title);
+      await page.keyboard.press('j');
+      await expect(page.locator('.jr-body .jr-title')).toHaveText(gallery.title);
+      await expect(page.locator('.jr-body .jr-tag.is-recreation')).toHaveText('Recreation');
+      expect(await page.evaluate(() => (window.__game as unknown as Game).journal.selectedId)).toBe(
+        gallery.entry,
+      );
+      const body = await page.locator('.jr-body .jr-para').allTextContents();
+      expect(body.length).toBeGreaterThan(0);
+      expect(body.join('\n')).not.toBe(firstBody);
+      firstBody = body.join('\n');
+      await expect(
+        page.locator('.jr-nav-item[data-target="great-blue-hole"] .jr-nav-meta'),
+      ).toHaveText(`${index + 1}/4 points of interest`);
+      await expect(
+        page.locator('details[data-category="great-blue-hole/poi"] summary .jr-nav-meta'),
+      ).toHaveText(`${index + 1}/4`);
+      await page.clock.runFor(34);
+      await page.screenshot({ path: info.outputPath(`gallery-${index + 1}.png`) });
+      await page.keyboard.press('Escape');
+    }
+    expect(
+      await page.evaluate(() => {
+        const d = (window.__game as unknown as Game).discovery;
+        return {
+          scans: d.scanner.view.completed,
+          discoveries: d.stats.snapshot().discoveries.length,
+        };
+      }),
+    ).toEqual({ scans: 2, discoveries: 2 });
+  });
+
+  for (const { site, poi, total } of [
+    { site: 'titanic', poi: 'titanic-bow', total: 7 },
+    { site: 'great-blue-hole', poi: 'great-blue-hole-stalactites', total: 4 },
+  ]) {
+    // Regression guard: overview unlocks inflated totals and THIS DIVE implied session scan counts.
+    test(`${site}: Journal counts points of interest consistently across views and reload`, async ({
+      page,
+    }, info) => {
+      await start(page, site, poi);
+      await scanWithKeyboard(page, poi);
+      await page.keyboard.press('j');
+      for (const width of [1280, 390]) {
+        await page.setViewportSize({ width, height: 844 });
+        await page.clock.runFor(34);
+        await journalFront(page);
+        await expect(page.locator('.jr-lead .jr-chip').first()).toHaveText(
+          /^1\/\d+ points of interest$/,
+        );
+        const card = page.locator(`.jr-site-card[data-target="${site}"]`);
+        await expect(card).toHaveAttribute(
+          'aria-label',
+          new RegExp(`1 of ${total} points of interest logged$`),
+        );
+        await expect(card.locator('.jr-card-count')).toHaveText(`1/${total}`);
+        await openJournalSite(page, site);
+        await expect(page.locator('.jr-progress .jr-chip').first()).toHaveText(
+          `1/${total} points of interest`,
+        );
+        if (await journalIsSheet(page)) {
+          await expect(
+            page.locator('.jr-group-title', { hasText: 'Points of interest' }).locator('.jr-badge'),
+          ).toHaveText(`1/${total}`);
+        } else {
+          await expect(page.locator(`.jr-nav-item[data-target="${site}"] .jr-nav-meta`)).toHaveText(
+            `1/${total} points of interest`,
+          );
+          await expect(
+            page.locator(`details[data-category="${site}/site"] summary .jr-nav-meta`),
+          ).toHaveText(/^[1-9]\d*\/[1-9]\d*$/);
+          await expect(
+            page.locator(`details[data-category="${site}/poi"] summary .jr-nav-meta`),
+          ).toHaveText(`1/${total}`);
+        }
+        await setJournalSpoilers(page, true);
+        await openJournalSite(page, site);
+        await expect(page.locator('.jr-progress .jr-chip').first()).toHaveText(
+          `1/${total} points of interest`,
+        );
+        await page.clock.runFor(34);
+        await page.screenshot({ path: info.outputPath(`counts-${width}.png`) });
+      }
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await clockFramesUntil(page, () => window.__gameReady === true);
+      await clockFramesUntil(page, () => (window.__game as unknown as Game).discovery.loaded);
+      await page.keyboard.press('j');
+      await openJournalSite(page, site);
+      await expect(page.locator('.jr-progress .jr-chip').first()).toHaveText(
+        `1/${total} points of interest`,
+      );
+      expect(
+        await page.evaluate(
+          () => (window.__game as unknown as Game).discovery.scanner.view.completed,
+        ),
+      ).toBe(0);
+    });
   }
 });
 
@@ -744,9 +905,9 @@ freshTest.describe('scan persistence and fixture debrief', () => {
       await expect(journal).toBeHidden();
       await page.keyboard.press('j');
       await expect(journal).toBeVisible();
-      // The dive's own site opens first: its overview and the bow are logged.
+      // The bow counts once; automatically opened overview pages do not count.
       await expect(journal.locator('.jr-nav-item[data-target="_test"] .jr-nav-meta')).toHaveText(
-        `THIS DIVE · 2/${fixtureGuide.entries.length}`,
+        `1/${fixtureGuide.entries.length - 1} points of interest`,
       );
       await expect(journal.locator('.jr-body .jr-title')).toHaveText('Test site · Titanic tile');
       // The debris entry is still locked; the bow is unlocked.
@@ -2097,6 +2258,7 @@ freshTest.describe('Home to scan and return journey', () => {
             });
             expect(secondResult.id).toBe(second.target);
             expect(secondResult.first).toBe(true);
+            expect(secondResult.entry).not.toBe(result.entry);
             await reward(current);
             await clockFramesUntil(
               page,
@@ -2334,7 +2496,7 @@ freshTest.describe('Home to scan and return journey', () => {
           await expect(journal.locator('.jr-body .is-undiscovered')).toHaveText('No scans logged');
           await contained(journal.locator('.jr-header'));
           await contained(journal.locator('.jr-body'));
-          // Check the long current-site label plus THIS DIVE count in its actual column.
+          // Check the long current-site label plus points-of-interest count in its actual column.
           await checkJournalNavigation(journal, site);
           await shot('07-journal-unscanned');
           await closeJournal(page, touch);

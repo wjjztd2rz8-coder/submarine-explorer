@@ -574,11 +574,10 @@ export class Journal {
     // --- D-PHOTO end ---
     for (const s of sites) {
       const p = siteProgress(s, this.store);
-      const cur = s.id === this.currentSiteId && !this.homeMode;
       const expanded = this.expandedSites.get(s.id) ?? s.id === this.currentSiteId;
       const li = this.navButton(
         s.name,
-        `${cur ? 'THIS DIVE · ' : ''}${p.logged}/${p.total}`,
+        `${p.logged}/${p.total} points of interest`,
         'is-site',
         s.id,
         this.view.kind === 'site' && s.id === open?.id,
@@ -695,7 +694,7 @@ export class Journal {
     return box;
   }
 
-  /** A row of small progress chips ("3/8 entries"). */
+  /** A row of small progress chips ("3/8 points of interest"). */
   private chips(items: ReadonlyArray<string>, cls = ''): HTMLUListElement {
     const ul = el('ul', `jr-chips ${cls}`.trim());
     for (const text of items) ul.append(el('li', 'jr-chip', text));
@@ -715,7 +714,7 @@ export class Journal {
     const scanned = sites.filter((s) => isSiteUnlocked(s, this.store)).length;
     b.append(
       this.chips(
-        [`${logged}/${total} entries`, `${scanned}/${sites.length} sites scanned`],
+        [`${logged}/${total} points of interest`, `${scanned}/${sites.length} sites scanned`],
         'jr-lead',
       ),
     );
@@ -725,12 +724,15 @@ export class Journal {
       const card = el('button', 'jr-site-card');
       card.type = 'button';
       card.dataset.target = s.id;
-      card.setAttribute('aria-label', `${s.name}, ${p.logged} of ${p.total} entries logged`);
+      card.setAttribute(
+        'aria-label',
+        `${s.name}, ${p.logged} of ${p.total} points of interest logged`,
+      );
       card.classList.toggle('is-locked', !isSiteUnlocked(s, this.store));
       const top = el('span', 'jr-card-top');
       top.append(el('span', 'jr-card-name', s.name));
       if (s.id === this.currentSiteId && !this.homeMode)
-        top.append(el('span', 'jr-card-tag', 'This dive'));
+        top.append(el('span', 'jr-card-tag', 'Current site'));
       top.append(el('span', 'jr-card-count jr-badge', `${p.logged}/${p.total}`));
       card.append(top);
       const meta = [s.region, s.depthM === null ? '' : `${s.depthM.toLocaleString('en-US')} m`]
@@ -787,7 +789,7 @@ export class Journal {
     const wl = wildlifeProgress(site, this.store);
     const secrets = site.entries.filter((e) => e.kind === 'secret');
     const found = secrets.filter((e) => isEntryUnlocked(site, e, this.store)).length;
-    const chips = [`${p.logged}/${p.total} entries`];
+    const chips = [`${p.logged}/${p.total} points of interest`];
     if (p.speciesTotal) chips.push(`${p.species}/${p.speciesTotal} species`);
     if (wl.total) chips.push(`${wl.scanned}/${wl.total} animals`);
     if (secrets.length) chips.push(`${found}/${secrets.length} secrets`);

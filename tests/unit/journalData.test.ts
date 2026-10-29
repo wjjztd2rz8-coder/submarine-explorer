@@ -79,6 +79,34 @@ function discoveryFixture() {
   return { bytes, writes, storage, store };
 }
 
+it('keeps consecutive gallery entries independent and restores both from existing scan records', async () => {
+  const site = await loadJournalSite('great-blue-hole', new Map(), realContentFetch);
+  const first = site.entries.find((e) => e.id === 'the-hole')!;
+  const second = site.entries.find((e) => e.id === 'eastern-gallery')!;
+  const { store, storage, bytes, writes } = discoveryFixture();
+  expect(first.title).toBe('Stalactite gallery');
+  expect(second.title).toBe('Eastern stalactite gallery');
+  expect(first.guide!.paragraphs).not.toEqual(second.guide!.paragraphs);
+  expect(siteProgress(site, store)).toMatchObject({ logged: 0, total: 4 });
+
+  store.record(site.id, 'great-blue-hole-stalactites');
+  expect(isEntryUnlocked(site, first, store)).toBe(true);
+  expect(isEntryUnlocked(site, second, store)).toBe(false);
+  expect(
+    site.entries.filter((e) => e.kind === 'site').every((e) => isEntryUnlocked(site, e, store)),
+  ).toBe(true);
+  expect(siteProgress(site, store)).toMatchObject({ logged: 1, total: 4 });
+
+  store.record(site.id, 'great-blue-hole-stalactites-east');
+  const archived = bytes.get(DISCOVERY_STORAGE_KEY);
+  const reloaded = new DiscoveryStore(storage);
+  expect(isEntryUnlocked(site, first, reloaded)).toBe(true);
+  expect(isEntryUnlocked(site, second, reloaded)).toBe(true);
+  expect(siteProgress(site, reloaded)).toMatchObject({ logged: 2, total: 4 });
+  expect(writes).toEqual([DISCOVERY_STORAGE_KEY, DISCOVERY_STORAGE_KEY]);
+  expect(bytes.get(DISCOVERY_STORAGE_KEY)).toBe(archived);
+});
+
 function scanPoi(store: DiscoveryStore, id: string, target: PoiDef, depth: number) {
   const scanner = new Scanner(DEFAULT_CONFIG.scan, new EventBus(), store);
   scanner.setTargets([
@@ -334,7 +362,7 @@ describe('shipped wildlife scan-to-Journal linkage', () => {
           );
         }
         expect(wildlifeProgress(site, saved)).toEqual({ scanned: 1, total: expectedIds.length });
-        expect(siteProgress(site, saved)).toEqual({ ...before, logged: overviews.length });
+        expect(siteProgress(site, saved)).toEqual(before);
         for (const other of sites.filter((item) => item.id !== siteId)) {
           expect(isSiteUnlocked(other, saved), other.id).toBe(false);
           expect(other.entries.every((item) => !isEntryUnlocked(other, item, saved))).toBe(true);
@@ -512,8 +540,8 @@ describe('Journal content model', () => {
       expect(isEntryUnlocked(reef, wreck, store)).toBe(false);
       expect(isSiteUnlocked(sites[1], store)).toBe(false);
       expect(siteProgress(reef, store)).toEqual({
-        logged: 2,
-        total: 4,
+        logged: 1,
+        total: 3,
         species: 1,
         speciesTotal: 3,
       });
@@ -528,8 +556,8 @@ describe('Journal content model', () => {
       expect(isEntryUnlocked(loadedSites[0], wreck, reloaded)).toBe(true);
       expect(isEntryUnlocked(loadedSites[0], mound, reloaded)).toBe(true);
       expect(siteProgress(loadedSites[0], reloaded)).toEqual({
-        logged: 3,
-        total: 4,
+        logged: 2,
+        total: 3,
         species: 1,
         speciesTotal: 3,
       });
@@ -786,7 +814,7 @@ describe('Journal content model', () => {
     // Another site's scan unlocks nothing here.
     expect(isSiteUnlocked(s, reader(['other/reef-mound']))).toBe(false);
 
-    expect(siteProgress(s, mound)).toEqual({ logged: 2, total: 4, species: 1, speciesTotal: 3 });
+    expect(siteProgress(s, mound)).toEqual({ logged: 1, total: 3, species: 1, speciesTotal: 3 });
   });
 
   it('reads discovery v1 without rewriting it', () => {

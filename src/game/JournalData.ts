@@ -396,7 +396,7 @@ export function isEntryUnlocked(
 }
 
 interface SiteProgress {
-  /** Site and POI entries logged / total. */
+  /** Points of interest logged / total; automatic overview unlocks do not count. */
   logged: number;
   total: number;
   /** Species identified / total. */
@@ -408,11 +408,10 @@ export function siteProgress(site: JournalSite, store: DiscoveryReader): SitePro
   const out: SiteProgress = { logged: 0, total: 0, species: 0, speciesTotal: 0 };
   for (const e of site.entries) {
     const open = isEntryUnlocked(site, e, store);
-    if (e.kind === 'life' || e.kind === 'secret') continue;
     if (e.kind === 'species') {
       out.speciesTotal++;
       if (open) out.species++;
-    } else {
+    } else if (e.kind === 'poi') {
       out.total++;
       if (open) out.logged++;
     }

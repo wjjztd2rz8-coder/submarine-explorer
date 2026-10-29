@@ -109,15 +109,19 @@ The scan overlay has a corner-bracket reticle over the nearest contact, plus a
 panel showing its name and a hint: `CLOSE TO 150 M` when out of range,
 `TURN n° PORT/STARBOARD` or `PITCH TOWARD TARGET` in amber when you are not
 facing it, and `HOLD G TO SCAN` when it can be scanned. While the beam is on,
-a cyan progress ring fills. A completed scan shows `New Journal entry`, and pressing
-J then opens the guide at that entry.
+a cyan progress ring fills. A scan that unlocks its linked entry shows
+`New Journal entry`; an already logged entry shows `SCAN COMPLETE`. Pressing
+J opens the guide at that entry. Journal progress counts logged points of interest,
+using the same entries as its Points of interest group. Overview pages unlock
+automatically and do not add to that count; progress persists across dives.
 
 When a scan candidate exists, the card, reticle and prompt share its identity.
 Otherwise guidance selects the nearest unscanned fixed contact within scan range, then a
 previously scanned POI still in range, then a remote unscanned POI within hint
 range. A distant hint cannot hide the logged-contact card where the pilot is
-hovering. POIs retain hint priority over passing wildlife. The Blue Hole's two authored galleries have separate scan contacts, both
-linked to the same cave-history Journal entry. On touch screens a reticle that
+hovering. POIs retain hint priority over passing wildlife. The Blue Hole's two
+authored galleries have separate scan contacts and Journal entries: cave formation
+and exploration history, drawn from the existing sources. On touch screens a reticle that
 intersects a visible stick, slider, action-button group or pause button is hidden;
 the target card stays available and the reticle returns at the contact's actual
 screen position when the controls are clear.

@@ -100,6 +100,8 @@ for (const site of [
         )!;
         expect(entry, poi.id).toBeDefined();
         expect(entry.poiIds).toContain(poi.id);
+        // Shared guide entries announce a new entry only on their first unlock.
+        const newEntry = !isEntryUnlocked(journal, entry, discovery.store);
         // Scan each real target in isolation so neighboring targets do not steal it.
         discovery.scanner.setTargets([poi]);
         discovery.scanner.update(
@@ -109,7 +111,7 @@ for (const site of [
           true,
         );
         expect(discovery.scanner.view.lastCompleteId).toBe(poi.id);
-        expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(poi.name, true, {
+        expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(poi.name, newEntry, {
           scan: 'G',
           guide: 'J',
         });

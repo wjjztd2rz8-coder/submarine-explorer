@@ -30,14 +30,14 @@
       "kind": "geology",
       "primary": false,
       "scan_seconds": 4,
-      "guide_entry": "the-hole",
+      "guide_entry": "eastern-gallery",
       "confidence": "low",
       "reconstruction": true,
       "sources": [
         "https://en.wikipedia.org/wiki/Great_Blue_Hole",
         "https://www.gpsworld.com/belizes-great-blue-hole-revealed-in-expedition-survey/"
       ],
-      "note": "Game scan contact at the authored karst-grotto-east prop on the south-eastern ledge. Position and gallery geometry are a reconstruction, not a surveyed gallery location; the documented cave history shares the existing the-hole Journal entry."
+      "note": "Game scan contact at the authored karst-grotto-east prop on the south-eastern ledge. Position and gallery geometry are a reconstruction, not a surveyed gallery location."
     },
     {
       "id": "great-blue-hole-outer-dropoff",

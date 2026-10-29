@@ -96,7 +96,7 @@ export class Discovery {
     });
 
     this.disposers.push(
-      bus.on('scan:complete', (e) => this.onComplete(e.landmarkId, e.poiId, e.firstTime)),
+      bus.on('scan:complete', (e) => this.onComplete(e.landmarkId, e.poiId)),
       bus.on('mission:restart', () => this.resetDive()),
       bus.on('landmarks:loaded', ({ landmarks }) => {
         const l = landmarks.find((x) => x.id === landmarkId);
@@ -178,7 +178,7 @@ export class Discovery {
     this.stats.reset();
   }
 
-  private onComplete(landmarkId: string, poiId: string, firstTime: boolean): void {
+  private onComplete(landmarkId: string, poiId: string): void {
     const target = [
       ...this.scanner.getTargets(),
       ...this.scanner.getExtraTargets(),
@@ -201,7 +201,7 @@ export class Discovery {
     this.guide.refresh();
     // The card names the target the objective panel showed; the Journal
     // entry (guide title) can differ in wording.
-    this.overlay.showComplete(poi.name, firstTime, this.keys());
+    this.overlay.showComplete(poi.name, !before.has(entryId), this.keys());
   }
 
   /**

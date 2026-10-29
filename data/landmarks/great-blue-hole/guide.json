@@ -54,11 +54,10 @@
     },
     {
       "id": "the-hole",
-      "title": "Inside the real Blue Hole",
+      "title": "Stalactite gallery",
       "paragraphs": [
         "The Great Blue Hole is a flooded limestone sinkhole. Its submerged stalactites formed in air-filled caves during glacial sea-level lows. They and the submerged ledges preserve traces of those caves, flooded as the sea rose.",
-        "Jacques Cousteau’s Calypso expedition explored it in 1971. A crewed-submarine and sonar expedition in 2018 mapped the interior in much greater detail, including submerged stalactite galleries.",
-        "Below roughly 90 m, the lower water is oxygen-depleted and rich in hydrogen sulfide. Reef fish stay in the upper water; the lower sediment still supports microbial life."
+        "Below roughly 90 m, the lower water is oxygen-depleted and rich in hydrogen sulfide."
       ],
       "facts": [
         {
@@ -68,14 +67,6 @@
         {
           "label": "Formed during",
           "value": "Pleistocene lower sea levels; later flooded as sea level rose"
-        },
-        {
-          "label": "Charted by",
-          "value": "explored by Jacques Cousteau in 1971 (Calypso)"
-        },
-        {
-          "label": "3D sonar-mapped by",
-          "value": "Blue Hole Belize Expedition, Nov-Dec 2018 (Aquatica Submarines, Kongsberg)"
         },
         {
           "label": "Anoxic layer",
@@ -88,6 +79,32 @@
           "title": "Gischler et al. 2013 — Blue Hole setting and stratification",
           "url": "https://limnogeology.ethz.ch/GischlerMarine.pdf"
         },
+        {
+          "title": "Gischler et al. 2025 — dimensions and anoxic water below about 90 m",
+          "url": "https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "eastern-gallery",
+      "title": "Eastern stalactite gallery",
+      "paragraphs": [
+        "Jacques Cousteau’s Calypso expedition explored the Great Blue Hole in 1971. A crewed-submarine and sonar expedition in 2018 mapped the interior in much greater detail, including submerged stalactite galleries.",
+        "Reef fish stay in the upper water; the lower sediment still supports microbial life."
+      ],
+      "facts": [
+        {
+          "label": "Charted by",
+          "value": "explored by Jacques Cousteau in 1971 (Calypso)"
+        },
+        {
+          "label": "3D sonar-mapped by",
+          "value": "Blue Hole Belize Expedition, Nov-Dec 2018 (Aquatica Submarines, Kongsberg)"
+        }
+      ],
+      "reconstruction": true,
+      "sources": [
         {
           "title": "Fabien Cousteau — Blue Hole expedition and 1971 exploration",
           "url": "https://fabiencousteau.com/project/belize-blue-hole-expedition/"

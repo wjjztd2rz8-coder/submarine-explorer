@@ -220,10 +220,8 @@ describe('shipped secret discoveries in the Journal', () => {
           found: 1,
           total: doc.secrets.length,
         });
-        expect(siteProgress(s, reader)).toEqual({
-          ...before,
-          logged: s.entries.filter((e) => e.kind === 'site').length,
-        });
+        // Secret scans open overview articles without adding POI completion credit.
+        expect(siteProgress(s, reader)).toEqual(before);
       }
 
       const journal = journalWithLoad();
