@@ -38,6 +38,7 @@ import { goldenOptions, goldenUrl, goldenJobs } from './golden-options.mjs';
 import { readGoldenBuild } from './golden-build.mjs';
 import { goldenManifest, goldenContactSheet } from './golden-manifest.mjs';
 import { installGoldenFrames } from './golden-frames.mjs';
+import { readGoldenReadability, readableSummary } from './golden-readable.mjs';
 import blueHolePoses from './blue-hole-poses.json' with { type: 'json' };
 import beebePoses from './beebe-poses.json' with { type: 'json' };
 import lostCityPoses from './lostcity-poses.json' with { type: 'json' };
@@ -604,6 +605,12 @@ async function main() {
     await writeFile(resolve(output, 'poses.json'), JSON.stringify(manifest, null, 2));
     await writeFile(resolve(output, 'index.html'), goldenContactSheet(manifest));
     console.log(`Contact sheet: ${resolve(output, 'index.html')}`);
+    // Advisory only, including on partial sets; capture failures keep their status.
+    try {
+      console.log(readableSummary(await readGoldenReadability(output)));
+    } catch (error) {
+      console.warn(`Golden readability (advisory): unavailable (${error.message})`);
+    }
     if (failures.length) process.exitCode = 1;
   }
 }
