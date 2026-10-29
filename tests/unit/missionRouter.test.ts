@@ -279,7 +279,7 @@ describe('bearing and range', () => {
     expect(Math.abs(b.bearingDeg - d.spawn.heading_deg)).toBeLessThan(15);
   });
 
-  it('pickNavTarget: nearest open primary, then secondaries, skipping unresolved', () => {
+  it('pickNavTarget: ordered open primary, then secondaries, skipping unresolved', () => {
     const obj = (
       id: string,
       poiId: string,
@@ -303,12 +303,12 @@ describe('bearing and range', () => {
     const from = at(0, 0);
     const objectives = [obj('a', 'far', true), obj('b', 'near', true), obj('c', 'sec', false)];
     let t = pickNavTarget(objectives, pois, from);
-    expect(t?.name).toBe('Near');
-    expect(t?.bearingDeg).toBeCloseTo(90, 6);
-    expect(t?.depthM).toBe(3790);
-    objectives[1]!.complete = true;
-    expect(pickNavTarget(objectives, pois, from)?.name).toBe('Far');
+    expect(t?.name).toBe('Far');
+    expect(t?.bearingDeg).toBeCloseTo(0, 6);
+    expect(t?.depthM).toBe(3800);
     objectives[0]!.complete = true;
+    expect(pickNavTarget(objectives, pois, from)?.name).toBe('Near');
+    objectives[1]!.complete = true;
     t = pickNavTarget(objectives, pois, from);
     expect(t?.name).toBe('Sec');
     expect(t?.objective.primary).toBe(false);
@@ -506,6 +506,18 @@ describe('MissionRouter completion timing', () => {
   afterEach(() => {
     router?.dispose();
     vi.unstubAllGlobals();
+  });
+
+  it('advances the navigation name with objective completion before another frame', () => {
+    frame(router);
+    expect(control(router.panel.root, 'obj-nav-target').textContent).toBe('→ PRIMARY');
+    scan('primary');
+    expect(router.mission.objectives[0].complete).toBe(true);
+    expect(control(router.panel.root, 'obj-nav-target').textContent).toBe('OPTIONAL → OPTIONAL');
+    scan('optional');
+    expect(control(router.panel.root, 'obj-nav-target').textContent).toBe(
+      'ALL OBJECTIVES COMPLETE',
+    );
   });
 
   it.each([

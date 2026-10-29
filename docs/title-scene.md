@@ -23,18 +23,18 @@ vehicle hovering beside a real Monterey Canyon crop. Spec: `plan/F-TITLE-SPEC.md
   triangle budgets. Reduced motion (OS or saved setting) freezes camera, vehicle
   and snow and draws only on dirty events.
 - **Loading and failure**: the tile loads after home is built. Until it is ready
-  the scene shows the vehicle on the navy fallback with the caption "Expedition
-  preview". If loading fails, that composition stays and the GMRT caption is
-  never shown; the menu is unaffected and nothing is fatal.
+  the scene shows the vehicle on the navy fallback. If loading fails, that
+  composition stays; the menu and destination caption are unaffected.
 - **Visibility**: drawing stops while the tab is hidden, during a dive or pause,
   behind modals, and in the globe/site list view.
 
 ## Scene caption
 
-Home shows the caption "Monterey Canyon - Real GMRT bathymetry" (terrain ready)
-or "Expedition preview" (terrain unavailable), with one caveat: "Vehicle and
-lighting are illustrative." That is the only place the scene carries this
-caveat; do not repeat it in other player text.
+Home's caption names the same destination as the primary button: "<site> · Next dive".
+`Home.setDiveSite` updates both together when the catalogue loads or the last mission
+changes. The caption is "Expedition preview" while no destination title is available.
+The decorative backdrop remains the fixed Monterey crop; terrain loading never
+changes the caption or claims that the backdrop depicts the launch destination.
 
 ## Fonts and licences
 

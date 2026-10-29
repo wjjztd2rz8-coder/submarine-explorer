@@ -181,10 +181,11 @@ export class Scanner {
   readonly scannedThisDive = new Set<string>();
   private active: ScanTarget | null = null;
   private objectivePoiId: string | null = null;
+  private objectiveSource: string | null | (() => string | null) = null;
 
-  /** Point the card's guidance at the active mission objective (POI id), or null. */
-  setObjective(poiId: string | null): void {
-    this.objectivePoiId = poiId;
+  /** Mission callers supply a live resolver so completion advances guidance immediately. */
+  setObjective(poiId: string | null | (() => string | null)): void {
+    this.objectiveSource = poiId;
   }
   private sinceProgressEmit = Infinity;
   private readonly cosCone: number;
@@ -278,6 +279,8 @@ export class Scanner {
   update(dt: number, position: Vector3, forward: Vector3, scanHeld: boolean): void {
     const v = this.view;
     const held = scanHeld && this.enabled;
+
+    this.updateObjective(position, forward);
 
     // Nearest target (for hints) and best scannable candidate.
     let candidate: ScanTarget | null = null;
@@ -396,7 +399,6 @@ export class Scanner {
     v.nearestTurnDeg = nearestGeo?.turnDeg ?? 0;
     v.nearestVertDeg = nearestGeo?.vertDeg ?? 0;
 
-    this.updateObjective(position, forward);
     v.activeDistance = activeGeo?.distance ?? Infinity;
 
     if (held && candidate) {
@@ -424,6 +426,8 @@ export class Scanner {
       this.sinceProgressEmit += dt;
       if (v.progress >= 1) {
         this.complete(candidate);
+        // Completion listeners advance the mission synchronously. Refresh before drawing.
+        this.updateObjective(position, forward);
       } else if (this.sinceProgressEmit >= 1 / this.config.progressEventHz) {
         this.sinceProgressEmit = 0;
         this.bus.emit('scan:progress', { poiId: candidate.id, progress: v.progress });
@@ -449,6 +453,8 @@ export class Scanner {
   }
 
   private updateObjective(position: Vector3, forward: Vector3): void {
+    this.objectivePoiId =
+      typeof this.objectiveSource === 'function' ? this.objectiveSource() : this.objectiveSource;
     const v = this.view;
     const t = this.objectivePoiId
       ? (this.targets.find((x) => x.id === this.objectivePoiId) ?? null)

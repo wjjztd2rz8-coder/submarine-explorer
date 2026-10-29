@@ -1,5 +1,8 @@
-import { scanWithKeyboard, advanceScan } from './helpers/scan.js';
+import { completeScan, scanWithKeyboard, advanceScan } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
+import type { MissionRouter } from '../../src/game/MissionRouter.js';
+import type { Submarine } from '../../src/sub/Submarine.js';
 import type { Discovery } from '../../src/game/Discovery.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
@@ -162,3 +165,146 @@ test('visual hints show an objective waypoint and obey the saved toggle', async 
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
   await expect(page.locator('.d-scan-waypoints')).toHaveAttribute('data-hints', 'false');
 });
+
+type MissionGame = {
+  discovery: Discovery;
+  missionRouter: MissionRouter;
+  sub: Submarine;
+  props: { loaded: boolean };
+};
+
+for (const layout of [
+  { width: 1280, height: 720, touch: false },
+  { width: 844, height: 390, touch: true },
+  { width: 390, height: 844, touch: true },
+]) {
+  test.describe(`current target at ${layout.width}x${layout.height}`, () => {
+    test.use({ viewport: layout, hasTouch: layout.touch, isMobile: layout.touch });
+
+    test('opening guidance and phone directions follow the primary beside optional wildlife', async ({
+      page,
+    }) => {
+      // Regression guard: a nearby fish replaced the primary name while phone directions still led to the gallery.
+      await pauseClockBeforeNavigation(page);
+      await page.goto('/?mission=great-blue-hole&skipBriefing=1&tier=low&tutorial=0', {
+        waitUntil: 'domcontentloaded',
+      });
+      await clockFramesUntil(page, () => {
+        const g = window.__game as unknown as MissionGame;
+        return window.__gameReady === true && g.discovery.loaded && g.props.loaded;
+      });
+      await page.evaluate(() => {
+        const g = window.__game as unknown as MissionGame;
+        g.discovery.scanner.setExtraTargets([
+          {
+            id: 'life:guidance-fish',
+            name: 'French grunt',
+            landmarkId: 'great-blue-hole',
+            position: g.sub.position.clone().addScaledVector(g.sub.getForward(), 5),
+            radius: 20,
+            scanSeconds: 2,
+          },
+        ]);
+      });
+      await page.clock.fastForward(17);
+      const target = await page.evaluate(() => {
+        const g = window.__game as unknown as MissionGame;
+        const v = g.discovery.scanner.view;
+        const objective = g.missionRouter.mission.objectives.find((o) => o.primary && !o.complete)!;
+        const turn = v.objectiveTurnDeg;
+        const near = `Get closer to scan · ${v.objectiveDistance.toFixed(0)} m`;
+        return {
+          candidate: v.candidateId,
+          id: v.objectiveId,
+          primary: objective.poiId,
+          name: v.objectiveName,
+          inRange: v.objectiveInRange,
+          hint:
+            document.documentElement.classList.contains('is-touch') && Math.abs(turn) >= 10
+              ? `${near} · TURN ${Math.abs(turn).toFixed(0)}° ${turn >= 0 ? 'STARBOARD' : 'PORT'}`
+              : near,
+        };
+      });
+      expect(target.candidate).toBe('life:guidance-fish');
+      expect(target.id).toBe(target.primary);
+      expect(target.name).toBe('Stalactite gallery');
+      expect(target.inRange).toBe(false);
+      await expect(page.locator('.guidance-slot .guidance-name')).toHaveText(target.name);
+      await expect(page.locator('.guidance-slot .guidance-hint')).toHaveText(target.hint);
+      await expect(page.locator('.guidance-slot')).not.toContainText('French grunt');
+    });
+
+    for (const site of ['titanic', 'great-blue-hole']) {
+      test(`completion advances navigation and direction in the same frame: ${site}`, async ({
+        page,
+      }) => {
+        // Regression guard: objectives advanced while the completion frame still navigated to the scanned contact.
+        await pauseClockBeforeNavigation(page);
+        await page.goto(`/?mission=${site}&skipBriefing=1&tier=low&tutorial=0`, {
+          waitUntil: 'domcontentloaded',
+        });
+        await clockFramesUntil(page, () => {
+          const g = window.__game as unknown as MissionGame;
+          return window.__gameReady === true && g.discovery.loaded && g.props.loaded;
+        });
+        const scanned = await page.evaluate(() => {
+          const g = window.__game as unknown as MissionGame;
+          const objective = g.missionRouter.mission.objectives.find(
+            (o) => o.primary && !o.complete,
+          )!;
+          const poi = g.discovery.pois.find((p) => p.id === objective.poiId)!;
+          g.sub.reset(poi.position.x, poi.position.y, poi.position.z + 5, 0);
+          return { id: poi.id, name: poi.name };
+        });
+        if (layout.touch) {
+          const button = page.locator('.tc-btn-scan');
+          await expect(button).toBeVisible();
+          const box = (await button.boundingBox())!;
+          const session = await page.context().newCDPSession(page);
+          try {
+            await session.send('Input.dispatchTouchEvent', {
+              type: 'touchStart',
+              touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }],
+            });
+            await completeScan(page, scanned.id);
+          } finally {
+            await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+            await session.detach();
+          }
+        } else await scanWithKeyboard(page, scanned.id);
+        // The clock is paused. Read synchronously before permitting any following frame.
+        const completed = await page.evaluate(() => {
+          const g = window.__game as unknown as MissionGame;
+          const objective = g.missionRouter.mission.objectives.find(
+            (o) => o.primary && !o.complete,
+          )!;
+          const next = g.discovery.pois.find((p) => p.id === objective.poiId)!;
+          return {
+            last: g.discovery.scanner.view.lastCompleteId,
+            target: g.discovery.scanner.view.objectiveId,
+            name: g.discovery.scanner.view.objectiveName,
+            next: { id: next.id, name: next.name },
+            current: document.querySelector('.obj-item.is-current')?.getAttribute('data-objective'),
+            objective: objective.id,
+            nav: document.querySelector('.obj-nav-target')?.textContent,
+            detail: document.querySelector('.guidance-hint')?.textContent,
+            reward: document.querySelector('.guidance-name')?.textContent,
+            waypoint: document.querySelector('.d-scan-edge-name')?.textContent,
+            waypointVisible: document.querySelector('.d-scan-edge-name')?.checkVisibility(),
+          };
+        });
+        expect(completed.last).toBe(scanned.id);
+        expect(completed.target).toBe(completed.next.id);
+        expect(completed.name).toBe(completed.next.name);
+        expect(completed.current).toBe(completed.objective);
+        expect(completed.nav).toBe(`→ ${completed.next.name.toUpperCase()}`);
+        expect(completed.reward).toBe(scanned.name);
+        expect(completed.waypoint).toBe(completed.next.name);
+        if (layout.touch) {
+          expect(completed.waypointVisible).toBe(true);
+          expect(completed.detail).toContain(`${completed.next.name} ·`);
+        }
+      });
+    }
+  });
+}

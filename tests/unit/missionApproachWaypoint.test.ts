@@ -152,9 +152,23 @@ it('guides optional objectives after primary completion and scans leftover conta
   mission.resolve(pois.map((p) => p.id));
   mission.start('site');
   const settings = { gameplay: { visualHints: true } };
+  const position = new Vector3();
   const ctx = {
     app: { state: 'dive' },
-    discovery: { ready: Promise.resolve(), pois, scanner },
+    sub: { position },
+    discovery: {
+      ready: Promise.resolve(),
+      pois,
+      scanner,
+      guide: { isOpen: false },
+      update: (
+        dt: number,
+        _realDt: number,
+        position: Vector3,
+        forward: Vector3,
+        input: { scan: boolean },
+      ) => scanner.update(dt, position, forward, input.scan),
+    },
     settings,
     effective: resolveEffective(
       {
@@ -173,20 +187,32 @@ it('guides optional objectives after primary completion and scans leftover conta
     missionRouter: { mission },
     rig: { camera: {} },
   } as unknown as GameContext;
-  const position = new Vector3();
   const forward = new Vector3(0, 0, -1);
   const guide = () => {
-    waypointsSystem.frame!['guide.waypoints']!({ pilotPosition: position } as FrameState, ctx);
-    scanner.update(0, position, forward, false);
+    const frame = {
+      pilotPosition: position,
+      pilotForward: forward,
+      state: { scan: false },
+      sampled: {},
+      steps: 1,
+      fixedDt: 0,
+      dt: 0,
+      clockDt: 0,
+    } as FrameState;
+    discoverySystem.frame!['scan.discovery']!(frame, ctx);
+    waypointsSystem.frame!['guide.waypoints']!(frame, ctx);
   };
   try {
     waypointsSystem.init!(ctx);
+    waypointsSystem.start!(ctx);
     await Promise.resolve();
     guide();
     expect(scanner.view.objectiveId).toBe('bow');
     expect(scanner.view.candidateId).toBe('bow');
     scanner.update(1, position, forward, true);
     expect(mission.state).toBe('primaries-complete');
+    // The event refreshes the visible target before another guide frame.
+    expect(view.update.mock.lastCall?.[2]).toEqual({ poiId: 'stern' });
     expect(finished).not.toHaveBeenCalled();
     guide();
     expect(scanner.view.objectiveId).toBe('stern');

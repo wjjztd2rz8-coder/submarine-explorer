@@ -320,19 +320,35 @@ for (const layout of [
         return animal !== null;
       });
       expect(spawned).toBe(true);
-      // An animal in range is announced by the scan card itself, so the separate
-      // "Animal nearby" tip stays out of the slot (it would only repeat the card).
-      await clockFramesUntil(
-        page,
-        () =>
-          document
-            .querySelector('.guidance-slot[data-kind="scan"]')
-            ?.textContent?.includes('Lobate comb jelly') === true,
-        250,
-      );
-      await expect(page.locator(GUIDANCE.scan)).toBeVisible();
-      await expect(page.locator(GUIDANCE.hint)).toBeHidden();
-      await reviewShot(page, `${layout.name}-animal-hint`);
+      // Mission idle coaching keeps the primary. A deliberate animal scan names
+      // its actual target and must still suppress the separate animal tip.
+      const session = layout.touch ? await page.context().newCDPSession(page) : null;
+      try {
+        if (session) {
+          const box = (await page.locator('.tc-btn-scan').boundingBox())!;
+          await session.send('Input.dispatchTouchEvent', {
+            type: 'touchStart',
+            touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }],
+          });
+        } else await page.keyboard.down('g');
+        await clockFramesUntil(
+          page,
+          () =>
+            document
+              .querySelector('.guidance-slot[data-kind="scan"]')
+              ?.textContent?.includes('Lobate comb jelly') === true,
+          250,
+        );
+        await expect(page.locator(GUIDANCE.scan)).toBeVisible();
+        await expect(page.locator(GUIDANCE.hint)).toBeHidden();
+        await reviewShot(page, `${layout.name}-animal-hint`);
+        await expect(page.locator('.guidance-kicker')).toHaveText('SCANNING');
+      } finally {
+        if (session) {
+          await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+          await session.detach();
+        } else await page.keyboard.up('g');
+      }
       await withClockFrames(page, () => hold(page, layout.touch, '.tc-stick', 'KeyW', 0));
       await page.clock.fastForward(250);
       await expect(page.locator(GUIDANCE.hint)).toBeHidden();

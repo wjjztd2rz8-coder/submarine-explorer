@@ -112,11 +112,16 @@ facing it, and `HOLD G TO SCAN` when it can be scanned. While the beam is on,
 a cyan progress ring fills. A completed scan shows `New Journal entry`, and pressing
 J then opens the guide at that entry.
 
-When a scan candidate exists, the card, reticle and prompt share its identity.
-Otherwise guidance selects the nearest unscanned fixed contact within scan range, then a
-previously scanned POI still in range, then a remote unscanned POI within hint
-range. A distant hint cannot hide the logged-contact card where the pilot is
-hovering. POIs retain hint priority over passing wildlife. The Blue Hole's two authored galleries have separate scan contacts, both
+Mission guidance follows `nextScanObjective`: the first unfinished resolved primary,
+then the first unfinished optional objective. Desktop navigation, waypoint and phone
+directions use that same order. A ready optional contact does not replace idle
+objective guidance; holding Scan still scans an eligible contact and displays its
+actual name. Free-dive guidance follows the scan candidate, then nearby contacts.
+`Scanner.setObjective` accepts a POI id or a live resolver; the mission uses a
+resolver so geometry and directions advance immediately after completion listeners
+update the objectives, before the completion frame is drawn.
+
+The Blue Hole's two authored galleries have separate scan contacts, both
 linked to the same cave-history Journal entry. On touch screens a reticle that
 intersects a visible stick, slider, action-button group or pause button is hidden;
 the target card stays available and the reticle returns at the contact's actual

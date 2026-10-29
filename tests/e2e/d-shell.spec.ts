@@ -414,3 +414,26 @@ test('Home needs no dive tile; selecting a site keeps loading until its first fr
   await expect(page.locator('.briefing')).toBeVisible();
   await expect(page.locator('.home-screen')).toBeHidden();
 });
+
+for (const [saved, destination, title] of [
+  [null, 'titanic', 'Titanic dive'],
+  ['great-blue-hole', 'great-blue-hole', 'Great Blue Hole: Lighthouse Reef'],
+  ['missing-site', 'titanic', 'Titanic dive'],
+] as const) {
+  test(`Home button and caption share the launch destination: ${saved ?? 'first visit'}`, async ({
+    page,
+  }) => {
+    // Regression guard: the caption named Monterey while Dive launched another site.
+    await page.addInitScript((saved) => {
+      if (saved)
+        localStorage.setItem('subexplorer.lastSite.v1', JSON.stringify({ missionId: saved }));
+      else localStorage.removeItem('subexplorer.lastSite.v1');
+    }, saved);
+    await boot(page, '/?tier=low');
+    const primary = page.locator('.home-primary');
+    await expect(primary).toHaveText(`Dive: ${title}`);
+    await expect(page.locator('.home-scene-caption')).toHaveText(`${title} · Next dive`);
+    await primary.click();
+    await expect(page).toHaveURL((url) => url.searchParams.get('mission') === destination);
+  });
+}

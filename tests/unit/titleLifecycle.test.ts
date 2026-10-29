@@ -52,7 +52,6 @@ function fakeRenderer() {
 function setup(over: { load?: () => Promise<unknown>; state?: string } = {}) {
   const handlers: Handler[] = [];
   const classes = new Set<string>();
-  const caption = vi.fn();
   const ctx = {
     app: { state: over.state ?? 'home' },
     tier: 'low',
@@ -73,7 +72,6 @@ function setup(over: { load?: () => Promise<unknown>; state?: string } = {}) {
       root: {
         classList: { add: (c: string) => classes.add(c), remove: (c: string) => classes.delete(c) },
       },
-      setSceneCaption: caption,
     },
     settingsScreen: { isOpen: false },
     journal: { isOpen: false },
@@ -84,7 +82,7 @@ function setup(over: { load?: () => Promise<unknown>; state?: string } = {}) {
   const system = createTitleSystem();
   system.init!(ctx);
   const frame = (): void => system.frame!['render.prepare']!({ dt: 1 / 30 } as FrameState, ctx);
-  return { ctx, system, frame, classes, caption, handlers };
+  return { ctx, system, frame, classes, handlers };
 }
 
 beforeEach(() => {
@@ -181,16 +179,15 @@ describe('title lifecycle', () => {
   });
 
   it('fails soft when the Monterey fetch is blocked', async () => {
-    const { ctx, frame, caption } = setup();
+    const { ctx, frame } = setup();
     await vi.runAllTimersAsync();
     frame();
     expect(ctx.titleScene.terrainReady).toBe(false);
-    expect(caption).not.toHaveBeenCalled();
     ctx.titleScene.present(fakeRenderer() as never);
     expect(ctx.titleScene.drawCount).toBe(1);
   });
 
-  it('sets the terrain caption once the crop is ready and disposes a late crop', async () => {
+  it('installs a ready crop and disposes a late crop', async () => {
     const crop = {
       mesh: new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial()),
       anchorFloorY: 0,
@@ -201,7 +198,6 @@ describe('title lifecycle', () => {
     vi.spyOn(terrain, 'loadTitleCrop').mockResolvedValue(crop);
     const a = setup();
     await vi.runAllTimersAsync();
-    expect(a.caption).toHaveBeenCalledWith(true);
     expect(a.ctx.titleScene.terrainReady).toBe(true);
     a.system.dispose!();
     expect(crop.dispose).toHaveBeenCalled();
@@ -216,7 +212,6 @@ describe('title lifecycle', () => {
     resolve(late);
     await vi.runAllTimersAsync();
     expect(late.dispose).toHaveBeenCalled();
-    expect(b.caption).not.toHaveBeenCalled();
     expect(b.classes.has('has-title-scene')).toBe(false);
   });
 

@@ -54,7 +54,7 @@ export const discoverySystem: GameSystem = {
     'scan.discovery': (f, ctx) => {
       // Select before the beam locks; guidance runs later in the same frame.
       ctx.discovery.scanner.setObjective(
-        nextScanObjective(ctx.missionRouter?.mission.objectives)?.poiId ?? null,
+        () => nextScanObjective(ctx.missionRouter?.mission.objectives)?.poiId ?? null,
       );
       // Journal shortcuts remain available to the top Journal or Home overlay,
       // including Home reached by cancelling or leaving this dive runtime.

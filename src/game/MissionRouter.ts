@@ -35,6 +35,7 @@ import { shellUrl } from '../util/navigation.js';
 import { landmarkIdFor, type FetchJson } from './ContentPath.js';
 import {
   loadMission,
+  nextScanObjective,
   Mission,
   type MissionDef,
   type MissionSpawn,
@@ -251,36 +252,21 @@ export function bearingTo(
   };
 }
 
-/**
- * The objective to steer toward: the nearest incomplete primary; once every
- * primary is done, the nearest incomplete secondary. Null when nothing is left
- * or no POI positions are known yet.
- */
+/** Navigation follows the same ordered objective as the scanner and waypoint. */
 export function pickNavTarget(
   objectives: readonly ObjectiveStatus[],
   pois: ReadonlyArray<{ id: string; name: string; position: XYZ }>,
   from: XYZ,
 ): NavTarget | null {
-  const open = objectives.filter((o) => o.resolved && !o.complete);
-  const primaries = open.filter((o) => o.primary);
-  const pool = primaries.length ? primaries : open;
-  let best: NavTarget | null = null;
-  for (const o of pool) {
-    const poi = pois.find((p) => p.id === o.poiId);
-    if (!poi) continue;
-    const { bearingDeg, rangeM, horizontalM } = bearingTo(from, poi.position);
-    if (!best || rangeM < best.rangeM) {
-      best = {
-        objective: o,
-        name: poi.name,
-        bearingDeg,
-        rangeM,
-        horizontalM,
-        depthM: Math.max(0, -poi.position.y),
-      };
-    }
-  }
-  return best;
+  const objective = nextScanObjective(objectives);
+  const poi = pois.find((p) => p.id === objective?.poiId);
+  if (!objective || !poi) return null;
+  return {
+    objective,
+    name: poi.name,
+    ...bearingTo(from, poi.position),
+    depthM: Math.max(0, -poi.position.y),
+  };
 }
 
 // --------------------------------------------------------------- controller
@@ -358,6 +344,8 @@ export class MissionRouter {
   exploration: Debrief['exploration'] = null;
 
   private navClock = 0;
+  private navPosition: XYZ | null = null;
+  private navHeadingDeg = 0;
   private readonly disposers: Array<() => void> = [];
   /** Set by `sub:emergencyBlow` during a dive; cleared when the blow ends. */
   private blow: { depth: number; cause: 'crush' | 'power' } | null = null;
@@ -477,13 +465,20 @@ export class MissionRouter {
     headingDeg: number,
     hull?: MissionHullState,
   ): void {
+    this.navPosition = position;
+    this.navHeadingDeg = headingDeg;
     this.mission.update(dt);
     if (this.blow && hull && !hull.emergencyBlow) this.onBlowComplete();
     this.updateBanner(dt);
     this.navClock += realDt;
     if (this.navClock < 1 / Math.max(1, this.opts.config.mission.navUpdateHz)) return;
     this.navClock = 0;
-    const t = pickNavTarget(this.mission.objectives, this.opts.discovery.pois, position);
+    this.refreshNav();
+  }
+
+  private refreshNav(): void {
+    if (!this.navPosition) return;
+    const t = pickNavTarget(this.mission.objectives, this.opts.discovery.pois, this.navPosition);
     let nav: NavReadout | null = null;
     if (t) {
       nav = {
@@ -492,7 +487,7 @@ export class MissionRouter {
         primary: t.objective.primary,
         bearingDeg: t.bearingDeg,
         depthM: t.depthM,
-        relativeDeg: ((t.bearingDeg - headingDeg + 540) % 360) - 180,
+        relativeDeg: ((t.bearingDeg - this.navHeadingDeg + 540) % 360) - 180,
       };
     }
     this.panel.setNav(nav, this.mission.primaryComplete);
@@ -500,6 +495,7 @@ export class MissionRouter {
 
   private onMissionChange(m: Mission): void {
     this.panel.setObjectives(m.objectives);
+    this.refreshNav();
     this.navClock = Infinity;
     // Everything done after the primaries: suggest surfacing, never force it.
     if (m.state === 'primaries-complete' && m.allComplete && !this.allAnnounced) {

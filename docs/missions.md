@@ -77,12 +77,13 @@ seabed + hullRadius + seabedClearance + mission.spawnClearanceM]`. The
    is the one place the current objective shows: the mission title, a nav
    line and an "n of m" progress line (`1 of 4 objectives · 1 of 2 primary`).
    The full list with each objective's `hint` is in the Esc menu's Objectives
-   view. The nav line points at the nearest open primary: bearing (0 = north, `headingFromForward`, the same
+   view. The nav line follows the first unfinished resolved primary in mission order,
+   matching the scanner and waypoint: bearing (0 = north, `headingFromForward`, the same
    maths as the HUD heading), `RNG` = the 3D slant range (the same metric as
    the scan panel's distance and the scanner's `radius_m` test; QA-B #11, so
    the surface start reads ~4.3 km to a bow 2 km away and 3.8 km down), target
    depth, and a turn cue.
-   Once every primary is done it points at the nearest open secondary
+   Once every primary is done it points at the first unfinished resolved secondary
    (`OPTIONAL → …`).
 5. **Primaries complete** (`all_primary`, D-FLOW). Objectives count scans
    (`scan:complete`) made during this dive, not the persisted discovery store

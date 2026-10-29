@@ -102,7 +102,7 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
 }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  const secrets = curiosityData('monterey-canyon').secrets;
+  const { secrets, samples } = curiosityData('monterey-canyon');
   await boot(page);
   const objectives = await page.evaluate(() =>
     (window.__game as unknown as Game).scanner.getTargets().map((t) => t.id),
@@ -150,7 +150,7 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
     g.journal.show('monterey-canyon');
   });
   await expect(page.locator('.jr-progress')).toContainText(
-    `${secrets.length}/${secrets.length} secrets`,
+    `${secrets.length}/${secrets.length + samples.length} secrets`,
   );
   await page
     .locator('.jr-nav')
@@ -172,9 +172,21 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
 test('samples collect per dive, appear in mission debrief, and reset on restart', async ({
   page,
 }) => {
+  // Free-dive coaching names a ready sample; mission coaching retains its primary.
+  await boot(page);
+  await park(page, 0, true);
+  await expect(page.locator('.guidance-hint')).toContainText('TO SCAN');
   await boot(page, 'monterey-canyon', true);
   const id = await park(page, 0, true);
-  await expect(page.locator('.guidance-hint')).toContainText('TO SCAN');
+  const primary = await page.evaluate(() => {
+    const g = window.__game as unknown as {
+      discovery: import('../../src/game/Discovery.js').Discovery;
+      missionRouter: import('../../src/game/MissionRouter.js').MissionRouter;
+    };
+    const objective = g.missionRouter.mission.objectives.find((o) => o.primary && !o.complete)!;
+    return g.discovery.pois.find((p) => p.id === objective.poiId)!.name;
+  });
+  await expect(page.locator('.guidance-name')).toHaveText(primary);
   await scan(page, id);
   await expect(page.locator('.guidance-name')).toHaveText('Sediment core');
   // Regression: a sample must have a persistent Journal entry, beyond its dive-local collection.
