@@ -20,7 +20,6 @@ import { buildComb, buildMedusa, buildSiphonophore } from './jelly.js';
 import { buildFish } from './fish.js';
 import type { Look } from './look.js';
 
-export type { Look } from './look.js';
 type ModelBuilder = (look: Look, size: number, detail: 0 | 1 | 2) => THREE.BufferGeometry;
 
 const MODEL_BUILDERS: Record<string, ModelBuilder> = {

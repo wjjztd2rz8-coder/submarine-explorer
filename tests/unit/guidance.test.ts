@@ -333,15 +333,14 @@ describe('guidance slot', () => {
     },
   );
 
-  it('keeps a message in place when only its detail changes, and reports names it shows', () => {
+  it('keeps a message in place when only its detail changes', () => {
     const slot = new GuidanceSlot();
     slot.offer('objective', 'objective', { ...msg('Stern section'), detail: 'TURN 40° PORT' });
     slot.offer('hint', 'hint', msg('Hold SCAN'));
     slot.offer('objective', 'objective', { ...msg('Stern section'), detail: 'TURN 20° PORT' });
     expect(slot.kind).toBe('hint');
     slot.offer('hint', 'hint', null);
-    expect(slot.showsName('stern section')).toBe(true);
-    expect(slot.showsName('Bow section')).toBe(false);
+    expect(texts(slot)).toMatchObject({ name: 'Stern section', detail: 'TURN 20° PORT' });
   });
 
   it('gives a sighting three seconds ahead of a ready contact, without delaying a held scan', () => {
@@ -691,14 +690,8 @@ describe('guidance slot', () => {
         const objective = nextScanObjective(mission.objectives);
         expect(frame.nextScanObjective?.poiId).toBe(objective?.poiId);
         const next = pois.find((p) => p.id === objective?.poiId);
-        expect(edge.hidden).toBe(!next || !effective.gameplay.visualHints);
-        if (next && effective.gameplay.visualHints) {
-          expect(edge.children[0].textContent).toBe(next.name);
-          const dy = next.position.y - position.y;
-          expect(edge.children[1].textContent).toBe(
-            `${Math.round(position.distanceTo(next.position))} m · ${dy >= 0 ? '↑' : '↓'}${Math.round(Math.abs(dy))} m${position.distanceTo(next.position) <= next.radius ? ' · IN RANGE' : ''}`,
-          );
-        }
+        expect(edge.children).toHaveLength(0);
+        expect(edge.textContent).toBe('');
         return next;
       };
       try {

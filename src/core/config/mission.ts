@@ -21,8 +21,6 @@ export interface MissionConfig {
   completionBannerS: number;
   /** Minimum spawn clearance above the seabed, on top of hull radius + seabedClearance (m). */
   spawnClearanceM: number;
-  /** Objectives-panel nav line refresh rate (Hz). Text writes are skipped when unchanged. */
-  navUpdateHz: number;
 
   // Safe free-dive spawn -----------------------------------------------------
   /**
@@ -40,7 +38,6 @@ export const DEFAULT_MISSION: MissionConfig = {
   completeDelayS: 3, // let the scan's "New Journal entry" banner land before the completion banner
   completionBannerS: 20, // D-FLOW: then Keep exploring (the default) applies
   spawnClearanceM: 10,
-  navUpdateHz: 5,
   minSpawnSeabedM: -60,
   freeDiveSpawnAltitudeM: 90,
 };

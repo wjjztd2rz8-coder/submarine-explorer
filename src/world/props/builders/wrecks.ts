@@ -215,8 +215,6 @@ function wreckMaterial(map: THREE.Texture | null): THREE.MeshStandardMaterial {
 
 // --------------------------------------------------------------- hull-block
 
-export type { HullEnd };
-
 interface HullEndSpec {
   kind: HullEnd;
   /** -1 for the forward (-Z) end, +1 for the aft (+Z) end. */

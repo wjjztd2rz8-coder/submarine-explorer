@@ -21,7 +21,16 @@ type Game = {
 };
 
 const keyNames = /\b(Space|Enter|Esc|Escape|Ctrl|Shift|WASD)\b|\bpress [A-Z]\b/i;
-const touchControls = '.tc-stick, .tc-slider, .tc-btn, .hud-journal, .hud-reset-camera';
+const touchControls = [
+  '.tc-stick',
+  '.tc-slider',
+  '.tc-btn-scan',
+  '.tc-btn-lights',
+  '.tc-btn-sonar',
+  '.tc-btn-photo',
+  '.tc-btn-pause',
+  '.hud-journal',
+];
 
 for (const viewport of [
   { width: 390, height: 844 },
@@ -253,6 +262,17 @@ async function reachable(target: Locator): Promise<void> {
   ).toBe(true);
 }
 
+/** Every phone control must be present and reachable; camera reset uses the double-tap gesture. */
+async function reachableTouchControls(page: Page): Promise<void> {
+  await expect(page.locator('.hud-reset-camera')).toBeHidden();
+  await expect(page.locator('.tc-btn')).toHaveCount(5);
+  for (const selector of touchControls) {
+    const control = page.locator(selector);
+    await expect(control).toHaveCount(1);
+    await reachable(control);
+  }
+}
+
 async function boot(page: Page, query: string): Promise<void> {
   await page.goto(`/?tier=low&touch=1&${query}`, { waitUntil: 'domcontentloaded' });
   await clockFramesUntil(page, () => {
@@ -397,7 +417,7 @@ for (const viewport of [
       await expect(page.getByRole('button', { name: /boost/i })).toHaveCount(0);
       await expect(page.locator('.hud')).not.toContainText(keyNames, { useInnerText: true });
       await expect(page.locator('.guidance-slot')).toBeVisible();
-      for (const control of await page.locator(touchControls).all()) await reachable(control);
+      await reachableTouchControls(page);
       await expectHudClear(page, 'opening at 150%');
     });
 
@@ -435,9 +455,17 @@ for (const viewport of [
         await expectHudClear(page, `scan result ${id}`);
       }
       const banner = page.locator('.obj-banner');
+      await expect(banner).toBeHidden();
+      // Completion waits for play time; locator polling cannot advance a paused clock.
+      await clockFramesUntil(
+        page,
+        () => !document.querySelector<HTMLElement>('.obj-banner')!.hidden,
+        250,
+      );
       await expect(banner).toBeVisible();
       await banner.locator('.is-keep').tap();
       await page.locator('.hud-journal').tap();
+      await clockFramesUntil(page, () => (window.__game as unknown as Game).discovery.guide.isOpen);
       const journal = page.locator('.journal');
       await expect(journal).toBeVisible();
       await openJournalSite(page, 'titanic');
@@ -449,6 +477,7 @@ for (const viewport of [
       ).toMatch(/^rgb\(/); // An opaque panel prevents the underlying HUD from ghosting through.
       await reachable(journal.locator('.jr-close'));
       await journal.locator('.jr-close').tap();
+      await clockFramesUntil(page, () => !document.querySelector<HTMLElement>('.tc-root')!.hidden);
       await page.locator('.tc-btn-pause').tap();
       await page.locator('.pause-surface').tap();
       const debrief = page.locator('.mission-debrief');
@@ -464,7 +493,14 @@ for (const viewport of [
       await page.addInitScript(() =>
         localStorage.setItem(
           'subexplorer.progress.v1',
-          JSON.stringify({ version: 1, lifetime: 150 }),
+          JSON.stringify({
+            version: 2,
+            awarded: [
+              'poi:titanic/titanic-bow',
+              'poi:titanic/titanic-stern',
+              'poi:titanic/titanic-boilers',
+            ],
+          }),
         ),
       );
       await page.goto('/?tier=low&touch=1');
@@ -482,16 +518,22 @@ for (const viewport of [
       if (viewport.width < viewport.height)
         for (const region of await sub.locator('.ss-stage, .ss-group').all())
           await expect(region).toBeInViewport({ ratio: 1 });
-      for (const label of ['Sub paint', 'Lamp trim', 'Sub decal', 'Photo frame']) {
+      for (const [label, defaultName] of [
+        ['Sub paint', 'Stock'],
+        ['Lamp trim', 'Stock'],
+        ['Sub decal', 'Stock'],
+        ['Photo frame', 'None'],
+      ]) {
         const group = sub.getByRole('group', { name: label, exact: true });
         await group.scrollIntoViewIfNeeded();
         await expect(group).toBeInViewport({ ratio: 1 });
-        await reachable(group.getByRole('button', { name: 'Stock', exact: true }));
+        await reachable(group.getByRole('button', { name: defaultName, exact: true }));
       }
       await expect(sub.locator('.ss-panel')).not.toContainText(/Journal|upgrade|purchase/i);
       const red = sub.getByRole('button', { name: 'Red', exact: true });
       await red.scrollIntoViewIfNeeded();
       await reachable(red);
+      await expect(red).toBeEnabled();
       await red.tap();
       await expect(red).toHaveAttribute('aria-pressed', 'true');
       const back = sub.getByRole('button', { name: 'Back', exact: true });
@@ -515,7 +557,17 @@ for (const viewport of [
       await expect(help).not.toContainText(keyNames, { useInnerText: true });
       await expect(help).not.toContainText(/boost/i);
       await expect(help.locator('.how-to-tile')).toHaveCount(9);
-      await reachable(help.getByRole('button', { name: 'Close', exact: true }));
+      const close = help.getByRole('button', { name: 'Close', exact: true });
+      await reachable(close);
+      // The article scrolls independently of its exit, even on a short landscape screen.
+      for (const tile of [
+        help.locator('.how-to-tile').last(),
+        help.locator('.how-to-tile').first(),
+      ]) {
+        await tile.scrollIntoViewIfNeeded();
+        await expect(tile).toBeInViewport({ ratio: 1 });
+        await reachable(close);
+      }
       await help.getByRole('button', { name: 'Close', exact: true }).tap();
       await pause.getByRole('button', { name: 'Resume', exact: true }).tap();
       await page.locator('.tc-btn-photo').tap();
@@ -578,7 +630,7 @@ for (const viewport of [
         inView: true,
         covered: false,
       });
-      for (const control of await page.locator(touchControls).all()) await reachable(control);
+      await reachableTouchControls(page);
       await expectHudClear(page, 'anchored event');
     });
   });

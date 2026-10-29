@@ -17,6 +17,9 @@ without an entry here is not done.
 - **V-monterey-flatten:** Monterey Canyon seabed is darker and more textured through its biome data only: sand colours drop about 20 percent, contrast 0.55 to 0.8, detail 0.5 to 0.85, stain 0.08 to 0.18, so the lower-right floor reads closer to the wall instead of a pale flat slab. Opening scene brightness is unchanged in practice (readable check passes).
 
 - **V-opening-dark:** Titanic and Bismarck openings are lit through site data only (existing site ambient floor and hemisphere fill, no new code): Titanic gains an ambient floor of 6 on every tier and its fill goes 2 to 6; Bismarck lifts its ambient floor 6 to 18 in the cool tint other lifted sites use. The bow and main hull now read in the first frame and the readable ratio no longer flags (Titanic 0.120 to 0.133, Bismarck 0.099 to 0.154).
+- Controls help keeps Close visible while its reference content scrolls, including phone landscape.
+
+- Mission openings use the objective card for target name and range. Remove the mission panel’s navigation/hint text and floating waypoint labels; keep the checklist, progress, world diamonds and offscreen arrows (S-hud-opening-dedupe).
 
 - Hunga rim apron is longer and lighter so it blends into the slope; Hiolo North gains a small smoker-cluster vent stack and its pillow heap is smaller (opening framing unchanged).
 
@@ -34,6 +37,9 @@ without an entry here is not done.
 - **V-endurance:** the Endurance opening is reframed so the wreck is the subject: the chase camera is closer and offset sideways so the hull fills about 37% of the frame (was about 33%) and the sub sits to one side above it, and the deep-water ground fill is brighter so the lower hull side reads. Portrait uses a matching offset.
 
 ### Removed
+
+- **S-dead sweep:** delete the uncalled wreck `plate` wrapper and its exclusive `strut` import; no builder uses it.
+- **S-dead sweep:** remove unused settings, Journal compatibility, vehicle, life-model, geology and wreck re-exports; their live declarations and direct consumers remain.
 
 - **S-dead:** delete the unimported audio barrel and obsolete sonar-marker/home-caveat CSS; direct audio imports, waypoint palettes and the home caption remain live.
 

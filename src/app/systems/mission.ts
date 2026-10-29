@@ -226,9 +226,6 @@ export const missionSystem: GameSystem = {
           ctx.missionRouter!.panel.setObjectives(mission!.objectives);
         }
       }
-      // The objectives hint line and the guidance card never show at once: the hint
-      // returns when the card empties, so its text is never lost.
-      ctx.missionRouter?.panel.setGuided(ctx.guidance.visible);
       ctx.missionRouter?.update(f.clockDt, f.dt, ctx.sub.position, f.sub.headingDeg, f.sub);
     },
   },

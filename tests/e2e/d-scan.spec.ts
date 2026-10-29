@@ -136,8 +136,9 @@ test('scanned contacts stay marked and cannot be rescanned until a new dive', as
 
 test('visual hints show an objective waypoint and obey the saved toggle', async ({ page }) => {
   await boot(page, '/?mission=titanic&skipBriefing=1&poi=titanic-bow');
-  await expect(page.locator('.d-scan-edge')).toBeVisible();
-  await expect(page.locator('.d-scan-edge')).toContainText(/m · [↑↓]\d+ m/);
+  await expect(page.locator('.d-scan-world-marker.is-current')).toBeVisible();
+  await expect(page.locator('.d-scan-edge')).toBeHidden();
+  await expect(page.locator('.d-scan-edge-name, .d-scan-edge-info')).toHaveCount(0);
   await screenshot(page, 'waypoint-onscreen');
   await screenshot(page, 'waypoint');
   await page.evaluate(() => {
@@ -152,7 +153,8 @@ test('visual hints show an objective waypoint and obey the saved toggle', async 
     g.sub.reset(p.x, p.y, p.z, Math.PI);
     g.rig.snap(g.sub.position, Math.PI, 0);
   });
-  await expect(page.locator('.d-scan-edge')).not.toHaveClass(/is-onscreen/);
+  await expect(page.locator('.d-scan-edge')).toBeVisible();
+  await expect(page.locator('.d-scan-edge')).toBeEmpty();
   await screenshot(page, 'waypoint-offscreen-arrow');
   await page.evaluate(() => {
     const g = window.__game as { save: { setGameplayOption(k: 'visualHints', v: boolean): void } };
@@ -286,22 +288,20 @@ for (const layout of [
             next: { id: next.id, name: next.name },
             current: document.querySelector('.obj-item.is-current')?.getAttribute('data-objective'),
             objective: objective.id,
-            nav: document.querySelector('.obj-nav-target')?.textContent,
             detail: document.querySelector('.guidance-hint')?.textContent,
             reward: document.querySelector('.guidance-name')?.textContent,
-            waypoint: document.querySelector('.d-scan-edge-name')?.textContent,
-            waypointVisible: document.querySelector('.d-scan-edge-name')?.checkVisibility(),
+            marker: document
+              .querySelector('.d-scan-world-marker.is-current')
+              ?.getAttribute('data-poi'),
           };
         });
         expect(completed.last).toBe(scanned.id);
         expect(completed.target).toBe(completed.next.id);
         expect(completed.name).toBe(completed.next.name);
         expect(completed.current).toBe(completed.objective);
-        expect(completed.nav).toBe(`→ ${completed.next.name.toUpperCase()}`);
         expect(completed.reward).toBe(scanned.name);
-        expect(completed.waypoint).toBe(completed.next.name);
+        expect(completed.marker).toBe(completed.next.id);
         if (layout.touch) {
-          expect(completed.waypointVisible).toBe(true);
           expect(completed.detail).toContain(`${completed.next.name} ·`);
         }
       });

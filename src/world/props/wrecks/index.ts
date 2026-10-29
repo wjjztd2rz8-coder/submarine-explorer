@@ -20,7 +20,6 @@ import { buildTitanicBow } from './titanicBow.js';
 import { buildTitanicStern } from './titanicStern.js';
 import { isWreckHull, isWreckScatter, type WreckId } from './variants.js';
 
-export type { WreckBuilt } from './assemble.js';
 export { WRECK_HULLS, WRECK_SCATTERS, isWreckHull, isWreckScatter } from './variants.js';
 export type { WreckId } from './variants.js';
 

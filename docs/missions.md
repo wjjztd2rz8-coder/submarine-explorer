@@ -10,7 +10,7 @@ dive: briefing, surface start, objectives, completion, debrief. Schema:
 | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
 | `data/landmarks/index.json`                | `{ "version": 1, "landmarks": ["titanic"] }`: content folders that have a `mission.json`. Content packs append. |
 | `src/game/Mission.ts`                      | `parseMission` / `loadMission`, the manifest loader, and the `Mission` state machine. Pure TS.                  |
-| `src/game/MissionRouter.ts`                | `?mission=` routing, `chooseTileId`, spawn pose + loadout, nav maths, and the `MissionRouter` controller.       |
+| `src/game/MissionRouter.ts`                | `?mission=` routing, `chooseTileId`, spawn pose + loadout and the `MissionRouter` controller.                   |
 | `src/ui/Briefing.ts`, `ObjectivesPanel.ts` | DOM overlays (styles under `/* --- B3 --- */`).                                                                 |
 | `src/ui/MissionSelect.ts`                  | MISSIONS section above DIVE SITES; collapsed behind a toggle during a mission.                                  |
 
@@ -56,7 +56,7 @@ seabed + hullRadius + seabedClearance + mission.spawnClearanceM]`. The
    220 m). The bearing search checks the terrain corridor, prop collisions,
    chase arm and fitted hull rating. Mission primary scan radii leave a transit
    with Extended sensors; surface choices restore the authored radii. The first
-   objective and its waypoint hint say "Head to …" until the contact is in scan
+   objective checklist and guidance slot say "Head to …" until the contact is in scan
    range, then restore the authored scan instructions. This opening marker is
    also shown for Realistic near-site starts; other waypoint preferences resume
    on arrival. Free dives retain their independent composed beauty frames.
@@ -73,18 +73,15 @@ seabed + hullRadius + seabedClearance + mission.spawnClearanceM]`. The
    behind it to return to, and starting the dive on Escape would surprise.
    Opening a modal does not pull focus into it (Space is ballast blow; a focused
    "Dive again" would turn a held Space into a reload); the first Tab does.
-4. **Diving** (`state: 'diving'`). The objectives panel (top centre, D-FLOW)
-   is the one place the current objective shows: the mission title, a nav
-   line and an "n of m" progress line (`1 of 4 objectives · 1 of 2 primary`).
-   The full list with each objective's `hint` is in the Esc menu's Objectives
-   view. The nav line follows the first unfinished resolved primary in mission order,
-   matching the scanner and waypoint: bearing (0 = north, `headingFromForward`, the same
-   maths as the HUD heading), `RNG` = the 3D slant range (the same metric as
-   the scan panel's distance and the scanner's `radius_m` test; QA-B #11, so
-   the surface start reads ~4.3 km to a bow 2 km away and 3.8 km down), target
-   depth, and a turn cue.
-   Once every primary is done it points at the first unfinished resolved secondary
-   (`OPTIONAL → …`).
+4. **Diving** (`state: 'diving'`). The guidance slot owns the target name,
+   slant range (the same 3D distance used by the scanner) and approach instruction.
+   The desktop mission panel keeps the checklist and progress tally
+   (`1 of 4 objectives · 1 of 2 primary`); phones show only its completion banner.
+   The full list with each objective's `hint` remains in the Esc menu's Objectives view.
+   Navigation follows the first unfinished resolved primary in mission order,
+   then the first unfinished resolved secondary. The world marker is a diamond,
+   with a text-free arrow when the target is off screen. No floating label competes
+   with the guidance slot or obscures the submarine.
 5. **Primaries complete** (`all_primary`, D-FLOW). Objectives count scans
    (`scan:complete`) made during this dive, not the persisted discovery store
    (the Journal), so every dive, including "Dive again", starts with every

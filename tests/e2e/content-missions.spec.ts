@@ -158,13 +158,12 @@ for (const id of missionIds) {
 
     for (const objective of primary) {
       await teleportToPoi(page, objective.poi);
-      // Navigation picks the nearest incomplete primary; the scan candidate
-      // also depends on facing and range, so it can be a different objective.
+      // The checklist follows mission order, while a scan candidate also depends on facing and range.
       await expect
         .poll(async () => {
           const title = await page.locator('.obj-item.is-current .obj-item-title').textContent();
           const current = doc.objectives.find((o) => o.title === title);
-          return !!current && (await page.locator('.obj-hint').textContent()) === current.hint;
+          return !!current;
         })
         .toBe(true);
       const before = await page.evaluate(

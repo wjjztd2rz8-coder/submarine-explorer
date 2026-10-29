@@ -155,25 +155,29 @@ test.describe('B3 mission flow', () => {
     await expect(panel.locator('.obj-progress')).toHaveText(
       `0 of ${objectiveCount} objectives · 0 of ${primaryCount} primary`,
     );
-    // Near-site start (D-START): the bow is close and dead ahead.
-    await expect(panel.locator('.obj-nav-target')).toHaveText('→ BOW SECTION');
-    const heading = await page.evaluate(
-      () => ((window.__game as { sub: { yaw: number } }).sub.yaw * 180) / Math.PI,
-    );
-    const brg = Number(
-      ((await panel.locator('.obj-nav-bearing').textContent()) ?? '').replace(/\D/g, ''),
-    );
-    const off = Math.abs(((brg - heading + 540) % 360) - 180);
-    // The opening aims off the target by the authored yaw offset.
-    expect(Math.abs(off - (siteData('titanic').opening!.mission!.yawOffset ?? 0))).toBeLessThan(2);
-    // The range is the waypoint label's slant range (the nav line keeps bearing and
-    // depth): Arcade opens on a composed approach (tens of metres from the set piece);
-    // the classic near-site offset is 350-600 m.
-    const edge = page.locator('.d-scan-edge-info');
-    await expect(edge).toHaveText(/^\d{2,3} m · [↑↓]\d+ m/);
-    const rng = Number.parseInt((await edge.textContent()) ?? '', 10);
-    expect(rng).toBeGreaterThanOrEqual(40);
-    expect(rng).toBeLessThan(700);
+    // Regression guard: the objective slot owns the target and slant range;
+    // opening composition still aims beside the bow at the authored offset.
+    await expect(panel.locator('.obj-nav, .obj-hint')).toHaveCount(0);
+    await expect(page.locator('.guidance-name')).toHaveText('Bow section');
+    const opening = await page.evaluate(() => {
+      const g = window.__game as unknown as {
+        sub: import('../../src/sub/Submarine.js').Submarine;
+        discovery: import('../../src/game/Discovery.js').Discovery;
+      };
+      const target = g.discovery.pois.find((p) => p.id === 'titanic-bow')!;
+      const delta = target.position.clone().sub(g.sub.position);
+      const bearing = (Math.atan2(delta.x, -delta.z) * 180) / Math.PI;
+      return {
+        offset: Math.abs(((bearing - (g.sub.yaw * 180) / Math.PI + 540) % 360) - 180),
+        range: delta.length(),
+      };
+    });
+    expect(
+      Math.abs(opening.offset - (siteData('titanic').opening!.mission!.yawOffset ?? 0)),
+    ).toBeLessThan(2);
+    expect(opening.range).toBeGreaterThanOrEqual(40);
+    expect(opening.range).toBeLessThan(700);
+    await expect(page.locator('.guidance-hint')).toContainText(`${Math.round(opening.range)} m`);
 
     // Now it simulates: flooding the tanks takes the boat down.
     const y0 = (await subPos(page)).y;
@@ -229,9 +233,8 @@ test.describe('B3 mission flow', () => {
     await expect(panel.locator('.obj-progress')).toHaveText(
       `1 of ${objectiveCount} objectives · 1 of ${primaryCount} primary`,
     );
-    await expect(panel.locator('.obj-nav-target')).toHaveText('→ STERN SECTION');
-    // Guards the desktop repeat of one "where next": while the stern is far, only the nav line
-    // names it (no standing objective card), and the finished bow row has left the list.
+    await expect(panel.locator('.obj-item.is-current')).toContainText('stern');
+    // The result temporarily owns the slot; completed rows leave the checklist.
     await expect(page.locator(GUIDANCE.objective)).toHaveCount(0);
     await expect(panel.locator('.obj-item.is-complete')).toHaveCount(0);
     await page.screenshot({ path: 'tests/e2e/screenshots/mission-objectives.png' });
@@ -269,7 +272,7 @@ test.describe('B3 mission flow', () => {
     expect(m.state).toBe('primaries-complete');
     expect(m.emitted.at(-1)).toBe('mission:primaryComplete');
     // The dive goes on: the next target is optional, and a banner offers the choice.
-    await expect(panel.locator('.obj-nav-target')).toContainText('OPTIONAL →');
+    await expect(panel.locator('.obj-item.is-current')).toHaveClass(/is-optional/);
     const banner = panel.locator('.obj-banner');
     await expect(banner).toBeVisible({ timeout: 10_000 });
     const debrief = page.locator('.mission-debrief');

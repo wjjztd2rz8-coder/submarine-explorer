@@ -2,6 +2,9 @@
 
 Changes to how the work is done (tooling, scheduling, agent use), with the reason and the evidence. The owner delegated this on 2026-10-01; the only hard constraint is the usage floors.
 
+- **2026-10-29 (midday) — starved-Codex trigger fires on budget starvation**
+  - **Problem:** `review-triggers.sh` raises "Codex starved" whenever the queue is empty for 2 h, even when the Codex week is exhausted (12% left, resets Nov 4) and dispatch is rightly holding. A Claude review run is wasted on it. Also a Codex package whose sandbox cannot run e2e ends as "gates FAIL" and sits unmerged.
+  - **Change:** none to tools yet; collect such worktrees with a local smoke gate, and treat the trigger as noise until the Codex week resets.
 - **2026-10-25 (night) — stale `current` dir blocks Sol start**
   - **Problem:** a plain directory at `.cache/review/current` (from the earlier Claude-alone review) made `rm -f` fail and `ln -sfn` nest a link inside it.
   - **Change:** `tools/codex-review.sh start` now uses `rm -rf .cache/review/current`. Treat efficiency.sh idle hours as sample-count estimates (Sol, 2026-10-25).

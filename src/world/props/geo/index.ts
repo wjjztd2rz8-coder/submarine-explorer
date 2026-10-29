@@ -17,7 +17,6 @@ import type { BuiltProp } from './shared.js';
 import type { GeoBuildInput } from './types.js';
 
 export * from './features.js';
-export { GEO_DETAIL, geoDetail, type GeoDetail } from './detail.js';
 export { countGeo } from './shared.js';
 
 const BUILDERS: Record<GeoFeatureId, (i: GeoBuildInput) => BuiltProp> = {
