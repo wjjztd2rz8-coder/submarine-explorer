@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **V-opening-dark:** Titanic and Bismarck openings are lit through site data only (existing site ambient floor and hemisphere fill, no new code): Titanic gains an ambient floor of 6 on every tier and its fill goes 2 to 6; Bismarck lifts its ambient floor 6 to 18 in the cool tint other lifted sites use. The bow and main hull now read in the first frame and the readable ratio no longer flags (Titanic 0.120 to 0.133, Bismarck 0.099 to 0.154).
+
 - Hunga rim apron is longer and lighter so it blends into the slope; Hiolo North gains a small smoker-cluster vent stack and its pillow heap is smaller (opening framing unchanged).
 
 - Challenger Deep seabed keeps broad silt tone swaths in the mid-ground and a faint pale crest where the far rise meets the dark water, so the horizon grades softly instead of fading to flat olive (baked vertex tint only; no new draw calls).

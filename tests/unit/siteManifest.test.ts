@@ -758,6 +758,7 @@ const LIFTED_FILL: Record<string, number> = {
   'hunga-tonga-caldera': 9,
   'axial-seamount-ashes': 14,
   'hudson-canyon': 15,
+  bismarck: 18,
 };
 
 it('ships exactly the authored atmosphere policies and leaves other sites absent', () => {
@@ -770,6 +771,7 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
     'hunga-tonga-caldera',
     'kamaehuakanaloa',
     'lost-city',
+    'titanic',
   ];
   const allTiers = [
     'axial-seamount-ashes',
@@ -778,6 +780,7 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
     'hudson-canyon',
     'hunga-tonga-caldera',
     'kamaehuakanaloa',
+    'titanic',
   ];
   for (const id of ids) {
     const atmosphere = siteManifest(id)!.atmosphere;
@@ -786,17 +789,19 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
         hemisphere: { name: 'montereyFill', sky: 0xa8bbc8, ground: 0x493d32, intensity: 3 },
         lamps: { intensity: 2, distance: 1.2, fillIntensity: 3, fillDistance: 1.5 },
       });
-    } else if (id === 'titanic') {
-      expect(atmosphere).toEqual({
-        hemisphere: { name: 'titanicFill', sky: 0x4a6a7a, ground: 0x2a2218, intensity: 2 },
-        lamps: { intensity: 3, distance: 1.2, fillIntensity: 2.5, fillDistance: 1.3 },
-      });
     } else if (low.includes(id)) {
       const tiers = allTiers.includes(id) ? ['low', 'medium', 'high'] : ['low'];
       expect(atmosphere).toEqual({
         // Beebe tones its lamps down so close sulfide keeps its texture instead of washing pale.
         ...(id === 'beebe-vent-field'
           ? { lamps: { intensity: 0.45, distance: 1, fillIntensity: 0.35, fillDistance: 1 } }
+          : {}),
+        // Titanic keeps its lamps and a hemisphere fill so the wreck reads from the first frame.
+        ...(id === 'titanic'
+          ? {
+              hemisphere: { name: 'titanicFill', sky: 0x4a6a7a, ground: 0x2a2218, intensity: 6 },
+              lamps: { intensity: 3, distance: 1.2, fillIntensity: 2.5, fillDistance: 1.3 },
+            }
           : {}),
         // Hunga's dim tuff slope gets stronger lamps so the rim and glow read on a phone.
         ...(id === 'hunga-tonga-caldera'
