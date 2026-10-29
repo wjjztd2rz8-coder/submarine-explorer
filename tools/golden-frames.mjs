@@ -7,8 +7,7 @@ export function installGoldenFrames({ mission }) {
   let paused = false;
   let pausedAt = 0;
   let timeOffset = 0;
-  let texturesReady = false;
-  let texturesWatching = false;
+  let settled = false;
   let firstElapsedS = null;
   let targetElapsedS = null;
   const pause = () => {
@@ -25,18 +24,12 @@ export function installGoldenFrames({ mission }) {
       entry.callback(now - timeOffset);
       if (!mission) return;
       const g = window.__game;
-      if (g?.terrain && !texturesWatching) {
-        texturesWatching = true;
-        Promise.resolve(g.terrain.texturesReady).then(() => {
-          texturesReady = true;
-        });
-      }
       if (
         !window.__gameReady ||
         g?.renderer?.info.render.frame === renderFrame ||
         !g?.props.loaded ||
         !g?.discovery.loaded ||
-        !texturesReady ||
+        !settled ||
         g?.mission?.state !== 'diving'
       )
         return;
@@ -71,6 +64,23 @@ export function installGoldenFrames({ mission }) {
   window.__goldenFrames = {
     pause,
     resume,
+    async settle() {
+      // Texture decoding must finish before the frames that upload and present it.
+      await window.__game.terrain.texturesReady;
+      return new Promise((done) => {
+        const times = [];
+        let last;
+        const next = (now) => {
+          if (last !== undefined) times.push(now - last);
+          last = now;
+          if (times.length < 7) return window.requestAnimationFrame(next);
+          settled = true;
+          const sorted = [...times].sort((a, b) => a - b);
+          done({ medianMs: sorted[3], maxMs: sorted[6], samples: times });
+        };
+        window.requestAnimationFrame(next);
+      });
+    },
     get paused() {
       return paused;
     },

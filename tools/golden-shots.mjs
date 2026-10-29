@@ -22,7 +22,7 @@
  * GOLDEN_MODE=mission captures all 13 real mission openings and +10 s frames.
  * It defaults to desktop, portrait and landscape, using ?mission=<id>&skipBriefing=1.
  * Mission physics and chase cameras run normally; no free-dive poses are applied.
- * Without GOLDEN_MODE, adds one first-loaded mission frame per catalog site to the hero set.
+ * Without GOLDEN_MODE, adds one settled mission opening per catalog site to the hero set.
  * GOLDEN_MODE=free-dive keeps only the authored hero captures.
  * GOLDEN_LAYOUTS=desktop,portrait captures 1600×900 and 390×844 at the same authored poses.
  * GOLDEN_TIER=low selects Low (default high); GOLDEN_LAYOUTS=portrait,landscape adds 844×390.
@@ -129,26 +129,6 @@ async function main() {
       clearTimeout(timer);
     }
   }
-  async function settle(page) {
-    return await bounded(
-      'settle rendered frames',
-      page.evaluate(
-        () =>
-          new Promise((done) => {
-            const times = [];
-            let last;
-            const next = (now) => {
-              if (last !== undefined) times.push(now - last);
-              last = now;
-              if (times.length < 7) return requestAnimationFrame(next);
-              const sorted = [...times].sort((a, b) => a - b);
-              done({ medianMs: sorted[3], maxMs: sorted[6], samples: times });
-            };
-            requestAnimationFrame(next);
-          }),
-      ),
-    );
-  }
   try {
     browser = await chromium.launch({
       args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
@@ -234,8 +214,10 @@ async function main() {
               null,
               { timeout: 120_000, ...(mode === 'mission' ? { polling: 100 } : {}) },
             );
+            stage = `${site}: settle terrain textures and rendered frames`;
+            await evaluate(() => window.__goldenFrames.settle());
             if (mode === 'mission') {
-              stage = `${site}: first loaded mission frame`;
+              stage = `${site}: settled mission opening`;
               await page.waitForFunction(() => window.__goldenFrames.paused, null, {
                 polling: 100,
               });
@@ -243,8 +225,6 @@ async function main() {
               if (missionId !== siteId)
                 throw new Error(`Expected mission ${siteId}, got ${missionId}`);
             } else {
-              await settle(page);
-              await evaluate(() => window.__game.terrain.texturesReady);
               await evaluate(() => {
                 // Free-dive fixed poses retain the original physics freeze.
                 window.__game.sub.step = () => {};
@@ -254,7 +234,8 @@ async function main() {
             const capture = async (n, range, timeS = null) => {
               stage = `${site}: capture ${n}`;
               console.log(stage);
-              const frameTimes = mode === 'mission' ? null : await settle(page);
+              const frameTimes =
+                mode === 'mission' ? null : await evaluate(() => window.__goldenFrames.settle());
               if (errors.length) throw new Error(`${site}: ${errors.join('; ')}`);
               const filename = `${site}${layout === 'desktop' ? '' : `-${layout}`}-${n}${mode === 'mission' ? '-mission' : ''}.png`;
               const pose = await evaluate(() => {
