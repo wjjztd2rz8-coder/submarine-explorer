@@ -61,7 +61,7 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
 | No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
-Stage (review 2026-10-29, Claude + Sol; see REVIEWS.md): about 85% (range 82-87%) to 1.0; 4-6 weeks. Beautiful: Titanic 3.9, Lost City 3.8, Blue Hole 3.7, Beebe 3.8, Monterey 4.0, Challenger 3.5, Endurance 3.6. Blockers: (1) only Monterey at 4; (2) Kama subject unreadable; (3) real-phone Low-tier acceptance.
+Stage (review 2026-10-29 evening, Claude alone; Sol skipped, Codex week 6%): about 85% (range 82-87%) to 1.0; 4-6 weeks. Beautiful: Titanic 3.9, Lost City 3.8, Blue Hole 3.7, Beebe 3.7, Monterey 3.9, Challenger 3.5, Endurance 3.6. Blockers: (1) no hero firmly at 4; (2) Kama, Blake, Bismarck and Blue Hole mission openings; (3) real-phone Low-tier acceptance.
 
 ## Needs owner
 
@@ -72,7 +72,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running. Merged 2026-10-29: S-dead sweep (111), S-bughunt journey spec (112, fixed by Sonnet). 110 S-verify was moot (ran on stale main). Codex week ~12% left (resets Nov 4): no new briefs queued.
+- No package running. Briefs 120-122 are queued but wait for the Codex week reset (Nov 4; 6% left). Claude week 94% left: run Sonnet packages V-bluehole-opening, V-bismarck-patches, V-kama-opening, V-titanic-aft in that order.
 
 ## Backlog
 
@@ -84,6 +84,11 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
    3c. **B-sub-decal-mirror [Codex, queued 101] DONE 2026-10-29 (84356aec; mirror not reproduced, regression test added; visual check open):** "DSV-1" hull lettering looks distorted/mirrored in the Blue Hole opening (Sol: not yet proven; inspect first). Also inspect whether the Blake coral stand at the bottom of its opening floats.
    3e. **T-golden-settle [Codex, small] DONE 2026-10-29 (aa93f660):** mission captures lack the terrain-texture wait free-dive captures use (tools/golden-shots.mjs ~228-246 vs ~386-394); add it so openings show settled terrain (Sol). Also check Endurance hard-edged seabed patches in `endurance-1-mission.png`.
    3d. **T-opening-readable [Codex] DONE 2026-10-29 (aa93f660); reference run flags Bismarck 0.099 and Titanic 0.120 (cutoff 0.125), `node tools/golden-readable.mjs <dir>`:** luminance/contrast table for `*-1-mission.png` so V-opening-dark is judged by number.
+   3f. **V-bluehole-opening [Sonnet]:** mission opening (great-blue-hole-1-mission.png) has the camera hugging the sub, stripy bands behind, and the 'DSV-1' hull lettering still looks flipped (item 101 added a unit test but the golden shot shows a reversed D: inspect the decal UV/mirroring on the roof). Target: camera pulled back so the arch target and sub both read, lettering correct. Shared opening-camera data, no site branch.
+   3g. **V-bismarck-patches [Sonnet, small]:** Bismarck opening is readable now but the seabed has hard-edged pale patches and over-bright marine snow (same family as the Endurance patches). Target: soft-edged tint variation, snow density/brightness capped to the sub's light.
+   3h. **V-kama-opening [Sonnet]:** the Hiolo vent target is a brown egg on a bare slope; the opening shows no vent. Keep iron-stained mounds (data/landmarks/kamaehuakanaloa/props.json) but add lit vent shimmer/smoke at the target and bring it into the frame.
+   3i. **V-blake-mound [Sonnet, small]:** lone pale mound on flat sand; add a few neighbouring mounds/coral cover from existing props so it reads as a coral field.
+   3j. **T-opening-geometry [Codex, queued 120]; S-verify CI [Codex, queued 121]; S-dead second sweep [Codex, queued 122]:** all wait for the Nov 4 Codex reset.
 3. **V-titanic-aft [Sonnet]:** Titanic bow reads (~3.9, Sol ~3.5) but the aft hull and upper-left frame go dark and flat. Target: a second soft light pool or hull-side emissive tint through site data so the hull has a lit and a shaded half; no per-site branch.
 4. **V-lostcity-ground [Sonnet, small]:** towers read (~3.8) but the upper two thirds is empty dark water; add distance shading or a faint ridge crest behind (shared terrain tint, no site branch).
 5. **V-monterey-flatten [Sonnet, small] DONE 2026-10-29 (b4855e94; modest gain, lamp-pool pale patch remains):** Monterey is the closest hero (~3.9); the lower-right sand is a flat pale slab. Target: sand tint and ripple falloff so it matches the wall; then re-shoot.

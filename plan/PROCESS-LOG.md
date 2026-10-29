@@ -355,3 +355,4 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 
 - STATUS.md claimed green CI while main was red for a day: the review must run `gh run list -L 5 --workflow CI` and write the real state. golden.sh (13 mission openings) ran ~12 min but still exceeds the tool timeout; run it with a background wait on its output.
 - Sol stood in for the reconcile in one round (~35 min); its useful corrections were evidence-discipline ones (stills cannot prove mirroring or "10 s" readability). Queued 102 to give openings a numeric readability check.
+- 2026-10-29 review (run 238): Sol review skipped because Codex weekly floor (6%); documented in REVIEWS.md. Codex dispatch holds 120-122 until Nov 4.

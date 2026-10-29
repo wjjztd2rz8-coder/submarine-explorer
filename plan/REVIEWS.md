@@ -1,5 +1,21 @@
 # Reviews
 
+## 2026-10-29 evening comprehensive review (Claude alone; Sol skipped: Codex week 6%)
+
+**Changed since the midday review (golden 112021 to 2026-10-29-200845):** R-ci-green, T-opening-readable, T-golden-settle, V-opening-dark (Titanic, Bismarck), V-monterey-flatten, V-hunga-kama-subject pins, S-hud-opening-dedupe, B-sub-decal-mirror, S-dead and the piloted journey spec merged. `golden-readable` now flags 0 of 13 openings (Titanic 0.133, Bismarck 0.156). Hosted CI: the last red run failed only on the 844x390 help/photo spec, fixed in run 237; the newest run was still in progress at review time, so no tag.
+
+**Scores, beautiful (Claude):** Titanic 3.9 (opening 3.6, now readable with the bow lit); Lost City 3.8 (upper two thirds still empty); Blue Hole 3.7 (opening 3.2: camera hugs the sub, 'DSV-1' lettering still looks flipped); Beebe 3.7 (subject small and dim); Monterey 3.9 (strata good, lamp patch pale). Others (opening): Kama 3.3 (brown egg, no vent), Bismarck 3.3 (hard pale seabed patches, bright snow), Blake 3.2 (lone mound), Challenger 3.5, Endurance 3.6. No hero is at 4.
+
+**Biggest gaps:** (1) no hero firmly at 4; (2) Blue Hole, Kama, Blake and Bismarck openings; (3) real-phone Low and Auto acceptance. Contradicts the 101 close-out: the DSV-1 decal still looks wrong in the Blue Hole opening.
+
+**Process:** efficiency.sh: Claude week 94% (~9%/day), Codex week 6% (~50%/day, resets Nov 4); Claude idle ~13-27 h of 24 (budget gate). Codex is the binding constraint, so Sol review was skipped (script rule). Queued 120-122 to run after the reset. Golden run takes ~25 min; poll in the background.
+
+**New priorities:** V-bluehole-opening, V-bismarck-patches, V-kama-opening, V-blake-mound, V-titanic-aft (Sonnet); Codex 120-122 after Nov 4.
+
+**Stage:** about 85% to 1.0 (range 82-87%); 4-6 weeks. Not agreed with Sol (alone).
+
+**Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
+
 ## 2026-10-29 13:10 targeted review (Claude alone): Codex starved again
 
 - Trigger: empty Codex queue ~2 h. Root cause this time is budget, not scheduling: Codex week is 12% left (resets Nov 4), far behind pace, so `codex-dispatch.sh` correctly holds launches. The trigger will refire every few hours until the reset.
