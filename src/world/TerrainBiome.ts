@@ -192,7 +192,7 @@ export const BIOMES: Record<string, Biome> = {
   bismarck: {
     ...ABYSSAL,
     colorA: 0x45403a,
-    colorB: 0x615c56,
+    colorB: 0x4f4a44,
     colorC: 0x3f3d3c,
     rockBias: 0.12,
     scatter: [

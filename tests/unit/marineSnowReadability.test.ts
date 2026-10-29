@@ -199,7 +199,8 @@ describe('570 permanent marine snow distance and brightness', () => {
     const middle = appearance(20);
     expect(middle.alpha).toBeGreaterThan(0.1);
     expect(middle.alpha).toBeLessThanOrEqual(0.24);
-    expect(middle.brightness).toBeCloseTo(1.8);
+    // Ambient plus lamp flare would reach 1.8; the cap keeps flakes from washing the frame.
+    expect(middle.brightness).toBeCloseTo(config.snowMaxBrightness);
     // Fine dust attenuates with depth; the largest flakes hit the pixel cap.
     const fine = (distance: number) =>
       snowParticleAppearance(config, atmo, 900, 0.3, distance, distance, 1);
@@ -252,6 +253,7 @@ describe('460/570 marine snow readability at all shipped sites and tiers', () =>
         uForegroundSizePx: 2,
         uForegroundAlpha: 0.12,
         uForegroundBrightness: 0.65,
+        uMaxBrightness: 1.4,
       }))
         expect(mat.uniforms[uniform]!.value).toBe(value);
       expect(mat.vertexShader).toContain('length(world - uCam)');

@@ -132,6 +132,8 @@ export interface WaterConfig {
   /** Sprite-centre alpha and linear colour multiplier, including lamp flare. */
   snowForegroundAlpha: number;
   snowForegroundBrightness: number;
+  /** Linear colour multiplier no snow flake exceeds, so lamp flare never washes the frame. */
+  snowMaxBrightness: number;
   /** The sea surface is only drawn when the camera is shallower than this. */
   surfaceVisibleAboveM: number;
   /** Sea-surface wave amplitude (m) and wavelength (m) for the Fresnel lid. */
@@ -235,6 +237,7 @@ export const DEFAULT_WATER: WaterConfig = {
   snowForegroundSizePx: 2,
   snowForegroundAlpha: 0.12,
   snowForegroundBrightness: 0.65,
+  snowMaxBrightness: 1.4,
   surfaceVisibleAboveM: -160,
   surfaceWaveAmpM: 0.9,
   surfaceWaveLengthM: 22,

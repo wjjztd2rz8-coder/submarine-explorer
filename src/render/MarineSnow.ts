@@ -46,6 +46,7 @@ export function snowReadabilityUniforms(config: WaterConfig): Record<string, THR
     uForegroundSizePx: { value: config.snowForegroundSizePx },
     uForegroundAlpha: { value: config.snowForegroundAlpha },
     uForegroundBrightness: { value: config.snowForegroundBrightness },
+    uMaxBrightness: { value: config.snowMaxBrightness },
   };
 }
 
@@ -92,7 +93,7 @@ export function snowParticleAppearance(
   return {
     sizePx,
     alpha: Math.min(alpha, THREE.MathUtils.lerp(config.snowForegroundAlpha, 1, t)),
-    brightness: Math.min(brightness, THREE.MathUtils.lerp(config.snowForegroundBrightness, 3.6, t)),
+    brightness: Math.min(brightness, THREE.MathUtils.lerp(config.snowForegroundBrightness, config.snowMaxBrightness, t)),
   };
 }
 
@@ -351,6 +352,7 @@ uniform float uBrightness;
 uniform float uLampGain;
 uniform float uForegroundAlpha;
 uniform float uForegroundBrightness;
+uniform float uMaxBrightness;
 varying float vAlpha;
 varying float vLit;
 varying float vForegroundFade;
@@ -361,7 +363,7 @@ void main() {
   if (r > 0.25) discard;
   // Gaussian-ish sprite: soft edge, no hard disc.
   float soft = exp(-r * 14.0);
-  float brightnessCap = mix(uForegroundBrightness, 3.6, vForegroundFade);
+  float brightnessCap = mix(uForegroundBrightness, uMaxBrightness, vForegroundFade);
   vec3 col = uColor * min(uBrightness + vLit * uLampGain, brightnessCap);
   // Clamp the centre before applying the Gaussian, preserving a soft edge.
   float alphaCap = mix(uForegroundAlpha, 1.0, vForegroundFade);
