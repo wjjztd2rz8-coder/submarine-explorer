@@ -2440,3 +2440,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to merge: 93 R-journey-guidance, 94 R-journey-labels and 96 T-golden-mission were relaunched by dispatch at 22:30 and are running in their worktrees (Codex 5h 84% left). Main clean. Claude week 15% left (resets Oct 29 07:00), no Claude package. No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-29 00:40 CDT headless run 225 (Claude): Codex collect
+
+- Merged R-journey-guidance (Home button/caption, Blue Hole opening names optional target, no stale target after scan) and R-journey-labels (waypoint/Journal label clipping, Settings Close on phones). Two small conflicts (opening-framing spec, discovery.md) resolved by hand. Gates smoke + project-base passed on main; pushed. Still running: 96 T-golden-mission (round 2). No Claude package (week ~15% left, resets Oct 29 07:00). No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
