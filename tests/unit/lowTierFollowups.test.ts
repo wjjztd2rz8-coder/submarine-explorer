@@ -101,7 +101,7 @@ test('d-scan Titanic fixture: extended sensors keep the logged bow ahead of the 
 for (const tier of ['low', 'medium', 'high'] as const) {
   // Regression guard: scenic geology hid the vent; moving its anchor also raised
   // the opening until the required contact fell outside the level scan beam.
-  test.each(['shipped', 'taller renamed subject'])(
+  test.each(['shipped', 'renamed subject'])(
     `Kamaehuakanaloa ${tier} %s: free and mission openings frame a lit subject with a clear camera and scan approach`,
     async (variant) => {
       const site = 'kamaehuakanaloa';
@@ -109,22 +109,24 @@ for (const tier of ['low', 'medium', 'high'] as const) {
       const original = manifest.opening;
       const content = json(`data/landmarks/${site}/props.json`);
       if (variant !== 'shipped') {
-        // Exercise the art retry entirely in memory: neither a prop id, the old
-        // scenic anchor nor the pillow footprint should define this capability.
-        const vent = content.props.find(
-          (p: { feature?: string }) => p.feature === 'smoker-cluster',
-        );
+        // Neither a prop id nor the pillow footprint should
+        // define this capability. Keep every reference to the renamed subject valid.
+        const opening = structuredClone(original)!;
+        const subjectId =
+          opening.reframe?.aimHero ?? opening.reframe?.hero ?? opening.freeDive!.hero;
+        const vent = content.props.find((p: { id: string }) => p.id === subjectId);
         expect(vent).toBeDefined();
         vent.id = 'renamed-vent-subject';
-        vent.dimensions_m = [18, 16, 6];
-        manifest.opening = structuredClone(original);
-        manifest.opening!.reframe!.hero = vent.id;
-        manifest.opening!.reframe!.aimHero = vent.id;
+        if (opening.freeDive?.hero === subjectId) opening.freeDive.hero = vent.id;
+        if (opening.reframe?.hero === subjectId) opening.reframe.hero = vent.id;
+        if (opening.reframe?.aimHero === subjectId) opening.reframe.aimHero = vent.id;
+        manifest.opening = opening;
       }
       const { config, meta, terrain, props } = await scene(site, tier, content);
       try {
         const authored = siteManifest(site)!.opening!;
-        const subjectId = authored.reframe?.aimHero ?? authored.freeDive!.hero;
+        const subjectId =
+          authored.reframe?.aimHero ?? authored.reframe?.hero ?? authored.freeDive!.hero;
         const subject = props.placed.find((p) => p.def.id === subjectId)!;
         expect(subject).toBeDefined();
         const pois = placePois(

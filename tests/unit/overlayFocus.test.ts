@@ -1476,7 +1476,11 @@ describe('overlay policies across the app', () => {
       ctx.waypoints.root.remove();
     });
     await ctx.discovery.ready;
-    const frame = () => waypointsSystem.frame!['guide.waypoints']!({} as FrameState, ctx);
+    const frame = () => {
+      const state = {} as FrameState;
+      waypointsSystem.frame!['guide.waypoints']!(state, ctx);
+      waypointsSystem.frame!['render.prepare']!(state, ctx);
+    };
     frame();
     expect(ctx.waypoints.root.dataset.hints).toBe('true');
     const apply = vi.spyOn(ctx.waypoints, 'setVisualHints');

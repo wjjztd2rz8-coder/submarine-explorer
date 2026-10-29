@@ -383,7 +383,8 @@ it.each(
         );
         if (kind === 'mission' && missionSightlineSites.includes(site)) {
           const authored = siteManifest(site)!.opening!;
-          const subjectId = authored.reframe?.aimHero ?? authored.freeDive!.hero;
+          const subjectId =
+            authored.reframe?.aimHero ?? authored.reframe?.hero ?? authored.freeDive!.hero;
           const subject = props.placed.find((p) => p.def.id === subjectId)!;
           expect(subject).toBeDefined();
           // The authored subject must represent the first required contact, not remote scenery.
@@ -402,22 +403,17 @@ it.each(
             terrain.update(rig.camera);
             props.update(rig.camera);
             expect(subject.root.visible).toBe(true);
-            // A contact describes a vent site, so a neighbouring stack of the
-            // authored subject's kind can represent the same required contact.
-            const bodies = props.placed
-              .filter(
-                (p) =>
-                  p.def.model === subject.def.model &&
-                  p.root.position.distanceTo(target.position) < target.radius,
-              )
-              .flatMap((p) => solidMeshes(p.root).slice(0, 1));
+            // The authored vent subject itself must be visible. A neighbouring
+            // chimney cannot stand in for an obscured opening subject.
+            const body = solidMeshes(subject.root)[0];
+            expect(body).toBeDefined();
             const solids = [...solidMeshes(terrain.group), ...solidMeshes(props.group)];
-            const visible = bodies.map((body) => subjectVisibility(body, solids, rig.camera));
+            const visible = subjectVisibility(body, solids, rig.camera);
             sightlines.push({ width, height, subjectId, visible });
             expect(
-              visible.some((bands) => bands.every(Boolean)),
-              `${width}x${height} ${target.id}: a vent body is visible, not just its plume or tip; ${JSON.stringify(visible)}`,
-            ).toBe(true);
+              visible,
+              `${width}x${height} ${target.id}: the opening subject's middle and upper body are visible`,
+            ).toEqual([true, true]);
             expect(props.collide(rig.camera.position.clone(), 1, new Vector3())).toBe(false);
           }
         }

@@ -201,6 +201,7 @@ it('guides optional objectives after primary completion and scans leftover conta
     } as FrameState;
     discoverySystem.frame!['scan.discovery']!(frame, ctx);
     waypointsSystem.frame!['guide.waypoints']!(frame, ctx);
+    waypointsSystem.frame!['render.prepare']!(frame, ctx);
   };
   try {
     waypointsSystem.init!(ctx);
@@ -211,7 +212,9 @@ it('guides optional objectives after primary completion and scans leftover conta
     expect(scanner.view.candidateId).toBe('bow');
     scanner.update(1, position, forward, true);
     expect(mission.state).toBe('primaries-complete');
-    // The event refreshes the visible target before another guide frame.
+    // Let the reward finish changing the HUD before measuring the next target;
+    // no rendered frame is needed for the completion event to refresh navigation.
+    await Promise.resolve();
     expect(view.update.mock.lastCall?.[2]).toEqual({ poiId: 'stern' });
     expect(finished).not.toHaveBeenCalled();
     guide();
@@ -276,8 +279,11 @@ it('Realistic retains its approach marker, then resumes normal waypoint preferen
   try {
     waypointsSystem.init!(ctx);
     await Promise.resolve();
-    const draw = () =>
-      waypointsSystem.frame!['guide.waypoints']!({ pilotPosition: {} } as FrameState, ctx);
+    const draw = () => {
+      const frame = { pilotPosition: {} } as FrameState;
+      waypointsSystem.frame!['guide.waypoints']!(frame, ctx);
+      waypointsSystem.frame!['render.prepare']!(frame, ctx);
+    };
     draw();
     expect(view.setVisualHints).toHaveBeenLastCalledWith(true);
     expect(view.update.mock.lastCall?.[2]).toEqual({ poiId: 'bow' });
@@ -291,6 +297,44 @@ it('Realistic retains its approach marker, then resumes normal waypoint preferen
     ctx.effective.gameplay.visualHints = true;
     draw();
     expect(view.setVisualHints).toHaveBeenLastCalledWith(true);
+  } finally {
+    waypointsSystem.dispose?.();
+  }
+});
+
+it('measures completion against the finished reward HUD and cancels queued layout on disposal', async () => {
+  let changed!: () => void;
+  let hud = 'scan';
+  const measured: string[] = [];
+  const ctx = {
+    sub: { position: new Vector3() },
+    effective: { gameplay: { visualHints: true } },
+    missionRouter: {
+      mission: {
+        objectives: [
+          { resolved: true, complete: false, primary: true, poiId: 'next', title: 'Next' },
+        ],
+        onChange: (listener: () => void) => {
+          changed = listener;
+          return () => {};
+        },
+      },
+    },
+    rig: { camera: {} },
+    waypoints: { setVisualHints() {}, update: () => measured.push(hud) },
+  } as unknown as GameContext;
+  try {
+    waypointsSystem.start!(ctx);
+    changed();
+    // Completion subscribers still have to replace the scan card. Its stylesheet
+    // hides the label, so measuring here would read a zero-sized box.
+    hud = 'reward';
+    await Promise.resolve();
+    expect(measured).toEqual(['reward']);
+    changed();
+    waypointsSystem.dispose?.();
+    await Promise.resolve();
+    expect(measured).toEqual(['reward']);
   } finally {
     waypointsSystem.dispose?.();
   }

@@ -45,11 +45,28 @@ export const waypointsSystem: GameSystem = {
   },
   start(ctx) {
     const mission = ctx.missionRouter?.mission;
-    if (mission) cleanup.add(mission.onChange(() => updateWaypoints(ctx, ctx.sub.position)));
+    let active = true;
+    cleanup.add(() => {
+      active = false;
+    });
+    if (mission)
+      cleanup.add(
+        mission.onChange(() => {
+          // The scanner publishes completion before the reward replaces its scan card.
+          // Measure after those synchronous subscribers finish, before the next paint.
+          queueMicrotask(() => {
+            if (active) updateWaypoints(ctx, ctx.sub.position);
+          });
+        }),
+      );
   },
   frame: {
     'guide.waypoints': (f, ctx) => {
-      f.nextScanObjective = updateWaypoints(ctx, f.pilotPosition);
+      f.nextScanObjective = selectScanObjective(ctx.missionRouter?.mission.objectives);
+    },
+    'render.prepare': (f, ctx) => {
+      // Tutorial, warning and mission panels now have their final geometry.
+      updateWaypoints(ctx, f.pilotPosition);
     },
   },
 };
@@ -71,5 +88,4 @@ function updateWaypoints(ctx: GameContext, position: Vector3) {
     nextScanObjective ? { poiId: nextScanObjective.poiId } : null,
     (name) => ctx.guidance.showsName(name) || !!ctx.missionRouter?.panel.showsTarget(name),
   );
-  return nextScanObjective;
 }

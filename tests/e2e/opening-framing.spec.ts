@@ -1347,7 +1347,8 @@ freshTest.describe('catalog underwater and approach poses', () => {
 
     for (const site of sites) {
       const authored = siteData(site.id).opening!;
-      const heroId = site.hero ?? authored.reframe?.aimHero ?? authored.freeDive!.hero;
+      const heroId =
+        site.hero ?? authored.reframe?.aimHero ?? authored.reframe?.hero ?? authored.freeDive!.hero;
       // Regression guard: opening faced away from its hero or put the hull/camera through props, terrain or water surface.
       test(`${site.id}: underwater free-dive opening${site.detail ? ' and 15 m detail' : ''}`, async ({
         page,
