@@ -87,7 +87,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 11. **R-ci-green [Codex] IN FLIGHT (queued 97, 2026-10-29):** hosted CI red since 2026-10-28; remaining real failure is the journey spec `.d-scan-edge` layout check (journal-debrief.spec.ts:1771, 4 of 6 combos, phone sizes).
 12. **V-hunga-kama-subject pins [Codex, test side of item 2; queued 98]:** re-apply the taller Kama vent cluster and re-pin the line-of-sight and pillow-framing tests by capability; Claude then judges the golden shot.
 8. **S-verify / S-bughunt / S-dead [Codex, standing]:** 4730-4780 merged 2026-10-28; keep rationing.
-9. **P2-phone-accept [owner + Codex; queued 99 automates the browser-checkable items]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
+9. **P2-phone-accept [owner + Codex; browser-checkable items automated 2026-10-29 in tests/e2e/phone-accept.spec.ts]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
 10. **R-release [Haiku]:** tag the latest green-CI main after each review (f68 is the newest); check the Pages deploy.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16), Titanic per-plate blockiness (accepted ~3.7). Codex weekly burn is ~60%/day, so briefs stay rationed.
