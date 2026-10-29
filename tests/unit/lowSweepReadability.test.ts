@@ -34,6 +34,7 @@ const lowReadabilitySites = [
   'hunga-tonga-caldera',
   'kamaehuakanaloa',
   'lost-city',
+  'titanic',
 ];
 const allTierFloorSites = [
   'axial-seamount-ashes',
@@ -42,6 +43,7 @@ const allTierFloorSites = [
   'hudson-canyon',
   'hunga-tonga-caldera',
   'kamaehuakanaloa',
+  'titanic',
 ];
 
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
@@ -67,7 +69,7 @@ test('Low seabed lighting is isolated to the observed dark sites and leaves surf
       for (const tier of ['medium', 'high'] as const)
         expect(siteLightWater(site, tier, water)).toBe(water);
   }
-  for (const site of ['titanic', 'monterey-canyon', 'great-blue-hole', 'unknown'])
+  for (const site of ['monterey-canyon', 'great-blue-hole', 'unknown'])
     expect(siteLightWater(site, 'low', water)).toBe(water);
   for (const site of ['challenger-deep', 'endurance']) {
     const deep = deepSiteWater(site, water);
@@ -103,7 +105,10 @@ for (const site of lowReadabilitySites) {
         if ('isLight' in o) lights.push(o.type);
       });
       expect(lights.filter((type) => type === 'AmbientLight')).toHaveLength(1);
-      expect(lights).not.toContain('HemisphereLight');
+      // A hemisphere fill exists only where the site manifest authors one.
+      expect(lights.includes('HemisphereLight')).toBe(
+        !!siteManifests.siteManifest(site)!.atmosphere!.hemisphere,
+      );
       for (let i = 0; i < 3; i++) {
         const frame = { dt: 1 / 60 } as FrameState;
         atmosphereSystem.frame!['env.atmosphere']!(frame, ctx);
@@ -353,7 +358,7 @@ test('Bismarck golden approach/detail aim at visible hull above the slope from c
 
 test('Per-site seabed light also lifts only the deep bands of the four all-tier sites on Medium and High', () => {
   const water = makeConfig().water;
-  expect(siteLightWater('titanic', 'high', water)).toBe(water);
+  expect(siteLightWater('monterey-canyon', 'high', water)).toBe(water);
   for (const site of allTierFloorSites)
     for (const tier of ['medium', 'high'] as const) {
       const lit = siteLightWater(site, tier, water);
