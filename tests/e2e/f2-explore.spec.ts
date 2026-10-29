@@ -149,6 +149,7 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
     g.journal.open();
     g.journal.show('monterey-canyon');
   });
+  // Samples share Finds, but the secret tally counts only hidden contacts.
   await expect(page.locator('.jr-progress')).toContainText(
     `${secrets.length}/${secrets.length} secrets`,
   );

@@ -163,9 +163,10 @@ html.is-touch .obj-banner-actions {
   flex-direction: column;
   flex-wrap: nowrap;
 }
-/* A contact's card and reticle lead while it is in range. */
+/* A contact's card and reticle lead while it is in range. Keep the waypoint
+   measurable so a scan completion can place the next label before it reappears. */
 html.is-touch body:has(.guidance-slot[data-kind='scan']:not([hidden])) .d-scan-edge {
-  display: none;
+  visibility: hidden;
 }
 
 @media (orientation: landscape) {

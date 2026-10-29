@@ -516,6 +516,14 @@
 .jr-credit a {
   color: inherit;
 }
+/* References remain usable touch targets even when their titles fit one line. */
+.jr-credit a,
+.jr-sources a {
+  display: inline-block;
+  min-width: 44px;
+  min-height: 44px;
+  align-content: center;
+}
 .jr-sources-title {
   margin: 18px 0 6px;
   font-size: 0.8em;
