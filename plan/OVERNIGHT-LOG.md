@@ -2492,3 +2492,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - 98 V-hunga-kama-subject-pins: Codex sandbox blocked its e2e. Local --full-e2e run was cut off by the 10 min background limit (python/content/build/unit passed), so it is NOT verified. Committed as wip on branch codex/v-hunga-kama-subject-pins in its worktree; next run should run gates.sh there with a longer foreground/background timeout, review the Kama screenshots, then merge.
 - Still running: 97 R-ci-green, 100 S-hud-opening-dedupe. Queued: 102, 103. No Claude package (budget was ample, time went to gates). No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
+
+## 2026-10-29 10:06 CDT headless run 235 (Claude): collect Kama pins
+
+- Merged V-hunga-kama-subject pins (98): full e2e hit my 50 min timeout, so I ran the three changed specs plus opening-framing (129/130 passed; the one failure is the journey `.d-scan-edge` check that 97 R-ci-green targets). Golden Kama shot shows the vent stack with smoke beside the sub, a modest gain; the mission opening stays dim (item 3a). Gates smoke + project-base passed on main; pushed.
+- Running: 97 R-ci-green (worktree still present), 100, 102, 103. Codex week 16% left, so no new briefs. No Claude package. No tag.
+- Process note: background Bash commands die at 10 min; run long gates with setsid nohup and poll the log.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
