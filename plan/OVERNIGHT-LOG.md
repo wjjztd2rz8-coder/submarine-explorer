@@ -2534,3 +2534,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged V-bismarck-patches (Sonnet): shared terrain shader patch blend widened (hard-edged pale patches now soft mottling at Bismarck and Endurance), Bismarck patch colour toned, marine-snow brightness cap made real (config `water.snowMaxBrightness`). Golden before/after checked by eye: clear gain on patches; Bismarck readable 0.144; upper frame still dark. Gates smoke + project-base passed on main; pushed. Hosted CI for run 239 was still queued at start.
 - Next Claude items: V-kama-opening, V-blake-mound. Nothing running; Codex 120-122 queued for the Nov 4 reset. No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
+
+## 2026-10-29 18:37 CDT headless run 241 (Claude): V-kama-opening
+
+- Merged V-kama-opening (Sonnet): Kama now uses the vent preset (smoke, shimmer, haze) and yawOffset 20, so a smoking rust-brown stack shows beside the sub in the opening; readability 0.170. Gain modest (my rating ~2.5-3/5): stack small at 110 m, no visible glow, sub centred. First attempt broke 7 unit specs and a free-dive e2e; sent back and fixed in data only. Gates smoke + project-base passed on main; pushed. Hosted CI for run 239 was green.
+- Next Claude item: V-blake-mound. Nothing running; Codex 120-122 queued for the Nov 4 reset. No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
