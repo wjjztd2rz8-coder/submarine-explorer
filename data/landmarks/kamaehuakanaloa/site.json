@@ -18,7 +18,8 @@
   },
   "opening": {
     "mission": {
-      "rangeM": 110,
+      "rangeM": 70,
+      "yawOffset": 25,
       "chaseRadius": 60,
       "chaseOffsetY": -20,
       "destinationLabel": "Hiolo North"
