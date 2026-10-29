@@ -2522,3 +2522,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Golden 200845 reviewed (0/13 openings flagged readable); no hero at 4; Sol skipped (Codex week 6%). DIRECTOR backlog gains V-bluehole-opening, V-bismarck-patches, V-kama-opening, V-blake-mound; Codex 120-122 queued for the Nov 4 reset. REVIEWS.md and STATUS.md updated. No package run, no tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
+
+## 2026-10-29 16:25 CDT headless run 239 (Claude): V-bluehole-opening
+
+- Merged V-bluehole-opening (Sonnet): Blue Hole mission opening now uses a level, sideways chase arm (shared mission-arm data), so sub and gallery arch both read; hull number moved clear of the deck fin (geometry test added; lettering still not legible in the opening). Terrace banding NOT fixed (terrain item). My rating ~5-6/10, modest gain. Gates smoke + project-base passed on main; pushed.
+- Next Claude items: V-bismarck-patches, V-kama-opening, V-blake-mound. Nothing running; Codex 120-122 queued for the Nov 4 reset. No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
