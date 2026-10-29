@@ -2485,3 +2485,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to merge: 97 R-ci-green, 100 S-hud-opening-dedupe and 101 B-sub-decal-mirror are running (Codex 5h 32% left); 102 and 103 are queued. 98 V-hunga-kama-subject-pins ended "gates FAIL after 2 rounds" (06:08) and is left uncommitted in its worktree for the next run to finish after the Claude week reset (Oct 29 07:00; week 13% left now, so no Claude package this run). Main clean. No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
+
+## 2026-10-29 08:35 CDT headless run 234 (Claude): Codex collect
+
+- Merged B-sub-decal-mirror (101): mirror not reproduced, decal orientation unit test added; gates smoke + project-base passed; pushed. Visual check of DSV-1 lettering still open.
+- 98 V-hunga-kama-subject-pins: Codex sandbox blocked its e2e. Local --full-e2e run was cut off by the 10 min background limit (python/content/build/unit passed), so it is NOT verified. Committed as wip on branch codex/v-hunga-kama-subject-pins in its worktree; next run should run gates.sh there with a longer foreground/background timeout, review the Kama screenshots, then merge.
+- Still running: 97 R-ci-green, 100 S-hud-opening-dedupe. Queued: 102, 103. No Claude package (budget was ample, time went to gates). No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
