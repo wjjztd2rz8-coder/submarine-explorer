@@ -72,7 +72,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running (Claude week ~14% left, resets Oct 29 07:00). Codex running: 97 R-ci-green, 98 V-hunga-kama-subject pins. Queued (waiting on Codex weekly pace, resets Nov 4): 110 S-verify, 111 S-dead, 112 S-bughunt.
+- No Claude package running. Merged 2026-10-29: S-dead sweep (111), S-bughunt journey spec (112, fixed by Sonnet). 110 S-verify was moot (ran on stale main). Codex week ~12% left (resets Nov 4): no new briefs queued.
 
 ## Backlog
 

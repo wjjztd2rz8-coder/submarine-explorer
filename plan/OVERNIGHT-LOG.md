@@ -2511,3 +2511,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged S-hud-opening-dedupe (Codex 100; took main's side on 3 conflicts, fixed a lost `samples` binding). Smoke gates pass on main; hosted CI is the full check.
 - Codex week 12% left (resets Nov 4), so empty-queue trigger is budget noise. Queued 110 S-verify, 111 S-dead, 112 S-bughunt (wait for pace). No Claude package run.
 - Needs owner: phone retest (unchanged).
+
+## 2026-10-29 15:08 CDT headless run 237 (Claude): collect Codex 111/112
+
+- Merged S-dead sweep (111; unused re-exports and an uncalled wreck helper, -34 src lines) and S-bughunt journey spec (112: piloted Home to first objective to debrief, 390x844 and 1280x800). Codex's sandbox could not run e2e, so a Sonnet agent got the new journey and the 844x390 help/photo test passing; all three were test problems, not product bugs. Gates smoke + project-base passed on main; pushed. 110 S-verify was moot (ran on a stale main) and was dropped.
+- Nothing running. Codex week ~12% left (resets Nov 4), so no new briefs queued. Hosted CI not yet checked; no tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
