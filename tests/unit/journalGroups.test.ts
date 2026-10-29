@@ -186,7 +186,10 @@ it.each([
   journal.setStore(store);
   journal.show('reef');
   const chips = find((el) => el.className.split(' ').includes('jr-progress'));
-  expect(chips.children.map((el) => el.textContent)).toEqual(['0/0 entries', `${found}/1 secrets`]);
+  expect(chips.children.map((el) => el.textContent)).toEqual([
+    '0/0 points of interest',
+    `${found}/1 secrets`,
+  ]);
   expect(reef.entries.filter((entry) => entry.kind === 'secret')).toHaveLength(2);
   if (scanned.includes('sample:mud')) {
     journal.show('reef/sample/mud');
