@@ -149,9 +149,13 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
     g.journal.open();
     g.journal.show('monterey-canyon');
   });
+  // Secret progress excludes samples; the Finds category retains both authored totals.
   await expect(page.locator('.jr-progress')).toContainText(
-    `${secrets.length}/${secrets.length + samples.length} secrets`,
+    `${secrets.length}/${secrets.length} secrets`,
   );
+  await expect(
+    page.locator('details[data-category="monterey-canyon/secret"] summary .jr-nav-meta'),
+  ).toHaveText(`${secrets.length}/${secrets.length + samples.length}`);
   await page
     .locator('.jr-nav')
     .getByRole('button', { name: 'Lost instrument frame', exact: true })

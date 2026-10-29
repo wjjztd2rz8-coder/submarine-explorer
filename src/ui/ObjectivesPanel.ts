@@ -1,30 +1,7 @@
-/**
- * Mission objectives HUD panel. The top-right list shows all short missions;
- * long missions show the current objective and the next few. Navigation and
- * the current hint sit under the list; Esc keeps the full list available.
- * Under it: the completion banner ("Primary objectives complete" with Keep
- * exploring / Surface and debrief). On phones only the banner shows; the
- * guidance slot carries the current objective.
- *
- * Bearings use the HUD's compass convention (0 = north, 90 = east); the
- * router computes them with `headingFromForward` from geo.ts, the same maths
- * the HUD heading reduces to. Text writes are skipped when unchanged.
- */
+/** Mission checklist, progress tally and completion choices. Target guidance lives in the guidance slot. */
 
 import { hudRegions } from './hudRegions.js';
-import type { ObjectiveStatus } from '../game/Mission.js';
-
-export interface NavReadout {
-  id: string;
-  name: string;
-  primary: boolean;
-  /** 0 = north, 90 = east. */
-  bearingDeg: number;
-  /** Target depth, positive metres. */
-  depthM: number;
-  /** Bearing minus current heading, -180..180 (+ = to starboard). */
-  relativeDeg: number;
-}
+import { nextScanObjective, type ObjectiveStatus } from '../game/Mission.js';
 
 /** The completion banner: a title, a detail line and the two end-of-dive choices. */
 export interface CompletionBanner {
@@ -34,13 +11,6 @@ export interface CompletionBanner {
   detail: string;
   onKeepExploring: () => void;
   onSurface: () => void;
-}
-
-/** "AHEAD" inside ±`aheadDeg`, else e.g. "35° STBD" / "120° PORT". */
-export function formatTurn(relativeDeg: number, aheadDeg = 10): string {
-  const a = Math.round(Math.abs(relativeDeg));
-  if (a <= aheadDeg) return 'AHEAD';
-  return `${a}° ${relativeDeg > 0 ? 'STBD' : 'PORT'}`;
 }
 
 /** The progress line: "1 of 4 objectives · 1 of 2 primary" (resolvable objectives only). */
@@ -55,7 +25,7 @@ export function formatProgress(objectives: readonly ObjectiveStatus[]): string {
   return `${all} · ${primaryDone} of ${primary.length} primary`;
 }
 
-/** Keep an instruction visible while navigation waits for its first position. */
+/** Keep a checklist step selected while mission positions are still loading. */
 export function currentObjectiveId(
   objectives: readonly ObjectiveStatus[],
   preferred: string | null,
@@ -88,9 +58,7 @@ function el<K extends keyof HTMLElementTagNameMap>(
 export class ObjectivesPanel {
   readonly root: HTMLDivElement;
   private readonly titleEl: HTMLSpanElement;
-  private readonly navEl: HTMLDivElement;
   private readonly listEl: HTMLDivElement;
-  private readonly hintEl: HTMLDivElement;
   private objectives: readonly ObjectiveStatus[] = [];
   private currentId: string | null = null;
   private readonly progressEl: HTMLDivElement;
@@ -99,10 +67,6 @@ export class ObjectivesPanel {
   private readonly bannerDetail: HTMLElement;
   private readonly bannerStars: HTMLElement;
   private banner: CompletionBanner | null = null;
-  private wanted = true;
-  /** The guidance card is showing, so the hint line stays down. */
-  private guided = false;
-  private readonly navText = new Map<string, HTMLSpanElement>();
   private readonly cache = new Map<string, string>();
 
   constructor(parent: HTMLElement = hudRegions()) {
@@ -111,14 +75,7 @@ export class ObjectivesPanel {
     const head = el('div', 'obj-head');
     this.titleEl = el('span', 'obj-title', 'MISSION');
     head.append(this.titleEl);
-    this.navEl = el('div', 'obj-nav');
     this.listEl = el('div', 'obj-list');
-    this.hintEl = el('div', 'obj-hint');
-    for (const f of ['target', 'bearing', 'depth', 'turn']) {
-      const span = el('span', `obj-nav-${f}`);
-      this.navText.set(f, span);
-      this.navEl.append(span);
-    }
     this.progressEl = el('div', 'obj-progress');
     // Completion banner. Never takes focus: the player's hands are on the
     // flight keys, and Space/Enter on a focused button would end the dive.
@@ -147,34 +104,12 @@ export class ObjectivesPanel {
     actions.append(keep, surface);
     this.bannerEl.append(text, actions);
 
-    this.root.append(head, this.listEl, this.navEl, this.hintEl, this.progressEl, this.bannerEl);
+    this.root.append(head, this.listEl, this.progressEl, this.bannerEl);
     parent.appendChild(this.root);
   }
 
   setVisible(visible: boolean): void {
-    this.wanted = visible;
-    this.sync();
-  }
-
-  /** True when the nav line on screen names `name` (its bearing and range then cover the waypoint label). */
-  showsTarget(name: string): boolean {
-    return (
-      !this.root.hidden &&
-      (this.navText.get('target')?.textContent ?? '').toLowerCase().includes(name.toLowerCase())
-    );
-  }
-
-  /** Hide the hint line while the guidance card carries an instruction; it returns when the card empties. */
-  setGuided(guided: boolean): void {
-    if (this.guided === guided) return;
-    this.guided = guided;
-    this.hintEl.hidden = guided || !this.hintEl.textContent;
-  }
-
-  /** Phones show only the completion banner; the guidance slot names the objective. */
-  private sync(): void {
-    const touch = document.documentElement.classList.contains('is-touch');
-    this.root.hidden = !this.wanted || (touch && this.bannerEl.hidden);
+    this.root.hidden = !visible;
   }
 
   setTitle(title: string): void {
@@ -186,7 +121,7 @@ export class ObjectivesPanel {
   /** Refresh the "n of m" progress line. Cheap; called when an objective changes. */
   setObjectives(objectives: readonly ObjectiveStatus[]): void {
     this.objectives = objectives;
-    this.currentId = currentObjectiveId(objectives, this.currentId);
+    this.currentId = currentObjectiveId(objectives, nextScanObjective(objectives)?.id ?? null);
     this.write(this.progressEl, 'progress', formatProgress(objectives));
     this.renderList();
   }
@@ -198,7 +133,6 @@ export class ObjectivesPanel {
     this.bannerDetail.textContent = banner.detail;
     this.setBannerStars(banner.stars);
     this.bannerEl.hidden = false;
-    this.sync();
   }
 
   /** Refresh the live rating without reopening the banner or extending its lifetime. */
@@ -215,42 +149,15 @@ export class ObjectivesPanel {
   hideBanner(): void {
     this.banner = null;
     this.bannerEl.hidden = true;
-    this.sync();
   }
 
   get bannerOpen(): boolean {
     return !this.bannerEl.hidden;
   }
 
-  /** The nav line; `allPrimaryDone` marks the target as optional, or shows a notice when none is left. */
-  setNav(nav: NavReadout | null, allPrimaryDone: boolean): void {
-    this.sync();
-    const currentId = currentObjectiveId(this.objectives, nav?.id ?? this.currentId);
-    if (this.currentId !== currentId) {
-      this.currentId = currentId;
-      this.renderList();
-    }
-    const t = (f: string, text: string): void => {
-      const span = this.navText.get(f);
-      if (span) this.write(span, `nav-${f}`, text);
-    };
-    this.navEl.classList.toggle('is-done', allPrimaryDone);
-    if (!nav) {
-      const allDone = allPrimaryDone && !this.objectives.some((o) => o.resolved && !o.complete);
-      t('target', allDone ? 'ALL OBJECTIVES COMPLETE' : 'NO TARGET POSITION');
-      for (const f of ['bearing', 'depth', 'turn']) t(f, '');
-      return;
-    }
-    const prefix = nav.primary ? '→ ' : 'OPTIONAL → ';
-    t('target', `${prefix}${nav.name.toUpperCase()}`);
-    t('bearing', `BRG ${String(Math.round(nav.bearingDeg) % 360).padStart(3, '0')}°`);
-    t('depth', `DEPTH ${Math.round(nav.depthM).toLocaleString('en-US')} m`);
-    t('turn', formatTurn(nav.relativeDeg));
-  }
-
   private renderList(): void {
     // Finished rows collapse into the progress line while something is outstanding,
-    // so the list and the nav line below it both point at what is next.
+    // so the checklist continues at the next unfinished objective.
     const open = this.objectives.filter((o) => !o.complete);
     const sorted = [...(open.length ? open : this.objectives)].sort(
       (a, b) => Number(b.primary) - Number(a.primary),
@@ -278,8 +185,6 @@ export class ObjectivesPanel {
     );
     const more = sorted.length - shown.length;
     if (more > 0) this.listEl.append(el('div', 'obj-more', `+${more} more · Esc for all`));
-    this.hintEl.textContent = current?.hint ?? '';
-    this.hintEl.hidden = this.guided || !current?.hint;
   }
 
   private write(target: HTMLElement, key: string, text: string): void {

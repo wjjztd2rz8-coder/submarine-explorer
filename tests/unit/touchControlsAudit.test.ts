@@ -896,7 +896,7 @@ it.each(['keyboard', 'touch'] as const)(
       overlay.update(view, keys, null, 0);
       expect(overlay.slot.kind).toBe('objective');
       expect(name.textContent).toBe('Stern section');
-      expect(overlay.slot.showsName('Bow result')).toBe(false);
+      expect(name.textContent).not.toBe('Bow result');
     } finally {
       overlay.dispose();
       f.controls.dispose();

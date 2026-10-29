@@ -14,6 +14,10 @@ without an entry here is not done.
 
 ### Changed
 
+- Controls help keeps Close visible while its reference content scrolls, including phone landscape.
+
+- Mission openings use the objective card for target name and range. Remove the mission panel’s navigation/hint text and floating waypoint labels; keep the checklist, progress, world diamonds and offscreen arrows (S-hud-opening-dedupe).
+
 - Hunga rim apron is longer and lighter so it blends into the slope; Hiolo North gains a small smoker-cluster vent stack and its pillow heap is smaller (opening framing unchanged).
 
 - Challenger Deep seabed keeps broad silt tone swaths in the mid-ground and a faint pale crest where the far rise meets the dark water, so the horizon grades softly instead of fading to flat olive (baked vertex tint only; no new draw calls).

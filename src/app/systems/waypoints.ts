@@ -69,7 +69,6 @@ function updateWaypoints(ctx: GameContext, position: Vector3) {
     ctx.rig.camera,
     position,
     nextScanObjective ? { poiId: nextScanObjective.poiId } : null,
-    (name) => ctx.guidance.showsName(name) || !!ctx.missionRouter?.panel.showsTarget(name),
   );
   return nextScanObjective;
 }

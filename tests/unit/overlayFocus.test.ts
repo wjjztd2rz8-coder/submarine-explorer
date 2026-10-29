@@ -40,7 +40,7 @@ import {
 import { MissionSelect } from '../../src/ui/MissionSelect.js';
 import landmarkIndex from '../../data/landmarks/index.json';
 import titanicMission from '../../data/landmarks/titanic/mission.json';
-import { MissionRouter, pickNavTarget } from '../../src/game/MissionRouter.js';
+import { MissionRouter } from '../../src/game/MissionRouter.js';
 import { createPointerSystem } from '../../src/app/systems/pointer.js';
 import { createInputSystem } from '../../src/app/systems/input.js';
 import { createControlsSystem } from '../../src/app/systems/controls.js';
@@ -762,7 +762,7 @@ describe('migrated modal consumers', () => {
         tone: 'dim',
       });
       expect(slot.kind).toBe('objective');
-      expect(slot.showsName('Next target')).toBe(true);
+      expect(body.querySelector('.guidance-name')!.textContent).toBe('Next target');
       expect(body.querySelectorAll('.guidance-slot')).toHaveLength(1);
     },
   );
@@ -2409,62 +2409,12 @@ describe('overlay policies across the app', () => {
         test.done.length === 3 ? 3 : 0,
       );
       expect(root.querySelector('.obj-progress')!.textContent).toBe(test.progress);
-      expect(root.querySelector('.obj-hint')!.textContent).toBe(`Find ${test.current}`);
+      expect(root.querySelector('.obj-hint')).toBeNull();
+      expect(root.querySelector('.obj-nav')).toBeNull();
       expect(objectives.map((o) => o.id)).toEqual(['side', 'a', 'b']);
       panel.setObjectives([]);
       expect(root.querySelectorAll('.obj-item')).toHaveLength(0);
-      expect(root.querySelector('.obj-hint')!.hidden).toBe(true);
-    },
-  );
-
-  it.each([
-    { remaining: 'primary', text: 'NO TARGET POSITION' },
-    { remaining: 'optional', text: 'NO TARGET POSITION' },
-    { remaining: 'none', text: 'ALL OBJECTIVES COMPLETE' },
-    { remaining: 'empty', text: 'NO TARGET POSITION' },
-  ])(
-    'keeps the nav notice honest with $remaining objectives and no positions',
-    ({ remaining, text }) => {
-      // Missing coordinates must not turn primary completion into an all-objectives reward.
-      const panel = new ObjectivesPanel();
-      cleanup.push(() => panel.dispose());
-      const objectives: ObjectiveStatus[] =
-        remaining === 'empty'
-          ? []
-          : [
-              {
-                id: 'a',
-                title: 'Primary',
-                hint: '',
-                poiId: 'a',
-                primary: true,
-                resolved: true,
-                complete: remaining !== 'primary',
-              },
-              {
-                id: 'b',
-                title: 'Optional',
-                hint: '',
-                poiId: 'b',
-                primary: false,
-                resolved: true,
-                complete: remaining === 'none',
-              },
-            ];
-      panel.setObjectives(objectives);
-      // Populate all nav fields first so the null-target branch must also withdraw stale directions.
-      panel.setNav(
-        { id: 'a', name: 'Primary', primary: true, bearingDeg: 90, depthM: 100, relativeDeg: 90 },
-        false,
-      );
-      const nav = pickNavTarget(objectives, [], { x: 0, y: 0, z: 0 });
-      expect(nav).toBeNull();
-      panel.setNav(null, remaining === 'optional' || remaining === 'none');
-      const root = panel.root as unknown as Element;
-      expect(root.querySelector('.obj-nav-target')!.textContent).toBe(text);
-      for (const field of ['bearing', 'depth', 'turn']) {
-        expect(root.querySelector(`.obj-nav-${field}`)!.textContent).toBe('');
-      }
+      expect(root.querySelector('.obj-hint')).toBeNull();
     },
   );
 
@@ -2481,10 +2431,8 @@ describe('overlay policies across the app', () => {
       complete: i === 0,
     }));
     panel.setObjectives(objectives);
-    panel.setNav(
-      { id: 'o5', name: 'Target', primary: true, bearingDeg: 90, depthM: 100, relativeDeg: 0 },
-      false,
-    );
+    // Unresolved early rows must not hide the next navigable primary near the end.
+    panel.setObjectives(objectives.map((o, i) => ({ ...o, resolved: i === 0 || i >= 5 })));
     const root = panel.root as unknown as Element;
     expect(root.querySelectorAll('.obj-item').map((row) => row.dataset.objective)).toEqual([
       'o5',

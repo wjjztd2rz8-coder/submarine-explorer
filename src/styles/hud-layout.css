@@ -127,6 +127,9 @@ html.is-touch .objectives-panel {
   border: 0;
   background: none;
 }
+html.is-touch .objectives-panel:has(.obj-banner[hidden]) {
+  display: none;
+}
 html.is-touch .objectives-panel > :not(.obj-banner) {
   display: none;
 }
@@ -163,11 +166,6 @@ html.is-touch .obj-banner-actions {
   flex-direction: column;
   flex-wrap: nowrap;
 }
-/* A contact's card and reticle lead while it is in range. */
-html.is-touch body:has(.guidance-slot[data-kind='scan']:not([hidden])) .d-scan-edge {
-  display: none;
-}
-
 @media (orientation: landscape) {
   html.is-touch .hud-regions {
     grid-template-areas:

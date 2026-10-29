@@ -1481,7 +1481,113 @@ freshTest.describe('animal guidance placement', () => {
   }
 });
 
-freshTest.describe('waypoint label layout', () => {
+experiencedTest.describe('mission opening guidance', () => {
+  for (const viewport of [
+    { width: 1600, height: 900, touch: false },
+    { width: 390, height: 844, touch: true },
+  ]) {
+    experiencedTest.describe(`${viewport.width}x${viewport.height}`, () => {
+      experiencedTest.use({ viewport, hasTouch: viewport.touch, isMobile: viewport.touch });
+      for (const site of catalog.landmarks) {
+        experiencedTest(`${site}: one target surface clears the submarine`, async ({ page }) => {
+          // Regression guard: mission openings repeated target navigation and placed a text chip over the sub.
+          await pauseClockBeforeNavigation(page);
+          await page.goto(
+            `/?mission=${site}&skipBriefing=1&tier=low&life=0${viewport.touch ? '&touch=1' : ''}`,
+          );
+          await clockFramesUntil(
+            page,
+            () =>
+              window.__gameReady === true &&
+              (window.__game as { discovery: Discovery; props: Props }).discovery.loaded &&
+              (window.__game as { props: Props }).props.loaded,
+          );
+          await page.clock.runFor(50);
+          await expect(page.locator(GUIDANCE.objective)).toBeVisible();
+          const metrics = await page.evaluate(() => {
+            const g = window.__game as unknown as {
+              discovery: Discovery;
+              sub: Submarine;
+              subMesh: import('../../src/sub/SubMesh.js').SubMesh;
+              rig: CameraRig;
+            };
+            const scanner = g.discovery.scanner.view;
+            const target = g.discovery.pois.find((p) => p.id === scanner.objectiveId)!;
+            const xs: number[] = [],
+              ys: number[] = [];
+            g.subMesh.group.updateMatrixWorld(true);
+            g.subMesh.vehicle.root.traverseVisible((object) => {
+              const mesh = object as import('three').Mesh;
+              const vertices = mesh.geometry?.getAttribute('position');
+              if (!vertices) return;
+              const p = g.sub.position.clone();
+              for (let i = 0; i < vertices.count; i++) {
+                p.fromBufferAttribute(vertices, i)
+                  .applyMatrix4(mesh.matrixWorld)
+                  .project(g.rig.camera);
+                xs.push(((p.x + 1) / 2) * innerWidth);
+                ys.push(((1 - p.y) / 2) * innerHeight);
+              }
+            });
+            const sub = {
+              left: Math.min(...xs),
+              right: Math.max(...xs),
+              top: Math.min(...ys),
+              bottom: Math.max(...ys),
+            };
+            const surfaces = [
+              ...document.querySelectorAll<HTMLElement>(
+                '.guidance-name, .obj-nav, .obj-hint, .d-scan-edge',
+              ),
+            ].filter((el) => el.checkVisibility({ checkVisibilityCSS: true }));
+            const chips = [...document.querySelectorAll<HTMLElement>('.d-scan-edge')]
+              .filter((el) => el.checkVisibility({ checkVisibilityCSS: true }))
+              .map((el) => el.getBoundingClientRect().toJSON());
+            return {
+              name: target.name,
+              range: Math.round(g.sub.position.distanceTo(target.position)),
+              named: surfaces.filter((el) =>
+                el.innerText.toLowerCase().includes(target.name.toLowerCase()),
+              ).length,
+              sub,
+              chips,
+            };
+          });
+          expect(metrics.named, 'the current target is named by one guidance surface').toBe(1);
+          await expect(page.locator('.guidance-name')).toHaveText(metrics.name);
+          await expect(page.locator('.d-scan-world-marker.is-current')).toHaveText('◇');
+          await expect(
+            page.locator('.d-scan-world-marker.is-current:visible, .d-scan-edge:visible'),
+          ).toHaveCount(1);
+          await expect(page.locator('.guidance-hint')).toContainText(`${metrics.range} m`);
+          await expect(
+            page.locator('.obj-nav, .obj-hint, .d-scan-edge-name, .d-scan-edge-info'),
+          ).toHaveCount(0);
+          expect(metrics.sub.right).toBeGreaterThan(metrics.sub.left);
+          expect(metrics.sub.bottom).toBeGreaterThan(metrics.sub.top);
+          for (const chip of metrics.chips)
+            expect(
+              chip.left < metrics.sub.right &&
+                chip.right > metrics.sub.left &&
+                chip.top < metrics.sub.bottom &&
+                chip.bottom > metrics.sub.top,
+              'waypoint must clear the complete projected submarine rectangle',
+            ).toBe(false);
+          await expectHudClear(page, `${site} opening`);
+          if (['kamaehuakanaloa', 'great-blue-hole', 'hudson-canyon'].includes(site)) {
+            const directory = '.cache/codex/shots/S-hud-opening-dedupe';
+            await mkdir(directory, { recursive: true });
+            await page.screenshot({
+              path: `${directory}/${site}-${viewport.width}x${viewport.height}.png`,
+            });
+          }
+        });
+      }
+    });
+  }
+});
+
+freshTest.describe('waypoint symbol layout', () => {
   for (const viewport of [
     { width: 1280, height: 720, touch: false },
     { width: 390, height: 844, touch: true },
@@ -1493,60 +1599,55 @@ freshTest.describe('waypoint label layout', () => {
         ['titanic', ['Bow section', 'Boiler field']],
         ['great-blue-hole', ['Eastern stalactite gallery', 'Eastern atoll drop-off']],
       ] as const) {
-        freshTest(
-          `${site}: waypoint names and readouts wrap clear of the HUD`,
-          async ({ page }, info) => {
-            // Guards first-frame clipping when a longer name returns, portrait ellipsis,
-            // and landscape labels covering sonar, tutorial or utility buttons.
-            await pauseClockBeforeNavigation(page);
-            await page.goto(
-              `/?mission=${site}&skipBriefing=1&tier=low&life=0${viewport.touch ? '&touch=1' : ''}`,
-            );
-            await clockFramesUntil(
-              page,
-              () =>
-                window.__gameReady === true &&
-                (window.__game as { discovery: Discovery }).discovery.loaded,
-            );
-            await page.clock.runFor(50);
-            await expectHudClear(page, 'mission opening');
-            for (const scale of [100, 105, 150]) {
-              for (const name of names) {
-                for (const yaw of [0, -1.3, 1.3, Math.PI]) {
-                  await page.evaluate(
-                    ({ name, yaw, scale }) => {
-                      const g = window.__game as unknown as {
-                        discovery: Discovery;
-                        rig: CameraRig;
-                        waypoints: Waypoints;
-                        save: Save;
-                      };
-                      g.save.save({ uiScale: scale });
-                      const poi = g.discovery.pois.find((p) => p.name === name);
-                      if (!poi) throw new Error(`Missing waypoint ${name}`);
-                      const camera = g.rig.camera.clone();
-                      camera.position.copy(poi.position).add(poi.position.clone().set(0, 0, 100));
-                      camera.lookAt(poi.position);
-                      camera.rotateY(yaw);
-                      camera.updateMatrixWorld(true);
-                      // A hidden name becoming visible must be measured on the same update.
-                      g.waypoints.update(camera, poi.position, { poiId: poi.id }, () => true);
-                      g.waypoints.update(camera, poi.position, { poiId: poi.id });
-                    },
-                    { name, yaw, scale },
-                  );
-                  await expect(page.locator('.d-scan-edge-name')).toBeVisible();
-                  await expect(page.locator('.d-scan-edge-name')).toHaveText(name);
-                  await expect(page.locator('.d-scan-edge-info')).toHaveText(
-                    '0 m · ↑0 m · IN RANGE',
-                  );
-                  await expectHudClear(page, `${name}, yaw ${yaw}, scale ${scale}`);
-                }
+        freshTest(`${site}: waypoint symbols stay clear of the HUD`, async ({ page }, info) => {
+          // Regression guard: world navigation must not duplicate target text or cover HUD controls.
+          await pauseClockBeforeNavigation(page);
+          await page.goto(
+            `/?mission=${site}&skipBriefing=1&tier=low&life=0${viewport.touch ? '&touch=1' : ''}`,
+          );
+          await clockFramesUntil(
+            page,
+            () =>
+              window.__gameReady === true &&
+              (window.__game as { discovery: Discovery }).discovery.loaded,
+          );
+          await page.clock.runFor(50);
+          await expectHudClear(page, 'mission opening');
+          for (const scale of [100, 105, 150]) {
+            for (const name of names) {
+              for (const yaw of [0, -1.3, 1.3, Math.PI]) {
+                await page.evaluate(
+                  ({ name, yaw, scale }) => {
+                    const g = window.__game as unknown as {
+                      discovery: Discovery;
+                      rig: CameraRig;
+                      waypoints: Waypoints;
+                      save: Save;
+                    };
+                    g.save.save({ uiScale: scale });
+                    const poi = g.discovery.pois.find((p) => p.name === name);
+                    if (!poi) throw new Error(`Missing waypoint ${name}`);
+                    const camera = g.rig.camera.clone();
+                    camera.position.copy(poi.position).add(poi.position.clone().set(0, 0, 100));
+                    camera.lookAt(poi.position);
+                    camera.rotateY(yaw);
+                    camera.updateMatrixWorld(true);
+                    g.waypoints.update(camera, poi.position, { poiId: poi.id });
+                  },
+                  { name, yaw, scale },
+                );
+                await expect(page.locator('.d-scan-edge-name, .d-scan-edge-info')).toHaveCount(0);
+                await expect(page.locator('.d-scan-edge')).toBeEmpty();
+                if (yaw === 0) {
+                  await expect(page.locator('.d-scan-world-marker.is-current')).toBeVisible();
+                  await expect(page.locator('.d-scan-edge')).toBeHidden();
+                } else await expect(page.locator('.d-scan-edge')).toBeVisible();
+                await expectHudClear(page, `${name}, yaw ${yaw}, scale ${scale}`);
               }
             }
-            await page.screenshot({ path: info.outputPath('waypoint-labels.png') });
-          },
-        );
+          }
+          await page.screenshot({ path: info.outputPath('waypoint-symbols.png') });
+        });
       }
     });
   }

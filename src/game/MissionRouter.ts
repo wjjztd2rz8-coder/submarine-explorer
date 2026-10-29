@@ -14,7 +14,7 @@
  *
  * Flow (`MissionRouter`, constructed once Discovery and Input exist; D-FLOW):
  *   briefing (game frozen) -> Begin dive / Enter -> `mission:started` ->
- *   objectives panel with bearing/range -> last primary scanned ->
+ *   mission checklist and progress tally -> last primary scanned ->
  *   `mission:primaryComplete` -> after `completeDelayS`, the banner "Primary
  *   objectives complete" (Keep exploring / Surface and debrief). The dive only
  *   ends when the player surfaces (banner, or the pause menu) or aborts:
@@ -28,19 +28,12 @@ import type { EventBus } from '../core/EventBus.js';
 import type { InputState } from '../core/Input.js';
 import { Briefing, type BriefingContent } from '../ui/Briefing.js';
 import { Debrief, type DebriefAction } from '../ui/Debrief.js';
-import { ObjectivesPanel, type NavReadout } from '../ui/ObjectivesPanel.js';
-import { headingFromForward, latLonToWorld, normalizeHeadingDeg } from '../util/geo.js';
+import { ObjectivesPanel } from '../ui/ObjectivesPanel.js';
+import { latLonToWorld, normalizeHeadingDeg } from '../util/geo.js';
 import type { TileMeta } from '../util/types.js';
 import { shellUrl } from '../util/navigation.js';
 import { landmarkIdFor, type FetchJson } from './ContentPath.js';
-import {
-  loadMission,
-  nextScanObjective,
-  Mission,
-  type MissionDef,
-  type MissionSpawn,
-  type ObjectiveStatus,
-} from './Mission.js';
+import { loadMission, Mission, type MissionDef, type MissionSpawn } from './Mission.js';
 import type { DebriefStats } from './Objectives.js';
 import type { SeabedSampler, SpawnPose } from './Pois.js';
 import { nearSiteSpawnPose, spawnSettings } from './Spawn.js';
@@ -220,55 +213,6 @@ interface XYZ {
   z: number;
 }
 
-export interface NavTarget {
-  objective: ObjectiveStatus;
-  name: string;
-  /** Compass bearing sub -> target, 0 = north, 90 = east (same as the HUD heading). */
-  bearingDeg: number;
-  /** 3D slant range, metres (the same metric as the scan panel). */
-  rangeM: number;
-  /** Horizontal range, metres. */
-  horizontalM: number;
-  /** Target depth, positive metres. */
-  depthM: number;
-}
-
-/**
- * Compass bearing, horizontal range and 3D slant range from `from` to `to`
- * (+X east, +Z south). Every range shown on screen is the slant range
- * (`RNG`), which is what the scanner's `radius_m` test uses too.
- */
-export function bearingTo(
-  from: XYZ,
-  to: XYZ,
-): { bearingDeg: number; rangeM: number; horizontalM: number } {
-  const dx = to.x - from.x;
-  const dz = to.z - from.z;
-  const horizontalM = Math.hypot(dx, dz);
-  return {
-    bearingDeg: headingFromForward(dx, dz),
-    rangeM: Math.hypot(horizontalM, to.y - from.y),
-    horizontalM,
-  };
-}
-
-/** Navigation follows the same ordered objective as the scanner and waypoint. */
-export function pickNavTarget(
-  objectives: readonly ObjectiveStatus[],
-  pois: ReadonlyArray<{ id: string; name: string; position: XYZ }>,
-  from: XYZ,
-): NavTarget | null {
-  const objective = nextScanObjective(objectives);
-  const poi = pois.find((p) => p.id === objective?.poiId);
-  if (!objective || !poi) return null;
-  return {
-    objective,
-    name: poi.name,
-    ...bearingTo(from, poi.position),
-    depthM: Math.max(0, -poi.position.y),
-  };
-}
-
 // --------------------------------------------------------------- controller
 
 /** The parts of Discovery the mission uses (Discovery satisfies it). */
@@ -343,9 +287,6 @@ export class MissionRouter {
   debrief: Debrief | null = null;
   exploration: Debrief['exploration'] = null;
 
-  private navClock = 0;
-  private navPosition: XYZ | null = null;
-  private navHeadingDeg = 0;
   private readonly disposers: Array<() => void> = [];
   /** Set by `sub:emergencyBlow` during a dive; cleared when the blow ends. */
   private blow: { depth: number; cause: 'crush' | 'power' } | null = null;
@@ -377,7 +318,6 @@ export class MissionRouter {
       if (this.disposed) return;
       this.mission.resolve(opts.discovery.pois.map((p) => p.id));
       this.panel.setObjectives(this.mission.objectives);
-      this.navClock = Infinity; // refresh the nav line on the next frame
     });
 
     if (route.skipBriefing) {
@@ -447,7 +387,6 @@ export class MissionRouter {
     this.mission.resume();
     this.debrief.hide();
     this.panel.setVisible(true);
-    this.navClock = Infinity;
   }
 
   /**
@@ -455,48 +394,22 @@ export class MissionRouter {
    * @param dt real (wall-clock) seconds of unfrozen play this frame, 0 while
    *   frozen: the mission clock. Not physics dt, which the 8-step
    *   cap in Time.ts shortens at low frame rates.
-   * @param realDt real frame delta, for the nav refresh clock
    * @param hull the sub's state; the end of an emergency blow aborts the dive
    */
   update(
     dt: number,
-    realDt: number,
-    position: XYZ,
-    headingDeg: number,
+    _realDt: number,
+    _position: XYZ,
+    _headingDeg: number,
     hull?: MissionHullState,
   ): void {
-    this.navPosition = position;
-    this.navHeadingDeg = headingDeg;
     this.mission.update(dt);
     if (this.blow && hull && !hull.emergencyBlow) this.onBlowComplete();
     this.updateBanner(dt);
-    this.navClock += realDt;
-    if (this.navClock < 1 / Math.max(1, this.opts.config.mission.navUpdateHz)) return;
-    this.navClock = 0;
-    this.refreshNav();
-  }
-
-  private refreshNav(): void {
-    if (!this.navPosition) return;
-    const t = pickNavTarget(this.mission.objectives, this.opts.discovery.pois, this.navPosition);
-    let nav: NavReadout | null = null;
-    if (t) {
-      nav = {
-        id: t.objective.id,
-        name: t.name,
-        primary: t.objective.primary,
-        bearingDeg: t.bearingDeg,
-        depthM: t.depthM,
-        relativeDeg: ((t.bearingDeg - this.navHeadingDeg + 540) % 360) - 180,
-      };
-    }
-    this.panel.setNav(nav, this.mission.primaryComplete);
   }
 
   private onMissionChange(m: Mission): void {
     this.panel.setObjectives(m.objectives);
-    this.refreshNav();
-    this.navClock = Infinity;
     // Everything done after the primaries: suggest surfacing, never force it.
     if (m.state === 'primaries-complete' && m.allComplete && !this.allAnnounced) {
       this.allAnnounced = true;

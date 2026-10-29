@@ -667,6 +667,7 @@ freshTest.describe('Journal scan rewards and counts', () => {
       await expect(page.locator('.guidance-slot .guidance-kicker')).toHaveText('New Journal entry');
       await expect(page.locator('.guidance-slot .guidance-name')).toHaveText(gallery.title);
       await page.keyboard.press('j');
+      await clockFramesUntil(page, () => (window.__game as unknown as Game).journal.isOpen);
       await expect(page.locator('.jr-body .jr-title')).toHaveText(gallery.title);
       await expect(page.locator('.jr-body .jr-tag.is-recreation')).toHaveText('Recreation');
       expect(await page.evaluate(() => (window.__game as unknown as Game).journal.selectedId)).toBe(
@@ -708,9 +709,14 @@ freshTest.describe('Journal scan rewards and counts', () => {
       await start(page, site, poi);
       await scanWithKeyboard(page, poi);
       await page.keyboard.press('j');
+      await clockFramesUntil(page, () => (window.__game as unknown as Game).journal.isOpen);
       for (const width of [1280, 390]) {
         await page.setViewportSize({ width, height: 844 });
         await page.clock.runFor(34);
+        // Media-query change events can arrive after the clock advance. Await the
+        // actual layout before selecting its tree or sheet navigation.
+        if (width === 390) await expect(page.locator('.journal')).toHaveClass(/is-phone/);
+        else await expect(page.locator('.journal')).not.toHaveClass(/is-phone/);
         await journalFront(page);
         await expect(page.locator('.jr-lead .jr-chip').first()).toHaveText(
           /^1\/\d+ points of interest$/,
@@ -752,6 +758,7 @@ freshTest.describe('Journal scan rewards and counts', () => {
       await clockFramesUntil(page, () => window.__gameReady === true);
       await clockFramesUntil(page, () => (window.__game as unknown as Game).discovery.loaded);
       await page.keyboard.press('j');
+      await clockFramesUntil(page, () => (window.__game as unknown as Game).journal.isOpen);
       await openJournalSite(page, site);
       await expect(page.locator('.jr-progress .jr-chip').first()).toHaveText(
         `1/${total} points of interest`,
@@ -1890,8 +1897,7 @@ freshTest.describe('Home to scan and return journey', () => {
                 ...document.querySelectorAll<HTMLElement>(
                   '.obj-title, .obj-item.is-current .obj-item-title, .guidance-text, ' +
                     '.briefing-title, .briefing-summary, .debrief-kicker, .debrief-title, ' +
-                    '.debrief-highlight, .debrief-next, .jr-body .jr-title, .jr-crumb, ' +
-                    '.d-scan-edge-name, .d-scan-edge-info',
+                    '.debrief-highlight, .debrief-next, .jr-body .jr-title, .jr-crumb',
                 ),
               ]
                 .filter((el) => visible(el) && (!modal || modal.contains(el)))
@@ -1937,11 +1943,6 @@ freshTest.describe('Home to scan and return journey', () => {
                 tier: g?.perf?.tier,
                 elapsedS: g?.discovery?.stats.elapsedS,
                 guidance: document.querySelector<HTMLElement>('.guidance-slot')?.innerText,
-                navigation: document.querySelector<HTMLElement>('.obj-nav')?.innerText,
-                navigationVisible:
-                  document
-                    .querySelector<HTMLElement>('.obj-nav')
-                    ?.checkVisibility({ checkVisibilityCSS: true, checkOpacity: true }) ?? false,
                 waypoint: (() => {
                   const el = document.querySelector<HTMLElement>('.d-scan-edge');
                   return el && visible(el) ? el.innerText : null;
@@ -2116,28 +2117,15 @@ freshTest.describe('Home to scan and return journey', () => {
               if (name !== step) await page.clock.fastForward(17);
               const direction = await page.locator('.guidance-slot .guidance-hint').innerText();
               if (/TURN \d|RISE TOWARD|SINK TOWARD|DIVE DEEPER|\d+ m AHEAD/.test(direction)) {
-                // Compare every waypoint name the player can see. On touch,
-                // the hidden desktop nav may select a different optional POI.
-                const waypoints = await page
-                  .locator('.obj-nav-target, .d-scan-edge-name')
-                  .evaluateAll((els) =>
-                    els
-                      .filter((el) =>
-                        el.checkVisibility({ checkVisibilityCSS: true, checkOpacity: true }),
-                      )
-                      .map((el) =>
-                        (el as HTMLElement).innerText.replace(/^(?:OPTIONAL )?→\s*/, '').trim(),
-                      ),
-                  );
-                expect(
-                  waypoints.length,
-                  'Directional rewards need a visible waypoint',
-                ).toBeGreaterThan(0);
-                for (const waypoint of waypoints)
-                  expect(
-                    direction.toUpperCase(),
-                    'Reward directions must agree with the waypoint',
-                  ).toContain(`${waypoint.toUpperCase()} ·`);
+                const nextName = await page.evaluate(() => {
+                  const g = window.__game as unknown as Game;
+                  const id = g.discovery.scanner.view.objectiveId;
+                  return g.discovery.pois.find((p) => p.id === id)?.name;
+                });
+                expect(nextName, 'Directional rewards need the current objective').toBeTruthy();
+                expect(direction, 'Reward directions must agree with the objective').toContain(
+                  `${nextName} ·`,
+                );
               }
               await shot(name);
             }

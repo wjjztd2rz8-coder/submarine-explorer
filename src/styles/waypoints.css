@@ -30,42 +30,13 @@
 }
 .d-scan-edge {
   position: absolute;
-  box-sizing: border-box;
-  width: max-content;
-  max-width: min(250px, 40vw); /* leaves the centre column to the sub on a narrow phone */
-  padding: 6px 10px;
-  border: 1px solid currentColor;
-  border-radius: 4px;
-  background: rgba(6, 14, 18, 0.85);
-  font-size: clamp(14px, calc(15px * var(--ui-scale)), 23px);
-  text-align: center;
-  text-shadow: 0 1px 3px #061018;
+  font-size: clamp(24px, calc(30px * var(--ui-scale)), 40px);
+  text-shadow: 0 1px 5px #061018;
 }
 .d-scan-edge::before {
   content: '➤';
-  display: inline-block;
-  float: left;
-  margin-right: 6px;
-  transform: rotate(var(--direction, 0rad));
-}
-.d-scan-edge-name,
-.d-scan-edge-info {
   display: block;
-  overflow-wrap: anywhere;
-}
-.d-scan-edge-name[hidden] {
-  display: none;
-}
-.d-scan-edge-info {
-  font-size: 0.85em;
-  opacity: 0.85;
-}
-.d-scan-edge.is-onscreen {
-  border-color: rgba(46, 217, 217, 0.45);
-}
-.d-scan-edge.is-onscreen::before {
-  content: '◇';
-  transform: none;
+  transform: rotate(var(--direction, 0rad));
 }
 .d-scan-waypoints[data-hints='false'] .d-scan-edge,
 .d-scan-waypoints[data-hints='false'] .d-scan-world-marker.is-current {
