@@ -5,7 +5,12 @@
   "title": "Kama'ehuakanaloa: the next Hawaiian island",
   "hull_class": "B",
   "environment": {
-    "preset": "seamount"
+    "preset": "vent",
+    "overrides": {
+      "smokeOpacitySulfide": 0.55,
+      "smokeColorSulfide": 7031350,
+      "hazeGlow": 0.5
+    }
   },
   "species_file": "species.json",
   "spawn": {

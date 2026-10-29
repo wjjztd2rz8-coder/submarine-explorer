@@ -1,29 +1,25 @@
-# V-kama-opening + V-hunga-opening
+# V-kama-opening
 
-Numbers from [4670](4670-S-verify-kama-opening.md).
+## Cause
 
-## What changed
+Kamaʻehuakanaloa used the `seamount` environment preset, which only adds a faint glow light and no smoke or shimmer. The opening spawned 110 m from Hiolo North with the chimney tiny and off-frame, so the pillow-lava mound read as the "target": a brown egg on a bare slope.
 
-- Hunga mission opening range 160 m to 120 m (`data/landmarks/hunga-tonga-caldera/site.json`). Data edit only; heading is 90 degrees and the chase camera is standard.
-- Kama mission opening range 130 m to 110 m, with a raised 35 m chase arm (`chaseRadius` 35, `chaseOffsetY` 100) in the site's `opening.mission` data.
-- The mission schema (`SiteManifest.ts`) accepts the existing camera fields. `composedMissionSpawn` (`Spawn.ts`) copies them from the site's mission row into the returned pose, and the existing mission start code applies them. No site branch, no config mutation.
-- Tests: `missionApproach.test.ts` ranges updated and a capability assertion that per-site mission arm data reaches the pose. The 110 m floor in that spec and in `missionComposition.test.ts` allows 0.01 m float tolerance (the reconciled range is 109.99999999999999). Not loosened beyond float error.
+## Change (data only, no shared code)
 
-## Simplicity rules
+- `data/landmarks/kamaehuakanaloa/mission.json`: environment preset `vent` with a rust-brown, lighter plume and haze glow. The existing vent preset supplies smoke, shimmer and haze. Glow-light settings stay at the vent defaults (the per-site preset spec has a table for authored glow; a stronger glow would need a row there).
+- `props.json` is unchanged: moving the chimney broke the free-dive opening framing checks, and the stack already sits under the scan marker.
+- `data/landmarks/kamaehuakanaloa/site.json` `opening.mission`: `yawOffset` 20 (existing shared opening table). Range stays 110 m: a 70 m try broke the approach-distance guards (110 m minimum) and was dropped.
 
-- Rule 4: extended the existing per-site mission table.
-- Rule 5: no runtime config change.
-- Rule 6: extended capability specs; no new spec.
-- Rule 1: no new UI or settings. Nothing cut, so no CHANGELOG line.
+No new HUD, setting or code branch. Logged in CHANGELOG.md; nothing cut.
 
-## Honest rating (Low tier, screenshots in `.cache/codex/shots/V-kama-opening/`)
+## Result
 
-- **Kama: 3.8 of 5 for the opening.** Pillow field is about 22% of desktop frame height (about 11% in portrait), outside the 100 m Arcade scan radius (HUD 110 m). Gold-brown iron mats are visible against the slate slope. The accents are small and the slope behind is busy. On desktop the hull sits below the frame, because the high arm looks down the slope. In portrait it fills the bottom. Target of about 10% met.
-- **Hunga: 3.6 of 5.** The tuff wall is about 27% of frame height and reads as a rim scarp in all three layouts. The scene is still dim and muddy-teal; no shader lift was added.
+Before/after Low-tier desktop shots in `.cache/codex/shots/V-kama-opening/{before,after}/`. After: a smoking rust-brown vent stack is visible mid-left under the scan marker, the pillow mound is mid-right, and the sub is centre. Readability scene/sub 0.170 (cutoff 0.125), pass. A yawOffset of -18 put the stack on the right but the frame was too dark (0.103, flagged), so a smaller offset was used, and +30 failed the high-tier first-person sightline check.
 
-## Gates
+Rating: 2.5 of 5. The vent reads as a smoking structure now, but it is small at 110 m, there is no visible glow, and the sub is centred rather than in the lower-left third.
 
-- Unit specs `missionApproach`, `missionComposition`, `siteManifest`: pass.
-- `tools/gates.sh` (smoke + project-base): see the end of this note.
+## What is left
 
-Gates: `tools/gates.sh` (smoke + project-base) passed on the branch. Director read: Kama pillow field clear (~3.8) but the hull is below frame on desktop; Hunga rim legible, still dim (~3.6).
+- Sub in the lower-left third and a larger stack: needs a chase-offset change; a first `chaseOffsetX` try swung the camera badly.
+- Visible orifice glow at Low tier (needs an authored-glow row in the preset spec).
+- Portrait and landscape layouts not reviewed.
