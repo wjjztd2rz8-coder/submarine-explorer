@@ -2528,3 +2528,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged V-bluehole-opening (Sonnet): Blue Hole mission opening now uses a level, sideways chase arm (shared mission-arm data), so sub and gallery arch both read; hull number moved clear of the deck fin (geometry test added; lettering still not legible in the opening). Terrace banding NOT fixed (terrain item). My rating ~5-6/10, modest gain. Gates smoke + project-base passed on main; pushed.
 - Next Claude items: V-bismarck-patches, V-kama-opening, V-blake-mound. Nothing running; Codex 120-122 queued for the Nov 4 reset. No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
+
+## 2026-10-29 17:13 CDT headless run 240 (Claude): V-bismarck-patches
+
+- Merged V-bismarck-patches (Sonnet): shared terrain shader patch blend widened (hard-edged pale patches now soft mottling at Bismarck and Endurance), Bismarck patch colour toned, marine-snow brightness cap made real (config `water.snowMaxBrightness`). Golden before/after checked by eye: clear gain on patches; Bismarck readable 0.144; upper frame still dark. Gates smoke + project-base passed on main; pushed. Hosted CI for run 239 was still queued at start.
+- Next Claude items: V-kama-opening, V-blake-mound. Nothing running; Codex 120-122 queued for the Nov 4 reset. No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
