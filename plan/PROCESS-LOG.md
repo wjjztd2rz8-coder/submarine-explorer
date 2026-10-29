@@ -342,3 +342,8 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 
 - golden.sh takes ~25 min (over the tool timeout): run it in the background. Wait on its PID, not `pgrep -f golden.sh` (matches the Claude run's own command line). Start the Sol review only after the contact sheet (index.html) exists; an early start wasted a launch.
 - Codex queue had emptied after 90-92 launched; refilled 93-96 in the same review.
+
+## 2026-10-29 targeted review: Codex starved
+
+- Cause: the Codex lane had no concrete unblocked items (all remaining Backlog items were Sonnet/visual or owner), so `codex-refill.sh` correctly wrote nothing (refill.log empty at 00:00, 01:00, 02:00). Meanwhile hosted CI was red for ~10 runs and nobody had queued the fix: collect runs only checked local gates.
+- Fix: queued 97 R-ci-green (journey `.d-scan-edge` real layout failure; stale-build note: the local spec fails with "current checkout build" until `npm run build` is rerun), 98 (Kama pins, test side) and 99 (phone-accept automation). Process rule: a collect run that sees red hosted CI must read the failing specs (`gh api repos/:owner/:repo/actions/jobs/<id>/logs | grep '  1) \['`) and queue a Codex R-ci-green item the same run.

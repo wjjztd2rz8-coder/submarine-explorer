@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-10-29 02:50 targeted review (Claude alone): Codex starved 2 h
+
+- Trigger: empty Codex queue ~2 h. Root cause: no Codex-lane Backlog item was concrete or unblocked, so the refill wrote nothing; and red hosted CI (since the 2026-10-28 evening, last real failure: journey spec `.d-scan-edge` at phone sizes, plus journal/f2 specs already fixed by the chip-test fix) had not been turned into a work item.
+- Actions: queued 97 R-ci-green, 98 V-hunga-kama-subject pins (test side), 99 P2-phone-accept automation; added them to DIRECTOR.md; removed DONE items; PROCESS-LOG entry with the rule above.
+- No scores or stage change (see the 2026-10-28 evening joint review). Needs owner: phone retest (unchanged).
+
 ## 2026-10-28 evening comprehensive review (joint with Sol, one reconcile round)
 
 **Changed since the morning review (golden 091604 to 194415):** V-terrain-blotch (Axial clearly calmer), V-hunga-kama-subject partly (Hunga apron grounded; Kama still a pillow beside a tiny vent), R-debrief-objectives, T-e2e-timings, T-journey-acceptance, T-pin-fragility, T-kama-pins, S-* sweeps, journal-home fix. All ten sites captured; f68 still the newest tag.

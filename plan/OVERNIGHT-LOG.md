@@ -2455,3 +2455,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged T-golden-mission (default golden set now includes the mission opening at all 13 sites; Journal secret tally ignores samples). Conflicts with main's identical Journal fixes resolved in favour of main; one stale chip-text unit test fixed. Gates smoke + project-base passed (unit failure fixed afterwards, targeted test re-run green); pushed. No Codex tasks running, queue empty (Codex week 37% left, no new briefs queued; nothing unblocked in Codex lane). No Claude package (week ~15% left, resets Oct 29 07:00). No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
+
+## 2026-10-29 02:50 CDT headless run 228 (Claude): targeted review, Codex starved
+
+- Found why Codex idled: no concrete unblocked Codex-lane item, and red hosted CI never became a work item. Queued 97 R-ci-green (journey `.d-scan-edge` layout, real failure at phone sizes), 98 V-hunga-kama-subject pins, 99 P2-phone-accept automation; DIRECTOR.md and PROCESS-LOG.md updated. Nothing merged; no Claude package (week 14% left, resets 07:00). No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md.
