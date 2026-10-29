@@ -5,7 +5,7 @@
  */
 
 import * as THREE from 'three';
-import { beam, loftPoint, strut, trs, v3, type LoftSpec, type PartBin } from './kit.js';
+import { beam, loftPoint, trs, v3, type LoftSpec, type PartBin } from './kit.js';
 import { facingMatrix, hangRusticle, type InstanceList } from './instances.js';
 
 const _a = new THREE.Vector3();
@@ -278,16 +278,4 @@ export function deckHouse(
     g.computeVertexNormals();
   }
   bin.add(g, color);
-}
-
-/** Thin plate from a to b (its long axis), `w` wide, a box of thickness t. */
-export function plate(
-  bin: PartBin,
-  a: THREE.Vector3,
-  b: THREE.Vector3,
-  w: number,
-  t: number,
-  color: number,
-): void {
-  bin.add(strut(a, b, w, t), color);
 }
