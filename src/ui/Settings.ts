@@ -478,6 +478,7 @@ export class SettingsScreen {
     // Touch devices have no key bindings: the Controls button and section stay hidden.
     const touch =
       document.documentElement.classList.contains('is-touch') || this.opts.isTouch?.() === true;
+    this.root.querySelector('.settings-close')!.textContent = touch ? 'Close' : 'Close (Esc)';
     show = show && !touch;
     if (!show && this.capturing) this.cancelCapture();
     this.controlsSection.hidden = !show;

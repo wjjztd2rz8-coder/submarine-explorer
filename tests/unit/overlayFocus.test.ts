@@ -1529,6 +1529,7 @@ describe('overlay policies across the app', () => {
       const button = ctx.settingsScreen.root.querySelector<HTMLElement>('.settings-controls-open')!;
       ctx.settingsScreen.open();
       expect(button.hidden).toBe(true);
+      expect(ctx.settingsScreen.root.querySelector('.settings-close')!.textContent).toBe('Close');
       ctx.settingsScreen.showControls(true);
       expect(
         ctx.settingsScreen.root.querySelector('.settings-bindings')!.parentElement!.hidden,
@@ -1538,6 +1539,9 @@ describe('overlay policies across the app', () => {
       expect(ctx.controlsCard.device).toBe('keyboard');
       ctx.settingsScreen.open();
       expect(button.hidden).toBe(false);
+      expect(ctx.settingsScreen.root.querySelector('.settings-close')!.textContent).toBe(
+        'Close (Esc)',
+      );
       ctx.settingsScreen.close();
       window.dispatchEvent(Object.assign(new Event('pointerdown'), { pointerType: 'touch' }));
       ctx.settingsScreen.open();

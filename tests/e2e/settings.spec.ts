@@ -145,7 +145,10 @@ test.describe('settings screen', () => {
             expect(await applied()).toEqual({ saved: scale, persisted: scale, css: scale / 100 });
             // Regression guard: scrolling to Aa pushed Close above the viewport on phones.
             // Measure before clicking: Playwright would otherwise scroll it back for us.
-            const close = dialog.getByRole('button', { name: 'Close (Esc)' });
+            const close = dialog.getByRole('button', {
+              name: viewport.touch ? 'Close' : 'Close (Esc)',
+              exact: true,
+            });
             expect(
               await close.evaluate((button) => {
                 const r = button.getBoundingClientRect();
@@ -201,7 +204,12 @@ test.describe('settings screen', () => {
           expect(metrics.height).toBeGreaterThanOrEqual(44);
           expect(metrics).toMatchObject({ clipped: false, overlaps: false, reachable: true });
           await reviewShot(page, `settings-aa-${surface}-${viewport.name}-150`);
-          await act(dialog.getByRole('button', { name: 'Close (Esc)' }));
+          await act(
+            dialog.getByRole('button', {
+              name: viewport.touch ? 'Close' : 'Close (Esc)',
+              exact: true,
+            }),
+          );
           if (surface === 'dive') {
             // A keyboard Escape deliberately switches to the desktop HUD.
             // Keep the original input modality when comparing scale layouts.
