@@ -5,7 +5,7 @@ import type { Scanner } from '../game/Scanner.js';
 
 type Rect = Pick<DOMRect, 'left' | 'top' | 'right' | 'bottom'>;
 
-/** Keep the whole wrapped label nearest its projection, clear of the composed HUD. */
+/** Keep the offscreen arrow nearest its projection, clear of the composed HUD. */
 export function clampWaypointLabel(
   preferred: { x: number; y: number },
   size: { width: number; height: number },
@@ -47,23 +47,9 @@ interface WaypointObjective {
   poiId: string;
 }
 
-export function waypointReadout(
-  from: { x: number; y: number; z: number },
-  target: { x: number; y: number; z: number },
-  radius: number,
-): string {
-  const dx = target.x - from.x;
-  const dy = target.y - from.y;
-  const dz = target.z - from.z;
-  const distance = Math.hypot(dx, dy, dz);
-  return `${Math.round(distance)} m · ${dy >= 0 ? '↑' : '↓'}${Math.round(Math.abs(dy))} m${distance <= radius ? ' · IN RANGE' : ''}`;
-}
-
 export class Waypoints {
   readonly root: HTMLDivElement;
   private readonly edge: HTMLDivElement;
-  private readonly edgeName = document.createElement('span');
-  private readonly edgeInfo = document.createElement('span');
   private readonly markers = new Map<string, HTMLDivElement>();
   private readonly projection = new Vector3();
   private pois: readonly PlacedPoi[] = [];
@@ -77,9 +63,6 @@ export class Waypoints {
     this.root.className = 'd-scan-waypoints';
     this.edge = document.createElement('div');
     this.edge.className = 'd-scan-edge';
-    this.edgeName.className = 'd-scan-edge-name';
-    this.edgeInfo.className = 'd-scan-edge-info';
-    this.edge.append(this.edgeName, this.edgeInfo);
     this.root.append(this.edge);
     parent.appendChild(this.root);
   }
@@ -109,16 +92,8 @@ export class Waypoints {
     this.root.dataset.palette = name;
   }
 
-  /**
-   * @param nameInSlot says whether the guidance slot already shows a name; the
-   *   label then keeps only range and depth.
-   */
-  update(
-    camera: Camera,
-    position: Vector3,
-    objective: WaypointObjective | null,
-    nameInSlot: (name: string) => boolean = () => false,
-  ): void {
+  /** The guidance slot owns target text; world navigation uses symbols only. */
+  update(camera: Camera, _position: Vector3, objective: WaypointObjective | null): void {
     const width = window.innerWidth;
     const height = window.innerHeight;
     const current = objective ? this.pois.find((p) => p.id === objective.poiId) : null;
@@ -149,19 +124,15 @@ export class Waypoints {
       return;
     }
     const point = this.projection.copy(current.position).project(camera);
-    this.edge.hidden = false;
     const onscreen =
       point.z > -1 && point.z < 1 && Math.abs(point.x) < 0.9 && Math.abs(point.y) < 0.85;
-    this.edge.classList.toggle('is-onscreen', onscreen);
+    this.edge.hidden = onscreen;
+    if (onscreen) return;
     const behind = point.z > 1;
     const x = behind ? -point.x : point.x;
     const y = behind ? -point.y : point.y;
     const angle = Math.atan2(-y, x);
-    this.edgeName.textContent = current.name;
-    this.edgeName.hidden = nameInSlot(current.name);
-    this.edgeInfo.textContent = waypointReadout(position, current.position, current.radius);
     this.edge.style.setProperty('--direction', `${angle}rad`);
-    // Measure this frame's wrapped copy before clamping, including the name when it returns.
     const size = this.edge.getBoundingClientRect();
     const gap = parseFloat(getComputedStyle(this.root).getPropertyValue('--hud-gap')) || 0;
     const occupied = Array.from(
@@ -172,13 +143,10 @@ export class Waypoints {
     )
       .filter((el) => el.checkVisibility({ checkVisibilityCSS: true }))
       .map((el) => el.getBoundingClientRect());
-    const markerHalf = (this.markers.get(current.id)?.offsetHeight ?? 0) / 2 + gap;
     const placement = clampWaypointLabel(
       {
         x: ((x + 1) / 2) * width - size.width / 2,
-        y:
-          ((1 - y) / 2) * height +
-          (onscreen ? (y < 0.24 ? -size.height - markerHalf : markerHalf) : -size.height / 2),
+        y: ((1 - y) / 2) * height - size.height / 2,
       },
       size,
       { width, height },

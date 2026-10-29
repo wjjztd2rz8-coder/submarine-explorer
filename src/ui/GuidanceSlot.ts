@@ -107,11 +107,6 @@ export class GuidanceSlot {
     return this.shown !== null;
   }
 
-  /** True when the message on screen already names `name` (the waypoint then omits it). */
-  showsName(name: string): boolean {
-    return !!this.shown && this.shown.message.text.toLowerCase().includes(name.toLowerCase());
-  }
-
   /** Offer (or with null, withdraw) a standing message for `source`. */
   offer(source: string, kind: GuidanceKind, message: GuidanceMessage | null): void {
     this.set(source, kind, message, Infinity);

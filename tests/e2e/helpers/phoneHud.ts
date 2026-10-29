@@ -2,9 +2,8 @@ import { expect, type Page } from '@playwright/test';
 import { GUIDANCE } from './guidance.js';
 import type { Camera } from 'three';
 import type { Submarine } from '../../../src/sub/Submarine.js';
-import type { Save } from '../../../src/core/Save.js';
 
-/** Shared composed-HUD guard: world labels participate alongside fixed regions and controls. */
+/** Shared composed-HUD guard: offscreen arrows participate alongside fixed regions and controls. */
 export async function expectHudClear(page: Page, phase: string): Promise<void> {
   const issues = await page.evaluate(() => {
     const selectors = [
@@ -44,15 +43,6 @@ export async function expectHudClear(page: Page, phase: string): Promise<void> {
         )
           issues.push(`${a.selector} overlaps ${b.selector}: ${JSON.stringify([a.box, b.box])}`);
       }
-    }
-    for (const el of document.querySelectorAll<HTMLElement>(
-      '.d-scan-edge-name, .d-scan-edge-info',
-    )) {
-      if (
-        el.checkVisibility() &&
-        (el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1)
-      )
-        issues.push(`Clipped waypoint text: ${el.innerText}`);
     }
     return issues;
   });
@@ -124,27 +114,5 @@ export async function expectCompactPhoneHud(page: Page): Promise<void> {
   }
   expect(metrics.depthSpeedOffset).toBeLessThanOrEqual(1);
   expect(metrics.hullBelowFirstRow).toBe(true);
-  if (await page.locator(GUIDANCE.any).isVisible()) {
-    // The scan card and its reticle lead while a contact is in range, so the waypoint
-    // label waits; every other message leaves the label to lead the approach.
-    const kind = await page.locator(GUIDANCE.any).getAttribute('data-kind');
-    const navigation = await page.evaluate(() => {
-      const g = window.__game as {
-        scanner: { view: { objectiveId: string | null } };
-        save: Save;
-        mission: { objectives: Array<{ poiId: string; title: string }> } | null;
-      };
-      const id = g.scanner.view.objectiveId;
-      const approach =
-        g.mission?.objectives.find((o) => o.poiId === id)?.title.startsWith('Head to ') ?? false;
-      return id !== null && (g.save.get().gameplay.visualHints || approach);
-    });
-    if (kind !== 'scan' && navigation) {
-      await expect(page.locator('.d-scan-edge')).toBeVisible();
-      await expect(page.locator('.d-scan-edge')).toHaveText(/\S/);
-    } else await expect(page.locator('.d-scan-edge')).toBeHidden();
-    // Phones carry no objectives list: the slot names the target.
-    await expect(page.locator('.objectives-panel')).toBeHidden();
-    await expect(page.locator(GUIDANCE.name)).toHaveText(/\S/);
-  }
+  await expect(page.locator('.d-scan-edge-name, .d-scan-edge-info')).toHaveCount(0);
 }

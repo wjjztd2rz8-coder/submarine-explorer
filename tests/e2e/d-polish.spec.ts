@@ -18,7 +18,8 @@ test('polished dive HUD keeps mission, telemetry, speed, and the controls guide 
   await expect(page.locator('.obj-item.is-current')).toContainText('Head to the bow');
   await expect(page.locator('.obj-item.is-optional')).toHaveCount(2);
   await expect(page.locator('.obj-check')).toHaveText(['○', '○', '○', '○']);
-  await expect(page.locator('.obj-hint')).not.toBeEmpty();
+  await expect(page.locator('.obj-hint, .obj-nav')).toHaveCount(0);
+  await expect(page.locator('.guidance-name')).toHaveText('Bow section');
   const depthSize = await page
     .locator('.hud-value[data-field="depth"]')
     .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize));

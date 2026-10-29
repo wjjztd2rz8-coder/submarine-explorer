@@ -5,9 +5,7 @@ import { EventBus } from '../../src/core/EventBus.js';
 import { Mission, nextScanObjective, parseMission } from '../../src/game/Mission.js';
 import type { PlacedPoi } from '../../src/game/Pois.js';
 import { Scanner } from '../../src/game/Scanner.js';
-import { GuidanceSlot } from '../../src/ui/GuidanceSlot.js';
-import { ObjectivesPanel } from '../../src/ui/ObjectivesPanel.js';
-import { clampWaypointLabel, Waypoints, waypointReadout } from '../../src/ui/Waypoints.js';
+import { clampWaypointLabel, Waypoints } from '../../src/ui/Waypoints.js';
 
 describe('waypoint label placement', () => {
   const viewport = { width: 844, height: 390 };
@@ -80,17 +78,6 @@ describe('waypoint label placement', () => {
     expect(
       clampWaypointLabel({ x: 0, y: 0 }, { width: 844, height: 400 }, viewport, [], gap),
     ).toBeNull();
-  });
-});
-
-describe('waypoint readout', () => {
-  it('reports slant range, signed depth direction and an in-range cue', () => {
-    expect(waypointReadout({ x: 0, y: -100, z: 0 }, { x: 0, y: -110, z: -40 }, 50)).toBe(
-      '41 m · ↓10 m · IN RANGE',
-    );
-    expect(waypointReadout({ x: 0, y: -100, z: 0 }, { x: 0, y: -80, z: -100 }, 50)).toBe(
-      '102 m · ↑20 m',
-    );
   });
 });
 
@@ -194,13 +181,9 @@ describe('waypoint objective state', () => {
     const view = new Waypoints(scanner);
     // The caller supplies this list once, after discovery readiness.
     view.setPois(pois);
-    const slot = new GuidanceSlot();
-    const panel = new ObjectivesPanel(document.body);
     cleanup.push(
       () => mission.dispose(),
       () => view.dispose(),
-      () => slot.dispose(),
-      () => panel.dispose(),
     );
     const position = new Vector3(0, -100, 0);
     const camera = new PerspectiveCamera(60, 4 / 3, 0.1, 1000);
@@ -209,7 +192,6 @@ describe('waypoint objective state', () => {
     camera.updateMatrixWorld(true);
     const root = view.root as unknown as Element;
     const edge = root.children[0];
-    const [name, info] = edge.children;
     const marker = (id: string) => root.children.find((node) => node.dataset.poi === id)!;
     const currentIds = () =>
       root.children
@@ -217,12 +199,7 @@ describe('waypoint objective state', () => {
         .map((node) => node.dataset.poi);
     const draw = (objective = nextScanObjective(mission.objectives) ?? null) => {
       scanner.setObjective(objective?.poiId ?? null);
-      view.update(
-        camera,
-        position,
-        objective,
-        (targetName) => slot.showsName(targetName) || panel.showsTarget(targetName),
-      );
+      view.update(camera, position, objective);
     };
     const scan = (poi: PlacedPoi) => {
       scanner.setObjective(poi.id);
@@ -238,12 +215,8 @@ describe('waypoint objective state', () => {
       scanner,
       mission,
       view,
-      slot,
-      panel,
       position,
       edge,
-      name,
-      info,
       marker,
       currentIds,
       draw,
@@ -261,9 +234,7 @@ describe('waypoint objective state', () => {
       attributes: { 'aria-label': 'First contact' },
     });
     expect(f.marker('b').hidden).toBe(true);
-    expect(f.edge.hidden).toBe(false);
-    expect(f.name).toMatchObject({ hidden: false, textContent: 'First contact' });
-    expect(f.info.textContent).toBe('41 m · ↓10 m · IN RANGE');
+    expect(f.edge.hidden).toBe(true);
 
     f.scan(f.pois[0]);
     expect(f.scanner.isScanned('site', 'a')).toBe(true);
@@ -277,8 +248,7 @@ describe('waypoint objective state', () => {
       title: 'First contact · scanned this dive',
     });
     expect(f.marker('a').classList.contains('is-scanned')).toBe(true);
-    expect(f.edge.hidden).toBe(false);
-    expect(f.name.textContent).toBe('First contact');
+    expect(f.edge.hidden).toBe(true);
 
     f.draw();
     expect(f.currentIds()).toEqual(['b']);
@@ -290,12 +260,9 @@ describe('waypoint objective state', () => {
       attributes: { 'aria-label': 'Next contact' },
     });
     expect(f.marker('b').classList.contains('is-scanned')).toBe(false);
-    expect(f.name).toMatchObject({ hidden: false, textContent: 'Next contact' });
-    expect(f.info.textContent).toBe('102 m · ↑20 m');
 
     f.position.set(0, -80, -60);
     f.draw();
-    expect(f.info.textContent).toBe('40 m · ↑0 m · IN RANGE');
     f.scan(f.pois[1]);
     expect(nextScanObjective(f.mission.objectives)).toBeUndefined();
     f.draw();
@@ -326,73 +293,21 @@ describe('waypoint objective state', () => {
     expect(f.marker('b')).toMatchObject({ hidden: false, textContent: '◇' });
     expect(f.marker('a')).toMatchObject({ hidden: false, textContent: '✓' });
     expect(f.marker('a').classList.contains('is-scanned')).toBe(true);
-    expect(f.edge.hidden).toBe(false);
-    expect(f.name).toMatchObject({ hidden: false, textContent: 'Next contact' });
-    expect(f.info.textContent).toBe('102 m · ↑20 m');
+    expect(f.edge.hidden).toBe(true);
   });
 
-  it('measures the current name, visibility and range before placing a wider label', () => {
+  it('uses an offscreen arrow without adding another target label', () => {
     const f = fixture();
-    f.draw();
-    f.pois[1].name = 'Eastern stalactite gallery';
-    f.position.copy(f.pois[1].position);
-    let measured = false;
-    f.edge.getBoundingClientRect = () => {
-      measured = true;
-      expect(f.name).toMatchObject({ hidden: false, textContent: 'Eastern stalactite gallery' });
-      expect(f.info.textContent).toBe('0 m · ↑0 m · IN RANGE');
-      return { width: 250.5, height: 80.5 };
-    };
-    f.draw(f.mission.objectives[1]);
-    expect(measured).toBe(true);
+    const camera = new PerspectiveCamera(60, 4 / 3, 0.1, 1000);
+    camera.position.copy(f.position);
+    camera.lookAt(f.position.clone().add(new Vector3(0, 0, 1)));
+    camera.updateMatrixWorld(true);
+    f.view.update(camera, f.position, { poiId: 'a' });
+    expect(f.edge.hidden).toBe(false);
+    expect(f.edge.children).toHaveLength(0);
+    expect(f.edge.textContent).toBe('');
+    expect(f.marker('a').hidden).toBe(true);
   });
-
-  it.each(['guidance slot', 'mission panel'] as const)(
-    'omits only the redundant name while the %s owns the current target',
-    (owner) => {
-      const f = fixture();
-      const ownName = (poi: PlacedPoi | null) => {
-        if (owner === 'guidance slot') {
-          f.slot.offer(
-            'objective',
-            'objective',
-            poi ? { kicker: 'NEXT', text: poi.name, tone: 'cyan' } : null,
-          );
-        } else {
-          f.panel.setNav(
-            poi
-              ? {
-                  id: poi.id,
-                  name: poi.name,
-                  primary: true,
-                  bearingDeg: 0,
-                  depthM: -poi.position.y,
-                  relativeDeg: 0,
-                }
-              : null,
-            false,
-          );
-        }
-      };
-      f.draw();
-      f.scan(f.pois[0]);
-      ownName(f.pois[0]);
-      f.draw();
-      expect(f.name).toMatchObject({ hidden: false, textContent: 'Next contact' });
-      ownName(f.pois[1]);
-      f.draw();
-      expect(f.name).toMatchObject({ hidden: true, textContent: 'Next contact' });
-      expect(f.edge.hidden).toBe(false);
-      expect(f.info).toMatchObject({ hidden: false, textContent: '102 m · ↑20 m' });
-      expect(f.currentIds()).toEqual(['b']);
-      expect(f.marker('a')).toMatchObject({ hidden: false, textContent: '✓' });
-      ownName(null);
-      f.draw();
-      expect(f.name).toMatchObject({ hidden: false, textContent: 'Next contact' });
-      expect(f.edge.hidden).toBe(false);
-      expect(f.info).toMatchObject({ hidden: false, textContent: '102 m · ↑20 m' });
-    },
-  );
 
   it('reads resetDive state on the next update without reviving an old current cue', () => {
     const f = fixture();
@@ -406,8 +321,6 @@ describe('waypoint objective state', () => {
     expect(f.marker('a')).toMatchObject({ hidden: true, textContent: '◇', title: 'First contact' });
     expect(f.marker('b')).toMatchObject({ hidden: false, textContent: '◇' });
     for (const poi of f.pois) expect(f.marker(poi.id).classList.contains('is-scanned')).toBe(false);
-    expect(f.name).toMatchObject({ hidden: false, textContent: 'Next contact' });
-    expect(f.info.textContent).toBe('102 m · ↑20 m');
     f.draw(null);
     expect(f.currentIds()).toEqual([]);
     expect(f.edge.hidden).toBe(true);

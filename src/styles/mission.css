@@ -231,36 +231,6 @@
   flex: 1 1 auto;
 }
 
-.obj-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 12px;
-  margin-top: 5px;
-  padding-top: 5px;
-  border-top: 1px solid var(--b3-hair-dim);
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-}
-
-.obj-nav-target {
-  flex-basis: 100%;
-  color: var(--b3-cyan);
-  letter-spacing: 0.06em;
-}
-
-.obj-nav-turn {
-  margin-left: auto;
-  color: var(--b3-amber);
-}
-
-.obj-nav.is-done .obj-nav-target {
-  color: var(--b3-text);
-}
-
-.obj-nav span:empty {
-  display: none;
-}
-
 /* ---- mission select: MISSIONS section + collapse toggle ---- */
 .mission-select-toggle {
   display: block;

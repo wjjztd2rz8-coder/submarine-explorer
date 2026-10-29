@@ -1,8 +1,4 @@
-/**
- * Routing + navigation maths: `?mission=` resolution, the surface-start
- * spawn pose, hull/sim-speed loadout, the frozen input, and the objectives
- * panel's bearing/range (checked against the Submarine's own heading).
- */
+/** Mission routing, spawn/loadout, frozen input, checklist progress and completion flow. */
 
 import { Vector3 } from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -14,24 +10,16 @@ import { EventBus } from '../../src/core/EventBus.js';
 import { ProgressSave } from '../../src/core/Save.js';
 import { Progress } from '../../src/game/Progress.js';
 import type { FetchJson } from '../../src/game/ContentPath.js';
-import {
-  nextScanObjective,
-  parseMission,
-  type MissionDef,
-  type ObjectiveStatus,
-} from '../../src/game/Mission.js';
+import { nextScanObjective, parseMission, type MissionDef } from '../../src/game/Mission.js';
 import {
   FROZEN_INPUT,
   MissionRouter,
   applyMissionLoadout,
-  bearingTo,
   chooseTileId,
   missionSpawnPose,
-  pickNavTarget,
   resolveMissionRoute,
 } from '../../src/game/MissionRouter.js';
 import { Submarine, type HeightField } from '../../src/sub/Submarine.js';
-import { formatTurn } from '../../src/ui/ObjectivesPanel.js';
 import type { DebriefStats } from '../../src/game/Objectives.js';
 import { missionUrl, tileUrl } from '../../src/ui/MissionSelect.js';
 import { latLonToWorld } from '../../src/util/geo.js';
@@ -238,92 +226,6 @@ describe('FROZEN_INPUT', () => {
   });
 });
 
-describe('bearing and range', () => {
-  const at = (x: number, z: number): { x: number; y: number; z: number } => ({ x, y: -100, z });
-
-  it('0 = north (-Z), 90 = east (+X), 180 = south, 270 = west', () => {
-    const o = at(0, 0);
-    expect(bearingTo(o, at(0, -100)).bearingDeg).toBeCloseTo(0, 9);
-    expect(bearingTo(o, at(100, 0)).bearingDeg).toBeCloseTo(90, 9);
-    expect(bearingTo(o, at(0, 100)).bearingDeg).toBeCloseTo(180, 9);
-    expect(bearingTo(o, at(-100, 0)).bearingDeg).toBeCloseTo(270, 9);
-    expect(bearingTo(o, at(300, -400)).rangeM).toBeCloseTo(500, 9);
-  });
-
-  it('QA-B #11: RNG is the 3D slant range (the scan panel metric)', () => {
-    const b = bearingTo({ x: 0, y: -3700, z: 0 }, { x: 300, y: -3800, z: -400 });
-    expect(b.horizontalM).toBeCloseTo(500, 9);
-    expect(b.rangeM).toBeCloseTo(Math.hypot(500, 100), 9);
-  });
-
-  it('agrees with the HUD heading: steering to the bearing closes the range', () => {
-    const sub = new Submarine(DEFAULT_CONFIG.submarine, flat());
-    const target = at(1200, 900); // south-east
-    const { bearingDeg, rangeM } = bearingTo(at(0, 0), target);
-    sub.reset(0, -100, 0, (bearingDeg * Math.PI) / 180);
-    expect(sub.getState().headingDeg).toBeCloseTo(bearingDeg, 6);
-    const drive = { ...FROZEN_INPUT, throttle: 1 };
-    for (let i = 0; i < 600; i++) sub.step(drive, 1 / 60);
-    const after = bearingTo(sub.position, target);
-    expect(after.rangeM).toBeLessThan(rangeM - 20);
-    expect(after.bearingDeg).toBeCloseTo(bearingDeg, 0);
-  });
-
-  it('titanic: the spawn is ~2 km from the bow and the briefed heading points at it', () => {
-    const d = titanic();
-    const spawn = latLonToWorld(META, d.spawn.lat, d.spawn.lon);
-    const bow = latLonToWorld(META, 41.7325, -49.94694);
-    const b = bearingTo({ ...spawn, y: 0 }, { ...bow, y: 0 });
-    expect(b.rangeM).toBeGreaterThan(1800);
-    expect(b.rangeM).toBeLessThan(2200);
-    expect(Math.abs(b.bearingDeg - d.spawn.heading_deg)).toBeLessThan(15);
-  });
-
-  it('pickNavTarget: ordered open primary, then secondaries, skipping unresolved', () => {
-    const obj = (
-      id: string,
-      poiId: string,
-      primary: boolean,
-      extra: Partial<ObjectiveStatus> = {},
-    ): ObjectiveStatus => ({
-      id,
-      title: id,
-      hint: '',
-      poiId,
-      primary,
-      complete: false,
-      resolved: true,
-      ...extra,
-    });
-    const pois = [
-      { id: 'far', name: 'Far', position: new Vector3(0, -3800, -2000) },
-      { id: 'near', name: 'Near', position: new Vector3(500, -3790, 0) },
-      { id: 'sec', name: 'Sec', position: new Vector3(10, -3790, 0) },
-    ];
-    const from = at(0, 0);
-    const objectives = [obj('a', 'far', true), obj('b', 'near', true), obj('c', 'sec', false)];
-    let t = pickNavTarget(objectives, pois, from);
-    expect(t?.name).toBe('Far');
-    expect(t?.bearingDeg).toBeCloseTo(0, 6);
-    expect(t?.depthM).toBe(3800);
-    objectives[0]!.complete = true;
-    expect(pickNavTarget(objectives, pois, from)?.name).toBe('Near');
-    objectives[1]!.complete = true;
-    t = pickNavTarget(objectives, pois, from);
-    expect(t?.name).toBe('Sec');
-    expect(t?.objective.primary).toBe(false);
-    objectives[2]!.resolved = false;
-    expect(pickNavTarget(objectives, pois, from)).toBeNull();
-    expect(pickNavTarget([obj('x', 'unknown', true)], pois, from)).toBeNull();
-  });
-
-  it('panel formatting', () => {
-    expect(formatTurn(4)).toBe('AHEAD');
-    expect(formatTurn(35.2)).toBe('35° STBD');
-    expect(formatTurn(-120)).toBe('120° PORT');
-  });
-});
-
 describe('mission select URLs', () => {
   it('a mission link drops free-dive params but keeps the graphics tier', () => {
     const u = new URL(missionUrl('http://h/?tile=monterey-canyon&tier=high&poi=x', 'titanic'));
@@ -508,16 +410,15 @@ describe('MissionRouter completion timing', () => {
     vi.unstubAllGlobals();
   });
 
-  it('advances the navigation name with objective completion before another frame', () => {
+  it('advances the checklist with objective completion before another frame', () => {
+    const current = () => control(router.panel.root, 'is-current').dataset.objective;
     frame(router);
-    expect(control(router.panel.root, 'obj-nav-target').textContent).toBe('→ PRIMARY');
+    expect(current()).toBe('primary');
     scan('primary');
     expect(router.mission.objectives[0].complete).toBe(true);
-    expect(control(router.panel.root, 'obj-nav-target').textContent).toBe('OPTIONAL → OPTIONAL');
+    expect(current()).toBe('optional');
     scan('optional');
-    expect(control(router.panel.root, 'obj-nav-target').textContent).toBe(
-      'ALL OBJECTIVES COMPLETE',
-    );
+    expect(control(router.panel.root, 'obj-progress').textContent).toContain('all complete');
   });
 
   it.each([
@@ -594,9 +495,6 @@ describe('MissionRouter completion timing', () => {
     for (const poiId of ['optional', 'later']) {
       bus.emit('scan:complete', { poiId, landmarkId: 'reef', firstTime: false });
       expect(nextScanObjective(router.mission.objectives)?.poiId).toBe('primary');
-      expect(pickNavTarget(router.mission.objectives, options.discovery.pois, POSITION)?.name).toBe(
-        'primary',
-      );
     }
     expect(router.mission.counts()).toEqual({ completed: 2, total: 3 });
     advance(router, 3);
@@ -604,7 +502,6 @@ describe('MissionRouter completion timing', () => {
     expect(events()).not.toContain('mission:primaryComplete');
     scan('primary');
     expect(nextScanObjective(router.mission.objectives)).toBeUndefined();
-    expect(pickNavTarget(router.mission.objectives, options.discovery.pois, POSITION)).toBeNull();
     advance(router, 2.75);
     const completedEvents = [...router.mission.emitted];
     for (const poiId of ['later', 'optional', 'primary']) {
