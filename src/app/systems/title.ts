@@ -160,7 +160,6 @@ export function createTitleSystem(): GameSystem<ShellContext, { dt: number }> {
       scene.setCrop(crop);
       presentationDirty = true;
       terrainReady = true;
-      ctx.home.setSceneCaption(true);
     } catch (error) {
       if (disposed) return;
       terrainReady = false;

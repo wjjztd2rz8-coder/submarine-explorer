@@ -104,9 +104,7 @@ for (const tier of ['low', 'high'] as const) {
     await expect(page.locator('#viewport')).toBeVisible();
     await expect(page.locator('.globe.is-embedded')).toBeHidden();
     await expect.poll(async () => (await title(page)).terrainReady).toBe(true);
-    await expect(page.locator('.home-scene-caption')).toHaveText(
-      'Monterey Canyon · Real GMRT bathymetry',
-    );
+    await expect(page.locator('.home-scene-caption')).toHaveText('Titanic dive · Next dive');
     await expect.poll(async () => (await title(page)).animated).toBe(true);
     const before = (await title(page)).drawCount;
     await expect.poll(async () => (await title(page)).drawCount).toBeGreaterThan(before);
@@ -357,7 +355,7 @@ test('optional title terrain and font failures leave an honest, usable fallback'
   await expect.poll(() => blockedFonts).toBeGreaterThan(0);
   // Seeing the request abort is earlier than the title loader's catch handler.
   await expect.poll(() => fallbackSettled).toBe(true);
-  await expect(page.locator('.home-scene-caption')).toHaveText('Expedition preview');
+  await expect(page.locator('.home-scene-caption')).toHaveText('Titanic dive · Next dive');
   expect((await title(page)).terrainReady).toBe(false);
   expect(await page.evaluate(() => window.__gameError)).toBeFalsy();
   await page.locator('.home-menu').getByRole('button', { name: 'Dive sites' }).click();

@@ -388,7 +388,7 @@ describe('guidance slot', () => {
   });
 
   it.each([false, true])(
-    'marks a ready curiosity optional beside an objective (touch=%s)',
+    'keeps idle guidance on the objective beside a ready optional contact (touch=%s)',
     (touch) => {
       document.documentElement.classList.contains = () => touch;
       const scanner = new Scanner(DEFAULT_CONFIG.scan, new EventBus());
@@ -410,11 +410,11 @@ describe('guidance slot', () => {
       overlay.update(scanner.view, keys, null, 0);
       const card = texts(overlay.slot);
       expect(scanner.view.candidateId).toBe('memorial');
-      expect(card.kicker).toContain('OPTIONAL');
-      if (touch) {
-        expect(card.detail).toContain('Stern');
-        expect(card.detail).toMatch(/TURN \d+° PORT/);
-      } else expect(card.detail).toBe('HOLD G TO SCAN');
+      expect(card.name).toBe('Stern');
+      expect(card.kind).toBe('objective');
+      expect(card.detail).toBe(
+        touch ? 'Get closer to scan · 300 m · TURN 90° PORT' : 'Get closer to scan · 300 m',
+      );
       // On touch a New Journal entry card keeps the direction to the objective; elsewhere it keeps its own line.
       overlay.showComplete('Memorial', true, keys);
       if (touch) expect(texts(overlay.slot).detail).toContain('Stern');
@@ -433,7 +433,7 @@ describe('guidance slot', () => {
     'refreshes contact choice without clearing the slot (touch=%s)',
     (touch) => {
       const f = contactGuidance(touch);
-      expect(f.step()).toMatchObject({ name: 'Memorial', kicker: 'SCAN TARGET · OPTIONAL' });
+      expect(f.step()).toMatchObject({ name: 'Stern', kicker: 'OBJECTIVE' });
       f.scanner.setObjective('memorial');
       expect(f.step()).toMatchObject({
         name: 'Memorial',
@@ -444,7 +444,9 @@ describe('guidance slot', () => {
       expect(f.step().kicker).toBe('SCAN TARGET');
       f.scanner.setObjective('stern');
       f.keys.scan = 'X';
-      expect(f.step().detail).toBe(touch ? 'Stern · TURN 90° PORT' : 'HOLD X TO SCAN');
+      expect(f.step().detail).toBe(
+        touch ? 'Get closer to scan · 300 m · TURN 90° PORT' : 'Get closer to scan · 300 m',
+      );
       // The objective wins when it becomes eligible, even beside a nearer contact.
       f.targets[1].position.set(0, 0, -15);
       expect(f.step()).toMatchObject({
@@ -462,7 +464,7 @@ describe('guidance slot', () => {
           : 'Get closer to scan · 1044 m',
       });
       f.position.set(0, 0, 0);
-      expect(f.step()).toMatchObject({ name: 'Memorial', kicker: 'SCAN TARGET · OPTIONAL' });
+      expect(f.step()).toMatchObject({ name: 'Stern', kicker: 'OBJECTIVE' });
       // Removing both sources must withdraw guidance without a manual overlay clear.
       f.scanner.setTargets([]);
       expect(f.step().hidden).toBe(true);
@@ -497,9 +499,11 @@ describe('guidance slot', () => {
       expect(texts(f.overlay.slot).name).toBe('BATTERY LOW');
       f.overlay.slot.offer('warning', 'urgent', null);
       expect(texts(f.overlay.slot).kicker).toBe('SCAN INTERRUPTED');
-      // Detail refreshes must not restart a result's three-second grace over ready contacts.
+      // Keep the three-second grace guard by making the primary ready to scan.
+      f.targets[1].position.set(0, 0, -15);
       expect(f.step(0.6).name).toBe('Whale');
-      expect(f.step(2.2)).toMatchObject({ name: 'Memorial', kicker: 'SCAN TARGET · OPTIONAL' });
+      expect(f.step(2.2)).toMatchObject({ name: 'Stern', kicker: 'SCAN TARGET' });
+      f.targets[1].position.set(-300, 0, 0);
       f.position.set(0, 0, 1000);
       f.step(DEFAULT_CONFIG.scan.completeBannerSeconds + 0.1);
       expect(texts(f.overlay.slot)).toMatchObject({
@@ -510,7 +514,7 @@ describe('guidance slot', () => {
           : 'Get closer to scan · 1044 m',
       });
       f.position.set(0, 0, 0);
-      expect(f.step().kicker).toBe('SCAN TARGET · OPTIONAL');
+      expect(f.step()).toMatchObject({ name: 'Stern', kicker: 'OBJECTIVE' });
       f.step(0.2, true);
       f.scanner.setTargets([]);
       expect(f.step().hidden).toBe(true);
@@ -649,6 +653,7 @@ describe('guidance slot', () => {
       });
       const ctx = {
         app: { state: 'dive' },
+        sub: { position },
         discovery,
         missionRouter: { mission, panel: { showsTarget: () => false } },
         waypoints,
@@ -657,7 +662,14 @@ describe('guidance slot', () => {
         rig: { camera },
       } as unknown as GameContext;
       const runner = new SystemRunner(ctx);
-      runner.init([discoverySystem, waypointsSystem].map(({ name, frame }) => ({ name, frame })));
+      runner.init(
+        [discoverySystem, waypointsSystem].map(({ name, frame, start, dispose }) => ({
+          name,
+          frame,
+          start,
+          dispose,
+        })),
+      );
       const frame = {
         state: { scan: false, toggleGuide: false },
         sampled: {},
@@ -712,16 +724,19 @@ describe('guidance slot', () => {
             name: current.name,
             kicker: firstTime ? 'New Journal entry' : 'SCAN COMPLETE',
             kind: 'discovery',
-            detail: firstTime ? (touch ? 'OPEN JOURNAL' : 'PRESS J · JOURNAL') : 'LOGGED · JOURNAL',
           });
           const next = checkWaypoint();
           expect(next?.id).not.toBe(current.id);
-          // The next frame refreshes the scanner geometry before composing reward text.
-          step();
+          // Completion geometry and reward directions advance in the same frame.
           expect(scanner.view.objectiveId).toBe(next?.id ?? null);
+          if (!touch || !next) {
+            expect(reward.detail).toBe(
+              firstTime ? (touch ? 'OPEN JOURNAL' : 'PRESS J · JOURNAL') : 'LOGGED · JOURNAL',
+            );
+          }
           if (next) {
             const detail = texts(overlay.slot).detail;
-            if (touch && detail !== (firstTime ? 'OPEN JOURNAL' : 'LOGGED · JOURNAL')) {
+            if (touch) {
               expect(detail.startsWith(`${next.name} · `)).toBe(true);
               const turn = detail.match(/TURN (\d+)° (PORT|STARBOARD)/);
               if (turn) {
@@ -817,9 +832,9 @@ describe('guidance slot', () => {
       f.targets[1].position.set(0, height, -30);
       f.targets[1].radius = 60;
       expect(f.step()).toMatchObject({
-        name: 'Memorial',
-        kicker: 'SCAN TARGET · OPTIONAL',
-        detail: `Stern · ${height > 0 ? 'RISE' : 'SINK'} TOWARD TARGET`,
+        name: 'Stern',
+        kicker: 'OBJECTIVE',
+        detail: `${height > 0 ? 'RISE' : 'SINK'} TOWARD TARGET`,
       });
       expect(f.scanner.view.objectiveInRange).toBe(true);
       f.overlay.showComplete('Whale', true, f.keys);
@@ -949,7 +964,7 @@ describe('guidance slot', () => {
       );
       expect(texts(f.overlay.slot).kicker).toBe('SCAN INTERRUPTED');
       f.scanner.cancel();
-      expect(f.step().kicker).toBe('SCAN TARGET · OPTIONAL');
+      expect(f.step()).toMatchObject({ name: 'Stern', kicker: 'OBJECTIVE' });
       f.scanner.setTargets([]);
       expect(f.step().hidden).toBe(true);
       f.overlay.dispose();

@@ -276,44 +276,7 @@ export class ScanOverlay {
       if (touch) return vert >= 0 ? 'RISE TOWARD TARGET' : 'SINK TOWARD TARGET';
       return fallback;
     };
-    if (inContact && view.nearestArrivalRadiusM !== undefined) {
-      const approach = `APPROACH TO ${view.nearestArrivalRadiusM.toFixed(0)} M`;
-      return {
-        scan: {
-          kicker: 'OPTIONAL CONTACT',
-          text: view.nearestName,
-          detail:
-            Math.abs(view.nearestTurnDeg) >= 10
-              ? guide(view.nearestTurnDeg, view.nearestVertDeg, approach)
-              : Math.abs(view.nearestVertDeg) >= 10
-                ? view.nearestVertDeg >= 0
-                  ? 'RISE TOWARD TARGET'
-                  : 'SINK TOWARD TARGET'
-                : approach,
-          tone: 'cyan',
-          soft: true,
-          ring: { progress: 0, label: dist },
-        },
-        objective: null,
-      };
-    }
-    if (view.candidateId !== null) {
-      // A curiosity beside an outstanding objective is marked optional and keeps the
-      // objective's direction on the same card.
-      const optional = view.objectiveId != null && view.candidateId !== view.objectiveId;
-      return {
-        scan: {
-          kicker: optional ? 'SCAN TARGET · OPTIONAL' : 'SCAN TARGET',
-          text: view.nearestName,
-          ready: true,
-          detail: optional && touch && this.cue ? this.cue : `HOLD ${scan} TO SCAN`,
-          tone: 'cyan',
-          ring: { progress: 0, label: dist },
-        },
-        objective: null,
-      };
-    }
-    const objectiveReady = view.objectiveId === view.nearestId && view.nearestInRange;
+    const objectiveReady = view.objectiveId === view.candidateId;
     // Keep the range instruction in the same slot as the ready-to-scan prompt.
     if (view.objectiveId != null && view.objectiveName && !objectiveReady) {
       const turn = view.objectiveTurnDeg;
@@ -336,6 +299,40 @@ export class ScanOverlay {
         },
       };
     }
+    if (inContact && view.nearestArrivalRadiusM !== undefined) {
+      const approach = `APPROACH TO ${view.nearestArrivalRadiusM.toFixed(0)} M`;
+      return {
+        scan: {
+          kicker: 'OPTIONAL CONTACT',
+          text: view.nearestName,
+          detail:
+            Math.abs(view.nearestTurnDeg) >= 10
+              ? guide(view.nearestTurnDeg, view.nearestVertDeg, approach)
+              : Math.abs(view.nearestVertDeg) >= 10
+                ? view.nearestVertDeg >= 0
+                  ? 'RISE TOWARD TARGET'
+                  : 'SINK TOWARD TARGET'
+                : approach,
+          tone: 'cyan',
+          soft: true,
+          ring: { progress: 0, label: dist },
+        },
+        objective: null,
+      };
+    }
+    if (view.candidateId !== null) {
+      return {
+        scan: {
+          kicker: 'SCAN TARGET',
+          text: view.nearestName,
+          ready: true,
+          detail: `HOLD ${scan} TO SCAN`,
+          tone: 'cyan',
+          ring: { progress: 0, label: dist },
+        },
+        objective: null,
+      };
+    }
     if (hasTarget && !view.nearestInRange && view.nearestDistance > view.nearestRadius) {
       return {
         scan: null,
@@ -348,9 +345,7 @@ export class ScanOverlay {
         },
       };
     }
-    // Steering toward a side contact would compete with the objective the nav line leads;
-    // once that contact is aimed at, the optional scan card above still offers it.
-    if (inContact && (view.objectiveId == null || view.nearestId === view.objectiveId)) {
+    if (inContact) {
       return {
         scan: {
           kicker: 'SCAN TARGET',

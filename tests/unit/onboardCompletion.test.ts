@@ -147,6 +147,30 @@ describe('onboarding completion through the system', () => {
     },
   );
 
+  it('tutorial approach distance follows the primary beside a ready optional contact', () => {
+    const { ctx, system, tick, onboard } = setup();
+    const view = ctx.discovery.scanner.view;
+    Object.assign(view, {
+      nearestId: 'fish',
+      nearestDistance: 5,
+      nearestRadius: 20,
+      objectiveId: 'gallery',
+      objectiveDistance: 217,
+      objectiveRadius: 100,
+    });
+    try {
+      onboard.tutorial.skipStep();
+      onboard.tutorial.skipStep();
+      tick();
+      expect(lastTutorial()?.text).toBe('Get closer to scan · 217 m');
+      view.objectiveDistance = 100;
+      tick();
+      expect(lastTutorial()?.text).toMatch(/Hold .* on a glowing target\./);
+    } finally {
+      system.dispose?.();
+    }
+  });
+
   it('disposing the previous dive again leaves the next dive handlers intact', () => {
     const { ctx, system, tick, exposed } = setup();
     system.dispose?.();

@@ -163,6 +163,11 @@ function shell(savedSite: string | null = null, inDive = false, reuse?: ShellCon
         `https://example.test/submarine-explorer/?mission=${id}&tier=low&touch=1`,
       );
       expect(announced).toBe(title ? `Dive: ${title}` : 'Dive');
+      const nodes = (node: Element): Element[] => [node, ...node.children.flatMap(nodes)];
+      const caption = nodes(ctx.home.root as unknown as Element).find(
+        (node) => node.className === 'home-scene-caption',
+      );
+      expect(caption?.textContent).toBe(title ? `${title} · Next dive` : 'Expedition preview');
     },
   };
 }

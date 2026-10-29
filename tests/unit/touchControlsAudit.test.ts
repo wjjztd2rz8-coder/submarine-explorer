@@ -747,12 +747,12 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     f.controls.setTouchMode(true);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(hint.textContent).toBe('SINK TOWARD TARGET');
-    // A scannable contact beside the objective is optional and keeps the objective's direction.
+    // A scannable side contact must not replace the primary's name or direction.
     view.candidateId = 'debris';
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
-    expect(kicker.textContent).toContain('OPTIONAL');
-    expect(name.textContent).toBe('Debris field');
-    expect(hint.textContent).toContain('Stern section'); // touch is on here
+    expect(kicker.textContent).toBe('OBJECTIVE');
+    expect(name.textContent).toBe('Stern section');
+    expect(hint.textContent).toBe('SINK TOWARD TARGET');
     // No objective: nearest-contact guidance as before.
     view.candidateId = null;
     view.objectiveId = null;
@@ -765,7 +765,7 @@ it('scan card guidance points at the mission objective, not the nearest contact'
   }
 });
 
-it('the standing objective yields to an in-range contact and to a completion card, then returns', () => {
+it('the standing objective yields to its ready scan and a completion card, then returns', () => {
   const f = fixture();
   const overlay = new ScanOverlay(makeConfig().scan);
   const scanner = new Scanner(makeConfig().scan, new EventBus(), {
@@ -785,11 +785,11 @@ it('the standing objective yields to an in-range contact and to a completion car
     expect(overlay.slot.kind).toBe('objective');
     expect(name.textContent).toBe('Stern section');
     Object.assign(view, {
-      nearestId: 'bow',
-      nearestName: 'Bow',
+      nearestId: 'stern',
+      nearestName: 'Stern section',
       nearestInRange: true,
       nearestDistance: 5,
-      candidateId: 'bow',
+      candidateId: 'stern',
     });
     overlay.update(view, keys, null, 0);
     expect(overlay.slot.kind).toBe('scan');
@@ -797,14 +797,14 @@ it('the standing objective yields to an in-range contact and to a completion car
     view.candidateId = null;
     overlay.update(view, keys, null, 0);
     expect(overlay.slot.kind).toBe('objective');
-    overlay.showComplete('Bow', true, keys);
+    overlay.showComplete('Stern section', true, keys);
     expect(overlay.slot.kind).toBe('discovery');
     overlay.update(view, keys, null, makeConfig().scan.completeBannerSeconds + 1);
     expect(overlay.slot.kind).toBe('objective');
     view.objectiveId = null;
     overlay.update(view, keys, null, 0);
     expect(overlay.slot.kind).toBe('objective');
-    expect(name.textContent).toBe('Bow');
+    expect(name.textContent).toBe('Stern section');
     view.nearestId = null;
     overlay.update(view, keys, null, 0);
     expect(overlay.slot.kind).toBeNull();
@@ -889,8 +889,8 @@ it.each(['keyboard', 'touch'] as const)(
       overlay.setSuppressed(false);
       expect(overlay.slot.visible).toBe(false);
       overlay.update(view, keys, null, 0);
-      expect(overlay.slot.kind).toBe('scan');
-      expect(name.textContent).toBe('Bow');
+      expect(overlay.slot.kind).toBe('objective');
+      expect(name.textContent).toBe('Stern section');
       view.nearestInRange = false;
       view.candidateId = null;
       overlay.update(view, keys, null, 0);

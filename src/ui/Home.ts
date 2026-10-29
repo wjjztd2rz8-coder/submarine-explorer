@@ -206,6 +206,7 @@ export class Home {
   /** Names the primary action's site ("Dive: Titanic"); plain "Dive" while the catalogue loads. */
   setDiveSite(title: string | null): void {
     this.diveButton.textContent = title ? `Dive: ${title}` : 'Dive';
+    this.sceneCaption.textContent = title ? `${title} · Next dive` : SCENE_FALLBACK;
   }
 
   show(): void {
@@ -252,13 +253,6 @@ export class Home {
   clearDaily(): void {
     this.dailyCard.hidden = true;
     this.dailyCard.onclick = null;
-  }
-
-  /** Terrain-ready caption (package E): real crop vs the honest fallback. */
-  setSceneCaption(terrainReady: boolean): void {
-    this.sceneCaption.textContent = terrainReady
-      ? 'Monterey Canyon · Real GMRT bathymetry'
-      : SCENE_FALLBACK;
   }
 
   showSites(freeDive: boolean, origin?: HTMLButtonElement): void {

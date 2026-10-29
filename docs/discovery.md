@@ -115,6 +115,14 @@ J opens the guide at that entry. Journal progress counts logged points of intere
 using the same entries as its Points of interest group. Overview pages unlock
 automatically and do not add to that count; progress persists across dives.
 
+Mission guidance follows `nextScanObjective`: the first unfinished resolved primary,
+then the first unfinished optional objective. Desktop navigation, waypoint and phone
+directions use that same order. A ready optional contact does not replace idle
+objective guidance; holding Scan still scans an eligible contact and displays its
+actual name. `Scanner.setObjective` accepts a POI id or a live resolver; the mission uses a
+resolver so geometry and directions advance immediately after completion listeners
+update the objectives, before the completion frame is drawn.
+
 When a scan candidate exists, the card, reticle and prompt share its identity.
 Otherwise guidance selects the nearest unscanned fixed contact within scan range, then a
 previously scanned POI still in range, then a remote unscanned POI within hint

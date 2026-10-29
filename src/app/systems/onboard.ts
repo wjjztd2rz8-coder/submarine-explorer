@@ -165,13 +165,11 @@ export function createOnboardSystem(): GameSystem {
         const guidance = ctx.guidance;
         const step = tutorial.step;
         const scanView = ctx.discovery.scanner.view;
-        const scanDistance = scanView.nearestId
-          ? scanView.nearestDistance
-          : scanView.objectiveDistance;
-        const scanRadius = scanView.nearestId ? scanView.nearestRadius : scanView.objectiveRadius;
-        const objectiveTitle = ctx.missionRouter?.mission.objectives.find(
-          (o) => o.primary && !o.complete,
-        )?.title;
+        const scanDistance = scanView.objectiveId
+          ? scanView.objectiveDistance
+          : scanView.nearestDistance;
+        const scanRadius = scanView.objectiveId ? scanView.objectiveRadius : scanView.nearestRadius;
+        const objectiveTitle = f.nextScanObjective?.title;
         guidance.offer(
           'tutorial',
           'hint',

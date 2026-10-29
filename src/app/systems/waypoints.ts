@@ -3,6 +3,8 @@
  * state on the sonar.
  */
 
+import type { Vector3 } from 'three';
+import type { GameContext } from '../context.js';
 import { nextScanObjective as selectScanObjective } from '../../game/Mission.js';
 import { Waypoints } from '../../ui/Waypoints.js';
 import type { GameSystem } from '../System.js';
@@ -41,26 +43,33 @@ export const waypointsSystem: GameSystem = {
     );
     ctx.expose({ waypoints });
   },
+  start(ctx) {
+    const mission = ctx.missionRouter?.mission;
+    if (mission) cleanup.add(mission.onChange(() => updateWaypoints(ctx, ctx.sub.position)));
+  },
   frame: {
     'guide.waypoints': (f, ctx) => {
-      const { missionRouter } = ctx;
-      const nextScanObjective = selectScanObjective(missionRouter?.mission.objectives);
-      // Near-site approaches retain their navigation marker in Realistic too.
-      // Once in scan range, resume the pilot's normal visual-waypoint preference.
-      const approach = nextScanObjective?.title.startsWith('Head to ') ?? false;
-      const showHints = ctx.effective.gameplay.visualHints || approach;
-      if (showHints !== visualHints) {
-        visualHints = showHints;
-        ctx.waypoints.setVisualHints(visualHints);
-      }
-      f.nextScanObjective = nextScanObjective;
-      ctx.discovery.scanner.setObjective(nextScanObjective?.poiId ?? null);
-      ctx.waypoints.update(
-        ctx.rig.camera,
-        f.pilotPosition,
-        nextScanObjective ? { poiId: nextScanObjective.poiId } : null,
-        (name) => ctx.guidance.showsName(name) || !!ctx.missionRouter?.panel.showsTarget(name),
-      );
+      f.nextScanObjective = updateWaypoints(ctx, f.pilotPosition);
     },
   },
 };
+
+function updateWaypoints(ctx: GameContext, position: Vector3) {
+  const { missionRouter } = ctx;
+  const nextScanObjective = selectScanObjective(missionRouter?.mission.objectives);
+  // Near-site approaches retain their navigation marker in Realistic too.
+  // Once in scan range, resume the pilot's normal visual-waypoint preference.
+  const approach = nextScanObjective?.title.startsWith('Head to ') ?? false;
+  const showHints = ctx.effective.gameplay.visualHints || approach;
+  if (showHints !== visualHints) {
+    visualHints = showHints;
+    ctx.waypoints.setVisualHints(visualHints);
+  }
+  ctx.waypoints.update(
+    ctx.rig.camera,
+    position,
+    nextScanObjective ? { poiId: nextScanObjective.poiId } : null,
+    (name) => ctx.guidance.showsName(name) || !!ctx.missionRouter?.panel.showsTarget(name),
+  );
+  return nextScanObjective;
+}

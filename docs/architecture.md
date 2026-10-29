@@ -1181,8 +1181,9 @@ a direct dive URL. It shares the gameplay renderer and `#viewport`; it never mov
 the gameplay sub or camera. `TitleTerrain.ts` crops a 2,400 m square of real GMRT
 Monterey bathymetry around the checked-in upper-channel POI. Optional terrain loads
 after scene creation without blocking `__gameReady`, reusing the boot tile when it
-is Monterey. Failure retains the usable vehicle/fog fallback and **Expedition
-preview** caption; success labels the crop **Monterey Canyon · Real GMRT bathymetry**.
+is Monterey. Failure retains the usable vehicle/fog fallback. Home's caption
+names **<site> · Next dive**, matching its primary button through `Home.setDiveSite`;
+the decorative crop's readiness never overwrites that destination.
 Vehicle and lighting are illustrative. See [title-scene.md](./title-scene.md).
 
 The bridge reconciles visibility/layout, quality and motion at `render.prepare`.
