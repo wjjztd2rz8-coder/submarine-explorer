@@ -17,8 +17,7 @@ import { blueprintFor, type HullClassId } from './hulls.js';
 import { Vehicle, type VehicleLod } from './Vehicle.js';
 import { withDetail } from './kit.js';
 
-export { Vehicle, type VehicleDrive, type VehicleLod, type VehicleStats } from './Vehicle.js';
-export type { HullClassId } from './hulls.js';
+export { Vehicle, type VehicleDrive } from './Vehicle.js';
 export type { VehicleLook } from './materials.js';
 
 /** Graphics tiers this module understands. */

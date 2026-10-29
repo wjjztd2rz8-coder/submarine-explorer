@@ -54,12 +54,7 @@ export function stepUiScale(value: number, dir: -1 | 1): number {
   return clampUiScale(next);
 }
 
-export {
-  GAMEPLAY_LABELS,
-  GAMEPLAY_ORDER,
-  GAMEPLAY_NOTES,
-  gameplayKeysInOrder,
-} from '../core/config/modes.js';
+export { GAMEPLAY_LABELS, GAMEPLAY_NOTES, gameplayKeysInOrder } from '../core/config/modes.js';
 
 /** Keys the dialog itself needs; never offered as a binding. */
 export const RESERVED_KEYS: readonly string[] = ['Escape', 'Tab'];

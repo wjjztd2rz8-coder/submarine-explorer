@@ -5,10 +5,4 @@
  * registry itself imports the wrecks.
  */
 
-export {
-  hashString,
-  mulberry32,
-  valueNoise3,
-  type BuiltProp,
-  type LocalHeightFn,
-} from '../builders/shared.js';
+export { mulberry32, valueNoise3, type BuiltProp, type LocalHeightFn } from '../builders/shared.js';

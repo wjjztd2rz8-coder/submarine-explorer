@@ -35,6 +35,9 @@ without an entry here is not done.
 
 ### Removed
 
+- **S-dead sweep:** delete the uncalled wreck `plate` wrapper and its exclusive `strut` import; no builder uses it.
+- **S-dead sweep:** remove unused settings, Journal compatibility, vehicle, life-model, geology and wreck re-exports; their live declarations and direct consumers remain.
+
 - **S-dead:** delete the unimported audio barrel and obsolete sonar-marker/home-caveat CSS; direct audio imports, waypoint palettes and the home caption remain live.
 
 - Debrief removes the unused normal-dive subtitle and its duplicate tally/time formatter. Its existing objective metric now counts and labels primary objectives; optional targets no longer make a completed mission read as unfinished.
