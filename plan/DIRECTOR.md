@@ -86,7 +86,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 7. **V-endurance-accent [Sonnet, small, demote if tried again]:** TRIED 2026-10-27, no change merged (see plan/progress/V-endurance-accent.md); next route is a per-site emissive tint in `src/world/props/wrecks/materials.ts` via site data.
    12a. **R-journey-guidance [Codex]:** queued 93: Home button/caption name different sites, Blue Hole opening names the optional target, one-frame stale target after a scan (journey findings 1, 4, 10).
    12b. **R-journey-labels [Codex]:** queued 94: waypoint/Journal label clipping and ellipsis, Settings Close off-screen on phones (findings 2, 3, 5, 6, 7).
-   12c. **R-journal-repeat [Codex]:** queued 95: second Blue Hole gallery scan repeats the same entry; THIS DIVE counters disagree with scan count (findings 8, 9).
+   12c. **R-journal-repeat [Codex]:** DONE 2026-10-28 (888fa9c2): second Blue Hole gallery scan repeats the same entry; THIS DIVE counters disagree with scan count (findings 8, 9).
    12d. **T-golden-mission [Codex]:** queued 96: golden sets use free-dive poses, so there is no mission-spawn capture (Bismarck, Blake, Hudson unrated); capture the default mission's first frame per site and note the auto-selected phone tier (Sol, 2026-10-28).
 8. **S-verify / S-bughunt / S-dead [Codex, standing]:** 4730-4780 merged 2026-10-28; keep rationing.
 9. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
