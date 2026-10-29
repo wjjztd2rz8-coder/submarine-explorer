@@ -19,7 +19,7 @@
   "opening": {
     "mission": {
       "rangeM": 110,
-      "yawOffset": 30,
+      "yawOffset": 20,
       "chaseRadius": 60,
       "chaseOffsetY": -20,
       "destinationLabel": "Hiolo North"
@@ -33,7 +33,7 @@
       "hero": "hiolo-north-chimney-1",
       "range": 26,
       "altitude": 9,
-      "yawOffset": -16,
+      "yawOffset": 20,
       "chaseOffsetX": 0,
       "chaseOffsetY": -10
     }
