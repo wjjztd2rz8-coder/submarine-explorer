@@ -31,11 +31,10 @@ import { waitForFrames } from './helpers/frames.js';
 import { type GameConfig } from '../../src/core/Config.js';
 import type * as THREE from 'three';
 import catalog from '../../data/landmarks/index.json' with { type: 'json' };
-import { HERO_SITES } from '../../src/game/Cosmetics.js';
 // @ts-expect-error The existing golden URL builder is JavaScript.
 import { goldenUrl } from '../../tools/golden-options.mjs';
 
-freshTest.describe('non-hero mission spawn Low portrait capture', () => {
+freshTest.describe('catalog mission spawn Low portrait capture', () => {
   freshTest.use({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 1,
@@ -45,8 +44,8 @@ freshTest.describe('non-hero mission spawn Low portrait capture', () => {
     serviceWorkers: 'block',
   });
 
-  for (const site of catalog.landmarks.filter((id) => !HERO_SITES.some((hero) => hero === id))) {
-    // Regression guard: ordinary runs omitted non-hero mission-spawn evidence and its golden entry.
+  for (const site of catalog.landmarks) {
+    // Regression guard: ordinary runs omitted catalog mission-spawn evidence and its golden entry.
     freshTest(
       `${site}: persists spawn PNG and golden manifest`,
       async ({ page, baseURL }, info) => {

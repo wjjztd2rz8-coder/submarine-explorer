@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Hero poses + one opening for each of the 13 missions, in one contact sheet.
 # One command for the nightly golden set: build, serve on 127.0.0.1 (a bare
 # "localhost" can resolve to ::1 and refuse), capture, stop the server.
 # Output: .cache/golden/<stamp>/ (contact sheet index.html). Usage: tools/golden.sh

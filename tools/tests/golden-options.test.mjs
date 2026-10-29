@@ -3,15 +3,16 @@ import assert from 'node:assert/strict';
 import {
   goldenOptions,
   goldenUrl,
+  goldenJobs,
   selectGoldenHeroes,
   selectGoldenMissions,
 } from '../golden-options.mjs';
 import bismarckPose from '../bismarck-poses.json' with { type: 'json' };
 import lowTierPoses from '../lowtier-poses.json' with { type: 'json' };
 
-test('nightly defaults remain High desktop and the original hero selection', () => {
+test('nightly defaults include mission openings alongside High desktop heroes', () => {
   assert.deepEqual(goldenOptions({}), {
-    mode: 'free-dive',
+    mode: 'all',
     tier: 'high',
     layouts: [{ name: 'desktop', width: 1600, height: 900 }],
     only: undefined,
@@ -26,7 +27,7 @@ test('Low all-site sweep uses exact portrait and landscape phone sizes', () => {
       GOLDEN_SITES: 'all',
     }),
     {
-      mode: 'free-dive',
+      mode: 'all',
       tier: 'low',
       layouts: [
         { name: 'portrait', width: 390, height: 844 },
@@ -181,7 +182,60 @@ test('mission defaults capture each real catalog mission once across all three l
       ),
     /Unknown/,
   );
-  const free = goldenUrl('http://localhost/', 'titanic', goldenOptions({}), 'desktop');
+  const free = goldenUrl(
+    'http://localhost/',
+    'titanic',
+    goldenOptions({ GOLDEN_MODE: 'free-dive' }),
+    'desktop',
+  );
   assert.equal(free.searchParams.get('tile'), 'titanic');
   assert.equal(free.searchParams.has('mission'), false);
+});
+
+test('the nightly plan appends all 13 mission openings without hero poses or gallery duplicates', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const catalog = JSON.parse(
+    await readFile(new URL('../../data/landmarks/index.json', import.meta.url)),
+  ).landmarks;
+  const heroes = [
+    ['titanic', 'bow-hull'],
+    ['great-blue-hole', 'karst-grotto-east', 'great-blue-hole-east'],
+  ];
+  const jobs = goldenJobs(heroes, catalog, goldenOptions({}));
+  assert.equal(jobs.length, heroes.length + 13);
+  assert.deepEqual(
+    jobs.filter((j) => j.mode === 'free-dive').map((j) => j.hero),
+    heroes,
+  );
+  assert.deepEqual(
+    jobs.filter((j) => j.mode === 'mission').map((j) => j.hero),
+    catalog.map((id) => [id]),
+  );
+  for (const job of jobs.filter((j) => j.mode === 'mission')) {
+    const url = goldenUrl(
+      'http://localhost/',
+      job.hero[0],
+      { ...goldenOptions({}), mode: job.mode },
+      job.layout.name,
+    );
+    assert.equal(url.searchParams.get('mission'), job.hero[0]);
+    assert.equal(url.searchParams.get('skipBriefing'), '1');
+    assert.equal(url.searchParams.has('tile'), false);
+  }
+  assert.equal(
+    goldenJobs(heroes, catalog, goldenOptions({ GOLDEN_MODE: 'free-dive' })).length,
+    heroes.length,
+  );
+  const gallery = goldenJobs(
+    heroes,
+    catalog,
+    goldenOptions({ GOLDEN_SITES: 'great-blue-hole-east' }),
+  );
+  assert.deepEqual(
+    gallery.map((j) => [j.mode, j.hero[0]]),
+    [
+      ['free-dive', 'great-blue-hole'],
+      ['mission', 'great-blue-hole'],
+    ],
+  );
 });

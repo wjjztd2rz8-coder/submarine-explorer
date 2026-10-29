@@ -175,7 +175,7 @@ test('golden comparison refuses partial sets, missing files and incompatible pos
 
 test('serialized pose manifests and contact sheets contain build, site, layout, mode and mission timing evidence', () => {
   const provenance = { sha: 'a'.repeat(40), dirty: true, buildMode: 'production' };
-  for (const mode of ['free-dive', 'mission']) {
+  for (const mode of ['all', 'free-dive', 'mission']) {
     const options = goldenOptions({ GOLDEN_MODE: mode });
     const captures = options.layouts.flatMap(({ name: layout }) =>
       [0, 10].map((timeS) => ({
@@ -230,4 +230,37 @@ test('serialized pose manifests and contact sheets contain build, site, layout, 
     assert.equal(partial.complete, false);
     assert.ok(goldenContactSheet(partial).includes('INCOMPLETE'));
   }
+});
+
+test('the combined contact sheet lists every mission opening with clean build provenance', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const missions = JSON.parse(
+    await readFile(new URL('../../data/landmarks/index.json', import.meta.url)),
+  ).landmarks;
+  assert.equal(missions.length, 13);
+  const provenance = { sha: 'b'.repeat(40), dirty: false, buildMode: 'production' };
+  const captures = missions.map((site) => ({
+    site,
+    layout: 'desktop',
+    mode: 'mission',
+    ...provenance,
+    filename: `${site}-1-mission.png`,
+    range: null,
+    timeS: 0,
+  }));
+  const manifest = goldenManifest({
+    base: 'http://localhost/',
+    stamp: 'fixture',
+    provenance,
+    options: goldenOptions({}),
+    heroes: [['titanic', 'bow-hull']],
+    missions,
+    captures,
+    failures: [],
+  });
+  assert.deepEqual(manifest.plannedMissions, missions);
+  assert.deepEqual(manifest.plannedHeroes, [['titanic', 'bow-hull']]);
+  const sheet = goldenContactSheet(manifest);
+  assert.ok(sheet.includes('(clean tree)'));
+  for (const shot of captures) assert.ok(sheet.includes(`href="${shot.filename}"`));
 });
