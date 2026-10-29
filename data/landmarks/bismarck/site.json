@@ -29,6 +29,12 @@
         "color": 8885145,
         "intensity": 6
       }
+    },
+    "hemisphere": {
+      "name": "bismarckFill",
+      "sky": 4876922,
+      "ground": 2761240,
+      "intensity": 14.0
     }
   }
 }

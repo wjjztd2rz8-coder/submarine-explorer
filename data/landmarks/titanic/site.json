@@ -22,13 +22,30 @@
       "name": "titanicFill",
       "sky": 4876922,
       "ground": 2761240,
-      "intensity": 2.0
+      "intensity": 6.0
     },
     "lamps": {
       "intensity": 3.0,
       "distance": 1.2,
       "fillIntensity": 2.5,
       "fillDistance": 1.3
+    },
+    "tiers": {
+      "low": {
+        "depthM": -200,
+        "color": 8885145,
+        "intensity": 6
+      },
+      "medium": {
+        "depthM": -200,
+        "color": 8885145,
+        "intensity": 6
+      },
+      "high": {
+        "depthM": -200,
+        "color": 8885145,
+        "intensity": 6
+      }
     }
   }
 }
