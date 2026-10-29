@@ -84,11 +84,11 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 5. **V-monterey-flatten [Sonnet, small]:** Monterey is the closest hero (~3.9); the lower-right sand is a flat pale slab. Target: sand tint and ripple falloff so it matches the wall; then re-shoot.
 6. **V-bluehole-floor-2 [Sonnet, small]:** floor and wall strata still read as stacked terraces and the foreground bottom corners are jagged (Claude 3.7, Sol 3.0-3.5). Understand the spawn-vs-detail-amplitude dependency first (plan/OVERNIGHT-LOG run 200); target a smooth bowl, not more fluting.
 7. **V-endurance-accent [Sonnet, small, demote if tried again]:** TRIED 2026-10-27, no change merged (see plan/progress/V-endurance-accent.md); next route is a per-site emissive tint in `src/world/props/wrecks/materials.ts` via site data.
-11. **R-ci-green [Codex] IN FLIGHT (queued 97, 2026-10-29):** hosted CI red since 2026-10-28; remaining real failure is the journey spec `.d-scan-edge` layout check (journal-debrief.spec.ts:1771, 4 of 6 combos, phone sizes).
-12. **V-hunga-kama-subject pins [Codex, test side of item 2; queued 98]:** re-apply the taller Kama vent cluster and re-pin the line-of-sight and pillow-framing tests by capability; Claude then judges the golden shot.
-8. **S-verify / S-bughunt / S-dead [Codex, standing]:** 4730-4780 merged 2026-10-28; keep rationing.
-9. **P2-phone-accept [owner + Codex; browser-checkable items automated 2026-10-29 in tests/e2e/phone-accept.spec.ts]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
-10. **R-release [Haiku]:** tag the latest green-CI main after each review (f68 is the newest); check the Pages deploy.
+8. **R-ci-green [Codex] IN FLIGHT (queued 97, 2026-10-29):** hosted CI red since 2026-10-28; remaining real failure is the journey spec `.d-scan-edge` layout check (journal-debrief.spec.ts:1771, 4 of 6 combos, phone sizes).
+9. **V-hunga-kama-subject pins [Codex, test side of item 2; queued 98]:** re-apply the taller Kama vent cluster and re-pin the line-of-sight and pillow-framing tests by capability; Claude then judges the golden shot.
+10. **S-verify / S-bughunt / S-dead [Codex, standing]:** 4730-4780 merged 2026-10-28; keep rationing.
+11. **P2-phone-accept [owner + Codex; browser-checkable items automated 2026-10-29 in tests/e2e/phone-accept.spec.ts]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
+12. **R-release [Haiku]:** tag the latest green-CI main after each review (f68 is the newest); check the Pages deploy.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16), Titanic per-plate blockiness (accepted ~3.7). Codex weekly burn is ~60%/day, so briefs stay rationed.
 
