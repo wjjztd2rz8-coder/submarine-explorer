@@ -61,7 +61,7 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
 | No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
-Stage (review 2026-10-28 evening, Claude + Sol; see REVIEWS.md): about 84% (range 82-86%) to 1.0; 4-6 weeks. Beautiful: Titanic 3.9, Lost City 3.8, Blue Hole 3.7, Beebe 3.8, Monterey 4.0, Challenger 3.5, Endurance 3.6. Blockers: (1) only Monterey at 4; (2) Kama subject unreadable; (3) real-phone Low-tier acceptance.
+Stage (review 2026-10-29, Claude + Sol; see REVIEWS.md): about 85% (range 82-87%) to 1.0; 4-6 weeks. Beautiful: Titanic 3.9, Lost City 3.8, Blue Hole 3.7, Beebe 3.8, Monterey 4.0, Challenger 3.5, Endurance 3.6. Blockers: (1) only Monterey at 4; (2) Kama subject unreadable; (3) real-phone Low-tier acceptance.
 
 ## Needs owner
 
@@ -72,13 +72,18 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running (Claude week ~14% left, resets Oct 29 07:00). Codex queued: 97 R-ci-green, 98 V-hunga-kama-subject pins, 99 P2-phone-accept automation.
+- No Claude package running (Claude week ~14% left, resets Oct 29 07:00). Codex running: 97 R-ci-green, 98 V-hunga-kama-subject pins. Queued 2026-10-29 review: 100 S-hud-opening-dedupe, 101 B-sub-decal-mirror, 102 T-opening-readable.
 
 ## Backlog
 
 One list, ordered by player impact and dependencies; lane in brackets. Evidence: reviews 2026-10-27 (Claude alone, Sol skipped for Codex budget) and 2026-10-26 in `plan/REVIEWS.md`; earlier item histories in [archive/DIRECTOR-HISTORY-2026-10-26-backlog.md](archive/DIRECTOR-HISTORY-2026-10-26-backlog.md). Art gains per package are ~0.1-0.2, so each V-* names a target composition, not a geometry list. Owner phone decisions: [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md). Done this cycle (removed): V-hunga-subject, V-kama-axial-approach, V-monterey-banding, V-bluehole-roof, V-lostcity-surround, V-monterey-wall-skirt, V-beebe-flow, V-lostcity-towers, V-bluehole-silhouette, V-monterey-apron.
 
 2. **V-hunga-kama-subject [Sonnet] PARTLY DONE 2026-10-28 (aa928fa6; Hunga apron grounded, modest gain; Kama still opens on the pillow egg beside a tiny vent stack; a taller 18x16x6 cluster with re-aimed opening looked better in golden 2026-10-28-131853 but broke the mission line-of-sight and pillow-framing pins, so re-pin those tests and retry):** Hunga opens on an isolated brown wedge and Kama on a brown egg lump; neither reads as the named feature. Target: ground the Hunga rim into the slope (blend base, no hard skirt) and give Kama's Hiolo vent site a lit vent/chimney silhouette; reuse existing props.
+   3a. **V-opening-dark [Sonnet]:** mission openings at Titanic and Bismarck are near-black (bow/hull barely lit, ~3.2-3.3) and fail "readable in 10 s"; Blue Hole's opening camera hugs the sub with stripy sand bands behind (~3.3); Blake's mound is a lone pale pebble. Target: at each mission spawn the sub sits in its own light pool with the first objective's silhouette lit and visible (shared light/spawn framing through site data, no site branch). Use T-opening-readable numbers once item 102 lands.
+   3b. **S-hud-opening-dedupe [Codex, queued 100]:** one surface owns the target (objective card or mission panel line, not both) and the waypoint chip must not sit on the sub.
+   3c. **B-sub-decal-mirror [Codex, queued 101]:** "DSV-1" hull lettering looks distorted/mirrored in the Blue Hole opening (Sol: not yet proven; inspect first). Also inspect whether the Blake coral stand at the bottom of its opening floats.
+   3e. **T-golden-settle [Codex, small, queued 103]:** mission captures lack the terrain-texture wait free-dive captures use (tools/golden-shots.mjs ~228-246 vs ~386-394); add it so openings show settled terrain (Sol). Also check Endurance hard-edged seabed patches in `endurance-1-mission.png`.
+   3d. **T-opening-readable [Codex, queued 102]:** luminance/contrast table for `*-1-mission.png` so V-opening-dark is judged by number.
 3. **V-titanic-aft [Sonnet]:** Titanic bow reads (~3.9, Sol ~3.5) but the aft hull and upper-left frame go dark and flat. Target: a second soft light pool or hull-side emissive tint through site data so the hull has a lit and a shaded half; no per-site branch.
 4. **V-lostcity-ground [Sonnet, small]:** towers read (~3.8) but the upper two thirds is empty dark water; add distance shading or a faint ridge crest behind (shared terrain tint, no site branch).
 5. **V-monterey-flatten [Sonnet, small]:** Monterey is the closest hero (~3.9); the lower-right sand is a flat pale slab. Target: sand tint and ripple falloff so it matches the wall; then re-shoot.

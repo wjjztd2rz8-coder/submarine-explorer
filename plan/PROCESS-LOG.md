@@ -347,3 +347,8 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 
 - Cause: the Codex lane had no concrete unblocked items (all remaining Backlog items were Sonnet/visual or owner), so `codex-refill.sh` correctly wrote nothing (refill.log empty at 00:00, 01:00, 02:00). Meanwhile hosted CI was red for ~10 runs and nobody had queued the fix: collect runs only checked local gates.
 - Fix: queued 97 R-ci-green (journey `.d-scan-edge` real layout failure; stale-build note: the local spec fails with "current checkout build" until `npm run build` is rerun), 98 (Kama pins, test side) and 99 (phone-accept automation). Process rule: a collect run that sees red hosted CI must read the failing specs (`gh api repos/:owner/:repo/actions/jobs/<id>/logs | grep '  1) \['`) and queue a Codex R-ci-green item the same run.
+
+## 2026-10-29 comprehensive review
+
+- STATUS.md claimed green CI while main was red for a day: the review must run `gh run list -L 5 --workflow CI` and write the real state. golden.sh (13 mission openings) ran ~12 min but still exceeds the tool timeout; run it with a background wait on its output.
+- Sol stood in for the reconcile in one round (~35 min); its useful corrections were evidence-discipline ones (stills cannot prove mirroring or "10 s" readability). Queued 102 to give openings a numeric readability check.

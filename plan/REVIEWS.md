@@ -1,5 +1,23 @@
 # Reviews
 
+## 2026-10-29 comprehensive review (joint with Sol, one reconcile round)
+
+**Changed since the 2026-10-28 evening review (golden 194415 to 2026-10-29-112021):** R-journal-repeat, R-journey-guidance, R-journey-labels, T-golden-mission, P2-phone-accept-auto merged. No art merges, so hero views are unchanged (both reads agree). New: the golden set now holds a mission opening at all 13 sites (a clean combined set; Sol notes an earlier dirty-build run had captured all 13 in Low portrait). f68 is still the newest tag; hosted CI on main has been red since 2026-10-28 evening; the Codex repair (97 R-ci-green, 852 passed / 50 skipped in its worktree) is not merged yet. STATUS.md said CI was green; that was stale and is corrected.
+
+**Scores, beautiful (agreed conservative band / Claude's opening read):** Titanic 3.5 / 3.3 opening; Lost City 3.5 / 3.8; Blue Hole 3.0 / 3.3 opening; Beebe 3.5 / 3.8; Monterey 3.5 / 3.8. Others (opening): Challenger 3.6, Hudson 3.5, Axial 3-3.5, Blake 3-3.3, Bismarck 3-3.2, Kama 3-3.2, Hunga 3, Endurance 3 (hard-edged seabed patches). No hero is jointly at 4. Sol holds the heroes lower than my opening reads: Lost City's target sits behind a ridge, Beebe's subject is small and dim, Monterey looks procedural. Both reads kept.
+
+**Biggest gaps (agreed order):** (1) merge the phone scan-edge repair and get hosted CI green; (2) unaided first-five-minutes proof on desktop and both phone orientations (the harness teleports); (3) heroes to 4, including mission openings (Titanic, Bismarck near-black; Blue Hole camera hugs the sub; Blake lone pale mound); (4) Kama and Hunga subjects and Endurance patches; (5) real-phone Low and Auto performance.
+
+**Settled on evidence:** accepted Sol's corrections that (a) the mirrored "DSV-1" decal and the floating Blake coral are not proven from stills (queued as inspection, not a confirmed bug); (b) "fails readable in 10 s" is not a timed result, since golden mission frames are the first loaded frame and lack the terrain-texture wait (queued T-golden-settle); (c) Kama's fix must stay iron-stained mounds per `data/landmarks/kamaehuakanaloa/props.json`, not tall smokers; (d) Pages deploys only after green CI; (e) stage range 82-85%. **Claude finding accepted by Sol:** the opening shows the target three times (objective card, mission panel line, in-world chip) and the chip sits on the sub or target at Kama, Blue Hole, Blake and Hudson. **Disputed:** only the ranking of HUD redundancy (Sol ranks it below confirmed phone failures; I agree it follows CI and phone work).
+
+**Process:** efficiency.sh: Claude week 14% (~7%/day, resets Oct 29 07:00), Codex week 27% (~57%/day, rationed); no failed timer runs in 24 h; Claude idle ~16-33 h of the last 24 h (budget gate, week low). Golden run takes ~12 min; ran it in the background and waited on the output file. Queue had been empty; refilled with 100-102.
+
+**New priorities:** Codex 97 (CI) then 100 S-hud-opening-dedupe, 101 B-sub-decal-mirror, 102 T-opening-readable, T-golden-settle (to queue); Claude V-opening-dark, V-hunga-kama-subject retry, V-titanic-aft, V-lostcity-ground, V-monterey-flatten, V-bluehole-floor-2 once the Claude week resets.
+
+**Stage (agreed with Sol):** about 83% to 1.0 (range 82-85%); 4-6 calendar weeks with three parallel Codex tasks and limited Claude time.
+
+**Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (browser-checkable items are automated; keep Auto tier and unaided navigation in the retest).
+
 ## 2026-10-29 02:50 targeted review (Claude alone): Codex starved 2 h
 
 - Trigger: empty Codex queue ~2 h. Root cause: no Codex-lane Backlog item was concrete or unblocked, so the refill wrote nothing; and red hosted CI (since the 2026-10-28 evening, last real failure: journey spec `.d-scan-edge` at phone sizes, plus journal/f2 specs already fixed by the chip-test fix) had not been turned into a work item.
