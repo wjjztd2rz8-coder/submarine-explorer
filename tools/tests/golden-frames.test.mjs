@@ -49,16 +49,17 @@ for (const pauses of [1, 2, 3]) {
   });
 }
 
-test('mission holds the first fully loaded frame and +10 seconds, excluding screenshot latency without overriding physics', async () => {
+test('mission settles decoded textures before holding the opening and +10 seconds, excluding screenshot latency without overriding physics', async () => {
   const originalWindow = globalThis.window;
   const nativePerformance = globalThis.performance;
   let now = 0;
   let nextId = 0;
   const callbacks = new Map();
   const step = () => {};
+  let decodeTextures;
   const game = {
     renderer: { info: { render: { frame: 0 } } },
-    terrain: { texturesReady: Promise.resolve() },
+    terrain: { texturesReady: new Promise((done) => (decodeTextures = done)) },
     props: { loaded: false },
     discovery: { loaded: false },
     mission: { id: 'titanic', state: 'diving', elapsedS: 0 },
@@ -96,16 +97,31 @@ test('mission holds the first fully loaded frame and +10 seconds, excluding scre
       due.forEach((callback) => callback(now));
       await Promise.resolve();
     };
+    const settling = window.__goldenFrames.settle();
     await frame(100);
     assert.equal(window.__goldenFrames.paused, false);
     window.__gameReady = true;
     game.props.loaded = game.discovery.loaded = true;
     await frame(100);
+    assert.equal(window.__goldenFrames.paused, false, 'loaded props cannot bypass decoding');
+    decodeTextures();
+    await Promise.resolve();
+    for (let i = 0; i < 8; i++) {
+      await frame(100);
+      assert.equal(
+        window.__goldenFrames.paused,
+        false,
+        'settle callbacks cannot hold a game frame',
+      );
+    }
+    assert.deepEqual(await settling, { medianMs: 100, maxMs: 100, samples: Array(7).fill(100) });
+    await frame(100);
     const first = game.mission.elapsedS;
+    const presentedAtHold = presented;
     assert.equal(window.__goldenFrames.paused, true);
     assert.equal(window.__goldenFrames.firstElapsedS, first);
     await frame(30_000); // Slow screenshot readback must not become play time.
-    assert.equal(presented, 2);
+    assert.equal(presented, presentedAtHold);
     window.__goldenFrames.advance(10);
     for (let i = 0; i < 40; i++) await frame(250);
     assert.equal(window.__goldenFrames.paused, true);
@@ -113,17 +129,18 @@ test('mission holds the first fully loaded frame and +10 seconds, excluding scre
     assert.equal(game.sub.step, step);
     assert.equal(game.rig.mode, 'third-person');
     await frame(1000);
-    assert.equal(presented, 42);
+    assert.equal(presented, presentedAtHold + 40);
   } finally {
     globalThis.window = originalWindow;
     globalThis.performance = nativePerformance;
   }
 });
 
-test('free-dive frame scheduling remains live until explicitly paused', () => {
+test('free-dive uses the same terrain settle for each pose and remains live until explicitly paused', async () => {
   const originalWindow = globalThis.window;
   let callback;
   globalThis.window = {
+    __game: { terrain: { texturesReady: Promise.resolve() } },
     requestAnimationFrame(fn) {
       callback = fn;
       return 1;
@@ -138,6 +155,12 @@ test('free-dive frame scheduling remains live until explicitly paused', () => {
     });
     callback(123);
     assert.equal(timestamp, 123);
+    for (let pose = 0; pose < 2; pose++) {
+      const settling = window.__goldenFrames.settle();
+      await Promise.resolve();
+      for (let i = 0; i < 8; i++) callback(200 + pose * 1000 + i * 16);
+      assert.deepEqual(await settling, { medianMs: 16, maxMs: 16, samples: Array(7).fill(16) });
+    }
     assert.equal(window.__goldenFrames.paused, false);
   } finally {
     globalThis.window = originalWindow;
@@ -165,16 +188,21 @@ test('mission capture holds a rendered game frame rather than an unrelated anima
   };
   try {
     installGoldenFrames({ mission: true });
-    for (let i = 0; i < 2; i++) {
-      window.requestAnimationFrame(() => {});
+    const settling = window.__goldenFrames.settle();
+    await Promise.resolve();
+    for (let i = 0; i < 8; i++) {
       callback(i);
       await Promise.resolve();
       assert.equal(window.__goldenFrames.paused, false);
     }
+    await settling;
+    window.requestAnimationFrame(() => {});
+    callback(8);
+    assert.equal(window.__goldenFrames.paused, false);
     window.requestAnimationFrame(() => {
       renderer.info.render.frame++;
     });
-    callback(2);
+    callback(9);
     assert.equal(window.__goldenFrames.paused, true);
   } finally {
     globalThis.window = originalWindow;
