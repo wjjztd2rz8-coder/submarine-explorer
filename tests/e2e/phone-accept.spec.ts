@@ -76,7 +76,7 @@ for (const viewport of [
                 };
               }),
           }),
-          `${touchControls}, button`,
+          `${touchControls.join(', ')}, button`,
         );
         checkpoints.push({ name, phase, diveMs, ...state });
         const path = info.outputPath(`${checkpoints.length}-${name}.png`);
@@ -141,6 +141,8 @@ for (const viewport of [
         }
         const site = page.locator('.home-sites [data-mission="titanic"]');
         await record('site-picker');
+        // The list scrolls like any phone list; a player would swipe to the site.
+        await site.evaluate((element) => element.scrollIntoView({ block: 'nearest' }));
         await tap(site);
         await expect(page).toHaveURL((url) => url.searchParams.get('mission') === 'titanic');
         const params = new URL(page.url()).searchParams;
@@ -162,13 +164,16 @@ for (const viewport of [
         phase = 'first objective approach';
         await record('opening');
         await expectHudClear(page, 'unassisted mission opening');
-        for (const control of await page.locator(touchControls).all()) await reachable(control);
-        const waypoint = page.locator('.d-scan-edge-info');
-        await expect(waypoint).toBeVisible();
-        expect(
-          parseFloat(await waypoint.innerText()),
-          'opening leaves a real transit',
-        ).toBeGreaterThan(100);
+        for (const control of await page.locator(touchControls.join(', ')).all())
+          await reachable(control);
+        // The waypoint is a symbol, so measure the opening transit by probe.
+        const transit = await page.evaluate(() => {
+          const g = window.__game as unknown as Game;
+          return g.sub.position.distanceTo(
+            g.discovery.pois.find((p) => p.id === 'titanic-bow')!.position,
+          );
+        });
+        expect(transit, 'opening leaves a real transit').toBeGreaterThan(100);
 
         const guidance = page.locator('.guidance-slot');
         const stick = page.locator('.tc-stick');
@@ -252,7 +257,8 @@ for (const viewport of [
 /** Measure before tapping: Playwright's automatic scroll must not conceal a clipped exit. */
 async function reachable(target: Locator): Promise<void> {
   await expect(target).toBeVisible();
-  await expect(target).toBeInViewport({ ratio: 1 });
+  // Scroll offsets snap to whole pixels, so tolerate a sub-pixel sliver of border.
+  await expect(target).toBeInViewport({ ratio: 0.99 });
   expect(
     await target.evaluate((element) => {
       const r = element.getBoundingClientRect();
@@ -565,7 +571,7 @@ for (const viewport of [
         help.locator('.how-to-tile').first(),
       ]) {
         await tile.scrollIntoViewIfNeeded();
-        await expect(tile).toBeInViewport({ ratio: 1 });
+        await expect(tile).toBeInViewport({ ratio: 0.99 });
         await reachable(close);
       }
       await help.getByRole('button', { name: 'Close', exact: true }).tap();

@@ -126,3 +126,17 @@ GATES_CONFIG_MODE=writable PW_PORT=4192 PW_OUTDIR=dist-journey \
 This extends the existing acceptance capability only: no new runtime state,
 guidance surface, settings, site branches, layout patches or dependencies.
 `DIRECTOR.md` was left unchanged. No commit, merge or push was performed.
+
+## Round 3: first real run (2026-10-29)
+
+No product defect; all three failures were stale or fragile tests. The journey
+now passes at 390x844 and 1280x800 with no teleporting and no forced clicks.
+
+- Site list: Titanic sits below the fold of the scrolling list, so the test now
+  scrolls it into view as a player would.
+- `reachable` demanded viewport ratio 1; scroll offsets snap to whole pixels, so
+  a sub-pixel border sliver (ratio 0.998) failed the How to play tiles. Now 0.99,
+  with the centre-tap hit test unchanged.
+- The waypoint is a symbol only (no distance text), so the opening transit is
+  measured by probe instead of reading a removed label.
+- `touchControls` was passed as an array where a selector string was needed.
