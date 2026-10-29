@@ -7,7 +7,81 @@ import type { PlacedPoi } from '../../src/game/Pois.js';
 import { Scanner } from '../../src/game/Scanner.js';
 import { GuidanceSlot } from '../../src/ui/GuidanceSlot.js';
 import { ObjectivesPanel } from '../../src/ui/ObjectivesPanel.js';
-import { Waypoints, waypointReadout } from '../../src/ui/Waypoints.js';
+import { clampWaypointLabel, Waypoints, waypointReadout } from '../../src/ui/Waypoints.js';
+
+describe('waypoint label placement', () => {
+  const viewport = { width: 844, height: 390 };
+  const size = { width: 240, height: 80 };
+  const gap = 8;
+  const occupied = [
+    { left: 12, top: 12, right: 132, bottom: 148 },
+    { left: 140, top: 12, right: 574, bottom: 170 },
+    { left: 582, top: 12, right: 832, bottom: 94 },
+    { left: 580, top: 202, right: 832, bottom: 374 },
+    { left: 16, top: 258, right: 128, bottom: 374 },
+  ];
+
+  it.each([
+    { x: -150, y: 100 },
+    { x: 800, y: 210 },
+    { x: 60, y: 120 },
+    { x: 320, y: -80 },
+    { x: 320, y: 380 },
+  ])('keeps the whole current label clear at $x, $y', (preferred) => {
+    const result = clampWaypointLabel(preferred, size, viewport, occupied, gap)!;
+    expect(result).not.toBeNull();
+    expect(result.x).toBeGreaterThanOrEqual(gap);
+    expect(result.y).toBeGreaterThanOrEqual(gap);
+    expect(result.x + size.width).toBeLessThanOrEqual(viewport.width - gap);
+    expect(result.y + size.height).toBeLessThanOrEqual(viewport.height - gap);
+    for (const r of occupied)
+      expect(
+        result.x < r.right + gap &&
+          result.x + size.width + gap > r.left &&
+          result.y < r.bottom + gap &&
+          result.y + size.height + gap > r.top,
+      ).toBe(false);
+  });
+
+  it('preserves a clear projection and clamps a newly wider label at the viewport edge', () => {
+    expect(clampWaypointLabel({ x: 200, y: 200 }, size, viewport, [], gap)).toEqual({
+      x: 200,
+      y: 200,
+    });
+    expect(
+      clampWaypointLabel({ x: 780, y: 200 }, { width: 300, height: 100 }, viewport, [], gap),
+    ).toEqual({ x: 536, y: 200 });
+  });
+
+  it('fits wrapped portrait copy between the top HUD and the touch dock', () => {
+    const result = clampWaypointLabel(
+      { x: 380, y: 140 },
+      { width: 156, height: 96 },
+      { width: 390, height: 844 },
+      [
+        { left: 0, top: 0, right: 390, bottom: 220 },
+        { left: 0, top: 660, right: 390, bottom: 844 },
+      ],
+      gap,
+    )!;
+    expect(result).toEqual({ x: 226, y: 228 });
+  });
+
+  it('yields when the map owns the viewport or wrapped copy cannot fit', () => {
+    expect(
+      clampWaypointLabel(
+        { x: 0, y: 0 },
+        size,
+        viewport,
+        [{ left: 0, top: 0, right: 844, bottom: 390 }],
+        gap,
+      ),
+    ).toBeNull();
+    expect(
+      clampWaypointLabel({ x: 0, y: 0 }, { width: 844, height: 400 }, viewport, [], gap),
+    ).toBeNull();
+  });
+});
 
 describe('waypoint readout', () => {
   it('reports slant range, signed depth direction and an in-range cue', () => {
@@ -32,6 +106,9 @@ class Element extends EventTarget {
   attributes: Record<string, string> = {};
   offsetWidth = 0;
   offsetHeight = 0;
+  getBoundingClientRect() {
+    return { width: this.offsetWidth, height: this.offsetHeight };
+  }
   style = { setProperty() {} };
   classList = {
     contains: (name: string) => this.className.split(' ').includes(name),
@@ -75,8 +152,10 @@ describe('waypoint objective state', () => {
       documentElement: new Element(),
       createElement: () => new Element(),
       createElementNS: () => new Element(),
+      querySelectorAll: () => [],
     });
     vi.stubGlobal('window', { innerWidth: 800, innerHeight: 600 });
+    vi.stubGlobal('getComputedStyle', () => ({ getPropertyValue: () => '8px' }));
   });
   afterEach(() => {
     for (const dispose of cleanup.splice(0).reverse()) dispose();
@@ -250,6 +329,22 @@ describe('waypoint objective state', () => {
     expect(f.edge.hidden).toBe(false);
     expect(f.name).toMatchObject({ hidden: false, textContent: 'Next contact' });
     expect(f.info.textContent).toBe('102 m · ↑20 m');
+  });
+
+  it('measures the current name, visibility and range before placing a wider label', () => {
+    const f = fixture();
+    f.draw();
+    f.pois[1].name = 'Eastern stalactite gallery';
+    f.position.copy(f.pois[1].position);
+    let measured = false;
+    f.edge.getBoundingClientRect = () => {
+      measured = true;
+      expect(f.name).toMatchObject({ hidden: false, textContent: 'Eastern stalactite gallery' });
+      expect(f.info.textContent).toBe('0 m · ↑0 m · IN RANGE');
+      return { width: 250.5, height: 80.5 };
+    };
+    f.draw(f.mission.objectives[1]);
+    expect(measured).toBe(true);
   });
 
   it.each(['guidance slot', 'mission panel'] as const)(

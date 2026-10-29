@@ -143,6 +143,22 @@ test.describe('settings screen', () => {
             await act(cycle);
             await expect(value).toHaveText(`${scale}%`);
             expect(await applied()).toEqual({ saved: scale, persisted: scale, css: scale / 100 });
+            // Regression guard: scrolling to Aa pushed Close above the viewport on phones.
+            // Measure before clicking: Playwright would otherwise scroll it back for us.
+            const close = dialog.getByRole('button', { name: 'Close (Esc)' });
+            expect(
+              await close.evaluate((button) => {
+                const r = button.getBoundingClientRect();
+                const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+                return (
+                  r.top >= 0 &&
+                  r.bottom <= innerHeight &&
+                  r.left >= 0 &&
+                  r.right <= innerWidth &&
+                  (hit === button || button.contains(hit))
+                );
+              }),
+            ).toBe(true);
           }
           expect(await fontSize()).toBeGreaterThan(initialFont);
           await cycle.scrollIntoViewIfNeeded();

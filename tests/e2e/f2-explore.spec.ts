@@ -180,6 +180,10 @@ test('samples collect per dive, appear in mission debrief, and reset on restart'
   // Regression: a sample must have a persistent Journal entry, beyond its dive-local collection.
   await page.keyboard.press('j');
   await expect(page.locator('.journal .jr-body .jr-title')).toHaveText('Sediment core');
+  // A sample is a Journal find, but must not inflate the hidden-secret numerator or total.
+  await page.evaluate(() => (window.__game as unknown as Game).journal.show('monterey-canyon'));
+  const secrets = curiosityData('monterey-canyon').secrets;
+  await expect(page.locator('.jr-progress')).toContainText(`0/${secrets.length} secrets`);
   await page.keyboard.press('Escape');
   expect(
     await page.evaluate(() => (window.__game as unknown as Game).explore.samples.collected.size),

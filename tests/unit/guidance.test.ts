@@ -93,6 +93,9 @@ class FakeElement extends EventTarget {
   type = '';
   offsetWidth = 0;
   offsetHeight = 0;
+  getBoundingClientRect() {
+    return { width: this.offsetWidth, height: this.offsetHeight };
+  }
   dataset: Record<string, string> = {};
   style = { setProperty() {} };
   classList = { toggle() {} };
@@ -110,6 +113,7 @@ class FakeElement extends EventTarget {
 
 describe('guidance slot', () => {
   beforeEach(() => {
+    vi.stubGlobal('getComputedStyle', () => ({ getPropertyValue: () => '8px' }));
     vi.stubGlobal('document', {
       body: new FakeElement(),
       documentElement: { classList: { contains: () => false } },

@@ -6,7 +6,12 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { finishAnimations } from './helpers/hudTips.js';
 import { GUIDANCE } from './helpers/guidance.js';
 import { dismissTutorial, setScanCardSuppressed } from './helpers/tutorial.js';
-import { expectCompactPhoneHud, expectObjectiveGuidance } from './helpers/phoneHud.js';
+import {
+  expectCompactPhoneHud,
+  expectObjectiveGuidance,
+  expectHudClear,
+} from './helpers/phoneHud.js';
+import type { Waypoints } from '../../src/ui/Waypoints.js';
 import { advanceScan, completeScan, scanWithKeyboard } from './helpers/scan.js';
 import { homeReady } from './helpers/home.js';
 import { diveReady, loadDive } from './helpers/dive.js';
@@ -686,6 +691,32 @@ freshTest.describe('large UI and menu reachability', () => {
           expect(
             await journal.locator('.jr-header').evaluate((e) => e.scrollWidth <= e.clientWidth),
           ).toBe(true);
+          // Regression guard: the portrait breadcrumb hid Great Blue Hole behind an ellipsis.
+          const blueHole = journal.locator('.jr-site-card[data-target="great-blue-hole"]');
+          await reachable(blueHole);
+          await blueHole.tap();
+          const expectSiteHeading = async (): Promise<void> => {
+            const crumb = journal.locator('.jr-crumb');
+            await expect(crumb).toHaveText('Lighthouse Reef / Great Blue Hole');
+            expect(
+              await crumb.evaluate((el) => {
+                const r = el.getBoundingClientRect();
+                return (
+                  el.scrollWidth <= el.clientWidth &&
+                  el.scrollHeight <= el.clientHeight &&
+                  r.left >= 0 &&
+                  r.right <= innerWidth &&
+                  r.top >= 0 &&
+                  r.bottom <= innerHeight
+                );
+              }),
+            ).toBe(true);
+            await reachable(journal.locator('.jr-back'));
+            await reachable(journal.locator('.jr-close'));
+          };
+          await expectSiteHeading();
+          await journal.locator('.jr-body .jr-row').first().tap();
+          await expectSiteHeading();
           await reachable(journal.locator('.jr-close'));
           await journal.locator('.jr-close').tap();
           await expect(journal).toBeHidden();
@@ -1450,6 +1481,77 @@ freshTest.describe('animal guidance placement', () => {
   }
 });
 
+freshTest.describe('waypoint label layout', () => {
+  for (const viewport of [
+    { width: 1280, height: 720, touch: false },
+    { width: 390, height: 844, touch: true },
+    { width: 844, height: 390, touch: true },
+  ]) {
+    freshTest.describe(`${viewport.width}x${viewport.height}`, () => {
+      freshTest.use({ viewport, hasTouch: viewport.touch });
+      for (const [site, names] of [
+        ['titanic', ['Bow section', 'Boiler field']],
+        ['great-blue-hole', ['Eastern stalactite gallery', 'Eastern atoll drop-off']],
+      ] as const) {
+        freshTest(
+          `${site}: waypoint names and readouts wrap clear of the HUD`,
+          async ({ page }, info) => {
+            // Guards first-frame clipping when a longer name returns, portrait ellipsis,
+            // and landscape labels covering sonar, tutorial or utility buttons.
+            await pauseClockBeforeNavigation(page);
+            await page.goto(
+              `/?mission=${site}&skipBriefing=1&tier=low&life=0${viewport.touch ? '&touch=1' : ''}`,
+            );
+            await clockFramesUntil(
+              page,
+              () =>
+                window.__gameReady === true &&
+                (window.__game as { discovery: Discovery }).discovery.loaded,
+            );
+            await page.clock.runFor(50);
+            await expectHudClear(page, 'mission opening');
+            for (const scale of [100, 105, 150]) {
+              for (const name of names) {
+                for (const yaw of [0, -1.3, 1.3, Math.PI]) {
+                  await page.evaluate(
+                    ({ name, yaw, scale }) => {
+                      const g = window.__game as unknown as {
+                        discovery: Discovery;
+                        rig: CameraRig;
+                        waypoints: Waypoints;
+                        save: Save;
+                      };
+                      g.save.save({ uiScale: scale });
+                      const poi = g.discovery.pois.find((p) => p.name === name);
+                      if (!poi) throw new Error(`Missing waypoint ${name}`);
+                      const camera = g.rig.camera.clone();
+                      camera.position.copy(poi.position).add(poi.position.clone().set(0, 0, 100));
+                      camera.lookAt(poi.position);
+                      camera.rotateY(yaw);
+                      camera.updateMatrixWorld(true);
+                      // A hidden name becoming visible must be measured on the same update.
+                      g.waypoints.update(camera, poi.position, { poiId: poi.id }, () => true);
+                      g.waypoints.update(camera, poi.position, { poiId: poi.id });
+                    },
+                    { name, yaw, scale },
+                  );
+                  await expect(page.locator('.d-scan-edge-name')).toBeVisible();
+                  await expect(page.locator('.d-scan-edge-name')).toHaveText(name);
+                  await expect(page.locator('.d-scan-edge-info')).toHaveText(
+                    '0 m · ↑0 m · IN RANGE',
+                  );
+                  await expectHudClear(page, `${name}, yaw ${yaw}, scale ${scale}`);
+                }
+              }
+            }
+            await page.screenshot({ path: info.outputPath('waypoint-labels.png') });
+          },
+        );
+      }
+    });
+  }
+});
+
 freshTest.describe('catalog tutorial and reload', () => {
   const test = freshTest;
   interface Game {
@@ -1461,22 +1563,6 @@ freshTest.describe('catalog tutorial and reload', () => {
   }
 
   const shots = '.cache/codex/shots/hud-touch/catalog';
-  const selectors = [
-    '.sonar',
-    '.objectives-panel',
-    '.hud-readouts',
-    '.guidance-slot',
-    '.tc-stick',
-    '.tc-slider',
-    '.tc-btn-scan',
-    '.tc-btn-lights',
-    '.tc-btn-sonar',
-    '.tc-btn-photo',
-    '.tc-btn-pause',
-    '.hud-journal',
-    '.hud-reset-camera',
-  ];
-
   async function layout(page: Page, phase: string): Promise<void> {
     // Layout settles in the next real rendering step (not on the fake clock). Wait for
     // one so a measurement taken right after a content change sees the settled grid.
@@ -1490,33 +1576,7 @@ freshTest.describe('catalog tutorial and reload', () => {
           observer.observe(document.body);
         }),
     );
-    // Read the entire composed HUD together, including transient reward notices.
-    const issues = await page.evaluate((selectors) => {
-      const boxes = selectors.flatMap((selector) => {
-        const element = document.querySelector<HTMLElement>(selector);
-        if (!element?.checkVisibility()) return [];
-        return [{ selector, box: element.getBoundingClientRect() }];
-      });
-      const issues: string[] = [];
-      for (const { selector, box } of boxes) {
-        if (box.x < 0 || box.y < 0 || box.right > innerWidth || box.bottom > innerHeight)
-          issues.push(`${selector} offscreen: ${JSON.stringify(box)}`);
-      }
-      for (let i = 0; i < boxes.length; i++) {
-        const a = boxes[i];
-        for (const b of boxes.slice(i + 1)) {
-          if (
-            a.box.left < b.box.right &&
-            b.box.left < a.box.right &&
-            a.box.top < b.box.bottom &&
-            b.box.top < a.box.bottom
-          )
-            issues.push(`${a.selector} overlaps ${b.selector}: ${JSON.stringify([a.box, b.box])}`);
-        }
-      }
-      return issues;
-    }, selectors);
-    expect.soft(issues, phase).toEqual([]);
+    await expectHudClear(page, phase);
   }
 
   async function ready(page: Page): Promise<void> {

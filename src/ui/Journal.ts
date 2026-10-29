@@ -39,6 +39,7 @@ import {
   type JournalSite,
 } from '../game/JournalData.js';
 import { fetchContentJson } from '../game/ContentPath.js';
+import { secretDiscoveryId } from '../game/Secrets.js';
 import { formatDepthRange, OBIS_HOME_URL, obisTaxonUrl, type SpeciesDoc } from '../game/Species.js';
 import { publicUrl } from '../util/publicUrl.js';
 import { FocusTrap } from './FocusTrap.js';
@@ -787,7 +788,10 @@ export class Journal {
 
     const p = siteProgress(site, this.store);
     const wl = wildlifeProgress(site, this.store);
-    const secrets = site.entries.filter((e) => e.kind === 'secret');
+    // Samples share Finds, but only hidden-contact discoveries belong in the secret tally.
+    const secrets = site.entries.filter(
+      (e) => e.kind === 'secret' && e.poiIds.includes(secretDiscoveryId(e.id)),
+    );
     const found = secrets.filter((e) => isEntryUnlocked(site, e, this.store)).length;
     const chips = [`${p.logged}/${p.total} points of interest`];
     if (p.speciesTotal) chips.push(`${p.species}/${p.speciesTotal} species`);

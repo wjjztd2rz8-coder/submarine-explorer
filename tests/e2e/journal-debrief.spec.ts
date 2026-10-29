@@ -1875,6 +1875,7 @@ freshTest.describe('Home to scan and return journey', () => {
                     '.objectives-panel',
                     '.hud-readouts',
                     '.guidance-slot',
+                    '.d-scan-edge',
                     '.hud-bar',
                     '.tc-stick',
                     '.tc-slider',
@@ -1889,7 +1890,8 @@ freshTest.describe('Home to scan and return journey', () => {
                 ...document.querySelectorAll<HTMLElement>(
                   '.obj-title, .obj-item.is-current .obj-item-title, .guidance-text, ' +
                     '.briefing-title, .briefing-summary, .debrief-kicker, .debrief-title, ' +
-                    '.debrief-highlight, .debrief-next, .jr-body .jr-title',
+                    '.debrief-highlight, .debrief-next, .jr-body .jr-title, .jr-crumb, ' +
+                    '.d-scan-edge-name, .d-scan-edge-info',
                 ),
               ]
                 .filter((el) => visible(el) && (!modal || modal.contains(el)))

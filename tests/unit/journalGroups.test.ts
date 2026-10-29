@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Journal } from '../../src/ui/Journal.js';
-import type { JournalEntry, JournalSite } from '../../src/game/JournalData.js';
+import {
+  buildJournalSite,
+  type JournalEntry,
+  type JournalSite,
+} from '../../src/game/JournalData.js';
+import { parseSecrets, secretDiscoveryId } from '../../src/game/Secrets.js';
 import { DiscoveryStore, DISCOVERY_STORAGE_KEY } from '../../src/game/DiscoveryStore.js';
 import { PhotoStore, type Photo } from '../../src/game/PhotoStore.js';
 import type { PhotoGallery } from '../../src/ui/PhotoGallery.js';
@@ -207,6 +212,30 @@ it.each(
     );
   },
 );
+
+it.each([false, true])('counts hidden secrets independently of samples (phone=%s)', (phone) => {
+  // Samples share the Finds section, but collecting them must not change the secret tally.
+  phoneQuery.matches = phone;
+  const id = 'monterey-canyon';
+  const content = parseSecrets(JSON.parse(readFileSync(`data/secrets/${id}.json`, 'utf8')));
+  const store = new DiscoveryStore(null);
+  Object.assign(journal, {
+    sites: [buildJournalSite({ id, guide: null, pois: [], species: null, ...content })],
+  });
+  journal.setStore(store);
+  journal.show(id);
+  const progress = () =>
+    find((el) => el.classList.contains('jr-progress')).children.map((el) => el.textContent);
+  expect(content.secrets).toHaveLength(3);
+  expect(content.samples).toHaveLength(2);
+  expect(progress()).toContain('0/3 secrets');
+  for (const sample of content.samples) store.record(id, `sample:${sample.id}`);
+  journal.refresh();
+  expect(progress()).toContain('0/3 secrets');
+  for (const secret of content.secrets) store.record(id, secretDiscoveryId(secret.id));
+  journal.refresh();
+  expect(progress()).toContain('3/3 secrets');
+});
 
 it('retains the Journal preview height cap without forcing an aspect ratio', () => {
   // Numeric style contract only; native CSS sizing and screenshot acceptance belong to browser QA.

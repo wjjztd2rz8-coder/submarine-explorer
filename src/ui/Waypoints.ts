@@ -3,8 +3,45 @@ import { Vector3, type Camera } from 'three';
 import type { PlacedPoi } from '../game/Pois.js';
 import type { Scanner } from '../game/Scanner.js';
 
-/** Bottom band (px) the touch controls use; the label stays above it. */
-const CONTROLS_BAND = 180;
+type Rect = Pick<DOMRect, 'left' | 'top' | 'right' | 'bottom'>;
+
+/** Keep the whole wrapped label nearest its projection, clear of the composed HUD. */
+export function clampWaypointLabel(
+  preferred: { x: number; y: number },
+  size: { width: number; height: number },
+  viewport: { width: number; height: number },
+  occupied: readonly Rect[],
+  gap: number,
+): { x: number; y: number } | null {
+  if (size.width + gap * 2 > viewport.width || size.height + gap * 2 > viewport.height) return null;
+  const clampX = (x: number) => Math.max(gap, Math.min(viewport.width - size.width - gap, x));
+  const clampY = (y: number) => Math.max(gap, Math.min(viewport.height - size.height - gap, y));
+  const origin = { x: clampX(preferred.x), y: clampY(preferred.y) };
+  const xs = [origin.x, ...occupied.flatMap((r) => [r.left - size.width - gap, r.right + gap])];
+  const ys = [origin.y, ...occupied.flatMap((r) => [r.top - size.height - gap, r.bottom + gap])];
+  let nearest: { x: number; y: number } | null = null;
+  let distance = Infinity;
+  for (const x of xs.map(clampX)) {
+    for (const y of ys.map(clampY)) {
+      if (
+        occupied.some(
+          (r) =>
+            x < r.right + gap &&
+            x + size.width + gap > r.left &&
+            y < r.bottom + gap &&
+            y + size.height + gap > r.top,
+        )
+      )
+        continue;
+      const d = (x - origin.x) ** 2 + (y - origin.y) ** 2;
+      if (d < distance) {
+        nearest = { x, y };
+        distance = d;
+      }
+    }
+  }
+  return nearest;
+}
 
 interface WaypointObjective {
   poiId: string;
@@ -40,7 +77,6 @@ export class Waypoints {
     this.root.className = 'd-scan-waypoints';
     this.edge = document.createElement('div');
     this.edge.className = 'd-scan-edge';
-    // Two fixed lines (name, then range/depth) so the chip never wraps mid-phrase.
     this.edgeName.className = 'd-scan-edge-name';
     this.edgeInfo.className = 'd-scan-edge-info';
     this.edge.append(this.edgeName, this.edgeInfo);
@@ -114,25 +150,47 @@ export class Waypoints {
     }
     const point = this.projection.copy(current.position).project(camera);
     this.edge.hidden = false;
-    this.edge.classList.toggle(
-      'is-onscreen',
-      point.z > -1 && point.z < 1 && Math.abs(point.x) < 0.9 && Math.abs(point.y) < 0.85,
-    );
+    const onscreen =
+      point.z > -1 && point.z < 1 && Math.abs(point.x) < 0.9 && Math.abs(point.y) < 0.85;
+    this.edge.classList.toggle('is-onscreen', onscreen);
     const behind = point.z > 1;
     const x = behind ? -point.x : point.x;
     const y = behind ? -point.y : point.y;
     const angle = Math.atan2(-y, x);
-    // Keep the whole label on screen (its own half-width from each edge). On screen it sits
-    // above a target that is low in the view, where the sub is, and below one that is high.
-    const half = this.edge.offsetWidth / 2 + 8;
-    const floor = height - CONTROLS_BAND - this.edge.offsetHeight / 2;
-    this.edge.style.left = `${Math.max(half, Math.min(width - half, ((x + 1) / 2) * width))}px`;
-    this.edge.style.top = `${Math.max(100, Math.min(floor, ((1 - y) / 2) * height))}px`;
-    this.edge.classList.toggle('is-above', y < 0.24);
     this.edgeName.textContent = current.name;
     this.edgeName.hidden = nameInSlot(current.name);
     this.edgeInfo.textContent = waypointReadout(position, current.position, current.radius);
     this.edge.style.setProperty('--direction', `${angle}rad`);
+    // Measure this frame's wrapped copy before clamping, including the name when it returns.
+    const size = this.edge.getBoundingClientRect();
+    const gap = parseFloat(getComputedStyle(this.root).getPropertyValue('--hud-gap')) || 0;
+    const occupied = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        '.sonar, .objectives-panel, .hud-readouts, .guidance-slot, .hud-bar, ' +
+          '.tc-stick, .tc-slider, .tc-buttons, .scan-reticle',
+      ),
+    )
+      .filter((el) => el.checkVisibility({ checkVisibilityCSS: true }))
+      .map((el) => el.getBoundingClientRect());
+    const markerHalf = (this.markers.get(current.id)?.offsetHeight ?? 0) / 2 + gap;
+    const placement = clampWaypointLabel(
+      {
+        x: ((x + 1) / 2) * width - size.width / 2,
+        y:
+          ((1 - y) / 2) * height +
+          (onscreen ? (y < 0.24 ? -size.height - markerHalf : markerHalf) : -size.height / 2),
+      },
+      size,
+      { width, height },
+      occupied,
+      gap,
+    );
+    // A full-screen map may leave no room; its navigation already owns the stage.
+    this.edge.hidden = placement === null;
+    if (placement) {
+      this.edge.style.left = `${placement.x}px`;
+      this.edge.style.top = `${placement.y}px`;
+    }
   }
 
   dispose(): void {

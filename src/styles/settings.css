@@ -39,6 +39,10 @@
 }
 
 .settings-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--b1-panel-solid);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
