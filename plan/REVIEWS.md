@@ -1,5 +1,13 @@
 # Reviews
 
+## 2026-10-30 targeted review (Claude alone; Codex week 6%): dry backlog refilled
+
+- Trigger: last 3 runs merged nothing because the Claude lane was empty (Backlog items all DONE). Fresh golden set 2026-10-30-174538: readability 0/13 flagged.
+- Scores (this look): Titanic ~4.0, Lost City ~3.9, Blue Hole ~3.6 (sawtooth terraces, gallery target reads as a shell), Beebe ~3.5 (opening near-black), Challenger ~3.6 (bow hull looks torn).
+- Added Claude items V-bluehole-terrace-saw, V-bluehole-gallery-read, V-beebe-opening, V-challenger-sub-hull, V-lostcity-tower-light. Codex briefs 120-123 stay queued for the Nov 4 reset.
+- Process: dry-backlog runs were "check only" for 6 runs; reviews should refill from golden instead of waiting.
+- **Needs owner:** phone retest (4410-P2 checklist).
+
 ## 2026-10-30 targeted review: CI red x4, fourth cause (same spec)
 
 - Hosted runs 41046923535 and 41050384737 failed only Blue Hole journey 390x844, now with `Expected scan candidate great-blue-hole-stalactites, got null` (wildlife was already off, so the fish theory was incomplete). It passes locally. Likely cause (not reproduced): `spawnPose` puts the sub exactly at the minimum scan depth (`Spawn.ts` ceiling = POI `minDepthM`), and any upward drift in slow CI frames drops the candidate. The step now starts 1 m deeper. If hosted CI is still red on this spec, the next step is to give `spawnPose` a depth margin in the product. No tag until green.
