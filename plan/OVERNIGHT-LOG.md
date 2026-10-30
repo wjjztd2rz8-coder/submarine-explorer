@@ -2546,3 +2546,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged V-blake-mound (Sonnet): five smaller coral mounds added around the hero via props data only; opening now reads as a mound field. My rating ~3: mounds are similar tan lumps, scene still dim, no scattered small colonies (would need a shared scatter hook). Gates smoke + project-base passed on main; pushed.
 - All Claude visual openings in the 3h list are done. Nothing running; Codex 120-122 queued for the Nov 4 reset. No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
+
+## 2026-10-29 20:56 CDT headless run 243 (Claude): V-titanic-aft
+
+- Merged V-titanic-aft (Sonnet): optional per-site `key` directional light in site atmosphere data (validated in SiteManifest), set for Titanic; deck and upper hull edges now catch light, readability 0.158 to 0.216, my rating ~3.5 to 3.7. Dark upper-left water is fog/background colour, unchanged. Gates smoke + project-base passed on main.
+- Hosted CI: run 241 failed only on f-save-soak (cycle 4, 240 s test timeout on a slow runner; looks like a timing flake, not product). Run 242 was still in progress. No tag.
+- Next Claude items: V-lostcity-ground, V-bluehole-floor-2. Nothing running; Codex 120-122 queued for the Nov 4 reset.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
