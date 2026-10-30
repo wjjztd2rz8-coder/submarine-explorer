@@ -1,5 +1,9 @@
 # Reviews
 
+## 2026-10-30 targeted review: CI red x4, fourth cause (same spec)
+
+- Hosted runs 41046923535 and 41050384737 failed only Blue Hole journey 390x844, now with `Expected scan candidate great-blue-hole-stalactites, got null` (wildlife was already off, so the fish theory was incomplete). It passes locally. Likely cause (not reproduced): `spawnPose` puts the sub exactly at the minimum scan depth (`Spawn.ts` ceiling = POI `minDepthM`), and any upward drift in slow CI frames drops the candidate. The step now starts 1 m deeper. If hosted CI is still red on this spec, the next step is to give `spawnPose` a depth margin in the product. No tag until green.
+
 ## 2026-10-30 targeted review: CI red x3, third cause
 
 - Hosted run 41032128643 failed one spec: Blue Hole journey 390x844 (`Expected scan candidate great-blue-hole-stalactites, got life:french-grunt`). A fish from the previous pose was nearer than the POI. Fix: the step now clears and disables wildlife before teleporting (it tests rewards and navigation, not targeting). Both Blue Hole journey specs pass locally on a fresh build (a stale `dist` gave a false build-mismatch failure first; rebuild before running e2e locally). No tag until hosted CI is green.

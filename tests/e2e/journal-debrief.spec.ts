@@ -2525,7 +2525,9 @@ freshTest.describe('Home to scan and return journey', () => {
               g.life.clear();
               g.life.enabled = false;
             }
-            g.sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+            // The pose sits exactly at the minimum scan depth; a slow frame's buoyancy drift
+            // would lift it above and the candidate would vanish, so start 1 m deeper.
+            g.sub.reset(pose.x, pose.y - 1, pose.z, pose.yaw);
             g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
             g.discovery.stats.markTeleport();
             return { id: poi.id, entry: poi.guideEntry };
