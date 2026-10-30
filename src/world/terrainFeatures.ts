@@ -82,6 +82,22 @@ const TERRACE_PROFILE: readonly (readonly [number, number])[] = [
   [0, -125],
 ];
 
+/**
+ * The terrace profile softened by a box average a few metres wide. A bare riser (up to 20 m in
+ * 4 m) is steeper than the mesh can follow: its contour crosses the grid diagonals and shows
+ * as regular teeth. Averaged, the steepest riser spans several mesh steps and stays smooth.
+ */
+const TERRACE_SOFTEN_M = 5;
+const TERRACE_SOFTEN_TAPS = 7;
+function softTerraceAt(r: number): number {
+  let sum = 0;
+  for (let i = 0; i < TERRACE_SOFTEN_TAPS; i++) {
+    const off = (i / (TERRACE_SOFTEN_TAPS - 1) - 0.5) * 2 * TERRACE_SOFTEN_M;
+    sum += profileAt(r + off, TERRACE_PROFILE);
+  }
+  return sum / TERRACE_SOFTEN_TAPS;
+}
+
 /** Wall alcoves: bearing (rad), angular half-width, absolute height (m), height half-range, depth (m). */
 const NOTCHES: readonly { a: number; w: number; h: number; hw: number; d: number }[] = [
   { a: 0.4, w: 0.16, h: -60, hw: 9, d: 13 },
@@ -158,7 +174,7 @@ export function blueHoleTerraces(a: number, r: number): number {
     0.4 * Math.sin(7 * a + 2) +
     0.25 * Math.sin(17 * a + 1 + r * 0.05);
   const rr = r + drift;
-  return mouth * zone * (profileAt(rr, TERRACE_PROFILE) - profileAt(r));
+  return mouth * zone * (softTerraceAt(rr) - profileAt(r));
 }
 
 /**
@@ -519,9 +535,8 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
       const wall =
         smoothstep(Math.min(1, Math.max(0, (r - 104) / 6))) *
         (1 - smoothstep(Math.min(1, Math.max(0, (r - 152) / 8))));
-      const strata =
-        wall *
-        (1.6 * Math.sin(r * 0.62 + 1.4 * Math.sin(3 * a)) + 0.9 * Math.sin(r * 1.37 + 2 * a));
+      // One broad band only: a finer term beats against the mesh and reads as a sawtooth.
+      const strata = wall * 1.6 * Math.sin(r * 0.3 + 1.4 * Math.sin(3 * a));
       // Fallen blocks and sediment mounds on the floor.
       const blocks = floor * boulderField(dx, dz);
       return Math.min(
@@ -531,7 +546,6 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
           ripple +
           strata +
           blocks +
-          lipBand * 1.1 * Math.max(0, Math.sin(37 * a + r * 0.7)) ** 3 +
           blueHoleWallRelief(a, r) +
           blueHoleTerraces(a, r) +
           blueHoleApron(a, r) +
