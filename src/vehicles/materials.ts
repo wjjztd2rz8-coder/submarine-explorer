@@ -111,6 +111,11 @@ function addKeyAndRim(mat: THREE.MeshStandardMaterial, u: LitUniforms, rimScale 
           // 30 m ahead of the boat, the bow inside its own beams) would clip
           // to flat white. Compress the top of the range, keeping hue.
           '{',
+          // Scene ambient/hemisphere fill and the boat's own lamps (a metre from the
+          // hull) sum far past the shoulder on pale paint and read as a flat slab.
+          // Keep a share of both so the key, normal map and rim carry the form.
+          '  outgoingLight -= reflectedLight.indirectDiffuse * 0.85',
+          '    + ( reflectedLight.directDiffuse + reflectedLight.directSpecular ) * 0.5;',
           '  outgoingLight *= uHullLight;',
           '  float hi = max( max( outgoingLight.r, outgoingLight.g ), outgoingLight.b );',
           '  if ( hi > 0.5 ) {',
