@@ -2636,3 +2636,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 ## 2026-10-30 14:22 CDT (Claude): V-bluehole-terrace-saw merged (5c58e7e1)
 
 - Soft terrace risers, aliasing strata terms removed; gates smoke+base green; golden checked by eye. Next Claude item: V-bluehole-gallery-read.
+
+## 2026-10-30 15:28 CDT headless run 253 (Claude): V-bluehole-gallery-read partly merged
+
+- Sonnet moved the Blue Hole mission chase offset (-16 to -44, one data value): the gallery dome is now visible beside the sub, not behind it. Stalactites still not visible at opening (10 m ceiling, 150 m out); next step is an opening-altitude field or different approach bearing. Gates smoke+base green; pushed.
+- Codex week 6% left; briefs 120-123 wait for Nov 4. Next Claude item: V-beebe-opening.
+- **Needs owner:** phone retest (4410-P2 checklist).
