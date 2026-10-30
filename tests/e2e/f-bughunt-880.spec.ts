@@ -118,14 +118,14 @@ for (const tier of ['low', 'medium']) {
       expect(opening.failed).toBe(0);
       expect(opening.calls).toBeGreaterThan(0);
       expect(opening.triangles).toBeGreaterThan(0);
-      if (site === 'titanic') {
+      if (site === 'titanic' || site === 'lost-city') {
         expect(opening.horizon).toMatchObject({
           visible: true,
           toneMapped: false,
           depthWrite: false,
         });
         expect(opening.horizon!.order).toBeLessThan(0);
-        expect(opening.target.distance).toBeLessThan(300);
+        if (site === 'titanic') expect(opening.target.distance).toBeLessThan(300);
       } else expect(opening.horizon).toBeNull();
       if (site === 'great-blue-hole') {
         expect(opening.target.id).toBe('great-blue-hole-stalactites');

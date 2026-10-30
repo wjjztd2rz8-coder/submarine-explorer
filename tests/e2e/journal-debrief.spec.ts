@@ -2049,17 +2049,18 @@ freshTest.describe('Home to scan and return journey', () => {
                 const from = g.discovery.spawnPose(id);
                 const target = g.discovery.pois.find((poi) => poi.id === id);
                 if (!from || !target) throw new Error(`No POI pose for ${id}`);
-                if (id === 'great-blue-hole-stalactites-east') {
+                if (id.startsWith('great-blue-hole-stalactites')) {
                   // The generic south bearing lands on the shallow reef rim.
-                  // Observe this gallery from inside the bowl, at a hull-safe depth.
+                  // Observe these galleries from inside the bowl, at a hull-safe depth.
                   from.x = target.position.x;
-                  from.z = target.position.z - 40;
+                  // Which side is deep differs per gallery (the rim is shallow).
+                  from.z = target.position.z + (id.endsWith('-east') ? -40 : 40);
                   from.y = Math.max(
                     target.position.y + 16,
                     g.terrain.sampleHeight(from.x, from.z) +
                       g.config.submarine.hullRadius +
                       g.config.submarine.seabedClearance +
-                      16,
+                      4,
                   );
                 }
                 return { from, target: target.position, maxPitch: g.config.submarine.maxPitch };

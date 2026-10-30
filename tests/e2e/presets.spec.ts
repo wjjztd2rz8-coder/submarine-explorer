@@ -211,7 +211,7 @@ test('Lost City uses clear carbonate flow without smoke or glow in a free dive',
     active: 'vent',
     source: 'mission',
     fluid: 'carbonate',
-    draws: 0,
+    draws: 1, // the site's horizon backdrop
     lights: 0,
     smoke: null,
   });

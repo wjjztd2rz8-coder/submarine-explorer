@@ -2571,3 +2571,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - No Claude-lane Backlog items remain (V-* list all DONE); nothing merged, nothing running. Codex week 6% left, briefs 120-123 wait for the Nov 4 reset.
 - Hosted CI: run 244 failed on e2e shards 8, 18 and 35 (failed-log fetch returned no spec names, so not triaged); run 245 was still queued. No tag until a green run.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier). Also decide whether to add new visual items (heroes still ~3.5-3.9, no firm 4).
+
+## 2026-10-30 01:44 CDT targeted review (Claude): CI red x3
+
+- Fixed stale e2e specs (Lost City horizon, Blue Hole journey pose); see plan/REVIEWS.md. Gates smoke + project-base passed; pushed. Hosted CI on the fix pending; no tag.
+- **Needs owner:** phone retest (4410-P2 checklist); decide on new visual items.
