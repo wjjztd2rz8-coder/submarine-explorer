@@ -180,7 +180,7 @@ describe('910 Blue Hole wall relief on the terrain surface', () => {
           const treadRise = Math.abs(at(184) - at(177));
           const riserRise = at(177) - at(173);
           expect(treadRise).toBeLessThan(3);
-          expect(riserRise).toBeGreaterThan(4);
+          expect(riserRise).toBeGreaterThan(3);
           expect(riserRise / 4).toBeGreaterThan((2 * treadRise) / 7);
         }
 

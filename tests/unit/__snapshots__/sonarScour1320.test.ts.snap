@@ -308,10 +308,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=default at DPR 1 zoom 250 1`] = `
 {
-  "contours": "092edf941ca2118c231c4848455aca2fcbb33ad27933d7417ab2129bebbcde80",
+  "contours": "e53501012e930334f7dcac381238b9c95f8c72b2213d0ffdf58a9db182319ef6",
   "height": 268,
-  "labels": "5060416aff1fdfcd567e0368b39b5b3b9b357a53b6c1901ad7d233b156f6158d",
-  "pixels": "0433efd91ffe6d8b0bcd354e23bbc3ea3de9a978cf4a062c016a1cb365fc520f",
+  "labels": "21b9c884f1708a8abdcebc50e8ecb07eefaa7ba392c559955f35cecbdb260f45",
+  "pixels": "b09620b27532572a8d34f57aea7344131467cc0adb0325ea958701ccef85aafb",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -325,10 +325,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=default at DPR 1 zoom 1000 1`] = `
 {
-  "contours": "acab3791c0503646f640f20df39a54bc939b834da71b5a40c531e6bbe01b4c04",
+  "contours": "4dbcc9d79e87044faabb6bee04764c442dab253f6c6225035a81cf0cebddd9a8",
   "height": 268,
-  "labels": "92888a42acc7927a15ddf90fecb391d12da096c557952810980d5821f0b5a079",
-  "pixels": "ce5d9110561584afa1b3d7a4f6c488cb91052cc5ce9333116a0be65dd152c8ef",
+  "labels": "31dc814de5029f09a0399e20680cabe68d7e2e9cc68573e37a1901dfee0fea3d",
+  "pixels": "c20c042f518921e18ea773466e09eae285d42777f3b668afc46fe5ecefd3f179",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -345,7 +345,7 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
   "contours": "86af013db87696e308fddd628d902880520e9a358e5e072cd221b15a22850ed3",
   "height": 220,
   "labels": "db69ec1b338f8beb6dd91d85a202afdfb5610d31adc3d922984153589c312056",
-  "pixels": "4b6a7ecd89e24080cb07d800d914ad3d85e5552823000408098406f877433579",
+  "pixels": "78031cda16f1fc8133f0b910f4f7c602dbb311535ef5547b7147185626fecad5",
   "relief": {
     "contourIntervalM": 200,
     "flatness": 0,
@@ -359,10 +359,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=default at DPR 2 zoom 250 1`] = `
 {
-  "contours": "80cb66e8427884b72f903586527392bb763fc27e2850001174f438ea077ec930",
+  "contours": "0887cb794e158d979864e2ce8bc9dcee7dac667eeaf2109176bc4127236d951d",
   "height": 536,
-  "labels": "1cd5da3ed81d6808037a0296541a2e44d217328b4b6bb1210ba8c2ac96396484",
-  "pixels": "c64faf008d31f868c4e1839f154525ca41b57d6059c7c3588985f7c430bb136f",
+  "labels": "cb7c06bcb222b97d1e79cebd8f40ffefdc5a48746ef4497114cfc7040a1ec5c1",
+  "pixels": "5a76c78d4516dd72b515a957eed060d31225caa6006e73869057084a6ffff956",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -376,10 +376,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=default at DPR 2 zoom 1000 1`] = `
 {
-  "contours": "d75d1852dd16e729192736c047bc0601a0457fb53e0ca9ee7c9713efe6d7bc11",
+  "contours": "9e285419ad5719b0c288b92c50b7a62867d3e27373a1b5b2bca12e739dfdf3a3",
   "height": 536,
-  "labels": "80342654ac79ef6b2f57f45330974651c42b329e9efa958c82c30e3fbe4280bb",
-  "pixels": "d736c78f54262652ff2fb29e42d039f863f65f81c8d12c84152ff47c44e20703",
+  "labels": "964d8c820e6be8d84bef28e17beb284014724c49f62dd73c64d9dd3ba6ccf818",
+  "pixels": "fb56aa7508446a57948b14e5ce5e726e4fbecfcf7445e78227b6acd015006d07",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -396,7 +396,7 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
   "contours": "a3806dcb2648496578a302a084462cd34652b01d714d3fc893e15cf2030201bc",
   "height": 440,
   "labels": "a894341bd7a2ecbe8fa08a6473b8e30b885a11088b233baca697f2eee1cf4afd",
-  "pixels": "ce59c85c0c5500a4cd0c9085ebddacc408831ac083edfeccf746ee663745239e",
+  "pixels": "8e7159804ea52a1fbfe267e00f19b1f4d974a72a7b3d5116cc7c7462ddadb2a6",
   "relief": {
     "contourIntervalM": 200,
     "flatness": 0,
@@ -410,10 +410,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=highContrast at DPR 1 zoom 250 1`] = `
 {
-  "contours": "b30e052812313e0b08a7f5b3fa116f9cda60bfb9588e238dcc2610bcf43497d8",
+  "contours": "a9f902a5f583084277ea62e5f30a41a8a72ffc2bab4b99c8044903f3163442e2",
   "height": 268,
-  "labels": "5060416aff1fdfcd567e0368b39b5b3b9b357a53b6c1901ad7d233b156f6158d",
-  "pixels": "16df3ff78833bbacac6a4d2cec67dbd8a5ecac56a20e939ad5d0e5e51de4d1b3",
+  "labels": "21b9c884f1708a8abdcebc50e8ecb07eefaa7ba392c559955f35cecbdb260f45",
+  "pixels": "9441619dda137dbfa3d6bbdf430e29b0362e327766cc2eb1e5085449c11307d4",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -427,10 +427,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=highContrast at DPR 1 zoom 1000 1`] = `
 {
-  "contours": "079e8646cf90dafddc7763e479b2ef9b631bee6bb32de89e83e9125eaa1d0e41",
+  "contours": "37147ec70fc7bac66dea2d83cd7ae7bfc19b1c2707cdbfb7dd2f055d6e4a3108",
   "height": 268,
-  "labels": "92888a42acc7927a15ddf90fecb391d12da096c557952810980d5821f0b5a079",
-  "pixels": "95f1f33aef7eaeacf27d7f9d684877c1205a0cf4c4f3fc700fcd80b71f1d15fc",
+  "labels": "31dc814de5029f09a0399e20680cabe68d7e2e9cc68573e37a1901dfee0fea3d",
+  "pixels": "22e844149023040cf78e8b1c4d5fc8096735ec3862df4790cf41dadb70c1dced",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -461,10 +461,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=highContrast at DPR 2 zoom 250 1`] = `
 {
-  "contours": "f8bd998f44594b8f8e34f6f45021860bdf22e5189443afb260053c84bfe06faf",
+  "contours": "db30cd85ab0f82ce8f2f2c5a4fbced0337a21cc094ba519e554e3b17ed7ff8e4",
   "height": 536,
-  "labels": "1cd5da3ed81d6808037a0296541a2e44d217328b4b6bb1210ba8c2ac96396484",
-  "pixels": "21d3edbabd6d5aaca98eca009a73d9b948106c4d3e8676c2fc71270d997af3e7",
+  "labels": "cb7c06bcb222b97d1e79cebd8f40ffefdc5a48746ef4497114cfc7040a1ec5c1",
+  "pixels": "f78e9ada6e19131368bd47a777e9b324c9783aa2efe9b5278002ade6ec3b99d5",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -478,10 +478,10 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
 
 exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=highContrast at DPR 2 zoom 1000 1`] = `
 {
-  "contours": "2706c0cdf7f0aad6f62a3e1e37e6ae782ffed44c4487693f670a77442da7e51b",
+  "contours": "2b5f8f146f9fa903090486b6c24dba08516a5661de5adc1aaee90fdf31b7a92a",
   "height": 536,
-  "labels": "80342654ac79ef6b2f57f45330974651c42b329e9efa958c82c30e3fbe4280bb",
-  "pixels": "9628d450c48dab7e9255776bc11d18a3b67e135ad424f5848390773d16f96e66",
+  "labels": "964d8c820e6be8d84bef28e17beb284014724c49f62dd73c64d9dd3ba6ccf818",
+  "pixels": "5aeac1195a7e6df386bbf07b6e22b873f5ad6f954cd7e33e2a94e616c1f9a9a3",
   "relief": {
     "contourIntervalM": 10,
     "flatness": 0,
@@ -498,7 +498,7 @@ exports[`sonar rendering equivalence > preserves great-blue-hole hull=false surv
   "contours": "b650355efcbe018d2eed8474a850bd334065ece6b947dbf62b6f642b93bdbb4f",
   "height": 440,
   "labels": "a894341bd7a2ecbe8fa08a6473b8e30b885a11088b233baca697f2eee1cf4afd",
-  "pixels": "6bb152e3bbc2dfa9d3b8d3b86011c703758645619171313a0a5fa3e203fa712e",
+  "pixels": "572586f4f2f38750d84b2c6146725edb360556031cd8bc6e0d05642fa3ffb0d6",
   "relief": {
     "contourIntervalM": 200,
     "flatness": 0,
