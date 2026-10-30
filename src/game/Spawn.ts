@@ -78,7 +78,12 @@ export function composedMissionSpawn(
   let bestScore = Infinity;
   for (const turn of [0, 22.5, -22.5, 45, -45, 67.5, -67.5, 90, -90, 135, -135, 180]) {
     const angle = bearing + (turn * Math.PI) / 180;
-    let y = Math.max(target.y + clearance, safeDepth + settings.hullRadius);
+    // A shallow target (the sinkhole gallery is ~30 m down) must not push the opening above the
+    // surface: cap it at the shallowest legal depth, the floor loop below still raises it if needed.
+    let y = Math.min(
+      Math.max(target.y + clearance, safeDepth + settings.hullRadius),
+      -settings.hullRadius,
+    );
     let p = target.clone();
     // Reconcile altitude with the authored 3D range; steep approaches may need a new bearing.
     for (let pass = 0; pass < 6; pass++) {

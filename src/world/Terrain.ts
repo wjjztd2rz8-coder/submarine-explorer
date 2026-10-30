@@ -169,12 +169,14 @@ export class Terrain {
       this.scour = { ...at, cos: Math.cos(a), sin: Math.sin(a) };
     } else this.scour = null;
     this.normalSubdiv = this.fidelity?.nearSubdiv[tier] ?? tierCfg.detailSubdiv;
+    this.biome = biomeFor(tile.meta.id);
     const cellM = Math.min(this.dx, this.dz);
     this.detail = {
       strength: config.detailStrength,
       invWavelengthM: 1 / Math.max(1e-6, config.detailWavelengthCells * cellM),
       octaves: tierCfg.detailOctaves,
-      amplitudeM: config.detailAmplitudeCells * cellM,
+      amplitudeM:
+        config.detailAmplitudeCells * cellM * (this.biome.smoothRock ? config.detailSmoothRockScale : 1),
       sedimentFactor: config.detailSedimentFactor,
       slopeLoDeg: config.detailSlopeLoDeg,
       slopeHiDeg: config.detailSlopeHiDeg,
@@ -183,7 +185,6 @@ export class Terrain {
     this.lodNear = config.lodDistancesM[0] * tierCfg.lodDistanceScale;
     this.lodFar = config.lodDistancesM[1] * tierCfg.lodDistanceScale;
 
-    this.biome = biomeFor(tile.meta.id);
     const built = createTerrainMaterial({
       config,
       tier,
