@@ -2632,3 +2632,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Fresh golden 2026-10-30-174538; added 5 Claude Backlog items (V-bluehole-terrace-saw first). Nothing merged. Briefs 120-123 wait for Nov 4.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-30 14:22 CDT (Claude): V-bluehole-terrace-saw merged (5c58e7e1)
+
+- Soft terrace risers, aliasing strata terms removed; gates smoke+base green; golden checked by eye. Next Claude item: V-bluehole-gallery-read.
