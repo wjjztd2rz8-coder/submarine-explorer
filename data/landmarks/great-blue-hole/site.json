@@ -11,7 +11,7 @@
     "mission": {
       "rangeM": 150,
       "chaseRadius": 46,
-      "chaseOffsetX": -16,
+      "chaseOffsetX": -44,
       "chaseOffsetY": -30,
       "localAltitudeWeight": -0.1,
       "destinationLabel": "the stalactite gallery"
