@@ -2553,3 +2553,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Hosted CI: run 241 failed only on f-save-soak (cycle 4, 240 s test timeout on a slow runner; looks like a timing flake, not product). Run 242 was still in progress. No tag.
 - Next Claude items: V-lostcity-ground, V-bluehole-floor-2. Nothing running; Codex 120-122 queued for the Nov 4 reset.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
+
+## 2026-10-29 22:29 CDT headless run 244 (Claude): V-lostcity-ground
+
+- Merged V-lostcity-ground (Sonnet): the vent preset now builds the graded water backdrop when site data has a `horizon`; Lost City gets one (data only), so the upper frame has haze and depth instead of flat dark. Gain modest (~3.8 to ~3.9): a haze band, not a ridge (terrain has no crest above eye line). Fixed the siteManifest allowlist test. Gates smoke + project-base passed on main.
+- Hosted CI run 242 passed; run 243 was still in progress. No tag. Next Claude item: V-bluehole-floor-2. Codex 120-122 queued for the Nov 4 reset.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
