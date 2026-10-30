@@ -2540,3 +2540,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged V-kama-opening (Sonnet): Kama now uses the vent preset (smoke, shimmer, haze) and yawOffset 20, so a smoking rust-brown stack shows beside the sub in the opening; readability 0.170. Gain modest (my rating ~2.5-3/5): stack small at 110 m, no visible glow, sub centred. First attempt broke 7 unit specs and a free-dive e2e; sent back and fixed in data only. Gates smoke + project-base passed on main; pushed. Hosted CI for run 239 was green.
 - Next Claude item: V-blake-mound. Nothing running; Codex 120-122 queued for the Nov 4 reset. No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
+
+## 2026-10-29 19:46 CDT headless run 242 (Claude): V-blake-mound
+
+- Merged V-blake-mound (Sonnet): five smaller coral mounds added around the hero via props data only; opening now reads as a mound field. My rating ~3: mounds are similar tan lumps, scene still dim, no scattered small colonies (would need a shared scatter hook). Gates smoke + project-base passed on main; pushed.
+- All Claude visual openings in the 3h list are done. Nothing running; Codex 120-122 queued for the Nov 4 reset. No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
