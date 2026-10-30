@@ -1,5 +1,9 @@
 # Reviews
 
+## 2026-10-30 targeted review: CI red x3, third cause
+
+- Hosted run 41032128643 failed one spec: Blue Hole journey 390x844 (`Expected scan candidate great-blue-hole-stalactites, got life:french-grunt`). A fish from the previous pose was nearer than the POI. Fix: the step now clears and disables wildlife before teleporting (it tests rewards and navigation, not targeting). Both Blue Hole journey specs pass locally on a fresh build (a stale `dist` gave a false build-mismatch failure first; rebuild before running e2e locally). No tag until hosted CI is green.
+
 ## 2026-10-30 targeted review: CI red on main for 3 runs
 
 - Cause (hosted e2e, runs 244-246): two test-side drifts from merged visual work, no product bug. (1) V-lostcity-ground gave Lost City a horizon backdrop, so `presets.spec` (draws 0) and `f-bughunt-880` (horizon null) were stale. (2) V-bluehole-floor-2 made the rim shallower, so the journey spec's scan pose at the first Stalactite gallery sat at the -8 m ceiling (under the 10 m minimum scan depth) and a fish became the held target.

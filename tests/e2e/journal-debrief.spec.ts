@@ -1625,6 +1625,7 @@ freshTest.describe('Home to scan and return journey', () => {
     sub: Submarine;
     rig: CameraRig;
     onboard: { tutorial: { index: number } };
+    life: { enabled: boolean; clear(): void } | null;
   };
 
   async function ready(page: Page): Promise<void> {
@@ -2518,6 +2519,12 @@ freshTest.describe('Home to scan and return journey', () => {
             const g = window.__game as unknown as Game;
             const poi = g.discovery.pois[0]!;
             const pose = g.discovery.spawnPose(poi.id)!;
+            // Animals from the previous pose can be nearer than the POI at this
+            // one; this step checks rewards and navigation, not wildlife targeting.
+            if (g.life) {
+              g.life.clear();
+              g.life.enabled = false;
+            }
             g.sub.reset(pose.x, pose.y, pose.z, pose.yaw);
             g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
             g.discovery.stats.markTeleport();
