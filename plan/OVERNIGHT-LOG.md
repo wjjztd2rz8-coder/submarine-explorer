@@ -2565,3 +2565,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged V-bluehole-floor-2 (Sonnet): found why spawn depended on detail amplitude (objective 22 m above target exceeded the -8 m ceiling by 0.4 m, so mission fell back to free-dive); spawn height now capped at first scan min depth (test added), smooth-rock biomes get no generic detail. Fine sawtooth gone; my rating ~3.7 (bottom-left terraces remain, they come from carved bed steps in terrainFeatures: a further carve change). Gates smoke + project-base passed on main.
 - Queued Codex 123 (verify spawn cap across all 13 sites). Codex 120-123 wait for the Nov 4 reset. No tag.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
+
+## 2026-10-30 00:05 CDT headless run 246 (Claude): check only
+
+- No Claude-lane Backlog items remain (V-* list all DONE); nothing merged, nothing running. Codex week 6% left, briefs 120-123 wait for the Nov 4 reset.
+- Hosted CI: run 244 failed on e2e shards 8, 18 and 35 (failed-log fetch returned no spec names, so not triaged); run 245 was still queued. No tag until a green run.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier). Also decide whether to add new visual items (heroes still ~3.5-3.9, no firm 4).
