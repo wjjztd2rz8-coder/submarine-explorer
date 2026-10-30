@@ -87,7 +87,7 @@ const TERRACE_PROFILE: readonly (readonly [number, number])[] = [
  * 4 m) is steeper than the mesh can follow: its contour crosses the grid diagonals and shows
  * as regular teeth. Averaged, the steepest riser spans several mesh steps and stays smooth.
  */
-const TERRACE_SOFTEN_M = 5;
+const TERRACE_SOFTEN_M = 3;
 const TERRACE_SOFTEN_TAPS = 7;
 function softTerraceAt(r: number): number {
   let sum = 0;

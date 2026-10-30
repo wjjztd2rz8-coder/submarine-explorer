@@ -9,13 +9,15 @@ Regular sawtooth teeth along the Blue Hole wall edges (golden 2026-10-30 great-b
 
 ## Fix
 
-- `softTerraceAt`: the terrace profile is box-averaged over +-5 m, so every riser spans several mesh steps. One shared function in the terrace path, no site branch.
+- `softTerraceAt`: the terrace profile is box-averaged over +-3 m, so every riser spans several mesh steps. One shared function in the terrace path, no site branch.
 - Strata reduced to the single broad band (`r*0.3`); the lip ridge term removed. Net fewer terms.
 
 ## Before / after
 
-Before: .cache/golden/2026-10-30-174538 (and 180123 rebuild). After: .cache/golden/2026-10-30-180551. Free-dive shot: teeth along the left ledges gone, bowl wall reads as smooth soft bands. Mission shot: bottom-left serration gone after the strata change alone.
+Before: .cache/golden/2026-10-30-174538 (and 180123 rebuild). After: .cache/golden/2026-10-30-183934 (softening +-3 m; +-5 m was also smooth but blurred the 177-173 riser into its tread). Free-dive shot: teeth along the left ledges gone, bowl wall reads as smooth soft bands. Mission shot: bottom-left serration gone after the strata change alone.
 
 ## Honest rating
 
 Sawtooth: fixed (was ~3.4/5 foreground, now ~4.0). Trade-off: terraces are softer, less crisp stacked-ledge reading; a touch blurry at mid range. Not retuned further.
+
+Tests: blueHoleWall riser-rise threshold 4 to 3 m and slope ratio relaxed (riser still steeper than tread); Blue Hole snapshots re-baselined (terrainFeatures, sonarScour1320, freeDiveComposition).
