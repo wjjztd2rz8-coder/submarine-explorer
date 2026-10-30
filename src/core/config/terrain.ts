@@ -47,8 +47,6 @@ export interface TerrainConfig {
   detailStrength: number;
   /** Peak detail amplitude as a fraction of the local cell size. */
   detailAmplitudeCells: number;
-  /** Amplitude multiplier for smooth-rock biomes (carved, fluted walls need no extra grain). */
-  detailSmoothRockScale: number;
   /** Wavelength of the first detail octave, in source cells. */
   detailWavelengthCells: number;
   /** Detail amplitude multiplier on flat sediment (see detailSlopeLoDeg). */
@@ -222,7 +220,6 @@ export const DEFAULT_TERRAIN: TerrainConfig = {
   // 15 % of a cell: at Titanic's 46 m cells that is +-6.9 m on rock, which is
   // enough to break the facets without inventing a landform.
   detailAmplitudeCells: 0.15,
-  detailSmoothRockScale: 0.25,
   // 3 cells for the first octave; with subdiv 2 the third octave lands at
   // 0.75 cells, i.e. 1.5 vertex spacings -- just above the Nyquist limit.
   detailWavelengthCells: 3.0,

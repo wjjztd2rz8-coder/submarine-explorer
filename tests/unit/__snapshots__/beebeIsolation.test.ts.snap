@@ -165,11 +165,11 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
       "high": {
         "buffers": [
           {
-            "aCavity": "fe07cbeb22e2abd3f3d23da32c6b46d044dc2b86dd632ae76f9071d9349c13a5",
-            "color": "d96260193b4cab669d43665c8e4b5f3db7fed0fa07cac3df223360a452e05147",
+            "aCavity": "51ac68b5c3a96cbecb90d921f1baa237ef01c1615dbe437556faee54362e9845",
+            "color": "23772706cf3a279974a26811490cfb4827b8b8778b32b98c6535a501c2906aa9",
             "index": "33f3f65b8909899dbddb9d23ac7ae208a4bd641501e600f2f2b5079f128619d4",
-            "normal": "20fdf9518a32b40a08bc99876e4a82142926de110d6327ee266ae1744c1e8868",
-            "position": "749ff7b1baf9072df4f4f88c53cbfb7997d1e0ce7a699328e8cdd215ed93af50",
+            "normal": "f883026bfd314d8a8d0e271a2bc616b8ac770f8dcb472242dd3a7a21c75ef9a4",
+            "position": "3a43bfc7495c06c84146f522f5c489240c12db2bb4ffd2fab93d7fb03aa0c1e4",
           },
         ],
         "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP-horizon-fade",
@@ -179,11 +179,11 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
       "low": {
         "buffers": [
           {
-            "aCavity": "bedb7a593d0293d0c75d58285b3b249a133e8e28c37a43109a96461857957966",
-            "color": "690773bbc07f14afef684a097e867c66b333a75c6bbf89643d3c35ade54f1cda",
+            "aCavity": "9979d2ea778781640702fc4fb610aa9c25e2e3d4fe772b1f3b1c0175115f5290",
+            "color": "95d051fec33ae08659adcef69d784bb2edbac98ce4da60614a0f2ed2f9e97222",
             "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
-            "normal": "71209a6b8677fd6180c55925a1420ecb6b068d401367daf7c5acc9bb109cdb0c",
-            "position": "e86df65adb3dcb10bcbc12fb606a8d7750eec974174d889ce239705514bebfec",
+            "normal": "00df7220fb873742ad2bd3bb62fdabc65edc041376a44713474f4545658bebb0",
+            "position": "b927b965540f8969a579179d5d0d9945784b4e6ec4a2232c7ae79f3ebf01acaf",
           },
         ],
         "cache": "seabed--horizon-fade",

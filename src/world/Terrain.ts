@@ -175,10 +175,8 @@ export class Terrain {
       strength: config.detailStrength,
       invWavelengthM: 1 / Math.max(1e-6, config.detailWavelengthCells * cellM),
       octaves: tierCfg.detailOctaves,
-      amplitudeM:
-        config.detailAmplitudeCells *
-        cellM *
-        (this.biome.smoothRock ? config.detailSmoothRockScale : 1),
+      // Smooth-rock biomes are authored by carve terms; generic grain only roughens them.
+      amplitudeM: this.biome.smoothRock ? 0 : config.detailAmplitudeCells * cellM,
       sedimentFactor: config.detailSedimentFactor,
       slopeLoDeg: config.detailSlopeLoDeg,
       slopeHiDeg: config.detailSlopeHiDeg,
