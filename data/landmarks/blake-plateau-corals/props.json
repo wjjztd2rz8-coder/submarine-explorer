@@ -37,11 +37,7 @@
       "snap_to_seabed": true,
       "heading_deg": 20,
       "scale": 1,
-      "dimensions_m": [
-        64,
-        48,
-        14
-      ],
+      "dimensions_m": [64, 48, 14],
       "lod_distance_m": 900,
       "collision": "box",
       "reconstruction": true,
@@ -56,11 +52,7 @@
       "snap_to_seabed": true,
       "heading_deg": 70,
       "scale": 1,
-      "dimensions_m": [
-        40,
-        30,
-        9
-      ],
+      "dimensions_m": [40, 30, 9],
       "lod_distance_m": 900,
       "collision": "box",
       "reconstruction": true,
@@ -75,11 +67,7 @@
       "snap_to_seabed": true,
       "heading_deg": 300,
       "scale": 1,
-      "dimensions_m": [
-        34,
-        26,
-        7
-      ],
+      "dimensions_m": [34, 26, 7],
       "lod_distance_m": 900,
       "collision": "box",
       "reconstruction": true,
@@ -94,11 +82,7 @@
       "snap_to_seabed": true,
       "heading_deg": 140,
       "scale": 1,
-      "dimensions_m": [
-        48,
-        34,
-        10
-      ],
+      "dimensions_m": [48, 34, 10],
       "lod_distance_m": 900,
       "collision": "box",
       "reconstruction": true,
@@ -113,11 +97,7 @@
       "snap_to_seabed": true,
       "heading_deg": 10,
       "scale": 1,
-      "dimensions_m": [
-        26,
-        20,
-        6
-      ],
+      "dimensions_m": [26, 20, 6],
       "lod_distance_m": 900,
       "collision": "box",
       "reconstruction": true,
@@ -132,11 +112,7 @@
       "snap_to_seabed": true,
       "heading_deg": 220,
       "scale": 1,
-      "dimensions_m": [
-        30,
-        24,
-        7
-      ],
+      "dimensions_m": [30, 24, 7],
       "lod_distance_m": 900,
       "collision": "box",
       "reconstruction": true,
