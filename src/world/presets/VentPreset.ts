@@ -17,6 +17,7 @@
 import * as THREE from 'three';
 import type { EnvPresetName } from '../../core/Config.js';
 import { clamp01, mulberry, particleBudget } from './maths.js';
+import { TitanicHorizon } from './TitanicHorizon.js';
 import {
   COMMON_VERT,
   GlowLights,
@@ -100,6 +101,7 @@ export class VentPreset implements EnvPreset {
   private haze: THREE.ShaderMaterial | null = null;
   private readonly hazeLean = new THREE.Vector2(1, 0);
   private glow: GlowLights | null = null;
+  private horizon: TitanicHorizon | null = null;
   private sources: VentSource[] = [];
   private params: PresetParams = {};
 
@@ -108,6 +110,11 @@ export class VentPreset implements EnvPreset {
   enter(ctx: PresetEnterContext): void {
     const p = (this.params = ctx.params);
     this.scene = ctx.scene;
+    // Opt-in graded water backdrop (site data): gives the far water a horizon, even on Low.
+    if (ctx.site?.horizon) {
+      this.horizon = new TitanicHorizon(ctx.scene, ctx.site.horizon);
+      this.stats.draws += 1;
+    }
     this.sources = ventSources(ctx, num(p.maxSources, 12));
     if (!this.sources.length) {
       console.info(
@@ -157,7 +164,7 @@ export class VentPreset implements EnvPreset {
       );
       this.stats.lights = glowCount;
     }
-    this.stats.draws = this.objects.length;
+    this.stats.draws += this.objects.length;
   }
 
   private buildSmoke(per: number, carbonate: boolean, intensity: number): void {
@@ -337,6 +344,7 @@ export class VentPreset implements EnvPreset {
     if (haze !== 1) ctx.atmo.fogDensity *= haze;
     const lift = num(this.params.hazeLift, 0);
     if (lift > 0) ctx.atmo.fogColor.lerp(HAZE_TINT, lift);
+    this.horizon?.update(ctx.camera, ctx.atmo);
     if (this.smoke) {
       updateCommonUniforms(this.smoke, ctx, this.look);
       // Bend the column downstream: half the drift a particle would make over its life,
@@ -380,6 +388,8 @@ export class VentPreset implements EnvPreset {
     if (this.scene) disposeObjects(this.scene, this.objects);
     this.glow?.dispose();
     this.glow = null;
+    this.horizon?.dispose();
+    this.horizon = null;
     this.smoke = null;
     this.shimmer = null;
     this.haze = null;

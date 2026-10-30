@@ -874,6 +874,6 @@ describe('site manifest graded backdrop', () => {
       allSiteManifests()
         .filter((m) => m.horizon)
         .map((m) => m.id),
-    ).toEqual(['blake-plateau-corals']);
+    ).toEqual(['blake-plateau-corals', 'lost-city']);
   });
 });
