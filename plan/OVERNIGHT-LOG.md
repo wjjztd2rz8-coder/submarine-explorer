@@ -2559,3 +2559,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged V-lostcity-ground (Sonnet): the vent preset now builds the graded water backdrop when site data has a `horizon`; Lost City gets one (data only), so the upper frame has haze and depth instead of flat dark. Gain modest (~3.8 to ~3.9): a haze band, not a ridge (terrain has no crest above eye line). Fixed the siteManifest allowlist test. Gates smoke + project-base passed on main.
 - Hosted CI run 242 passed; run 243 was still in progress. No tag. Next Claude item: V-bluehole-floor-2. Codex 120-122 queued for the Nov 4 reset.
 - **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
+
+## 2026-10-29 23:55 CDT headless run 245 (Claude): V-bluehole-floor-2
+
+- Merged V-bluehole-floor-2 (Sonnet): found why spawn depended on detail amplitude (objective 22 m above target exceeded the -8 m ceiling by 0.4 m, so mission fell back to free-dive); spawn height now capped at first scan min depth (test added), smooth-rock biomes get no generic detail. Fine sawtooth gone; my rating ~3.7 (bottom-left terraces remain, they come from carved bed steps in terrainFeatures: a further carve change). Gates smoke + project-base passed on main.
+- Queued Codex 123 (verify spawn cap across all 13 sites). Codex 120-123 wait for the Nov 4 reset. No tag.
+- **Needs owner:** phone retest using plan/progress/4410-P2-phone-accept-checklist.md (include Auto tier).
