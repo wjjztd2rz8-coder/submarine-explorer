@@ -158,6 +158,8 @@ export interface EventSpot {
 export interface SiteManifest {
   atmosphere?: {
     hemisphere?: { name: string; sky: number; ground: number; intensity: number };
+    /** Fixed side light; direction points from the scene toward the light. */
+    key?: { name: string; color: number; intensity: number; direction: [number, number, number] };
     lamps?: { intensity: number; distance: number; fillIntensity: number; fillDistance: number };
     /** Ambient floors apply to band stops at or below depthM, preserving brighter inputs. */
     tiers?: Partial<Record<GraphicsTier, { depthM: number; color: number; intensity: number }>>;
@@ -378,6 +380,10 @@ const color: Check = (id, path, value) => {
   count(id, path, value);
   if ((value as number) > 0xffffff) fail(id, path, 'expected a color from 0 to 0xffffff');
 };
+const vector: Check = (id, path, value) => {
+  if (!Array.isArray(value) || value.length !== 3) fail(id, path, 'expected three numbers');
+  (value as unknown[]).forEach((part, i) => finite(id, `${path}[${i}]`, part));
+};
 const nonnegative: Check = (id, path, value) => {
   finite(id, path, value);
   if ((value as number) < 0) fail(id, path, 'expected a nonnegative number');
@@ -395,6 +401,12 @@ const atmosphereCheck = fields(
   {},
   {
     hemisphere: fields({ name: text, sky: color, ground: color, intensity: nonnegative }),
+    key: fields({
+      name: text,
+      color,
+      intensity: nonnegative,
+      direction: vector,
+    }),
     lamps: fields({
       intensity: nonnegative,
       distance: nonnegative,

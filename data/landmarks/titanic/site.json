@@ -46,6 +46,16 @@
         "color": 8885145,
         "intensity": 6
       }
+    },
+    "key": {
+      "name": "titanicKey",
+      "color": 13162712,
+      "intensity": 4.5,
+      "direction": [
+        -1,
+        0.7,
+        -0.2
+      ]
     }
   }
 }

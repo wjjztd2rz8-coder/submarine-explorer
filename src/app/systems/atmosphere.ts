@@ -13,7 +13,7 @@ import { Disposables } from '../Disposables.js';
 import type { GameSystem } from '../System.js';
 import { deepOpeningFor, deepSiteWater } from '../../core/Config.js';
 import { siteManifest } from '../../core/SiteManifest.js';
-import { HemisphereLight } from 'three';
+import { DirectionalLight, HemisphereLight } from 'three';
 import { siteLightWater } from '../../core/config/atmosphere.js';
 
 const cleanup = new Disposables();
@@ -44,6 +44,12 @@ export const atmosphereSystem: GameSystem = {
       const hemisphere = new HemisphereLight(fill.sky, fill.ground, fill.intensity);
       hemisphere.name = fill.name;
       atmosphere.group.add(hemisphere);
+    }
+    if (policy?.key) {
+      const key = new DirectionalLight(policy.key.color, policy.key.intensity);
+      key.name = policy.key.name;
+      key.position.set(...policy.key.direction);
+      atmosphere.group.add(key);
     }
     const headlights = new Headlights(config.water, atmoTier, deep?.lamps ?? policy?.lamps);
     cleanup.add(() => headlights.dispose());
