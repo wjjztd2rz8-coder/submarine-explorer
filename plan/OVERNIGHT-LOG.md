@@ -2642,3 +2642,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Sonnet moved the Blue Hole mission chase offset (-16 to -44, one data value): the gallery dome is now visible beside the sub, not behind it. Stalactites still not visible at opening (10 m ceiling, 150 m out); next step is an opening-altitude field or different approach bearing. Gates smoke+base green; pushed.
 - Codex week 6% left; briefs 120-123 wait for Nov 4. Next Claude item: V-beebe-opening.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-30 16:27 CDT headless run 254 (Claude): V-beebe-opening merged
+
+- Sonnet shortened the Beebe mission opening (data only: rangeM 155, chase 46/-8; 155 m keeps the target outside the 150 m scan radius). Two smokers and the sub now share a warm light pool; scene still dark overall (exposure untouched). Gates smoke+base green; pushed.
+- Codex week 6% left; briefs 120-123 wait for Nov 4. Claude backlog next: see DIRECTOR.md after 1c.
+- **Needs owner:** phone retest (4410-P2 checklist).
