@@ -615,8 +615,11 @@ export function classC(low: boolean): Blueprint {
     4.5,
     6,
   );
-  const hullPaint: Painter = (c, n) => {
-    if (n.y > 0.55) return PAINT.red;
+  // Red crown is cut by height below the section's own top, not by face
+  // normal: on the raked, narrowing bow the normals swing wildly between
+  // neighbouring quads and the red/white edge came out torn.
+  const hullPaint: Painter = (c) => {
+    if (c.y > hull(c.z).top - 0.3) return PAINT.red;
     if (c.y < 0.25) return PAINT.black;
     if (c.y < 0.36) return PAINT.red;
     return PAINT.white;
