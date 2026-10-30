@@ -1,5 +1,21 @@
 # Reviews
 
+## 2026-10-30 evening comprehensive review (Claude alone; Sol skipped: Codex budget low, exit 75)
+
+**Changed since the last look (golden 174538 to 212725):** V-bluehole-terrace-saw (soft terraces, sawtooth gone), V-bluehole-gallery-read (partial: dome now beside the sub), V-beebe-opening (155 m opening, smokers and sub in one warm pool). Readability screen: 0/13 openings flagged (lowest Bismarck 0.139, Beebe ratio 0.31 but scene Y only 1.7%).
+
+**Scores, beautiful (Claude):** Titanic 3.9 (mission opening reads: lit bow, flat seabed, small sub); Lost City 3.9 (towers strong, upper third empty); Blue Hole 3.8 (smooth now, gallery dome still looks like an overturned boat, water washed-out teal at 27% scene luminance); Beebe 3.7 (two smokers lit, rest near-black); Monterey 3.9 (wall strata still regular stripes, sub looks pasted-on); Challenger 3.6 (bow hull torn); Endurance 3.6. Single biggest gap per site: Blue Hole gallery read, Beebe exposure, Lost City upper light, Monterey strata, Challenger hull; the shared sub hull looks flat pale-blue in several openings.
+
+**Play check:** no new flow finding from the e2e journey captures; the previous review's guidance fixes hold. The player-facing gap is now art, not UX. Phone retest still pending with the owner.
+
+**Process:** efficiency shows Claude idle capacity (~12-24 h of the last 24 h) mostly from empty-backlog runs; this review refills six Claude items. Codex is stuck at 6% weekly until Nov 4, which is why Sol could not review; briefs 120-123 are queued. CI run 41123511681 had one red e2e shard (2/38); its log was not retrievable, so the next completed run (41131150577) decides whether it is a real failure; next run must triage it before any tag.
+
+**New priorities:** V-challenger-sub-hull, V-bluehole-gallery-read, V-beebe-exposure, V-lostcity-tower-light, V-sub-hull-wash, V-monterey-strata-soften (DIRECTOR Backlog 1-6; DONE items archived to `plan/archive/DIRECTOR-HISTORY-2026-10-30-backlog.md`).
+
+**Stage:** about 86% (range 83-88%) to 1.0; 4-5 weeks. Not agreed with Sol (skipped).
+
+**Needs owner:** short phone retest (4410-P2 checklist).
+
 ## 2026-10-30 targeted review (Claude alone; Codex week 6%): dry backlog refilled
 
 - Trigger: last 3 runs merged nothing because the Claude lane was empty (Backlog items all DONE). Fresh golden set 2026-10-30-174538: readability 0/13 flagged.
