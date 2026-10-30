@@ -192,10 +192,14 @@ describe('hero-site spawn, placement and scan integrity', () => {
                     );
                   end.y = Math.max(
                     poi.position.y + settings.hullRadius + settings.seabedClearance,
-                    terrain.sampleHeight(end.x, end.z) +
-                      settings.hullRadius +
-                      settings.seabedClearance +
-                      settings.spawnClearanceM,
+                    Math.min(
+                      terrain.sampleHeight(end.x, end.z) +
+                        settings.hullRadius +
+                        settings.seabedClearance +
+                        settings.spawnClearanceM,
+                      // Shallow sites cap the preferred clearance at the POI's minimum scan depth.
+                      -Math.max(settings.hullRadius, poi.minDepthM ?? 0),
+                    ),
                   );
                   if (end.y > -settings.hullRadius || end.distanceTo(poi.position) > poi.radius)
                     continue;

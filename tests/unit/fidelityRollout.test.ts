@@ -84,7 +84,8 @@ for (const site of ['great-blue-hole', 'lost-city']) {
               const prev = edges.get(key);
               if (prev) {
                 shared++;
-                expect(p.getY(i)).toBeCloseTo(prev.y, 4);
+                // Float32 spacing is ~1e-4 m at a kilometre of depth, so shared seam vertices may differ by one step.
+                expect(p.getY(i)).toBeCloseTo(prev.y, 3);
                 expect(normal.distanceTo(prev.normal)).toBeLessThan(1e-5);
                 expect(cavity.getX(i)).toBe(prev.cavity);
               } else edges.set(key, { y: p.getY(i), normal, cavity: cavity.getX(i) });
