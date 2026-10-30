@@ -800,6 +800,12 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
         ...(id === 'titanic'
           ? {
               hemisphere: { name: 'titanicFill', sky: 0x4a6a7a, ground: 0x2a2218, intensity: 6 },
+              key: {
+                name: 'titanicKey',
+                color: 0xc8d8d8,
+                intensity: 4.5,
+                direction: [-1, 0.7, -0.2],
+              },
               lamps: { intensity: 3, distance: 1.2, fillIntensity: 2.5, fillDistance: 1.3 },
             }
           : {}),
