@@ -15,7 +15,9 @@
   },
   "opening": {
     "mission": {
-      "rangeM": 165,
+      "rangeM": 155,
+      "chaseRadius": 46,
+      "chaseOffsetY": -8,
       "destinationLabel": "the Beebe smokers"
     },
     "freeDive": {
