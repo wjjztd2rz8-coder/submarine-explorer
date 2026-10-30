@@ -6,4 +6,4 @@ Fix: `classC` hull painter in `src/vehicles/hulls.ts` now paints red by height b
 
 Screenshot (golden challenger-deep-1, desktop): the bow now has a clean, smooth red cap and white face with no notch.
 
-Gates: see commit message / final report.
+Gates: tools/gates.sh all PASS (e2e=smoke).
