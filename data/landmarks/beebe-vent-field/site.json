@@ -15,7 +15,7 @@
   },
   "opening": {
     "mission": {
-      "rangeM": 220,
+      "rangeM": 165,
       "destinationLabel": "the Beebe smokers"
     },
     "freeDive": {
