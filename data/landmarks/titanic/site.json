@@ -51,11 +51,7 @@
       "name": "titanicKey",
       "color": 13162712,
       "intensity": 4.5,
-      "direction": [
-        -1,
-        0.7,
-        -0.2
-      ]
+      "direction": [-1, 0.7, -0.2]
     }
   }
 }
