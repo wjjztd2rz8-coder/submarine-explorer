@@ -2654,3 +2654,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Golden 2026-10-30-212725 reviewed; stage ~86%, 4-5 weeks. Backlog rewritten (6 Claude items, DONE archived); briefs 120-123 still queued for Nov 4. Entry in plan/REVIEWS.md, STATUS.md rewritten.
 - CI run 41123511681 had one red e2e shard (2/38), log unavailable; triage next run from 41131150577.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-30 17:30 CDT (Claude): V-challenger-sub-hull merged
+
+- Sonnet fixed the torn bow (hull red crown now by height, not face normal; src/vehicles/hulls.ts); golden checked by eye, gates smoke+base green. Next: V-bluehole-gallery-read. Worktree removed.
