@@ -171,8 +171,12 @@ describe('F-GOLDEN-CHECK hero spawn and ambient readability', () => {
               .clone()
               .applyMatrix4(hero.root.matrixWorld)
               .distanceToPoint(position);
+            // The preferred clearance is capped at the first scan's minimum depth over shallow floors.
             expect(altitude).toBeGreaterThanOrEqual(
-              settings.hullRadius + settings.seabedClearance + settings.spawnClearanceM - 1e-6,
+              Math.min(
+                settings.hullRadius + settings.seabedClearance + settings.spawnClearanceM,
+                -Math.max(settings.hullRadius, primaries[0].minDepthM ?? 0) - (pose.y - altitude),
+              ) - 1e-6,
             );
             if (opening === 'free')
               expect(altitude, opening).toBeLessThanOrEqual(limits.maxAltitude);

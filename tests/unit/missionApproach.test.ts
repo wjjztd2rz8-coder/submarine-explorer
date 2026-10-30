@@ -137,7 +137,7 @@ for (const site of sites.landmarks) {
         expect(pose!.chaseOffsetX).toBe(arm?.chaseOffsetX);
         expect(pose!.chaseOffsetY).toBe(arm?.chaseOffsetY);
         expect(p.y).toBeGreaterThanOrEqual(ratedDepth + settings.hullRadius);
-        expect(p.y).toBeLessThan(-settings.hullRadius);
+        expect(p.y).toBeLessThanOrEqual(-settings.hullRadius);
         expect(props.collide(p.clone(), settings.hullRadius + 4, new Vector3())).toBe(false);
         const direction = target.position.clone().sub(p).setY(0).normalize();
         const forward = new Vector3(Math.sin(pose!.yaw), 0, -Math.cos(pose!.yaw));

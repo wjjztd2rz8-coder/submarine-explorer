@@ -41,7 +41,10 @@ export function missionApproachScanRadius(siteId: string, radius: number): numbe
 /** Missions navigate to the first primary; free-dive subject framing is independent. */
 export function composedMissionSpawn(
   siteId: string,
-  primaries: readonly { position: { x: number; y: number; z: number } }[],
+  primaries: readonly {
+    position: { x: number; y: number; z: number };
+    minDepthM?: number;
+  }[],
   meta: TileMeta,
   seabed: SeabedSampler,
   props: Pick<Props, 'placed' | 'collide'>,
@@ -68,6 +71,15 @@ export function composedMissionSpawn(
   const nw = latLonToWorld(meta, meta.bbox.north, meta.bbox.west);
   const se = latLonToWorld(meta, meta.bbox.south, meta.bbox.east);
   const clearance = settings.hullRadius + settings.seabedClearance + settings.spawnClearanceM;
+  // Preferred height over a floor, capped at the shallowest depth the first scan allows: a shallow
+  // site (the Blue Hole gallery is ~30 m down) opens just deep enough, never closer to the floor
+  // than the hull needs.
+  const ceiling = -Math.max(settings.hullRadius, first.minDepthM ?? 0);
+  const above = (floor: number): number =>
+    Math.max(
+      Math.min(floor + clearance, ceiling),
+      floor + settings.hullRadius + settings.seabedClearance,
+    );
   const rig = new CameraRig(cameraConfig, 16 / 9, {
     sampleHeight: (x, z) => seabed.sampleHeight(x, z),
     getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
@@ -78,12 +90,7 @@ export function composedMissionSpawn(
   let bestScore = Infinity;
   for (const turn of [0, 22.5, -22.5, 45, -45, 67.5, -67.5, 90, -90, 135, -135, 180]) {
     const angle = bearing + (turn * Math.PI) / 180;
-    // A shallow target (the sinkhole gallery is ~30 m down) must not push the opening above the
-    // surface: cap it at the shallowest legal depth, the floor loop below still raises it if needed.
-    let y = Math.min(
-      Math.max(target.y + clearance, safeDepth + settings.hullRadius),
-      -settings.hullRadius,
-    );
+    let y = Math.max(above(target.y), safeDepth + settings.hullRadius);
     let p = target.clone();
     // Reconcile altitude with the authored 3D range; steep approaches may need a new bearing.
     for (let pass = 0; pass < 6; pass++) {
@@ -99,11 +106,11 @@ export function composedMissionSpawn(
           seabed.sampleHeight(p.x + (target.x - p.x) * t, p.z + (target.z - p.z) * t),
         );
       }
-      const nextY = Math.max(y, floor + clearance);
+      const nextY = Math.max(y, above(floor));
       if (nextY === y) break;
       y = nextY;
     }
-    if (y - target.y >= range || p.y !== y || y > -settings.hullRadius) continue;
+    if (y - target.y >= range || p.y !== y || y > ceiling) continue;
     if (p.x < nw.x || p.x > se.x || p.z < nw.z || p.z > se.z) continue;
     if (Math.abs(p.distanceTo(target) - range) > 0.01) continue;
     // Do not open closer to another primary and send the waypoint in a different direction.
@@ -118,7 +125,7 @@ export function composedMissionSpawn(
     for (let d = 8; d < range - missionApproachScanRadius(siteId, Infinity); d += 8) {
       const point = p.clone().lerp(target.clone().setY(p.y), d / range);
       if (
-        seabed.sampleHeight(point.x, point.z) + clearance > p.y ||
+        above(seabed.sampleHeight(point.x, point.z)) > p.y ||
         props.collide(point, settings.hullRadius + 4, new Vector3())
       )
         clear = false;

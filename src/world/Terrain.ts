@@ -176,7 +176,9 @@ export class Terrain {
       invWavelengthM: 1 / Math.max(1e-6, config.detailWavelengthCells * cellM),
       octaves: tierCfg.detailOctaves,
       amplitudeM:
-        config.detailAmplitudeCells * cellM * (this.biome.smoothRock ? config.detailSmoothRockScale : 1),
+        config.detailAmplitudeCells *
+        cellM *
+        (this.biome.smoothRock ? config.detailSmoothRockScale : 1),
       sedimentFactor: config.detailSedimentFactor,
       slopeLoDeg: config.detailSlopeLoDeg,
       slopeHiDeg: config.detailSlopeHiDeg,
