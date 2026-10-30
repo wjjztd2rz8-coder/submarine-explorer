@@ -7,7 +7,6 @@
 - Process: both breakages came from merging visual items on smoke+project-base only; a merge that changes site data should run the specs naming that site (`-g <site>`) before pushing. Added to the run habit, no tooling change.
 - Backlog: no Claude-lane items remain; still needs the owner's call on new visual items (see OVERNIGHT-LOG).
 
-
 ## 2026-10-29 evening comprehensive review (Claude alone; Sol skipped: Codex week 6%)
 
 **Changed since the midday review (golden 112021 to 2026-10-29-200845):** R-ci-green, T-opening-readable, T-golden-settle, V-opening-dark (Titanic, Bismarck), V-monterey-flatten, V-hunga-kama-subject pins, S-hud-opening-dedupe, B-sub-decal-mirror, S-dead and the piloted journey spec merged. `golden-readable` now flags 0 of 13 openings (Titanic 0.133, Bismarck 0.156). Hosted CI: the last red run failed only on the 844x390 help/photo spec, fixed in run 237; the newest run was still in progress at review time, so no tag.

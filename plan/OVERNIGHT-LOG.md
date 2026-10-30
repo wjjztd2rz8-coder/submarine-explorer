@@ -2582,3 +2582,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Nothing to collect, no worktrees, no Claude-lane Backlog items. Nothing merged or running. Codex week 6% left; briefs 120-123 wait for the Nov 4 reset.
 - Hosted CI for the e2e-spec fix (run 41015809731) is still queued. No tag.
 - **Needs owner:** phone retest (4410-P2 checklist); decide on new visual items.
+
+## 2026-10-30 03:46 CDT targeted review (Claude): CI red x3, second cause
+
+- Hosted e2e is now fully green; the remaining red was prettier on plan/REVIEWS.md (static checks). Fixed and pushed; see plan/PROCESS-LOG.md. No tag until a green run.
+- **Needs owner:** phone retest (4410-P2 checklist); decide on new visual items.
