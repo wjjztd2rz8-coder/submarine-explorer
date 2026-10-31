@@ -1,5 +1,21 @@
 # Reviews
 
+## 2026-10-31 comprehensive review (Claude alone; Sol skipped: Codex week 5% until Nov 4)
+
+**Changed since the 10-30 evening review (golden 212725 to 161522):** Monterey strata softer (lower-contrast beds, warped relief; still banded but calmer), Hunga rim-foot vent added beside the sub (wedge still isolated), Lost City tower key lights, Challenger hull and shared sub-hull shading fixed. CI is green and **f69** is tagged and deployed after the Lost City spec and Blue Hole 4 m margin fixes.
+
+**Scores, beautiful (Claude):** Titanic 3.9, Lost City 4.0, Blue Hole 3.8, Beebe 3.8, Monterey 4.0, Challenger 3.7, Endurance 3.6, Hunga 3.3. Biggest gap per site: Blue Hole hood shape, Beebe dark seabed beyond the lamp pool, Lost City empty upper third, Hunga terrain under the wall, Endurance flat tint.
+
+**Play check:** no new flow finding. One small bug: a teal label line is clipped at the left edge in the Hunga opening (U-label-clip). Phone retest still pending with the owner.
+
+**Process:** efficiency shows Claude idle ~10-19 h/24 h because the backlog ran dry of small items; this review adds seven (code-level, per-site data or prop variants). Codex is at 5% weekly until Nov 4 (briefs 120-123 queued). Lesson already logged: read the CI job log before calling a red shard flaky.
+
+**New priorities:** V-hunga-wall-rise, V-bluehole-hood-geometry, V-beebe-ambient-reach, V-lostcity-upper-light, V-endurance-tint, V-coral-variant, U-label-clip (DIRECTOR Backlog 1-7; DONE items removed).
+
+**Stage:** about 87% (range 84-89%) to 1.0; 4 weeks. Not agreed with Sol (skipped).
+
+**Needs owner:** short phone retest (4410-P2 checklist).
+
 ## 2026-10-31 (later) targeted review: CI still red on main for 3 runs
 
 - Cause: after the Lost City fix, e2e shard 2/38 still failed every run on one spec, `journal-debrief` Blue Hole journey at 390x844 ("Expected scan candidate great-blue-hole-stalactites, got null"). The log was retrievable via `gh api repos/{owner}/{repo}/actions/jobs/<job id>/logs`; earlier "flaky or CI-specific" calls were wrong. The spec passes locally in 9 s but the touch path waits on real time on hosted runners, so the sub drifts above the first scan's minimum depth (the 1 m margin was too small).
