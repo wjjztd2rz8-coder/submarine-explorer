@@ -2671,3 +2671,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Short of the 30 m seabed target; the rest needs a shared ambientFill/lamp-reach change (left in DIRECTOR.md). Next: V-bluehole-gallery-read (needs code-level opening altitude).
 - Codex week 5%; briefs 120-123 wait for Nov 4.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-30 21:06 CDT headless run 257 (Claude): V-lostcity-tower-light merged (192601ce)
+
+- Sonnet turned on Lost City's carbonate glow lights in mission data (3 lights, cool white, 90 m reach); tower rims and Poseidon's lip catch a key light, edges slightly speckled. Small gain (~3.9 to 4.0); upper third still dark water. Preset unit test updated to the authored lost-city glow. Gates smoke+base green on worktree and main; pushed.
+- Remaining: carbonate-aware standoff/drop and a light shaft (code-level, left in DIRECTOR.md). Next: V-bluehole-gallery-read (needs opening-altitude field).
+- Codex week 5%; briefs 120-123 wait for Nov 4.
+- **Needs owner:** phone retest (4410-P2 checklist).
