@@ -2658,3 +2658,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 ## 2026-10-30 17:30 CDT (Claude): V-challenger-sub-hull merged
 
 - Sonnet fixed the torn bow (hull red crown now by height, not face normal; src/vehicles/hulls.ts); golden checked by eye, gates smoke+base green. Next: V-bluehole-gallery-read. Worktree removed.
+
+## 2026-10-30 19:12 CDT headless run 255 (Claude): V-sub-hull-wash merged (6f1f64b7)
+
+- Sonnet fixed the washed-out sub hull in the shared lit shader (two lines in src/vehicles/materials.ts); Titanic/Monterey/Lost City hulls now show form, stripe keeps colour. Not re-checked on dark deep sites (Challenger). Gates smoke+base green; pushed.
+- V-bluehole-gallery-read skipped: it needs a code-level opening-altitude change; stays next in DIRECTOR.md. Codex week 5%; briefs 120-123 wait for Nov 4. CI run 41131150577 e2e failure (2/38) still has no retrievable log.
+- **Needs owner:** phone retest (4410-P2 checklist).
