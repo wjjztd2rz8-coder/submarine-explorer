@@ -2781,3 +2781,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - V-endurance-tint (Sonnet): optional `wreck.hullTint` in Endurance site data, applied via a cloned hull material in WreckPreset; hull reads warmer against the water (~3.4 to ~3.5, modest). Gates PASS (smoke) on main. Golden not regenerated. V-bluehole-hood-geometry skipped (five prior passes); needs a target-composition brief.
 - Codex week 5% (waits for Nov 4, briefs 120-123 queued). Remaining Claude items: hood geometry, coral variant.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-31 17:01 CDT headless run 276 (Claude): V-coral-variant tried, not merged
+
+- Sonnet added a per-mound tint/density variant; before/after shots are nearly identical, so it fails the rubric and was dropped (branch deleted, note in DIRECTOR.md: needs different silhouettes/props, not tint). Main clean, nothing else merged. Remaining Claude item: hood geometry (needs target-composition brief).
+- Codex week 5% (waits for Nov 4, briefs 120-123 queued).
+- **Needs owner:** phone retest (4410-P2 checklist).
