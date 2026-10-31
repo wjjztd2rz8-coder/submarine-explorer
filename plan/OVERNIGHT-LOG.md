@@ -2752,3 +2752,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - New golden set captured and compared; backlog refilled with 7 Claude items (V-hunga-wall-rise, V-bluehole-hood-geometry, V-beebe-ambient-reach, V-lostcity-upper-light, V-endurance-tint, V-coral-variant, U-label-clip). Stage ~87%. REVIEWS.md and STATUS.md updated. No package started.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-31 12:11 CDT headless run 271 (Claude): U-label-clip merged
+
+- U-label-clip (Haiku): landmark labels now hide unless fully on screen (`labelFitsViewport` in Landmarks.ts), fixing the clipped Hunga label. Gates PASS (smoke) on main. Golden not regenerated, so the in-game result is unconfirmed. Pushed. Codex week 5% (waits for Nov 4, briefs queued). Remaining Claude items are Sonnet visual work, not started this run.
+- **Needs owner:** phone retest (4410-P2 checklist).
