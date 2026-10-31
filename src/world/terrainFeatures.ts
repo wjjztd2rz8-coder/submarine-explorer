@@ -493,6 +493,25 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
       },
     };
   }
+  if (carve === 'caldera-rim') {
+    // The tuff wall (heading 270, face west) stands where the grid shows a bare slope. Raise a
+    // rim bank behind it (east of the face), so the wall stands against rising ground.
+    const wall = latLonToWorld(meta, -20.57, -175.42);
+    const centre = { x: wall.x + 40, z: wall.z };
+    return {
+      centre,
+      apply(x, z, height) {
+        const back = x - (wall.x + 22);
+        const across = Math.abs(z - wall.z);
+        if (back <= 0 || back >= 260 || across >= 150) return height;
+        const ramp = smoothstep(Math.min(1, back / 45));
+        const tail = 1 - smoothstep(Math.min(1, Math.max(0, (back - 120) / 140)));
+        const side = 1 - smoothstep(Math.min(1, Math.max(0, (across - 60) / 90)));
+        const wobble = 1 + 0.12 * Math.sin(z * 0.045 + 0.7) + 0.08 * Math.sin(z * 0.11 + x * 0.03);
+        return height + 60 * ramp * tail * side * wobble;
+      },
+    };
+  }
   if (carve !== 'sinkhole') return null;
   const centre = latLonToWorld(meta, BLUE_HOLE_LAT, BLUE_HOLE_LON);
   blueHoleCentre = centre;

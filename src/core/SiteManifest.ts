@@ -201,7 +201,7 @@ export interface SiteManifest {
   };
   terrain?: {
     /** Select an analytic reconstruction where the survey grid cannot resolve the feature. */
-    carve?: 'canyon-bend' | 'sinkhole';
+    carve?: 'canyon-bend' | 'sinkhole' | 'caldera-rim';
   };
   sonar?: {
     /** Authored hull POI anchoring scour contours on flat terrain. */
@@ -562,8 +562,8 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
       {},
       {
         carve: (id, path, value) => {
-          if (value !== 'canyon-bend' && value !== 'sinkhole')
-            fail(id, path, 'expected canyon-bend or sinkhole');
+          if (value !== 'canyon-bend' && value !== 'sinkhole' && value !== 'caldera-rim')
+            fail(id, path, 'expected canyon-bend, sinkhole or caldera-rim');
         },
       },
     )(id, 'terrain', root.terrain);

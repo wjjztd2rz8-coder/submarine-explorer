@@ -127,7 +127,7 @@ describe('site manifest validator', () => {
       (carve): [string, unknown, string] => [
         `invalid terrain carve ${JSON.stringify(carve)}`,
         { id: 's', terrain: { carve } },
-        'terrain.carve: expected canyon-bend or sinkhole',
+        'terrain.carve: expected canyon-bend, sinkhole or caldera-rim',
       ],
     ),
     ['empty sonar', { id: 's', sonar: {} }, null],
@@ -507,10 +507,11 @@ describe('shipped site manifests', () => {
       );
     }
   });
-  it('ships only the two authored terrain reconstructions', () => {
+  it('ships only the authored terrain reconstructions', () => {
     const expected = new Map([
       ['monterey-canyon', { carve: 'canyon-bend' }],
       ['great-blue-hole', { carve: 'sinkhole' }],
+      ['hunga-tonga-caldera', { carve: 'caldera-rim' }],
     ]);
     for (const id of ids) expect(siteManifest(id)!.terrain).toEqual(expected.get(id));
     expect(siteManifest('unknown')?.terrain).toBeUndefined();

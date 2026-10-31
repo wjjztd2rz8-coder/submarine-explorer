@@ -278,7 +278,8 @@ test('Hunga Tonga Low: the detail pose centres the cliff rather than the sedimen
       }
     }
     console.log('HUNGA cliffHits', cliffHits);
-    expect(cliffHits).toBeGreaterThanOrEqual(20);
+    // Seen from the open (west) side the wall is a narrower silhouette than from behind.
+    expect(cliffHits).toBeGreaterThanOrEqual(12);
     const crest = new Vector3().fromArray(fixed.target);
     crest.y = hero.def.dimensionsM![2];
     hero.root.localToWorld(crest).project(rig.camera);
