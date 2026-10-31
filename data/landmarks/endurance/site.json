@@ -2,6 +2,7 @@
   "id": "endurance",
   "wreck": {
     "hullPoi": "endurance-hull",
+    "hullTint": 16767400,
     "atmosphere": {
       "hazeParticles": 1500,
       "hazeSizeM": 0.08,
