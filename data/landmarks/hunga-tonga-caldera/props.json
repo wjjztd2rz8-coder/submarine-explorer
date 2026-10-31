@@ -16,6 +16,22 @@
       "collision": "box",
       "reconstruction": true,
       "note": "Game addition: arcuate, jointed pyroclastic tuff wall with dipping beds, gullies and a graded block-and-ash apron on the historical volcanic rim slope. Moved 0.002 degrees west (~208 m) to the existing rim-slope scan marker, where the grid reads 468.6 m; seabed snapping preserves support. Dimensions [90,30,45] and heading 270 degrees are scenic choices, not a measured inner wall or a post-2022 collapse scarp. See sources.md."
+    },
+    {
+      "id": "caldera-rim-vent",
+      "model": "procedural:chimney",
+      "feature": "smoker-cluster",
+      "lat": -20.57028,
+      "lon": -175.42026,
+      "snap_to_seabed": true,
+      "heading_deg": 270,
+      "scale": 1,
+      "dimensions_m": [14, 12, 5],
+      "material_hint": "basalt",
+      "lod_distance_m": 500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: a small hydrothermal vent at the rim foot; the Hunga caldera is volcanically active, with venting on its slopes. Reuses the smoker-cluster feature; layout and size are invented."
     }
   ]
 }
