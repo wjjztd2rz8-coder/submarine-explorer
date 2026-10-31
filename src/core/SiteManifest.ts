@@ -213,6 +213,8 @@ export interface SiteManifest {
       rangeM: number;
       destinationLabel?: string;
       localAltitudeWeight?: number;
+      /** Opening depth below the surface, for sites whose subject needs a deeper vantage than the shallowest safe pose. */
+      openingDepthM?: number;
       yawOffset?: number;
       /** Opening chase arm, same meaning as the free-dive fields. */
       chaseRadius?: number;
@@ -308,7 +310,13 @@ const openingCheck = fields(
   {
     mission: fields(
       { rangeM: aboveZero },
-      { destinationLabel: text, localAltitudeWeight: finite, yawOffset: finite, ...cameraFields },
+      {
+        destinationLabel: text,
+        localAltitudeWeight: finite,
+        openingDepthM: aboveZero,
+        yawOffset: finite,
+        ...cameraFields,
+      },
     ),
     freeDive: fields(
       { hero: text, bearing: finite, range: aboveZero },

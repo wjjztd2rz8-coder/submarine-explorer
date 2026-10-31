@@ -12,6 +12,7 @@
       "rangeM": 150,
       "chaseRadius": 46,
       "chaseOffsetX": -44,
+      "openingDepthM": 24,
       "chaseOffsetY": -30,
       "localAltitudeWeight": -0.1,
       "destinationLabel": "the stalactite gallery"

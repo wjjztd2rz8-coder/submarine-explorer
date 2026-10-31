@@ -91,6 +91,15 @@ export function composedMissionSpawn(
   for (const turn of [0, 22.5, -22.5, 45, -45, 67.5, -67.5, 90, -90, 135, -135, 180]) {
     const angle = bearing + (turn * Math.PI) / 180;
     let y = Math.max(above(target.y), safeDepth + settings.hullRadius);
+    // An authored opening depth sinks the pose below the shallow default; the loop below still lifts
+    // it over any floor, and the shallowest-depth ceiling still applies.
+    if (arm?.openingDepthM !== undefined) y = Math.min(y, -arm.openingDepthM);
+    // The route check below stops at the scan radius, so the lift may too: a subject seated on a
+    // ledge must not raise the whole opening when a depth is authored.
+    const reach =
+      arm?.openingDepthM !== undefined
+        ? 1 - missionApproachScanRadius(siteId, Infinity) / range
+        : 1;
     let p = target.clone();
     // Reconcile altitude with the authored 3D range; steep approaches may need a new bearing.
     for (let pass = 0; pass < 6; pass++) {
@@ -100,7 +109,7 @@ export function composedMissionSpawn(
       p.set(target.x + Math.sin(angle) * horizontal, y, target.z - Math.cos(angle) * horizontal);
       let floor = seabed.sampleHeight(p.x, p.z);
       for (let step = 1; step <= 24; step++) {
-        const t = step / 24;
+        const t = (step / 24) * reach;
         floor = Math.max(
           floor,
           seabed.sampleHeight(p.x + (target.x - p.x) * t, p.z + (target.z - p.z) * t),
