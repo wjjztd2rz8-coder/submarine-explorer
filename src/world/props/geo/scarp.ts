@@ -707,6 +707,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       // Each bed keeps its own muted albedo; resistant beds are paler than weak ones.
       const k = Math.min(P.bands - 1, Math.max(0, Math.floor(s)));
       out.copy(bedColour[k]!).multiplyScalar(0.8 + 0.4 * bedHard[k]!);
+      out.lerp(P.base, MONTEREY_STRATA.bedBlend);
       // Slow drift along and up the wall so one bed changes tone instead of striping evenly.
       const [dx, dy] = MONTEREY_STRATA.toneDriftFrequency;
       const drift = fbm3(x * dx, y * dy, seed + 41, seed + 63, 2);

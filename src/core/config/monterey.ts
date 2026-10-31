@@ -18,8 +18,10 @@ export const MONTEREY_STRATA = {
   /** Lamina wobble (in laminae) and the share of each lamina's tone replaced by local noise, to break long stripes. */
   /** Per-bed albedo multiplier: floor and swing. */
   bedTone: [0.92, 0.14],
+  /** Share each bed's albedo is pulled toward the wall's base rock, so neighbouring beds differ gently. */
+  bedBlend: 0.5,
   laminaWarp: 1.6,
-  laminaBreak: 0.8,
+  laminaBreak: 0.9,
   /** Share of the ledge shadow line kept where laminae fade out. */
   lipFloor: 0.3,
   /** Darkness of the shadow line under each eroded ledge. */
