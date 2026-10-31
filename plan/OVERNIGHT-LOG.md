@@ -2685,3 +2685,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - CI run 41154345541 e2e shard 2/38 red again with no retrievable log (3rd time); unresolved.
 - Codex week 5%; briefs 120-123 wait for Nov 4. Next Claude item: V-monterey-strata-soften.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-31 01:09 CDT headless run 259 (Claude): V-monterey-strata-soften merged
+
+- Sonnet halved Monterey bed contrast and ledge shadow, and warped the bedding relief phase (scarp.ts, materials.ts, monterey.ts config). Checked by eye: bands now wavy and lower contrast, but ledge geometry still reads as banded (optional follow-up). Digests re-baselined. Gates smoke+base green on worktree and main; pushed.
+- Note: a gate run killed by a tool timeout leaves its dev server on the PW port; rerun on a fresh port.
+- Codex week 5%; briefs 120-123 wait for Nov 4. Next Claude item: V-hunga-kama-subject / V-endurance-accent (see DIRECTOR.md).
+- **Needs owner:** phone retest (4410-P2 checklist).
