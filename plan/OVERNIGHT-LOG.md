@@ -2757,3 +2757,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - U-label-clip (Haiku): landmark labels now hide unless fully on screen (`labelFitsViewport` in Landmarks.ts), fixing the clipped Hunga label. Gates PASS (smoke) on main. Golden not regenerated, so the in-game result is unconfirmed. Pushed. Codex week 5% (waits for Nov 4, briefs queued). Remaining Claude items are Sonnet visual work, not started this run.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-31 13:25 CDT headless run 272 (Claude): V-beebe-ambient-reach merged
+
+- V-beebe-ambient-reach (Sonnet, data only): Beebe ambientFill 6 to 12, hullLight 0.9 to 0.75; seabed beyond the lamp pool and the third smoker base now read, sub 13.4% (was 14.7%). Gates PASS (smoke) in worktree and on main. Golden not regenerated on main. Pushed. Codex week 5% (waits for Nov 4, briefs 120-123 queued; fewer than 3 would run anyway until the reset).
+- **Needs owner:** phone retest (4410-P2 checklist).
