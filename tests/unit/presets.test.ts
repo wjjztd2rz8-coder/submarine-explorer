@@ -708,10 +708,12 @@ describe('per-site preset atmosphere', () => {
   // Vent glow lights as authored in each mission's overrides (defaults elsewhere).
   const authoredGlow: Record<
     string,
-    { drop: number; standoff: number; distance: number; intensity: number }
+    { drop: number; standoff: number; distance: number; intensity: number; dy?: number }
   > = {
     default: { drop: 4, standoff: 0, distance: 60, intensity: 260 },
     'beebe-vent-field': { drop: 12, standoff: 6, distance: 60, intensity: 3000 },
+    // Carbonate towers put the key light just above the rim, ignoring the drop.
+    'lost-city': { dy: 2, drop: 4, standoff: 0, distance: 90, intensity: 8400 },
     'axial-seamount-ashes': { drop: 0.5, standoff: 1.5, distance: 28, intensity: 700 },
   };
   const sites = (
@@ -819,7 +821,7 @@ describe('per-site preset atmosphere', () => {
             if (ventPois.length) {
               const lights = glowLights(scene);
               const count =
-                tier === 'low' || site === 'lost-city' ? 0 : site === 'beebe-vent-field' ? 3 : 2;
+                tier === 'low' ? 0 : site === 'beebe-vent-field' || site === 'lost-city' ? 3 : 2;
               expect(lights).toHaveLength(count);
               expect(system.preset!.stats.lights).toBe(count);
               expect(new Set(lights.map((light) => light.name)).size).toBe(count);
@@ -831,7 +833,7 @@ describe('per-site preset atmosphere', () => {
               for (const [i, light] of lights.entries()) {
                 const delta = light.position.clone().sub(ventPois[i]!.position);
                 expect(delta.toArray().every(Number.isFinite)).toBe(true);
-                expect(delta.y).toBe(-glow.drop);
+                expect(delta.y).toBe(glow.dy ?? -glow.drop);
                 expect(Math.hypot(delta.x, delta.z)).toBeCloseTo(glow.standoff);
                 expect(light.distance).toBe(glow.distance);
                 expect(light.decay).toBe(2);
