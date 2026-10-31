@@ -360,3 +360,8 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 ## 2026-10-30: prettier on plan docs broke CI
 
 - Runs after the e2e-spec fix still failed: all e2e shards green, but `static checks` failed on prettier for plan/REVIEWS.md (a double blank line). Docs-only commits skip the local gate habit. Run `npx prettier --check plan/` before pushing any plan-doc edit; fixed in this commit.
+
+## 2026-10-31 Red CI diagnosis (targeted review)
+
+- The "no retrievable log" e2e shard failures were not flakes: `gh api repos/{owner}/{repo}/actions/jobs/<id>/logs` returns the full log even when `gh run view --log` does not. Both failing specs (presets.spec.ts, f-content-fix.spec.ts) still asserted zero Lost City lights after V-lostcity-tower-light (b76ac121) authored 3 cool-white key lights. Fixed the specs. Different shards each run was just which spec shard held them.
+- A stale `dist/` makes local e2e pass against old code; run `npm run build` before targeted Playwright runs.

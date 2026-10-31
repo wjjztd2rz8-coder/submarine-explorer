@@ -176,7 +176,7 @@ test('a frozen frame does not apply canyon current to sub velocity', async ({ pa
   expect(result.unchanged).toBe(true);
 });
 
-test('Lost City uses clear carbonate flow without smoke or glow in a free dive', async ({
+test('Lost City uses clear carbonate flow without smoke or warm glow in a free dive', async ({
   page,
 }, testInfo) => {
   const errors: string[] = [];
@@ -212,7 +212,7 @@ test('Lost City uses clear carbonate flow without smoke or glow in a free dive',
     source: 'mission',
     fluid: 'carbonate',
     draws: 1, // the site's horizon backdrop
-    lights: 0,
+    lights: 3, // cool-white tower key lights, not orange vent glow
     smoke: null,
   });
   expect(errors).toEqual([]);

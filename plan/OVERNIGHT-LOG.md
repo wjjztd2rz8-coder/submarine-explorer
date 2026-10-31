@@ -2711,3 +2711,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Main clean, no worktrees. Remaining Claude Backlog items (Endurance tint, Hunga terrain rise, Monterey ledges, Blue Hole hood, Blake variants) all need code-level work with ~0.1 gains; I did not spend budget on them. Codex week 5%, briefs 120-123 wait for Nov 4.
 - CI run 41178918557 red on e2e shards 2, 18 and 29 of 38 with no retrievable logs (different shards each run, so likely flaky or timeout); no tag possible (latest f68).
 - **Needs owner:** phone retest (4410-P2 checklist). Suggest deciding whether to pause V-* art items until a new direction (e.g. code-level tint/variant work) is approved.
+
+## 2026-10-31 04:16 CDT headless run 263 (Claude): targeted review, CI red fixed
+
+- Diagnosed red CI: Lost City specs (presets.spec.ts, f-content-fix.spec.ts) expected 0 lights after the tower key lights landed. Updated to 3; pass locally on fresh build. See REVIEWS.md / PROCESS-LOG.md.
+- **Needs owner:** phone retest (4410-P2 checklist).

@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-10-31 targeted review: CI red on main for 3 runs
+
+- Cause: two Lost City e2e specs expected 0 lights; V-lostcity-tower-light added 3 cool-white tower key lights (data only), so shards holding those specs failed every run. Not flaky; earlier "no log" was a `gh run view` limit (use the jobs/<id>/logs API). Specs updated and pass locally on a fresh build.
+- Process: logged in PROCESS-LOG.md. Lesson: a merge that changes light/particle counts must update the preset specs; gates.sh smoke does not run them, so hosted CI is the only check.
+- Needs owner: unchanged (phone retest).
+
 ## 2026-10-30 evening comprehensive review (Claude alone; Sol skipped: Codex budget low, exit 75)
 
 **Changed since the last look (golden 174538 to 212725):** V-bluehole-terrace-saw (soft terraces, sawtooth gone), V-bluehole-gallery-read (partial: dome now beside the sub), V-beebe-opening (155 m opening, smokers and sub in one warm pool). Readability screen: 0/13 openings flagged (lowest Bismarck 0.139, Beebe ratio 0.31 but scene Y only 1.7%).

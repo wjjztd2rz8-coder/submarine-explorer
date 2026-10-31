@@ -73,10 +73,10 @@ test('Lost City mission and free dive both retain clear flow', async ({ page }) 
     // Lost City has zero shimmer strength, so its preset shimmer is not built.
     expect(effects).toEqual({
       smokeIntensity: 0,
-      glowLights: 0,
+      glowLights: 3,
       smoke: null,
       shimmer: null,
-      lights: 0,
+      lights: 3,
       particles: 0,
     });
     await page.screenshot({
