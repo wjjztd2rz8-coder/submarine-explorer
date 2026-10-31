@@ -171,6 +171,8 @@ export interface SiteManifest {
   wreck?: {
     /** Hull POI gating the local atmosphere, backdrop and ice-scour relief. */
     hullPoi: string;
+    /** Colour multiplier on this site's wooden hull material (0xffffff = unchanged). */
+    hullTint?: number;
     atmosphere: {
       hazeParticles: number;
       hazeSizeM: number;
@@ -523,27 +525,30 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
   if (root.id !== id) fail(id, 'id', `expected "${id}"`);
   const out: SiteManifest = { id };
   if (root.wreck !== undefined) {
-    fields({
-      hullPoi: text,
-      atmosphere: fields({
-        hazeParticles: count,
-        hazeSizeM: aboveZero,
-        hazeOpacity: fraction,
-        motesPerHull: count,
-        moteSizeM: aboveZero,
-        moteOpacity: fraction,
-        maxSizePx: aboveZero,
-        maxBrightness: nonnegative,
-      }),
-      horizon: fields({
-        name: text,
-        upperColor: color,
-        hazeColor: color,
-        hazePeakElevation: positiveFraction,
-        fogLift: nonnegative,
-        fogHaze: fraction,
-      }),
-    })(id, 'wreck', root.wreck);
+    fields(
+      {
+        hullPoi: text,
+        atmosphere: fields({
+          hazeParticles: count,
+          hazeSizeM: aboveZero,
+          hazeOpacity: fraction,
+          motesPerHull: count,
+          moteSizeM: aboveZero,
+          moteOpacity: fraction,
+          maxSizePx: aboveZero,
+          maxBrightness: nonnegative,
+        }),
+        horizon: fields({
+          name: text,
+          upperColor: color,
+          hazeColor: color,
+          hazePeakElevation: positiveFraction,
+          fogLift: nonnegative,
+          fogHaze: fraction,
+        }),
+      },
+      { hullTint: color },
+    )(id, 'wreck', root.wreck);
     out.wreck = root.wreck as SiteManifest['wreck'];
   }
   if (root.horizon !== undefined) {

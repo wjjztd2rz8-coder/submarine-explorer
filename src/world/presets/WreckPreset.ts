@@ -83,6 +83,7 @@ export class WreckPreset implements EnvPreset {
   private horizon: TitanicHorizon | null = null;
   private maxSizePx = 256;
   private maxBrightness = 1_000_000;
+  private tinted: THREE.Material[] = [];
 
   constructor(
     private readonly look: ParticleLook,
@@ -105,6 +106,7 @@ export class WreckPreset implements EnvPreset {
       this.stats.draws = 1;
     }
     if (!ctx.visuals) return;
+    if (wreck?.hullTint !== undefined) this.tintHull(ctx.scene, wreck.hullTint);
     if (hull) {
       const relief = buildEnduranceRelief(ctx.terrain, hull.position);
       ctx.scene.add(relief);
@@ -114,6 +116,19 @@ export class WreckPreset implements EnvPreset {
     this.buildHaze(ctx);
     this.buildMotes(ctx);
     this.stats.draws += this.objects.length;
+  }
+
+  /** Warm the site's wood hull. Meshes get their own material so the shared cache stays untinted. */
+  private tintHull(scene: THREE.Scene, tint: number): void {
+    scene.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      const mat = mesh.material as THREE.MeshStandardMaterial | undefined;
+      if (mat?.name !== 'wreck-wood') return;
+      const own = mat.clone();
+      own.color.multiply(new THREE.Color(tint));
+      mesh.material = own;
+      this.tinted.push(own);
+    });
   }
 
   private buildHaze(ctx: PresetEnterContext): void {
@@ -235,6 +250,8 @@ export class WreckPreset implements EnvPreset {
     this.horizon?.dispose();
     this.horizon = null;
     if (this.scene) disposeObjects(this.scene, this.objects);
+    for (const m of this.tinted) m.dispose();
+    this.tinted = [];
     this.haze = this.motes = null;
     this.stats.draws = this.stats.particles = 0;
   }
