@@ -28,6 +28,13 @@
       "chaseOffsetY": 10
     }
   },
+  "atmosphere": {
+    "water": {
+      "depthM": -20,
+      "waterColor": 1400972,
+      "fogColor": 1855094
+    }
+  },
   "props": {
     "karst-grotto-east": {
       "grotto": "hood"

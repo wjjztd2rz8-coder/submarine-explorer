@@ -163,6 +163,8 @@ export interface SiteManifest {
     lamps?: { intensity: number; distance: number; fillIntensity: number; fillDistance: number };
     /** Ambient floors apply to band stops at or below depthM, preserving brighter inputs. */
     tiers?: Partial<Record<GraphicsTier, { depthM: number; color: number; intensity: number }>>;
+    /** Water and fog colour for band stops at or below depthM (negative m), for a bluer column. */
+    water?: { depthM: number; waterColor: number; fogColor: number };
   };
   props?: Record<string, PropManifest>;
   id: string;
@@ -425,6 +427,7 @@ const atmosphereCheck = fields(
       {},
       { low: ambientFloorCheck, medium: ambientFloorCheck, high: ambientFloorCheck },
     ),
+    water: fields({ depthM: submergedDepth, waterColor: color, fogColor: color }),
   },
 );
 const positiveFraction: Check = (id, path, value) => {
