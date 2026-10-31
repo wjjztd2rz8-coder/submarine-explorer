@@ -17,11 +17,13 @@ export const MONTEREY_STRATA = {
   faintBedAmount: 0.45,
   /** Lamina wobble (in laminae) and the share of each lamina's tone replaced by local noise, to break long stripes. */
   /** Per-bed albedo multiplier: floor and swing. */
-  bedTone: [0.86, 0.26],
+  bedTone: [0.92, 0.14],
   laminaWarp: 1.6,
-  laminaBreak: 0.65,
+  laminaBreak: 0.8,
   /** Share of the ledge shadow line kept where laminae fade out. */
-  lipFloor: 0.45,
+  lipFloor: 0.3,
+  /** Darkness of the shadow line under each eroded ledge. */
+  lipShadow: 0.2,
   /** Rill domain warp (m) and vertical frequency: more of both break up straight channels. */
   rillWarp: 14,
   rillStretch: 0.075,

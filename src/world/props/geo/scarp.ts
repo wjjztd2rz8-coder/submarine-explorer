@@ -740,7 +740,8 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       const lipShare = erodedBeds
         ? MONTEREY_STRATA.lipFloor + (1 - MONTEREY_STRATA.lipFloor) * lamFade
         : 1;
-      const lipDark = 1 - 0.34 * (1 - smooth(0, 0.07, saw)) * lipShare;
+      const lipDark =
+        1 - (erodedBeds ? MONTEREY_STRATA.lipShadow : 0.34) * (1 - smooth(0, 0.07, saw)) * lipShare;
       out.multiplyScalar(
         (1 + (0.84 + 0.32 * lam - 1) * lamFade) * lipDark * lipLit * gullyShade * grain,
       );

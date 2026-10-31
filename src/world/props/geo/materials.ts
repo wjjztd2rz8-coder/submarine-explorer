@@ -112,7 +112,8 @@ export function canyonRockDetail(m: THREE.MeshStandardMaterial, strength: number
       vec3 phase = cp * vec3(7.0, 11.0, 6.0);
       vec3 filtered = vec3(1.0) - smoothstep(vec3(0.8), vec3(2.5), fwidth(phase));
       vec3 grad = cos(phase) * filtered * vec3(0.35, 0.5, 0.35);
-      float bed = (cp.y + cp.x * 0.07 + cp.z * 0.03) * 4.2;
+      // Phase-warped along the wall so the bedding relief never runs as evenly spaced contours.
+      float bed = (cp.y + cp.x * 0.07 + cp.z * 0.03) * 4.2 + 3.0 * sin(cp.x * 0.13 + 0.9 * sin(cp.z * 0.21 + cp.y * 0.17)) + 2.0 * sin(cp.y * 0.31 + cp.x * 0.07);
       // Bedding relief swells and fades along the wall so the corrugation never repeats evenly.
       float swell = 0.5 + 0.5 * sin(cp.x * 0.09 + 1.7 * sin(cp.y * 0.05)) * sin(cp.y * 0.11 + cp.x * 0.04 + 2.0);
       grad += vec3(0.07, 1.0, 0.03) * cos(bed) * (0.25 + 0.75 * swell) * (1.0 - smoothstep(0.8, 2.5, fwidth(bed)));
