@@ -2692,3 +2692,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Note: a gate run killed by a tool timeout leaves its dev server on the PW port; rerun on a fresh port.
 - Codex week 5%; briefs 120-123 wait for Nov 4. Next Claude item: V-hunga-kama-subject / V-endurance-accent (see DIRECTOR.md).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-31 02:01 CDT headless run 260 (Claude): V-hunga-kama-subject merged (ba559fb2)
+
+- Sonnet added one `caldera-rim-vent` smoker cluster at the Hunga wall foot (data only). Checked by eye: small warm accent, wedge still reads as isolated (~3.6 to 3.9 self-rated, my read is smaller). Real fix needs terrain rise under the wall without moving the 120 m scan pins (left in DIRECTOR.md). Gates smoke+base green on worktree and main; pushed.
+- Codex week 5%; briefs 120-123 wait for Nov 4. Next Claude item: V-endurance-accent / V-opening-dark remainder.
+- **Needs owner:** phone retest (4410-P2 checklist).
