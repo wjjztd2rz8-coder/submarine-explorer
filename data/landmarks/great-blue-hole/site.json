@@ -12,6 +12,7 @@
       "rangeM": 150,
       "chaseRadius": 46,
       "chaseOffsetX": -44,
+      "openingDepthM": 24,
       "chaseOffsetY": -30,
       "localAltitudeWeight": -0.1,
       "destinationLabel": "the stalactite gallery"
@@ -25,6 +26,13 @@
       "minSeabedAltitudeM": 26,
       "openWater": true,
       "chaseOffsetY": 10
+    }
+  },
+  "atmosphere": {
+    "water": {
+      "depthM": -20,
+      "waterColor": 1400972,
+      "fogColor": 1855094
     }
   },
   "props": {

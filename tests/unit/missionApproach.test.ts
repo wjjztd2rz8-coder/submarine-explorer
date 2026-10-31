@@ -136,6 +136,8 @@ for (const site of sites.landmarks) {
         expect(pose!.chaseRadius).toBe(arm?.chaseRadius);
         expect(pose!.chaseOffsetX).toBe(arm?.chaseOffsetX);
         expect(pose!.chaseOffsetY).toBe(arm?.chaseOffsetY);
+        // An authored opening depth is honoured exactly; without one the pose stays shallow-capped.
+        if (arm?.openingDepthM !== undefined) expect(pose!.y).toBeCloseTo(-arm.openingDepthM, 6);
         expect(p.y).toBeGreaterThanOrEqual(ratedDepth + settings.hullRadius);
         expect(p.y).toBeLessThanOrEqual(-settings.hullRadius);
         expect(props.collide(p.clone(), settings.hullRadius + 4, new Vector3())).toBe(false);
@@ -163,7 +165,12 @@ for (const site of sites.landmarks) {
           );
           expect(p.distanceTo(primary.position), primary.id).toBeGreaterThan(radius);
         }
-        const radius = missionApproachScanRadius(site, target.radius);
+        // A deeper authored opening passes under the subject's own hood, so (like the spawn search)
+        // its route check stops at the capped scan radius, not the contact's full radius.
+        const radius = missionApproachScanRadius(
+          site,
+          arm?.openingDepthM !== undefined ? Infinity : target.radius,
+        );
         for (let distance = 0; distance < range - radius; distance += 5) {
           const point = p.clone().lerp(target.position.clone().setY(p.y), distance / range);
           expect(point.y - terrain.sampleHeight(point.x, point.z)).toBeGreaterThanOrEqual(

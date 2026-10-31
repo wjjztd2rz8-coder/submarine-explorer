@@ -284,20 +284,28 @@ export const DEFAULT_WATER: WaterConfig = {
   },
 };
 
-/** Reuse the existing ambient light, preserving the upper column and brighter inputs. */
+/**
+ * Per-site column light from manifest data: the tier ambient floor reuses the existing ambient
+ * light (preserving the upper column and brighter inputs); `water` recolours the water and fog.
+ */
 export function siteLightWater(site: string, tier: GraphicsTier, water: WaterConfig): WaterConfig {
-  const light = siteManifest(site)?.atmosphere?.tiers?.[tier];
-  if (!light) return water;
+  const atmosphere = siteManifest(site)?.atmosphere;
+  const light = atmosphere?.tiers?.[tier];
+  const column = atmosphere?.water;
+  if (!light && !column) return water;
   return {
     ...water,
-    bands: water.bands.map((band) =>
-      band.depth <= light.depthM
+    bands: water.bands.map((band) => ({
+      ...band,
+      ...(light && band.depth <= light.depthM
         ? {
-            ...band,
             ambientColor: light.color,
             ambientIntensity: Math.max(band.ambientIntensity, light.intensity),
           }
-        : band,
-    ),
+        : {}),
+      ...(column && band.depth <= column.depthM
+        ? { waterColor: column.waterColor, fogColor: column.fogColor }
+        : {}),
+    })),
   };
 }

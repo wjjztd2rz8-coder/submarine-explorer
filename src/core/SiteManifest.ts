@@ -163,6 +163,8 @@ export interface SiteManifest {
     lamps?: { intensity: number; distance: number; fillIntensity: number; fillDistance: number };
     /** Ambient floors apply to band stops at or below depthM, preserving brighter inputs. */
     tiers?: Partial<Record<GraphicsTier, { depthM: number; color: number; intensity: number }>>;
+    /** Water and fog colour for band stops at or below depthM (negative m), for a bluer column. */
+    water?: { depthM: number; waterColor: number; fogColor: number };
   };
   props?: Record<string, PropManifest>;
   id: string;
@@ -213,6 +215,8 @@ export interface SiteManifest {
       rangeM: number;
       destinationLabel?: string;
       localAltitudeWeight?: number;
+      /** Opening depth below the surface, for sites whose subject needs a deeper vantage than the shallowest safe pose. */
+      openingDepthM?: number;
       yawOffset?: number;
       /** Opening chase arm, same meaning as the free-dive fields. */
       chaseRadius?: number;
@@ -308,7 +312,13 @@ const openingCheck = fields(
   {
     mission: fields(
       { rangeM: aboveZero },
-      { destinationLabel: text, localAltitudeWeight: finite, yawOffset: finite, ...cameraFields },
+      {
+        destinationLabel: text,
+        localAltitudeWeight: finite,
+        openingDepthM: aboveZero,
+        yawOffset: finite,
+        ...cameraFields,
+      },
     ),
     freeDive: fields(
       { hero: text, bearing: finite, range: aboveZero },
@@ -417,6 +427,7 @@ const atmosphereCheck = fields(
       {},
       { low: ambientFloorCheck, medium: ambientFloorCheck, high: ambientFloorCheck },
     ),
+    water: fields({ depthM: submergedDepth, waterColor: color, fogColor: color }),
   },
 );
 const positiveFraction: Check = (id, path, value) => {
