@@ -2762,3 +2762,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - V-beebe-ambient-reach (Sonnet, data only): Beebe ambientFill 6 to 12, hullLight 0.9 to 0.75; seabed beyond the lamp pool and the third smoker base now read, sub 13.4% (was 14.7%). Gates PASS (smoke) in worktree and on main. Golden not regenerated on main. Pushed. Codex week 5% (waits for Nov 4, briefs 120-123 queued; fewer than 3 would run anyway until the reset).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-31 14:09 CDT headless run 273 (Claude): V-lostcity-upper-light tried, not merged
+
+- Sonnet tried V-lostcity-upper-light: a data-only horizon colour change; before/after shots are nearly identical, so it fails the rubric and was dropped. Needs a code-level shaft term (post-processing, ungated by depth) or a VentPreset standoff; noted in DIRECTOR.md.
+- CI for run 271 was red on the same Blue Hole 390x844 journey spec (scan candidate null on hosted runners, intermittent; CI went green on f69 and later commits). No change made.
+- Codex week 5% (waits for Nov 4, briefs queued). Main clean.
+- **Needs owner:** phone retest (4410-P2 checklist).
