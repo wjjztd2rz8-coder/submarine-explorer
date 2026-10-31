@@ -9,8 +9,8 @@
     "overrides": {
       "smokeOpacitySulfide": 0.9,
       "smokeColorSulfide": 1841688,
-      "ambientFill": 6,
-      "hullLight": 0.9,
+      "ambientFill": 12,
+      "hullLight": 0.75,
       "hazeGlow": 0.5,
       "glowIntensity": 3000,
       "glowDistanceM": 60,

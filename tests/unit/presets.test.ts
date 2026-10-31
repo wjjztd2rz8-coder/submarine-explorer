@@ -791,7 +791,7 @@ describe('per-site preset atmosphere', () => {
         });
         try {
           await system.ready;
-          const expected = site === 'beebe-vent-field' ? 0.9 : 1;
+          const expected = mission?.environment?.overrides?.hullLight ?? 1;
           for (let frame = 0; frame < 3; frame++) {
             const sample = atmosphere.update(position.y, position, 1 / 60);
             const fog = sample.fogColor.clone();
