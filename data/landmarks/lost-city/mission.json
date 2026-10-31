@@ -12,7 +12,10 @@
       "hazeScale": 1.25,
       "hazeLift": 0.2,
       "smokeIntensity": 0,
-      "glowLights": 0,
+      "glowLights": 3,
+      "glowColor": 13625599,
+      "glowIntensity": 24000,
+      "glowDistanceM": 90,
       "shimmerStrength": 0
     }
   },
