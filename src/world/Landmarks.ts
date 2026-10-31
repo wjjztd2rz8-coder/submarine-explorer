@@ -134,6 +134,34 @@ interface MarkerParts {
 }
 
 const TMP_SIZE = new THREE.Vector2();
+const TMP_NDC = new THREE.Vector3();
+
+function sizeOf(renderer: THREE.WebGLRenderer): { width: number; height: number } {
+  renderer.getSize(TMP_SIZE);
+  return { width: TMP_SIZE.x, height: TMP_SIZE.y };
+}
+
+/**
+ * Whether a sprite label's box lies fully inside the viewport. `anchor` is the
+ * projected point (CSS px, y up); `center` is the sprite's `center` (its anchor
+ * within the sprite, 0..1 from the bottom-left, may sit outside that range).
+ * A label that would be clipped at an edge is hidden instead.
+ */
+export function labelFitsViewport(
+  anchor: { x: number; y: number },
+  size: { width: number; height: number },
+  center: { x: number; y: number },
+  viewport: { width: number; height: number },
+): boolean {
+  const left = anchor.x - center.x * size.width;
+  const bottom = anchor.y - center.y * size.height;
+  return (
+    left >= 0 &&
+    left + size.width <= viewport.width &&
+    bottom >= 0 &&
+    bottom + size.height <= viewport.height
+  );
+}
 
 export class Landmarks {
   readonly group = new THREE.Group();
@@ -209,11 +237,11 @@ export class Landmarks {
   }
 
   /**
-   * Refresh fades and label sizes for a camera and a viewport height (CSS px).
+   * Refresh fades, label sizes and label visibility for a camera and a viewport (CSS px).
    * Normally driven automatically from `onBeforeRender`.
    */
-  update(camera: THREE.Camera, viewportHeightPx: number): void {
-    for (const p of this.parts) this.updatePart(p, camera, viewportHeightPx);
+  update(camera: THREE.Camera, viewport: { width: number; height: number }): void {
+    for (const p of this.parts) this.updatePart(p, camera, viewport);
   }
 
   /** Current opacities, for tests and the debug console. */
@@ -224,18 +252,35 @@ export class Landmarks {
     }));
   }
 
-  private updatePart(p: MarkerParts, camera: THREE.Camera, viewportHeightPx: number): void {
+  private updatePart(
+    p: MarkerParts,
+    camera: THREE.Camera,
+    viewport: { width: number; height: number },
+  ): void {
     const c = this.config;
     const d = camera.position.distanceTo(p.position);
     p.dot.material.opacity =
       c.markerOpacity * fadeByDistance(d, c.markerFadeM[0], c.markerFadeM[1]);
     if (p.label) {
-      p.label.material.opacity = fadeByDistance(d, c.labelFadeM[0], c.labelFadeM[1]);
       const fov = (camera as THREE.PerspectiveCamera).isPerspectiveCamera
         ? (camera as THREE.PerspectiveCamera).fov
         : 60;
-      const sy = labelScaleForPixels(c.labelHeightPx, fov, viewportHeightPx);
+      const sy = labelScaleForPixels(c.labelHeightPx, fov, viewport.height);
       p.label.scale.set(sy * p.aspect, sy, 1);
+      // A label clipped at a screen edge reads as a broken tag, so it is hidden
+      // until its anchor moves far enough in to show the whole text.
+      const ndc = TMP_NDC.copy(p.position).project(camera);
+      const fits =
+        ndc.z > -1 &&
+        ndc.z < 1 &&
+        labelFitsViewport(
+          { x: ((ndc.x + 1) / 2) * viewport.width, y: ((ndc.y + 1) / 2) * viewport.height },
+          { width: c.labelHeightPx * p.aspect, height: c.labelHeightPx },
+          p.label.center,
+          viewport,
+        );
+      p.label.material.opacity =
+        fadeByDistance(d, c.labelFadeM[0], c.labelFadeM[1]) * (fits ? 1 : 0);
     }
   }
 
@@ -245,12 +290,12 @@ export class Landmarks {
    */
   private hookFades(p: MarkerParts): void {
     p.dot.onBeforeRender = (renderer, _scene, camera) => {
-      this.updatePart(p, camera, renderer.getSize(TMP_SIZE).y);
+      this.updatePart(p, camera, sizeOf(renderer));
     };
     if (p.label) {
       const label = p.label;
       label.onBeforeRender = (renderer, _scene, camera) => {
-        this.updatePart(p, camera, renderer.getSize(TMP_SIZE).y);
+        this.updatePart(p, camera, sizeOf(renderer));
         label.updateMatrixWorld();
       };
     }
