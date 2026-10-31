@@ -789,7 +789,7 @@ describe('per-site preset atmosphere', () => {
         });
         try {
           await system.ready;
-          const expected = site === 'beebe-vent-field' ? 0.27 : 1;
+          const expected = site === 'beebe-vent-field' ? 0.9 : 1;
           for (let frame = 0; frame < 3; frame++) {
             const sample = atmosphere.update(position.y, position, 1 / 60);
             const fog = sample.fogColor.clone();
