@@ -1,5 +1,12 @@
 # Reviews
 
+## 2026-10-31 (later) targeted review: CI still red on main for 3 runs
+
+- Cause: after the Lost City fix, e2e shard 2/38 still failed every run on one spec, `journal-debrief` Blue Hole journey at 390x844 ("Expected scan candidate great-blue-hole-stalactites, got null"). The log was retrievable via `gh api repos/{owner}/{repo}/actions/jobs/<job id>/logs`; earlier "flaky or CI-specific" calls were wrong. The spec passes locally in 9 s but the touch path waits on real time on hosted runners, so the sub drifts above the first scan's minimum depth (the 1 m margin was too small).
+- Fix: the post-opening teleport starts 4 m deeper; all six Blue Hole journey specs pass locally. Hosted CI must go green before any tag.
+- Process: if a shard fails the same spec in consecutive runs, read the job log first, never assume flake (PROCESS-LOG.md).
+- Needs owner: unchanged (phone retest).
+
 ## 2026-10-31 targeted review: CI red on main for 3 runs
 
 - Cause: two Lost City e2e specs expected 0 lights; V-lostcity-tower-light added 3 cool-white tower key lights (data only), so shards holding those specs failed every run. Not flaky; earlier "no log" was a `gh run view` limit (use the jobs/<id>/logs API). Specs updated and pass locally on a fresh build.

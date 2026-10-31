@@ -365,3 +365,6 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 
 - The "no retrievable log" e2e shard failures were not flakes: `gh api repos/{owner}/{repo}/actions/jobs/<id>/logs` returns the full log even when `gh run view --log` does not. Both failing specs (presets.spec.ts, f-content-fix.spec.ts) still asserted zero Lost City lights after V-lostcity-tower-light (b76ac121) authored 3 cool-white key lights. Fixed the specs. Different shards each run was just which spec shard held them.
 - A stale `dist/` makes local e2e pass against old code; run `npm run build` before targeted Playwright runs.
+
+## 2026-10-31 shard-2 red misdiagnosed as flaky
+- Run 265 called the failure CI-specific after a local shard pass. The job log showed one deterministic failing spec (Blue Hole touch journey, scan-depth drift). Rule: pull the failing job's log with `gh api .../jobs/<id>/logs | grep -E '✘|Error'` before judging flake; a local pass with a different timing profile proves nothing.
