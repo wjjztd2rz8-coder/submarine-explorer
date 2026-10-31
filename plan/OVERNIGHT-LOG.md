@@ -2775,3 +2775,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - V-hunga-wall-rise (Sonnet): new `caldera-rim` terrain carve (data-driven, no site branch) raises a bank behind the Hunga wall; opening now reads wall-against-hill, ~3.9 to ~4.0. Bends: Hunga Low-tier detail pose flipped to the west, cliff-hit floor 20 to 12 in lowTierFollowups (logged in progress note). Gates PASS (smoke) in worktree and on main; golden not regenerated on main. Pushed.
 - Codex week 5% (waits for Nov 4, briefs 120-123 queued). Remaining Claude items: hood geometry, endurance tint, coral variant.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-31 16:27 CDT headless run 275 (Claude): V-endurance-tint merged
+
+- V-endurance-tint (Sonnet): optional `wreck.hullTint` in Endurance site data, applied via a cloned hull material in WreckPreset; hull reads warmer against the water (~3.4 to ~3.5, modest). Gates PASS (smoke) on main. Golden not regenerated. V-bluehole-hood-geometry skipped (five prior passes); needs a target-composition brief.
+- Codex week 5% (waits for Nov 4, briefs 120-123 queued). Remaining Claude items: hood geometry, coral variant.
+- **Needs owner:** phone retest (4410-P2 checklist).
