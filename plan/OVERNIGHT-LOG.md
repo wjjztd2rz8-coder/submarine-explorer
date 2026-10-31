@@ -2678,3 +2678,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Remaining: carbonate-aware standoff/drop and a light shaft (code-level, left in DIRECTOR.md). Next: V-bluehole-gallery-read (needs opening-altitude field).
 - Codex week 5%; briefs 120-123 wait for Nov 4.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-30 23:20 CDT headless run 258 (Claude): V-bluehole-gallery-read merged (c3762037)
+
+- Sonnet added an optional `opening.mission.openingDepthM` (shared pose search, Spawn.ts) and `atmosphere.water` (colour/fog from a depth); Blue Hole opens 24 m down with a documentary-blue column and stalactites visible. Checked by eye: big gain over the teal 10 m frame, but the dome still partly reads as an overturned boat (hood geometry left in DIRECTOR.md). Route check in missionApproach.test.ts uses the capped 45 m radius for sites that set openingDepthM (9 m looser for Blue Hole only). Gates smoke+base green on worktree and main (unit suite now takes ~10+ min; allow for it).
+- CI run 41154345541 e2e shard 2/38 red again with no retrievable log (3rd time); unresolved.
+- Codex week 5%; briefs 120-123 wait for Nov 4. Next Claude item: V-monterey-strata-soften.
+- **Needs owner:** phone retest (4410-P2 checklist).
