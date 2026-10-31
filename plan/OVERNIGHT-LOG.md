@@ -2664,3 +2664,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Sonnet fixed the washed-out sub hull in the shared lit shader (two lines in src/vehicles/materials.ts); Titanic/Monterey/Lost City hulls now show form, stripe keeps colour. Not re-checked on dark deep sites (Challenger). Gates smoke+base green; pushed.
 - V-bluehole-gallery-read skipped: it needs a code-level opening-altitude change; stays next in DIRECTOR.md. Codex week 5%; briefs 120-123 wait for Nov 4. CI run 41131150577 e2e failure (2/38) still has no retrievable log.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-30 20:14 CDT headless run 256 (Claude): V-beebe-exposure merged (1224939d)
+
+- Sonnet retuned Beebe data only (hullLight 0.27 to 0.9, lamps 2.4/1.2): sub luminance 3% to 14.7%, warm seabed pool ~25 m, deep-black water kept; checked by eye. Gates smoke+base green on worktree and main.
+- Short of the 30 m seabed target; the rest needs a shared ambientFill/lamp-reach change (left in DIRECTOR.md). Next: V-bluehole-gallery-read (needs code-level opening altitude).
+- Codex week 5%; briefs 120-123 wait for Nov 4.
+- **Needs owner:** phone retest (4410-P2 checklist).
