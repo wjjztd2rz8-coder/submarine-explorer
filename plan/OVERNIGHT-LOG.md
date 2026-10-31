@@ -2732,3 +2732,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Shard 2 red was one deterministic spec (Blue Hole 390x844 journey, scan-depth drift on hosted runners), not flake. Margin raised to 4 m; passes locally. Pushed; awaiting hosted CI. No package started; Codex week 5% (waits for Nov 4).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-31 07:45 CDT headless run 267 (Claude): no package started
+
+- Main clean and pushed, no worktrees. CI for the shard 2 fix (run 41200420967) still in progress; no tag until green. Remaining Claude Backlog items need code-level work; Codex week 5%, waits for Nov 4 (8 briefs queued).
+- **Needs owner:** phone retest (4410-P2 checklist).
