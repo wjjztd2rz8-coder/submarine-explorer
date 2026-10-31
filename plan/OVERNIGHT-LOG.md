@@ -2787,3 +2787,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Sonnet added a per-mound tint/density variant; before/after shots are nearly identical, so it fails the rubric and was dropped (branch deleted, note in DIRECTOR.md: needs different silhouettes/props, not tint). Main clean, nothing else merged. Remaining Claude item: hood geometry (needs target-composition brief).
 - Codex week 5% (waits for Nov 4, briefs 120-123 queued).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-31 17:01 CDT headless run 277 (Claude): no package started
+
+- Only Claude backlog item left is V-bluehole-hood-geometry (five prior passes, needs a target-composition brief or a reference image). Not worth another blind pass. Main clean, nothing merged. Codex week 5% (waits for Nov 4, briefs 120-123 queued).
+- **Needs owner:** phone retest (4410-P2 checklist); a reference for the Blue Hole hood composition.
