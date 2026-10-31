@@ -483,7 +483,7 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
         const along = z - centre.z;
         const axis = centre.x + 20 * Math.sin(along / 220);
         const across = Math.abs(x - axis);
-        if (Math.abs(along) >= 620 || across >= 90) return height;
+        if (Math.abs(along) >= 620 || across >= 150) return height;
         const end = 1 - smoothstep(Math.max(0, (Math.abs(along) - 450) / 170));
         const bank = 1 - smoothstep(Math.max(0, (across - 30) / 60));
         // This local bend turns north before continuing west: its sandy floor
@@ -501,12 +501,12 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
     return {
       centre,
       apply(x, z, height) {
-        const back = x - (wall.x - 14);
+        const back = x - (wall.x + 22);
         const across = Math.abs(z - wall.z);
-        if (back <= 0 || back >= 260 || across >= 170) return height;
-        const ramp = smoothstep(Math.min(1, back / 55));
+        if (back <= 0 || back >= 260 || across >= 150) return height;
+        const ramp = smoothstep(Math.min(1, back / 45));
         const tail = 1 - smoothstep(Math.min(1, Math.max(0, (back - 120) / 140)));
-        const side = 1 - smoothstep(Math.min(1, Math.max(0, (across - 70) / 110)));
+        const side = 1 - smoothstep(Math.min(1, Math.max(0, (across - 60) / 90)));
         const wobble = 1 + 0.12 * Math.sin(z * 0.045 + 0.7) + 0.08 * Math.sin(z * 0.11 + x * 0.03);
         return height + 60 * ramp * tail * side * wobble;
       },
