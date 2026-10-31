@@ -26,7 +26,7 @@ exports[`1140: lost-city Low buffers are finite and draw counts stay within f43 
 
 exports[`1140: monterey-canyon Low buffers are finite and draw counts stay within f43 1`] = `
 {
-  "buffers": "5808580c797e740b0000f01947e72a8516e31d8476e5e06c5f5105060a64f32a",
+  "buffers": "818b250f31d18b8d28c927669a075c86280f5c5b32d9c352cb7544943382b4d2",
   "draws": 30,
   "triangles": 284010,
 }
