@@ -1,5 +1,9 @@
 # Reviews
 
+## 2026-10-31 evening targeted review (trigger: CI red on main for 3 runs)
+
+Two separate red specs, not one flaky shard. (1) Shard 20, `f-content-fix` "Hunga hero and scan marker share a supported terrain location": V-hunga-wall-rise (run 274) raised the terrain under the wall and only the smoke gate ran, so the hard-coded ground height of -471.1 went stale (hosted -465.6, a fresh local build -471.7: it also differs by machine). The check now asserts the ground is within 8 m of the validator's 468.6 m. Lesson: a terrain-carve change needs `--full-e2e` for the specs that sample that site. (2) Shard 2, Blue Hole 390x844 journey "scan candidate null": still red after the 4 m margin; it passes locally on a fresh build at all three sizes, so it is hosted-only. The scan helper's error now prints the sub position and scanner view, so the next red log shows why the candidate vanished; no further blind fix. Both changes are test-only. Watch the next CI run.
+
 ## 2026-10-31 comprehensive review (Claude alone; Sol skipped: Codex week 5% until Nov 4)
 
 **Changed since the 10-30 evening review (golden 212725 to 161522):** Monterey strata softer (lower-contrast beds, warped relief; still banded but calmer), Hunga rim-foot vent added beside the sub (wedge still isolated), Lost City tower key lights, Challenger hull and shared sub-hull shading fixed. CI is green and **f69** is tagged and deployed after the Lost City spec and Blue Hole 4 m margin fixes.

@@ -2792,3 +2792,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Only Claude backlog item left is V-bluehole-hood-geometry (five prior passes, needs a target-composition brief or a reference image). Not worth another blind pass. Main clean, nothing merged. Codex week 5% (waits for Nov 4, briefs 120-123 queued).
 - **Needs owner:** phone retest (4410-P2 checklist); a reference for the Blue Hole hood composition.
+
+## 2026-10-31 18:29 CDT targeted review (Claude): CI red x3 diagnosed
+
+- Two causes: stale Hunga ground-height assert after wall-rise (relaxed to 8 m of validator value) and hosted-only Blue Hole scan null (diagnostics added to the scan helper). Test-only; gates PASS (smoke). See REVIEWS.md. Codex week 5% (waits Nov 4, briefs queued).
+- **Needs owner:** phone retest (4410-P2 checklist); a reference for the Blue Hole hood composition.

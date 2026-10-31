@@ -369,3 +369,4 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 ## 2026-10-31 shard-2 red misdiagnosed as flaky
 
 - Run 265 called the failure CI-specific after a local shard pass. The job log showed one deterministic failing spec (Blue Hole touch journey, scan-depth drift). Rule: pull the failing job's log with `gh api .../jobs/<id>/logs | grep -E '✘|Error'` before judging flake; a local pass with a different timing profile proves nothing.
+- 2026-10-31 targeted review: CI red 3 runs = stale Hunga ground height after wall-rise (smoke-only gate) plus hosted-only Blue Hole scan null; spec relaxed, diagnostics added. Terrain changes should run --full-e2e.

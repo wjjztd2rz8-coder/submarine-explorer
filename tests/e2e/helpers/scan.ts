@@ -44,7 +44,10 @@ async function stepScan(page: Page, seconds: number | null, id?: string): Promis
         // A normal rendered frame may have finished the partial scan between calls.
         if (id !== undefined && scanner.view.lastCompleteId === id) return;
         if (!candidateId || (id !== undefined && candidateId !== id))
-          throw new Error(`Expected scan candidate ${id ?? 'in range'}, got ${candidateId}`);
+          throw new Error(
+            `Expected scan candidate ${id ?? 'in range'}, got ${candidateId} ` +
+              `(sub ${[pilot.position.x, pilot.position.y, pilot.position.z].map((n) => n.toFixed(1)).join(',')}, view ${JSON.stringify(scanner.view)})`,
+          );
         const target = [
           ...scanner.getTargets(),
           ...scanner.getExtraTargets(),
