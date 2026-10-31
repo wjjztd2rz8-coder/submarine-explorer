@@ -136,6 +136,8 @@ for (const site of sites.landmarks) {
         expect(pose!.chaseRadius).toBe(arm?.chaseRadius);
         expect(pose!.chaseOffsetX).toBe(arm?.chaseOffsetX);
         expect(pose!.chaseOffsetY).toBe(arm?.chaseOffsetY);
+        // An authored opening depth is honoured exactly; without one the pose stays shallow-capped.
+        if (arm?.openingDepthM !== undefined) expect(pose!.y).toBeCloseTo(-arm.openingDepthM, 6);
         expect(p.y).toBeGreaterThanOrEqual(ratedDepth + settings.hullRadius);
         expect(p.y).toBeLessThanOrEqual(-settings.hullRadius);
         expect(props.collide(p.clone(), settings.hullRadius + 4, new Vector3())).toBe(false);

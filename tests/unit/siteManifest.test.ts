@@ -789,6 +789,11 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
         hemisphere: { name: 'montereyFill', sky: 0xa8bbc8, ground: 0x493d32, intensity: 3 },
         lamps: { intensity: 2, distance: 1.2, fillIntensity: 3, fillDistance: 1.5 },
       });
+    } else if (id === 'great-blue-hole') {
+      // A bluer column from the twilight stop down; no extra lights.
+      expect(atmosphere).toEqual({
+        water: { depthM: -20, waterColor: 0x15608c, fogColor: 0x1c4e76 },
+      });
     } else if (low.includes(id)) {
       const tiers = allTiers.includes(id) ? ['low', 'medium', 'high'] : ['low'];
       expect(atmosphere).toEqual({
@@ -875,5 +880,43 @@ describe('site manifest graded backdrop', () => {
         .filter((m) => m.horizon)
         .map((m) => m.id),
     ).toEqual(['blake-plateau-corals', 'lost-city']);
+  });
+});
+
+describe('opening depth and column colour', () => {
+  const mission = { rangeM: 150, openingDepthM: 24 };
+  it('accepts an authored mission opening depth and rejects a non-positive one', () => {
+    expect(validateSiteManifest({ id: 's', opening: { mission } }, 's').opening?.mission).toEqual(
+      mission,
+    );
+    for (const bad of [0, -5])
+      expect(() =>
+        validateSiteManifest(
+          { id: 's', opening: { mission: { ...mission, openingDepthM: bad } } },
+          's',
+        ),
+      ).toThrow('openingDepthM');
+  });
+  it('accepts a water column colour and rejects typos and surface depths', () => {
+    const water = { depthM: -20, waterColor: 0x15608c, fogColor: 0x1c4e76 };
+    expect(validateSiteManifest({ id: 's', atmosphere: { water } }, 's').atmosphere?.water).toEqual(
+      water,
+    );
+    expect(() =>
+      validateSiteManifest({ id: 's', atmosphere: { water: { ...water, depthM: 5 } } }, 's'),
+    ).toThrow('depthM');
+    expect(() =>
+      validateSiteManifest({ id: 's', atmosphere: { water: { ...water, typo: 1 } } }, 's'),
+    ).toThrow('water.typo: unknown field');
+  });
+  it('recolours only the sites that author it', () => {
+    const blue = siteManifest('great-blue-hole')!;
+    expect(blue.opening?.mission?.openingDepthM).toBeGreaterThan(0);
+    expect(blue.atmosphere?.water).toBeDefined();
+    expect(
+      allSiteManifests()
+        .filter((m) => m.opening?.mission?.openingDepthM !== undefined || m.atmosphere?.water)
+        .map((m) => m.id),
+    ).toEqual(['great-blue-hole']);
   });
 });
