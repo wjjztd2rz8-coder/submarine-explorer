@@ -69,8 +69,17 @@ test('Low seabed lighting is isolated to the observed dark sites and leaves surf
       for (const tier of ['medium', 'high'] as const)
         expect(siteLightWater(site, tier, water)).toBe(water);
   }
-  for (const site of ['monterey-canyon', 'great-blue-hole', 'unknown'])
+  for (const site of ['monterey-canyon', 'unknown'])
     expect(siteLightWater(site, 'low', water)).toBe(water);
+  // Blue Hole recolours the water below its twilight stop on every tier and leaves the light alone.
+  for (const tier of ['low', 'medium', 'high'] as const) {
+    const blue = siteLightWater('great-blue-hole', tier, water);
+    expect(sampleAtmosphere(blue, 0)).toEqual(sampleAtmosphere(water, 0));
+    expect(sampleAtmosphere(blue, -30).fogColor).not.toEqual(sampleAtmosphere(water, -30).fogColor);
+    expect(sampleAtmosphere(blue, -30).ambientColor).toEqual(
+      sampleAtmosphere(water, -30).ambientColor,
+    );
+  }
   for (const site of ['challenger-deep', 'endurance']) {
     const deep = deepSiteWater(site, water);
     expect(siteLightWater(site, 'low', deep)).toBe(deep);

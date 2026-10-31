@@ -165,7 +165,12 @@ for (const site of sites.landmarks) {
           );
           expect(p.distanceTo(primary.position), primary.id).toBeGreaterThan(radius);
         }
-        const radius = missionApproachScanRadius(site, target.radius);
+        // A deeper authored opening passes under the subject's own hood, so (like the spawn search)
+        // its route check stops at the capped scan radius, not the contact's full radius.
+        const radius = missionApproachScanRadius(
+          site,
+          arm?.openingDepthM !== undefined ? Infinity : target.radius,
+        );
         for (let distance = 0; distance < range - radius; distance += 5) {
           const point = p.clone().lerp(target.position.clone().setY(p.y), distance / range);
           expect(point.y - terrain.sampleHeight(point.x, point.z)).toBeGreaterThanOrEqual(
