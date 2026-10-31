@@ -72,7 +72,7 @@ The newest items go first.
 
 ## In flight
 
-- No package running (refilled 2026-10-31 review). Briefs 120-123 are queued but wait for the Codex week reset (Nov 4; 6% left). Claude lane: Sonnet items 1-6 in order.
+- V-beebe-ambient-reach IN FLIGHT (Sonnet, worktree subexp-wt/V-beebe-ambient-reach), started 2026-10-31. Briefs 120-123 queued, waiting for Nov 4 Codex reset.
 
 ## Backlog
 
@@ -83,7 +83,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 4. **V-lostcity-tower-light [Sonnet, small] PARTLY DONE 2026-10-30 (merge of claude/V-lostcity-tower-light; Lost City tower rims now lit by cool-white glow lights via mission data, ~3.9→4.0; upper-third light shaft and flank key still open):** Lost City (~3.9) has a dark empty upper third and flat grey tower base; add a soft key light on tower tops via site data.
 5. **V-hunga-wall-rise [Sonnet]:** Hunga opening still shows an isolated brown wedge on a flat slope. Raise terrain under and behind the wall (data-driven height field, no site branch) so it reads as a caldera rim; target: wall meets ground, vent beside the sub.
 6. **V-bluehole-hood-geometry [Sonnet]:** gallery dome still reads as an overturned boat; reshape the hood (ribbed, irregular lip, darker underside) from Blue Hole data.
-7. **V-beebe-ambient-reach [Sonnet]:** seabed beyond the 25 m lamp pool is near-black; raise ambientFill or lamp reach via Beebe data until the third smoker is visible.
+7. **V-beebe-ambient-reach [Sonnet] IN FLIGHT:** seabed beyond the 25 m lamp pool is near-black; raise ambientFill or lamp reach via Beebe data until the third smoker is visible.
 8. **V-lostcity-upper-light [Sonnet]:** upper third of the Lost City opening is empty; add a light shaft or flank key from mission data.
 9. **V-endurance-tint [Sonnet, small]:** per-site emissive tint in `src/world/props/wrecks/materials.ts` via site data (route named in V-endurance-accent).
 10. **V-coral-variant [Sonnet]:** per-prop tint/variant on the coral-mound feature so mounds stop reading as identical lumps (V-opening-dark route).
