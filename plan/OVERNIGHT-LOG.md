@@ -2769,3 +2769,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - CI for run 271 was red on the same Blue Hole 390x844 journey spec (scan candidate null on hosted runners, intermittent; CI went green on f69 and later commits). No change made.
 - Codex week 5% (waits for Nov 4, briefs queued). Main clean.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-31 15:34 CDT headless run 274 (Claude): V-hunga-wall-rise merged
+
+- V-hunga-wall-rise (Sonnet): new `caldera-rim` terrain carve (data-driven, no site branch) raises a bank behind the Hunga wall; opening now reads wall-against-hill, ~3.9 to ~4.0. Bends: Hunga Low-tier detail pose flipped to the west, cliff-hit floor 20 to 12 in lowTierFollowups (logged in progress note). Gates PASS (smoke) in worktree and on main; golden not regenerated on main. Pushed.
+- Codex week 5% (waits for Nov 4, briefs 120-123 queued). Remaining Claude items: hood geometry, endurance tint, coral variant.
+- **Needs owner:** phone retest (4410-P2 checklist).
