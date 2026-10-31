@@ -2698,3 +2698,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Sonnet added one `caldera-rim-vent` smoker cluster at the Hunga wall foot (data only). Checked by eye: small warm accent, wedge still reads as isolated (~3.6 to 3.9 self-rated, my read is smaller). Real fix needs terrain rise under the wall without moving the 120 m scan pins (left in DIRECTOR.md). Gates smoke+base green on worktree and main; pushed.
 - Codex week 5%; briefs 120-123 wait for Nov 4. Next Claude item: V-endurance-accent / V-opening-dark remainder.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-31 03:02 CDT headless run 261 (Claude): V-opening-dark remainder tried, not merged
+
+- Sonnet added 3 coral-mound stands and 4 rocks to Blake's opening (props.json only). My read of the before/after frames: still identical tan lumps (~3.2 to 3.3), so I rejected it and deleted the branch. Real fix needs code (per-prop tint/variant on coral-mound, or a lower opening pose); item demoted in DIRECTOR.md. Main unchanged.
+- Remaining Backlog Claude items are low value or need code-level work (Endurance emissive tint, Hunga terrain rise, Monterey ledge geometry, Blue Hole hood geometry). CI e2e shard failures (29/38 on run 41175459299) still need triage from the failing specs.
+- Codex week 5%; briefs 120-123 wait for Nov 4.
+- **Needs owner:** phone retest (4410-P2 checklist).
