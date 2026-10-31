@@ -483,7 +483,7 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
         const along = z - centre.z;
         const axis = centre.x + 20 * Math.sin(along / 220);
         const across = Math.abs(x - axis);
-        if (Math.abs(along) >= 620 || across >= 150) return height;
+        if (Math.abs(along) >= 620 || across >= 90) return height;
         const end = 1 - smoothstep(Math.max(0, (Math.abs(along) - 450) / 170));
         const bank = 1 - smoothstep(Math.max(0, (across - 30) / 60));
         // This local bend turns north before continuing west: its sandy floor
@@ -495,7 +495,7 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
   }
   if (carve === 'caldera-rim') {
     // The tuff wall (heading 270, face west) stands where the grid shows a bare slope. Raise a
-    // broad rim bank from its foot eastward and behind it, so the wall grows out of rising ground.
+    // rim bank behind it (east of the face), so the wall stands against rising ground.
     const wall = latLonToWorld(meta, -20.57, -175.42);
     const centre = { x: wall.x + 40, z: wall.z };
     return {
