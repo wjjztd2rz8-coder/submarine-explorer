@@ -254,8 +254,10 @@ for (const site of ['beebe-vent-field', 'axial-seamount-ashes', 'unknown']) {
               const effective = resolveEffective(custom, mode, daily, config);
               const effectiveBefore = JSON.stringify(effective);
               const preset = effective.light;
-              const spotGain = site === 'beebe-vent-field' ? 0.45 : 1;
-              const fillGain = site === 'beebe-vent-field' ? 0.35 : 1;
+              const spotGain = site === 'beebe-vent-field' ? 2.4 : 1;
+              const fillGain = site === 'beebe-vent-field' ? 2.4 : 1;
+              const spotReach = site === 'beebe-vent-field' ? 1.2 : 1;
+              const fillReach = site === 'beebe-vent-field' ? 1.3 : 1;
               for (let repeat = 0; repeat < 3; repeat++) {
                 const oldGeometry = ctx.headlights.beams[0]?.geometry;
                 const disposed = oldGeometry ? vi.spyOn(oldGeometry, 'dispose') : undefined;
@@ -273,7 +275,7 @@ for (const site of ['beebe-vent-field', 'axial-seamount-ashes', 'unknown']) {
                 ctx.headlights.update(new Vector3(0, -4200, 0), new Vector3(0, 0, -1));
                 for (const light of ctx.headlights.lights) {
                   expect(light.intensity).toBe(preset.intensity * spotGain);
-                  expect(light.distance).toBe(preset.distance);
+                  expect(light.distance).toBeCloseTo(preset.distance * spotReach);
                   expect(light.angle).toBe((preset.angleDeg * Math.PI) / 180);
                   expect(
                     [light.intensity, light.distance, light.angle].every(Number.isFinite),
@@ -281,7 +283,7 @@ for (const site of ['beebe-vent-field', 'axial-seamount-ashes', 'unknown']) {
                   expect(light.visible).toBe(true);
                 }
                 expect(ctx.headlights.fill.intensity).toBe(preset.fillIntensity * fillGain);
-                expect(ctx.headlights.fill.distance).toBe(preset.fillDistance);
+                expect(ctx.headlights.fill.distance).toBeCloseTo(preset.fillDistance * fillReach);
                 expect(ctx.headlights.fill.visible).toBe(preset.fillIntensity > 0);
                 expect(Number.isFinite(ctx.headlights.fill.intensity)).toBe(true);
               }

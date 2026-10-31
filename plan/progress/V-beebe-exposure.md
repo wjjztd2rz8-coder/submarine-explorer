@@ -7,10 +7,10 @@
 
 ## Measured (golden mission opening, desktop, tools/golden-readable.mjs)
 
-| | Scene Y | Sub Y | Scene/sub |
-| --- | ---: | ---: | ---: |
-| Before | 1.6% | 3.1% | 0.51 |
-| After | 2.6% | 14.7% | 0.18 |
+|        | Scene Y | Sub Y | Scene/sub |
+| ------ | ------: | ----: | --------: |
+| Before |    1.6% |  3.1% |      0.51 |
+| After  |    2.6% | 14.7% |      0.18 |
 
 Portrait after: scene 3.0%, sub 3.1% (the sub is partly in shadow under the camera; hull reads by eye). Challenger opening unchanged (5.3% / 11.6%); no shared code touched.
 

@@ -792,9 +792,9 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
     } else if (low.includes(id)) {
       const tiers = allTiers.includes(id) ? ['low', 'medium', 'high'] : ['low'];
       expect(atmosphere).toEqual({
-        // Beebe tones its lamps down so close sulfide keeps its texture instead of washing pale.
+        // Beebe lamps sit below Titanic's so close sulfide keeps its texture while the hull and seabed still read.
         ...(id === 'beebe-vent-field'
-          ? { lamps: { intensity: 0.45, distance: 1, fillIntensity: 0.35, fillDistance: 1 } }
+          ? { lamps: { intensity: 2.4, distance: 1.2, fillIntensity: 2.4, fillDistance: 1.3 } }
           : {}),
         // Titanic keeps its lamps and a hemisphere fill so the wreck reads from the first frame.
         ...(id === 'titanic'
