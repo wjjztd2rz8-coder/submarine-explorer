@@ -2727,3 +2727,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Main clean and pushed, no worktrees. CI (run 41189994812) is red only on e2e shard 2/38, with no retrievable logs. I ran that whole shard locally (26 specs: d-input-hud, d-modes, d-photo, d-polish, d-power, d-scan): all pass in 60 s. So it looks CI-specific or flaky, not a code regression. Previous reds were Lost City specs, already fixed. No tag possible.
 - Remaining Claude Backlog items need code-level work; none started. 8 Codex briefs queued; Codex week 5%, waits for Nov 4.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-10-31 07:18 CDT headless run 266 (Claude): targeted review, shard 2 root cause fixed
+
+- Shard 2 red was one deterministic spec (Blue Hole 390x844 journey, scan-depth drift on hosted runners), not flake. Margin raised to 4 m; passes locally. Pushed; awaiting hosted CI. No package started; Codex week 5% (waits for Nov 4).
+- **Needs owner:** phone retest (4410-P2 checklist).
