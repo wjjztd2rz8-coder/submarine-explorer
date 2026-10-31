@@ -20,3 +20,10 @@
 ## Simplicity check
 
 No siteId branches, no layout patches, no new specs, reuses existing props; net code change is three constants.
+
+## Hunga rim pass (V-hunga-kama-subject, Hunga half)
+
+- Added `caldera-rim-vent` (existing `smoker-cluster`, 14x12x5 m, in `data/landmarks/hunga-tonga-caldera/props.json`) at the wall's south foot: a warm, smoking accent that breaks the wedge silhouette on the opening frame. Data only; wall dims and 120 m scan pins untouched.
+- Tried and dropped: a pillow-field (iron-mat orange, Kama-specific look), and four `rock_09` blocks at 3-8x scale along the foot (read as specks at 120 m, so cost without gain).
+- Golden: .cache/golden/2026-10-31-061924 (blocks, dropped) vs 2026-10-31-061048 (before).
+- Honest rating: opening frame 3.9 of 5 (was ~3.6). The vent helps; the wall still reads as a separate wedge because its footprint is fixed by the scan pins. Real "grown out of the slope" needs terrain-level rise under the wall, a follow-up.
