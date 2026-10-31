@@ -5,6 +5,7 @@ import {
   Landmarks,
   extractLandmarks,
   fadeByDistance,
+  labelFitsViewport,
   labelScaleForPixels,
   truncateLabel,
 } from '../../src/world/Landmarks.js';
@@ -106,6 +107,20 @@ describe('landmark label maths (QA-B #1)', () => {
     }
   });
 
+  it('shows a label only while its whole box is inside the viewport', () => {
+    const vp = { width: 1000, height: 600 };
+    const size = { width: 100, height: 14 };
+    // Sprite center (0.5, -0.6): the box is centred on x and sits above the anchor.
+    const center = { x: 0.5, y: -0.6 };
+    expect(labelFitsViewport({ x: 500, y: 300 }, size, center, vp)).toBe(true);
+    // Anchor 49 px from the left edge: the 100 px box would be clipped by 1 px.
+    expect(labelFitsViewport({ x: 49, y: 300 }, size, center, vp)).toBe(false);
+    expect(labelFitsViewport({ x: 50, y: 300 }, size, center, vp)).toBe(true);
+    // Above the top edge: the box extends 1.6 heights above the anchor.
+    expect(labelFitsViewport({ x: 500, y: 600 - 14 * 1.6 }, size, center, vp)).toBe(true);
+    expect(labelFitsViewport({ x: 500, y: 600 - 14 * 1.6 + 1 }, size, center, vp)).toBe(false);
+  });
+
   it('sizes a label to a constant pixel height, independent of distance', () => {
     const cam = new THREE.PerspectiveCamera(62, 1280 / 800, 0.5, 60000);
     const heightPx = 14;
@@ -149,11 +164,11 @@ describe('Landmarks markers', () => {
     const [near, far] = DEFAULT_CONFIG.landmarks.markerFadeM;
 
     cam.position.copy(p!.position).add(new THREE.Vector3(0, 0, far * 3));
-    lm.update(cam, 800);
+    lm.update(cam, { width: 1280, height: 800 });
     expect(lm.opacities()[0]!.dot).toBeCloseTo(DEFAULT_CONFIG.landmarks.markerOpacity, 6);
 
     cam.position.copy(p!.position).add(new THREE.Vector3(0, 0, near * 0.5));
-    lm.update(cam, 800);
+    lm.update(cam, { width: 1280, height: 800 });
     expect(lm.opacities()[0]!.dot).toBe(0);
   });
 
