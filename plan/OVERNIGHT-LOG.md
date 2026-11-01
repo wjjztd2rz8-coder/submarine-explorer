@@ -2842,3 +2842,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-bluehole-hood-geometry (26d21bd1): seven authored stalactites, ragged lip, darker underside; gates smoke PASS on worktree and main. Gain is real up close (~3.8 to 4.0) but the 24 m opening pose is 150 m from the hood, so the target frame needs an opening-pose change (not done; noted in DIRECTOR item 1). Portrait/Low shots were not captured. Codex week 5% until Nov 4, briefs 120-124 queued.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-01 06:24 CST headless run 285 (Claude): one package merged
+
+- Merged V-coral-sponge-garden: Blake gets tall pale sponge-stack scatter (data-driven, no new tier). Partial: foreground now has a second silhouette, but the distant mounds still read as similar tan lumps (needs per-mound variety in coral.ts). Gates smoke PASS on worktree and main. Next: V-beebe-seabed-read. Codex week 5% until Nov 4, briefs 120-124 queued.
+- **Needs owner:** phone retest (4410-P2 checklist).
