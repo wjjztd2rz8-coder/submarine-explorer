@@ -9,11 +9,11 @@
   },
   "opening": {
     "mission": {
-      "rangeM": 150,
+      "rangeM": 125,
       "chaseRadius": 46,
       "chaseOffsetX": -44,
-      "openingDepthM": 24,
-      "chaseOffsetY": -30,
+      "openingDepthM": 44,
+      "chaseOffsetY": -50,
       "localAltitudeWeight": -0.1,
       "destinationLabel": "the stalactite gallery"
     },
