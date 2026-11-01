@@ -72,7 +72,7 @@ The newest items go first.
 
 ## In flight
 
-- No package running. Briefs 120-123 queued, waiting for the Nov 4 Codex reset. Claude lane: Sonnet items 1-5 in order.
+- V-beebe-stub-light [Sonnet] IN FLIGHT (Claude, 2026-11-01). Briefs 120-123 queued, waiting for the Nov 4 Codex reset. Claude lane: Sonnet items 1-5 in order.
 
 ## Backlog
 
