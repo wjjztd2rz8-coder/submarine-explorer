@@ -2056,8 +2056,9 @@ freshTest.describe('Home to scan and return journey', () => {
                   from.x = target.position.x;
                   // Which side is deep differs per gallery (the rim is shallow).
                   from.z = target.position.z + (id.endsWith('-east') ? -40 : 40);
+                  // Stay below the gallery's 10 m scan floor even where the rim is shallow.
                   from.y = Math.max(
-                    target.position.y + 16,
+                    Math.min(target.position.y + 16, -20),
                     g.terrain.sampleHeight(from.x, from.z) +
                       g.config.submarine.hullRadius +
                       g.config.submarine.seabedClearance +
