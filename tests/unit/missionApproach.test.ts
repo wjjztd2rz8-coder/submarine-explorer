@@ -46,7 +46,7 @@ it('every authored site retains its mission approach distance', () => {
     'hudson-canyon': 112,
     kamaehuakanaloa: 110,
     'beebe-vent-field': 155,
-    'great-blue-hole': 150,
+    'great-blue-hole': 125,
     bismarck: 110,
     'hunga-tonga-caldera': 120,
     'blake-plateau-corals': 160,

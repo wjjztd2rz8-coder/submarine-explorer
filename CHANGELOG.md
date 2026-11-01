@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Blue Hole mission opening (data only): opens 125 m from the gallery (was 150 m) at 44 m depth (was 24 m) with a lower chase arm (offset Y -50, was -30), so the hood lip and stalactites sit at eye level instead of a small roof seen from above. Ranges of 110 m or less have no hull-safe pose under the hood at any depth.
+
 - **V-kama-subject:** Kama'ehuakanaloa slope tint is calmer (mottle 0.3 to 0.1, patch 0.2 to 0.08, stain 0.12 to 0.06) and the Hiolo North pillow heap moved from about 95 m east to the chimney's east flank so it reads as the vent's lava apron. Site data only; nothing cut.
 - **V-hunga-wall-rise:** the caldera tuff wall is larger ([150,24,80] m, was [90,30,45]) and the opening now looks at its lit face (site opening bearing 0 to 75, free-dive range 75 to 65, Low detail pose rescaled); the rim objective is renamed "Volcanic rim slope" (dropped the "(pre-2022 survey)" suffix so the card stays on one line). Site data only; the wall is still tagged a game addition.
 - **V-blake-mound:** the Blake Plateau opening now shows a field of five smaller coral mounds around the hero mound instead of a lone mound. Site data only; nothing cut.
