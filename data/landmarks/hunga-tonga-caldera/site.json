@@ -28,6 +28,11 @@
     }
   },
   "atmosphere": {
+    "water": {
+      "depthM": -200,
+      "waterColor": 1197662,
+      "fogColor": 1722976
+    },
     "lamps": {
       "intensity": 3,
       "distance": 1.2,

@@ -61,7 +61,8 @@ test('Low seabed lighting is isolated to the observed dark sites and leaves surf
       const c = sample.ambientColor;
       const illumination = sample.ambientIntensity * (0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b);
       expect(illumination).toBeGreaterThan(0.8);
-      expect(sample.fogColor).toEqual(base.fogColor);
+      if (!siteManifests.siteManifest(site)?.atmosphere?.water)
+        expect(sample.fogColor).toEqual(base.fogColor);
       expect(sample.fogDensity).toBe(base.fogDensity);
       expect(sample.sunIntensity).toBe(base.sunIntensity);
     }
