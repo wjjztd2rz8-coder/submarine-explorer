@@ -2837,3 +2837,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Golden captured and reviewed (stage ~88%); Sol skipped (Codex week 5%). Backlog now 5 Claude items; CI shard-2 flake: added github reporter, hunt queued in brief 124. No packages started. f71 not tagged: latest CI red on that flake.
 - **Needs owner:** phone retest (4410-P2 checklist); optional Blue Hole hood reference.
+
+## 2026-11-01 04:52 CST headless run 284 (Claude): one package merged
+
+- Merged V-bluehole-hood-geometry (26d21bd1): seven authored stalactites, ragged lip, darker underside; gates smoke PASS on worktree and main. Gain is real up close (~3.8 to 4.0) but the 24 m opening pose is 150 m from the hood, so the target frame needs an opening-pose change (not done; noted in DIRECTOR item 1). Portrait/Low shots were not captured. Codex week 5% until Nov 4, briefs 120-124 queued.
+- **Needs owner:** phone retest (4410-P2 checklist).
