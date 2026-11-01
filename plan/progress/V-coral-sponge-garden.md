@@ -10,3 +10,5 @@ After: `.cache/golden/2026-11-01-110006/blake-plateau-corals-1-mission.png` (als
 Honest rating: partial. Tall pale stacks now show in the foreground bed (a second silhouette next to the low tan mounds), but the stretch between sub and mounds at the opening is still empty (scatter is sparse beyond the near field), so the mounds themselves still look like similar lumps from 160 m.
 
 Gaps: mound silhouettes at distance are unchanged; fixing that needs per-mound variety in `coral.ts` or a denser mid-range scatter.
+
+Gates: only the two cross-site snapshots (beebeIsolation, beebeScatter) changed, both from the intended Blake biome edit; re-baselined. Everything else passed.

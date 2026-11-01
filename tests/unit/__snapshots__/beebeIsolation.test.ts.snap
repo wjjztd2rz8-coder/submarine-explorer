@@ -65,7 +65,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
     },
   },
   "blake-plateau-corals": {
-    "biome": "4e3e2e2a06f3252dd87fc295f623476d8e105a695b57204bbfb29ea4ac2ea8ad",
+    "biome": "0fdc6dbc5d6c1f9c20021af4f90e672e2f2676e8e51723136f0aa2bb7e9601d2",
     "tiers": {
       "high": {
         "buffers": [
