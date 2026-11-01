@@ -279,7 +279,7 @@ export const SCATTER_TYPES: Record<ScatterKind, ScatterTypeDef> = {
   tubeworm: {
     material: 'soft',
     geometry: tubeSpongeGeometry,
-    size: [0.15, 0.4],
+    size: [0.3, 0.7],
     height: [1.3, 2.4],
     embed: 0.05,
     align: 0.15,

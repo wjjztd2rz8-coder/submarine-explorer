@@ -320,8 +320,8 @@ export const BIOMES: Record<string, Biome> = {
       { kind: 'rubble', density: 8, slopeMaxDeg: 35, on: 'any', sizeMul: 1.3 },
       { kind: 'boulder', density: 1.2, slopeMaxDeg: 40, on: 'rock' },
       // Dead sulphide stubs and pale tube-worm clumps give the plain its mid-distance subjects.
-      { kind: 'ventstub', density: 2.2, slopeMaxDeg: 25, on: 'any' },
-      { kind: 'tubeworm', density: 5, slopeMaxDeg: 30, on: 'any' },
+      { kind: 'ventstub', density: 7, slopeMaxDeg: 25, on: 'any' },
+      { kind: 'tubeworm', density: 30, slopeMaxDeg: 30, on: 'any' },
     ],
   },
   'hunga-tonga-caldera': {
