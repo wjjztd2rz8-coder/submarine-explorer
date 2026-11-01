@@ -233,6 +233,29 @@ export const SCATTER_TYPES: Record<ScatterKind, ScatterTypeDef> = {
         o,
       ),
   },
+  // Tall pale tube-sponge stacks in the same muted hues as the vase sponges.
+  chimney: {
+    material: 'soft',
+    geometry: tubeSpongeGeometry,
+    size: [0.4, 1.0],
+    height: [1.2, 2.4],
+    embed: 0.05,
+    align: 0.2,
+    wobble: 0.15,
+    clump: [3, 6],
+    clumpRadiusM: 1.8,
+    patchiness: 0.6,
+    patchScaleM: 28,
+    drawRangeM: 160,
+    color: (_b, r, o) =>
+      tinted(
+        SPONGE_HUES[Math.floor(r() * SPONGE_HUES.length) % SPONGE_HUES.length] as number,
+        0.8,
+        1.2,
+        r,
+        o,
+      ),
+  },
   mound: {
     material: 'soft',
     geometry: moundGeometry,

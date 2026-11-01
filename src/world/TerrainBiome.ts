@@ -44,7 +44,8 @@ export type ScatterKind =
   | 'whip'
   | 'mound'
   | 'ledge'
-  | 'tube';
+  | 'tube'
+  | 'chimney';
 
 export interface ScatterSpec {
   kind: ScatterKind;
@@ -367,6 +368,8 @@ export const BIOMES: Record<string, Biome> = {
       { kind: 'sponge', density: 0.9, slopeMaxDeg: 30, on: 'any' },
       { kind: 'whip', density: 0.7, slopeMaxDeg: 30, on: 'any' },
       { kind: 'mound', density: 2, slopeMaxDeg: 10, on: 'flat' },
+      // Tall pale sponge stacks stand up from the bed: a vertical silhouette against the low mounds.
+      { kind: 'chimney', density: 12, slopeMaxDeg: 20, on: 'any', sizeMul: 3 },
     ],
   },
   // Limestone walls, pale silt floor.
