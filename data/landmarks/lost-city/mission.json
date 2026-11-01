@@ -14,8 +14,10 @@
       "smokeIntensity": 0,
       "glowLights": 3,
       "glowColor": 13625599,
-      "glowIntensity": 24000,
+      "glowIntensity": 60000,
       "glowDistanceM": 90,
+      "glowDropM": 8,
+      "glowStandoffM": 8,
       "shimmerStrength": 0
     }
   },
