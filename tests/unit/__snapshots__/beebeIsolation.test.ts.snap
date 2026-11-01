@@ -255,7 +255,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
     },
   },
   "kamaehuakanaloa": {
-    "biome": "589d6775f0d8bc3b8b795a8d5e9a940f98238eabb37ca76b25efe87dabaa10ce",
+    "biome": "b3035f8b44443d00c5236052c2b13e57efa1d95c6bca6b808c5e2f2051ae6784",
     "tiers": {
       "high": {
         "buffers": [
@@ -268,7 +268,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
         ],
         "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
         "shader": "ecee33e178410d74a6ac6899792d2c460eb035a134653f461838a31c14104abc",
-        "uniforms": "6b7c14a422cb62b0217fb5c6495f0a86ba7f1e3b31b673e067bccc4ba99f28b9",
+        "uniforms": "46a15e885fcc8d45d5e276ddc29f864942b8b3f1f0ffc8355d7c1e798ee9fd40",
       },
       "low": {
         "buffers": [
@@ -281,7 +281,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
         ],
         "cache": "seabed-",
         "shader": "278282786c2f1bd61b4ad34ff3999c314f5a808369c331d25f9b75f94ada5873",
-        "uniforms": "6b7c14a422cb62b0217fb5c6495f0a86ba7f1e3b31b673e067bccc4ba99f28b9",
+        "uniforms": "46a15e885fcc8d45d5e276ddc29f864942b8b3f1f0ffc8355d7c1e798ee9fd40",
       },
     },
   },
