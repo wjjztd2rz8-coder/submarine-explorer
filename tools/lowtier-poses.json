@@ -6,10 +6,10 @@
     "close": { "range": 60, "above": 22 }
   },
   "hunga-tonga-caldera": {
-    "target": [0, 36, -8],
+    "target": [0, 68, -8],
     "direction": [-1, 0, 0],
-    "above": 38,
-    "approachRange": 75,
-    "close": { "range": 50, "above": 38 }
+    "above": 60,
+    "approachRange": 110,
+    "close": { "range": 50, "above": 60 }
   }
 }
