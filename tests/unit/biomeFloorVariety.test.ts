@@ -483,13 +483,13 @@ describe('site floor material bindings', () => {
               expect(biome.vertexTint).toBeUndefined();
               for (const [name, color] of [
                 ['uColA', 0x8a6b54],
-                ['uColB', 0x7a6a5c],
+                ['uColB', 0x876a56],
                 ['uColC', 0x2f2e30],
                 ['uStain', 0x7a5a44],
               ] as const)
                 expect(uniforms[name].value.toArray()).toEqual(new THREE.Color(color).toArray());
-              expect(uniforms.uPatch.value).toBe(0.2);
-              expect(uniforms.uStainAmount.value).toBe(0.12);
+              expect(uniforms.uPatch.value).toBe(0.08);
+              expect(uniforms.uStainAmount.value).toBe(0.06);
               expect(uniforms.uContrast.value.toArray()).toEqual([1.9, 1.3, 1.3]);
               expect(uniforms.uNormalStrength.value).toBe(0.9);
               expect(uniforms.uRipple.value).toBe(0.1);
