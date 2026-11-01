@@ -2862,3 +2862,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-kama-subject (36772522): calmer Kama slope tint (biome data) and the pillow heap moved to the vent base. Partial: plume base only marginally lit, far slope still dark blue-grey, heap clips slightly into the slope; desktop only. First gates run failed on unit snapshots (biome values), fixed by Haiku; gates smoke PASS on main. Next: backlog has no Claude visual items left except follow-ups (needs re-ranking). Codex week 4% until Nov 4, briefs 120-124 queued.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-01 11:18 CST headless run 289 (Claude): one package merged
+
+- Backlog's Claude lane was empty, so added and merged V-beebe-stub-light (b12388a1): ventstub scatter is now rust-tinted and taller, reads against the seabed at mid distance; frame not darker. Partial: more stubs than the 2-3 target, desktop only. Gates smoke PASS on worktree and main. CI on run 287 failed only in the known e2e shard 2/38 flake (hunt in brief 124). Claude backlog needs re-ranking by the next review (bluehole-opening-pose overlaps queued brief 120). Codex week 4% until Nov 4, briefs 120-124 queued.
+- **Needs owner:** phone retest (4410-P2 checklist).
