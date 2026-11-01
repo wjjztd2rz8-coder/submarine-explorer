@@ -14,6 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
+- **V-kama-slope-light:** Kama'ehuakanaloa vent glow is stronger and reaches further (7000 cd, 150 m) and the site ambient is lifted (18 to 26), so the plume base is warmly lit and the far slope is lighter. Site data only.
 - Blue Hole mission opening (data only): opens 125 m from the gallery (was 150 m) at 44 m depth (was 24 m) with a lower chase arm (offset Y -50, was -30), so the hood lip and stalactites sit at eye level instead of a small roof seen from above. Ranges of 110 m or less have no hull-safe pose under the hood at any depth.
 
 - **V-kama-subject:** Kama'ehuakanaloa slope tint is calmer (mottle 0.3 to 0.1, patch 0.2 to 0.08, stain 0.12 to 0.06) and the Hiolo North pillow heap moved from about 95 m east to the chimney's east flank so it reads as the vent's lava apron. Site data only; nothing cut.
