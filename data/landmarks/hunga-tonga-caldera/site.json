@@ -23,7 +23,7 @@
     },
     "freeDive": {
       "hero": "caldera-tuff-wall",
-      "bearing": 0,
+      "bearing": 75,
       "range": 75
     }
   },
