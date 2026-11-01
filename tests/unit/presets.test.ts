@@ -396,7 +396,7 @@ describe('vent haze and glow budgets', () => {
     }
   });
 
-  it('preserves carbonate lights at two metres above the orifice despite sulfide offsets', () => {
+  it('applies glow drop and standoff to carbonate like other fluids, with the carbonate scale', () => {
     const { scene, preset, context } = enter({
       fluid: 'carbonate',
       glowDropM: 12,
@@ -405,11 +405,9 @@ describe('vent haze and glow budgets', () => {
     try {
       const lights = glowLights(scene);
       expect(lights).toHaveLength(1);
-      expect(lights[0]!.position.toArray()).toEqual(
-        context.pois[0]!.position.clone()
-          .add(new Vector3(0, 2, 0))
-          .toArray(),
-      );
+      const delta = lights[0]!.position.clone().sub(context.pois[0]!.position);
+      expect(delta.y).toBe(-12);
+      expect(Math.hypot(delta.x, delta.z)).toBeCloseTo(6);
       expect(lights[0]!.intensity).toBe(260 * 0.35);
     } finally {
       preset.exit();
@@ -712,8 +710,7 @@ describe('per-site preset atmosphere', () => {
   > = {
     default: { drop: 4, standoff: 0, distance: 60, intensity: 260 },
     'beebe-vent-field': { drop: 12, standoff: 6, distance: 60, intensity: 3000 },
-    // Carbonate towers put the key light just above the rim, ignoring the drop.
-    'lost-city': { dy: 2, drop: 4, standoff: 0, distance: 90, intensity: 8400 },
+    'lost-city': { drop: 8, standoff: 8, distance: 90, intensity: 21000 },
     'axial-seamount-ashes': { drop: 0.5, standoff: 1.5, distance: 28, intensity: 700 },
   };
   const sites = (
