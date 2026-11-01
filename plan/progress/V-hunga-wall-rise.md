@@ -1,21 +1,14 @@
 # V-hunga-wall-rise
 
-## What changed
+## What changed (data only, no code)
+- `data/landmarks/hunga-tonga-caldera/props.json`: wall `heading_deg` 270 to 195 (the opening spawns the sub in front of the wall's face; at 270 it saw the back of the arc, which read as a wedge), `dimensions_m` [90,30,45] to [150,24,80]; note updated, game-addition tag kept.
+- `pois.json`: POI name "Volcanic rim slope (pre-2022 survey)" to "Volcanic rim slope" (objective card now one line).
+- CHANGELOG entry added.
 
-- New `caldera-rim` value for the existing site `terrain.carve` mechanism (`src/world/terrainFeatures.ts`, `src/core/SiteManifest.ts`), selected from `data/landmarks/hunga-tonga-caldera/site.json`. It adds a smooth rim bank (up to ~60 m, wobbled) starting just behind the wall (22 m east of its centre, face west) and fading over ~260 m, about ±60-150 m laterally. Starting at the wall's own foot (first tries) buried the wall's back and blocked the Low detail pose. Same pattern as `canyon-bend` and `sinkhole`; no siteId branch.
-- Test bends (rules can bend, logged): `tools/lowtier-poses.json` Hunga detail pose direction [1,0,0] -> [-1,0,0] (the old pose sat 42 m behind the wall, now inside the rim, so it views the open face from the west); `lowTierFollowups` cliff-hit floor 20 -> 12 for that narrower front silhouette. Manifest test, freeDiveComposition snapshots refreshed.
-- Wall dims, position and the 120 m scan-distance pins are unchanged. The rim-foot vent still snaps to the seabed beside the sub.
+## Result vs target
+Screenshots: before `.cache/golden/2026-11-01-081522/hunga-tonga-caldera-1-mission.png`; after `.cache/golden/2026-11-01-132032/hunga-tonga-caldera-1-mission.png` (desktop).
+Now a wide, lit, bedded wall band with a rubble apron, centred rather than upper-left, filling roughly the middle third of the frame and ~40% of its height. Reads as a wall: about 3.6 on the rubric (was ~3.0). Not met: it sits centre, not upper-left; top is a bit dark; the opening camera is high so the face is foreshortened.
+Label: one line, unclipped.
 
-## Before / after (Hunga mission opening, desktop)
-
-- Before: /home/vijay/submarine-explorer/.cache/golden/2026-10-31-161522/hunga-tonga-caldera-1-mission.png
-- Tried 38 m rise (too subtle): .cache/golden/2026-10-31-191010/
-- Final (60 m, bank behind wall): /home/vijay/subexp-wt/V-hunga-wall-rise/.cache/golden/2026-10-31-194825/hunga-tonga-caldera-1-mission.png
-
-## Honest rating
-
-About 4.1 of 5 (was ~3.9). The wall now stands against a rising dome of ground behind it, so it reads less like a free-standing wedge; the wall still looks pasted in front of the hill rather than grown out of it (the bank starts behind it), and the vent sits warm beside the sub. Weaknesses: the bank is a smooth, dark, blobby dome with little surface texture, and the wall's cut face is still sharply faceted against it. Not too dark by golden readability, but the bank is dimmer than the foreground.
-
-## Simplicity check
-
-One data line in site.json, one carve branch (~15 lines) beside the existing two, one union member. No new specs, props or layout patches. Nothing cut.
+## Verification
+`PW_PORT=5871 tools/gates.sh` (smoke + project-base, static) passed.
