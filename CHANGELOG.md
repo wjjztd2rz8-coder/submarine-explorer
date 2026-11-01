@@ -14,7 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
-- **V-hunga-wall-rise:** the caldera tuff wall now faces the mission opening (heading 270 to 195, so the lit face shows instead of its back) and is larger [150,24,80] m (was [90,30,45]); the rim objective is renamed "Volcanic rim slope" (dropped the "(pre-2022 survey)" suffix so the card stays on one line). Site data only; the wall is still tagged a game addition.
+- **V-hunga-wall-rise:** the caldera tuff wall is larger ([150,24,80] m, was [90,30,45]) and the opening now looks at its lit face (site opening bearing 0 to 75, free-dive range 75 to 65, Low detail pose rescaled); the rim objective is renamed "Volcanic rim slope" (dropped the "(pre-2022 survey)" suffix so the card stays on one line). Site data only; the wall is still tagged a game addition.
 - **V-blake-mound:** the Blake Plateau opening now shows a field of five smaller coral mounds around the hero mound instead of a lone mound. Site data only; nothing cut.
 - **V-kama-opening:** Kamaʻehuakanaloa now uses the vent environment preset (smoke, shimmer, haze) instead of seamount, and its mission opening is angled so the Hiolo North vent stack is visible beside the sub. Site data only.
 - **V-monterey-flatten:** Monterey Canyon seabed is darker and more textured through its biome data only: sand colours drop about 20 percent, contrast 0.55 to 0.8, detail 0.5 to 0.85, stain 0.08 to 0.18, so the lower-right floor reads closer to the wall instead of a pale flat slab. Opening scene brightness is unchanged in practice (readable check passes).

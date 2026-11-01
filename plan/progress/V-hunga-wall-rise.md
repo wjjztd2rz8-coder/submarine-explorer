@@ -2,16 +2,18 @@
 
 ## What changed (data only, no code)
 
-- `data/landmarks/hunga-tonga-caldera/props.json`: wall `heading_deg` 270 to 195 (the opening spawns the sub in front of the wall's face; at 270 it saw the back of the arc, which read as a wedge), `dimensions_m` [90,30,45] to [150,24,80]; note updated, game-addition tag kept.
-- `pois.json`: POI name "Volcanic rim slope (pre-2022 survey)" to "Volcanic rim slope" (objective card now one line).
+- `props.json`: wall `dimensions_m` [90,30,45] to [150,24,80]; note updated, game-addition tag kept.
+- `site.json`: opening `freeDive.bearing` 0 to 75 (the mission opening now comes in on the wall's lit face, not at an angle to its side), `range` 75 to 65 (keeps the first scan within 120 m).
+- `pois.json`: name "Volcanic rim slope (pre-2022 survey)" to "Volcanic rim slope" (objective card is one line).
+- `tools/lowtier-poses.json`: Hunga detail pose rescaled to the taller wall; free-dive snapshot regenerated (genuine pose change).
 - CHANGELOG entry added.
 
 ## Result vs target
 
-Screenshots: before `.cache/golden/2026-11-01-081522/hunga-tonga-caldera-1-mission.png`; after `.cache/golden/2026-11-01-132032/hunga-tonga-caldera-1-mission.png` (desktop).
-Now a wide, lit, bedded wall band with a rubble apron, centred rather than upper-left, filling roughly the middle third of the frame and ~40% of its height. Reads as a wall: about 3.6 on the rubric (was ~3.0). Not met: it sits centre, not upper-left; top is a bit dark; the opening camera is high so the face is foreshortened.
-Label: one line, unclipped.
+Before: `.cache/golden/2026-11-01-081522/hunga-tonga-caldera-1-mission.png`. After: `.cache/golden/2026-11-01-134814/hunga-tonga-caldera-1-mission.png` (desktop).
+A wide, lit, steep bedded wall with a rubble apron fills the middle of the frame and about 55% of its height; joints and beds read, and it stands in front of the dark dome as a wall rather than a wedge. Self-rating about 3.7 (was about 3.0). Not met exactly: it is centred rather than upper-left, the top is a little dark, and the bearing was tuned on desktop only (portrait/landscape not re-captured).
+Label is one line, unclipped.
 
 ## Verification
 
-`PW_PORT=5871 tools/gates.sh` (smoke + project-base, static) passed.
+`PW_PORT=5871 tools/gates.sh` passed (smoke + project-base e2e, unit, static). Not run: full e2e.
