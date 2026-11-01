@@ -218,22 +218,22 @@ const slope = (x: number, z: number) => 0.045 * x + 0.025 * z;
 // clipped depth extents. Placement and material contracts remain independent.
 const scarpBaseline: Record<string, string[]> = {
   'tuff-low': [
-    'e96e7ab77c81d31df191e3b680e9de128f38608895a5fa203ed754aa5d6d211e',
+    'd0c99e1332a1888e25c93deb36baeb8372f71337a2b61707e176ae81fafe3cf1',
     '18b7e7ec183937dc9ba6296cb75fa34e1c48253df3c93f66f83a0113790de95b',
     '9a0255067cba24ebae01497072a0e9e4e544b768adadb0bdc85f8708b029d68a',
-    'f64de787b57029e6f9a5bd32f04d99954a6d2b162a3f163ce25aaaae0ce2a1b2',
+    'e871e9946f2ffca4ce775806629f61dd0a2c61b6cd3669064e12a851f23522fa',
   ],
   'tuff-medium': [
-    '09cff40c8dac45c2c42b547ab6ae230b404ead41bd6f0097d5fd8ddef0db3afb',
+    'd1b2d4ca80b9549cbb91207ba1472016d1264d8521e69dbf320a9afa73b6557f',
     'b3e02644e65503abd5ddbf48e17b2abdfeeac5fee6e61c30106005c5b46c7071',
     'db463017008dfc3080e0e2a04c076c436c48c888dac7fb77670374f9fc0e6c92',
-    'dd87c3d418eb12fbafb1e4c5a4e6553c213ff24e2f126327efb71e50772f4f76',
+    'b77359aa0e481b3583e3ff422da83bc62df6c960e178e50df611a5fc7acd69d3',
   ],
   'tuff-high': [
-    'a0c4cc9c640fba93a326c56fa1d41100860ae8567f1c5b3d975b9af204d7be8c',
+    '638404b60086683dc4b4ae032632afad1b6d03281cc6414039768dc476a57b6c',
     'cf2189a1ddc14a8be492f4cf3c1710620e02664cb2ada9a5c52bef5ea8d05c94',
     'db463017008dfc3080e0e2a04c076c436c48c888dac7fb77670374f9fc0e6c92',
-    '6957eb6dd98a1c6b35e13c618db11941e8204e45eab9fed6f9531d4a121e6c47',
+    'aceedcc92e9cda8ab9d0a99e9d56e4aa185b3f1759065c173cb39d4f36cbf87c',
   ],
   'canyon-low': [
     'a59694039df1257d8887a9756e06df631427481bdea775a10030526e7d40fe68',

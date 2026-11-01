@@ -817,7 +817,11 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
           : {}),
         // Hunga's dim tuff slope gets stronger lamps so the rim and glow read on a phone.
         ...(id === 'hunga-tonga-caldera'
-          ? { lamps: { intensity: 3, distance: 1.2, fillIntensity: 3.5, fillDistance: 1.4 } }
+          ? {
+              lamps: { intensity: 3, distance: 1.2, fillIntensity: 3.5, fillDistance: 1.4 },
+              // A lighter deep column so the wall crest stands against lit water, not black.
+              water: { depthM: -200, waterColor: 0x12465e, fogColor: 0x1a4a60 },
+            }
           : {}),
         tiers: Object.fromEntries(
           tiers.map((tier) => [
@@ -918,6 +922,6 @@ describe('opening depth and column colour', () => {
       allSiteManifests()
         .filter((m) => m.opening?.mission?.openingDepthM !== undefined || m.atmosphere?.water)
         .map((m) => m.id),
-    ).toEqual(['great-blue-hole']);
+    ).toEqual(['great-blue-hole', 'hunga-tonga-caldera']);
   });
 });
