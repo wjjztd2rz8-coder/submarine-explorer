@@ -14,6 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
+- **V-kama-subject:** Kama'ehuakanaloa slope tint is calmer (mottle 0.3 to 0.1, patch 0.2 to 0.08, stain 0.12 to 0.06) and the Hiolo North pillow heap moved from about 95 m east to the chimney's east flank so it reads as the vent's lava apron. Site data only; nothing cut.
 - **V-hunga-wall-rise:** the caldera tuff wall is larger ([150,24,80] m, was [90,30,45]) and the opening now looks at its lit face (site opening bearing 0 to 75, free-dive range 75 to 65, Low detail pose rescaled); the rim objective is renamed "Volcanic rim slope" (dropped the "(pre-2022 survey)" suffix so the card stays on one line). Site data only; the wall is still tagged a game addition.
 - **V-blake-mound:** the Blake Plateau opening now shows a field of five smaller coral mounds around the hero mound instead of a lone mound. Site data only; nothing cut.
 - **V-kama-opening:** Kamaʻehuakanaloa now uses the vent environment preset (smoke, shimmer, haze) instead of seamount, and its mission opening is angled so the Hiolo North vent stack is visible beside the sub. Site data only.
@@ -76,6 +77,7 @@ without an entry here is not done.
 
 ### Changed
 
+- **V-kama-subject:** Kama'ehuakanaloa slope tint is calmer (mottle 0.3 to 0.1, patch 0.2 to 0.08, stain 0.12 to 0.06) and the Hiolo North pillow heap moved from about 95 m east to the chimney's east flank so it reads as the vent's lava apron. Site data only; nothing cut.
 - **V-headlight:** damp terrain texture roughness toward 0.9 to remove the repeating speckle under the lamps. Low keeps its existing non-PBR branch; no shader resources or geometry are added.
 - **V-titanic close view:** shared wreck steel adds texture-space plate tones and rust stains on Titanic, Bismarck and their steel scatter. Existing textures, lighting and tier budgets remain; the layer adds fragment arithmetic on all tiers.
 - **V-eight-sites approaches:** Bismarck's mission approach shortens from 240 to 150 m, Hudson's from 240 to 160 m, and Hunga's and Blake's from 260 to 160 m so the first subject is nearer at spawn. The scan-radius cap follows the existing table rule and preserves at least 60 m of transit with Extended sensors.

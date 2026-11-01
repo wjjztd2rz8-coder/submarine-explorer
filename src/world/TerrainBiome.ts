@@ -344,11 +344,11 @@ export const BIOMES: Record<string, Biome> = {
     a: 'silt',
     b: 'basalt',
     stain: 0x7a5a44,
-    mottle: 0.3,
+    mottle: 0.1,
     colorA: 0x8a6b54,
-    colorB: 0x7a6a5c,
-    stainAmount: 0.12,
-    patch: 0.2,
+    colorB: 0x876a56,
+    stainAmount: 0.06,
+    patch: 0.08,
   },
   // Cold-water coral rubble on carbonate sand.
   'blake-plateau-corals': {

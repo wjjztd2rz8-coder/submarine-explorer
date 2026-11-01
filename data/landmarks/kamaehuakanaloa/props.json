@@ -53,8 +53,8 @@
       "id": "hiolo-north-pillows",
       "model": "procedural:geo",
       "feature": "pillow-field",
-      "lat": 18.91205,
-      "lon": -155.2669,
+      "lat": 18.91237,
+      "lon": -155.26764,
       "snap_to_seabed": true,
       "heading_deg": 0,
       "scale": 1,
@@ -62,7 +62,7 @@
       "lod_distance_m": 700,
       "collision": "box",
       "reconstruction": true,
-      "note": "Game addition: pillow-lava heap with iron-oxide staining and orange iron-bacteria mats east-southeast of the Hiolo North chimneys, leaving the vent mounds visible on approach; the seamount is basaltic and its summit vents host Fe-oxidising mats (Emerson & Moyer 2002). Exact layout and size are invented."
+      "note": "Game addition: pillow-lava heap with iron-oxide staining and orange iron-bacteria mats against the east flank of the Hiolo North chimneys, so the vent sits on its own lava apron; the seamount is basaltic and its summit vents host Fe-oxidising mats (Emerson & Moyer 2002). Exact layout and size are invented."
     }
   ]
 }
