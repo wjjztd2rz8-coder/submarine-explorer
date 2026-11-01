@@ -134,6 +134,8 @@ export interface PropManifest {
   galleryApron?: GalleryApron;
   grounding?: 'rendered';
   grotto?: 'hood';
+  /** Hood feature stalactites: [position along the width as a fraction of it, depth fraction toward the lip, length as a fraction of the height]. */
+  pendants?: [number, number, number][];
   apronHabitat?: boolean;
   habitat?: boolean;
   seabed?: { biome: string };
@@ -471,6 +473,15 @@ const propCheck = fields(
       if (value !== 'hood') fail(id, path, 'expected hood');
     },
     galleryApron: fields(numericFields(galleryApronKeys, aboveZero)),
+    pendants: (id, path, value) => {
+      if (!Array.isArray(value)) fail(id, path, 'expected an array');
+      (value as unknown[]).forEach((row, i) => {
+        if (!Array.isArray(row) || row.length !== 3)
+          fail(id, `${path}[${i}]`, 'expected [u, f, length]');
+        (row as unknown[]).forEach((v, j) => finite(id, `${path}[${i}][${j}]`, v));
+        if ((row as number[])[2]! <= 0) fail(id, `${path}[${i}][2]`, 'expected a positive length');
+      });
+    },
     apronHabitat: flag,
     habitat: flag,
     seabed: fields({ biome: text }),

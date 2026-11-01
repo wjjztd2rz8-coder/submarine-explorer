@@ -334,7 +334,11 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const jut = hood
       ? 0.07 * D * noseAt(x) * smooth(0.6 * H, 0.66 * H, y) * smooth(0.5, 0.9, -z / D)
       : 0;
-    return disp(x, y, z) - lipZone * Math.max(0, chip) * (hood ? 11 : 4.5) * scale - jut;
+    // Hood: vertical ribs scallop the lip so its edge is a ragged fringe, not one smooth hem.
+    const rib = hood
+      ? lipZone * smooth(0.45, 0.8, fbm3(x * 0.55 + 51, 2, seed + 37, seed + 9, 3)) * 0.12 * D
+      : 0;
+    return disp(x, y, z) - lipZone * Math.max(0, chip) * (hood ? 6 : 4.5) * scale - jut - rib;
   };
 
   /**
@@ -457,6 +461,15 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       // Underside and cavity fall into cool shadow, darkest deep in the bay.
       const shade =
         smooth(0.2, -0.4, ny) * smooth(0.4 * H, 0.52 * H, y) * (1 - smooth(0.62 * H, 0.7 * H, y));
+      // The lip's outer face catches the light that the underside never gets.
+      out.multiplyScalar(
+        1 +
+          0.22 *
+            smooth(0.5 * H, 0.64 * H, y) *
+            smooth(0.7, 0.95, -z / D) *
+            (1 - smooth(0.2, 0.6, Math.abs(ny))),
+      );
+      if (ny < -0.2 && y > 0.4 * H && y < 0.7 * H) out.multiplyScalar(0.55);
       out.lerp(
         CAVE_DARK,
         0.75 *
@@ -704,66 +717,85 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
   let galleryGeometry: THREE.BufferGeometry | undefined;
   const longest: { x: number; z: number; y: number; len: number; r: number }[] = [];
   const clusters = Math.max(4, Math.round((hood ? 10 : 8) * Math.sqrt(d.growth)));
+  /** Hang one pendant at plan fraction f (0 = rear, 1 = lip) from the underside at x. */
+  const hang = (o: {
+    x: number;
+    f: number;
+    len?: number;
+    main: boolean;
+    id: number;
+    stub: boolean;
+  }): void => {
+    const { x, main } = o;
+    const f = Math.min(0.97, Math.max(0.15, o.f));
+    // Where the underside really is at this x: the profile's own point, displaced like the mesh.
+    const z0 = -f * D;
+    const sc = shelf(x);
+    if (sc * f < 0.12) return; // no shelf here: nothing to hang from
+    const yBase = undersideY(f) * H;
+    const { edge } = wallEnvelope(x, W, EDGE_START);
+    const z = hood
+      ? (z0 + disp(x, yBase, z0) * (1 - edge * 0.6)) * (1 - edge * 0.55) + plan(x)
+      : z0 + disp(x, yBase, z0) + plan(x);
+    const yTop = yBase * scaleAt(x) + liftAt(x) + 0.5 - (hood ? sinkAt(x) : 0);
+    const generatedLength =
+      (1.4 + rnd() * rnd() * 0.36 * H) *
+      (main ? 1.35 : 0.55 + rnd() * 0.5) *
+      (0.6 + 0.4 * scaleAt(x));
+    // Hood: authored feature pendants carry their own length; the rest are short stubs.
+    const clump = smooth(0.35, 0.65, fbm3(x * 0.09 + 12, 3, seed + 47, seed + 15, 3));
+    const wanted = o.len ?? H * (0.03 + 0.1 * clump * (0.3 + 0.7 * rnd()));
+    const len = hood ? Math.min(wanted, yTop - gnd(x, z) - 0.7) : generatedLength;
+    if (hood && (len < 0.5 || (o.stub && gapAt(x) > 0.02))) return;
+    // Variation draws use their own stream, so the placement of the original gallery is unchanged.
+    const lean = main ? 0 : 0.05 + vr() * 0.14;
+    const leanDir = vr() * 6.28;
+    const r = len * 0.12 + 0.22;
+    // Feature pendants are slender cones; stubs and the original gallery vary in girth.
+    const girth =
+      o.stub || !hood ? (1 + vr() * 1.4) * (hood ? 1 + 0.5 * clump : 1) : 0.8 + 0.5 * vr();
+    parts.push(
+      place(
+        pendant({
+          h: len,
+          r0: r,
+          girth,
+          seed: seed + o.id * 3,
+          segs: 10 * d.meshDensity + 4,
+          rings: 8 + 6 * d.meshDensity,
+        }),
+        {
+          x,
+          y: yTop,
+          z,
+          rx: Math.PI + lean * Math.cos(leanDir),
+          ry: rnd() * 6.28,
+          rz: (rnd() - 0.5) * 0.1 + lean * Math.sin(leanDir),
+        },
+      ),
+    );
+    longest.push({ x, z, y: yTop, len, r });
+  };
   for (let k = 0; k < clusters; k++) {
     const cx = hood
       ? ((k + 0.25 + rnd() * 0.5) / clusters - 0.5) * W * 0.62
       : (rnd() - 0.5) * W * 0.5;
     // Alternate lip silhouettes and recessed clusters, leaving water between them.
     const cf = hood ? (k % 3 === 0 ? 0.84 : k % 3 === 1 ? 0.57 : 0.32) : 0.25 + rnd() * 0.65;
-    const members = 2 + Math.floor(rnd() * 4);
-    for (let i = 0; i < members; i++) {
-      const x = cx + (rnd() - 0.5) * 3.2;
-      const f = Math.min(0.97, Math.max(0.15, cf + (rnd() - 0.5) * 0.18));
-      // Where the underside really is at this x: the profile's own point, displaced like the mesh.
-      const z0 = -f * D;
-      const sc = shelf(x);
-      if (sc * f < 0.12) continue; // no shelf here: nothing to hang from
-      const yBase = undersideY(f) * H;
-      const { edge } = wallEnvelope(x, W, EDGE_START);
-      const z = hood
-        ? (z0 + disp(x, yBase, z0) * (1 - edge * 0.6)) * (1 - edge * 0.55) + plan(x)
-        : z0 + disp(x, yBase, z0) + plan(x);
-      const yTop = yBase * scaleAt(x) + liftAt(x) + 0.5 - (hood ? sinkAt(x) : 0);
-      const main = i === 0;
-      const generatedLength =
-        (1.4 + rnd() * rnd() * 0.36 * H) *
-        (main ? 1.35 : 0.55 + rnd() * 0.5) *
-        (0.6 + 0.4 * scaleAt(x));
-      // Hood: a clump noise decides where pendants are long; most stay short stubs.
-      const clump = smooth(0.35, 0.65, fbm3(x * 0.09 + 12, 3, seed + 47, seed + 15, 3));
-      const hoodLength =
-        H * (0.03 + 0.5 * clump * clump * clump * (0.3 + 0.7 * (main ? 1 : rnd())));
-      const len = hood ? Math.min(hoodLength, yTop - gnd(x, z) - 0.7) : generatedLength;
-      if (hood && (len < 0.5 || gapAt(x) > 0.02)) continue;
-      // Thick, uneven columns: some stout, some slender, so no two read alike.
-      // Variation draws use their own stream, so the placement of the original gallery is unchanged.
-      const lean = main ? 0 : 0.05 + vr() * 0.14;
-      const leanDir = vr() * 6.28;
-      const r = len * 0.12 + 0.22;
-      const girth = (1 + vr() * 1.4) * (hood ? 1 + 0.5 * clump : 1);
-      parts.push(
-        place(
-          pendant({
-            h: len,
-            r0: r,
-            girth,
-            seed: seed + (k * 7 + i) * 3,
-            segs: 10 * d.meshDensity + 4,
-            rings: 8 + 6 * d.meshDensity,
-          }),
-          {
-            x,
-            y: yTop,
-            z,
-            rx: Math.PI + lean * Math.cos(leanDir),
-            ry: rnd() * 6.28,
-            rz: (rnd() - 0.5) * 0.1 + lean * Math.sin(leanDir),
-          },
-        ),
-      );
-      longest.push({ x, z, y: yTop, len, r });
-    }
+    const members = (hood ? 1 : 2) + Math.floor(rnd() * (hood ? 3 : 4));
+    for (let i = 0; i < members; i++)
+      hang({
+        x: cx + (rnd() - 0.5) * 3.2,
+        f: cf + (rnd() - 0.5) * 0.18,
+        main: i === 0,
+        id: k * 7 + i,
+        stub: true,
+      });
   }
+  // Hood: the site's authored stalactites, a few clearly long cones of different lengths.
+  (propManifest(input.def.id)?.pendants ?? []).forEach(([u, f, len], i) =>
+    hang({ x: u * W, f, len: len * H, main: true, id: 100 + i, stub: false }),
+  );
   if (parts.length) {
     const stal = mergeAll(parts);
     galleryGeometry = stal;
