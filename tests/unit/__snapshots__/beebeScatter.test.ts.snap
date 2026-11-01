@@ -102,11 +102,11 @@ exports[`1130: other sites retain byte-identical scatter geometry, placement, co
     },
   },
   "blake-plateau-corals": {
-    "meshes": "ee4169bb41e44855c769563bd034e93deca4fe119797f6845b64c73ff96c6ade",
+    "meshes": "4d49b7adf66d6f54e9dfa0e97ef8c22b93d710ee65a496a6c90e7e9da3dfca07",
     "stats": {
       "cells": 21,
-      "drawCalls": 4,
-      "instances": 276,
+      "drawCalls": 5,
+      "instances": 914,
     },
   },
   "challenger-deep": {
