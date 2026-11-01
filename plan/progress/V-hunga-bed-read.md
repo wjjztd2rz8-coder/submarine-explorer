@@ -14,4 +14,4 @@ Not fully met: the wall is still a wedge/haystack silhouette (shape unchanged, d
 
 ## Verification
 
-`PW_PORT=5881 tools/gates.sh`: see final report.
+`PW_PORT=5881 tools/gates.sh` passed (build, unit, smoke e2e, project-base e2e, attribution, prettier). Unit snapshots and hashes for the tuff scarp and Hunga atmosphere updated (genuine change); manifest tests now expect the Hunga water column.
