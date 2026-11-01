@@ -77,6 +77,9 @@ function tinted(
 // Muted sponge palette (sRGB): ochre, pale cream, dusky orange, grey-lilac.
 const SPONGE_HUES = [0xb59a55, 0xc9bfa0, 0xa8663b, 0x8f8290];
 
+// Pale white tubes with the odd red plume.
+const WORM_HUES = [0xd9d2c4, 0xcfc6b6, 0xd9d2c4, 0xb8584a];
+
 const TUBE_HUES = [0x7d6f9a, 0xb86f55, 0xc7b36a, 0x6a8f93, 0x9c7a8e];
 
 export const SCATTER_TYPES: Record<ScatterKind, ScatterTypeDef> = {
@@ -250,6 +253,45 @@ export const SCATTER_TYPES: Record<ScatterKind, ScatterTypeDef> = {
     color: (_b, r, o) =>
       tinted(
         SPONGE_HUES[Math.floor(r() * SPONGE_HUES.length) % SPONGE_HUES.length] as number,
+        0.8,
+        1.2,
+        r,
+        o,
+      ),
+  },
+  // Extinct sulphide stubs: dark, stained and wider than a sponge stack.
+  ventstub: {
+    material: 'rock',
+    geometry: tubeSpongeGeometry,
+    size: [0.8, 1.6],
+    height: [0.7, 1.5],
+    embed: 0.08,
+    align: 0.1,
+    wobble: 0.12,
+    clump: [1, 3],
+    clumpRadiusM: 2.5,
+    patchiness: 0.6,
+    patchScaleM: 40,
+    drawRangeM: 220,
+    color: (b, r, o) => tinted(b.stain, 0.8, 1.4, r, o),
+  },
+  // Pale tube-worm clumps with a red tint, as at Cayman vents.
+  tubeworm: {
+    material: 'soft',
+    geometry: tubeSpongeGeometry,
+    size: [0.3, 0.7],
+    height: [1.3, 2.4],
+    embed: 0.05,
+    align: 0.15,
+    wobble: 0.2,
+    clump: [6, 14],
+    clumpRadiusM: 1.2,
+    patchiness: 0.8,
+    patchScaleM: 30,
+    drawRangeM: 150,
+    color: (_b, r, o) =>
+      tinted(
+        WORM_HUES[Math.floor(r() * WORM_HUES.length) % WORM_HUES.length] as number,
         0.8,
         1.2,
         r,

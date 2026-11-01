@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`1130: Beebe rocks darken and fracture in the same three draws with identical placement at every tier 1`] = `
+exports[`1130: Beebe rocks darken and fracture in the same draws with identical placement at every tier 1`] = `
 {
   "high": [
     {
