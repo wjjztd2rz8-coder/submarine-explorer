@@ -2812,3 +2812,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - CI on "Log run 279" failed one spec: Blue Hole 390x844 journey, sub at 8.9 m depth, under the stalactite gallery's 10 m scan floor (hosted only). Test pose now keeps the sub at or below 20 m depth. Local spec and gates PASS (smoke); hosted result to check next run. No packages started (only Claude item is V-bluehole-hood-geometry, needs a target composition). Codex week 5% until Nov 4, briefs 120-123 queued.
 - **Needs owner:** phone retest (4410-P2 checklist); a reference for the Blue Hole hood composition.
+
+## 2026-10-31 22:15 CDT headless run 281 (Claude): idle, nothing started
+
+- CI on the run 280 fix (a9f22b16) is still in progress; triage next run. No worktrees or paused packages. Only Claude item is V-bluehole-hood-geometry (needs a target composition). Codex week 5% until Nov 4, briefs 120-123 queued. Nothing merged.
+- **Needs owner:** phone retest (4410-P2 checklist); a reference for the Blue Hole hood composition.
