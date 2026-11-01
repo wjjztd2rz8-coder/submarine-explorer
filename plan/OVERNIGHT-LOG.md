@@ -2882,3 +2882,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - State unchanged from run 291: main clean, no worktrees, Claude 5h 99% / week 50%, Codex week 4% until Nov 4 (briefs 120-124 queued). Claude lane still has only "partial" visual follow-ups that need the next review to re-rank, so I started nothing. CI on the f71 tag commit's successor (Log run 291) failed (known e2e flake, hunt in brief 124); no new tag.
 - **Needs owner:** phone retest (4410-P2 checklist); optional Blue Hole hood reference image.
+
+## 2026-11-01 15:32 CST headless run 293 (Claude): comprehensive review
+
+- Review for tag f71 (Claude alone; Sol skipped, Codex week 4%). Stage ~88%. Backlog re-planned (six Claude items), CI red root-caused to the Blue Hole 390x844 journey spec (sub at 8.9 m < 10 m minimum scan depth) and test fixed. No package started. See plan/REVIEWS.md.
+- **Needs owner:** phone retest (4410-P2 checklist).

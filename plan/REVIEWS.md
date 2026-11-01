@@ -1,5 +1,16 @@
 # Reviews
 
+## 2026-11-01 evening comprehensive review (trigger: tag f71; Claude alone, Sol skipped: Codex week 4% until Nov 4)
+
+- **Stage:** about 88% to 1.0 (range 85-89%); about 4 weeks. Golden `2026-11-01-211523` vs `2026-11-01-081522`. Not agreed with Sol (Codex budget low).
+- **Changed since the morning review:** Blue Hole hood stalactites, Blake sponge stacks, Beebe tube worms and rust-tinted stubs, Hunga wall resize, Kama slope tint, f71 tagged.
+- **Scores (rubric, hero poses):** Lost City 4.0 (flank lit; tower top blown white), Monterey 4.0, Titanic 3.9, Blue Hole 3.85 (hood is a small brown leaf-shaped mass with open water above; opening pose too far), Beebe 3.85 (smoker, plume and warm pool read; hard horizon, black sky), Hunga 3.4 (big lit mound but reads as stacked straw; empty dark upper half), Kama 3.2 (plume reads; slope is a dark uniform plane).
+- **Biggest gaps:** Blue Hole opening pose, Hunga bed read, Kama slope light, Beebe horizon, Lost City tower bloom.
+- **Play flow:** not re-captured (no budget for a walk-through); queued as U-play-walkthrough. Phone retest is still the main unknown.
+- **Process:** efficiency shows Claude idle ~13-26 h/24 h (backlog was exhausted of non-partial items; refilled with six items) and Codex paused (week 4%, briefs 120-124 queued). CI red on the last two runs, both in e2e shard 2/38: the log shows the Blue Hole 390x844 journey spec starting the sub at 8.9 m, above the 10 m minimum scan depth, so the candidate vanished (the spawn pose differs by machine). Fixed in the test by enforcing the POI's minimum depth plus 4 m; the six Blue Hole journey specs pass locally. Not hosted-verified yet.
+- **New priorities:** DIRECTOR Backlog 1-6 (V-bluehole-opening-pose, V-hunga-bed-read, V-kama-slope-light, V-beebe-horizon, V-lostcity-tower-blown, U-play-walkthrough); Codex 120-124 after the reset.
+- **Needs owner:** phone retest (4410-P2 checklist); optional Blue Hole hood reference image.
+
 ## 2026-11-01 comprehensive review (Claude alone; Sol skipped, Codex budget low: 5% weekly until Nov 4)
 
 - **Stage:** about 88% to 1.0 (range 85-89%); about 4 weeks. Golden set `2026-11-01-081522` vs `2026-10-31-161522`. Not agreed with Sol (exit 75).

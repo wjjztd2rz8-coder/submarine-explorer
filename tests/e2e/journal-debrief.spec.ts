@@ -2529,7 +2529,10 @@ freshTest.describe('Home to scan and return journey', () => {
             // The pose sits exactly at the minimum scan depth; a slow frame's buoyancy drift
             // would lift it above and the candidate would vanish, so start 4 m deeper
             // (a 1 m margin still failed on hosted runners, three runs in a row).
-            g.sub.reset(pose.x, pose.y - 4, pose.z, pose.yaw);
+            // The spawn pose can sit above the minimum depth when terrain differs by machine
+            // (hosted run: sub at 8.9 m, minimum 10 m), so enforce the depth explicitly.
+            const y = Math.min(pose.y - 4, -((poi.minDepthM ?? 0) + 4));
+            g.sub.reset(pose.x, y, pose.z, pose.yaw);
             g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
             g.discovery.stats.markTeleport();
             return { id: poi.id, entry: poi.guideEntry };
