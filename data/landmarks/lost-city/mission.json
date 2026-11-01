@@ -16,6 +16,8 @@
       "glowColor": 13625599,
       "glowIntensity": 24000,
       "glowDistanceM": 90,
+      "glowDropM": -2,
+      "glowStandoffM": 8,
       "shimmerStrength": 0
     }
   },
