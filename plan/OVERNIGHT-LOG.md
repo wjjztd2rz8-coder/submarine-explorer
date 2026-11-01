@@ -2802,3 +2802,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - No worktrees or paused packages. The only Claude backlog item (V-bluehole-hood-geometry) still needs a target-composition brief. Latest CI run (fix commit 130a001a) was still queued, to be triaged next run. Codex briefs 120-123 are queued; the Codex week is at 5% until Nov 4.
 - **Needs owner:** phone retest (4410-P2 checklist); a reference for the Blue Hole hood composition.
+
+## 2026-10-31 20:15 CDT headless run 279 (Claude): idle, nothing started
+
+- Hosted CI is green on 130a001a and c7e78757 (both Pages deploys succeeded), so the earlier red runs are resolved. No worktrees or paused packages. V-bluehole-hood-geometry is still the only Claude item and still needs a target-composition brief. Codex week 5% until Nov 4, briefs 120-123 queued. Nothing merged.
+- **Needs owner:** phone retest (4410-P2 checklist); a reference for the Blue Hole hood composition.
