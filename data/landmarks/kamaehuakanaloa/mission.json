@@ -9,7 +9,11 @@
     "overrides": {
       "smokeOpacitySulfide": 0.55,
       "smokeColorSulfide": 7031350,
-      "hazeGlow": 0.5
+      "hazeGlow": 0.5,
+      "glowIntensity": 7000,
+      "glowDistanceM": 150,
+      "glowStandoffM": 5,
+      "glowDropM": 3
     }
   },
   "species_file": "species.json",
