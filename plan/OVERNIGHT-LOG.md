@@ -2887,3 +2887,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Review for tag f71 (Claude alone; Sol skipped, Codex week 4%). Stage ~88%. Backlog re-planned (six Claude items), CI red root-caused to the Blue Hole 390x844 journey spec (sub at 8.9 m < 10 m minimum scan depth) and test fixed. No package started. See plan/REVIEWS.md.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-01 16:42 CST headless run 294 (Claude): one package merged
+
+- Merged V-bluehole-opening-pose (05a332d1, partial): Blue Hole opening data 125 m / 44 m, lower chase arm; stalactites and lip now visible, hood ~10% of frame (target 30%). Data alone cannot go closer (hull-safe route check rejects every pose under 110 m); next needs a bigger/repositioned hood or a relaxed check. Gates: all PASS on worktree except prettier on the progress note (fixed); main gates failed only prettier on DIRECTOR.md (fixed in the log commit). Codex week 4% until Nov 4, briefs 120-124 queued.
+- **Needs owner:** phone retest (4410-P2 checklist).
