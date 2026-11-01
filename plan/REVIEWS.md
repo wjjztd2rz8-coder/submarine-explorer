@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-11-01 targeted review (trigger: last 3 runs merged nothing, backlog dry)
+
+- Cause: the remaining Claude items were all "tried, not merged" or needed a target composition, so runs 277-283 correctly idled but nothing re-planned. Art gains per pass are now ~0.05.
+- Fix: backlog rewritten with concrete routes (V-lostcity-carbonate-flank, V-bluehole-hood-geometry with a written target composition, V-coral-sponge-garden, R-ci-speed queued as Codex brief 124). Tagged f70 on green CI. Merged V-lostcity-carbonate-flank (gates PASS smoke; small gain, tower top slightly blown).
+- Needs owner: phone retest (4410-P2 checklist); optional reference image for the Blue Hole hood. Codex week 5% until Nov 4 (briefs 120-124 queued).
+
 ## 2026-10-31 evening targeted review (trigger: CI red on main for 3 runs)
 
 Two separate red specs, not one flaky shard. (1) Shard 20, `f-content-fix` "Hunga hero and scan marker share a supported terrain location": V-hunga-wall-rise (run 274) raised the terrain under the wall and only the smoke gate ran, so the hard-coded ground height of -471.1 went stale (hosted -465.6, a fresh local build -471.7: it also differs by machine). The check now asserts the ground is within 8 m of the validator's 468.6 m. Lesson: a terrain-carve change needs `--full-e2e` for the specs that sample that site. (2) Shard 2, Blue Hole 390x844 journey "scan candidate null": still red after the 4 m margin; it passes locally on a fresh build at all three sizes, so it is hosted-only. The scan helper's error now prints the sub position and scanner view, so the next red log shows why the candidate vanished; no further blind fix. Both changes are test-only. Watch the next CI run.

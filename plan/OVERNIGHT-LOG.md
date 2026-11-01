@@ -2827,3 +2827,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Hosted CI is green on "Log run 282" (the run 281 e2e failure was a flake) and Pages deployed. No worktrees or paused packages. Only Claude item is V-bluehole-hood-geometry (needs a target composition). Codex week 5% until Nov 4, briefs 120-123 queued. Nothing merged.
 - **Needs owner:** phone retest (4410-P2 checklist); a reference for the Blue Hole hood composition.
+
+## 2026-11-01 02:02 CST targeted review (Claude): backlog refilled, one package merged
+
+- Dry backlog diagnosed (items all tried or needing a target composition); rewrote Claude items 1-3 with concrete routes, queued Codex brief 124 (R-ci-speed), tagged f70. Merged V-lostcity-carbonate-flank (gates smoke PASS). Next run: V-bluehole-hood-geometry, then V-coral-sponge-garden. Hosted CI for the merge to be checked next run.
+- **Needs owner:** phone retest (4410-P2 checklist); optional Blue Hole hood reference.
