@@ -2872,3 +2872,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Checked state: main clean, no worktrees, Claude 5h 82% / week 50%, Codex week 4% (briefs 120-124 queued, waiting for Nov 4). The Claude lane has no unblocked visual item: every remaining one is a "partial" follow-up (Blue Hole opening pose overlaps queued brief 120; Beebe/Kama/Hunga/Blake follow-ups have diminishing returns without a target reference). Starting another speculative visual pass would break the "target composition" rule, so I left the backlog for the next comprehensive review to re-rank. CI on the run 288 push failed (known e2e shard flake, hunt in brief 124); run on 289 still queued. No tag.
 - **Needs owner:** phone retest (4410-P2 checklist); optional Blue Hole hood reference image.
+
+## 2026-11-01 13:16 CST headless run 291 (Claude): tag only
+
+- Hosted CI on 6e559b56 (Log run 290) is green, so tagged and pushed f71. No package started: Claude lane still has only "partial" follow-ups needing the next review's re-rank; Codex week 4% until Nov 4, briefs 120-124 queued.
+- **Needs owner:** phone retest (4410-P2 checklist); optional Blue Hole hood reference image.
