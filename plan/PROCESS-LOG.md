@@ -374,3 +374,4 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 ## 2026-11-01 review: CI failing-spec visibility
 
 - Shard 2/38 failed on three docs-only commits and `gh` returned no log text, so triage guessed "flake" each time. Added the Playwright `github` reporter under `CI` (failures become annotations readable via the API) and added the shard-2 flake hunt to Codex brief 124.
+- Correction: the first reporter edit broke the TypeScript build (no @types/node); I pushed it before the gate result was read, then fixed it to use the existing isCI constant (gates smoke PASS). Lesson: check the gate result before pushing.
