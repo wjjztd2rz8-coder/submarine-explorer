@@ -2857,3 +2857,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-hunga-wall-rise (413cfc9a): wall resized, opening bearing/range changed (data only), one-line label. Partial: wall is lit and steep but sits mid-frame not upper-left, top a bit dark; portrait/landscape not captured. Gates smoke PASS on worktree and main. Next: V-kama-subject. Codex week 4% until Nov 4, briefs 120-124 queued.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-01 10:09 CST headless run 288 (Claude): one package merged
+
+- Merged V-kama-subject (36772522): calmer Kama slope tint (biome data) and the pillow heap moved to the vent base. Partial: plume base only marginally lit, far slope still dark blue-grey, heap clips slightly into the slope; desktop only. First gates run failed on unit snapshots (biome values), fixed by Haiku; gates smoke PASS on main. Next: backlog has no Claude visual items left except follow-ups (needs re-ranking). Codex week 4% until Nov 4, briefs 120-124 queued.
+- **Needs owner:** phone retest (4410-P2 checklist).
