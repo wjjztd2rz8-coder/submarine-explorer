@@ -2847,3 +2847,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-coral-sponge-garden: Blake gets tall pale sponge-stack scatter (data-driven, no new tier). Partial: foreground now has a second silhouette, but the distant mounds still read as similar tan lumps (needs per-mound variety in coral.ts). Gates smoke PASS on worktree and main. Next: V-beebe-seabed-read. Codex week 5% until Nov 4, briefs 120-124 queued.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-01 07:09 CST headless run 286 (Claude): one package merged
+
+- Merged V-beebe-seabed-read (7665ab5e): tube-worm clumps and vent stubs scatter kinds for Beebe (data-driven). Partial: tube worms read and the opening is no darker, but the stubs are too dark outside the lamp pool and the horizon is still hard. Gates smoke PASS on worktree and main. CI on run 284 failed only in e2e shard 2/38 (the known flake, hunt in brief 124). Next: V-hunga-wall-rise. Codex week 5% until Nov 4, briefs 120-124 queued.
+- **Needs owner:** phone retest (4410-P2 checklist).
