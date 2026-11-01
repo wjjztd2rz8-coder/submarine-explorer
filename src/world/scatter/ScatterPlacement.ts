@@ -81,6 +81,8 @@ const KIND_SALT: Record<ScatterKind, number> = {
   ledge: 9,
   tube: 10,
   chimney: 11,
+  ventstub: 12,
+  tubeworm: 13,
 };
 
 /** Generate every instance of every kind in cell (cx, cz). */

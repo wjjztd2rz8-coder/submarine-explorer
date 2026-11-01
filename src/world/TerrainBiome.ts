@@ -45,7 +45,9 @@ export type ScatterKind =
   | 'mound'
   | 'ledge'
   | 'tube'
-  | 'chimney';
+  | 'chimney'
+  | 'ventstub'
+  | 'tubeworm';
 
 export interface ScatterSpec {
   kind: ScatterKind;
@@ -317,6 +319,9 @@ export const BIOMES: Record<string, Biome> = {
       { kind: 'pillow', density: 2.6, slopeMaxDeg: 35, on: 'any' },
       { kind: 'rubble', density: 8, slopeMaxDeg: 35, on: 'any', sizeMul: 1.3 },
       { kind: 'boulder', density: 1.2, slopeMaxDeg: 40, on: 'rock' },
+      // Dead sulphide stubs and pale tube-worm clumps give the plain its mid-distance subjects.
+      { kind: 'ventstub', density: 2.2, slopeMaxDeg: 25, on: 'any' },
+      { kind: 'tubeworm', density: 5, slopeMaxDeg: 30, on: 'any' },
     ],
   },
   'hunga-tonga-caldera': {
