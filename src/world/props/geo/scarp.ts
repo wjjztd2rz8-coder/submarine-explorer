@@ -147,7 +147,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     sbend: 0.05,
     sPhase: 0.6,
     passage: 0,
-    bands: 15,
+    bands: 8,
     dip: 0.1,
     ledge: 0.7,
     gully: 1.5,
@@ -165,7 +165,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     blocks: 0.05,
     rough: 0.95,
     edgeStart: 0.3,
-    tile: [11, 6],
+    tile: [14, 14],
     bedContrast: 1,
   },
   canyon: {
