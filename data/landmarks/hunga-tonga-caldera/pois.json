@@ -4,7 +4,7 @@
   "pois": [
     {
       "id": "hunga-tonga-rim-wall",
-      "name": "Volcanic rim slope (pre-2022 survey)",
+      "name": "Volcanic rim slope",
       "lat": -20.57,
       "lon": -175.42,
       "snap_to_seabed": true,
