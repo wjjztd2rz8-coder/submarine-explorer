@@ -89,7 +89,7 @@ it('1130: other sites retain byte-identical scatter geometry, placement, colors 
   expect(evidence).toMatchSnapshot();
 });
 
-it('1130: Beebe rocks darken and fracture in the same three draws with identical placement at every tier', () => {
+it('1130: Beebe rocks darken and fracture in the same draws with identical placement at every tier', () => {
   const biome = BIOMES['beebe-vent-field']!;
   const cfg = makeConfig();
   const evidence: Record<string, unknown> = {};
@@ -99,63 +99,70 @@ it('1130: Beebe rocks darken and fracture in the same three draws with identical
     const changed = populated(biome, scatterDensity, scatterRangeM);
     try {
       expect(changed.stats).toEqual(original.stats);
-      expect(changed.stats.drawCalls).toBe(3);
+      expect(changed.stats.drawCalls).toBe(5);
       const meshes = changed.group.children as THREE.InstancedMesh[];
-      evidence[tier] = meshes.map((mesh, index) => {
-        const before = original.group.children[index] as THREE.InstancedMesh;
-        expect(mesh.name).toBe(before.name);
-        expect(mesh.count).toBe(before.count);
-        expect(digest(mesh.instanceMatrix.array)).toBe(digest(before.instanceMatrix.array));
-        expect(digest(mesh.instanceColor!.array)).toBe(digest(before.instanceColor!.array));
-        const mat = mesh.material as THREE.MeshStandardMaterial;
-        const beforeMat = before.material as THREE.MeshStandardMaterial;
-        expect([mat.color.getHex(), mat.roughness, mat.vertexColors, mat.map]).toEqual([
-          beforeMat.color.getHex(),
-          beforeMat.roughness,
-          beforeMat.vertexColors,
-          beforeMat.map,
-        ]);
-        const position = mesh.geometry.getAttribute('position');
-        const normal = mesh.geometry.getAttribute('normal');
-        const color = mesh.geometry.getAttribute('color');
-        const beforeColor = before.geometry.getAttribute('color');
-        const meanColor = (
-          attribute: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
-        ): number => {
-          let sum = 0;
-          for (let i = 0; i < attribute.count; i++) {
-            sum += attribute.getX(i) + attribute.getY(i) + attribute.getZ(i);
+      evidence[tier] = meshes
+        .map((mesh, index) => {
+          const before = original.group.children[index] as THREE.InstancedMesh;
+          expect(mesh.name).toBe(before.name);
+          expect(mesh.count).toBe(before.count);
+          // Only the rock kinds take the fractured-basalt treatment; the soft ones are untouched.
+          if (!['pillow', 'rubble', 'boulder'].some((kind) => mesh.name === `scatter:${kind}`))
+            return null;
+          expect(digest(mesh.instanceMatrix.array)).toBe(digest(before.instanceMatrix.array));
+          expect(digest(mesh.instanceColor!.array)).toBe(digest(before.instanceColor!.array));
+          const mat = mesh.material as THREE.MeshStandardMaterial;
+          const beforeMat = before.material as THREE.MeshStandardMaterial;
+          expect([mat.color.getHex(), mat.roughness, mat.vertexColors, mat.map]).toEqual([
+            beforeMat.color.getHex(),
+            beforeMat.roughness,
+            beforeMat.vertexColors,
+            beforeMat.map,
+          ]);
+          const position = mesh.geometry.getAttribute('position');
+          const normal = mesh.geometry.getAttribute('normal');
+          const color = mesh.geometry.getAttribute('color');
+          const beforeColor = before.geometry.getAttribute('color');
+          const meanColor = (
+            attribute: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
+          ): number => {
+            let sum = 0;
+            for (let i = 0; i < attribute.count; i++) {
+              sum += attribute.getX(i) + attribute.getY(i) + attribute.getZ(i);
+            }
+            return sum / (attribute.count * 3);
+          };
+          expect(meanColor(color)).toBeLessThan(meanColor(beforeColor) * 0.6);
+          expect(position.count).toBeLessThanOrEqual(
+            before.geometry.getAttribute('position').count,
+          );
+          expect(digest(position.array)).not.toBe(
+            digest(before.geometry.getAttribute('position').array),
+          );
+          expect(mesh.geometry.boundingBox!.min.y).toBeCloseTo(0, 6);
+          for (let f = 0; f < position.count; f += 3) {
+            const a = new THREE.Vector3().fromBufferAttribute(position, f);
+            const b = new THREE.Vector3().fromBufferAttribute(position, f + 1);
+            const c = new THREE.Vector3().fromBufferAttribute(position, f + 2);
+            expect(b.sub(a).cross(c.sub(a)).length()).toBeGreaterThan(1e-8);
+            for (let k = 0; k < 3; k++) {
+              const n = new THREE.Vector3().fromBufferAttribute(normal, f + k);
+              expect(n.length()).toBeCloseTo(1, 5);
+              expect(n.distanceTo(new THREE.Vector3().fromBufferAttribute(normal, f))).toBeLessThan(
+                1e-6,
+              );
+            }
           }
-          return sum / (attribute.count * 3);
-        };
-        expect(meanColor(color)).toBeLessThan(meanColor(beforeColor) * 0.6);
-        expect(position.count).toBeLessThanOrEqual(before.geometry.getAttribute('position').count);
-        expect(digest(position.array)).not.toBe(
-          digest(before.geometry.getAttribute('position').array),
-        );
-        expect(mesh.geometry.boundingBox!.min.y).toBeCloseTo(0, 6);
-        for (let f = 0; f < position.count; f += 3) {
-          const a = new THREE.Vector3().fromBufferAttribute(position, f);
-          const b = new THREE.Vector3().fromBufferAttribute(position, f + 1);
-          const c = new THREE.Vector3().fromBufferAttribute(position, f + 2);
-          expect(b.sub(a).cross(c.sub(a)).length()).toBeGreaterThan(1e-8);
-          for (let k = 0; k < 3; k++) {
-            const n = new THREE.Vector3().fromBufferAttribute(normal, f + k);
-            expect(n.length()).toBeCloseTo(1, 5);
-            expect(n.distanceTo(new THREE.Vector3().fromBufferAttribute(normal, f))).toBeLessThan(
-              1e-6,
-            );
-          }
-        }
-        return {
-          name: mesh.name,
-          triangles: position.count / 3,
-          position: digest(position.array),
-          normal: digest(normal.array),
-          color: digest(color.array),
-          instances: mesh.count,
-        };
-      });
+          return {
+            name: mesh.name,
+            triangles: position.count / 3,
+            position: digest(position.array),
+            normal: digest(normal.array),
+            color: digest(color.array),
+            instances: mesh.count,
+          };
+        })
+        .filter(Boolean);
     } finally {
       original.dispose();
       changed.dispose();
