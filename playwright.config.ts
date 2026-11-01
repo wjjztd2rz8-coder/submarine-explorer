@@ -30,7 +30,7 @@ export default defineConfig({
   retries: isCI ? 1 : 0,
   fullyParallel: false,
   workers: 1,
-  reporter: [['list']],
+  reporter: process.env.CI ? [['list'], ['github']] : [['list']],
   use: {
     baseURL,
     ...devices['Desktop Chrome'],

@@ -1,5 +1,16 @@
 # Reviews
 
+## 2026-11-01 comprehensive review (Claude alone; Sol skipped, Codex budget low: 5% weekly until Nov 4)
+
+- **Stage:** about 88% to 1.0 (range 85-89%); about 4 weeks. Golden set `2026-11-01-081522` vs `2026-10-31-161522`. Not agreed with Sol (exit 75).
+- **Changed since last review:** Lost City carbonate flank lights (glow standoff/drop from data, f70), Blue Hole journey-pose test fix, CI flake handling.
+- **Scores (rubric):** Lost City 4.05 (front tower flank now lit; tower top slightly blown, upper third still open water), Monterey 4.0, Titanic 3.9, Blue Hole 3.8 (hood still reads as a smooth boat hull, not an overhang with stalactites), Beebe 3.8 (good smoker and plume; seabed is a flat plain with a hard horizon), Hunga 3.2 (wall does not read; striped wedge; label wraps wide), Kama 3.1 (blotchy blue slope, stray pillow lump; plume reads).
+- **Biggest gaps:** Blue Hole hood (5 failed passes; target composition written), Hunga wall, Kama slope, Beebe depth layers, no hero firmly at 4.0 except Lost City/Monterey.
+- **Play flow:** not re-captured this run (no budget for a new walk-through); last run-through and phone retest items stand. Owner phone retest still the main unknown.
+- **Process:** Claude idle ~17-35 h/24 h because the backlog was dry (fixed in the earlier targeted review; now 5 unblocked Claude items). Codex week at 5% so Codex lane is paused until Nov 4 (briefs 120-124 queued). CI: shard 2/38 failed on three docs-only commits and `gh` gave no log text; added the Playwright `github` reporter and a flake hunt to brief 124. Golden capture takes ~15 min.
+- **New priorities:** Claude lane V-bluehole-hood-geometry, V-coral-sponge-garden, V-beebe-seabed-read, V-hunga-wall-rise, V-kama-subject; then R-ci-speed and verification briefs after the reset.
+- **Needs owner:** phone retest (4410-P2 checklist); optional reference image for the Blue Hole hood.
+
 ## 2026-11-01 targeted review (trigger: last 3 runs merged nothing, backlog dry)
 
 - Cause: the remaining Claude items were all "tried, not merged" or needed a target composition, so runs 277-283 correctly idled but nothing re-planned. Art gains per pass are now ~0.05.

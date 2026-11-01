@@ -61,7 +61,7 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
 | No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
-Stage (review 2026-10-30, Claude alone; Sol skipped, Codex week 6%): about 86% (range 83-88%) to 1.0; 4-5 weeks. Beautiful: Titanic 3.9, Lost City 3.9, Blue Hole 3.8, Beebe 3.7, Monterey 3.9, Challenger 3.6, Endurance 3.6. Blockers: (1) no hero firmly at 4; (2) Blue Hole and Beebe openings (gallery read, Beebe darkness); (3) real-phone Low-tier acceptance.
+Stage (review 2026-11-01, Claude alone; Sol skipped, Codex week 5%): about 88% (range 85-89%); 4 weeks. Lost City 4.05 (tower flank now lit), Monterey 4.0, Titanic 3.9, Blue Hole 3.8 (hood still a slab), Beebe 3.8, Hunga 3.2, Kama 3.1. Previous stage (review 2026-10-30, Claude alone; Sol skipped, Codex week 6%): about 86% (range 83-88%) to 1.0; 4-5 weeks. Beautiful: Titanic 3.9, Lost City 3.9, Blue Hole 3.8, Beebe 3.7, Monterey 3.9, Challenger 3.6, Endurance 3.6. Blockers: (1) no hero firmly at 4; (2) Blue Hole and Beebe openings (gallery read, Beebe darkness); (3) real-phone Low-tier acceptance.
 
 ## Needs owner
 
@@ -72,19 +72,21 @@ The newest items go first.
 
 ## In flight
 
-- No package running. Briefs 120-123 queued, waiting for the Nov 4 Codex reset. Claude lane: Sonnet items 1-3 in order.
+- No package running. Briefs 120-123 queued, waiting for the Nov 4 Codex reset. Claude lane: Sonnet items 1-5 in order.
 
 ## Backlog
 
 One list, ordered by player impact and dependencies; lane in brackets. Evidence: review 2026-10-30 in `plan/REVIEWS.md` (Claude alone, Sol skipped for Codex budget) and golden `2026-10-30-212725`; earlier items (all DONE ones, with commits) in [archive/DIRECTOR-HISTORY-2026-10-30-backlog.md](archive/DIRECTOR-HISTORY-2026-10-30-backlog.md). Art gains per package are ~0.1-0.2, so each V-* names a target composition, not a geometry list. Owner phone decisions: [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md).
 
-1. **V-lostcity-carbonate-flank [Sonnet] DONE 2026-11-01 (e6ca56ee; carbonate glow reads standoff/drop from data, flank lit, ~4.0 to 4.05, tower top slightly blown, upper third still open water) (replaces V-lostcity-upper-light, 4.0 to 4.1 target):** `VentPreset` hard-codes carbonate glow standoff 0 and drop +2 (src/world/presets/VentPreset.ts:148-157), so Lost City lights only touch tower tops. Make carbonate standoff and drop read `glowStandoffM`/`glowDropM` like other vents (default unchanged for other sites), then set Lost City data so the lights sit 6-10 m beside the towers and rake their flanks. Target: opening shows a cool key on the tower flanks and a lit band up the front tower; no site branch. Evidence: plan/progress/V-lostcity-upper-light.md.
-2. **V-bluehole-hood-geometry [Sonnet] (five geometry passes failed; this brief is a TARGET COMPOSITION):** from the 24 m opening pose, the top ~25% of the frame is a dark, irregular overhang whose underside is darker than its lip, with 5-8 conical stalactites of clearly different lengths hanging from it, the sub off to one side in blue water. It must not read as a smooth dome or boat hull. Route: stalactites.ts hood profile (ribs, lip noise, underside tint) driven by Blue Hole data; judge only by a fresh great-blue-hole-1-mission.png.
-3. **V-coral-sponge-garden [Sonnet] (tint did not work; needs different silhouettes):** Blake's field reads as identical tan lumps. Add one new low-poly prop (tall vase/tube sponge cluster or dark rubble) and scatter it between the mounds via Blake data; target: two clearly different silhouettes at opening, no new tier. Keep prop cost within the coral budget test.
-4. **R-ci-speed [Codex, brief later]:** hosted CI takes 30+ min, so failures surface 1-2 runs late. Audit shard balance and slow specs; target under 20 min without dropping coverage.
-5. **Codex, queued 120-123, waiting for the Nov 4 reset:** T-opening-geometry (120), S-verify CI (121), S-dead second sweep (122), S-verify spawn cap (123).
-6. **P2-phone-accept [owner + Codex; browser-checkable items automated in tests/e2e/phone-accept.spec.ts]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
-7. **R-release [Haiku]:** tag the latest green-CI main after each review (f70 is the newest, 2026-11-01).
+1. **V-bluehole-hood-geometry [Sonnet] (five geometry passes failed; this brief is a TARGET COMPOSITION):** from the 24 m opening pose, the top ~25% of the frame is a dark, irregular overhang whose underside is darker than its lip, with 5-8 conical stalactites of clearly different lengths hanging from it, the sub off to one side in blue water. It must not read as a smooth dome or boat hull. Route: stalactites.ts hood profile (ribs, lip noise, underside tint) driven by Blue Hole data; judge only by a fresh great-blue-hole-1-mission.png.
+2. **V-coral-sponge-garden [Sonnet] (tint did not work; needs different silhouettes):** Blake's field reads as identical tan lumps. Add one new low-poly prop (tall vase/tube sponge cluster or dark rubble) and scatter it between the mounds via Blake data; target: two clearly different silhouettes at opening, no new tier. Keep prop cost within the coral budget test.
+3. **V-beebe-seabed-read [Sonnet]:** Beebe opening (4967 m): smoker, plume and sub read well, but the seabed is a flat brown plain with a hard horizon and no second subject. Target: a faint warm pool of vent light on the near seabed plus 2-3 small chimney stubs or mussel/tube-worm patches at 20-40 m so the frame has depth layers. Data-driven via the Beebe vent preset; no site branch; opening must stay readable (not darker).
+4. **V-hunga-wall-rise [Sonnet]:** Hunga opening shows a striped wedge in front of a faint dome; the caldera wall does not read as a wall. Target: a lit, clearly vertical wall band filling the upper-left third from the opening pose, with the pre-2022 rim label unclipped (label wraps to two lines now and runs wide).
+5. **V-kama-subject [Sonnet]:** Kama'ehuakanaloa opening: the vent plume is the subject but the slope is a blotchy blue plane and the pillow lump at right is unexplained. Target: calm slope tint (no blotches) and the plume base lit; cut or move the stray lump.
+6. **R-ci-speed [Codex, queued 124]:** hosted CI takes 30+ min, so failures surface 1-2 runs late. Audit shard balance and slow specs; target under 20 min without dropping coverage.
+7. **Codex, queued 120-123, waiting for the Nov 4 reset:** T-opening-geometry (120), S-verify CI (121), S-dead second sweep (122), S-verify spawn cap (123).
+8. **P2-phone-accept [owner + Codex; browser-checkable items automated in tests/e2e/phone-accept.spec.ts]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
+9. **R-release [Haiku]:** tag the latest green-CI main after each review (f70 is the newest, 2026-11-01).
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16), Titanic per-plate blockiness (accepted ~3.7). Codex weekly burn is ~60%/day, so briefs stay rationed.
 

@@ -2832,3 +2832,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Dry backlog diagnosed (items all tried or needing a target composition); rewrote Claude items 1-3 with concrete routes, queued Codex brief 124 (R-ci-speed), tagged f70. Merged V-lostcity-carbonate-flank (gates smoke PASS). Next run: V-bluehole-hood-geometry, then V-coral-sponge-garden. Hosted CI for the merge to be checked next run.
 - **Needs owner:** phone retest (4410-P2 checklist); optional Blue Hole hood reference.
+
+## 2026-11-01 02:36 CST comprehensive review (Claude alone)
+
+- Golden captured and reviewed (stage ~88%); Sol skipped (Codex week 5%). Backlog now 5 Claude items; CI shard-2 flake: added github reporter, hunt queued in brief 124. No packages started. f71 not tagged: latest CI red on that flake.
+- **Needs owner:** phone retest (4410-P2 checklist); optional Blue Hole hood reference.

@@ -370,3 +370,7 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 
 - Run 265 called the failure CI-specific after a local shard pass. The job log showed one deterministic failing spec (Blue Hole touch journey, scan-depth drift). Rule: pull the failing job's log with `gh api .../jobs/<id>/logs | grep -E '✘|Error'` before judging flake; a local pass with a different timing profile proves nothing.
 - 2026-10-31 targeted review: CI red 3 runs = stale Hunga ground height after wall-rise (smoke-only gate) plus hosted-only Blue Hole scan null; spec relaxed, diagnostics added. Terrain changes should run --full-e2e.
+
+## 2026-11-01 review: CI failing-spec visibility
+
+- Shard 2/38 failed on three docs-only commits and `gh` returned no log text, so triage guessed "flake" each time. Added the Playwright `github` reporter under `CI` (failures become annotations readable via the API) and added the shard-2 flake hunt to Codex brief 124.
