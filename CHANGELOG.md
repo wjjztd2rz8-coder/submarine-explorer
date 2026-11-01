@@ -1302,3 +1302,4 @@ without an entry here is not done.
   build strips three's default decoder URLs so no second copy of the Draco or
   Basis files ships.
 - Phase F, F0-CORE: **Auto** and **Ultra** entries in Settings → Graphics tier.
+- Backlog cleanup (2026-11-01 targeted review): V-lostcity-upper-light (horizon data, tried) replaced by V-lostcity-carbonate-flank; V-endurance-accent, V-hunga-kama-subject, V-opening-dark remainder and V-coral-variant folded into DONE work or V-coral-sponge-garden.
