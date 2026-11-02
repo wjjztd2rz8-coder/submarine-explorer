@@ -88,7 +88,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 8. **Codex, queued 120-123, waiting for the Nov 4 reset:** T-opening-geometry (120), S-verify CI (121), S-dead second sweep (122), S-verify spawn cap (123).
 9. **P2-phone-accept [owner + Codex; browser-checkable items automated in tests/e2e/phone-accept.spec.ts]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
 10. **U-debrief-surface-copy [Codex]:** debrief says "Back at the surface" while the sub is still submerged (MissionRouter.ts:279); reword by state.
-11. **U-touch-left-stick [Haiku]:** touch dive-start shows "Left stick" (onboard.ts:41, HowToPlay.ts:31); say what to do, no control names on touch.
+11. **U-touch-left-stick [Haiku] — DONE 2026-11-01 (796f8b8e):** touch dive-start shows "Left stick" (onboard.ts:41, HowToPlay.ts:31); say what to do, no control names on touch.
 12. **U-home-one-primary [Sonnet]:** Home shows "Dive: <site>" and "Daily dive" as two primary-looking cards after a dive; one primary action.
 13. **U-dive-start-hud [Sonnet]:** desktop dive start stacks four HUD blocks and mission/briefing objective names differ; cut to one guidance surface.
 14. **U-pick-site-clean [Sonnet]:** pick-site rows show empty stars and "0/N logged" before play, globe pins unlabeled; hide until earned, label pins.

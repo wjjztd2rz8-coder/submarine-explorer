@@ -2917,3 +2917,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged U-play-walkthrough (Haiku): walkthrough captured (journal-debrief spec 62/62), 8 findings recorded as Backlog items 11-16 (debrief "Back at the surface" while submerged, "Left stick" on touch, two primary Home cards, stacked dive-start HUD, empty stars on pick-site, "Class A/B hull" jargon). No game code changed. Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-home-one-primary / U-dive-start-hud (Sonnet), U-touch-left-stick (Haiku).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-01 22:25 CST headless run 300 (Claude): one package merged
+
+- Merged U-touch-left-stick (Haiku): touch tutorial and How-to-play now say "Drag to move and turn" / "Steer" instead of "Left stick"; desktop and pad wording unchanged; tests pinned to the new copy. Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-home-one-primary / U-dive-start-hud (Sonnet).
+- **Needs owner:** phone retest (4410-P2 checklist).
