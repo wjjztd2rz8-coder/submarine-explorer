@@ -252,12 +252,11 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-content: center;
   gap: 4px 12px;
-  min-height: 76px;
-  border-color: var(--home-mint);
+  min-height: 64px;
   font-size: 14px;
 }
 .daily-card-title {
-  color: var(--home-mint);
+  color: var(--home-text);
   font-weight: 600;
 }
 .daily-card-details {

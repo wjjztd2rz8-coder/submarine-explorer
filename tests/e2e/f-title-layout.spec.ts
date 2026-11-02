@@ -2,7 +2,9 @@
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from './helpers/unlocked.js';
 
-const shots = '.cache/codex/shots/f-title-d';
+const env =
+  (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
+const shots = env.SHOTS_DIR ?? '.cache/codex/shots/f-title-d';
 
 const VIEWPORTS = [
   { width: 1920, height: 1080 },
@@ -38,6 +40,16 @@ test('home copy, semantic order and first focus', async ({ page }) => {
     /^(Expedition preview|Titanic dive · Next dive)$/,
   );
   await expect(page.locator('.home-scene-caveat')).toHaveCount(0);
+  // One primary action: Daily stays a plain secondary row, not a second mint card.
+  await expect(page.locator('.home-menu .home-primary')).toHaveCount(1);
+  const daily = await page.locator('.home-menu > .daily-card').evaluate((el) => {
+    const css = getComputedStyle(el);
+    const ref = getComputedStyle(
+      document.querySelector('.home-menu > button:not(.home-primary):not(.daily-card)')!,
+    );
+    return css.borderTopColor === ref.borderTopColor && css.backgroundColor === ref.backgroundColor;
+  });
+  expect(daily).toBe(true);
   await expect(page.locator('.home-copy')).not.toContainText(/illustrative|reconstructed/i);
   const order = await page
     .locator('.home-menu > button:not(.daily-card), .home-menu > .mode-selector')

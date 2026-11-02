@@ -14,6 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
+- **U-home-one-primary:** Home shows one primary action ("Dive: <site>"); the Daily dive row drops its mint border and title and uses the same quiet style as the other menu buttons. Nothing removed.
 - **U-touch-left-stick:** touch tutorial and How to play say what to do ("Drag to move and turn", tile "Steer") instead of "Left stick"; desktop and gamepad wording unchanged.
 - **V-kama-slope-light:** Kama'ehuakanaloa vent glow is stronger and reaches further (7000 cd, 150 m) and the site ambient is lifted (18 to 26), so the plume base is warmly lit and the far slope is lighter. Site data only.
 - Blue Hole mission opening (data only): opens 125 m from the gallery (was 150 m) at 44 m depth (was 24 m) with a lower chase arm (offset Y -50, was -30), so the hood lip and stalactites sit at eye level instead of a small roof seen from above. Ranges of 110 m or less have no hull-safe pose under the hood at any depth.
