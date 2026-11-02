@@ -213,18 +213,13 @@ export const missionSystem: GameSystem = {
     'play.mission': (f, ctx) => {
       const mission = ctx.missionRouter?.mission;
       const first = mission?.objectives.find((o) => o.primary);
-      const original = ctx.route?.def.objectives.find((o) => o.id === first?.id);
       const target = ctx.discovery.pois.find((p) => p.id === first?.poiId);
-      if (first && original && target) {
+      if (first && target) {
         const distance = ctx.sub.position.distanceTo(target.position);
         const navigating = approachOpening && !first.complete && distance > target.radius;
         const destination =
           siteManifest(ctx.route!.landmarkId)?.opening?.mission?.destinationLabel ?? target.name;
-        const title = navigating ? `Head to ${destination}` : original.title;
-        if (first.title !== title) {
-          first.title = title;
-          ctx.missionRouter!.panel.setObjectives(mission!.objectives);
-        }
+        first.approachTo = navigating ? destination : undefined;
       }
       ctx.missionRouter?.update(f.clockDt, f.dt, ctx.sub.position, f.sub.headingDeg, f.sub);
     },

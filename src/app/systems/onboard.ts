@@ -169,7 +169,7 @@ export function createOnboardSystem(): GameSystem {
           ? scanView.objectiveDistance
           : scanView.nearestDistance;
         const scanRadius = scanView.objectiveId ? scanView.objectiveRadius : scanView.nearestRadius;
-        const objectiveTitle = f.nextScanObjective?.title;
+        const approachTo = f.nextScanObjective?.approachTo;
         guidance.offer(
           'tutorial',
           'hint',
@@ -185,7 +185,7 @@ export function createOnboardSystem(): GameSystem {
                   device,
                   tutorialKeys(device),
                   tutorial.scanning ? tutorial.scanProgress : null,
-                  objectiveTitle?.startsWith('Head to ') ? objectiveTitle.slice(8) : undefined,
+                  approachTo,
                   Number.isFinite(scanDistance) && scanDistance > scanRadius
                     ? scanDistance
                     : undefined,

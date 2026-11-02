@@ -15,7 +15,7 @@ test('polished dive HUD keeps mission, telemetry, speed, and the controls guide 
     () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
   );
   await expect(page.locator('.obj-item')).toHaveCount(4);
-  await expect(page.locator('.obj-item.is-current')).toContainText('Head to the bow');
+  await expect(page.locator('.obj-item.is-current')).toContainText('Scan the bow');
   await expect(page.locator('.obj-item.is-optional')).toHaveCount(2);
   await expect(page.locator('.obj-check')).toHaveText(['○', '○', '○', '○']);
   await expect(page.locator('.obj-hint, .obj-nav')).toHaveCount(0);
@@ -25,23 +25,20 @@ test('polished dive HUD keeps mission, telemetry, speed, and the controls guide 
     .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize));
   expect(depthSize).toBeGreaterThanOrEqual(14);
   await page.screenshot({ path: `${shots}/near-site-start-titanic.png` });
-  await page.locator('.objectives-panel').screenshot({ path: `${shots}/objectives-list.png` });
+  await expect(page.locator('.objectives-panel')).toBeHidden();
 
   await page.keyboard.press('t');
   await expect(page.locator('.hud-sim-speed')).toHaveText('2× SIM SPEED');
   const stack = await page.evaluate(() => {
-    const objective = document.querySelector('.objectives-panel')!.getBoundingClientRect();
     const telemetry = document.querySelector('.hud-readouts')!.getBoundingClientRect();
     const badge = document.querySelector('.hud-sim-speed')!.getBoundingClientRect();
     return {
-      objectiveBottom: objective.bottom,
       telemetryTop: telemetry.top,
       badgeTop: badge.top,
       badgeBottom: badge.bottom,
       telemetryBottom: telemetry.bottom,
     };
   });
-  expect(stack.telemetryTop).toBeGreaterThanOrEqual(stack.objectiveBottom);
   expect(stack.badgeTop).toBeGreaterThanOrEqual(stack.telemetryTop);
   expect(stack.badgeBottom).toBeLessThanOrEqual(stack.telemetryBottom);
   await page.screenshot({ path: `${shots}/hud-1280.png` });
@@ -82,7 +79,7 @@ test('a long objective list shows the current target and the next few', async ({
   await page.waitForFunction(
     () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
   );
-  await expect(page.locator('.obj-item.is-current')).toContainText('Head to Poseidon');
+  await expect(page.locator('.obj-item.is-current')).toContainText('Scan Poseidon');
   await page.evaluate(() => {
     const g = window.__game as {
       mission: { objectives: Array<{ id: string; title: string }> };
@@ -98,9 +95,9 @@ test('a long objective list shows the current target and the next few', async ({
     ]);
   });
   await expect(page.locator('.obj-item')).toHaveCount(4);
-  await expect(page.locator('.obj-item.is-current')).toContainText('Head to Poseidon');
+  await expect(page.locator('.obj-item.is-current')).toContainText('Scan Poseidon');
   await expect(page.locator('.obj-item-title')).toHaveText([
-    'Head to Poseidon',
+    'Scan Poseidon',
     'Scan IMAX Tower',
     'Extra vent one',
     'Scan Beehive',

@@ -249,7 +249,8 @@ it('Realistic retains its approach marker, then resumes normal waypoint preferen
     complete: false,
     primary: true,
     poiId: 'bow',
-    title: 'Head to the bow',
+    title: 'Scan the bow',
+    approachTo: 'the bow' as string | undefined,
     hint: 'Head to the bow, 220 m ahead.',
   };
   const settings = { gameplay: { visualHints: false } };
@@ -290,7 +291,7 @@ it('Realistic retains its approach marker, then resumes normal waypoint preferen
     const calls = view.setVisualHints.mock.calls.length;
     draw();
     expect(view.setVisualHints).toHaveBeenCalledTimes(calls);
-    objective.title = 'Scan the bow';
+    objective.approachTo = undefined;
     objective.hint = 'Hold SCAN to finish.';
     draw();
     expect(view.setVisualHints).toHaveBeenLastCalledWith(false);

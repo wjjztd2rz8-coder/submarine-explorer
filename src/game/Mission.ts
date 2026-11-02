@@ -286,6 +286,8 @@ export interface ObjectiveStatus {
   complete: boolean;
   /** False when the POI is not in this landmark's pois.json (the objective is ignored). */
   resolved: boolean;
+  /** Set while the player is still travelling to the target: where to head. The title never changes. */
+  approachTo?: string | undefined;
 }
 
 /** The bus subset Mission uses (EventBus satisfies it; tests pass a fake). */

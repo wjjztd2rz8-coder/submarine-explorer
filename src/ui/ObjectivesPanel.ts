@@ -72,6 +72,7 @@ export class ObjectivesPanel {
   constructor(parent: HTMLElement = hudRegions()) {
     this.root = el('div', 'objectives-panel');
     this.root.setAttribute('aria-label', 'Mission objectives');
+    this.root.hidden = true;
     const head = el('div', 'obj-head');
     this.titleEl = el('span', 'obj-title', 'MISSION');
     head.append(this.titleEl);

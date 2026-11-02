@@ -150,7 +150,10 @@ test.describe('B3 mission flow', () => {
       .toBeGreaterThan(3000);
 
     const panel = page.locator('.objectives-panel');
-    await expect(panel).toBeVisible();
+    // Regression guard: the checklist repeats the step banner's goal, so it
+    // stays hidden until the first objective is done (one guidance surface).
+    await expect(panel).toBeHidden();
+    await expect(page.locator('.guidance-slot')).toBeVisible();
     // D-FLOW: one compact line of progress; the full list is in the Esc menu.
     await expect(panel.locator('.obj-progress')).toHaveText(
       `0 of ${objectiveCount} objectives · 0 of ${primaryCount} primary`,
@@ -230,6 +233,7 @@ test.describe('B3 mission flow', () => {
     expect(m.objectives.find((o) => o.id === 'find-bow')?.complete).toBe(true);
     expect(m.emitted).toEqual(['mission:started', 'mission:objective']);
     const panel = page.locator('.objectives-panel');
+    await expect(panel).toBeVisible();
     await expect(panel.locator('.obj-progress')).toHaveText(
       `1 of ${objectiveCount} objectives · 1 of ${primaryCount} primary`,
     );
