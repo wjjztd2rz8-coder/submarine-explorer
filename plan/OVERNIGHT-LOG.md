@@ -2897,3 +2897,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-hunga-bed-read (6e9e0f5d, partial): tuff wall 8 beds on a 14 m texture tile, and a lighter teal water column via Hunga's site atmosphere data; crest now reads against faintly lit water, frame brighter, label one line. Not met: silhouette still a wedge (needs code). Low-sweep fog-equality test now skips sites that recolour their water. Desktop + portrait captured. Gates smoke PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: V-kama-slope-light.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-01 18:41 CST headless run 296 (Claude): one package merged
+
+- Merged V-kama-slope-light (259617b4, partial): Kama vent glow 7000 / 150 m and far-slope ambient 18 to 26 via site data; chimney and heap now warmly lit, far slope lighter, frame not darker. Not met: slope facing away from the vent gets little glow; sky near black; desktop opening only. Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: V-beebe-horizon.
+- **Needs owner:** phone retest (4410-P2 checklist).
