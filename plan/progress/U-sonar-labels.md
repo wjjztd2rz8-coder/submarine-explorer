@@ -11,4 +11,4 @@
 ## Gate
 
 - First `PW_PORT=4711 tools/gates.sh` run: unit failed only on the 8 `sonarScour1320` label snapshots (expected, see above); python, content, build, e2e, e2e-base, attribution, prettier passed.
-- After the snapshot update: see the rerun result below.
+- After the snapshot update: `PW_PORT=4711 tools/gates.sh` passes (python, content, build, unit, e2e smoke, e2e-base, attribution, prettier; EXIT 0, 2026-11-02).
