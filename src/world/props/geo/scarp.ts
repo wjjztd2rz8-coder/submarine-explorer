@@ -122,6 +122,14 @@ const REAR: [number, number][] = [
   [-0.12, 1.8],
 ];
 
+/** Rear of a flat-topped escarpment: the crest runs back as a level shelf before it falls away. */
+const PLATEAU_REAR: [number, number][] = [
+  [1.01, 0.5],
+  [1, 1.2],
+  [0.3, 1.5],
+  [-0.12, 1.8],
+];
+
 const PRESETS: Record<ScarpPresetId, Preset> = {
   tuff: {
     bedding: 'regular',
@@ -139,11 +147,11 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
       [0.86, 0],
       [0.93, -0.05],
       [1, 0.02],
-      ...REAR,
+      ...PLATEAU_REAR,
     ],
     join: 0.14,
     reach: 0.9,
-    arc: -0.42,
+    arc: -0.2,
     sbend: 0.05,
     sPhase: 0.6,
     passage: 0,
@@ -164,7 +172,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     rockSize: 0.75,
     blocks: 0.05,
     rough: 0.95,
-    edgeStart: 0.3,
+    edgeStart: 0.75,
     tile: [14, 14],
     bedContrast: 1,
   },
@@ -310,8 +318,11 @@ export function wallEnvelope(
 ): { edge: number; skyline: number } {
   const edge = smooth(edgeStart, 1, endRatio(x, width));
   // A ragged skyline: the crest varies along the wall and slopes away at both ends.
+  // Late-pinching walls (edgeStart >= 0.6) are escarpments: a level crest in a few terraces.
   const skyline =
-    edgeStart < 0.6 ? 0.72 + 0.5 * fbm3(x * 0.06, 1, width, Math.round(width * 31), 4) : 1;
+    edgeStart < 0.6
+      ? 0.72 + 0.5 * fbm3(x * 0.06, 1, width, Math.round(width * 31), 4)
+      : 1 - 0.09 * Math.abs(Math.round(((x / width) * 2.4) % 2));
   return { edge, skyline };
 }
 
