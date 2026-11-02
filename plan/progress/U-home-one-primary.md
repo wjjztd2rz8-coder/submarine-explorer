@@ -6,4 +6,5 @@ Home now has one primary action: the mint "Dive: <site>" button.
 - Files: src/styles/home.css (3 lines), tests/e2e/f-title-layout.spec.ts (assert one `.home-primary`, daily has the same border/background as a plain menu button; `SHOTS_DIR` env override for screenshots), CHANGELOG.md.
 - No new @media, no site branches, DOM/Tab order unchanged so other specs are untouched.
 - Screenshots: .cache/codex/shots/U-home-one-primary/{before,after}/home-1280x720.png and home-390x844.png.
-- e2e: f-title-layout home specs (all 8 viewports) passed; gates result below.
+- e2e: f-title-layout home specs (all 8 viewports) passed.
+- Gates: smoke + project-base PASS (smoke e2e mode).
