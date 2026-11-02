@@ -1140,8 +1140,12 @@ freshTest.describe('frozen debrief and resume', () => {
               await act('.mission-debrief [data-action="keep-exploring"]');
             }
             await expect(debrief).toBeHidden();
-            // Phones name the objective in the guidance slot, not the panel.
-            if (!viewport.touch) await expect(page.locator('.objectives-panel')).toBeVisible();
+            // The checklist appears with the first completed objective; phones name the objective in the guidance slot.
+            if (!viewport.touch) {
+              const checklist = page.locator('.objectives-panel');
+              if (scans === 0) await expect(checklist).toBeHidden();
+              else await expect(checklist).toBeVisible();
+            }
             await expect(page.locator('.hud-readouts')).toBeVisible();
             const resumed = await snapshot(page);
             expect(resumed).toEqual({
