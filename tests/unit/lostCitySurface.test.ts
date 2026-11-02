@@ -168,7 +168,7 @@ describe('Lost City carbonate surface', () => {
       );
       expect(shoulder).toBeLessThan(shader.fragmentShader.indexOf('#include <opaque_fragment>'));
       const ceiling = Number(/outgoingLight \*= ([\d.]+) \//.exec(shader.fragmentShader)![1]);
-      expect(ceiling).toBeLessThanOrEqual(0.8); // asymptote of the shoulder;
+      expect(ceiling).toBeLessThanOrEqual(0.8); // asymptote of the shoulder
       material.dispose();
     }
   });
