@@ -4,6 +4,8 @@
 
 Data only, in `data/landmarks/lost-city/mission.json`: `glowIntensity` 60000 to 10000 and `ambientFill` 16 to 32. The blown bloom was the three glow point lights saturating the tower face; material albedo and emissive changes had no effect on it (tried 1.5 to 0.7 and 0.22 to 0.1, reverted).
 
+Tests that pinned the old numbers (fill 16, effective glow 21000) were updated: `tests/unit/presets.test.ts`, `tests/unit/lostCityReadability.test.ts`, `tests/e2e/opening-framing.spec.ts`.
+
 ## Evidence
 
 - Before: `.cache/golden/2026-11-02-022248/lost-city-1.png`
