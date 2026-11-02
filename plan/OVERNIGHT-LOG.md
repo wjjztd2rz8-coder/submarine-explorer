@@ -2958,3 +2958,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged R-debrief-frozen-red (Haiku, 8bb5f1ea): frozen-debrief resume test now asserts the objectives panel hidden at zero scans and visible after the first scan (test change only). Gates smoke + project-base PASS on worktree and main. Haiku took ~64 min. Four other red specs from hosted CI run 41419337643 added as Backlog 4c R-ci-red-4. Codex week 4% until Nov 4, briefs 120-124 queued. Next: R-ci-red-4, U-sonar-labels.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-02 07:37 CST headless run 308 (Claude): one package merged
+
+- Merged R-ci-red-4 (Haiku, b12783e6): all four hosted-CI red specs were stale tests (checklist now appears after the first completed objective); tests updated, no product change. Gates smoke + project-base PASS on worktree and main. Haiku took ~58 min. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-sonar-labels (Haiku).
+- **Needs owner:** phone retest (4410-P2 checklist).
