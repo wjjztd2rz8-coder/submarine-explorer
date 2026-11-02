@@ -83,11 +83,17 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 3. **V-kama-slope-light [Sonnet] — PARTIAL 2026-11-01 (259617b4): vent glow reach and far-slope ambient raised (site data); warm pool mostly on chimney and heap, slope away from vent still uniform blue-grey.** plume reads well but the slope is a uniform dark blue-grey plane with one orange streak. Target: slope lit warmly around the plume base (a pool of vent light) and a gentle value gradient to the horizon; no new props.
 4. **V-beebe-horizon [Sonnet] — PARTIAL 2026-11-01 (da5095c6): site horizon block gives a teal-to-dark water gradient above the seabed; the dark band at the seabed edge and uniform mid-ground remain (fogHaze needs a validator or code change), no extra far glow (a third plume is already visible).** smoker, plume and sub read; the horizon is a hard line with black sky above and the mid-ground is a uniform brown plain. Target: a soft haze/fog gradient at the horizon and one far vent glow; opening not darker overall. Data-driven via the Beebe vent preset.
 5. **V-lostcity-tower-blown [Sonnet] — PARTIAL 2026-11-01 (d5d40cc0): glow 60000 to 10000, fill 16 to 32; halo gone, near face still pale.** the Poseidon tower top is a blown-white bloom that loses the carbonate detail. Target: tower top keeps visible texture (peak value below clipping) while the flank stays lit. Route: tower light intensity / emissive in Lost City data.
-6. **U-play-walkthrough [Haiku]:** capture a Home -> pick site -> first 60 s -> Journal -> debrief set from the e2e shots (journal-debrief spec output) and list confusion or clutter; not re-captured in the last two reviews. Findings become backlog items.
+6. **U-play-walkthrough [Haiku] — DONE 2026-11-01:** findings in `plan/progress/U-play-walkthrough.md`, added below as items 11-16.
 7. **R-ci-speed [Codex, queued 124]:** hosted CI takes 30+ min, so failures surface 1-2 runs late. Audit shard balance and slow specs; target under 20 min without dropping coverage.
 8. **Codex, queued 120-123, waiting for the Nov 4 reset:** T-opening-geometry (120), S-verify CI (121), S-dead second sweep (122), S-verify spawn cap (123).
 9. **P2-phone-accept [owner + Codex; browser-checkable items automated in tests/e2e/phone-accept.spec.ts]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
-10. **R-release [Haiku]:** tag the latest green-CI main after each review (f71 is the newest, 2026-11-01).
+10. **U-debrief-surface-copy [Codex]:** debrief says "Back at the surface" while the sub is still submerged (MissionRouter.ts:279); reword by state.
+11. **U-touch-left-stick [Haiku]:** touch dive-start shows "Left stick" (onboard.ts:41, HowToPlay.ts:31); say what to do, no control names on touch.
+12. **U-home-one-primary [Sonnet]:** Home shows "Dive: <site>" and "Daily dive" as two primary-looking cards after a dive; one primary action.
+13. **U-dive-start-hud [Sonnet]:** desktop dive start stacks four HUD blocks and mission/briefing objective names differ; cut to one guidance surface.
+14. **U-pick-site-clean [Sonnet]:** pick-site rows show empty stars and "0/N logged" before play, globe pins unlabeled; hide until earned, label pins.
+15. **U-briefing-jargon [Sonnet]:** briefing says "Class A/B hull" with tiny tags; plain words. Also first Journal visit shows 55 empty entries (U-journal-first-visit) and sonar range labels overlap (U-sonar-labels).
+16. **R-release [Haiku]:** tag the latest green-CI main after each review (f71 is the newest, 2026-11-01).
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16), Titanic per-plate blockiness (accepted ~3.7). Codex weekly burn is ~60%/day, so briefs stay rationed.
 
