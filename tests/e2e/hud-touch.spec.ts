@@ -2093,9 +2093,10 @@ freshTest.describe('surface mode HUD', () => {
           expect(surface.y).toBeGreaterThan(-20);
           expect(surface.y).toBeLessThanOrEqual(-surface.radius + 1);
           // Touch layouts carry the objective in the guidance slot, not a panel.
+          // The mission panel waits for the first completed objective, so it is hidden at dive start.
+          if (!layout.touch) await expect(page.locator('.objectives-panel')).toBeHidden();
           for (const selector of [
             '.sonar',
-            ...(layout.touch ? [] : ['.objectives-panel']),
             '.hud-readouts',
             ...(layout.touch ? ['.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause'] : []),
           ])

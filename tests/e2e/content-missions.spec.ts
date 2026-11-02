@@ -154,8 +154,7 @@ for (const id of missionIds) {
       primary.map((objective) => objective.title),
     );
     await page.locator('.briefing-begin').click();
-    await expect(page.locator('.objectives-panel')).toBeVisible();
-
+    // The checklist appears with the first completed objective, not at dive start.
     for (const objective of primary) {
       await teleportToPoi(page, objective.poi);
       // The checklist follows mission order, while a scan candidate also depends on facing and range.
@@ -186,6 +185,7 @@ for (const id of missionIds) {
       expect(completed, `${id}: ${objective.id} should complete through a scan`).toBeGreaterThan(
         before,
       );
+      await expect(page.locator('.objectives-panel')).toBeVisible();
     }
     await expect(page.locator('.obj-progress')).toHaveText(/primaries done|all complete/);
 
