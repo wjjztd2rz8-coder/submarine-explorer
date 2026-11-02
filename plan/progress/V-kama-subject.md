@@ -18,3 +18,8 @@ About 6.5/10 (was ~4). Blotches gone, lump explained, frame not darker.
 
 - Plume base is only marginally better lit; the slope far from the sub is still dark blue-grey.
 - Pillow heap partly clips into the steep slope; only the desktop opening was viewed.
+
+## Second pass 2026-11-02 (V-kama-subject, backlog 6a)
+
+- Opening pose closer (chaseRadius 45, yaw 23, rangeM kept at 110: 105 or less puts the sub inside scan range and breaks the approach-opening spec) plus a secondary chimney field in props.json.
+- Site specs (`tools/site-specs.sh kamaehuakanaloa`) 14/14 pass; golden desktop viewed: vent site, glow pool and several plumes fill the lower-left third, slope still dark on the right. About 3.8.

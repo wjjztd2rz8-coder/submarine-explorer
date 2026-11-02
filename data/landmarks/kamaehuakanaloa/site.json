@@ -18,7 +18,7 @@
   },
   "opening": {
     "mission": {
-      "rangeM": 85,
+      "rangeM": 110,
       "yawOffset": 23,
       "chaseRadius": 45,
       "chaseOffsetY": -20,
