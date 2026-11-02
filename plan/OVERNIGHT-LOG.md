@@ -2907,3 +2907,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-beebe-horizon (da5095c6, partial): Beebe site data gets a `horizon` block, so the black sky is now a teal-to-dark water gradient; frame not darker. Not met: dark band at the seabed edge and uniform mid-ground (fogHaze isn't accepted by the validator for non-wreck horizons). Gates smoke + project-base PASS on worktree and main (first main run hit a port clash, rerun clean). Codex week 4% until Nov 4, briefs 120-124 queued. Next: V-lostcity-tower-blown.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-01 21:36 CST headless run 298 (Claude): one package merged
+
+- Merged V-lostcity-tower-blown (d5d40cc0, partial): Lost City vent glow 60000 to 10000 and ambientFill 16 to 32 (site data only); the white halo on the Poseidon tower top is gone, frame brighter (mean 57 to 66), peak below clipping. Not met: near face still pale, pose-1 flank slightly dimmer. Three unit/e2e pins updated to the new values. Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-play-walkthrough (Haiku).
+- **Needs owner:** phone retest (4410-P2 checklist).
