@@ -134,7 +134,6 @@ export interface SubmarineConfig {
 
 /** An operating rating and a separate game failure threshold. */
 export interface HullClass {
-  name: string;
   /** Certified operating depth (negative metres). */
   ratedDepth: number;
   /** Game failure threshold below the rating, with a 10% safety margin. */
@@ -182,9 +181,9 @@ export const DEFAULT_SUBMARINE: SubmarineConfig = {
     // C: Triton 36000/2 rated 11,000 m for repeated full-ocean-depth dives
     // (https://tritonsubs.com/subs/t36000-2/).
     // The 10% simulated crush margin is gameplay tuning, not a certification claim.
-    A: { name: 'Class A - coastal', ratedDepth: -1000, crushDepth: -1100 },
-    B: { name: 'Class B - deep ocean', ratedDepth: -6500, crushDepth: -7150 },
-    C: { name: 'Class C - full ocean depth', ratedDepth: -11000, crushDepth: -12100 },
+    A: { ratedDepth: -1000, crushDepth: -1100 },
+    B: { ratedDepth: -6500, crushDepth: -7150 },
+    C: { ratedDepth: -11000, crushDepth: -12100 },
   },
   impactStressSpeed: 6.0,
   hullStressHalfLife: 0.9,

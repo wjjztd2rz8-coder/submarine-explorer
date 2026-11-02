@@ -284,7 +284,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
     .toBeLessThan(0.02);
   await expectGlobeClearEdges(page);
   await expect(sites.locator('[data-mission="titanic"]')).toBeVisible();
-  await expect(sites.locator('[data-mission="titanic"]')).toContainText(/Class B hull/);
+  await expect(sites.locator('[data-mission="titanic"]')).toContainText(/Rated to 6,500 m/);
   // Regression guard: a first-time player sees one recommended row (listed first) and no
   // empty stars or "0/N logged" noise on rows with nothing earned yet.
   await expect(sites.locator('.mission-badge')).toHaveText(['Recommended first dive']);

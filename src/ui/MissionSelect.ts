@@ -289,13 +289,12 @@ export class MissionSelect {
         btn.append(progress);
         void fetchContentJson(contentUrl(m.id, 'mission.json')).then((raw) => {
           if (!btn.isConnected || typeof raw !== 'object' || raw === null) return;
-          const doc = raw as { hull_class?: unknown; objectives?: unknown };
+          const doc = raw as { objectives?: unknown };
+          // Rated depth, not a hull class id: casual players don't know what a class is.
           const hull =
             this.progress && m.depthM !== null
-              ? `Class ${requiredHull(m.depthM).id} hull`
-              : typeof doc.hull_class === 'string'
-                ? `Class ${doc.hull_class} hull`
-                : 'Hull class unknown';
+              ? `Rated to ${requiredHull(m.depthM).depthM.toLocaleString('en-US')} m`
+              : '';
           meta.textContent = [
             m.depthM !== null ? `${Math.round(m.depthM).toLocaleString('en-US')} m` : '',
             hull,
