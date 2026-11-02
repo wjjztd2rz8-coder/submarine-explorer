@@ -183,6 +183,8 @@ test('discoveries unlock Your sub cosmetics; photo bonus and best stars survive 
   await expect(sites.locator('[data-mission="blake-plateau-corals"] .mission-stars')).toHaveText(
     '★★★',
   );
+  // Regression guard: only the site with something earned shows stars (no empty-star rows).
+  await expect(sites.locator('.mission-stars')).toHaveCount(1);
   await expect(sites.locator('[data-mission="titanic"]')).toBeEnabled();
   await expect(sites.locator('[data-mission="challenger-deep"]')).toBeEnabled();
   await expect(sites.locator('.mission-lock')).toHaveCount(0);

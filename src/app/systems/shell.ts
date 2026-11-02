@@ -24,6 +24,9 @@ const keysCleanup = new Disposables();
 
 /** The mission a first-time player dives into from Home. */
 const FIRST_MISSION_ID = 'titanic';
+/** Before the first dive the opening site is the suggested one; afterwards nothing is. */
+const recommendedSite = (app: { lastSite?: string | null }): string | undefined =>
+  app.lastSite ? undefined : FIRST_MISSION_ID;
 
 /** localStorage key for the last mission dived (Home's Dive button continues it). */
 export const LAST_SITE_KEY = 'subexplorer.lastSite.v1';
@@ -97,8 +100,11 @@ export function initializeShell(ctx: ShellContext): void {
   ctx.home = home;
   const updateDiveSite = (): void =>
     home.setDiveSite(ctx.missionSummaries.find((entry) => entry.id === diveSite())?.title ?? null);
-  const completion = (id: string, pois: string[]): string =>
-    `${pois.filter((poi) => discoveries.isDiscovered(id, poi)).length}/${pois.length} logged`;
+  // Progress text only for sites where something has been logged.
+  const completion = (id: string, pois: string[]): string => {
+    const n = pois.filter((poi) => discoveries.isDiscovered(id, poi)).length;
+    return n > 0 ? `${n}/${pois.length} logged` : '';
+  };
   const summaries = loadMissionSummaries();
   const selectMission = (id: string): void => {
     const m = ctx.missionSummaries.find((entry) => entry.id === id);
@@ -115,6 +121,7 @@ export function initializeShell(ctx: ShellContext): void {
     onSelect: selectTile,
     onSelectMission: selectMission,
     completion,
+    recommendedId: recommendedSite(app),
     onSiteFocus: (id) => ctx.homeGlobe.previewSite(id),
   });
   ctx.homeSites = homeSites;
@@ -244,6 +251,7 @@ export const globeSystem: GameSystem<ShellContext, { dt: number }> = {
       currentId: contentLandmark,
       parent: home.globeSlot,
       embedded: true,
+      recommendedId: recommendedSite(ctx.app),
       onSiteFocus: (id) => homeSites.highlightSite(id),
       onSiteSelected: siteSelected,
     });

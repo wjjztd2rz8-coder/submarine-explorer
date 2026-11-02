@@ -40,8 +40,10 @@ interface MissionSelectOptions {
   onSelect?: (id: string) => void;
   onSelectMission?: (id: string) => void;
   presentation?: 'legacy' | 'shell';
-  /** Journal progress for this site, for example "3/5 logged". */
+  /** Journal progress for this site, for example "3/5 logged"; empty before anything is logged. */
   completion?: (id: string, objectivePois: string[]) => string;
+  /** The suggested first dive: listed first and tagged. */
+  recommendedId?: string;
   onSiteFocus?: (id: string) => void;
 }
 
@@ -226,7 +228,11 @@ export class MissionSelect {
     title.textContent = 'MISSIONS';
     box.appendChild(title);
 
-    for (const m of missions) {
+    const { recommendedId } = this.options;
+    const ordered = [...missions].sort(
+      (a, b) => +(b.id === recommendedId) - +(a.id === recommendedId),
+    );
+    for (const m of ordered) {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'mission-item is-mission';
@@ -246,6 +252,11 @@ export class MissionSelect {
         badge.className = 'mission-badge';
         badge.textContent = 'TILE MISSING';
         row.append(badge);
+      } else if (m.id === recommendedId) {
+        const badge = document.createElement('span');
+        badge.className = 'mission-badge is-recommended';
+        badge.textContent = 'Recommended first dive';
+        row.append(badge);
       }
 
       const meta = document.createElement('span');
@@ -264,10 +275,10 @@ export class MissionSelect {
         summary.textContent = m.summary;
         btn.append(summary);
       }
-      if (this.progress) {
+      const best = this.progress?.rating(m.id) ?? 0;
+      if (best > 0) {
         const stars = document.createElement('span');
         stars.className = 'mission-stars';
-        const best = this.progress.rating(m.id);
         stars.textContent = '★'.repeat(best) + '☆'.repeat(3 - best);
         stars.setAttribute('aria-label', `Best dive: ${best} of 3 stars`);
         btn.append(stars);
@@ -275,7 +286,6 @@ export class MissionSelect {
       if (this.options.presentation === 'shell') {
         const progress = document.createElement('span');
         progress.className = 'mission-item-progress';
-        progress.textContent = 'Journal · 0 logged';
         btn.append(progress);
         void fetchContentJson(contentUrl(m.id, 'mission.json')).then((raw) => {
           if (!btn.isConnected || typeof raw !== 'object' || raw === null) return;
@@ -298,7 +308,7 @@ export class MissionSelect {
                 return typeof poi === 'string' ? [poi] : [];
               })
             : [];
-          progress.textContent = this.options.completion?.(m.id, pois) ?? `0/${pois.length} logged`;
+          progress.textContent = this.options.completion?.(m.id, pois) ?? '';
         });
         btn.addEventListener('focus', () => this.highlightSite(m.id));
         btn.addEventListener('pointerenter', () => this.highlightSite(m.id));

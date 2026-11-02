@@ -284,9 +284,20 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
     .toBeLessThan(0.02);
   await expectGlobeClearEdges(page);
   await expect(sites.locator('[data-mission="titanic"]')).toBeVisible();
-  await expect(sites.locator('[data-mission="titanic"] .mission-badge')).toHaveCount(0);
   await expect(sites.locator('[data-mission="titanic"]')).toContainText(/Class B hull/);
-  await expect(sites.locator('[data-mission="titanic"]')).toContainText(/\d+\/\d+ logged/);
+  // Regression guard: a first-time player sees one recommended row (listed first) and no
+  // empty stars or "0/N logged" noise on rows with nothing earned yet.
+  await expect(sites.locator('.mission-badge')).toHaveText(['Recommended first dive']);
+  await expect(sites.locator('.mission-item.is-mission').first()).toHaveAttribute(
+    'data-mission',
+    'titanic',
+  );
+  await expect(sites.locator('.mission-stars')).toHaveCount(0);
+  await expect(sites.locator('.mission-item-progress:not(:empty)')).toHaveCount(0);
+  // The recommended pin (or its cluster) carries a visible name on the globe.
+  await expect(
+    page.locator('.globe.is-embedded .globe-pin-label:visible', { hasText: 'Titanic' }),
+  ).toHaveCount(1);
   await sites.locator('[data-mission="titanic"]').hover();
   await expect(page.locator('.globe.is-embedded .globe-card')).toContainText('Titanic');
   await Promise.all([
@@ -433,6 +444,10 @@ for (const [saved, destination, title] of [
     const primary = page.locator('.home-primary');
     await expect(primary).toHaveText(`Dive: ${title}`);
     await expect(page.locator('.home-scene-caption')).toHaveText(`${title} · Next dive`);
+    // Regression guard: the first-dive recommendation disappears once a site has been dived.
+    await expect(page.locator('.home-sites .mission-badge.is-recommended')).toHaveCount(
+      saved === null ? 1 : 0,
+    );
     await primary.click();
     await expect(page).toHaveURL((url) => url.searchParams.get('mission') === destination);
   });

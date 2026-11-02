@@ -58,6 +58,8 @@ export interface GlobeOptions {
   tileIds: readonly string[];
   /** The landmark being dived now: highlighted, and the globe starts over it. */
   currentId?: string;
+  /** The suggested first dive: its name stays visible beside its pin (or its cluster). */
+  recommendedId?: string;
   /** Navigate to a URL (tests inject a spy). Default: `location.href = url`. */
   navigate?: (url: string) => void;
   /** Inject the catalogue (tests); default loads it from /data. */
@@ -88,6 +90,7 @@ interface Pin {
 interface ClusterEl {
   el: HTMLButtonElement;
   count: HTMLSpanElement;
+  label: HTMLSpanElement;
   /** Seed pin index of the group it shows (-1 while hidden). */
   leader: number;
   size: number;
@@ -475,6 +478,7 @@ export class Globe {
       if (site.state === 'mission' && this.missionAccess?.(site))
         b.setAttribute('aria-disabled', 'true');
       if (site.id === this.opts.currentId) b.classList.add('is-current');
+      if (site.id === this.opts.recommendedId) b.classList.add('is-recommended');
       b.setAttribute(
         'aria-label',
         `${site.name}, ${site.type}, ${formatDepth(site.depthM)}. ${site.state === 'mission' ? (this.missionAccess?.(site) ?? pinBadge(site)) : pinBadge(site)}`,
@@ -673,6 +677,11 @@ export class Globe {
         c.size = size;
         c.hash = groupHash[i];
         c.count.textContent = String(size);
+        const rec = this.clusterMembers(i).find(
+          (m) => this.pins[m].site.id === this.opts.recommendedId,
+        );
+        c.label.hidden = rec === undefined;
+        c.label.textContent = rec === undefined ? '' : shortName(this.pins[rec].site.name);
         c.el.setAttribute('aria-label', this.clusterLabel(i));
         c.el.hidden = false;
         c.el.dataset.sites = this.clusterIds(i);
@@ -715,8 +724,10 @@ export class Globe {
     // Members are the keyboard path; the cluster is for pointer and touch.
     b.tabIndex = -1;
     const count = el('span', 'globe-cluster-count');
-    b.append(count);
-    c = { el: b, count, leader: -1, size: 0, hash: 0, x: NaN, y: NaN, opacity: NaN };
+    const label = el('span', 'globe-pin-label');
+    label.hidden = true;
+    b.append(count, label);
+    c = { el: b, count, label, leader: -1, size: 0, hash: 0, x: NaN, y: NaN, opacity: NaN };
     const entry = c;
     b.addEventListener('pointerenter', () => this.orbit.poke());
     b.addEventListener('click', () => this.openCluster(entry.leader));

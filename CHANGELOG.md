@@ -14,6 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
+- **U-pick-site-clean:** the pick-site list shows stars and "N/M logged" only on sites where something has been earned (was empty stars and "0/N logged" on every row, plus a fixed "Journal · 0 logged" placeholder); before the first dive the opening site is listed first and tagged "Recommended first dive", and its globe pin (or the cluster holding it) shows its name. Removed: the empty-star rows and the zero-progress text.
 - **U-home-one-primary:** Home shows one primary action ("Dive: <site>"); the Daily dive row drops its mint border and title and uses the same quiet style as the other menu buttons. Nothing removed.
 - **U-touch-left-stick:** touch tutorial and How to play say what to do ("Drag to move and turn", tile "Steer") instead of "Left stick"; desktop and gamepad wording unchanged.
 - **V-kama-slope-light:** Kama'ehuakanaloa vent glow is stronger and reaches further (7000 cd, 150 m) and the site ambient is lifted (18 to 26), so the plume base is warmly lit and the far slope is lighter. Site data only.
