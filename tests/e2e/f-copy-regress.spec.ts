@@ -111,6 +111,8 @@ for (const layout of [
                     : { ...o, complete: true },
                 ),
               );
+              // The checklist shows once an objective is complete, as it does in a real dive.
+              g.missionRouter.panel.setVisible(true);
               const element = document.querySelector<HTMLElement>(
                 '.obj-item.is-current .obj-item-title',
               )!;

@@ -31,6 +31,16 @@ import { openBriefingAdvanced } from './helpers/briefing.js';
 import catalog from '../../data/landmarks/index.json' with { type: 'json' };
 import sites from '../../data/landmarks/index.json' with { type: 'json' };
 
+/** The checklist opens after the first completed objective; layout checks open it directly. */
+async function revealChecklist(page: Page): Promise<void> {
+  await page.evaluate(() =>
+    (
+      window.__game as unknown as { missionRouter: { panel: { setVisible(v: boolean): void } } }
+    ).missionRouter.panel.setVisible(true),
+  );
+  await expect(page.locator('.objectives-panel')).toBeVisible();
+}
+
 experiencedTest.describe('guidance lifecycle', () => {
   for (const transition of ['scan', 'pause', 'crush', 'power'] as const) {
     // Regression guard: scan progress/results replace the target, and covered or
@@ -223,7 +233,8 @@ freshTest.describe('fixture and mission layout', () => {
         );
         await diveReady(page, {});
         await expect(page.locator('.guidance-slot[data-step]')).toBeVisible();
-        if (!layout.touch) await expect(page.locator('.objectives-panel')).toBeVisible();
+        // The checklist waits for the first completed objective; open it here to measure its layout.
+        if (!layout.touch) await revealChecklist(page);
         else await expect(page.locator('.objectives-panel')).toBeHidden();
         await finishAnimations(page, '.guidance-slot[data-step]');
         await shot(page, `mission-${layout.name}`);
@@ -270,6 +281,7 @@ freshTest.describe('fixture and mission layout', () => {
         await page.waitForFunction(() => window.__gameReady === true, undefined, {
           timeout: 45_000,
         });
+        if (!layout.touch) await revealChecklist(page);
         await finishAnimations(page, '.guidance-slot[data-step]');
         await shot(page, `regions-${layout.name}`);
         await expect(page.locator('.d-sonar-legend')).toHaveCount(0);
@@ -782,11 +794,19 @@ freshTest.describe('landscape guidance and completion', () => {
         // Regression: on a phone in landscape the banner sat under Sonar/Lights, hiding Surface.
         await ready(page, stackUrl);
         await dismissTutorial(page, true);
-        await page.evaluate(() =>
-          (
-            window.__game as unknown as { missionRouter: { showBanner(kind: 'primary'): void } }
-          ).missionRouter.showBanner('primary'),
-        );
+        await page.evaluate(() => {
+          const router = (
+            window.__game as unknown as {
+              missionRouter: {
+                panel: { setVisible(v: boolean): void };
+                showBanner(kind: 'primary'): void;
+              };
+            }
+          ).missionRouter;
+          // The banner sits in the checklist panel, which opens after the first completed objective.
+          router.panel.setVisible(true);
+          router.showBanner('primary');
+        });
         const banner = page.locator('.obj-banner');
         await expect(banner).toBeVisible();
         await banner.evaluate((e) => Promise.all(e.getAnimations().map((a) => a.finished)));
