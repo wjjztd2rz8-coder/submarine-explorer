@@ -276,7 +276,7 @@ export function debriefText(
         ? 'All objectives complete'
         : primaries.total > 0 && primaries.completed === primaries.total
           ? 'Primaries complete'
-          : 'Back at the surface',
+          : 'Dive summary',
   };
 }
 

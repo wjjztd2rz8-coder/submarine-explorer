@@ -882,9 +882,9 @@ describe('Journal content model', () => {
 
 describe('debrief wording', () => {
   it.each([
-    [0, 0, 'Back at the surface'],
-    [0, 2, 'Back at the surface'],
-    [1, 2, 'Back at the surface'],
+    [0, 0, 'Dive summary'],
+    [0, 2, 'Dive summary'],
+    [1, 2, 'Dive summary'],
     [2, 2, 'Primaries complete'],
   ])('keeps counts solely in the metric row (%s of %s primary)', (completed, total, title) => {
     expect(debriefText('surface', { completed, total })).toEqual({ title });
