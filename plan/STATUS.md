@@ -4,14 +4,14 @@
 
 ## 1.0 table
 
-| Requirement                               | State                                                                                                             |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Five heroes beautiful (4 of 5)            | Beebe 4.0, Lost City 4.0, Monterey 4.0, Titanic 3.9, Blue Hole 3.85; all 13 openings pass the readability screen |
-| Other eight sites coherent                | Axial ~3.5 (calmer), Hunga 3.45, Kama 3.3, Challenger and Endurance ~3.5; three sites unrated                      |
-| New player understands first five minutes | No dead ends; walk-through found 8 confusions, 3 fixed (touch wording, one Home primary, dive-start HUD), 5 queued    |
-| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great; Medium auto-tier and weaker phones untested                                              |
-| Hosted CI green, releases tagged          | f71 tagged and deployed; main was red on two specs (Beebe horizon assertion, Blue Hole touch journey); fixes pushed 2026-11-02, awaiting hosted run before tagging f72            |
-| Code simple enough                        | Dead-code and test sweeps merged; standing S-* audits                                                             |
+| Requirement                               | State                                                                                                                                                                  |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Five heroes beautiful (4 of 5)            | Beebe 4.0, Lost City 4.0, Monterey 4.0, Titanic 3.9, Blue Hole 3.85; all 13 openings pass the readability screen                                                       |
+| Other eight sites coherent                | Axial ~3.5 (calmer), Hunga 3.45, Kama 3.3, Challenger and Endurance ~3.5; three sites unrated                                                                          |
+| New player understands first five minutes | No dead ends; walk-through found 8 confusions, 3 fixed (touch wording, one Home primary, dive-start HUD), 5 queued                                                     |
+| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great; Medium auto-tier and weaker phones untested                                                                                                   |
+| Hosted CI green, releases tagged          | f71 tagged and deployed; main was red on two specs (Beebe horizon assertion, Blue Hole touch journey); fixes pushed 2026-11-02, awaiting hosted run before tagging f72 |
+| Code simple enough                        | Dead-code and test sweeps merged; standing S-* audits                                                                                                                  |
 
 ## Done recently
 
