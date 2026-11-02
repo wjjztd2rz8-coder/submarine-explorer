@@ -16,4 +16,4 @@ Shards 4 and 5 show no frozen-debrief failures. Other red specs, not fixed here:
 ## Gates
 
 - `PW_PORT=5871 npx playwright test tests/e2e/journal-debrief.spec.ts -g 'frozen debrief'`: 6 passed (before the fix, the 3 desktop tests failed at line 1144).
-- `PW_PORT=5871 tools/gates.sh`: run before the prettier fix: python, content, build, unit, e2e, e2e-base, attribution PASS; prettier FAIL on `plan/DIRECTOR.md` (fixed above). Re-run result recorded below.
+- `PW_PORT=5871 tools/gates.sh`: PASS on the final tree (python, content, build, unit, e2e, e2e-base, attribution, prettier, gates).
