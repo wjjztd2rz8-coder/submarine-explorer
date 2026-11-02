@@ -7,9 +7,15 @@
   "environment": {
     "preset": "vent",
     "overrides": {
-      "smokeOpacitySulfide": 0.55,
+      "smokeOpacitySulfide": 0.14,
       "smokeColorSulfide": 7031350,
-      "hazeGlow": 0.5,
+      "spreadM": 3.5,
+      "smokeParticles": 7000,
+      "sizeStartM": 0.8,
+      "sizeEndM": 2.2,
+      "riseHeightM": 38,
+      "hazeGlow": 0.8,
+      "hazeGlowSizeM": 16,
       "glowIntensity": 7000,
       "glowDistanceM": 150,
       "glowStandoffM": 5,
