@@ -2902,3 +2902,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-kama-slope-light (259617b4, partial): Kama vent glow 7000 / 150 m and far-slope ambient 18 to 26 via site data; chimney and heap now warmly lit, far slope lighter, frame not darker. Not met: slope facing away from the vent gets little glow; sky near black; desktop opening only. Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: V-beebe-horizon.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-01 20:21 CST headless run 297 (Claude): one package merged
+
+- Merged V-beebe-horizon (da5095c6, partial): Beebe site data gets a `horizon` block, so the black sky is now a teal-to-dark water gradient; frame not darker. Not met: dark band at the seabed edge and uniform mid-ground (fogHaze isn't accepted by the validator for non-wreck horizons). Gates smoke + project-base PASS on worktree and main (first main run hit a port clash, rerun clean). Codex week 4% until Nov 4, briefs 120-124 queued. Next: V-lostcity-tower-blown.
+- **Needs owner:** phone retest (4410-P2 checklist).
