@@ -2973,3 +2973,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-lostcity-tower-top (Sonnet, 6de33a56): carbonate highlight shoulder in the material; tower top peak 184-194 (was 206-215), streaks visible in the close pose (viewed), softer than ideal. Gates smoke + project-base PASS on main (first main run hit a stale vite on port 4872, rerun clean). Codex week 4% until Nov 4, briefs 120-124 queued. Next: V-kama-plume-scale (Sonnet).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-02 10:23 CST headless run 311 (Claude): one package merged
+
+- Merged V-kama-plume-scale (Sonnet, 70bad412): Kama plume data only (opacity 0.55 to 0.14, narrower, glow pool 0.8/16 m); before/after viewed, plume now thin wisps, glow pool larger than base, ~3.8. Gates smoke + project-base PASS on main. Found 3 monterey-canyon opening-framing specs red on main (also before this change): added Backlog item R-monterey-opening-red. Codex week 4% until Nov 4, briefs 120-124 queued. Next: R-monterey-opening-red (Haiku), V-bluehole-hood-code.
+- **Needs owner:** phone retest (4410-P2 checklist).
