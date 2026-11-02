@@ -227,6 +227,36 @@ export function easeSonarRange(from: number, to: number, progress: number): numb
   return from * Math.pow(to / from, eased);
 }
 
+/** Minimum clear pixels between two map labels (box to box). */
+export const LABEL_GAP_PX = 4;
+
+export interface LabelBox {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+}
+
+/**
+ * Keeps labels in order, dropping any whose box comes within `gap` px of a
+ * label already kept. Earlier entries win, so callers list the more useful
+ * label first.
+ */
+export function keepSeparatedBoxes<T extends LabelBox>(boxes: readonly T[], gap: number): T[] {
+  const kept: T[] = [];
+  for (const box of boxes) {
+    const clear = kept.every(
+      (other) =>
+        box.x1 + gap <= other.x0 ||
+        other.x1 + gap <= box.x0 ||
+        box.y1 + gap <= other.y0 ||
+        other.y1 + gap <= box.y0,
+    );
+    if (clear) kept.push(box);
+  }
+  return kept;
+}
+
 export function canSonarWheelStep(now: number, lastStepAt: number): boolean {
   return now - lastStepAt >= 150;
 }
@@ -727,12 +757,22 @@ export class Sonar {
     // A phone's compact map shows the 220 px canvas at ~110 px: labels would be ~4 px, so skip them.
     const compact = this.canvas.clientWidth > 0 && this.canvas.clientWidth < 140;
     // Authored swells are a visual reconstruction, so their contours carry no surveyed-depth labels.
-    for (const label of compact || authoredRelief ? [] : labels) {
+    if (compact || authoredRelief) return;
+    const boxes = labels.map((label) => {
       const width = ctx.measureText(label.text).width + 6;
+      return {
+        ...label,
+        x0: label.x - 2,
+        y0: label.y - 6,
+        x1: label.x - 2 + width,
+        y1: label.y + 6,
+      };
+    });
+    for (const box of keepSeparatedBoxes(boxes, LABEL_GAP_PX)) {
       ctx.fillStyle = 'rgba(2, 12, 17, .88)';
-      ctx.fillRect(label.x - 2, label.y - 6, width, 12);
+      ctx.fillRect(box.x0, box.y0, box.x1 - box.x0, box.y1 - box.y0);
       ctx.fillStyle = '#fff';
-      ctx.fillText(label.text, label.x + 1, label.y);
+      ctx.fillText(box.text, box.x + 1, box.y);
     }
   }
 
