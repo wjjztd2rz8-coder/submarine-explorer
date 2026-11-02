@@ -2953,3 +2953,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged U-journal-first-visit (Sonnet, af8a56e1): Journal lists only earned entries plus one hint ("Scan something on a dive to add it here."); Journal.ts about 60 lines smaller; phone and desktop screenshots viewed. Gates smoke + project-base PASS on worktree and main. Three "frozen debrief 1280x720" specs fail on main too (objectives-panel visibility, likely from U-dive-start-hud): added Backlog item R-debrief-frozen-red. Hosted CI for run 304 was red in e2e shards 4 and 5; logs not yet available to triage. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-sonar-labels (Haiku), R-debrief-frozen-red.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-02 06:19 CST headless run 307 (Claude): one package merged
+
+- Merged R-debrief-frozen-red (Haiku, 8bb5f1ea): frozen-debrief resume test now asserts the objectives panel hidden at zero scans and visible after the first scan (test change only). Gates smoke + project-base PASS on worktree and main. Haiku took ~64 min. Four other red specs from hosted CI run 41419337643 added as Backlog 4c R-ci-red-4. Codex week 4% until Nov 4, briefs 120-124 queued. Next: R-ci-red-4, U-sonar-labels.
+- **Needs owner:** phone retest (4410-P2 checklist).
