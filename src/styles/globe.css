@@ -179,7 +179,9 @@
   pointer-events: none;
 }
 
-.globe-pin.is-active .globe-pin-label {
+.globe-pin.is-active .globe-pin-label,
+.globe-pin.is-recommended:not(.is-clustered) .globe-pin-label,
+.globe-cluster .globe-pin-label:not([hidden]) {
   display: block;
 }
 
