@@ -14,6 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
+- **V-kama-plume-scale:** Kama'ehuakanaloa vent plume is about a third as wide, shorter and translucent (data overrides only: spread, sprite sizes, opacity 0.55 to 0.14, rise 38 m, 7000 particles), and the warm glow pool at the vent base is larger (hazeGlow 0.8, size 16 m). Nothing removed.
 - **V-lostcity-tower-top:** Lost City carbonate lit radiance now rolls off through a highlight shoulder (ceiling 0.55) instead of clipping, so the Poseidon tower top and face show streaked carbonate texture; hero-frame peak (max channel) 216 to 184 on the tower top. Nothing removed.
 - **U-sonar-labels:** sonar depth labels are checked by their box: a label that would touch or overlap one already drawn is cut (the later one in draw order). Cut: overlapping labels such as "120 m / 80 m" at the 1000 m range. Reason: the labels ran into each other on Blue Hole.
 - **U-journal-first-visit:** the Journal lists only entries the player has earned. Cut: locked/empty rows, empty group headings, "N more to find" and "species not yet identified" notes, zero-progress chips and the "No scans logged" tag; a site or the front page with nothing earned shows one line ("Scan something on a dive to add it here."). Reason: a first-time player saw ~55 empty entries. "Show spoilers" still lists everything.
