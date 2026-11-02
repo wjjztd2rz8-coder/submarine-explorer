@@ -1,5 +1,16 @@
 # Reviews
 
+## 2026-11-02 comprehensive review (trigger: 8+ merges; Claude alone, Sol skipped: Codex week 4% until Nov 4)
+
+- **Stage:** about 89% to 1.0 (range 86-90%); 3.5-4 weeks. Golden `2026-11-02-061016` vs `2026-11-01-211523`. Not agreed with Sol (Codex budget low).
+- **Changed since the last review (runs 295-302, 8 merges):** Hunga bed scale, Kama vent glow, Beebe horizon gradient, Lost City tower glow cut, a play walk-through (8 findings), touch "Left stick" wording, one primary action on Home, one guidance surface at dive start.
+- **Scores (hero poses):** Beebe 4.0 (up from 3.85: smoker, plume, teal horizon and warm pool all read), Lost City 4.0 (tower top still a flat white blob), Monterey 4.0, Titanic 3.9 (not re-viewed), Blue Hole 3.85 (opening still a small brown leaf with open water above; unchanged), Hunga 3.45 (lighter water, still a pointed wedge), Kama 3.3 (the pale-tan plume is a huge column that dominates the frame; vent site small). Readability screen: 0/13 openings flagged.
+- **Biggest gaps:** Blue Hole hood (needs code), Hunga silhouette (needs code), Kama plume scale, Lost City tower top texture.
+- **Play flow:** not re-captured; the walk-through run (299) already found the confusions, and three are now fixed. Still open: empty stars on pick-site, "Class A/B hull", 55 empty Journal entries, overlapping sonar labels, "Back at the surface" while submerged.
+- **Process:** CI red on run 301 for two real causes, both fixed and pushed this run: (1) V-beebe-horizon is data-only, only smoke ran, and `f-bughunt-880` still asserted Beebe has no horizon; (2) the Blue Hole 390x844 touch journey again showed the sub at 8.9 m on the hosted runner (passes locally, the earlier 4 m margin did not hold), so the spec now re-poses the sub just before the scan steps. Not verified on hosted yet. Rule added as item R-site-specs: a V-* package that edits site data runs the specs that mention the site. Claude idle ~6-12 h/24 h; Codex paused (week 4%, briefs 120-124 queued for Nov 4).
+- **New priorities:** DIRECTOR Backlog 1-10: U-pick-site-clean, U-debrief-surface-copy, U-briefing-jargon, U-journal-first-visit + U-sonar-labels, then V-lostcity-tower-top, V-kama-plume-scale, V-bluehole-hood-code, V-hunga-silhouette, V-beebe-seabed-edge, R-site-specs. Art passes now name code routes, not data tweaks, since data-only gains are ~0.05.
+- **Needs owner:** phone retest (4410-P2 checklist). Nothing else.
+
 ## 2026-11-01 evening comprehensive review (trigger: tag f71; Claude alone, Sol skipped: Codex week 4% until Nov 4)
 
 - **Stage:** about 88% to 1.0 (range 85-89%); about 4 weeks. Golden `2026-11-01-211523` vs `2026-11-01-081522`. Not agreed with Sol (Codex budget low).

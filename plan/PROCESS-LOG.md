@@ -375,3 +375,7 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 
 - Shard 2/38 failed on three docs-only commits and `gh` returned no log text, so triage guessed "flake" each time. Added the Playwright `github` reporter under `CI` (failures become annotations readable via the API) and added the shard-2 flake hunt to Codex brief 124.
 - Correction: the first reporter edit broke the TypeScript build (no @types/node); I pushed it before the gate result was read, then fixed it to use the existing isCI constant (gates smoke PASS). Lesson: check the gate result before pushing.
+
+## 2026-11-02 review: data-only art merges broke full specs
+
+- Run 301 CI red: V-beebe-horizon (site data) invalidated `f-bughunt-880` ("only titanic/lost-city have a horizon"), and the Blue Hole touch journey showed sub depth 8.9 m on hosted again. Only smoke gates ran on the art merges, so the break surfaced one CI run late. Fixed both specs; added backlog item R-site-specs (run specs that name the site before merging site-data packages). Also: local reproduction of one spec needs `PW_OUTDIR=<dir> tools/gates.sh --phase build`, then `PW_PORT=<p> PW_OUTDIR=<dir> npx playwright test <file> -g <title>` (the gates `--phase e2e` wrapper only accepts shard syntax).
