@@ -25,23 +25,20 @@ test('polished dive HUD keeps mission, telemetry, speed, and the controls guide 
     .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize));
   expect(depthSize).toBeGreaterThanOrEqual(14);
   await page.screenshot({ path: `${shots}/near-site-start-titanic.png` });
-  await page.locator('.objectives-panel').screenshot({ path: `${shots}/objectives-list.png` });
+  await expect(page.locator('.objectives-panel')).toBeHidden();
 
   await page.keyboard.press('t');
   await expect(page.locator('.hud-sim-speed')).toHaveText('2× SIM SPEED');
   const stack = await page.evaluate(() => {
-    const objective = document.querySelector('.objectives-panel')!.getBoundingClientRect();
     const telemetry = document.querySelector('.hud-readouts')!.getBoundingClientRect();
     const badge = document.querySelector('.hud-sim-speed')!.getBoundingClientRect();
     return {
-      objectiveBottom: objective.bottom,
       telemetryTop: telemetry.top,
       badgeTop: badge.top,
       badgeBottom: badge.bottom,
       telemetryBottom: telemetry.bottom,
     };
   });
-  expect(stack.telemetryTop).toBeGreaterThanOrEqual(stack.objectiveBottom);
   expect(stack.badgeTop).toBeGreaterThanOrEqual(stack.telemetryTop);
   expect(stack.badgeBottom).toBeLessThanOrEqual(stack.telemetryBottom);
   await page.screenshot({ path: `${shots}/hud-1280.png` });
