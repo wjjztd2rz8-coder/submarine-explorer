@@ -2938,3 +2938,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Comprehensive review (Claude alone; Sol skipped, Codex week 4%): stage ~89%, Beebe 4.0, Hunga 3.45, Kama 3.3; entry in plan/REVIEWS.md, STATUS.md rewritten, DIRECTOR Backlog re-planned (U-* confusions first, then code-level V-* routes, R-site-specs). Fixed two real red CI specs (Beebe horizon assertion; Blue Hole touch journey re-pose), pushed, hosted result pending.
 - Merged U-debrief-surface-copy (Haiku): partial-dive debrief title "Dive summary". Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-pick-site-clean (Sonnet).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-02 02:21 CST headless run 304 (Claude): one package merged
+
+- Merged U-pick-site-clean (Sonnet, 7d3c54bc): stars and "N/M logged" only on earned rows, "Recommended first dive" badge on Titanic until a first dive, recommended globe pin labelled (bare cluster badges elsewhere remain). Sent back once for two overlayFocus unit tests. Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-briefing-jargon (Sonnet).
+- **Needs owner:** phone retest (4410-P2 checklist).

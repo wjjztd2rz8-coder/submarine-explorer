@@ -78,7 +78,7 @@ The newest items go first.
 
 One list, ordered by player impact and dependencies; lane in brackets. Evidence: review 2026-11-01 (evening) in `plan/REVIEWS.md` (Claude alone, Sol skipped for Codex budget) and golden `2026-10-30-212725`; earlier items (all DONE ones, with commits) in [archive/DIRECTOR-HISTORY-2026-10-30-backlog.md](archive/DIRECTOR-HISTORY-2026-10-30-backlog.md). Art gains per package are ~0.1-0.2, so each V-* names a target composition, not a geometry list. Owner phone decisions: [PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md).
 
-1. **U-pick-site-clean [Sonnet]:** pick-site rows show empty stars and "0/N logged" before play, globe pins unlabeled; hide until earned, label pins. (Walk-through finding, `plan/progress/U-play-walkthrough.md`.)
+1. **U-pick-site-clean [Sonnet] — DONE 2026-11-02 (7d3c54bc):** pick-site rows show empty stars and "0/N logged" before play, globe pins unlabeled; hide until earned, label pins. (Walk-through finding, `plan/progress/U-play-walkthrough.md`.)
 2. **U-debrief-surface-copy [Haiku] — DONE 2026-11-02 (merged; title now "Dive summary" for partial dives):** debrief says "Back at the surface" while the sub is still submerged (MissionRouter.ts:279); reword by state. Moved from the Codex lane (Codex week 4% until Nov 4).
 3. **U-briefing-jargon [Sonnet]:** briefing says "Class A/B hull" with tiny tags; plain words, no jargon.
 4. **U-journal-first-visit [Sonnet]:** first Journal visit shows 55 empty entries; show only what is earned plus one hint. Then **U-sonar-labels [Haiku]:** sonar range labels overlap at the 1000 m setting (see any golden frame: "120 m / 80 m" on Blue Hole).
