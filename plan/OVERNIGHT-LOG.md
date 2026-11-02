@@ -2948,3 +2948,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged U-briefing-jargon (Sonnet, 2f94e768): briefing and pick-site hull text now "Rated to N m" (HullClass.name deleted), PRIMARY/OPTIONAL tags 9 to 11 px; Advanced was already a closed disclosure. No briefing screenshots were viewed (agent skipped them; text/size change only). Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-journal-first-visit (Sonnet).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-02 04:49 CST headless run 306 (Claude): one package merged
+
+- Merged U-journal-first-visit (Sonnet, af8a56e1): Journal lists only earned entries plus one hint ("Scan something on a dive to add it here."); Journal.ts about 60 lines smaller; phone and desktop screenshots viewed. Gates smoke + project-base PASS on worktree and main. Three "frozen debrief 1280x720" specs fail on main too (objectives-panel visibility, likely from U-dive-start-hud): added Backlog item R-debrief-frozen-red. Hosted CI for run 304 was red in e2e shards 4 and 5; logs not yet available to triage. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-sonar-labels (Haiku), R-debrief-frozen-red.
+- **Needs owner:** phone retest (4410-P2 checklist).
