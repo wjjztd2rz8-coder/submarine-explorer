@@ -2927,3 +2927,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged U-home-one-primary (Sonnet): Daily dive row demoted to the quiet menu style, so Home has exactly one primary action (Dive: <site>); f-title-layout asserts it. Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-dive-start-hud (Sonnet).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-02 00:00 CST headless run 302 (Claude): one package merged
+
+- Merged U-dive-start-hud (Sonnet): dive start shows sonar, one step banner and depth; the mission panel appears after the first objective; one objective name everywhere (the "Head to X" rewrite is deleted). Gates smoke + project-base PASS on worktree and main; a wider 9-spec run on the worktree timed out with no result, so hosted CI is the check. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-pick-site-clean (Sonnet).
+- **Needs owner:** phone retest (4410-P2 checklist).
