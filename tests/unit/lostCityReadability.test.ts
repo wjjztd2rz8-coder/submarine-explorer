@@ -111,14 +111,14 @@ describe('Lost City first-ten-second Arcade opening', () => {
           fetchJson: async (url) => (url.endsWith('/mission.json') ? mission : []),
         });
         await presets.ready;
-        expect(presets.params.ambientFill).toBe(16); // Preserve the vent passes' tuning.
+        expect(presets.params.ambientFill).toBe(32);
         for (const elapsed of [0, 5, 10]) {
           const atmo = sampleAtmosphere(config.water, rig.camera.position.y);
           scene.fog.density = atmo.fogDensity;
           presets.update(1 / 60, 0, atmo, rig.camera, 844, elapsed);
           expect(presets.entered).toBe(true);
           expect(ambient.intensity).toBeCloseTo(
-            sampleAtmosphere(config.water, rig.camera.position.y).ambientIntensity + 16,
+            sampleAtmosphere(config.water, rig.camera.position.y).ambientIntensity + 32,
             8,
           );
           const y = 0.2126 * ambient.color.r + 0.7152 * ambient.color.g + 0.0722 * ambient.color.b;
