@@ -54,7 +54,9 @@ export async function expectObjectiveGuidance(page: Page, touch: boolean): Promi
   if (touch) {
     await expect(page.locator(GUIDANCE.any)).toBeVisible();
     await expect(page.locator(GUIDANCE.name)).toHaveText(/\S/);
-  } else await expect(page.locator('.obj-item[aria-current="step"]')).toBeVisible();
+  } else
+    // The checklist stays hidden until the first objective completes; it always names the step.
+    await expect(page.locator('.obj-item[aria-current="step"]')).toHaveCount(1);
 }
 
 /** Measure actual text and camera projection; do not guess the sub's screen centre. */
