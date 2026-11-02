@@ -13,7 +13,7 @@
 
 - Unit: `missionApproachSystem`, `missionApproachWaypoint` and `overlayFocus` now use `approachTo`, and the title stays "Scan the bow".
 - E2E: `mission.spec` guards the regression (panel hidden at dive start with the guidance slot visible, visible after the first scan). `d-polish` asserts hidden and drops the panel screenshot and stacking check. `f-arcade-access`, `opening-framing` and `d-polish` copy updated from "Head to" to "Scan".
-- Passed with `PW_OUTDIR=dist-hud PW_PORT=4881`: mission, d-polish, f-arcade-access (11/11 after spec updates). Unit: the three specs above. `tools/gates.sh`: see the final report.
+- Passed with `PW_OUTDIR=dist-hud PW_PORT=4881`: mission, d-polish, f-arcade-access (11/11 after spec updates). Unit: the three specs above. `PW_PORT=4881 tools/gates.sh` passed (smoke + project-base e2e, prettier, attribution).
 
 ## Screenshots (Great Blue Hole, 2.5 s and 10.5 s in)
 
