@@ -677,7 +677,9 @@ export class Globe {
         c.size = size;
         c.hash = groupHash[i];
         c.count.textContent = String(size);
-        const rec = this.clusterMembers(i).find((m) => this.pins[m].site.id === this.opts.recommendedId);
+        const rec = this.clusterMembers(i).find(
+          (m) => this.pins[m].site.id === this.opts.recommendedId,
+        );
         c.label.hidden = rec === undefined;
         c.label.textContent = rec === undefined ? '' : shortName(this.pins[rec].site.name);
         c.el.setAttribute('aria-label', this.clusterLabel(i));

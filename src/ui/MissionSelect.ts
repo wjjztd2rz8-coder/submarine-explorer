@@ -229,7 +229,9 @@ export class MissionSelect {
     box.appendChild(title);
 
     const { recommendedId } = this.options;
-    const ordered = [...missions].sort((a, b) => +(b.id === recommendedId) - +(a.id === recommendedId));
+    const ordered = [...missions].sort(
+      (a, b) => +(b.id === recommendedId) - +(a.id === recommendedId),
+    );
     for (const m of ordered) {
       const btn = document.createElement('button');
       btn.type = 'button';
