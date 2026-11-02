@@ -315,10 +315,13 @@ it('compact shell site rows keep catalog, Tab and activation order while retaini
     presentation: 'shell',
     onSelectMission: select,
     onSiteFocus: preview,
-    completion: (_id, pois) => `0/${pois.length} logged`,
+    // Only the earned site (the first) reports progress, as the shell does.
+    completion: (id, pois) => (id === summaries[0].id ? `1/${pois.length} logged` : ''),
   });
   cleanup.push(() => picker.dispose());
-  picker.setProgress(new Progress(new ProgressSave(null)));
+  const progress = new Progress(new ProgressSave(null));
+  progress.finish(summaries[0].id, [{ primary: true, complete: true }]);
+  picker.setProgress(progress);
   picker.setMissions(summaries);
   const root = picker.root as unknown as Element;
   const buttons = root.querySelectorAll('.is-mission');
@@ -332,8 +335,9 @@ it('compact shell site rows keep catalog, Tab and activation order while retaini
     expect(button.querySelector('.mission-item-name')?.textContent).toBe(summaries[index].title);
     expect(button.querySelector('.mission-item-summary')).toBeNull();
     expect(button.title).toBe(summaries[index].summary);
+    // Reward labels appear only on the earned row; unvisited rows carry no empty stars.
     expect(button.querySelector('.mission-stars')?.getAttribute('aria-label')).toBe(
-      'Best dive: 0 of 3 stars',
+      index === 0 ? 'Best dive: 2 of 3 stars' : undefined,
     );
     button.dispatchEvent(new Event('focus'));
     expect(preview).toHaveBeenLastCalledWith(summaries[index].id);
@@ -356,7 +360,7 @@ it('compact shell site rows keep catalog, Tab and activation order while retaini
         `${Math.round(depth).toLocaleString('en-US')} m · Class ${requiredHull(depth).id} hull`,
       );
       expect(button.querySelector('.mission-item-progress')?.textContent).toBe(
-        `0/${doc.objectives.length} logged`,
+        summaries[index].id === summaries[0].id ? `1/${doc.objectives.length} logged` : '',
       );
     }
   });
@@ -409,9 +413,10 @@ it('keeps fresh, formerly locked and finished sites in authored order across pro
         'Class B hull',
         '125 m · Class A hull',
       ]);
-      expect(buttons[0].querySelector('.mission-stars')!.getAttribute('aria-label')).toBe(
-        `Best dive: ${finished ? 2 : 0} of 3 stars`,
+      expect(buttons[0].querySelector('.mission-stars')?.getAttribute('aria-label')).toBe(
+        finished ? 'Best dive: 2 of 3 stars' : undefined,
       );
+      expect(buttons[1].querySelector('.mission-stars')).toBeNull();
       expect(buttons[0].querySelector('.mission-item-progress')!.textContent).toBe(
         `${titanicMission.objectives.length}/${titanicMission.objectives.length} logged`,
       );
