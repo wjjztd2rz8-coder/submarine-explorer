@@ -2932,3 +2932,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged U-dive-start-hud (Sonnet): dive start shows sonar, one step banner and depth; the mission panel appears after the first objective; one objective name everywhere (the "Head to X" rewrite is deleted). Gates smoke + project-base PASS on worktree and main; a wider 9-spec run on the worktree timed out with no result, so hosted CI is the check. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-pick-site-clean (Sonnet).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-02 01:04 CST headless run 303 (Claude): comprehensive review + one package
+
+- Comprehensive review (Claude alone; Sol skipped, Codex week 4%): stage ~89%, Beebe 4.0, Hunga 3.45, Kama 3.3; entry in plan/REVIEWS.md, STATUS.md rewritten, DIRECTOR Backlog re-planned (U-* confusions first, then code-level V-* routes, R-site-specs). Fixed two real red CI specs (Beebe horizon assertion; Blue Hole touch journey re-pose), pushed, hosted result pending.
+- Merged U-debrief-surface-copy (Haiku): partial-dive debrief title "Dive summary". Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-pick-site-clean (Sonnet).
+- **Needs owner:** phone retest (4410-P2 checklist).
