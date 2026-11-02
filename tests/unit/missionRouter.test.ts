@@ -422,9 +422,9 @@ describe('MissionRouter completion timing', () => {
   });
 
   it.each([
-    { optional: false, completed: false, heading: 'Back at the surface' },
+    { optional: false, completed: false, heading: 'Dive summary' },
     { optional: false, completed: true, heading: 'All objectives complete' },
-    { optional: true, completed: false, heading: 'Back at the surface' },
+    { optional: true, completed: false, heading: 'Dive summary' },
     { optional: true, completed: true, heading: 'Primaries complete' },
   ])(
     'debrief primary progress with optional=$optional and completed=$completed survives reopening',

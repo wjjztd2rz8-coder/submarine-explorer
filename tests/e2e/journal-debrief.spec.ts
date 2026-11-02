@@ -430,7 +430,7 @@ freshTest.describe('mission progression and Home Journal', () => {
       // Surfacing before the primaries is an honest "Dive ended".
       await surfaceFromPause(page);
       const debrief = page.locator('.mission-debrief');
-      await expect(debrief.locator('.debrief-title')).toHaveText('Back at the surface');
+      await expect(debrief.locator('.debrief-title')).toHaveText('Dive summary');
       await expect(debrief.locator('.debrief-highlight')).toHaveText('Scanned Bow section.');
       await expect(debrief.locator('.debrief-next')).toHaveText(
         'Next: Keep exploring to finish the primary objectives.',
@@ -2501,7 +2501,7 @@ freshTest.describe('Home to scan and return journey', () => {
           await act(page.locator('.pause-surface'), touch);
           const debrief = page.locator('.mission-debrief');
           await expect(debrief).toBeVisible();
-          await expect(debrief.locator('.debrief-title')).toHaveText('Back at the surface');
+          await expect(debrief.locator('.debrief-title')).toHaveText('Dive summary');
           await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText(
             '0',
           );
