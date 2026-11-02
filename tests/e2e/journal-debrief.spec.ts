@@ -1382,10 +1382,10 @@ freshTest.describe('summary, disclosures and provenance', () => {
                   await expect(
                     journal.locator('.jr-nav-list > li > [aria-expanded="true"]'),
                   ).toHaveCount(1);
+                  // Nothing is earned yet, so no group is listed until spoilers are on.
+                  await expect(journal.locator('.jr-site-entries details')).toHaveCount(0);
+                  await journal.locator('.jr-spoilers input').check();
                   await expect(poi).toHaveAttribute('open', '');
-                  await expect(
-                    journal.locator('.jr-nav-item', { hasText: /Unscanned target/ }),
-                  ).toHaveCount(0);
                   const wildlife = journal.locator(`details[data-category="${site}/life"]`);
                   await expect(wildlife).not.toHaveAttribute('open', '');
                   await shot('journal-default-groups');
@@ -1432,11 +1432,6 @@ freshTest.describe('summary, disclosures and provenance', () => {
                   await expect(tags).toHaveCount(1);
                   await expect(tags).toHaveText('Game addition');
                   await shot('journal-secret');
-                  await journal.locator('.jr-spoilers input').uncheck();
-                  await openJournalCategory(page, site, 'life');
-                  await act(wildlife.locator('summary'));
-                  await journal.locator('.jr-spoilers input').check();
-                  await expect(wildlife).not.toHaveAttribute('open', '');
                   const axe = await withClockFrames(page, () =>
                     new AxeBuilder({ page }).include('.journal').analyze(),
                   );
