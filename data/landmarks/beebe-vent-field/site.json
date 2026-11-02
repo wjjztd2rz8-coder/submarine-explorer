@@ -154,5 +154,13 @@
         "intensity": 6
       }
     }
+  },
+  "horizon": {
+    "upperColor": 1844518,
+    "hazeColor": 3827544,
+    "hazePeakElevation": 0.4,
+    "fogLift": 1.2,
+    "fadeStartM": 400,
+    "fadeEndM": 600
   }
 }
