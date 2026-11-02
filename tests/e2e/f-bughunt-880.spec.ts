@@ -118,7 +118,7 @@ for (const tier of ['low', 'medium']) {
       expect(opening.failed).toBe(0);
       expect(opening.calls).toBeGreaterThan(0);
       expect(opening.triangles).toBeGreaterThan(0);
-      if (site === 'titanic' || site === 'lost-city') {
+      if (site === 'titanic' || site === 'lost-city' || site === 'beebe-vent-field') {
         expect(opening.horizon).toMatchObject({
           visible: true,
           toneMapped: false,

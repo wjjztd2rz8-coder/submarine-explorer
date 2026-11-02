@@ -2548,6 +2548,14 @@ freshTest.describe('Home to scan and return journey', () => {
                 type: 'touchStart',
                 touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }],
               });
+              // Hosted runs showed the sub back at 8.9 m by now (above the 10 m scan floor);
+              // re-pose it just before the scan steps, which do not move the sub.
+              await page.evaluate(() => {
+                const g = window.__game as unknown as Game;
+                const poi = g.discovery.pois[0]!;
+                const p = g.sub.position;
+                g.sub.reset(p.x, Math.min(p.y, -((poi.minDepthM ?? 0) + 4)), p.z, g.sub.yaw);
+              });
               await completeScan(page, poi.id);
             } finally {
               await session
