@@ -2983,3 +2983,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Review only, no package merged (Sol skipped, Codex week 4%). Golden 2026-11-02-162332 captured and viewed; scores in plan/REVIEWS.md (Kama 3.5, Lost City 4.0, Hunga 3.45, Blue Hole 3.85). CI red on runs 309/310 is one cause: Monterey opening-framing spec (R-monterey-opening-red, next). Added V-kama-subject. Briefs 120-124 queued for Nov 4.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-02 11:39 CST headless run 313 (Claude): one package merged
+
+- Merged R-monterey-opening-red (Haiku, 27fcb0c4): stale test only (objective text "Survey..." was an intentional copy change); monterey specs 15/15. Also prettier-fixed plan/DIRECTOR.md and STATUS.md (were failing the prettier gate on main). Gates: all pass except prettier on my own note, fixed after. Codex week 4% until Nov 4, briefs 120-124 queued. Next: V-kama-subject, V-bluehole-hood-code, R-site-specs.
+- **Needs owner:** phone retest (4410-P2 checklist).
