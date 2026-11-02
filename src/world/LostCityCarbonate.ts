@@ -11,6 +11,9 @@ const LOST_CITY_SURFACE = {
   poreM: 0.065,
   poreStrength: 0.16,
   poreFadeM: [3, 18],
+  // Highlight shoulder: lit radiance saturates toward this ceiling instead of clipping, so
+  // faces next to the glow lights keep their carbonate texture rather than going flat white.
+  shoulder: 0.55,
 } as const;
 
 const declarations = /* glsl */ `
@@ -254,11 +257,14 @@ export function createLostCityCarbonateMaterial(tier: string): THREE.MeshStandar
       '#include <begin_vertex>\nvCarbonatePosition = (modelMatrix * vec4(transformed, 1.0)).xyz;',
     );
     shader.fragmentShader =
-      `${detailed ? '#define LOST_CITY_NORMALS\n' : ''}${declarations}\n${shader.fragmentShader}`.replace(
-        '#include <normal_fragment_maps>',
-        `#include <normal_fragment_maps>\n${surface}`,
-      );
+      `${detailed ? '#define LOST_CITY_NORMALS\n' : ''}${declarations}\n${shader.fragmentShader}`
+        .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>\n${surface}`)
+        .replace(
+          '#include <opaque_fragment>',
+          `outgoingLight *= ${LOST_CITY_SURFACE.shoulder.toFixed(3)} / (${LOST_CITY_SURFACE.shoulder.toFixed(3)} + max(outgoingLight.r, max(outgoingLight.g, outgoingLight.b)));\n#include <opaque_fragment>`,
+        );
   };
-  material.customProgramCacheKey = () => `lost-city-carbonate-820-${detailed ? 'detail' : 'low'}`;
+  material.customProgramCacheKey = () =>
+    `lost-city-carbonate-shoulder-${detailed ? 'detail' : 'low'}`;
   return material;
 }

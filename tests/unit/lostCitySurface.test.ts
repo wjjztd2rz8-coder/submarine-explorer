@@ -161,6 +161,14 @@ describe('Lost City carbonate surface', () => {
       expect(shader.fragmentShader.indexOf('vec3 carbonateWorldNormal =')).toBeLessThan(
         shader.fragmentShader.indexOf('#include <lights_physical_fragment>'),
       );
+      // Lit radiance is shouldered after all lighting, so no channel can clip to flat white.
+      const shoulder = shader.fragmentShader.indexOf('outgoingLight *=');
+      expect(shoulder).toBeGreaterThan(
+        shader.fragmentShader.indexOf('#include <lights_fragment_end>'),
+      );
+      expect(shoulder).toBeLessThan(shader.fragmentShader.indexOf('#include <opaque_fragment>'));
+      const ceiling = Number(/outgoingLight \*= ([\d.]+) \//.exec(shader.fragmentShader)![1]);
+      expect(ceiling).toBeLessThanOrEqual(0.8); // asymptote of the shoulder
       material.dispose();
     }
   });
