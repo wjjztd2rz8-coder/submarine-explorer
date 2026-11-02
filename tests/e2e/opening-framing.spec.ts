@@ -405,8 +405,8 @@ freshTest.describe('route and mode camera poses', () => {
           expect(z).toBeLessThan(1);
         }
         expect(opening.altitude).toBeGreaterThanOrEqual(22);
-        expect(opening.fill).toBe(16);
-        expect(opening.ambient).toBeGreaterThanOrEqual(16);
+        expect(opening.fill).toBe(32);
+        expect(opening.ambient).toBeGreaterThanOrEqual(32);
         expect(opening.floorProxies.every((value) => value > 2.5)).toBe(true);
         expect(opening.lampsOn).toBe(false);
       });
