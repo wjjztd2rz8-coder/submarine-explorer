@@ -2943,3 +2943,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged U-pick-site-clean (Sonnet, 7d3c54bc): stars and "N/M logged" only on earned rows, "Recommended first dive" badge on Titanic until a first dive, recommended globe pin labelled (bare cluster badges elsewhere remain). Sent back once for two overlayFocus unit tests. Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-briefing-jargon (Sonnet).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-02 03:16 CST headless run 305 (Claude): one package merged
+
+- Merged U-briefing-jargon (Sonnet, 2f94e768): briefing and pick-site hull text now "Rated to N m" (HullClass.name deleted), PRIMARY/OPTIONAL tags 9 to 11 px; Advanced was already a closed disclosure. No briefing screenshots were viewed (agent skipped them; text/size change only). Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-journal-first-visit (Sonnet).
+- **Needs owner:** phone retest (4410-P2 checklist).
