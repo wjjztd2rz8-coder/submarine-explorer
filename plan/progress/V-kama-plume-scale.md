@@ -20,4 +20,4 @@ Data only, no site branches, no new tests (no test covers these numbers), no pac
 
 ## Gates
 
-See below.
+`PW_PORT=4881 tools/gates.sh`: python, content, build, unit PASS; e2e smoke+project-base 127 passed, 3 failed, all monterey-canyon `mission previews and opens on an approach` (expects a Scan objective, got `Survey the north canyon wall`); not touched by this data change, likely pre-existing on main. `npx playwright test -g kama`: 19 passed, 3 skipped.
