@@ -354,12 +354,23 @@ it('moves focus to the article when rotation hides the connected spoilers switch
   expect(document.activeElement).toBe(find((el) => el.className === 'jr-body'));
 });
 
+const byClassAll = (name: string) => descendants(root).filter((el) => el.classList.contains(name));
 it('opens the current site and points of interest, keeping other sites/categories collapsed', () => {
   expect(header('reef').attributes['aria-expanded']).toBe('true');
   expect(header('wreck').attributes['aria-expanded']).toBe('false');
   expect(category('reef/poi').open).toBe(true);
-  for (const kind of ['site', 'life'])
-    expect(category(`reef/${kind}`).open).toBe(false);
+  for (const kind of ['site', 'life']) expect(category(`reef/${kind}`).open).toBe(false);
+});
+// Guards the first-visit Journal listing dozens of empty rows, counts and notes.
+it('lists nothing but one hint before anything is earned', () => {
+  journal.setStore({ isDiscovered: () => false });
+  journal.show('reef');
+  expect(descendants(root).filter((el) => el.tagName === 'DETAILS')).toHaveLength(0);
+  expect(descendants(root).filter((el) => el.classList.contains('jr-row'))).toHaveLength(0);
+  expect(byClassAll('jr-progress')).toHaveLength(0);
+  expect(byClassAll('jr-locked').map((el) => el.textContent)).toEqual([
+    'Scan something on a dive to add it here.',
+  ]);
 });
 it('collapses a site without changing its article and restores focus on the rebuilt button', () => {
   const button = header('reef');
