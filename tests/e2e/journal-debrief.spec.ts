@@ -556,10 +556,9 @@ freshTest.describe('mission progression and Home Journal', () => {
       await expect(journal.locator('.jr-body .jr-title')).toHaveText('RMS Titanic');
       const bow = journal.locator('.jr-nav-item[data-target="titanic/poi/bow"]');
       const stern = journal.locator('.jr-nav-item[data-target="titanic/poi/stern"]');
-      // Unscanned targets collapse into one quiet count row: no per-target rows, no names.
+      // Unscanned targets are not listed at all: no rows, no names, no counts.
       await expect(stern).toHaveCount(0);
       await expect(journal.locator('.jr-nav-item', { hasText: /Unscanned target/ })).toHaveCount(0);
-      await expect(journal.locator('.jr-more-to-find')).toHaveText(/^\d+ more to find$/);
       await bow.click();
       await expect(journal.locator('.jr-tag.is-recreation')).toHaveText('Recreation');
       await expect(journal.locator('.jr-sources a').first()).toHaveAttribute('href', /^https?:/);
@@ -567,7 +566,6 @@ freshTest.describe('mission progression and Home Journal', () => {
       await shot(page, 'journal-site');
 
       await journal.locator('.jr-spoilers input').check();
-      await expect(journal.locator('.jr-more-to-find')).toHaveCount(0);
       await expect(stern).toBeVisible();
       await stern.click();
       await expect(journal.locator('.jr-tag.is-undiscovered')).toBeVisible();
@@ -921,11 +919,9 @@ freshTest.describe('scan persistence and fixture debrief', () => {
       );
       await expect(journal.locator('.jr-body .jr-title')).toHaveText('Test site · Titanic tile');
       // The debris entry is still locked; the bow is unlocked.
-      // It collapses into one quiet count row rather than a locked list item.
+      // It is not listed rather than shown as a locked list item.
       await expect(journal.locator('.jr-site-entries li.is-locked')).toHaveCount(0);
-      await expect(journal.locator('.jr-site-entries .jr-more-to-find')).toHaveText(
-        `${fixtureGuide.entries.length - 2} more to find`,
-      );
+      await expect(journal.locator('.jr-site-entries .jr-nav-item.is-poi')).toHaveCount(1);
       await journal.locator('.jr-nav-item[data-target="_test/poi/bow"]').click();
       await expect(journal.locator('.jr-body .jr-title')).toHaveText('The bow section');
       await expect(journal.locator('.jr-tag.is-recreation')).toHaveText('Recreation');
@@ -1387,7 +1383,6 @@ freshTest.describe('summary, disclosures and provenance', () => {
                     journal.locator('.jr-nav-list > li > [aria-expanded="true"]'),
                   ).toHaveCount(1);
                   await expect(poi).toHaveAttribute('open', '');
-                  await expect(poi.locator('.jr-more-to-find')).toHaveText(/^\d+ more to find$/);
                   await expect(
                     journal.locator('.jr-nav-item', { hasText: /Unscanned target/ }),
                   ).toHaveCount(0);
@@ -2489,7 +2484,9 @@ freshTest.describe('Home to scan and return journey', () => {
           );
           const journal = page.locator('.journal');
           await expect(journal.locator('.jr-body .jr-locked')).toBeVisible();
-          await expect(journal.locator('.jr-body .is-undiscovered')).toHaveText('No scans logged');
+          await expect(journal.locator('.jr-body .jr-locked')).toHaveText(
+            'Scan something on a dive to add it here.',
+          );
           await contained(journal.locator('.jr-header'));
           await contained(journal.locator('.jr-body'));
           // Check the long current-site label plus points-of-interest count in its actual column.
