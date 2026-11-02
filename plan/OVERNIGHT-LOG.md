@@ -2922,3 +2922,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged U-touch-left-stick (Haiku): touch tutorial and How-to-play now say "Drag to move and turn" / "Steer" instead of "Left stick"; desktop and pad wording unchanged; tests pinned to the new copy. Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-home-one-primary / U-dive-start-hud (Sonnet).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-01 23:00 CST headless run 301 (Claude): one package merged
+
+- Merged U-home-one-primary (Sonnet): Daily dive row demoted to the quiet menu style, so Home has exactly one primary action (Dive: <site>); f-title-layout asserts it. Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-dive-start-hud (Sonnet).
+- **Needs owner:** phone retest (4410-P2 checklist).
