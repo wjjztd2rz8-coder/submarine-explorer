@@ -1,6 +1,6 @@
 /**
  * The Journal (D-FLOW): a Civilopedia-style overlay that replaces the field
- * guide. It lists every dive site, and per site its site, POI and species
+ * guide. It lists every dive site, and per site its earned site, POI and species
  * entries (game/JournalData.ts). Entries unlock from the persistent discovery
  * store; "Show undiscovered entries (spoilers)" is an in-memory toggle.
  *
@@ -83,13 +83,6 @@ const GROUPS: ReadonlyArray<readonly [label: string, kind: JournalEntry['kind']]
   ['Wildlife', 'life'],
   ['Finds', 'secret'],
 ];
-
-/** One short line on finding the first of a hidden group's entries. */
-const HOW_TO_FIND: Partial<Record<JournalEntry['kind'], string>> = {
-  species: 'Scan their habitat to identify them.',
-  life: 'Face an animal and hold Scan.',
-  secret: 'Follow faint sonar contacts.',
-};
 
 /** `data/tiles/index.json` -> tile id to data source (for the site's data credit). */
 async function loadTileSources(): Promise<Map<string, string>> {
@@ -610,47 +603,11 @@ export class Journal {
   }
 
   /**
-   * One group's rows. Locked species, animals and secrets are only counted
-   * (their names would spoil them); locked targets collapse into one quiet
-   * "more to find" count; spoilers show everything.
+   * One group's rows: only entries the player has earned. Locked names would
+   * spoil them, so they are not listed at all unless spoilers are on.
    */
-  private groupRows(
-    site: JournalSite,
-    label: string,
-    list: JournalEntry[],
-  ): {
-    rows: Array<{ entry: JournalEntry; open: boolean; title: string }>;
-    unscanned: number;
-    hidden: number;
-    note: string;
-  } {
-    const rows: Array<{ entry: JournalEntry; open: boolean; title: string }> = [];
-    let hidden = 0;
-    let unscanned = 0;
-    for (const e of list) {
-      const open = isEntryUnlocked(site, e, this.store);
-      if (
-        !open &&
-        !this.spoilers_ &&
-        (e.kind === 'species' || e.kind === 'life' || e.kind === 'secret')
-      ) {
-        hidden++;
-        continue;
-      }
-      if (!open && !this.spoilers_ && e.kind === 'poi') {
-        unscanned++;
-        continue;
-      }
-      rows.push({ entry: e, open, title: open || this.spoilers_ ? e.title : 'Undiscovered' });
-    }
-    const note = !hidden
-      ? ''
-      : label === 'Finds'
-        ? `${hidden} finds remain. Follow faint nearby sonar contacts.`
-        : label === 'Wildlife'
-          ? `${hidden} animals unscanned. Face one and hold Scan during a dive.`
-          : `${hidden} species not yet identified. Show spoilers to read the survey list.`;
-    return { rows, unscanned, hidden, note };
+  private groupRows(site: JournalSite, list: JournalEntry[]): JournalEntry[] {
+    return list.filter((e) => this.spoilers_ || isEntryUnlocked(site, e, this.store));
   }
 
   /** The open site's entries, grouped, under its nav item. */
@@ -658,7 +615,8 @@ export class Journal {
     const box = el('div', 'jr-site-entries');
     for (const [label, kind] of GROUPS) {
       const list = site.entries.filter((e) => e.kind === kind);
-      if (!list.length) continue;
+      const rows = this.groupRows(site, list);
+      if (!rows.length) continue;
       const key = `${site.id}/${kind}`;
       const group = el('details', 'jr-category');
       group.dataset.category = key;
@@ -676,21 +634,18 @@ export class Journal {
       });
       box.append(group);
       const ul = el('ul');
-      const { rows, unscanned, note } = this.groupRows(site, label, list);
-      for (const { entry, open, title } of rows) {
+      for (const entry of rows) {
         const li = this.navButton(
-          title,
+          entry.title,
           '',
           `is-entry is-${entry.kind}`,
           entry.key,
           entry === current,
         );
-        li.classList.toggle('is-locked', !open);
+        li.classList.toggle('is-locked', !isEntryUnlocked(site, entry, this.store));
         ul.append(li);
       }
       group.append(ul);
-      if (unscanned) group.append(el('p', 'jr-more-to-find', `${unscanned} more to find`));
-      if (note) group.append(el('p', 'jr-hidden-note', note));
     }
     return box;
   }
@@ -714,10 +669,12 @@ export class Journal {
     }
     const scanned = sites.filter((s) => isSiteUnlocked(s, this.store)).length;
     b.append(
-      this.chips(
-        [`${logged}/${total} points of interest`, `${scanned}/${sites.length} sites scanned`],
-        'jr-lead',
-      ),
+      logged
+        ? this.chips(
+            [`${logged}/${total} points of interest`, `${scanned}/${sites.length} sites scanned`],
+            'jr-lead',
+          )
+        : el('p', 'jr-locked', 'Scan something on a dive to add it here.'),
     );
     const grid = el('div', 'jr-site-grid');
     for (const s of sites) {
@@ -773,7 +730,6 @@ export class Journal {
     const open = unlocked || this.spoilers_;
     const titleRow = el('div', 'jr-title-row');
     titleRow.append(el('h2', 'jr-title', site.name));
-    if (!unlocked) titleRow.append(el('span', 'jr-tag is-undiscovered', 'No scans logged'));
     b.append(titleRow);
     const meta = [
       site.region,
@@ -786,23 +742,22 @@ export class Journal {
     const summary = open ? site.summary || site.briefing?.summary : site.briefing?.summary;
     if (summary) b.append(el('p', 'jr-para', summary));
 
-    const p = siteProgress(site, this.store);
-    const wl = wildlifeProgress(site, this.store);
-    // Samples share Finds, but only hidden-contact discoveries belong in the secret tally.
-    const secrets = site.entries.filter(
-      (e) => e.kind === 'secret' && e.poiIds.includes(secretDiscoveryId(e.id)),
-    );
-    const found = secrets.filter((e) => isEntryUnlocked(site, e, this.store)).length;
-    const chips = [`${p.logged}/${p.total} points of interest`];
-    if (p.speciesTotal) chips.push(`${p.species}/${p.speciesTotal} species`);
-    if (wl.total) chips.push(`${wl.scanned}/${wl.total} animals`);
-    if (secrets.length) chips.push(`${found}/${secrets.length} secrets`);
-    b.append(this.chips(chips, 'jr-progress'));
-
-    if (!open) {
-      b.append(el('p', 'jr-locked', 'Scan a target here to open this page, or show spoilers.'));
-    } else {
+    if (open) {
+      const p = siteProgress(site, this.store);
+      const wl = wildlifeProgress(site, this.store);
+      // Samples share Finds, but only hidden-contact discoveries belong in the secret tally.
+      const secrets = site.entries.filter(
+        (e) => e.kind === 'secret' && e.poiIds.includes(secretDiscoveryId(e.id)),
+      );
+      const found = secrets.filter((e) => isEntryUnlocked(site, e, this.store)).length;
+      const chips = [`${p.logged}/${p.total} points of interest`];
+      if (p.speciesTotal) chips.push(`${p.species}/${p.speciesTotal} species`);
+      if (wl.total) chips.push(`${wl.scanned}/${wl.total} animals`);
+      if (secrets.length) chips.push(`${found}/${secrets.length} secrets`);
+      b.append(this.chips(chips, 'jr-progress'));
       this.body.append(this.entryRows(site));
+    } else {
+      b.append(el('p', 'jr-locked', 'Scan something on a dive to add it here.'));
     }
     this.body.append(foot);
     this.renderAbout(site, open, summary ?? '', foot);
@@ -822,8 +777,8 @@ export class Journal {
     const box = el('div', 'jr-entries');
     for (const [label, kind] of GROUPS) {
       const list = site.entries.filter((e) => e.kind === kind);
-      if (!list.length) continue;
-      const { rows, unscanned, hidden } = this.groupRows(site, label, list);
+      const rows = this.groupRows(site, list);
+      if (!rows.length) continue;
       const logged = list.filter((e) => isEntryUnlocked(site, e, this.store)).length;
       const section = el('section', 'jr-entry-group');
       const head = el('h3', 'jr-group-title');
@@ -834,33 +789,19 @@ export class Journal {
       badge.setAttribute('aria-hidden', 'true');
       head.append(text, badge);
       section.append(head);
-      if (rows.length) {
-        const ul = el('ul', 'jr-rows');
-        for (const { entry, open, title } of rows) {
-          const li = el('li');
-          const b = el('button', `jr-row is-${entry.kind}`);
-          b.type = 'button';
-          b.dataset.row = entry.key;
-          b.classList.toggle('is-locked', !open);
-          b.append(el('span', 'jr-row-title', title), this.glyph('›'));
-          b.addEventListener('click', () => this.show(entry.key));
-          li.append(b);
-          ul.append(li);
-        }
-        section.append(ul);
+      const ul = el('ul', 'jr-rows');
+      for (const entry of rows) {
+        const li = el('li');
+        const b = el('button', `jr-row is-${entry.kind}`);
+        b.type = 'button';
+        b.dataset.row = entry.key;
+        b.classList.toggle('is-locked', !isEntryUnlocked(site, entry, this.store));
+        b.append(el('span', 'jr-row-title', entry.title), this.glyph('›'));
+        b.addEventListener('click', () => this.show(entry.key));
+        li.append(b);
+        ul.append(li);
       }
-      // Locked names stay hidden: a count, plus how to find the first one.
-      const more = unscanned + hidden;
-      if (more) {
-        const how = HOW_TO_FIND[kind];
-        section.append(
-          el(
-            'p',
-            'jr-row-note',
-            rows.length || !how ? `${more} more to find` : `${more} more to find. ${how}`,
-          ),
-        );
-      }
+      section.append(ul);
       box.append(section);
     }
     return box;

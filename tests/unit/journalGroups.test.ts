@@ -157,6 +157,8 @@ beforeEach(() => {
   // The catalogue is loaded already; do not make network requests in lifecycle tests.
   Object.assign(journal, { sites: [site('reef'), site('wreck')] });
   vi.spyOn(journal, 'load').mockResolvedValue();
+  // Only earned entries are listed, so the lifecycle tests start with everything earned.
+  journal.setStore({ isDiscovered: () => true });
   journal.setCurrentSite('reef');
   journal.open();
 });
@@ -184,6 +186,7 @@ it.each([
   const store = new DiscoveryStore(null);
   for (const id of scanned) store.record('reef', id);
   journal.setStore(store);
+  journal.setSpoilers(true);
   journal.show('reef');
   const chips = find((el) => el.className.split(' ').includes('jr-progress'));
   expect(chips.children.map((el) => el.textContent)).toEqual([
@@ -255,6 +258,7 @@ it.each([false, true])('counts hidden secrets independently of samples (phone=%s
     sites: [buildJournalSite({ id, guide: null, pois: [], species: null, ...content })],
   });
   journal.setStore(store);
+  journal.setSpoilers(true);
   journal.show(id);
   const progress = () =>
     find((el) => el.classList.contains('jr-progress')).children.map((el) => el.textContent);
@@ -350,17 +354,23 @@ it('moves focus to the article when rotation hides the connected spoilers switch
   expect(document.activeElement).toBe(find((el) => el.className === 'jr-body'));
 });
 
+const byClassAll = (name: string) => descendants(root).filter((el) => el.classList.contains(name));
 it('opens the current site and points of interest, keeping other sites/categories collapsed', () => {
   expect(header('reef').attributes['aria-expanded']).toBe('true');
   expect(header('wreck').attributes['aria-expanded']).toBe('false');
   expect(category('reef/poi').open).toBe(true);
-  for (const kind of ['site', 'species', 'life', 'secret'])
-    expect(category(`reef/${kind}`).open).toBe(false);
-  expect(
-    descendants(root)
-      .filter((el) => el.className === 'jr-more-to-find')
-      .map((el) => el.textContent),
-  ).toEqual(['1 more to find']);
+  for (const kind of ['site', 'life']) expect(category(`reef/${kind}`).open).toBe(false);
+});
+// Guards the first-visit Journal listing dozens of empty rows, counts and notes.
+it('lists nothing but one hint before anything is earned', () => {
+  journal.setStore({ isDiscovered: () => false });
+  journal.show('reef');
+  expect(descendants(root).filter((el) => el.tagName === 'DETAILS')).toHaveLength(0);
+  expect(descendants(root).filter((el) => el.classList.contains('jr-row'))).toHaveLength(0);
+  expect(byClassAll('jr-progress')).toHaveLength(0);
+  expect(byClassAll('jr-locked').map((el) => el.textContent)).toEqual([
+    'Scan something on a dive to add it here.',
+  ]);
 });
 it('collapses a site without changing its article and restores focus on the rebuilt button', () => {
   const button = header('reef');
@@ -541,6 +551,7 @@ describe('phone sheet', () => {
   });
 
   it('lists a site page as entry rows and goes back one level at a time', () => {
+    journal.setStore({ isDiscovered: () => false });
     journal.setSpoilers(true);
     journal.show('reef');
     expect(root.classList.contains('at-front')).toBe(false);

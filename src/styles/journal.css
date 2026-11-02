@@ -255,11 +255,6 @@
   font-size: 0.92em;
   padding: 4px 8px;
 }
-.jr-hidden-note {
-  margin: 4px 8px;
-  font-size: 0.8em;
-  opacity: 0.6;
-}
 .jr-body {
   overscroll-behavior: contain;
   min-width: 0;
@@ -496,11 +491,6 @@
 .jr-row.is-locked {
   opacity: 0.6;
 }
-.jr-row-note {
-  margin: 8px 2px 0;
-  font-size: 0.85em;
-  opacity: 0.65;
-}
 .jr-site-more {
   margin: 16px 0 0;
   border-top: 1px solid var(--b1-hair-dim);
@@ -690,11 +680,6 @@
   .jr-footer {
     display: none;
   }
-}
-.jr-more-to-find {
-  margin: 4px 8px;
-  font-size: 0.8em;
-  opacity: 0.55;
 }
 
 .jr-nav-item.is-secret {

@@ -180,10 +180,10 @@ test('Journal lists the survey species with their OBIS sources', async ({ page }
   await page.keyboard.press('KeyJ');
   const journal = page.locator('.journal');
   await expect(journal).toBeVisible();
-  await openJournalCategory(page, '_test', 'species');
-  // D-FLOW: no species is linked to a scanned POI yet, so they are spoilers.
-  await expect(journal.locator('.jr-hidden-note')).toContainText('2 species not yet identified');
+  // No species is linked to a scanned POI yet, so none are listed until spoilers are on.
+  await expect(journal.locator('details[data-category="_test/species"]')).toHaveCount(0);
   await journal.locator('.jr-spoilers input').check();
+  await openJournalCategory(page, '_test', 'species');
   const rows = journal.locator('.jr-site-entries .jr-nav-item.is-species');
   await expect(rows).toHaveCount(2); // the row without a scientific name is dropped
   await rows.first().click();
