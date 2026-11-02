@@ -333,7 +333,6 @@ export class MissionRouter {
         ...(opts.onHome ? { onCancel: opts.onHome } : {}),
       });
       this.briefing.show(this.briefingContent());
-      this.panel.setVisible(false);
     }
   }
 
@@ -366,7 +365,7 @@ export class MissionRouter {
       if (this.disposed) return;
       this.opts.applyStart?.(choice);
       this.briefing?.hide();
-      this.panel.setVisible(true);
+      this.showPanel();
       this.mission.start(this.opts.meta.id);
     });
   }
@@ -386,7 +385,7 @@ export class MissionRouter {
     if (!this.debrief?.isOpen || !this.mission.canResume) return;
     this.mission.resume();
     this.debrief.hide();
-    this.panel.setVisible(true);
+    this.showPanel();
   }
 
   /**
@@ -408,8 +407,17 @@ export class MissionRouter {
     this.updateBanner(dt);
   }
 
+  /**
+   * The checklist repeats the step banner's goal, so it stays hidden until the
+   * first objective is done and there is progress to show.
+   */
+  private showPanel(): void {
+    this.panel.setVisible(this.mission.counts().completed > 0);
+  }
+
   private onMissionChange(m: Mission): void {
     this.panel.setObjectives(m.objectives);
+    if (m.diving) this.showPanel();
     // Everything done after the primaries: suggest surfacing, never force it.
     if (m.state === 'primaries-complete' && m.allComplete && !this.allAnnounced) {
       this.allAnnounced = true;

@@ -546,7 +546,7 @@ freshTest.describe('mission preview and approach', () => {
         expect(distance).toBeGreaterThan(60);
         expect(mission.objectiveId).toBeTruthy();
         expect(mission.objectiveDistance).toBeCloseTo(mission.range!, 1);
-        await expect(page.locator('.obj-item.is-current')).toContainText('Head to');
+        await expect(page.locator('.obj-item.is-current')).toContainText('Scan');
         expect(preview.position).toEqual(mission.position);
         expect(preview.yaw).toEqual(mission.yaw);
         expect(errors).toEqual([]);

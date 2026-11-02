@@ -1439,7 +1439,8 @@ describe('overlay policies across the app', () => {
     const objective = {
       id: 'bow',
       poiId: 'bow',
-      title: 'Head to the bow',
+      title: 'Scan the bow',
+      approachTo: 'the bow' as string | undefined,
       primary: true,
       complete: false,
       resolved: true,
@@ -1488,7 +1489,7 @@ describe('overlay policies across the app', () => {
     frame();
     expect(ctx.waypoints.root.dataset.hints).toBe('true');
     expect(apply).not.toHaveBeenCalled();
-    objective.title = 'Scan the bow';
+    objective.approachTo = undefined;
     frame();
     expect(ctx.waypoints.root.dataset.hints).toBe('false');
     expect(apply).toHaveBeenCalledExactlyOnceWith(false);

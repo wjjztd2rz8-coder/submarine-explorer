@@ -73,7 +73,7 @@ test('fresh Arcade Titanic starts on an approach in its deep-ocean vehicle', asy
   expect(pose.facing).toBeGreaterThan(
     Math.cos(((siteData('titanic').opening!.mission!.yawOffset ?? 0) * Math.PI) / 180) - 0.001,
   );
-  await expect(page.locator('.obj-item.is-current')).toContainText('Head to the bow');
+  await expect(page.locator('.obj-item.is-current')).toContainText('Scan the bow');
   expect(pose.hull).toBe('B');
   expect(pose.vehicle).toBe('B');
   expect(pose.missionHull).toBe('B');

@@ -92,11 +92,13 @@ for (const mode of ['arcade', 'realistic'] as const) {
         );
       draw();
       const first = ctx.missionRouter!.mission.objectives[0];
-      expect(first.title).toBe('Head to the bow');
+      expect(first.title).toBe('Scan the bow');
+      expect(first.approachTo).toBe('the bow');
       expect(first.hint).toBe(def.objectives[0].hint);
       sub.position.copy(target.position).add(new Vector3(0, 24, target.radius / 2));
       draw();
       expect(first.title).toBe('Scan the bow');
+      expect(first.approachTo).toBeUndefined();
       expect(first.hint).toBe(def.objectives[0].hint);
       ctx.applyMissionStart!('surface');
       draw();

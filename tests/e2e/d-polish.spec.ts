@@ -15,7 +15,7 @@ test('polished dive HUD keeps mission, telemetry, speed, and the controls guide 
     () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
   );
   await expect(page.locator('.obj-item')).toHaveCount(4);
-  await expect(page.locator('.obj-item.is-current')).toContainText('Head to the bow');
+  await expect(page.locator('.obj-item.is-current')).toContainText('Scan the bow');
   await expect(page.locator('.obj-item.is-optional')).toHaveCount(2);
   await expect(page.locator('.obj-check')).toHaveText(['○', '○', '○', '○']);
   await expect(page.locator('.obj-hint, .obj-nav')).toHaveCount(0);
@@ -82,7 +82,7 @@ test('a long objective list shows the current target and the next few', async ({
   await page.waitForFunction(
     () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
   );
-  await expect(page.locator('.obj-item.is-current')).toContainText('Head to Poseidon');
+  await expect(page.locator('.obj-item.is-current')).toContainText('Scan Poseidon');
   await page.evaluate(() => {
     const g = window.__game as {
       mission: { objectives: Array<{ id: string; title: string }> };
@@ -98,9 +98,9 @@ test('a long objective list shows the current target and the next few', async ({
     ]);
   });
   await expect(page.locator('.obj-item')).toHaveCount(4);
-  await expect(page.locator('.obj-item.is-current')).toContainText('Head to Poseidon');
+  await expect(page.locator('.obj-item.is-current')).toContainText('Scan Poseidon');
   await expect(page.locator('.obj-item-title')).toHaveText([
-    'Head to Poseidon',
+    'Scan Poseidon',
     'Scan IMAX Tower',
     'Extra vent one',
     'Scan Beehive',

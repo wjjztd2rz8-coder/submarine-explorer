@@ -76,7 +76,7 @@ function updateWaypoints(ctx: GameContext, position: Vector3) {
   const nextScanObjective = selectScanObjective(missionRouter?.mission.objectives);
   // Near-site approaches retain their navigation marker in Realistic too.
   // Once in scan range, resume the pilot's normal visual-waypoint preference.
-  const approach = nextScanObjective?.title.startsWith('Head to ') ?? false;
+  const approach = nextScanObjective?.approachTo !== undefined;
   const showHints = ctx.effective.gameplay.visualHints || approach;
   if (showHints !== visualHints) {
     visualHints = showHints;
