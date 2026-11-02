@@ -13,7 +13,9 @@ import {
   sonarPoiVisible,
   sonarProject,
   sonarProjectZoomed,
+  keepSeparatedBoxes,
   sonarReliefRange,
+  LABEL_GAP_PX,
 } from '../../src/ui/Sonar.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import type { Terrain } from '../../src/world/Terrain.js';
@@ -22,6 +24,36 @@ import type { SubmarineState } from '../../src/sub/Submarine.js';
 import type { GameContext } from '../../src/app/context.js';
 import { sonarControlsSystem } from '../../src/app/systems/sonar.js';
 import { recordSonarCanvas } from './helpers/sonarCanvas.js';
+
+describe('sonar map labels', () => {
+  const box = (x: number, y: number, w = 40) => ({ x0: x, y0: y, x1: x + w, y1: y + 12 });
+
+  it('never keeps two labels closer than the minimum pixel gap', () => {
+    const boxes = [];
+    for (let i = 0; i < 200; i++) {
+      boxes.push({ text: `${i} m`, ...box((i * 37) % 300, (i * 53) % 220) });
+    }
+    const kept = keepSeparatedBoxes(boxes, LABEL_GAP_PX);
+    for (const [i, a] of kept.entries()) {
+      for (const b of kept.slice(i + 1)) {
+        const clear =
+          a.x1 + LABEL_GAP_PX <= b.x0 ||
+          b.x1 + LABEL_GAP_PX <= a.x0 ||
+          a.y1 + LABEL_GAP_PX <= b.y0 ||
+          b.y1 + LABEL_GAP_PX <= a.y0;
+        expect(clear).toBe(true);
+      }
+    }
+  });
+
+  it('keeps the earlier label when two would collide, and both when they are apart', () => {
+    const first = { text: '120 m', ...box(100, 50) };
+    const second = { text: '80 m', ...box(120, 54) };
+    const apart = { text: '40 m', ...box(100, 50 + 12 + LABEL_GAP_PX) };
+    expect(keepSeparatedBoxes([first, second], LABEL_GAP_PX)).toEqual([first]);
+    expect(keepSeparatedBoxes([first, apart], LABEL_GAP_PX)).toEqual([first, apart]);
+  });
+});
 
 describe('sonar canvas sizing', () => {
   it('portrait tile (Titanic, ~25 x 33 km): 220 px tall, narrower wide', () => {
