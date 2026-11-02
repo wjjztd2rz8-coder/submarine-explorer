@@ -2968,3 +2968,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged U-sonar-labels (Haiku, dfccf640): contour depth labels are box-separated (4 px gap), later colliding label dropped; unit tests by capability, 8 label snapshots updated. Gates smoke + project-base PASS on worktree and main. Haiku took ~23 min. Codex week 4% until Nov 4, briefs 120-124 queued. Next: V-lostcity-tower-top (Sonnet).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-02 09:18 CST headless run 310 (Claude): one package merged
+
+- Merged V-lostcity-tower-top (Sonnet, 6de33a56): carbonate highlight shoulder in the material; tower top peak 184-194 (was 206-215), streaks visible in the close pose (viewed), softer than ideal. Gates smoke + project-base PASS on main (first main run hit a stale vite on port 4872, rerun clean). Codex week 4% until Nov 4, briefs 120-124 queued. Next: V-kama-plume-scale (Sonnet).
+- **Needs owner:** phone retest (4410-P2 checklist).
