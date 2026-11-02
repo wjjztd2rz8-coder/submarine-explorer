@@ -712,6 +712,7 @@ describe('per-site preset atmosphere', () => {
     'beebe-vent-field': { drop: 12, standoff: 6, distance: 60, intensity: 3000 },
     'lost-city': { drop: 8, standoff: 8, distance: 90, intensity: 21000 },
     'axial-seamount-ashes': { drop: 0.5, standoff: 1.5, distance: 28, intensity: 700 },
+    kamaehuakanaloa: { drop: 3, standoff: 5, distance: 150, intensity: 7000 },
   };
   const sites = (
     JSON.parse(readFileSync('data/tiles/index.json', 'utf8')).tiles as { id: string }[]

@@ -828,7 +828,7 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
             tier,
             // Kamaʻehuakanaloa's spawn hangs in open water over a dark slope, so its fill is lifted.
             id === 'kamaehuakanaloa'
-              ? { depthM: -200, color: 0x9aa6ad, intensity: 18 }
+              ? { depthM: -200, color: 0x9aa6ad, intensity: 26 }
               : // Blake, Hunga, Axial and Hudson lift the same fill so the opening bed reads.
                 id in LIFTED_FILL
                 ? { depthM: -200, color: 0x6f8f9e, intensity: LIFTED_FILL[id] }
