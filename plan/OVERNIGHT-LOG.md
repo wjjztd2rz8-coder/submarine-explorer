@@ -2988,3 +2988,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged R-monterey-opening-red (Haiku, 27fcb0c4): stale test only (objective text "Survey..." was an intentional copy change); monterey specs 15/15. Also prettier-fixed plan/DIRECTOR.md and STATUS.md (were failing the prettier gate on main). Gates: all pass except prettier on my own note, fixed after. Codex week 4% until Nov 4, briefs 120-124 queued. Next: V-kama-subject, V-bluehole-hood-code, R-site-specs.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-02 15:00 CST headless run 314 (Claude): two packages merged
+
+- Merged R-site-specs (db8a0fea): `tools/site-specs.sh <site>` plus the merge-routine rule for V-* data edits. Merged V-kama-subject (Sonnet): closer Kama opening plus a secondary chimney field; vent site and plumes now fill the lower-left third (~3.8, desktop viewed). The new site-specs rule paid off at once: it caught rangeM 85/105 putting the sub inside scan range (hud-touch kama spec), so rangeM stays 110. Gates smoke + project-base PASS on worktree and main.
+- Codex week 4% until Nov 4, briefs 120-124 queued. Next: V-bluehole-hood-code, V-hunga-silhouette, V-beebe-seabed-edge.
+- **Needs owner:** phone retest (4410-P2 checklist).
