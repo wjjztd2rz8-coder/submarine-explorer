@@ -33,7 +33,7 @@ export function controlGroups(device: InputDevice, key: KeyOf, input?: Input): C
       {
         heading: 'Fly',
         rows: [
-          ['Left stick', 'Speed and turning'],
+          ['Steer', 'Speed and turning'],
           ['Right slider', 'Rise and sink'],
         ],
       },

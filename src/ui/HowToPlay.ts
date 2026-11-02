@@ -28,8 +28,8 @@ const HOW_TO_PLAY: readonly HowToGroup[] = [
     tiles: [
       {
         id: 'stick',
-        label: 'Left stick',
-        words: 'Move and turn',
+        label: 'Steer',
+        words: 'Drag to move and turn',
         art:
           '<circle cx="32" cy="32" r="25"/><circle class="htp-a htp-f" cx="32" cy="32" r="9"/>' +
           ARROW(32, 11, 0) +

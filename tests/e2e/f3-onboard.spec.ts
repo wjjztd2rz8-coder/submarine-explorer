@@ -256,7 +256,7 @@ test('desktop: Pause opens the controls card for the active device', async ({ pa
   await dialog.getByRole('button', { name: 'Touch' }).click();
   const howTo = page.getByRole('dialog', { name: 'How to play', exact: true });
   await expect(howTo).toBeVisible();
-  await expect(howTo).toContainText('Left stick');
+  await expect(howTo).toContainText('Steer');
   await expect(howTo.locator('.how-to-tile svg')).toHaveCount(9);
   await expect(howTo.locator('.controls-card-tabs')).toBeVisible();
 });
@@ -369,7 +369,7 @@ test.describe('touch viewport', () => {
       for (let cycle = 0; cycle < 3; cycle++) {
         await opener.tap();
         await expect(dialog).toBeVisible();
-        await expect(dialog).toContainText('Left stick');
+        await expect(dialog).toContainText('Steer');
         await expect(dialog).toContainText('Right slider');
         await expect(dialog.locator('.how-to-tile svg')).toHaveCount(9);
         await expect(dialog.locator('.controls-card-tabs')).toBeHidden();
@@ -437,7 +437,7 @@ test.describe('touch viewport', () => {
     await boot(page, '&touch=1');
     const card = page.locator(GUIDANCE.any);
     await expect(page.locator(GUIDANCE.tutorial)).toBeVisible();
-    await expect(card).toContainText(/left stick/i);
+    await expect(card).toContainText(/drag to/i);
     const box = (await card.boundingBox())!;
     const vp = page.viewportSize()!;
     expect(box.x).toBeGreaterThanOrEqual(0);
@@ -469,7 +469,7 @@ test.describe('touch viewport', () => {
       .getByRole('button', { name: 'How to play', exact: true })
       .tap();
     const dialog = page.getByRole('dialog', { name: 'How to play', exact: true });
-    await expect(dialog).toContainText('Left stick');
+    await expect(dialog).toContainText('Steer');
     await expect(dialog).toContainText('Right slider');
     await expect(dialog.locator('.how-to-tile svg')).toHaveCount(9);
     await expect(dialog.locator('.controls-card-tabs')).toBeHidden();

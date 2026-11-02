@@ -1020,7 +1020,7 @@ describe('tutorial copy', () => {
     for (const step of TUTORIAL_STEPS)
       expect(tutorialText(step.id, 'touch', keys).length).toBeLessThanOrEqual(42);
     expect(tutorialText('move', 'touch', keys, null, 'Bow section')).toBe(
-      'Left stick: follow the marker.',
+      'Drag to follow the marker.',
     );
     expect(tutorialText('move', 'keyboard', keys, null, 'Bow section')).toContain('Bow section');
   });

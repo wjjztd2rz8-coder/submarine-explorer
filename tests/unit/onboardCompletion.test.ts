@@ -195,14 +195,14 @@ describe('onboarding completion through the system', () => {
       ctx.input.touchActive = true;
       try {
         tick();
-        expect(lastTutorial()?.text).toBe('Left stick: move and turn.');
+        expect(lastTutorial()?.text).toBe('Drag to move and turn.');
         const event =
           deviceEvent === 'pen'
             ? Object.assign(new Event('pointerdown'), { pointerType: 'pen' })
             : Object.assign(new Event('keydown'), { code: deviceEvent });
         window.dispatchEvent(event);
         tick();
-        expect(lastTutorial()?.text).toBe('Left stick: move and turn.');
+        expect(lastTutorial()?.text).toBe('Drag to move and turn.');
       } finally {
         system.dispose?.();
       }
@@ -441,7 +441,7 @@ describe('onboarding completion through the system', () => {
       expect(lastTutorial()?.text).toBe('Hold G to move, then G or G to turn.');
       ctx.input.touchActive = true;
       tick();
-      expect(lastTutorial()?.text).toBe('Left stick: move and turn.');
+      expect(lastTutorial()?.text).toBe('Drag to move and turn.');
       window.dispatchEvent(new Event('keydown'));
       tick();
       expect(lastTutorial()?.text).toBe('Hold G to move, then G or G to turn.');
