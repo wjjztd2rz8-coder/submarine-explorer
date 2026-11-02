@@ -2963,3 +2963,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged R-ci-red-4 (Haiku, b12783e6): all four hosted-CI red specs were stale tests (checklist now appears after the first completed objective); tests updated, no product change. Gates smoke + project-base PASS on worktree and main. Haiku took ~58 min. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-sonar-labels (Haiku).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-02 08:12 CST headless run 309 (Claude): one package merged
+
+- Merged U-sonar-labels (Haiku, dfccf640): contour depth labels are box-separated (4 px gap), later colliding label dropped; unit tests by capability, 8 label snapshots updated. Gates smoke + project-base PASS on worktree and main. Haiku took ~23 min. Codex week 4% until Nov 4, briefs 120-124 queued. Next: V-lostcity-tower-top (Sonnet).
+- **Needs owner:** phone retest (4410-P2 checklist).
