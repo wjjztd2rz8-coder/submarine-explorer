@@ -2978,3 +2978,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-kama-plume-scale (Sonnet, 70bad412): Kama plume data only (opacity 0.55 to 0.14, narrower, glow pool 0.8/16 m); before/after viewed, plume now thin wisps, glow pool larger than base, ~3.8. Gates smoke + project-base PASS on main. Found 3 monterey-canyon opening-framing specs red on main (also before this change): added Backlog item R-monterey-opening-red. Codex week 4% until Nov 4, briefs 120-124 queued. Next: R-monterey-opening-red (Haiku), V-bluehole-hood-code.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-02 10:44 CST headless run 312 (Claude): comprehensive review
+
+- Review only, no package merged (Sol skipped, Codex week 4%). Golden 2026-11-02-162332 captured and viewed; scores in plan/REVIEWS.md (Kama 3.5, Lost City 4.0, Hunga 3.45, Blue Hole 3.85). CI red on runs 309/310 is one cause: Monterey opening-framing spec (R-monterey-opening-red, next). Added V-kama-subject. Briefs 120-124 queued for Nov 4.
+- **Needs owner:** phone retest (4410-P2 checklist).

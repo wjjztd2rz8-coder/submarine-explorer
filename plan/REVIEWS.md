@@ -1,5 +1,16 @@
 # Reviews
 
+## 2026-11-02 evening comprehensive review (trigger: 8+ merges, CI red on main for 3 runs; Claude alone, Sol skipped: Codex week 4% until Nov 4)
+
+- **Stage:** about 89% to 1.0 (range 86-90%); 3.5-4 weeks. Golden `2026-11-02-162332` vs `2026-11-02-061016`. Not agreed with Sol (Codex budget low).
+- **Changed since the morning review (runs 303-311):** Journal first-visit (earned entries only), sonar label separation, Lost City tower-top shoulder (peak 184-194, streaks visible), Kama plume thinned to translucent wisps with a bigger glow pool, plus test fixes (frozen debrief, four stale CI specs).
+- **Scores (hero poses, viewed):** Lost City 4.0 (tower top now streaked; upper third still open water), Kama 3.5 (up from 3.3: plume no longer a stack, but the frame is a huge dark slope with a tiny vent), Hunga 3.45 (unchanged: bedded pointed wedge), Blue Hole 3.85 (unchanged: small brown leaf, open water above). Beebe 4.0, Monterey 4.0, Titanic 3.9 not re-viewed this run (data unchanged). Readability screen 0/13 flagged.
+- **Biggest gaps:** Blue Hole hood and Hunga silhouette (both need code, no pass since 11-01), Kama subject framing.
+- **Play flow:** not re-captured; four of five walk-through confusions are now fixed. Phone retest still the main unknown.
+- **Process:** CI red on runs 309 and 310 is one cause: `opening-framing.spec.ts:503` Monterey low/medium/high (objective text "Survey the north canyon wall" vs expected "Scan"), already on the Backlog as R-monterey-opening-red (Haiku, next). Same spec was red on main before V-kama-plume-scale, so no regression from this review's merges. Hosted CI takes ~34 min, so failures surface 1-3 runs late (R-ci-speed queued as Codex 124). Claude idle ~4-8 h/24 h (good); Codex idle by design (week 4%, briefs 120-124 queued for Nov 4). No tooling change needed.
+- **New priorities:** R-monterey-opening-red, V-bluehole-hood-code, V-hunga-silhouette, V-kama-subject (new), V-beebe-seabed-edge, R-site-specs; R-release f72 once CI is green.
+- **Needs owner:** phone retest (4410-P2 checklist). Nothing else.
+
 ## 2026-11-02 comprehensive review (trigger: 8+ merges; Claude alone, Sol skipped: Codex week 4% until Nov 4)
 
 - **Stage:** about 89% to 1.0 (range 86-90%); 3.5-4 weeks. Golden `2026-11-02-061016` vs `2026-11-01-211523`. Not agreed with Sol (Codex budget low).
