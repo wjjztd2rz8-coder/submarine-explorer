@@ -301,8 +301,10 @@ test('completion banner keeps AA contrast over bright Blue Hole water', async ({
   await boot(page, '/?mission=great-blue-hole&tier=low&skipBriefing=1');
   await page.evaluate(() => {
     const game = window.__game as unknown as {
-      missionRouter: { showBanner(kind: 'primary'): void };
+      missionRouter: { panel: { setVisible(v: boolean): void }; showBanner(kind: 'primary'): void };
     };
+    // The banner lives in the objectives panel, which appears after the first completed objective.
+    game.missionRouter.panel.setVisible(true);
     game.missionRouter.showBanner('primary');
   });
   const banner = page.locator('.obj-banner');
@@ -321,8 +323,10 @@ test('completion banner choices accept Tab, Shift+Tab and native keyboard activa
   await boot(page, '/?mission=titanic&tier=low&skipBriefing=1');
   await page.evaluate(() => {
     const game = window.__game as unknown as {
-      missionRouter: { showBanner(kind: 'primary'): void };
+      missionRouter: { panel: { setVisible(v: boolean): void }; showBanner(kind: 'primary'): void };
     };
+    // The banner lives in the objectives panel, which appears after the first completed objective.
+    game.missionRouter.panel.setVisible(true);
     game.missionRouter.showBanner('primary');
   });
   const banner = page.locator('.obj-banner');
