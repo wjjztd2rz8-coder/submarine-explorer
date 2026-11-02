@@ -17,4 +17,4 @@ Pose 3 (close tower top): the cap and face now show vertical streaks and mottlin
 
 ## Gate
 
-See the bottom line of this file (filled in after the run).
+`PW_PORT=4871 tools/gates.sh`: green (python, content, build, unit, e2e smoke, e2e-base, attribution, prettier), exit 0.
