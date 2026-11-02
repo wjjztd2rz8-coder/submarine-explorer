@@ -2912,3 +2912,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-lostcity-tower-blown (d5d40cc0, partial): Lost City vent glow 60000 to 10000 and ambientFill 16 to 32 (site data only); the white halo on the Poseidon tower top is gone, frame brighter (mean 57 to 66), peak below clipping. Not met: near face still pale, pose-1 flank slightly dimmer. Three unit/e2e pins updated to the new values. Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-play-walkthrough (Haiku).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-01 21:52 CST headless run 299 (Claude): one package merged
+
+- Merged U-play-walkthrough (Haiku): walkthrough captured (journal-debrief spec 62/62), 8 findings recorded as Backlog items 11-16 (debrief "Back at the surface" while submerged, "Left stick" on touch, two primary Home cards, stacked dive-start HUD, empty stars on pick-site, "Class A/B hull" jargon). No game code changed. Gates smoke + project-base PASS on worktree and main. Codex week 4% until Nov 4, briefs 120-124 queued. Next: U-home-one-primary / U-dive-start-hud (Sonnet), U-touch-left-stick (Haiku).
+- **Needs owner:** phone retest (4410-P2 checklist).
