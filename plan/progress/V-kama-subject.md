@@ -22,3 +22,7 @@ About 4.1 (was ~3.6 against the new target). Warm chimneys with glow now sit low
 
 - Desktop opening only; portrait/landscape not reviewed (phone opening-guidance specs pass).
 - Right-hand slope is unchanged and flat.
+
+## Gates
+
+site-specs kamaehuakanaloa: 14 passed. tools/gates.sh: all PASS (python, content, build, unit, e2e smoke, e2e-base, attribution, prettier).
