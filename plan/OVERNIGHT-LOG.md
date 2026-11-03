@@ -3079,3 +3079,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged U-phone-guidance-distance (Sonnet: "Marker N m ahead" after 20 s idle, same slot) and U-phone-sheet-half (Haiku: sheet starts at half height, "More options", full-width Surface and debrief). gates.sh (smoke) green on main. No screenshot review of the half sheet yet; hud-touch lost-city tutorial/hero-guidance specs fail on the base build too (hosted CI will show). Claude week ~23% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-124 queued).
 - **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
+
+## 2026-11-03 10:15 CST headless run 331 (Claude): CI triage
+
+- Run 329's CI red was stale hud-touch specs (depth step now skipped near target). Merged R-hud-touch-depth-skip (Haiku); gates.sh (smoke) green on main. Hosted CI will confirm. Codex week 3% until Nov 4 (briefs 120-124 queued). Claude week ~23%.
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.

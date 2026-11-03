@@ -94,6 +94,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 - **V-bluehole-opening-decision [owner call]:** closer approach vs. pitch-up (see Needs owner); Claude proceeds with the pitch-up variant only if the owner does not answer by the next review.
 
 11. **R-ci-speed [Codex, queued 124]:** hosted CI takes 30+ min, so failures surface 1-2 runs late. Audit shard balance and slow specs; target under 20 min without dropping coverage.
+12a. **R-hud-touch-depth-skip [Haiku] DONE 2026-11-03 (merged):** hud-touch specs follow the depth-step skip (CI red from run 329).
 12. **Codex, queued 120-123, waiting for the Nov 4 reset:** T-opening-geometry (120), S-verify CI (121), S-dead second sweep (122), S-verify spawn cap (123).
 13. **P2-phone-accept [owner + Codex; browser-checkable items automated in tests/e2e/phone-accept.spec.ts]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
 14. **R-release [Haiku]:** tag the latest green-CI main after each review (f71 is the newest, 2026-11-01); f72 tagged 2026-11-03 (c985a29c, CI green); next tag after the next review.
