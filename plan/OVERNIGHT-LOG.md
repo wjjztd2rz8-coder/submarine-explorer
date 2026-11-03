@@ -3089,3 +3089,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-blake-endurance-tint (Sonnet, data only): Blake gets a pale coral mound (~4.0); Endurance spars read as debris but are thin and dark (~3.6), follow-up V-endurance-lit-foreground added. gates.sh (smoke) green on main before push. Claude week ~22% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-124 queued).
 - **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
+
+## 2026-11-03 12:20 CST headless run 333 (Claude): V-kama-subject
+
+- Merged V-kama-subject (Sonnet, data only): two outlying vent clusters on the Hiolo North approach (~4.1; vent field visible and lit, right half still plain slope). gates.sh (smoke) green on main. Claude week ~19% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-124 queued).
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
