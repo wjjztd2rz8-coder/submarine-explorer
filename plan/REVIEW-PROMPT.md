@@ -18,7 +18,7 @@ You are the creative director doing a deliberate review, not routine collection.
    - "Needs owner" items;
    - the stage (% toward 1.0) and time remaining, as agreed with Sol.
      Also rewrite `plan/STATUS.md` (one page: stage, the 1.0 table, done, left, needs owner) so the owner has a current summary.
-     Commit and push both, so the owner can read them on GitHub.
+     Run `npx prettier --write plan/*.md` first (unformatted plan docs failed CI static gates on 2026-11-03), then commit and push both, so the owner can read them on GitHub.
 6. `touch .cache/last-review-comprehensive && rm -f .cache/review-due`
 
 ## Targeted review

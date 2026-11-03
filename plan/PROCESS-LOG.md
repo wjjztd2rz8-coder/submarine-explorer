@@ -379,3 +379,7 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 ## 2026-11-02 review: data-only art merges broke full specs
 
 - Run 301 CI red: V-beebe-horizon (site data) invalidated `f-bughunt-880` ("only titanic/lost-city have a horizon"), and the Blue Hole touch journey showed sub depth 8.9 m on hosted again. Only smoke gates ran on the art merges, so the break surfaced one CI run late. Fixed both specs; added backlog item R-site-specs (run specs that name the site before merging site-data packages). Also: local reproduction of one spec needs `PW_OUTDIR=<dir> tools/gates.sh --phase build`, then `PW_PORT=<p> PW_OUTDIR=<dir> npx playwright test <file> -g <title>` (the gates `--phase e2e` wrapper only accepts shard syntax).
+
+## 2026-11-03 targeted review: CI red 3 runs from unformatted plan docs
+
+- Runs 321-323 failed only the static gate: `prettier --check` flagged plan/DIRECTOR.md and plan/STATUS.md (written by the review run, never formatted). All 38 e2e shards passed. Fixed by formatting; REVIEW-PROMPT.md step 5 now says to run `npx prettier --write plan/*.md` before committing review docs.

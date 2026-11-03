@@ -1,5 +1,9 @@
 # Reviews
 
+## 2026-11-03 targeted review (trigger: CI red on main for 3 runs)
+
+- **Cause:** static gate only (prettier on plan/DIRECTOR.md and plan/STATUS.md from the 321 review); unit, attribution and all e2e shards were green. Formatted, and REVIEW-PROMPT.md now requires prettier before committing review docs. Logged in PROCESS-LOG.md. No other action.
+
 ## 2026-11-03 comprehensive review (trigger: tag f72; Claude alone, Sol skipped: Codex week 3% until Nov 4)
 
 - **Stage:** about 90% to 1.0 (range 87-91%); 3.5 weeks. Golden `2026-11-03-044523` vs `2026-11-02-162332`. Not agreed with Sol (Codex budget low).

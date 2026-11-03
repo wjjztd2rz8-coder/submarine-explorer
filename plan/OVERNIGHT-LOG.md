@@ -3044,3 +3044,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - No package started. No worktrees, main clean. Claude week 26% left (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-124 queued). Remaining Claude items are small art gains or the Blue Hole design call.
 - **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
+
+## 2026-11-03 01:46 CST headless run 324 (Claude): targeted review
+
+- CI red x3 was prettier on two plan docs; fixed and process note added. No package started (state unchanged: Codex week 3% until Nov 4, Claude items are small or design calls).
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
