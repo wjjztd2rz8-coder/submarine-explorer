@@ -16,4 +16,4 @@ Endurance opening about 3.6 to about 3.8. Two pale grey boulder clusters now sit
 
 ## Gates
 
-See below.
+`tools/gates.sh` (smoke + project-base) green: python, content, build, e2e-base, attribution, unit; prettier fixed.

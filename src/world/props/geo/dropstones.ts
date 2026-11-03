@@ -59,7 +59,10 @@ export function buildDropstones(input: GeoBuildInput): BuiltProp {
   for (const t of tmpl) t.dispose();
   paint(geom, (x, y, z, ny, out) => {
     const n1 = fbm3(x * 0.6, y * 0.6, z * 0.6, seed ^ 0x51, 3);
-    out.copy(WARM).lerp(PALE, n1).multiplyScalar(0.85 + 0.3 * ny);
+    out
+      .copy(WARM)
+      .lerp(PALE, n1)
+      .multiplyScalar(0.85 + 0.3 * ny);
   });
   projectUVs(geom, 2.4);
   geom.computeBoundingBox();
