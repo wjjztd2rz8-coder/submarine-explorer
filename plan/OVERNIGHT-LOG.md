@@ -3064,3 +3064,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - No package started. No worktrees, main clean. Claude week 25% left (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-124 queued).
 - **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
+
+## 2026-11-03 06:23 CST headless run 328 (Claude): targeted review
+
+- Backlog was not dry, runs were declining work. Ran U-play-walkthrough-2 (Sonnet); four U-* items added (home 720 fit, tutorial depth skip, phone guidance distance, phone sheet half). Nothing merged; items next run.
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.

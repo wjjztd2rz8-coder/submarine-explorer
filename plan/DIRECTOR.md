@@ -87,7 +87,10 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 - **V-kama-subject [Sonnet]:** golden 2026-11-03 Kama is a huge dark slope with a tiny vent. Route: opening pose closer to the vent (spawn/camera data) plus a larger vent glow pool. Target: vent and chimney fill about a quarter of the frame.
 - **V-blake-endurance-tint [Sonnet]:** Endurance and Blake read as flat tint planes (~3.5); add one lit foreground feature each (code-level prop variant, not a tint tweak).
 - **V-hunga-bank [Sonnet]:** the crest now reads as a level slab (~4.0); the bank behind it is a soft hill. Add a darker talus apron and a lit crest edge. Target: wall reads as a cliff, not a block.
-- **U-play-walkthrough-2 [Sonnet]:** re-capture Home, pick site, first 60 s, Journal and debrief with Playwright; log confusions as items. Last walk-through was run 299.
+- **U-home-720-fit [Haiku]:** Home panel clips the Settings/Controls row at 1280x720; fold Advanced into the Game mode row (evidence: plan/progress/U-play-walkthrough-2.md).
+- **U-tutorial-depth-skip [Haiku]:** skip tutorial step 2 (Space/Ctrl depth) when the target is within ~15 m of current depth (Beebe).
+- **U-phone-guidance-distance [Sonnet]:** phone guidance stays "Drag to follow the marker." for 60 s; after ~20 s idle show "Marker N m ahead" in the same slot.
+- **U-phone-sheet-half [Haiku]:** phone site sheet should start at half height so the globe is visible; also rename debrief "More" and make pause "Surface and debrief" full width.
 - **V-bluehole-opening-decision [owner call]:** closer approach vs. pitch-up (see Needs owner); Claude proceeds with the pitch-up variant only if the owner does not answer by the next review.
 
 11. **R-ci-speed [Codex, queued 124]:** hosted CI takes 30+ min, so failures surface 1-2 runs late. Audit shard balance and slow specs; target under 20 min without dropping coverage.

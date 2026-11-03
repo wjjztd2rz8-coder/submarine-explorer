@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-11-03 targeted review (trigger: last 3 runs merged nothing)
+
+- **Cause:** the backlog was not dry; runs 322-327 declined to start work (Claude week 25% left, Codex 3% until Nov 4) and the small art items were judged low value. With 99% in the 5 h window and a weekly reset on Nov 5, unspent weekly budget is wasted, so one bounded Sonnet agent ran U-play-walkthrough-2.
+- **Result:** no dead ends or errors; briefing, debrief and phone HUD look good. Six issues found (plan/progress/U-play-walkthrough-2.md); four became small U-* backlog items, Blue Hole opening stays the owner call.
+- **Needs owner:** phone retest; Blue Hole opening design call.
+
 ## 2026-11-03 targeted review (trigger: CI red on main for 3 runs)
 
 - **Cause:** static gate only (prettier on plan/DIRECTOR.md and plan/STATUS.md from the 321 review); unit, attribution and all e2e shards were green. Formatted, and REVIEW-PROMPT.md now requires prettier before committing review docs. Logged in PROCESS-LOG.md. No other action.
