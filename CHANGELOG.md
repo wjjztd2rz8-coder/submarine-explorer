@@ -14,6 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
+- **V-blake-endurance-tint:** Blake Plateau and Endurance each gain one foreground prop on the opening approach (data only: a low coral-mound-f ahead-left of the Blake spawn; fallen-spars, a second endurance-rigging scatter, ahead-right of the Endurance spawn). Nothing removed; no code change.
 - **V-kama-plume-scale:** Kama'ehuakanaloa vent plume is about a third as wide, shorter and translucent (data overrides only: spread, sprite sizes, opacity 0.55 to 0.14, rise 38 m, 7000 particles), and the warm glow pool at the vent base is larger (hazeGlow 0.8, size 16 m). Nothing removed.
 - **V-lostcity-tower-top:** Lost City carbonate lit radiance now rolls off through a highlight shoulder (ceiling 0.55) instead of clipping, so the Poseidon tower top and face show streaked carbonate texture; hero-frame peak (max channel) 216 to 184 on the tower top. Nothing removed.
 - **U-sonar-labels:** sonar depth labels are checked by their box: a label that would touch or overlap one already drawn is cut (the later one in draw order). Cut: overlapping labels such as "120 m / 80 m" at the 1000 m range. Reason: the labels ran into each other on Blue Hole.

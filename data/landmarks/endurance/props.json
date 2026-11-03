@@ -47,6 +47,21 @@
       "collision": "none",
       "reconstruction": true,
       "note": "Stands in for the ship's wheel, photographed by Endurance22 near the stern (HISTORY, 'Photos of the Wreck of Shackleton's Endurance'), and the marine life documented around it -- sea stars, sponges, an anemone and sea squirts (Smithsonian Magazine). The engine's procedural kinds do not include a wheel or marine-growth shape, so a small debris cluster marks the site instead; it does not depict the wheel's real form. No coordinate is published for the wheel itself, so placement near the stern is illustrative."
+    },
+    {
+      "id": "fallen-spars",
+      "model": "procedural:debris",
+      "lat": -68.738947,
+      "lon": -52.327535,
+      "snap_to_seabed": true,
+      "heading_deg": 35,
+      "scale": 1,
+      "dimensions_m": [34, 34, 3],
+      "lod_distance_m": 500,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "Game addition: a second scatter of fallen spars, blocks and planks off the hull, after the debris field Endurance22 reported around the wreck; position invented.",
+      "wreck": "endurance-rigging"
     }
   ]
 }
