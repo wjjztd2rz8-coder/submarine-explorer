@@ -395,18 +395,19 @@
 .home-screen.has-sites {
   background: radial-gradient(ellipse at 40% 40%, #0a2936 0%, var(--home-canvas) 60%, #020710 100%);
 }
-/* Narrow screens: the globe fills the screen above a peeking sheet; swiping the sheet up lists the
-   sites over it. Desktop and sideways phones show the list beside the globe instead (below). */
+/* Narrow screens: the globe fills the top half and the sites sheet sits over the bottom half, so the
+   globe stays visible as the picker. Swiping the sheet up expands it to the full list. Desktop and
+   sideways phones show the list beside the globe instead (below). */
 .home-sites-grab {
   display: none;
 }
 @media (max-width: 959px) and (not ((min-aspect-ratio: 1/1) and (max-height: 500px))) {
   .home-screen.has-sites {
-    --sheet-peek: calc(96px + var(--home-safe-b));
+    --sheet-half: 50dvh;
   }
   .home-screen.has-sites .home-globe-wrap {
     position: absolute;
-    inset: 0 0 var(--sheet-peek);
+    inset: 0 0 var(--sheet-half);
     height: auto;
   }
   .home-screen.has-sites .home-globe-wrap .globe-card {
@@ -419,13 +420,10 @@
     padding-bottom: calc(16px + var(--home-safe-b));
     border-radius: 16px 16px 0 0;
     box-shadow: 0 -8px 24px rgba(2, 7, 16, 0.5);
-    transition: transform 0.25s ease;
+    transition: height 0.25s ease;
   }
   .home-screen.has-sites .home-sites.is-collapsed {
-    transform: translateY(calc(100% - var(--sheet-peek)));
-  }
-  .home-sites.is-collapsed .home-sites-scroll {
-    visibility: hidden;
+    height: var(--sheet-half);
   }
   .home-sites-grab {
     display: block;

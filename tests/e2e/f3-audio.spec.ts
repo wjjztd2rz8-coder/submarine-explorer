@@ -199,7 +199,7 @@ for (const touch of [false, true]) {
         );
         await page.clock.fastForward(50);
         const debrief = page.locator('.mission-debrief');
-        await act(debrief.getByRole('button', { name: 'More', exact: true }));
+        await act(debrief.getByRole('button', { name: 'More options', exact: true }));
         await assertPaused();
         await Promise.all([
           page.waitForEvent('domcontentloaded'),

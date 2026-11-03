@@ -191,7 +191,8 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
   overflow-y: auto;
 }
 .pause-actions button:first-child,
-.pause-actions button:last-child {
+.pause-actions button:last-child,
+.pause-actions .pause-surface {
   grid-column: span 2;
 }
 .pause-actions button:last-child {
