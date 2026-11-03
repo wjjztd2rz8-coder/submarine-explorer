@@ -123,6 +123,38 @@
       "collision": "box",
       "reconstruction": true,
       "note": "Game addition: pillow-lava heap with iron-oxide staining and orange iron-bacteria mats against the east flank of the Hiolo North chimneys, so the vent sits on its own lava apron; the seamount is basaltic and its summit vents host Fe-oxidising mats (Emerson & Moyer 2002). Exact layout and size are invented."
+    },
+    {
+      "id": "hiolo-north-outlier-1",
+      "model": "procedural:chimney",
+      "feature": "smoker-cluster",
+      "lat": 18.91196,
+      "lon": -155.26762,
+      "snap_to_seabed": true,
+      "heading_deg": 310,
+      "scale": 1,
+      "dimensions_m": [16, 14, 6],
+      "material_hint": "basalt",
+      "lod_distance_m": 500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: an outlying vent cluster on the approach to Hiolo North, so the vent field reads as a field from the opening. Low-temperature, iron-stained venting is real at the Hiolo sites; this layout and size are invented."
+    },
+    {
+      "id": "hiolo-north-outlier-2",
+      "model": "procedural:chimney",
+      "feature": "smoker-cluster",
+      "lat": 18.91225,
+      "lon": -155.26776,
+      "snap_to_seabed": true,
+      "heading_deg": 70,
+      "scale": 1,
+      "dimensions_m": [12, 10, 4.5],
+      "material_hint": "basalt",
+      "lod_distance_m": 500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: an outlying vent cluster on the approach to Hiolo North, so the vent field reads as a field from the opening. Low-temperature, iron-stained venting is real at the Hiolo sites; this layout and size are invented."
     }
   ]
 }
