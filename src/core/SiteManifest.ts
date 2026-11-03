@@ -200,6 +200,8 @@ export interface SiteManifest {
     hazeColor: number;
     hazePeakElevation: number;
     fogLift: number;
+    /** Share (0..1) of the haze colour mixed into the fog at full abyss depth. */
+    fogHaze?: number;
     fadeStartM: number;
     fadeEndM: number;
   };
@@ -563,14 +565,17 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
     out.wreck = root.wreck as SiteManifest['wreck'];
   }
   if (root.horizon !== undefined) {
-    fields({
-      upperColor: color,
-      hazeColor: color,
-      hazePeakElevation: positiveFraction,
-      fogLift: nonnegative,
-      fadeStartM: nonnegative,
-      fadeEndM: aboveZero,
-    })(id, 'horizon', root.horizon);
+    fields(
+      {
+        upperColor: color,
+        hazeColor: color,
+        hazePeakElevation: positiveFraction,
+        fogLift: nonnegative,
+        fadeStartM: nonnegative,
+        fadeEndM: aboveZero,
+      },
+      { fogHaze: fraction },
+    )(id, 'horizon', root.horizon);
     out.horizon = root.horizon as SiteManifest['horizon'];
   }
   if (root.terrain !== undefined) {

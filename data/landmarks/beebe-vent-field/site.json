@@ -160,6 +160,7 @@
     "hazeColor": 3827544,
     "hazePeakElevation": 0.25,
     "fogLift": 2,
+    "fogHaze": 0.5,
     "fadeStartM": 400,
     "fadeEndM": 600
   }
