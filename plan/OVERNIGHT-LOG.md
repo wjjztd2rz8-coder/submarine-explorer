@@ -3094,3 +3094,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-kama-subject (Sonnet, data only): two outlying vent clusters on the Hiolo North approach (~4.1; vent field visible and lit, right half still plain slope). gates.sh (smoke) green on main. Claude week ~19% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-124 queued).
 - **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
+
+## 2026-11-03 13:50 CST headless run 334 (Claude): V-hunga-bank
+
+- Merged V-hunga-bank (Sonnet): darker talus apron and lit crest edge through a `cliff` field on the tuff scarp preset (no site branch); Hunga ~4.1, soft hill behind the crest unchanged. Updated tuff geometry hashes on purpose. gates.sh (smoke) green on branch and main, pushed. Claude week ~19.0% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-124 queued).
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
