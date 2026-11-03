@@ -232,7 +232,7 @@ for (const viewport of [
         await record('debrief');
 
         phase = 'debrief exit';
-        await tap(debrief.getByRole('button', { name: 'More', exact: true }));
+        await tap(debrief.getByRole('button', { name: 'More options', exact: true }));
         await tap(debrief.getByRole('button', { name: 'Home', exact: true }));
         await homeReady(page, true);
         await reachable(page.locator('.home-primary'));

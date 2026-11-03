@@ -394,7 +394,8 @@ html.is-touch .hud-reset-camera {
     min-height: 44px;
   }
   .pause-actions button:first-child,
-  .pause-actions button:last-child {
+  .pause-actions button:last-child,
+  .pause-actions .pause-surface {
     grid-column: span 3;
   }
 }

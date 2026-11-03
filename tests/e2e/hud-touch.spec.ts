@@ -624,7 +624,7 @@ freshTest.describe('large UI and menu reachability', () => {
             await origin.tap();
             await expect(home.locator('.home-sites h2')).toHaveText(name);
             await expect(page.locator('.globe.is-embedded')).toBeVisible();
-            // The list is a sheet over the globe: its header (the part a collapsed sheet shows) must clear it.
+            // The list is a half-height sheet over the globe: its header must clear the globe.
             await separate(page, ['.home-globe-wrap', '.home-sites-head']);
             const back = home.getByRole('button', { name: 'Back to menu' });
             await reachable(back);

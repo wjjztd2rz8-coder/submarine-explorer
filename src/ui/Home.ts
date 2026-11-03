@@ -154,8 +154,9 @@ export class Home {
     sitesHead.append(sitesTitle, back);
     this.sitesSlot = document.createElement('div');
     this.sitesSlot.className = 'home-sites-scroll';
-    // Narrow screens show the list as a bottom sheet over the globe (CSS); the grab bar and a swipe on
-    // the header both toggle it. Elsewhere the grab bar is hidden and the list is always open.
+    // Narrow screens show the list as a bottom sheet: half height over the globe, expanding to the full
+    // list (CSS). The grab bar and a swipe on the header toggle it. Elsewhere the grab bar is hidden
+    // and the list is always open.
     const grab = document.createElement('button');
     grab.type = 'button';
     grab.className = 'home-sites-grab';

@@ -146,7 +146,7 @@ test.describe('globe pins on touch', () => {
       await grab.focus();
       await page.keyboard.press('Enter');
       await expect(grab).toHaveAttribute('aria-expanded', 'false');
-      await expect(sheet.locator('.home-sites-scroll')).toBeHidden();
+      await expect(sheet.locator('.home-sites-scroll')).toBeVisible();
       await page.keyboard.press('Space');
       await expect(grab).toHaveAttribute('aria-expanded', 'true');
       await page.keyboard.press('Tab');
@@ -186,12 +186,20 @@ test.describe('globe pins on touch', () => {
       expect(size.width).toBeGreaterThanOrEqual(44);
       expect(size.height).toBeGreaterThanOrEqual(44);
     }
-    // The sites list is a sheet over the globe: collapsed it keeps its rows out of reach, and the
-    // grab bar opens it.
-    await expect(page.locator('.home-sites [data-mission="titanic"]')).toBeHidden();
+    // The sites list is a half-height sheet over the globe; the grab bar expands it to the full list.
+    await expect(page.locator('.home-sites-grab')).toHaveAttribute('aria-expanded', 'false');
+    // Regression guard: the sheet opened at full height and hid the globe, so it was not discoverable as the picker.
+    const sheetBox = (await page.locator('.home-sites').boundingBox())!;
+    expect(sheetBox.height, 'sheet starts at half height').toBeLessThan(
+      page.viewportSize()!.height * 0.55,
+    );
     await page.locator('.home-sites-grab').click();
     await expect(page.locator('.home-sites [data-mission="titanic"]')).toBeVisible();
     await page.locator('.home-sites-grab').click();
+    // Let the sheet finish its height transition before tapping the globe under it.
+    await expect
+      .poll(async () => (await page.locator('.home-sites').boundingBox())?.height)
+      .toBeCloseTo(page.viewportSize()!.height / 2, 0);
 
     const pin = page
       .locator('.globe.is-embedded .globe-pin:not(.is-clustered):not(.is-back):not(.is-catalogue)')

@@ -208,7 +208,7 @@ export class Debrief {
     const navigation = el('div', 'debrief-navigation');
     const secondary = el('div', 'debrief-secondary');
     const more = el('div', 'debrief-more');
-    const toggle = el('button', 'debrief-more-toggle', 'More');
+    const toggle = el('button', 'debrief-more-toggle', 'More options');
     toggle.type = 'button';
     toggle.setAttribute('aria-expanded', 'false');
     const moreBox = el('div', 'debrief-more-items');
@@ -218,7 +218,7 @@ export class Debrief {
       toggle.setAttribute('aria-expanded', String(!moreBox.hidden));
     });
     more.append(toggle, moreBox);
-    // One filled primary; at most two quiet links (first choice + Journal); the rest tuck under More.
+    // One filled primary; at most two quiet links (first choice + Journal); the rest tuck under More options.
     const rest = list.filter((a) => a !== primary);
     // When resuming is primary, Dive sites is the quiet link beside Journal.
     if (unstarted)
