@@ -1,5 +1,16 @@
 # Reviews
 
+## 2026-11-03 comprehensive review (trigger: tag f72; Claude alone, Sol skipped: Codex week 3% until Nov 4)
+
+- **Stage:** about 90% to 1.0 (range 87-91%); 3.5 weeks. Golden `2026-11-03-044523` vs `2026-11-02-162332`. Not agreed with Sol (Codex budget low).
+- **Changed since the evening review (runs 312-320):** Hunga flat-topped escarpment (generic scarp option), Beebe seabed haze (`fogHaze` on site horizons), Monterey opening spec fix, f72 tagged on green CI.
+- **Scores (hero poses, viewed):** Beebe 4.1 (seabed edge gone, smoker and plume read), Hunga 4.0 (up from 3.45: level crest, still slab-like, soft bank behind), Blue Hole 3.85 (unchanged: small brown leaf, open water above), Lost City 4.0, Monterey 4.0, Titanic 3.9, Kama 3.5 not re-viewed. Readability screen 0/13 flagged.
+- **Biggest gaps:** Blue Hole hood (needs an owner design call or a code-level hood), Kama subject framing, Hunga bank.
+- **Play flow:** not re-captured; queued as U-play-walkthrough-2. Phone retest still the main unknown.
+- **Process:** efficiency: no failed timer runs, Claude idle ~6-12 h/24 h (backlog was down to design calls; refilled with four concrete items), Codex idle by design (week 3%, briefs 120-124 queued for Nov 4). Golden capture takes ~15 min, so it needs a background run.
+- **New priorities:** V-kama-subject, V-hunga-bank, V-blake-endurance-tint, U-play-walkthrough-2; Codex 120-124 after the reset.
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call (closer approach vs. pitch-up).
+
 ## 2026-11-02 evening comprehensive review (trigger: 8+ merges, CI red on main for 3 runs; Claude alone, Sol skipped: Codex week 4% until Nov 4)
 
 - **Stage:** about 89% to 1.0 (range 86-90%); 3.5-4 weeks. Golden `2026-11-02-162332` vs `2026-11-02-061016`. Not agreed with Sol (Codex budget low).
