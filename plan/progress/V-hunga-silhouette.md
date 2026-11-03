@@ -18,3 +18,7 @@ About 4.0 (was 3.45). Near-vertical wall, flat top with a stepped crest, never d
 
 - Reads slightly boxy, like a slab; the crest has only two steps and the bank behind is still a soft hill.
 - Wall face is uniform tan; no breakup of the crest by gullies at the top. Only the desktop opening was viewed.
+
+## Gates
+
+- `tools/gates.sh` (smoke): all PASS (run on PW_PORT=4933; 4931 was held by a leaked preview server). `tools/site-specs.sh hunga-tonga-caldera`: 10/10 pass. Full unit suite passes after baseline updates.
