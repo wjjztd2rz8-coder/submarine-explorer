@@ -3104,3 +3104,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-endurance-lit-foreground (Sonnet): new `dropstones` geo feature, two pale boulder clusters in the Endurance opening foreground (~3.8; grey, a little uniform). gates.sh (smoke) green. Queued brief 125 (verify dropstones). Claude week ~17% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-125 queued).
 - **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
+
+## 2026-11-03 15:18 CST headless run 336 (Claude): no package
+
+- Nothing merged. Claude backlog has no unblocked well-specified item (remaining: V-bluehole-opening-decision needs owner; P2-phone-accept is owner; Codex items 120-125 wait for the Nov 4 reset). Claude week ~18% (reset Nov 5), so no new review or art pass started. CI for run 334 green; run 335's still in progress. Main clean.
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
