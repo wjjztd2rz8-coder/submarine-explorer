@@ -11,7 +11,7 @@ import { Props } from '../../src/world/Props.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import { geoDetail } from '../../src/world/props/geo/detail.js';
-import { buildScarp, type ScarpPresetId } from '../../src/world/props/geo/scarp.js';
+import { buildScarp, wallEnvelope, type ScarpPresetId } from '../../src/world/props/geo/scarp.js';
 import type { BuiltProp } from '../../src/world/props/geo/shared.js';
 import type { PropDef } from '../../src/world/PropLoader.js';
 
@@ -218,22 +218,22 @@ const slope = (x: number, z: number) => 0.045 * x + 0.025 * z;
 // clipped depth extents. Placement and material contracts remain independent.
 const scarpBaseline: Record<string, string[]> = {
   'tuff-low': [
-    'd0c99e1332a1888e25c93deb36baeb8372f71337a2b61707e176ae81fafe3cf1',
-    '18b7e7ec183937dc9ba6296cb75fa34e1c48253df3c93f66f83a0113790de95b',
+    '9bbcb357b2a5505430ae998c6696a14b0fa633c4b778d41e475db22449c60a31',
+    '35d1d8379c8e2e838127d4afe3f3c6515f1f4a7157cb3b299862e1f415e358a0',
     '9a0255067cba24ebae01497072a0e9e4e544b768adadb0bdc85f8708b029d68a',
-    'e871e9946f2ffca4ce775806629f61dd0a2c61b6cd3669064e12a851f23522fa',
+    '8f9deed2ba0979770c623965f7f3ca923f7a8dfe20ca9c56c999607f9fd92dc9',
   ],
   'tuff-medium': [
-    'd1b2d4ca80b9549cbb91207ba1472016d1264d8521e69dbf320a9afa73b6557f',
-    'b3e02644e65503abd5ddbf48e17b2abdfeeac5fee6e61c30106005c5b46c7071',
+    'd0082cb031873205c7834925bb38a7cee75d089e3868e52663a06a3a242b80f7',
+    '6c63ceceebaf4c33bb0d4c103e928f33bae679a6dfbfc216f9985de5e575e716',
     'db463017008dfc3080e0e2a04c076c436c48c888dac7fb77670374f9fc0e6c92',
-    'b77359aa0e481b3583e3ff422da83bc62df6c960e178e50df611a5fc7acd69d3',
+    'b8a241a2024ab47df60d542da7bc2802ad074587b724df9b49aa85588ae20426',
   ],
   'tuff-high': [
-    '638404b60086683dc4b4ae032632afad1b6d03281cc6414039768dc476a57b6c',
-    'cf2189a1ddc14a8be492f4cf3c1710620e02664cb2ada9a5c52bef5ea8d05c94',
+    '554a00eb951bf3422ca1eafd5b06de9d111725e5cc30b0d5291819f85a92399a',
+    'ae54b2b639557b80c88fbe0041f7ced945b4d87bc7902abdbbbba28b3305241a',
     'db463017008dfc3080e0e2a04c076c436c48c888dac7fb77670374f9fc0e6c92',
-    'aceedcc92e9cda8ab9d0a99e9d56e4aa185b3f1759065c173cb39d4f36cbf87c',
+    '71ba2f4676e68e7c38277384e7d93f6df21bc59eb09cfaa1b7aaac5ab126cf25',
   ],
   'canyon-low': [
     'a59694039df1257d8887a9756e06df631427481bdea775a10030526e7d40fe68',
@@ -391,4 +391,17 @@ it('rejects offscreen steep terrain boxes in the elevated wall view without chan
   } finally {
     terrain.dispose();
   }
+});
+
+describe('escarpment crest', () => {
+  // Walls that pinch late are flat-topped escarpments: a level, stepped crest across the
+  // middle, not the ragged skyline of a slumped wall.
+  it('keeps the crest level across the middle and within a few terrace steps', () => {
+    const heights = [-0.35, -0.2, -0.05, 0.05, 0.2, 0.35].map(
+      (f) => wallEnvelope(f * 150, 150, 0.75).skyline,
+    );
+    for (const h of heights) expect(h).toBeGreaterThan(0.85);
+    expect(new Set(heights.map((h) => h.toFixed(3))).size).toBeLessThanOrEqual(3);
+    expect(wallEnvelope(0, 150, 0.75).edge).toBe(0);
+  });
 });
