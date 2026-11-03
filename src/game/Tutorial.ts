@@ -24,6 +24,8 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
 export const MOVE_HOLD_S = 0.8;
 export const TURN_HOLD_S = 0.5;
 export const DEPTH_HOLD_S = 0.8;
+/** A first target this close in depth (m) makes the depth step pointless: skip it. */
+export const DEPTH_SKIP_M = 15;
 const AXIS_MIN = 0.25;
 
 export interface TutorialSample {
@@ -32,6 +34,8 @@ export interface TutorialSample {
   throttle: number;
   yaw: number;
   ballast: number;
+  /** Metres between the sub and the first target's depth; absent when no target. */
+  targetGapM?: number;
 }
 
 export class Tutorial {
@@ -77,6 +81,7 @@ export class Tutorial {
       // player who only drives (or only turns) is not stuck on this step.
       if (this.moveS >= MOVE_HOLD_S || this.turnS >= TURN_HOLD_S) return this.advance();
     } else if (step.id === 'depth') {
+      if (s.targetGapM !== undefined && s.targetGapM <= DEPTH_SKIP_M) return this.advance();
       this.depthS = Math.abs(s.ballast) >= AXIS_MIN ? this.depthS + s.dt : 0;
       if (this.depthS >= DEPTH_HOLD_S) return this.advance();
     }
