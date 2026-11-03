@@ -194,6 +194,7 @@ export function createOnboardSystem(): GameSystem {
                   Number.isFinite(scanDistance) && scanDistance > scanRadius
                     ? scanDistance
                     : undefined,
+                  tutorial.stalled && Number.isFinite(scanDistance) ? scanDistance : undefined,
                 ),
                 tone: 'cyan',
                 step: step.id,

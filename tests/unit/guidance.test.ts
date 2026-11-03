@@ -24,7 +24,7 @@ import { Waypoints } from '../../src/ui/Waypoints.js';
 import type { TileMeta } from '../../src/util/types.js';
 import { GuidanceSlot } from '../../src/ui/GuidanceSlot.js';
 import { HULL_GAUGE_SHOW_RATIO, hullGaugeVisible } from '../../src/ui/HullGauge.js';
-import { TUTORIAL_STEPS, tutorialText } from '../../src/game/Tutorial.js';
+import { MOVE_IDLE_S, TUTORIAL_STEPS, Tutorial, tutorialText } from '../../src/game/Tutorial.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
@@ -1023,5 +1023,21 @@ describe('tutorial copy', () => {
       'Drag to follow the marker.',
     );
     expect(tutorialText('move', 'keyboard', keys, null, 'Bow section')).toContain('Bow section');
+  });
+  it('adds the marker distance on touch only after the move step sits idle', () => {
+    const t = new Tutorial();
+    const idle = { dt: 1, throttle: 0, yaw: 0, ballast: 0 };
+    for (let i = 0; i < MOVE_IDLE_S - 1; i++) t.update(idle);
+    expect(t.stalled).toBe(false);
+    t.update(idle);
+    expect(t.stalled).toBe(true);
+    const text = tutorialText('move', 'touch', keys, null, 'Bow section', undefined, 122);
+    expect(text).toBe('Marker 120 m ahead');
+    expect(text.length).toBeLessThanOrEqual(42);
+    expect(tutorialText('move', 'touch', keys, null, 'Bow section', undefined, 1)).toBe(
+      'Marker 5 m ahead',
+    );
+    t.update({ ...idle, dt: 0.1, throttle: 0.5 });
+    expect(t.stalled).toBe(false);
   });
 });

@@ -26,6 +26,8 @@ export const TURN_HOLD_S = 0.5;
 export const DEPTH_HOLD_S = 0.8;
 /** A first target this close in depth (m) makes the depth step pointless: skip it. */
 export const DEPTH_SKIP_M = 15;
+/** Seconds on the move step with no input before the text adds the marker distance. */
+export const MOVE_IDLE_S = 20;
 const AXIS_MIN = 0.25;
 
 export interface TutorialSample {
@@ -46,6 +48,7 @@ export class Tutorial {
   private moveS = 0;
   private turnS = 0;
   private depthS = 0;
+  private idleS = 0;
   /** Events seen before their step came up; that step completes on arrival. */
   private early = new Set<TutorialEvent>();
 
@@ -66,6 +69,11 @@ export class Tutorial {
     return this.active_ ? (TUTORIAL_STEPS[this.index_] ?? null) : null;
   }
 
+  /** True once the move step has seen no input for MOVE_IDLE_S. */
+  get stalled(): boolean {
+    return this.step?.id === 'move' && this.idleS >= MOVE_IDLE_S;
+  }
+
   get finished(): boolean {
     return this.index_ >= TUTORIAL_STEPS.length;
   }
@@ -77,6 +85,7 @@ export class Tutorial {
     if (step.id === 'move') {
       this.moveS = Math.abs(s.throttle) >= AXIS_MIN ? this.moveS + s.dt : 0;
       this.turnS = Math.abs(s.yaw) >= AXIS_MIN ? this.turnS + s.dt : 0;
+      this.idleS = this.moveS > 0 || this.turnS > 0 ? 0 : this.idleS + s.dt;
       // Either a sustained push ahead/astern or a sustained turn counts, so a
       // player who only drives (or only turns) is not stuck on this step.
       if (this.moveS >= MOVE_HOLD_S || this.turnS >= TURN_HOLD_S) return this.advance();
@@ -164,11 +173,15 @@ export function tutorialText(
   scanProgress: number | null = null,
   destination?: string,
   scanDistanceM?: number,
+  markerDistanceM?: number,
 ): string {
   switch (id) {
     case 'move': {
-      if (device === 'touch')
+      if (device === 'touch') {
+        if (markerDistanceM !== undefined && destination)
+          return `Marker ${Math.max(5, Math.round(markerDistanceM / 5) * 5)} m ahead`;
         return destination ? 'Drag to follow the marker.' : 'Drag to move and turn.';
+      }
       const guidance = destination ? `Follow the marker toward ${destination}. ` : '';
       return (
         guidance +
