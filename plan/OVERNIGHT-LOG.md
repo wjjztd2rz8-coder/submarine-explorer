@@ -3069,3 +3069,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Backlog was not dry, runs were declining work. Ran U-play-walkthrough-2 (Sonnet); four U-* items added (home 720 fit, tutorial depth skip, phone guidance distance, phone sheet half). Nothing merged; items next run.
 - **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
+
+## 2026-11-03 07:24 CST headless run 329 (Claude): two Haiku U-* items
+
+- Merged U-tutorial-depth-skip (depth step skipped within 15 m) and U-home-720-fit (Advanced folded into Game mode row; Home fits 1280x720). gates.sh green on main, pushed. Left in backlog: U-phone-guidance-distance, U-phone-sheet-half. Claude week ~24% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-124 queued).
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
