@@ -149,6 +149,10 @@ export function createOnboardSystem(): GameSystem {
         // actual approach, rather than interpreting that teleport as descent.
         if (playing && startDepth === null && ctx.props.loaded && ctx.discovery.loaded)
           startDepth = f.sub.depth;
+        const firstTarget = f.nextScanObjective
+          ? ctx.discovery.scanner.getTargets().find((t) => t.id === f.nextScanObjective?.poiId)
+          : undefined;
+        const targetGapM = firstTarget ? Math.abs(f.sub.depth - firstTarget.position.y) : undefined;
         if (tutorial.active && playing) {
           if (
             tutorial.update({
@@ -156,6 +160,7 @@ export function createOnboardSystem(): GameSystem {
               throttle: f.state.throttle,
               yaw: f.state.yaw,
               ballast: f.state.ballast,
+              targetGapM,
             })
           )
             onAdvance();

@@ -153,6 +153,26 @@ describe('tutorial progression', () => {
     hold(t, { yaw: -1 }, 10); // past 0.5 s
     expect(t.step?.id).toBe('depth');
   });
+  it('skips depth step when target is within 15 m of the sub', () => {
+    const near = new Tutorial();
+    hold(near, { throttle: 1 }, 30);
+    expect(near.step?.id).toBe('depth');
+    near.update({ dt: 1 / 30, throttle: 0, yaw: 0, ballast: 0, targetGapM: 15 });
+    expect(near.step?.id).toBe('scan');
+
+    const far = new Tutorial();
+    hold(far, { throttle: 1 }, 30);
+    far.update({ dt: 1 / 30, throttle: 0, yaw: 0, ballast: 0, targetGapM: 15.5 });
+    expect(far.step?.id).toBe('depth');
+    hold(far, { ballast: -1 }, 30);
+    expect(far.step?.id).toBe('scan');
+  });
+  it('keeps the depth step when no target is known', () => {
+    const t = new Tutorial();
+    hold(t, { throttle: 1 }, 30);
+    hold(t, {}, 30);
+    expect(t.step?.id).toBe('depth');
+  });
   it('short thrust and turn presses do not add up across axes', () => {
     const t = new Tutorial();
     hold(t, { yaw: 1 }, 6);
