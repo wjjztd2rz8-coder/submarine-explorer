@@ -51,17 +51,17 @@
     {
       "id": "fallen-spars",
       "model": "procedural:debris",
-      "wreck": "endurance-rigging",
-      "lat": -68.738877,
-      "lon": -52.328183,
+      "lat": -68.738947,
+      "lon": -52.327535,
       "snap_to_seabed": true,
       "heading_deg": 35,
       "scale": 1,
-      "dimensions_m": [26, 26, 3],
+      "dimensions_m": [34, 34, 3],
       "lod_distance_m": 500,
       "collision": "none",
       "reconstruction": true,
-      "note": "Game addition: a second scatter of fallen spars, blocks and planks off the hull, after the debris field Endurance22 reported around the wreck; position invented."
+      "note": "Game addition: a second scatter of fallen spars, blocks and planks off the hull, after the debris field Endurance22 reported around the wreck; position invented.",
+      "wreck": "endurance-rigging"
     }
   ]
 }
