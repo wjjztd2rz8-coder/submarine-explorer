@@ -881,13 +881,13 @@ describe('site manifest graded backdrop', () => {
   });
   it('accepts an optional fogHaze fraction and rejects out-of-range values', () => {
     for (const fogHaze of [0, 0.4, 1])
-      expect(validateSiteManifest({ id: 's', horizon: { ...horizon, fogHaze } }, 's').horizon).toEqual(
-        { ...horizon, fogHaze },
-      );
+      expect(
+        validateSiteManifest({ id: 's', horizon: { ...horizon, fogHaze } }, 's').horizon,
+      ).toEqual({ ...horizon, fogHaze });
     for (const fogHaze of [-0.1, 1.1, 'x'])
-      expect(() => validateSiteManifest({ id: 's', horizon: { ...horizon, fogHaze } }, 's')).toThrow(
-        'horizon.fogHaze',
-      );
+      expect(() =>
+        validateSiteManifest({ id: 's', horizon: { ...horizon, fogHaze } }, 's'),
+      ).toThrow('horizon.fogHaze');
   });
   it('is authored only where the water above the seabed needs grading', () => {
     expect(
