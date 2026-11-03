@@ -61,12 +61,15 @@ export class ModeSelector {
   /**
    * @param className extra class for placement styles (e.g. `is-home`).
    * @param source the settings store; picking a mode applies it there.
+   * @param advancedBesideSegments put the Advanced toggle on the segment row instead of its own
+   *   row below the description (the home menu uses this so it fits a 720 px viewport).
    */
   constructor(
     className: string,
     private readonly source: GameplaySettingsSource,
     label = 'Game mode',
     optionChoices = DEFAULT_SETTINGS.gameplayOptions,
+    advancedBesideSegments = false,
   ) {
     const id = `mode-${++uid}`;
     this.root = el('div', `mode-selector ${className}`.trim());
@@ -150,7 +153,13 @@ export class ModeSelector {
       this.controls.set(key, control);
       this.advancedPanel.append(field);
     }
-    this.root.append(heading, group, this.desc, this.advancedToggle, this.advancedPanel);
+    if (advancedBesideSegments) {
+      const row = el('div', 'mode-selector-row');
+      row.append(group, this.advancedToggle);
+      this.root.append(heading, row, this.desc, this.advancedPanel);
+    } else {
+      this.root.append(heading, group, this.desc, this.advancedToggle, this.advancedPanel);
+    }
     this.set(source.get().gameplayMode);
     this.unsubscribe = source.onChange(() => this.set(source.get().gameplayMode));
   }
