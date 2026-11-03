@@ -3013,3 +3013,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged V-beebe-seabed-edge (Sonnet, 426bd136): site horizon now accepts `fogHaze` (validator + unit test), Beebe sets 0.5; dark seabed band gone, frame ~4.2 (viewed), slightly flatter water. site-specs beebe 47 pass, gates smoke + project-base PASS on main.
 - Codex week 4% until Nov 4, briefs 120-124 queued. Next: R-release (tag after green CI), V-bluehole opening design call.
 - **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call (closer approach vs. pitch-up).
+
+## 2026-11-02 20:12 CST headless run 318 (Claude): release only
+
+- Tagged f72 on c985a29c (hosted CI green, run 41556260600), pushed. No package started: remaining Claude items are design calls (Blue Hole opening) or Codex-lane, and Codex week is 4% until Nov 4 (briefs 120-124 queued).
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call (closer approach vs. pitch-up).
