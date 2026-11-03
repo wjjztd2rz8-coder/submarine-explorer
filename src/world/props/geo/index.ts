@@ -6,6 +6,7 @@
  */
 
 import { buildCarbonateTower } from './towers.js';
+import { buildDropstones } from './dropstones.js';
 import { buildCoralMound } from './coral.js';
 import type { GeoFeatureId } from './features.js';
 import { buildBenthicLander } from './lander.js';
@@ -29,6 +30,7 @@ const BUILDERS: Record<GeoFeatureId, (i: GeoBuildInput) => BuiltProp> = {
   'canyon-ledge': (i) => buildScarp('canyon', i),
   'hadal-scarp': (i) => buildScarp('hadal', i),
   'benthic-lander': buildBenthicLander,
+  dropstones: buildDropstones,
 };
 
 /** Build one geo feature; a missing `feature` gives a plain lumpy outcrop (tuff scarp). */

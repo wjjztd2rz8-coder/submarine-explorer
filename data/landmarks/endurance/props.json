@@ -62,6 +62,36 @@
       "reconstruction": true,
       "note": "Game addition: a second scatter of fallen spars, blocks and planks off the hull, after the debris field Endurance22 reported around the wreck; position invented.",
       "wreck": "endurance-rigging"
+    },
+    {
+      "id": "dropstones-a",
+      "model": "procedural:geo",
+      "feature": "dropstones",
+      "lat": -68.739285,
+      "lon": -52.327642,
+      "snap_to_seabed": true,
+      "heading_deg": 20,
+      "scale": 1,
+      "dimensions_m": [26, 20, 6],
+      "lod_distance_m": 500,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "Game addition: pale ice-rafted dropstones on the mud, after the glacial-marine seabed of the Weddell Sea; position invented."
+    },
+    {
+      "id": "dropstones-b",
+      "model": "procedural:geo",
+      "feature": "dropstones",
+      "lat": -68.738917,
+      "lon": -52.327005,
+      "snap_to_seabed": true,
+      "heading_deg": 110,
+      "scale": 1,
+      "dimensions_m": [18, 16, 4],
+      "lod_distance_m": 500,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "Game addition: pale ice-rafted dropstones on the mud, after the glacial-marine seabed of the Weddell Sea; position invented."
     }
   ]
 }

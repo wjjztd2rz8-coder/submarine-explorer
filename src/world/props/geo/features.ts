@@ -13,6 +13,7 @@ export const GEO_FEATURES = [
   'canyon-ledge',
   'hadal-scarp',
   'benthic-lander',
+  'dropstones',
 ] as const;
 
 export type GeoFeatureId = (typeof GEO_FEATURES)[number];
