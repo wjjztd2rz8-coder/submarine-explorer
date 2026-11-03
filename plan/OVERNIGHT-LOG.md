@@ -3099,3 +3099,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-hunga-bank (Sonnet): darker talus apron and lit crest edge through a `cliff` field on the tuff scarp preset (no site branch); Hunga ~4.1, soft hill behind the crest unchanged. Updated tuff geometry hashes on purpose. gates.sh (smoke) green on branch and main, pushed. Claude week ~19.0% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-124 queued).
 - **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
+
+## 2026-11-03 15:07 CST headless run 335 (Claude): V-endurance-lit-foreground
+
+- Merged V-endurance-lit-foreground (Sonnet): new `dropstones` geo feature, two pale boulder clusters in the Endurance opening foreground (~3.8; grey, a little uniform). gates.sh (smoke) green. Queued brief 125 (verify dropstones). Claude week ~17% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-125 queued).
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
