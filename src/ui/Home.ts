@@ -31,7 +31,7 @@ export class Home {
   readonly globeSlot: HTMLDivElement;
   readonly sitesSlot: HTMLDivElement;
   readonly diveButton: HTMLButtonElement;
-  /** The Arcade / Realistic selector with Advanced above the menu (with a settings source). */
+  /** The Arcade / Realistic selector, Advanced beside the segments (with a settings source). */
   readonly modeSelector: ModeSelector | null;
   private readonly dailyCard: HTMLButtonElement;
   private readonly diveSitesButton: HTMLButtonElement;
@@ -114,7 +114,9 @@ export class Home {
     this.dailyCard.className = 'daily-card';
     this.dailyCard.hidden = true;
     menu.append(this.dailyCard);
-    this.modeSelector = gameplay ? new ModeSelector('is-home', gameplay) : null;
+    this.modeSelector = gameplay
+      ? new ModeSelector('is-home', gameplay, undefined, undefined, true)
+      : null;
     if (this.modeSelector) menu.append(this.modeSelector.root);
     entry('Journal', actions.journal);
     entry('Your sub', actions.subScreen);

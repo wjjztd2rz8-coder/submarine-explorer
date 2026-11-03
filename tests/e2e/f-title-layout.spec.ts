@@ -104,6 +104,18 @@ for (const viewport of VIEWPORTS) {
     const size = `${viewport.width}x${viewport.height}`;
     await page.screenshot({ path: `${shots}/home-${size}.png` });
 
+    // Side-by-side desktop: the whole menu sits inside the visible panel, so the last row
+    // (Controls) is on screen without scrolling. The reachability loop below scrolls, so it
+    // cannot catch clipping by itself.
+    if (viewport.width >= 960 && viewport.height >= 501) {
+      const menuFits = await page.evaluate(() => {
+        const menu = document.querySelector('.home-menu')!.getBoundingClientRect();
+        const body = document.querySelector('.home-body')!.getBoundingClientRect();
+        return menu.bottom <= body.bottom + 0.5 && body.bottom <= window.innerHeight;
+      });
+      expect(menuFits, `menu fits the visible panel at ${size}`).toBe(true);
+    }
+
     const noHScroll = await page.evaluate(
       () =>
         document.documentElement.scrollWidth <= window.innerWidth &&

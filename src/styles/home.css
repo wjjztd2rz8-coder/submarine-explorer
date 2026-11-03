@@ -287,8 +287,17 @@
   min-height: 48px;
   font-size: 16px;
 }
+.home-menu .mode-selector-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.home-menu .mode-selector-row .mode-segments {
+  flex: 1 1 auto;
+}
 .home-menu .mode-selector .mode-advanced-toggle {
   min-height: 48px;
+  align-self: center;
 }
 .home-menu .mode-selector .mode-advanced {
   max-height: none;
@@ -617,23 +626,6 @@
   }
   .home-screen.has-sites .home-globe-wrap .globe-card {
     display: none;
-  }
-  /* The menu is one scroll column here: the Advanced toggle sits beside the mode segments
-     so Journal and Settings stay on screen. */
-  .home-menu .mode-selector {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 4px 8px;
-  }
-  .home-menu .mode-selector .mode-selector-label,
-  .home-menu .mode-selector .mode-desc,
-  .home-menu .mode-selector .mode-advanced {
-    grid-column: 1 / -1;
-  }
-  .home-menu .mode-selector .mode-advanced-toggle {
-    grid-column: 2;
-    grid-row: 2;
   }
   .home-menu {
     gap: 6px;
