@@ -218,20 +218,20 @@ const slope = (x: number, z: number) => 0.045 * x + 0.025 * z;
 // clipped depth extents. Placement and material contracts remain independent.
 const scarpBaseline: Record<string, string[]> = {
   'tuff-low': [
-    '9bbcb357b2a5505430ae998c6696a14b0fa633c4b778d41e475db22449c60a31',
+    '043499bafa3eada94c6c979a4d74acd59958354f0465303c484d5f1825a82a4c',
     '35d1d8379c8e2e838127d4afe3f3c6515f1f4a7157cb3b299862e1f415e358a0',
     '9a0255067cba24ebae01497072a0e9e4e544b768adadb0bdc85f8708b029d68a',
     '8f9deed2ba0979770c623965f7f3ca923f7a8dfe20ca9c56c999607f9fd92dc9',
   ],
   'tuff-medium': [
-    'd0082cb031873205c7834925bb38a7cee75d089e3868e52663a06a3a242b80f7',
-    '6c63ceceebaf4c33bb0d4c103e928f33bae679a6dfbfc216f9985de5e575e716',
+    '0802d829afad759db2037108e82eeaa35317b9fb08b1db2b7df17e05b2a390f8',
+    '4ee62fb8f8331b46f1820b2be89868152088d8e85e5d5c47f9ec9f0c02413b2e',
     'db463017008dfc3080e0e2a04c076c436c48c888dac7fb77670374f9fc0e6c92',
     'b8a241a2024ab47df60d542da7bc2802ad074587b724df9b49aa85588ae20426',
   ],
   'tuff-high': [
-    '554a00eb951bf3422ca1eafd5b06de9d111725e5cc30b0d5291819f85a92399a',
-    'ae54b2b639557b80c88fbe0041f7ced945b4d87bc7902abdbbbba28b3305241a',
+    '76efa284b9bf70cb8c5fdd7ab8375f11b8a5565b743251362243d4b2e1f04048',
+    'f342f4bb8571f2accc156aaef6a28173c17585ac93ad261a3a86b43083771cc4',
     'db463017008dfc3080e0e2a04c076c436c48c888dac7fb77670374f9fc0e6c92',
     '71ba2f4676e68e7c38277384e7d93f6df21bc59eb09cfaa1b7aaac5ab126cf25',
   ],
@@ -403,5 +403,46 @@ describe('escarpment crest', () => {
     for (const h of heights) expect(h).toBeGreaterThan(0.85);
     expect(new Set(heights.map((h) => h.toFixed(3))).size).toBeLessThanOrEqual(3);
     expect(wallEnvelope(0, 150, 0.75).edge).toBe(0);
+  });
+});
+
+describe('cliff read', () => {
+  // A preset with a cliff profile shades the apron at the wall base and lights the crest lip.
+  it('darkens the talus at the wall and lights the crest edge', () => {
+    const built = buildScarp('tuff', {
+      def: { raw: {} } as PropDef,
+      dims: [70, 26, 36],
+      seed: 17,
+      cfg: makeConfig().props,
+      tier: 'low',
+      groundHeight: () => undefined,
+    });
+    const meshes: THREE.Mesh[] = [];
+    built.full.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh && !(o as THREE.InstancedMesh).isInstancedMesh)
+        meshes.push(o as THREE.Mesh);
+    });
+    const mean = (mesh: THREE.Mesh, pick: (y: number, z: number) => boolean): number => {
+      const pos = mesh.geometry.attributes.position!;
+      const col = mesh.geometry.attributes.color!;
+      let sum = 0;
+      let n = 0;
+      for (let i = 0; i < pos.count; i++) {
+        if (!pick(pos.getY(i), pos.getZ(i))) continue;
+        sum += col.getX(i) + col.getY(i) + col.getZ(i);
+        n++;
+      }
+      return n ? sum / n : NaN;
+    };
+    const [wall, apron] = meshes;
+    const zs = Array.from(apron!.geometry.attributes.position!.array).filter((_, i) => i % 3 === 2);
+    const zMin = Math.min(...zs);
+    const zMax = Math.max(...zs);
+    const near = mean(apron!, (_y, z) => z > zMax - 0.15 * (zMax - zMin));
+    const far = mean(apron!, (_y, z) => z < zMin + 0.15 * (zMax - zMin));
+    expect(near).toBeLessThan(far);
+    expect(mean(wall!, (y) => y > 31 && y < 35.5)).toBeGreaterThan(
+      mean(wall!, (y) => y > 20 && y < 24),
+    );
   });
 });
