@@ -117,6 +117,21 @@
       "collision": "box",
       "reconstruction": true,
       "note": "Game addition: a smaller neighbouring Desmophyllum pertusum (Lophelia) mound, one of many in the Blake Plateau mound field; layout invented."
+    },
+    {
+      "id": "coral-mound-f",
+      "model": "procedural:geo",
+      "feature": "coral-mound",
+      "lat": 30.160788,
+      "lon": -79.790604,
+      "snap_to_seabed": true,
+      "heading_deg": 95,
+      "scale": 1,
+      "dimensions_m": [40, 26, 7],
+      "lod_distance_m": 900,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: a low Desmophyllum pertusum (Lophelia) mound with coral rubble on the approach, standing for the many small mounds of the Blake Plateau field; layout invented."
     }
   ]
 }
