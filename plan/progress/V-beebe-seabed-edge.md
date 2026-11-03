@@ -14,4 +14,4 @@ The navy band between seabed and horizon is gone; the water now lifts into teal 
 ## Gates
 
 - `tools/site-specs.sh beebe-vent-field`: 47 passed.
-- `PW_PORT=4931 tools/gates.sh`: see final report in the run log (result recorded below).
+- `PW_PORT=4931 tools/gates.sh`: all PASS (smoke + project-base).
