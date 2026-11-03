@@ -3074,3 +3074,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged U-tutorial-depth-skip (depth step skipped within 15 m) and U-home-720-fit (Advanced folded into Game mode row; Home fits 1280x720). gates.sh green on main, pushed. Left in backlog: U-phone-guidance-distance, U-phone-sheet-half. Claude week ~24% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-124 queued).
 - **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
+
+## 2026-11-03 09:01 CST headless run 330 (Claude): two U-* items
+
+- Merged U-phone-guidance-distance (Sonnet: "Marker N m ahead" after 20 s idle, same slot) and U-phone-sheet-half (Haiku: sheet starts at half height, "More options", full-width Surface and debrief). gates.sh (smoke) green on main. No screenshot review of the half sheet yet; hud-touch lost-city tutorial/hero-guidance specs fail on the base build too (hosted CI will show). Claude week ~23% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-124 queued).
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
