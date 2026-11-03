@@ -71,6 +71,8 @@ interface Preset {
   /** Vertex-colour light lift: [strength, tint, floor]. */
   glow?: { wall: [number, number, number]; rubble: [number, number, number] };
   decoration?: 'wall-life' | 'seeps';
+  /** Cliff read: how much darker the apron is at the wall base, and how much the crest edge is lit. */
+  cliff?: { talusShade: number; crestLit: number };
   tex: GeoTexKind;
   /** (y / H, z / D) control points from the apron join up and over the crest. */
   profile: [number, number][];
@@ -135,6 +137,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     bedding: 'regular',
     glow: { wall: [0.19, 0xb4b09a, 0.25], rubble: [0.35, 0xb4b09a, 0.45] },
     decoration: 'seeps',
+    cliff: { talusShade: 0.6, crestLit: 0.5 },
     tex: 'strata',
     profile: [
       [0.14, -0.2],
@@ -761,6 +764,8 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       if (!erodedBeds) out.lerp(P.drape, 0.22 * smooth(0.5, 0.75, bed));
     }
     out.lerp(P.crest, smooth(0.75, 1, y / H) * 0.6);
+    // A lit lip along the top edge separates the wall from the bank behind it.
+    if (P.cliff) out.multiplyScalar(1 + P.cliff.crestLit * smooth(0.9, 0.99, y / H));
     if (P.joints > 0) {
       const { crack } = jointOffset(x, P.joints, P.jointStep, seed);
       out.multiplyScalar(1 - 0.35 * crack);
@@ -835,6 +840,8 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       out.multiplyScalar(1 - 0.5 * smooth(0.5, 0.75, fbm3(x * 0.3, z * 0.3, 5, seed ^ 0x77, 3)));
     // Contact shading hugging the foot of the wall.
     out.multiplyScalar(0.82 + 0.18 * smooth(0, 0.25, u));
+    // Cliff: a dark talus apron at the wall base that fades out over the first 70% of its reach.
+    if (P.cliff) out.multiplyScalar(1 - P.cliff.talusShade * (1 - smooth(0, 0.7, u)));
   });
   apron.computeBoundingBox();
   const apronMat = geoMaterial('rock', d, { roughness: P.rough });
@@ -920,6 +927,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
         .lerp(P.base, 0.3)
         .lerp(P.drape, rnd() * 0.3 + 0.35 * spot.u)
         .multiplyScalar(0.85 + rnd() * 0.3);
+      if (P.cliff) c.multiplyScalar(1 - P.cliff.talusShade * (1 - smooth(0, 0.5, spot.u)));
       m.setMatrixAt(m.count, mat);
       m.setColorAt(m.count, c);
       m.count++;
