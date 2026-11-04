@@ -3174,3 +3174,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged Codex 135 (S-verify-phone-hud, test only: 26 catalog-wide phone cases, phone-accept spec 42/42 pass locally; no product defect found). gates.sh (smoke) green on main, pushed. 133 (blue-hole hood poses) has no progress note yet, 134 (framing metrics) still running; 124 and 131 still held. No Claude package: Claude week ~10% (reset Nov 5 06:00).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-04 07:54 CST headless run 349 (Claude): Codex collection
+
+- Merged Codex 133 (T-bluehole-hood-poses: three candidate hood poses, B preferred at 5.87 m clearance; intended 30% hood composition still unresolved) and 134 (T-framing-metrics: opening width/height/empty-sky table; worst sites Axial 0.9% width, Kamaehuakanaloa 8%, Blake 10%, Endurance 11.5%). Both tools/tests only. gates.sh (smoke) green on branch and main, pushed. Codex 136-138 (verify pose tools, progression bug hunt, audio/settings audit) launched. 124 and 131 still held.
+- No Claude package: Claude week ~9% (reset Nov 5 06:00); V-bluehole-opening-hood and V-lostcity-tower-scale are next after the reset.
+- **Needs owner:** phone retest (4410-P2 checklist).

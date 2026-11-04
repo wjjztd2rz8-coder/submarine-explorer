@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Codex 130-132 running or queued for dispatch (S-verify-opening-poses, R-ci-speed follow-up, S-fact-check-journal); 133-135 queued (T-bluehole-hood-poses, T-framing-metrics, S-verify-phone-hud). Claude lane: next is V-lostcity-tower-scale.
+- Codex 133-135 merged 2026-11-04; 136-138 queued (S-verify-pose-tools, S-bughunt-progression, S-verify-audio-settings). Claude lane: next is V-lostcity-tower-scale (waiting for Claude week reset Nov 5 06:00).
 
 ## Backlog
 
