@@ -3158,3 +3158,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Comprehensive review, Claude alone (Sol start exited 75, Codex 5h 6%). Stage ~92%. Scores: Beebe 4.1, Titanic 3.9, Lost City 3.9, Endurance 3.8, Monterey 3.7, Blue Hole 3.7, Bismarck 3.6. Backlog refilled (V-lostcity-tower-scale, V-bismarck-hull-scale, V-monterey-wall-clarity, V-bluehole-opening-hood, V-endurance-hull-scale); Codex briefs 133-135 queued; 14 DONE items archived. Tag f73 on af8fbce2 (CI green). No package started (Claude week ~10%, reset Nov 5).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-04 04:28 CST headless run 346 (Claude): Codex collection
+
+- Merged Codex 130 (S-verify-opening-poses) and 132 (S-fact-check-journal; corrections and unsupported claims logged in plan/progress/S-fact-check-journal.md). Main's unit tests were red (deepOpening: Endurance dropstones-a overlapped the wreck bounds on all tiers); fixed by moving that cluster ~14 m east (data only). gates.sh (smoke) green on main, pushed.
+- **Held: 131 (CI shard experiment)**: workflow_dispatch + fromJSON matrix, defaults unchanged, but untested on hosted CI; worktree kept for review. 124 also kept. No Claude package started (Claude week ~10%, reset Nov 5). Codex briefs 133-135 queued.
+- **Needs owner:** phone retest (4410-P2 checklist).
