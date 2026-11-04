@@ -3149,3 +3149,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-endurance-dropstone-tone (Sonnet, data only): free-dive pose higher/further so hull sits left of centre clear of the sub, dropstones in lower right (~3.8 → ~4.0; stones mid grey, one shape). gates.sh (smoke) green on branch and main, pushed. Claude week ~11% (reset Nov 5); Codex week refilled to 90% (reset Nov 11), briefs 120-125 queued for dispatch.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-04 02:38 CST run 344 addendum: Codex collection
+
+- Merged Codex 120 (T-opening-geometry tests), 121 (CI verify: green), 122 (S-dead second sweep, 25 unused UI exports), 123 and 125 (verification: no production bugs; dropstone test fixed for four clusters). Gates smoke green after fixing one stale count; pushed. **124 (R-ci-speed 19 shards x 2 workers) NOT merged**: unmeasured and may flake on SwiftShader; worktree kept; follow-up 131 queued as a manual-dispatch experiment. Queued 130-132. Findings: Axial and Endurance flag small objective height in the 120 geometry diagnostics.

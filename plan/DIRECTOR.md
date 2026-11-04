@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- No package running. Briefs 120-124 queued, waiting for the Nov 4 Codex reset. Claude lane: V-bismarck-framing, V-hudson-ledge, then U-play-walkthrough-3 and V-golden-refresh.
+- No package running. Briefs 130-132 queued (S-verify-opening-poses, R-ci-speed follow-up, S-fact-check-journal). Claude lane: V-hudson-ledge, then U-play-walkthrough-3 and V-golden-refresh.
 
 ## Backlog
 
@@ -101,9 +101,9 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 - **V-endurance-dropstone-tone [Sonnet] DONE 2026-11-04 (80e2795f, ~4.0; free-dive pose higher/further, stones moved lower-right; stones mid grey, one shape) (golden 2026-11-04, ~3.8):** dropstones are not visible in the opening frame; the sub sits over the hull and hides the stern. Target: hull left of centre with two pale lit stones in the lower-right, sub clear of the hull. Route: opening pose and stone placement data.
 - **V-axial-sky-band [Sonnet, optional] (golden 2026-11-04, Axial ~4.0):** upper third is still empty dark water above the ridge; add a faint far ridge or particle haze via the generic `fogHaze` horizon option.
 
-11. **R-ci-speed [Codex, queued 124]:** hosted CI takes 30+ min, so failures surface 1-2 runs late. Audit shard balance and slow specs; target under 20 min without dropping coverage.
+11. **R-ci-speed [Codex, 124 NOT merged 2026-11-04 (19x2 unmeasured, may flake); follow-up queued 131 as workflow_dispatch experiment]:** hosted CI takes 30+ min, so failures surface 1-2 runs late. Audit shard balance and slow specs; target under 20 min without dropping coverage.
     12a. **R-hud-touch-depth-skip [Haiku] DONE 2026-11-03 (merged):** hud-touch specs follow the depth-step skip (CI red from run 329).
-12. **Codex, queued 120-123, waiting for the Nov 4 reset:** T-opening-geometry (120), S-verify CI (121), S-dead second sweep (122), S-verify spawn cap (123).
+12. **Codex 120-123 DONE 2026-11-04 (merged, no production bugs; dead-code sweep 2 merged):** T-opening-geometry (120), S-verify CI (121), S-dead second sweep (122), S-verify spawn cap (123).
 13. **P2-phone-accept [owner + Codex; browser-checkable items automated in tests/e2e/phone-accept.spec.ts]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
 14. **R-release [Haiku]:** tag the latest green-CI main after each review (f71 is the newest, 2026-11-01); f72 tagged 2026-11-03 (c985a29c, CI green); next tag after the next review.
 
