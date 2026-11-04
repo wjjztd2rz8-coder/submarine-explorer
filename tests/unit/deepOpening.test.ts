@@ -1,7 +1,17 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { afterAll, describe, expect, it, vi } from 'vitest';
-import { Box2, InstancedMesh, Matrix4, Mesh, Raycaster, Triangle, Vector2, Vector3 } from 'three';
+import {
+  Box2,
+  Box3,
+  InstancedMesh,
+  Matrix4,
+  Mesh,
+  Raycaster,
+  Triangle,
+  Vector2,
+  Vector3,
+} from 'three';
 import { deepSiteWater, makeConfig } from '../../src/core/Config.js';
 import { siteManifest, type ApproachOpeningLife } from '../../src/core/SiteManifest.js';
 import {
@@ -205,6 +215,25 @@ describe('Challenger / Endurance opening', () => {
           expect(missionPose!.y).toBeGreaterThanOrEqual(
             (site === 'challenger-deep' ? -11000 : -6500) + config.submarine.hullRadius,
           );
+          // Non-colliding dressing must clear the visible sub and the entire hull
+          // approach, even though Props.collide deliberately ignores that dressing.
+          for (const stone of props.placed.filter((p) => p.def.feature === 'dropstones')) {
+            const stoneBounds = new Box3().setFromObject(stone.full);
+            expect(stoneBounds.isEmpty()).toBe(false);
+            expect(stoneBounds.intersectsBox(new Box3().setFromObject(hero.full))).toBe(false);
+            for (const opening of [pose, missionPose!]) {
+              const start = new Vector3(opening.x, opening.y, opening.z);
+              sub.setPose(start, opening.yaw, 0, 0);
+              sub.group.updateMatrixWorld(true);
+              const hull = new Box3().setFromObject(sub.vehicle.root);
+              const end = target.position.clone().setY(start.y).sub(start);
+              const sweptHull = hull.clone().union(hull.clone().translate(end)).expandByScalar(4);
+              expect(
+                sweptHull.intersectsBox(stoneBounds),
+                `${stone.def.id}: rendered stones clear the opening and swept hull with 4 m margin`,
+              ).toBe(false);
+            }
+          }
           if (hero.def.feature === 'benthic-lander') {
             // Dressing is outside the reported placement bounds: test the actual triangles.
             const openings = [
