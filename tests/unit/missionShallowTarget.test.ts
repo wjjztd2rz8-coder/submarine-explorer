@@ -25,3 +25,49 @@ it('a shallow first target still opens underwater, whatever the seabed detail do
     expect(pose!.y).toBeLessThanOrEqual(-settings.hullRadius);
   }
 });
+
+it('caps an unauthored shallow opening at the first target scan depth', () => {
+  const meta = JSON.parse(readFileSync('data/tiles/great-blue-hole/meta.json', 'utf8')) as TileMeta;
+  const settings = spawnSettings(makeConfig());
+  // Avoid site-authored openingDepthM: that could hide a broken scan-depth cap.
+  const site = 'shallow-target-fixture';
+  for (const minDepthM of [undefined, 10, 16]) {
+    const target = { position: { x: 0, y: -29.2, z: 0 }, minDepthM };
+    const pose = composedMissionSpawn(
+      site,
+      [target],
+      meta,
+      { sampleHeight: () => -29.2 },
+      { placed: [], collide: () => false } as never,
+      settings,
+      -300,
+    );
+    expect(pose, `minimum scan depth ${minDepthM}`).not.toBeNull();
+    expect(pose!.y).toBe(-Math.max(settings.hullRadius, minDepthM ?? 0));
+    expect(pose!.y + 29.2).toBeGreaterThanOrEqual(settings.hullRadius + settings.seabedClearance);
+    expect(Math.hypot(pose!.x, pose!.y - target.position.y, pose!.z)).toBeCloseTo(220, 6);
+  }
+});
+
+it('keeps the minimum hull gap when the scan-depth cap leaves too little water', () => {
+  const meta = JSON.parse(readFileSync('data/tiles/great-blue-hole/meta.json', 'utf8')) as TileMeta;
+  const settings = spawnSettings(makeConfig());
+  for (const floor of [-22, -21.9]) {
+    const pose = composedMissionSpawn(
+      'shallow-target-fixture',
+      [{ position: { x: 0, y: floor, z: 0 }, minDepthM: 10 }],
+      meta,
+      { sampleHeight: () => floor },
+      { placed: [], collide: () => false } as never,
+      settings,
+      -300,
+    );
+    if (floor === -22) {
+      expect(pose).not.toBeNull();
+      expect(pose!.y).toBe(-10);
+      expect(pose!.y - floor).toBe(settings.hullRadius + settings.seabedClearance);
+    } else {
+      expect(pose).toBeNull();
+    }
+  }
+});
