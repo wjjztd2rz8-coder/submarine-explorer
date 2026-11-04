@@ -62,6 +62,36 @@ exports[`authored prop geometry golden > axial-seamount-ashes high: retains buff
     "placement": "4d07b0e14f99b24371825b473d2500522a45121a7b3ffa6126d6cc0e233d72f1",
     "ventTop": 6.388528390240593,
   },
+  {
+    "budget": {
+      "draws": 5,
+      "triangles": 34044,
+    },
+    "buffers": "734f5da325f3f4a478a8997f86d6bdc6a4c28b8b37156d302377b61a219ff249",
+    "id": "ashes-outlier-1",
+    "placement": "f78bf8345aaca0c868fcbc6ba7b119fb5284a91f6623a2a33fc114c206e4afad",
+    "ventTop": 10.384229480129441,
+  },
+  {
+    "budget": {
+      "draws": 5,
+      "triangles": 33480,
+    },
+    "buffers": "4cfa1febfcbd4dcbe83e3389df6995f4c7742a731b99abf257e7d405b5317cf8",
+    "id": "ashes-outlier-2",
+    "placement": "393c5cfcc3b55950b945ba28302e59b318943f8c409b2f8489bdb18071bf4972",
+    "ventTop": 8.169270319346706,
+  },
+  {
+    "budget": {
+      "draws": 5,
+      "triangles": 29368,
+    },
+    "buffers": "8878feabf809df897fd4f759fc70fe124f898c53ed4eb2e7a55763d6b56133af",
+    "id": "ashes-outlier-3",
+    "placement": "cbed505ce7b2cd604bc47f3bdb98291340487fb473025cfc6cbf69984360c961",
+    "ventTop": 6.877974854831019,
+  },
 ]
 `;
 
@@ -127,6 +157,36 @@ exports[`authored prop geometry golden > axial-seamount-ashes low: retains buffe
     "placement": "4d07b0e14f99b24371825b473d2500522a45121a7b3ffa6126d6cc0e233d72f1",
     "ventTop": 6.388528390240593,
   },
+  {
+    "budget": {
+      "draws": 5,
+      "triangles": 7902,
+    },
+    "buffers": "cbd9edd6e09f9b69c5744303191aaec3a85e8c691721a66aa06dfa782b8a3a7a",
+    "id": "ashes-outlier-1",
+    "placement": "f78bf8345aaca0c868fcbc6ba7b119fb5284a91f6623a2a33fc114c206e4afad",
+    "ventTop": 10.384229480129441,
+  },
+  {
+    "budget": {
+      "draws": 5,
+      "triangles": 7614,
+    },
+    "buffers": "475ee138db93ddae400cc725a5173cbd97459ae9f9b06cefe714bba0b5946efa",
+    "id": "ashes-outlier-2",
+    "placement": "393c5cfcc3b55950b945ba28302e59b318943f8c409b2f8489bdb18071bf4972",
+    "ventTop": 8.169270319346706,
+  },
+  {
+    "budget": {
+      "draws": 5,
+      "triangles": 6850,
+    },
+    "buffers": "98a396ac0f0c810b146e36274b4b06b65f434d10b51757565559437c424384ee",
+    "id": "ashes-outlier-3",
+    "placement": "cbed505ce7b2cd604bc47f3bdb98291340487fb473025cfc6cbf69984360c961",
+    "ventTop": 6.877974854831019,
+  },
 ]
 `;
 
@@ -191,6 +251,36 @@ exports[`authored prop geometry golden > axial-seamount-ashes medium: retains bu
     "id": "ashes-smoker-mound",
     "placement": "4d07b0e14f99b24371825b473d2500522a45121a7b3ffa6126d6cc0e233d72f1",
     "ventTop": 6.388528390240593,
+  },
+  {
+    "budget": {
+      "draws": 5,
+      "triangles": 17826,
+    },
+    "buffers": "0a17fb314f495e611ff2795cb0dc93bc87cfd301bf65b061b918cfec636e9527",
+    "id": "ashes-outlier-1",
+    "placement": "f78bf8345aaca0c868fcbc6ba7b119fb5284a91f6623a2a33fc114c206e4afad",
+    "ventTop": 10.384229480129441,
+  },
+  {
+    "budget": {
+      "draws": 5,
+      "triangles": 17466,
+    },
+    "buffers": "aa004901a8b3715a19a184c72a7285411b35a39ae3523769e122b97c84b82196",
+    "id": "ashes-outlier-2",
+    "placement": "393c5cfcc3b55950b945ba28302e59b318943f8c409b2f8489bdb18071bf4972",
+    "ventTop": 8.169270319346706,
+  },
+  {
+    "budget": {
+      "draws": 5,
+      "triangles": 15430,
+    },
+    "buffers": "282efccae0621567fb70af2a142ede3d7a425485a66b3921cd1098f62b71bb70",
+    "id": "ashes-outlier-3",
+    "placement": "cbed505ce7b2cd604bc47f3bdb98291340487fb473025cfc6cbf69984360c961",
+    "ventTop": 6.877974854831019,
   },
 ]
 `;
