@@ -55,6 +55,9 @@ without an entry here is not done.
 
 ### Removed
 
+- **S-dead second sweep:** remove 25 unused UI exports (private options, helper types and local constants/functions); their local implementations and consumed exports remain.
+- **S-dead second sweep:** delete guidance's unread `fadeMs` tuning field and the unproduced `.mission-badge.is-available` selector; guidance timing and live mission badges are unchanged.
+
 - **S-dead sweep:** delete the uncalled wreck `plate` wrapper and its exclusive `strut` import; no builder uses it.
 - **S-dead sweep:** remove unused settings, Journal compatibility, vehicle, life-model, geology and wreck re-exports; their live declarations and direct consumers remain.
 

@@ -45,7 +45,7 @@ const DEFAULT_WARN: HudWarnConfig = {
 };
 
 /** Per-frame context the physics snapshot does not carry. */
-export interface HudContext {
+interface HudContext {
   /** A scan target is within its scan radius: suppress the static proximity warning. */
   nearScanTarget?: boolean;
   simSpeed?: number;

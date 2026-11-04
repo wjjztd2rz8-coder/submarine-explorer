@@ -293,10 +293,6 @@
   white-space: nowrap;
 }
 
-.mission-badge.is-available {
-  color: var(--b3-cyan);
-}
-
 .mission-item-summary {
   display: -webkit-box;
   -webkit-line-clamp: 2;

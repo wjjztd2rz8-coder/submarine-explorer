@@ -1,13 +1,13 @@
 import { FocusTrap } from './FocusTrap.js';
 
-export interface PauseObjective {
+interface PauseObjective {
   title: string;
   hint: string;
   complete: boolean;
   primary: boolean;
 }
 
-export interface PauseActions {
+interface PauseActions {
   resume(): void;
   journal(): void;
   subScreen(): void;
