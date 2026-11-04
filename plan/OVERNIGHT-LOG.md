@@ -3134,3 +3134,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Comprehensive review, Claude alone (Sol skipped: Codex week 3% until Nov 4 00:45). Stage ~91%. Backlog refilled (V-bismarck-framing next, V-bluehole-pitchup, V-endurance-dropstone-tone, V-hudson-ledge, V-axial-sky-band); REVIEWS.md and STATUS.md updated and pushed. No package started (Claude week ~16%, reset Nov 5). Codex briefs 120-125 queued.
 - **Needs owner:** phone retest (4410-P2 checklist); Blue Hole pitch-up now the default unless overruled.
+
+## 2026-11-03 22:39 CST headless run 342 (Claude): V-bismarck-framing
+
+- Merged V-bismarck-framing (Sonnet): opening yaw 25→8, snow/haze thinned via mission data, wreck preset now honours `snowScale` (generic, no site branch). Bismarck ~3.5 → ~3.8-3.9; hull still ~quarter width, boulders unchanged. gates.sh (smoke) green on branch and main. Claude week ~15% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-125 queued).
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole pitch-up is the default unless overruled.
