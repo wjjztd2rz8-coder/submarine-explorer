@@ -7,7 +7,7 @@
       "id": "overview",
       "title": "Endurance: Shackleton's polar ship",
       "paragraphs": [
-        "Endurance carried Sir Ernest Shackleton's Imperial Trans-Antarctic Expedition into the Weddell Sea in 1914-15. Construction began in 1911 at the Framnæs yard in Sandefjord, Norway. Launched as Polaris on 17 December 1912, she was a three-masted barquentine reinforced for polar ice. Shackleton bought and renamed her in January 1914. Pack ice closed around her in January 1915, and after ten months drifting, beset, the ice finally crushed her hull. Captain Frank Worsley recorded her sinking position on 21 November 1915. All 28 men aboard survived; they camped on the drifting ice and eventually reached Elephant Island, from where Shackleton and five others made the 1,300 km open-boat journey to South Georgia for rescue.",
+        "Endurance carried Sir Ernest Shackleton's Imperial Trans-Antarctic Expedition into the Weddell Sea in 1914-15. Construction began in 1911 at the Framnæs yard in Sandefjord, Norway. Launched as Polaris on 17 December 1912, she was a three-masted barquentine reinforced for polar ice. The Conservation Management Plan dates Shackleton’s purchase and renaming to 25 March 1914. Pack ice closed around her in January 1915, and after ten months drifting, beset, the ice finally crushed her hull. Captain Frank Worsley recorded her sinking position on 21 November 1915. All 28 men aboard survived; they camped on the drifting ice and eventually reached Elephant Island, from where Shackleton and five others made the 1,300 km open-boat journey to South Georgia for rescue.",
         "The wreck was found on 5 March 2022 by the Endurance22 expedition, organised by the Falklands Maritime Heritage Trust (FMHT) aboard the South African polar vessel S.A. Agulhas II -- exactly 100 years to the day after Shackleton was buried at Grytviken, South Georgia. She lies 3,008 m deep in the Weddell Sea, within the search area the team had defined before departure. The expedition found her upright, with much of her hull and fittings preserved.",
         "The wreck had already been designated a protected Historic Site and Monument (HSM No. 93) under the Antarctic Treaty System in 2019, three years before anyone knew exactly where she lay. The UK Antarctic Heritage Trust (UKAHT), working with Historic England, now leads the Conservation Management Plan for the site.",
         "This tile uses GMRT's coarser GEBCO-derived grid, smoothing small features. Endurance22's published imagery shows the 44 m ship in much finer detail; the Conservation Management Plan describes soft mud with pockmarks, small mounds and occasional dropstones around the site."
@@ -313,13 +313,13 @@
       "id": "abyssal-plain",
       "title": "A very flat piece of ocean floor",
       "paragraphs": [
-        "Away from the wreck, this part of the Weddell Sea floor is remarkably featureless: across the whole ~70 x 33 km tile the terrain ranges only from about 2,915 m to 3,096 m, a relief of under 200 m. Two kilometres west of the wreck the seabed is about 2,988 m deep, a gentle 12 m rise from the 3,000 m reading at the wreck itself.",
+        "Away from the wreck, this part of the Weddell Sea floor is remarkably featureless: across the whole ~27 x 33 km tile the terrain ranges only from about 2,915 m to 3,096 m, a relief of under 200 m. Two kilometres west of the wreck the seabed is about 2,988 m deep, a gentle 12 m rise from the 3,000 m reading at the wreck itself.",
         "The deep Weddell Sea plain lies far from ridges and canyons. The coarser GEBCO-derived grid used here also smooths seabed features smaller than a few kilometres."
       ],
       "facts": [
         {
           "label": "Tile relief",
-          "value": "≈ 2,915–3,096 m (< 200 m across ~70 x 33 km)"
+          "value": "≈ 2,915–3,096 m (< 200 m across ~27 x 33 km)"
         },
         {
           "label": "2 km west of the wreck",

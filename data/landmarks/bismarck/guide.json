@@ -8,7 +8,7 @@
       "title": "Bismarck: the last battle",
       "paragraphs": [
         "Bismarck was one of the largest battleships ever built by Germany, commissioned in August 1940. In May 1941 she sailed into the North Atlantic with the heavy cruiser Prinz Eugen on Operation Rheinubung, a commerce raid intended to disrupt Allied shipping. The Royal Navy intercepted her, opening a three-day pursuit that became one of the most famous naval actions of the Second World War.",
-        "On 24 May 1941, at the Battle of the Denmark Strait, Bismarck and Prinz Eugen engaged HMS Hood and HMS Prince of Wales. Hood was destroyed in minutes, with all but three of her 1,419 crew lost; Bismarck took damage that forced her to abandon the raid and head for occupied France for repairs. Swordfish torpedo bombers from HMS Victorious and, on 26 May, from HMS Ark Royal found and struck her; a torpedo hit near the stern jammed her rudders, leaving her unable to steer clear of the pursuing British fleet. On the morning of 27 May, HMS King George V and HMS Rodney closed in and bombarded her for almost two hours. With the ship ablaze, listing, and unable to fight back, her crew opened the sea cocks and detonated scuttling charges; she sank, stern-first, at roughly 10:40. Of her crew of 2,221, only around 114 were rescued -- most by HMS Dorsetshire and HMS Maori, who broke off the rescue early on report of a U-boat sighting.",
+        "On 24 May 1941, at the Battle of the Denmark Strait, Bismarck and Prinz Eugen engaged HMS Hood and HMS Prince of Wales. Hood was destroyed in minutes, with all but three of her 1,418 crew lost; Bismarck took damage that forced her to abandon the raid and head for occupied France for repairs. Swordfish torpedo bombers from HMS Victorious and, on 26 May, from HMS Ark Royal found and struck her; a torpedo hit near the stern jammed her rudders, leaving her unable to steer clear of the pursuing British fleet. On the morning of 27 May, HMS King George V and HMS Rodney closed in and bombarded her for almost two hours. With the ship ablaze, listing, and unable to fight back, her crew opened the sea cocks and detonated scuttling charges; she sank, stern-first, at roughly 10:40. Of her crew of 2,221, only around 114 were rescued -- most by HMS Dorsetshire and HMS Maori, who broke off the rescue early on report of a U-boat sighting.",
         "Robert Ballard’s team found the wreck on 8 June 1989. Later expeditions documented the hull, detached structures and debris with submersibles and remotely operated vehicles.",
         "Published surveys place Bismarck at about 4,790 m. This dive uses the 2001 expedition’s published vicinity, where the terrain grid reads about 4,219 m. The roughly 570 m gap between that grid and the survey remains unresolved; the hull stays on the seabed shown here."
       ],
@@ -35,7 +35,7 @@
         },
         {
           "label": "Protection",
-          "value": "war grave; treated as such by every expedition"
+          "value": "treated as a war grave"
         }
       ],
       "reconstruction": true,
@@ -55,6 +55,10 @@
         {
           "title": "Who Sank the Bismarck? — U.S. Naval Institute Proceedings, June 1991",
           "url": "https://www.usni.org/magazines/proceedings/1991/june/who-sank-bismarck"
+        },
+        {
+          "title": "H.M.S. Hood Association — verified casualty rolls (1,415 lost, three survivors)",
+          "url": "https://www.hmshood.org.uk/crew/database/Verification%20of%20details%20of%20Casualties.pdf"
         }
       ],
       "confidence": "high"
@@ -136,6 +140,10 @@
         {
           "title": "vROV Pilot: Bismarck — Magellan",
           "url": "https://www.magellan.gg/vrov-pilot-bismarck/"
+        },
+        {
+          "title": "H.M.S. Hood Association / David Mearns — 2001 expedition wreck observations",
+          "url": "https://www.hmshood.org.uk/hoodtoday/2001expedition/bismarck/encrypt.htm"
         }
       ],
       "confidence": "low"
@@ -250,7 +258,7 @@
         },
         {
           "label": "Status",
-          "value": "treated as a war grave by every expedition"
+          "value": "treated as a war grave"
         }
       ],
       "reconstruction": false,

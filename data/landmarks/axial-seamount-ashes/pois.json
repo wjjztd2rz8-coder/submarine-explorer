@@ -19,7 +19,7 @@
         "https://oceanobservatories.org/site/rs03ashs/",
         "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"
       ],
-      "note": "Coordinate is the OOI RS03ASHS site position (45.9337 N, -130.0139 W, 1,552 m per OOI; this tile's grid reads 1,540.1 m at that point, within GMRT's ~43x61 m cell resolution). Interactive Oceans states the CAMHDS301 HD camera sits at Mushroom, so this is Mushroom's own monitored position, not an approximation. Mushroom is described as ~4 m tall with orifice temperatures over 275 degC and largely unchanged in size since the late 1980s; depth_m is set 4 m above the seabed reading. The chimney itself is a placed reconstruction: the field (about 2,826 sq m, per Wikipedia) is about the area of one grid cell, so no individual chimney is resolved in the real terrain."
+      "note": "OOI's RS03ASHS platform reference is 45.9337 N, -130.0139 W at 1,552 m; it is used here as the Mushroom marker's reference, not an independently surveyed chimney coordinate. The local grid reads 1,540.1 m. Mushroom is about 4 m tall with fluids over 275 degC. UW describes most ASHES activity within an area 60-80 m across. Individual chimney geometry is a reconstruction."
     },
     {
       "id": "axial-ashes-inferno",
@@ -54,7 +54,7 @@
       "confidence": "low",
       "reconstruction": true,
       "sources": ["https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"],
-      "note": "Hell, Phoenix and Virgin are real named ASHES structures, generally under 4 m tall with several narrow discharge orifices each (UW Interactive Oceans); Virgin Mound is a separate sub-metre anhydrite spire venting some of the caldera's most CO2-rich fluid. None has a published coordinate, so this POI is placed illustratively about 40 m from Mushroom, within the field's roughly 2,826 sq m extent (Wikipedia), representing the field's smaller chimneys as a cluster rather than three separate points."
+      "note": "Hell, Phoenix and Virgin are documented ASHES chimneys, generally under 4 m tall. Virgin Mound is a separate sub-metre anhydrite spire. This smaller-chimney marker's grouping and offset are authored choices; UW describes most field activity within an area about 60-80 m across."
     },
     {
       "id": "axial-caldera-wall",

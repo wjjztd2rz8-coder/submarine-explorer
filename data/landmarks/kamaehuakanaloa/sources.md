@@ -1,5 +1,12 @@
 # Kama'ehuakanaloa content: sources and notes (package C4, kamaehuakanaloa)
 
+## S-fact-check-journal — 2026-11-04
+
+The current audit, sourced corrections, coordinate and grid checks, and unresolved
+claims are recorded in [S-fact-check-journal](../../../plan/progress/S-fact-check-journal.md).
+That audit supersedes conflicting historical notes below. Existing Journal provenance
+tags identify scene additions once per entry.
+
 Researched 2026-09-23. Files: `pois.json`, `guide.json`, `props.json`, `mission.json`,
 `species.json` in this folder. Tile: `data/tiles/kamaehuakanaloa` (GMRT Synthesis, Ryan et al.
 2009, doi:10.1029/2008GC002332; bbox N 19.06694 / S 18.76646 / E -155.10718 / W -155.42578;

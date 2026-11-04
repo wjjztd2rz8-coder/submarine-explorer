@@ -16,7 +16,7 @@
       "lod_distance_m": 500,
       "collision": "box",
       "reconstruction": true,
-      "note": "Game reconstruction: an enlarged cluster standing in for Hiolo North's iron-oxide-draped, low-temperature venting (~1,300 m, ~20-40 degC fluids). The existing smoker-cluster feature supplies the silhouette and plume; its roughly 9 m tallest stack exceeds the earlier 5 m art cap and is not a surveyed Hiolo structure or evidence of black-smoker sulfides. Layout and size are invented. The basalt material hint retains the iron-stained palette."
+      "note": "Game reconstruction: an enlarged cluster standing in for Hiolo North's iron-oxide-draped, low-temperature venting (~1,300 m, ~40 degC mean fluids in Sylvan et al. 2017). The existing smoker-cluster feature supplies the silhouette and plume; its roughly 9 m tallest stack exceeds the earlier 5 m art cap and is not a surveyed Hiolo structure or evidence of black-smoker sulfides. Layout and size are invented. The basalt material hint retains the iron-stained palette."
     },
     {
       "id": "hiolo-north-chimney-2",

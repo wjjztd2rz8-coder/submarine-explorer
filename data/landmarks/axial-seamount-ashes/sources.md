@@ -1,5 +1,12 @@
 # Axial Seamount / ASHES content: sources and notes (package C4d)
 
+## S-fact-check-journal — 2026-11-04
+
+The current audit, sourced corrections, coordinate and grid checks, and unresolved
+claims are recorded in [S-fact-check-journal](../../../plan/progress/S-fact-check-journal.md).
+That audit supersedes conflicting historical notes below. Existing Journal provenance
+tags identify scene additions once per entry.
+
 ## Phase F factual corrections — 2026-10-01
 
 - [UW/OOI ASHES description](https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes/) documents clear fluid and active black-smoker chimlets at Mushroom. A clear-Mushroom/dark-Inferno split is not an exclusive factual rule; no discharge geometry was changed here.
