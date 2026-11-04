@@ -369,7 +369,7 @@ describe('dropstone buffers and terrain grounding', () => {
 
   for (const tier of ['low', 'medium', 'high']) {
     it(`${tier}: repeats all buffers, bounds and colliders on flat and sloped ground`, () => {
-      expect(definitions).toHaveLength(2);
+      expect(definitions).toHaveLength(4);
       for (const def of definitions) {
         for (const slope of [0, 0.15]) {
           const source = JSON.stringify(def);
