@@ -3144,3 +3144,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged V-bluehole-pitchup (Sonnet, data only): Blue Hole free-dive pose now looks up at the hood, stalactites visible (~3.85 → ~4.0); still reads as an outcrop ahead, lower half dark. Mission-opening route check untouched. gates.sh (smoke) green on branch and main, pushed. Claude week ~14% (reset Nov 5); Codex reset Nov 4 00:45, briefs 120-125 queued for dispatch.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-04 02:25 CST headless run 344 (Claude): V-endurance-dropstone-tone
+
+- Merged V-endurance-dropstone-tone (Sonnet, data only): free-dive pose higher/further so hull sits left of centre clear of the sub, dropstones in lower right (~3.8 → ~4.0; stones mid grey, one shape). gates.sh (smoke) green on branch and main, pushed. Claude week ~11% (reset Nov 5); Codex week refilled to 90% (reset Nov 11), briefs 120-125 queued for dispatch.
+- **Needs owner:** phone retest (4410-P2 checklist).
