@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- No package running. Briefs 120-124 queued, waiting for the Nov 4 Codex reset. Claude lane: V-axial-subject, V-bismarck-framing, V-hudson-ledge, then U-play-walkthrough-3 and V-golden-refresh.
+- No package running. Briefs 120-124 queued, waiting for the Nov 4 Codex reset. Claude lane: V-bismarck-framing, V-hudson-ledge, then U-play-walkthrough-3 and V-golden-refresh.
 
 ## Backlog
 
@@ -92,7 +92,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 - **U-tutorial-depth-skip [Haiku] DONE 2026-11-03 (merged):** skip tutorial step 2 (Space/Ctrl depth) when the target is within ~15 m of current depth (Beebe).
 - **U-phone-guidance-distance [Sonnet] DONE 2026-11-03 (merged, c779dc59):** phone guidance stays "Drag to follow the marker." for 60 s; after ~20 s idle show "Marker N m ahead" in the same slot.
 - **U-phone-sheet-half [Haiku] DONE 2026-11-03 (merged, c779dc59):** phone site sheet should start at half height so the globe is visible; also rename debrief "More" and make pause "Surface and debrief" full width.
-- **V-axial-subject [Sonnet] (golden 2026-11-03, Mushroom opening ~3.6):** vents and plumes are a small cluster in the middle of a huge dark blue slope with a wide empty sky band. Same pattern as Kama: add two or three outlying vent clusters and a larger glow pool as data, and drop the opening pose lower so the slope is a lit edge. Target: vent field fills the lower-centre third.
+- **V-axial-subject [Sonnet] DONE 2026-11-04 (9a9bf175, ~4.0-4.1; three outlier vent clusters, data only; sky band still empty) (golden 2026-11-03, Mushroom opening ~3.6):** vents and plumes are a small cluster in the middle of a huge dark blue slope with a wide empty sky band. Same pattern as Kama: add two or three outlying vent clusters and a larger glow pool as data, and drop the opening pose lower so the slope is a lit edge. Target: vent field fills the lower-centre third.
 - **V-bismarck-framing [Sonnet] (golden 2026-11-03, ~3.5):** main hull is small, low-left and half off-frame; dense marine-snow bokeh covers the lower right and the foreground boulders are big and grey. Target: hull centred and filling a third of the width, snow thinned to a few motes. Route: opening pose data plus the snow density preset, not a site branch.
 - **V-hudson-ledge [Sonnet] (golden 2026-11-03, ~3.8):** coral heads are lit and readable but the top 40% is plain dark water. Target: a horizon wall or ledge lip in the upper third (generic `cliff` field, as Hunga). Lowest priority of the three.
 - **U-play-walkthrough-3 [Haiku, after the next phone retest]:** re-run the first-60-s capture (Home, site pick, briefing, first scan, debrief) at 1280x720 and 390x844 and list confusions in `plan/progress/`; file each as a U-* item.

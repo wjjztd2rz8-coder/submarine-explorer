@@ -3124,3 +3124,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Targeted review (trigger: 3 empty runs). Refilled the Claude backlog from golden 2026-11-03: V-axial-subject, V-bismarck-framing, V-hudson-ledge, U-play-walkthrough-3, V-golden-refresh. No package started (Claude week ~17%, reset Nov 5); Codex briefs 120-125 still wait for Nov 4.
 - **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
+
+## 2026-11-03 21:38 CST headless run 340 (Claude): V-axial-subject
+
+- Merged V-axial-subject (Sonnet, data only): three outlying vent clusters flank the Mushroom group (~4.0-4.1; sky band still empty). gates.sh (smoke) green on branch and main, pushed. Claude week ~16% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-125 queued).
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
