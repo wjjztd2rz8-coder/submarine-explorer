@@ -186,10 +186,10 @@
       "id": "axial-seamount-ashes",
       "name": "Axial Seamount / ASHES Vent Field",
       "type": "vent",
-      "lat": 45.95,
-      "lon": -130.0089,
-      "depth_m": 1530,
-      "depth_range_m": [1400, 1550],
+      "lat": 45.9337,
+      "lon": -130.0139,
+      "depth_m": 1552,
+      "depth_range_m": [1410, 1552],
       "bbox": {
         "north": 46.02,
         "south": 45.88,
@@ -199,7 +199,7 @@
       "region": "Juan de Fuca Ridge, NE Pacific",
       "country_eez": "international waters",
       "confidence": "high",
-      "coordinate_source": "https://en.wikipedia.org/wiki/Axial_Seamount",
+      "coordinate_source": "https://oceanobservatories.org/site/rs03ashs/",
       "summary": "The most active submarine volcano on the Juan de Fuca Ridge, hosting the ASHES vent field within its caldera; instrumented by the Ocean Observatories Initiative Regional Cabled Array for real-time eruption monitoring.",
       "facts": [
         "Erupted in 1998, 2011, and 2015; monitored for future eruptions",
@@ -215,9 +215,11 @@
       "notable_species": ["tubeworms", "limpets", "palm worms"],
       "external_links": [
         "https://en.wikipedia.org/wiki/Axial_Seamount",
-        "https://interactiveoceans.washington.edu/"
+        "https://interactiveoceans.washington.edu/",
+        "https://oceanobservatories.org/site/rs03ashs/"
       ],
-      "wreck_meta": null
+      "wreck_meta": null,
+      "coordinate_note": "OOI RS03ASHS platform reference for the ASHES vent field, 1,552 m published depth; the local terrain grid reads about 1,540 m. This is a field reference, not a surveyed coordinate for each chimney."
     },
     {
       "id": "guaymas-basin",
@@ -706,7 +708,7 @@
       "summary": "An active submarine shield volcano rising over 3,000 m from the seafloor southeast of the Big Island of Hawaii; the presumed next Hawaiian island in the making.",
       "facts": [
         "Renamed from Lo'ihi to Kama'ehuakanaloa in 2021, honoring Hawaiian tradition",
-        "Summit lies about 975 m below sea level, could breach the surface in tens of thousands of years",
+        "Summit lies about 975 m below sea level; emergence timing is uncertain and depends on future eruption rates",
         "Hosts active hydrothermal venting and iron-oxidizing microbial mats",
         "Experienced a major seismic swarm and collapse event in 1996"
       ],
@@ -716,7 +718,10 @@
       ],
       "hazards": ["volcanic activity", "seismic swarms", "acidic vent fluids"],
       "notable_species": ["iron-oxidizing bacteria mats", "hydroid colonies"],
-      "external_links": ["https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount"],
+      "external_links": [
+        "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount",
+        "https://www.usgs.gov/volcanoes/loihi-seamount"
+      ],
       "wreck_meta": null
     },
     {

@@ -6,9 +6,9 @@
       "id": "overview",
       "title": "Kama'ehuakanaloa",
       "paragraphs": [
-        "Kama'ehuakanaloa is an active submarine shield volcano about 30 km (20 miles) off the southeast shore of the island of Hawai'i -- the youngest volcano in the Hawaiian chain, and the only one still entirely underwater. It rises more than 3,000 m (10,000 ft) from the surrounding seafloor, taller than Mount St. Helens stood before its 1980 eruption, yet its summit still sits under roughly 975-1,000 m of water: this tile's shallowest sounded point reads -975.2 m, right at the published figure.",
-        "Two rift zones radiate from the summit: a shorter, roughly 7-mile-long north rift, and a longer, roughly 12-mile-long south rift that hosts most of the volcano's recent lava flows and virtually all of its hydrothermal venting. At current growth rates scientists estimate Kama'ehuakanaloa could breach the sea surface and become Hawai'i's newest island in another 10,000 to 100,000 years.",
-        "This tile covers the volcano's summit and upper south rift; it does not reach the volcano's base or the north rift."
+        "Kama'ehuakanaloa is an active submarine volcano about 30 km off the southeast shore of the island of Hawai'i, and the youngest volcano in the Hawaiian chain. Its summit remains roughly 975-1,000 m below sea level; this tile's shallowest grid cell reads about 975.2 m.",
+        "Rift zones extend northwest and southeast from the summit, forming a volcanic ridge about 31 km long. Its emergence as a new island depends on future eruption rates; USGS gives a speculative estimate of as much as 200,000 years.",
+        "This mission visits summit terrain and follows the upper south rift."
       ],
       "facts": [
         {
@@ -16,16 +16,16 @@
           "value": "~975-1,000 m"
         },
         {
-          "label": "Height above surrounding seafloor",
-          "value": ">3,000 m (10,000 ft)"
+          "label": "Rift system length",
+          "value": "~31 km (USGS)"
         },
         {
-          "label": "North rift / south rift length",
-          "value": "~7 mi / ~12 mi"
+          "label": "Time to reach sea level",
+          "value": "uncertain; USGS speculates as much as 200,000 years"
         },
         {
-          "label": "Projected time to breach the surface",
-          "value": "~10,000-100,000 years"
+          "label": "Volcano reference position (USGS)",
+          "value": "18.92°N, 155.27°W"
         }
       ],
       "reconstruction": false,
@@ -41,6 +41,10 @@
         {
           "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332 (value read directly from this tile's grid)",
           "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "USGS Hawaiian Volcano Observatory — Kama‘ehuakanaloa overview",
+          "url": "https://www.usgs.gov/volcanoes/loihi-seamount"
         }
       ],
       "confidence": "high"
@@ -83,22 +87,18 @@
       "id": "peles-pit",
       "title": "Pele's Pit: the 1996 collapse",
       "paragraphs": [
-        "In July and early August 1996, Kama'ehuakanaloa produced the largest earthquake swarm ever recorded at any Hawaiian volcano -- thousands of quakes over about two weeks. The seismic crisis accompanied a collapse of the volcano's summit: 'Pele's Vents,' until then the volcano's main hydrothermal site at about 980 m depth, dropped away entirely, leaving a new pit crater roughly 600 m across and about 300 m deep, since named Pele's Pit. Its walls stand about 700 feet (210 m) high and are unusually thick -- about 70 feet (21 m) -- suggesting the crater rim has been built up by repeated lava flows over a long history, not created in a single event.",
+        "More than 4,000 earthquakes were recorded between 16 July and 9 August 1996 during Kama'ehuakanaloa's most intense recorded swarm. Summit collapse formed Pele's Pit, about 600 m across, with its floor about 300 m below the previous surface, destroying the earlier summit vent site.",
         "Hydrothermal venting did not stop after the collapse; it moved and changed. Diffuse ~30 degC vents that had existed on the pre-collapse summit gave way, within Pele's Pit itself, to much hotter fluids -- around 80 degC soon after the collapse, and exceeding 200 degC by late 1997 during submersible dives -- before settling into the cooler, iron-rich venting the pit hosts today.",
         "This tile's grid has cells about 58 × 61 m across. The scan points sample summit terrain at the published Hiolo vent depths; the grid does not establish a detailed outline of Pele's Pit's roughly 600 m rim."
       ],
       "facts": [
         {
-          "label": "Collapse event",
-          "value": "July-August 1996, largest Hawaiian earthquake swarm on record"
+          "label": "Collapse and seismic swarm",
+          "value": "16 July-9 August 1996; >4,000 earthquakes"
         },
         {
           "label": "Pele's Pit diameter / depth",
           "value": "~600 m / ~300 m"
-        },
-        {
-          "label": "Crater wall height / thickness",
-          "value": "~700 ft (210 m) / ~70 ft (21 m)"
         },
         {
           "label": "Peak post-collapse fluid temperature (1997)",
@@ -114,6 +114,10 @@
         {
           "title": "Kama'ehuakanaloa Seamount — Wikipedia",
           "url": "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount"
+        },
+        {
+          "title": "USGS Hawaiian Volcano Observatory — 1996 swarm and Pele’s Pit dimensions",
+          "url": "https://www.usgs.gov/volcanoes/loihi-seamount"
         }
       ],
       "confidence": "high"
@@ -122,36 +126,36 @@
       "id": "vents",
       "title": "Pele's and Hiolo vents: iron, not sulfide",
       "paragraphs": [
-        "Today's main hydrothermal sites sit inside Pele's Pit: Hiolo North, around 1,300 m deep, and Hiolo South, around 1,274 m deep and roughly 330 m away, both venting warm fluid diffusely rather than the fast, scalding jets of a black smoker. Measured fluid temperatures run about 20-50 degC, with Hiolo South's mean (~47 degC) running about 7 degC hotter than Hiolo North's.",
-        "Kama'ehuakanaloa's vent fluids are unusual: compared to typical mid-ocean-ridge vents they are low in sulfide and rich in CO2 and dissolved ferrous iron (Fe2+). That chemistry starves out the sulfide-oxidizing bacteria that build black-smoker chimneys elsewhere, and instead feeds mats of iron-oxidizing Zetaproteobacteria, which convert Fe2+ to insoluble, rust-colored ferric iron oxyhydroxide. Those mats can grow up to half a metre thick, draping over low mounds and any hard surface near a vent orifice -- at Hiolo North they form over small venting chimneys; at Hiolo South they form a distinctive 'cauliflower' texture around the active orifice."
+        "Research cruises in 2006, 2008, 2009 and 2013 sampled Hiolo North at roughly 1,300 m and Hiolo South at roughly 1,274 m inside Pele's Pit. Sylvan and colleagues reported a mean Hiolo South fluid temperature of about 47 degC, roughly 7 degC warmer than Hiolo North. These are diffuse, warm-fluid sites.",
+        "The fluids are rich in dissolved iron and CO2 and depleted in sulfide compared with typical mid-ocean-ridge vents. Iron-oxidizing Zetaproteobacteria help form rust-colored iron oxyhydroxide mats. Jesser and colleagues documented mats over small venting chimneys at Hiolo North and cauliflower-shaped mats around an active orifice at Hiolo South. Mineral precipitation builds the sulfide chimneys of black smokers; sulfur-oxidizing microbes use the vent chemicals as an energy source."
       ],
       "facts": [
         {
-          "label": "Hiolo North depth / temperature",
-          "value": "~1,300 m / ~20-40 degC"
+          "label": "Hiolo North depth / mean fluid temperature",
+          "value": "~1,300 m / ~40 degC (sampled cruises)"
         },
         {
-          "label": "Hiolo South depth / temperature",
-          "value": "~1,274 m / ~47 degC mean"
+          "label": "Hiolo South depth / mean fluid temperature",
+          "value": "~1,274 m / ~47 degC (sampled cruises)"
         },
         {
-          "label": "Iron mat thickness",
-          "value": "up to ~0.5 m"
-        },
-        {
-          "label": "Dominant microbe",
-          "value": "Zetaproteobacteria (iron-oxidizing)"
+          "label": "Characteristic mat microbes",
+          "value": "iron-oxidizing Zetaproteobacteria"
         }
       ],
       "reconstruction": true,
       "sources": [
         {
-          "title": "Quantitative PCR Analysis of Functional Genes in Iron-Rich Microbial Mats at an Active Hydrothermal Vent System (Lo'ihi Seamount, Hawai'i) — Applied and Environmental Microbiology (accessed via search summary; direct fetch returned HTTP 403)",
-          "url": "https://journals.asm.org/doi/10.1128/aem.03608-14"
+          "title": "Jesser et al. (2015) — Quantitative PCR Analysis of Functional Genes in Iron-Rich Microbial Mats (Figure 2)",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4393452/"
         },
         {
           "title": "Volcano Watch: Treasures of the Deep Sea: Lo'ihi Hosts Hydrothermal Vents — USGS Hawaiian Volcano Observatory",
           "url": "https://www.usgs.gov/news/volcano-watch-treasures-deep-sea-loihi-hosts-hydrothermal-vents"
+        },
+        {
+          "title": "Sylvan et al. (2017) — Evidence for microbial mediation of subseafloor nitrogen redox processes at Loihi Seamount, §§1, 3.1 and Table 1",
+          "url": "https://fire.biol.wwu.edu/cmoyer/research/Sylvan_nitrogen_loihi_geocosmo17.pdf"
         }
       ],
       "confidence": "medium"
@@ -160,13 +164,13 @@
       "id": "south-rift",
       "title": "The south rift zone",
       "paragraphs": [
-        "Kama'ehuakanaloa's south rift zone runs roughly 12 miles from the summit and is the volcano's most volcanically and hydrothermally active feature -- the source of its most recent lava flows, including young flows likely erupted during the 1996 event, and host to additional hydrothermal sites (published literature names one, Naha Vents, further along the rift than this tile reaches). This tile's real terrain deepens steadily south of the summit and Pele's Pit along that same bearing, from about -1,281 m roughly 1.4 km south of the summit to about -1,897 m at 3.4 km -- a terrain trace of the rift's general direction, not a mapped rift-zone boundary.",
-        "By contrast, the shorter north rift (~7 miles) is quieter: most of the seismicity, the freshest lava and essentially all of the documented hydrothermal activity concentrate on the south side, which is why this mission's rift objective heads south from the summit rather than north."
+        "A rift system extends northwest and southeast from the summit for about 31 km in total. This tile's terrain deepens southward, from about 1,281 m at a reference point roughly 1.4 km south of the summit high to about 1,897 m at 3.4 km. These grid samples follow the general south-rift bearing.",
+        "Hydrothermal activity also occurs away from the summit: research cruises documented ultra-diffuse venting at Ula Nui near the volcano's base, about 5,000 m deep. Venting is not confined to Pele's Pit or the upper south rift."
       ],
       "facts": [
         {
-          "label": "South rift length",
-          "value": "~12 mi (published)"
+          "label": "Rift system length",
+          "value": "~31 km total (USGS)"
         },
         {
           "label": "This tile's south-rift depth at 1.4 km / 3.4 km from summit",
@@ -182,6 +186,14 @@
         {
           "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009 (value read directly from this tile's grid)",
           "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "USGS Hawaiian Volcano Observatory — rift system dimensions",
+          "url": "https://www.usgs.gov/volcanoes/loihi-seamount"
+        },
+        {
+          "title": "Sylvan et al. (2017) — summit vents and Ula Nui basal venting",
+          "url": "https://fire.biol.wwu.edu/cmoyer/research/Sylvan_nitrogen_loihi_geocosmo17.pdf"
         }
       ],
       "confidence": "medium"

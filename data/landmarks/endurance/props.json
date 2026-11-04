@@ -16,7 +16,7 @@
       "lod_distance_m": 1200,
       "collision": "box",
       "reconstruction": true,
-      "note": "Endurance's hull at the published position 68°44′21″S 52°19′47″W. Length 44 m (144 ft) and beam 7.6 m (25 ft) are the ship's published dimensions (Wikipedia \"Endurance (1912 ship)\"). Height 8 m is an unsourced estimate -- no source found publishes a keel-to-deck figure -- for a wooden barquentine of this tonnage (350 GRT) found upright and largely intact (UKAHT; FMHT press release). ends [prow, rounded]: unlike the broken Titanic and Bismarck hulls, Endurance is reported intact, so this uses a pointed bow and a rounded counter stern rather than a torn 'cut' end. heading_deg 0 is arbitrary: no source found publishes the ship's actual compass orientation on the seabed."
+      "note": "Endurance's hull at the published position 68°44′21″S 52°19′47″W. Length 44 m (144 ft) and beam 7.6 m (25 ft) are the ship's published dimensions (Wikipedia \"Endurance (1912 ship)\"). Height 8 m is an authored visual estimate; the Conservation Management Plan lists a moulded depth of 4.8 m, which is not this model’s total visual height. The model height is for a wooden barquentine of this tonnage (350 GRT) found upright and largely intact (UKAHT; FMHT press release). ends [prow, rounded]: unlike the broken Titanic and Bismarck hulls, Endurance is reported intact, so this uses a pointed bow and a rounded counter stern rather than a torn 'cut' end. heading_deg 0 follows the approximate north-south orientation in the Conservation Management Plan; the precise model heading remains an authored choice."
     },
     {
       "id": "rigging-debris",

@@ -1,5 +1,12 @@
 # Bismarck site content: sources and notes (package C4)
 
+## S-fact-check-journal — 2026-11-04
+
+The current audit, sourced corrections, coordinate and grid checks, and unresolved
+claims are recorded in [S-fact-check-journal](../../../plan/progress/S-fact-check-journal.md).
+That audit supersedes conflicting historical notes below. Existing Journal provenance
+tags identify scene additions once per entry.
+
 ## Phase F depth and condition decision — 2026-10-01
 
 The [2001 expedition account](https://www.hmshood.org.uk/hoodtoday/2001expedition/bismarck/encrypt.htm) gives both a **vicinity** position (48°09′N, 016°07′W) and roughly 4,790 m hull depth. At the adopted position this grid reads 4,218.5 m, a ~571.5 m gap. The source does **not** establish that the discrepancy is caused by the hull’s slide or prove that the catalog pin is an impact position. Earlier statements assigning that cause are superseded by this correction. Source rounding, coarse bathymetry and a precise wreck fix remain unresolved.
