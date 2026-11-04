@@ -39,8 +39,8 @@
     "reframe": {
       "hero": "main-hull",
       "range": 35,
-      "altitude": 16,
-      "yawOffset": 35,
+      "altitude": 30,
+      "yawOffset": 11,
       "chaseRadius": 50,
       "chaseOffsetX": -45,
       "chaseOffsetY": -34,
@@ -66,7 +66,7 @@
       "mesh": "endurance-hull",
       "deckPatch": {
         "x": 1.8,
-        "z": -13,
+        "z": -4,
         "rowSpacingM": 3,
         "castHeightM": 20
       }
