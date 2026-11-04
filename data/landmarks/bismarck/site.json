@@ -3,7 +3,7 @@
   "opening": {
     "mission": {
       "rangeM": 110,
-      "yawOffset": 25,
+      "yawOffset": 8,
       "destinationLabel": "the main hull"
     },
     "freeDive": {

@@ -5,7 +5,12 @@
   "title": "Bismarck dive",
   "hull_class": "C",
   "environment": {
-    "preset": "wreck"
+    "preset": "wreck",
+    "overrides": {
+      "snowScale": 0.3,
+      "hazeParticles": 1500,
+      "motesPerHull": 200
+    }
   },
   "species_file": "species.json",
   "spawn": {
