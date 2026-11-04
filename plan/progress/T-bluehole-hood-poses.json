@@ -1,0 +1,1135 @@
+{
+  "method": "CPU geometry only; fractions use pixel centres and solid depth occlusion, not lighting/HUD. Clearance is the minimum sampled hull-to-terrain gap and enclosing-hull-sphere-to-prop gap. No runtime tuning changed.",
+  "search": {
+    "rounds": 2,
+    "subPosesTested": 1425,
+    "hullSafePoses": 292,
+    "refinementSeeds": [
+      {
+        "bearing": 327.00000000242517,
+        "range": 55,
+        "altitude": -50,
+        "radius": 35,
+        "offsetY": -50,
+        "offsetX": 0,
+        "score": 0.056372177676379344
+      },
+      {
+        "bearing": 312.00000000242517,
+        "range": 55,
+        "altitude": -50,
+        "radius": 35,
+        "offsetY": -50,
+        "offsetX": 0,
+        "score": 0.05618485414457831
+      },
+      {
+        "bearing": 342.00000000242517,
+        "range": 70,
+        "altitude": -60,
+        "radius": 35,
+        "offsetY": -50,
+        "offsetX": 0,
+        "score": 0.04433291883431369
+      }
+    ],
+    "finalistsMeasured": 12
+  },
+  "tiers": [
+    {
+      "tier": "low",
+      "heroPosition": [-74.53585386856939, -37.62363775680525, 85.44246015276428],
+      "baselines": [
+        {
+          "name": "free-dive",
+          "tuning": {
+            "radius": 60,
+            "offsetX": -30,
+            "offsetY": -45
+          },
+          "sub": [-264.1123721263851, -55.61827473458976, -44.80193984705082],
+          "yaw": -1.5707963267948966,
+          "clearance": {
+            "terrainM": 7.427768354707631,
+            "propsM": 18.03125,
+            "minimumM": 7.427768354707631
+          },
+          "distanceToWestM": 55.06710598257861,
+          "distanceToEastM": 230.70905263129578,
+          "routeToWestClear": true,
+          "routeToEastClear": true,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-207.34569598670825, -60.03346065656463, -25.87971446715853],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                0.07623456616503023, -0.3046537607067968, 0.32048360560580796, 0.16306915956740753
+              ],
+              "armClear": true,
+              "armTerrainM": 30.38033515320457,
+              "projected": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              },
+              "visible": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-207.34569598670825, -60.03346065656463, -25.87971446715853],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                0.13552811762672043, -0.1407760268668848, 0.5697486321881031, 0.07535186283328074
+              ],
+              "armClear": true,
+              "armTerrainM": 30.38033515320457,
+              "projected": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              },
+              "visible": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              }
+            }
+          ]
+        },
+        {
+          "name": "mission",
+          "tuning": {
+            "radius": 46,
+            "offsetX": -36,
+            "offsetY": -50
+          },
+          "sub": [-187.60761545108392, -44, -44.801939847050825],
+          "yaw": -1.5707963267948968,
+          "clearance": {
+            "terrainM": 73.25856925309395,
+            "propsM": 74.90625,
+            "minimumM": 73.25856925309395
+          },
+          "distanceToWestM": 124.99999999999999,
+          "distanceToEastM": 172.59630643249955,
+          "routeToWestClear": true,
+          "routeToEastClear": true,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-145.2212523895413, -49.65151507487235, -27.847394622433775],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                0.09619432734750026, -0.3204043628637532, 0.4537621570350649, 0.29118344031590704
+              ],
+              "armClear": true,
+              "armTerrainM": 74.30331144915962,
+              "projected": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              },
+              "visible": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-145.2212523895413, -49.65151507487235, -27.847394622433775],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                0.17101213750666716, -0.14805414871666323, 0.8066882791734481, 0.134551589719436
+              ],
+              "armClear": true,
+              "armTerrainM": 74.30331144915962,
+              "projected": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              },
+              "visible": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "name": "A",
+          "tuning": {
+            "id": "A",
+            "bearing": 327,
+            "range": 55,
+            "altitude": -55,
+            "radius": 35,
+            "offsetY": -50,
+            "offsetX": 0
+          },
+          "sub": [-109.39275210953112, -92.62363775680525, 31.767543804257137],
+          "yaw": 2.5656340004316647,
+          "clearance": {
+            "terrainM": 1.145692957006176,
+            "propsM": 32.4609375,
+            "minimumM": 1.145692957006176
+          },
+          "distanceToWestM": 225.71631984024745,
+          "distanceToEastM": 84.38601779915912,
+          "routeToWestClear": false,
+          "routeToEastClear": false,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-128.28790136530276, -97.24936795999088, 2.6715654792471923],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.17768955606119666, -0.40566562303897774, 0.177689556061197, 0.3926517701350003
+              ],
+              "armClear": true,
+              "armTerrainM": 24.577790612482005,
+              "projected": {
+                "screenFraction": 0.06412986111111112,
+                "topThirdScreenFraction": 0.06412986111111112,
+                "topThirdFill": 0.19238958333333334,
+                "hoodInTopThird": 1
+              },
+              "visible": {
+                "screenFraction": 0.024263194444444445,
+                "topThirdScreenFraction": 0.024263194444444445,
+                "topThirdFill": 0.07278958333333334,
+                "hoodInTopThird": 1
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-128.28790136530276, -97.24936795999088, 2.6715654792471923],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.3158925441087941, -0.18745212439004902, 0.3158925441087947, 0.18143861416190776
+              ],
+              "armClear": true,
+              "armTerrainM": 24.577790612482005,
+              "projected": {
+                "screenFraction": 0.05623405030987969,
+                "topThirdScreenFraction": 0.02982136347065257,
+                "topThirdFill": 0.08957021626060772,
+                "hoodInTopThird": 0.5303079416531604
+              },
+              "visible": {
+                "screenFraction": 0.0234688297484506,
+                "topThirdScreenFraction": 0.0234688297484506,
+                "topThirdFill": 0.07049000821242814,
+                "hoodInTopThird": 1
+              }
+            }
+          ]
+        },
+        {
+          "name": "B",
+          "tuning": {
+            "id": "B",
+            "bearing": 327,
+            "range": 55,
+            "altitude": -50,
+            "radius": 35,
+            "offsetY": -50,
+            "offsetX": 0
+          },
+          "sub": [-109.39275210953112, -87.62363775680525, 31.767543804257137],
+          "yaw": 2.5656340004316647,
+          "clearance": {
+            "terrainM": 6.145692957006176,
+            "propsM": 32.4609375,
+            "minimumM": 6.145692957006176
+          },
+          "distanceToWestM": 224.32744685392984,
+          "distanceToEastM": 81.21576201698781,
+          "routeToWestClear": false,
+          "routeToEastClear": false,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-128.28790136530276, -92.24936795999088, 2.6715654792471923],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.17768955606119666, -0.4056656230389771, 0.17768955606119705, 0.3926517701350009
+              ],
+              "armClear": true,
+              "armTerrainM": 29.577790612482005,
+              "projected": {
+                "screenFraction": 0.06540208333333333,
+                "topThirdScreenFraction": 0.06540208333333333,
+                "topThirdFill": 0.19620625,
+                "hoodInTopThird": 1
+              },
+              "visible": {
+                "screenFraction": 0.02839861111111111,
+                "topThirdScreenFraction": 0.02839861111111111,
+                "topThirdFill": 0.08519583333333333,
+                "hoodInTopThird": 1
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-128.28790136530276, -92.24936795999088, 2.6715654792471923],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.3158925441087941, -0.18745212439004869, 0.3158925441087948, 0.18143861416190807
+              ],
+              "armClear": true,
+              "armTerrainM": 29.577790612482005,
+              "projected": {
+                "screenFraction": 0.054171223720986754,
+                "topThirdScreenFraction": 0.021308786000729128,
+                "topThirdFill": 0.06400218998083766,
+                "hoodInTopThird": 0.39335987886265494
+              },
+              "visible": {
+                "screenFraction": 0.023784785514643334,
+                "topThirdScreenFraction": 0.02050674444039373,
+                "topThirdFill": 0.06159321105940323,
+                "hoodInTopThird": 0.8621790777877123
+              }
+            }
+          ]
+        },
+        {
+          "name": "C",
+          "tuning": {
+            "id": "C",
+            "bearing": 334.5,
+            "range": 55,
+            "altitude": -50,
+            "radius": 35,
+            "offsetY": -50,
+            "offsetX": 0
+          },
+          "sub": [-103.11571550816086, -87.62363775680525, 28.252234402013123],
+          "yaw": 2.6965336943312392,
+          "clearance": {
+            "terrainM": 4.5510262587846455,
+            "propsM": 33.3125,
+            "minimumM": 4.5510262587846455
+          },
+          "distanceToWestM": 228.8533831147888,
+          "distanceToEastM": 81.1636027586262,
+          "routeToWestClear": false,
+          "routeToEastClear": false,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-118.05142688300613, -92.24936795999088, -3.0611356787471706],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.17768955606119755, -0.40566562303897796, 0.17768955606119627, 0.3926517701350003
+              ],
+              "armClear": true,
+              "armTerrainM": 28.87135591785595,
+              "projected": {
+                "screenFraction": 0.06584305555555556,
+                "topThirdScreenFraction": 0.06584305555555556,
+                "topThirdFill": 0.19752916666666667,
+                "hoodInTopThird": 1
+              },
+              "visible": {
+                "screenFraction": 0.027799305555555556,
+                "topThirdScreenFraction": 0.027799305555555556,
+                "topThirdFill": 0.08339791666666667,
+                "hoodInTopThird": 1
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-118.05142688300613, -92.24936795999088, -3.0611356787471706],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.31589254410879564, -0.18745212439004913, 0.3158925441087934, 0.18143861416190776
+              ],
+              "armClear": true,
+              "armTerrainM": 28.87135591785595,
+              "projected": {
+                "screenFraction": 0.05517073763519261,
+                "topThirdScreenFraction": 0.022031838619516346,
+                "topThirdFill": 0.06617392097819144,
+                "hoodInTopThird": 0.39933920704845816
+              },
+              "visible": {
+                "screenFraction": 0.023906306963179,
+                "topThirdScreenFraction": 0.020461173897192854,
+                "topThirdFill": 0.061456337257049,
+                "hoodInTopThird": 0.8558902020587114
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tier": "medium",
+      "heroPosition": [-74.53585386856939, -37.62363775680525, 85.44246015276428],
+      "baselines": [
+        {
+          "name": "free-dive",
+          "tuning": {
+            "radius": 60,
+            "offsetX": -30,
+            "offsetY": -45
+          },
+          "sub": [-264.1212432048763, -55.61827473458976, -44.80193984705082],
+          "yaw": -1.5707963267948966,
+          "clearance": {
+            "terrainM": 7.405592845926371,
+            "propsM": 17.90625,
+            "minimumM": 7.405592845926371
+          },
+          "distanceToWestM": 55.059467464413366,
+          "distanceToEastM": 230.71634216299708,
+          "routeToWestClear": true,
+          "routeToEastClear": true,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-207.35456706519946, -60.03346065656463, -25.87971446715853],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                0.07620394815278476, -0.30465376070679695, 0.3207037114374575, 0.16306915956740722
+              ],
+              "armClear": true,
+              "armTerrainM": 30.359343629060817,
+              "projected": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              },
+              "visible": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-207.35456706519946, -60.03346065656463, -25.87971446715853],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                0.1354736856049507, -0.14077602686688487, 0.570139931444369, 0.0753518628332806
+              ],
+              "armClear": true,
+              "armTerrainM": 30.359343629060817,
+              "projected": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              },
+              "visible": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              }
+            }
+          ]
+        },
+        {
+          "name": "mission",
+          "tuning": {
+            "radius": 46,
+            "offsetX": -36,
+            "offsetY": -50
+          },
+          "sub": [-187.60761545108392, -44, -44.801939847050825],
+          "yaw": -1.5707963267948968,
+          "clearance": {
+            "terrainM": 73.25856925309395,
+            "propsM": 74.890625,
+            "minimumM": 73.25856925309395
+          },
+          "distanceToWestM": 124.99999999999999,
+          "distanceToEastM": 172.59630643249955,
+          "routeToWestClear": true,
+          "routeToEastClear": true,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-145.2212523895413, -49.65151507487235, -27.847394622433775],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                0.09611488581702655, -0.3204043628637532, 0.45389102183671376, 0.29118344031590704
+              ],
+              "armClear": true,
+              "armTerrainM": 74.30331144915962,
+              "projected": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              },
+              "visible": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-145.2212523895413, -49.65151507487235, -27.847394622433775],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                0.17087090811915814, -0.14805414871666323, 0.8069173721541578, 0.134551589719436
+              ],
+              "armClear": true,
+              "armTerrainM": 74.30331144915962,
+              "projected": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              },
+              "visible": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "name": "A",
+          "tuning": {
+            "id": "A",
+            "bearing": 327,
+            "range": 55,
+            "altitude": -55,
+            "radius": 35,
+            "offsetY": -50,
+            "offsetX": 0
+          },
+          "sub": [-109.39275210953112, -92.62363775680525, 31.767543804257137],
+          "yaw": 2.5656340004316647,
+          "clearance": {
+            "terrainM": 1.1256088404006732,
+            "propsM": 32.3984375,
+            "minimumM": 1.1256088404006732
+          },
+          "distanceToWestM": 225.71631984024745,
+          "distanceToEastM": 84.38601779915912,
+          "routeToWestClear": false,
+          "routeToEastClear": false,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-128.28790136530276, -97.24936795999088, 2.6715654792471923],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.17768955606119666, -0.40566562303897774, 0.177689556061197, 0.3926517701350003
+              ],
+              "armClear": true,
+              "armTerrainM": 24.577790612482005,
+              "projected": {
+                "screenFraction": 0.06427638888888888,
+                "topThirdScreenFraction": 0.06427638888888888,
+                "topThirdFill": 0.19282916666666666,
+                "hoodInTopThird": 1
+              },
+              "visible": {
+                "screenFraction": 0.024390972222222224,
+                "topThirdScreenFraction": 0.024390972222222224,
+                "topThirdFill": 0.07317291666666667,
+                "hoodInTopThird": 1
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-128.28790136530276, -97.24936795999088, 2.6715654792471923],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.3158925441087941, -0.18745212439004902, 0.3158925441087947, 0.18143861416190776
+              ],
+              "armClear": true,
+              "armTerrainM": 24.577790612482005,
+              "projected": {
+                "screenFraction": 0.056750516466156274,
+                "topThirdScreenFraction": 0.030337829626929155,
+                "topThirdFill": 0.09112145268728898,
+                "hoodInTopThird": 0.5345824411134904
+              },
+              "visible": {
+                "screenFraction": 0.023973143759873618,
+                "topThirdScreenFraction": 0.023973143759873618,
+                "topThirdFill": 0.07200474495848161,
+                "hoodInTopThird": 1
+              }
+            }
+          ]
+        },
+        {
+          "name": "B",
+          "tuning": {
+            "id": "B",
+            "bearing": 327,
+            "range": 55,
+            "altitude": -50,
+            "radius": 35,
+            "offsetY": -50,
+            "offsetX": 0
+          },
+          "sub": [-109.39275210953112, -87.62363775680525, 31.767543804257137],
+          "yaw": 2.5656340004316647,
+          "clearance": {
+            "terrainM": 6.125608840400673,
+            "propsM": 32.3984375,
+            "minimumM": 6.125608840400673
+          },
+          "distanceToWestM": 224.32744685392984,
+          "distanceToEastM": 81.21576201698781,
+          "routeToWestClear": false,
+          "routeToEastClear": false,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-128.28790136530276, -92.24936795999088, 2.6715654792471923],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.17768955606119666, -0.4056656230389771, 0.17768955606119705, 0.3926517701350009
+              ],
+              "armClear": true,
+              "armTerrainM": 29.577790612482005,
+              "projected": {
+                "screenFraction": 0.06594791666666666,
+                "topThirdScreenFraction": 0.06594791666666666,
+                "topThirdFill": 0.19784375,
+                "hoodInTopThird": 1
+              },
+              "visible": {
+                "screenFraction": 0.028858333333333333,
+                "topThirdScreenFraction": 0.028858333333333333,
+                "topThirdFill": 0.086575,
+                "hoodInTopThird": 1
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-128.28790136530276, -92.24936795999088, 2.6715654792471923],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.3158925441087941, -0.18745212439004869, 0.3158925441087948, 0.18143861416190807
+              ],
+              "armClear": true,
+              "armTerrainM": 29.577790612482005,
+              "projected": {
+                "screenFraction": 0.05472718434803743,
+                "topThirdScreenFraction": 0.021849556446712846,
+                "topThirdFill": 0.06562642576877452,
+                "hoodInTopThird": 0.39924503164205616
+              },
+              "visible": {
+                "screenFraction": 0.024283023453639568,
+                "topThirdScreenFraction": 0.02103840077773727,
+                "topThirdFill": 0.06319007208686923,
+                "hoodInTopThird": 0.8663830851995497
+              }
+            }
+          ]
+        },
+        {
+          "name": "C",
+          "tuning": {
+            "id": "C",
+            "bearing": 334.5,
+            "range": 55,
+            "altitude": -50,
+            "radius": 35,
+            "offsetY": -50,
+            "offsetX": 0
+          },
+          "sub": [-103.11571550816086, -87.62363775680525, 28.252234402013123],
+          "yaw": 2.6965336943312392,
+          "clearance": {
+            "terrainM": 4.541129538803489,
+            "propsM": 33.3046875,
+            "minimumM": 4.541129538803489
+          },
+          "distanceToWestM": 228.8533831147888,
+          "distanceToEastM": 81.1636027586262,
+          "routeToWestClear": false,
+          "routeToEastClear": false,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-118.05142688300613, -92.24936795999088, -3.0611356787471706],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.17768955606119755, -0.40566562303897796, 0.17768955606119627, 0.3926517701350003
+              ],
+              "armClear": true,
+              "armTerrainM": 28.87135591785595,
+              "projected": {
+                "screenFraction": 0.0663375,
+                "topThirdScreenFraction": 0.0663375,
+                "topThirdFill": 0.1990125,
+                "hoodInTopThird": 1
+              },
+              "visible": {
+                "screenFraction": 0.028269444444444444,
+                "topThirdScreenFraction": 0.028269444444444444,
+                "topThirdFill": 0.08480833333333333,
+                "hoodInTopThird": 1
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-118.05142688300613, -92.24936795999088, -3.0611356787471706],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.31589254410879564, -0.18745212439004913, 0.3158925441087934, 0.18143861416190776
+              ],
+              "armClear": true,
+              "armTerrainM": 28.87135591785595,
+              "projected": {
+                "screenFraction": 0.05575100255195042,
+                "topThirdScreenFraction": 0.02257564710171345,
+                "topThirdFill": 0.06780728168628525,
+                "hoodInTopThird": 0.4049370606506457
+              },
+              "visible": {
+                "screenFraction": 0.024462267590229677,
+                "topThirdScreenFraction": 0.021001944343176572,
+                "topThirdFill": 0.06308057304498586,
+                "hoodInTopThird": 0.8585444610034774
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tier": "high",
+      "heroPosition": [-74.53585386856939, -37.88145624367314, 85.44246015276428],
+      "baselines": [
+        {
+          "name": "free-dive",
+          "tuning": {
+            "radius": 60,
+            "offsetX": -30,
+            "offsetY": -45
+          },
+          "sub": [-264.0803610942806, -56.561294948137295, -44.80193984705082],
+          "yaw": -1.5707963267948966,
+          "clearance": {
+            "terrainM": 6.85210437415418,
+            "propsM": 17.9375,
+            "minimumM": 6.85210437415418
+          },
+          "distanceToWestM": 55.09467242716373,
+          "distanceToEastM": 230.73721053348615,
+          "routeToWestClear": true,
+          "routeToEastClear": true,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-207.31368495460376, -60.97648087011216, -25.87971446715853],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                0.07620394815278479, -0.3046537607067973, 0.3207037114374575, 0.16306915956740684
+              ],
+              "armClear": true,
+              "armTerrainM": 29.226907442542405,
+              "projected": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              },
+              "visible": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-207.31368495460376, -60.97648087011216, -25.87971446715853],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                0.13547368560495077, -0.140776026866885, 0.570139931444369, 0.07535186283328042
+              ],
+              "armClear": true,
+              "armTerrainM": 29.226907442542405,
+              "projected": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              },
+              "visible": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              }
+            }
+          ]
+        },
+        {
+          "name": "mission",
+          "tuning": {
+            "radius": 46,
+            "offsetX": -36,
+            "offsetY": -50
+          },
+          "sub": [-187.4866010751835, -44, -44.801939847050825],
+          "yaw": -1.5707963267948968,
+          "clearance": {
+            "terrainM": 73.27314905207729,
+            "propsM": 75.09375,
+            "minimumM": 73.27314905207729
+          },
+          "distanceToWestM": 124.99999999999999,
+          "distanceToEastM": 172.50771462036812,
+          "routeToWestClear": true,
+          "routeToEastClear": true,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-145.10023801364088, -49.65151507487235, -27.847394622433775],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                0.0961148858170265, -0.32040436286375296, 0.45389102183671376, 0.29118344031590704
+              ],
+              "armClear": true,
+              "armTerrainM": 74.31138110130948,
+              "projected": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              },
+              "visible": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-145.10023801364088, -49.65151507487235, -27.847394622433775],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                0.17087090811915834, -0.14805414871666323, 0.806917372154158, 0.1345515897194355
+              ],
+              "armClear": true,
+              "armTerrainM": 74.31138110130948,
+              "projected": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              },
+              "visible": {
+                "screenFraction": 0,
+                "topThirdScreenFraction": 0,
+                "topThirdFill": 0,
+                "hoodInTopThird": 0
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "name": "A",
+          "tuning": {
+            "id": "A",
+            "bearing": 327,
+            "range": 55,
+            "altitude": -55,
+            "radius": 35,
+            "offsetY": -50,
+            "offsetX": 0
+          },
+          "sub": [-109.39275210953112, -92.88145624367314, 31.767543804257137],
+          "yaw": 2.5656340004316647,
+          "clearance": {
+            "terrainM": 0.8698224122414899,
+            "propsM": 32.3828125,
+            "minimumM": 0.8698224122414899
+          },
+          "distanceToWestM": 225.5199391842296,
+          "distanceToEastM": 84.38601779915912,
+          "routeToWestClear": false,
+          "routeToEastClear": false,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-128.28790136530276, -97.50718644685877, 2.6715654792471923],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.177689556061197, -0.40566562303897774, 0.1776895560611966, 0.39265177013500013
+              ],
+              "armClear": true,
+              "armTerrainM": 24.28288917308535,
+              "projected": {
+                "screenFraction": 0.06414930555555555,
+                "topThirdScreenFraction": 0.06414930555555555,
+                "topThirdFill": 0.19244791666666666,
+                "hoodInTopThird": 1
+              },
+              "visible": {
+                "screenFraction": 0.023509027777777778,
+                "topThirdScreenFraction": 0.023509027777777778,
+                "topThirdFill": 0.07052708333333334,
+                "hoodInTopThird": 1
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-128.28790136530276, -97.50718644685877, 2.6715654792471923],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.3158925441087947, -0.18745212439004902, 0.31589254410879397, 0.18143861416190768
+              ],
+              "armClear": true,
+              "armTerrainM": 24.28288917308535,
+              "projected": {
+                "screenFraction": 0.05694798882002673,
+                "topThirdScreenFraction": 0.030744926479523635,
+                "topThirdFill": 0.0923441919883201,
+                "hoodInTopThird": 0.5398773006134969
+              },
+              "visible": {
+                "screenFraction": 0.023590351196986267,
+                "topThirdScreenFraction": 0.023590351196986267,
+                "topThirdFill": 0.07085500501870609,
+                "hoodInTopThird": 1
+              }
+            }
+          ]
+        },
+        {
+          "name": "B",
+          "tuning": {
+            "id": "B",
+            "bearing": 327,
+            "range": 55,
+            "altitude": -50,
+            "radius": 35,
+            "offsetY": -50,
+            "offsetX": 0
+          },
+          "sub": [-109.39275210953112, -87.88145624367314, 31.767543804257137],
+          "yaw": 2.5656340004316647,
+          "clearance": {
+            "terrainM": 5.86982241224149,
+            "propsM": 32.3828125,
+            "minimumM": 5.86982241224149
+          },
+          "distanceToWestM": 224.14513458182233,
+          "distanceToEastM": 81.21576201698781,
+          "routeToWestClear": false,
+          "routeToEastClear": false,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-128.28790136530276, -92.50718644685877, 2.6715654792471923],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.17768955606119705, -0.40566562303897774, 0.1776895560611966, 0.3926517701350003
+              ],
+              "armClear": true,
+              "armTerrainM": 29.28288917308535,
+              "projected": {
+                "screenFraction": 0.06602638888888888,
+                "topThirdScreenFraction": 0.06602638888888888,
+                "topThirdFill": 0.19807916666666667,
+                "hoodInTopThird": 1
+              },
+              "visible": {
+                "screenFraction": 0.028194444444444446,
+                "topThirdScreenFraction": 0.028194444444444446,
+                "topThirdFill": 0.08458333333333333,
+                "hoodInTopThird": 1
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-128.28790136530276, -92.50718644685877, 2.6715654792471923],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.3158925441087948, -0.18745212439004902, 0.31589254410879397, 0.18143861416190776
+              ],
+              "armClear": true,
+              "armTerrainM": 29.28288917308535,
+              "projected": {
+                "screenFraction": 0.05489123830356058,
+                "topThirdScreenFraction": 0.022211082756106452,
+                "topThirdFill": 0.06671229126745142,
+                "hoodInTopThird": 0.40463803409342486
+              },
+              "visible": {
+                "screenFraction": 0.023806051768137076,
+                "topThirdScreenFraction": 0.02122068295054077,
+                "topThirdFill": 0.06373756729628616,
+                "hoodInTopThird": 0.8913986727922409
+              }
+            }
+          ]
+        },
+        {
+          "name": "C",
+          "tuning": {
+            "id": "C",
+            "bearing": 334.5,
+            "range": 55,
+            "altitude": -50,
+            "radius": 35,
+            "offsetY": -50,
+            "offsetX": 0
+          },
+          "sub": [-103.11571550816086, -87.88145624367314, 28.252234402013123],
+          "yaw": 2.6965336943312392,
+          "clearance": {
+            "terrainM": 4.823037763672076,
+            "propsM": 33.3046875,
+            "minimumM": 4.823037763672076
+          },
+          "distanceToWestM": 228.67467920122863,
+          "distanceToEastM": 81.1636027586262,
+          "routeToWestClear": false,
+          "routeToEastClear": false,
+          "layouts": [
+            {
+              "width": 1600,
+              "height": 900,
+              "camera": [-118.05142688300613, -92.50718644685877, -3.0611356787471706],
+              "fov": 62,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.17768955606119785, -0.40566562303897785, 0.17768955606119582, 0.3926517701350003
+              ],
+              "armClear": true,
+              "armTerrainM": 28.56123787165467,
+              "projected": {
+                "screenFraction": 0.0665576388888889,
+                "topThirdScreenFraction": 0.0665576388888889,
+                "topThirdFill": 0.19967291666666667,
+                "hoodInTopThird": 1
+              },
+              "visible": {
+                "screenFraction": 0.027715277777777776,
+                "topThirdScreenFraction": 0.027715277777777776,
+                "topThirdFill": 0.08314583333333334,
+                "hoodInTopThird": 1
+              }
+            },
+            {
+              "width": 390,
+              "height": 844,
+              "camera": [-118.05142688300613, -92.50718644685877, -3.0611356787471706],
+              "fov": 104.87661615601527,
+              "hullOnscreen": true,
+              "hullBounds": [
+                -0.3158925441087962, -0.18745212439004905, 0.31589254410879264, 0.18143861416190776
+              ],
+              "armClear": true,
+              "armTerrainM": 28.56123787165467,
+              "projected": {
+                "screenFraction": 0.05599708348523515,
+                "topThirdScreenFraction": 0.02302831449750881,
+                "topThirdFill": 0.06916689478967059,
+                "hoodInTopThird": 0.4112413194444444
+              },
+              "visible": {
+                "screenFraction": 0.024097703244622674,
+                "topThirdScreenFraction": 0.021232835095394337,
+                "topThirdFill": 0.06377406697691396,
+                "hoodInTopThird": 0.8811144730206757
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
