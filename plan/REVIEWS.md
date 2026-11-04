@@ -1,5 +1,16 @@
 # Reviews
 
+## 2026-11-04 afternoon comprehensive review (trigger: 8+ merges; Claude alone, Sol start exited 75: Codex 5h at 6% with three tasks running)
+
+- **Stage:** about 92% to 1.0 (range 89-93%); 2.5-3 weeks. Golden `2026-11-04-083927` vs `2026-11-04-033854`. Not agreed with Sol.
+- **Changed since the last review:** V-bismarck-framing, V-bluehole-pitchup, V-endurance-dropstone-tone; Codex 120-125 merged (geometry tests, CI verify, dead-code sweep 2, verification; no production bugs). Main CI green on af8fbce2; tag f73.
+- **Scores (mission openings, viewed):** Beebe 4.1 (smokers and glow centred; the best frame), Titanic 3.9, Lost City 3.9 (tower is a small spire, upper half empty), Endurance 3.8 (hull small, upper 45% empty), Monterey 3.7 (busy layered ridge, no clear wall to scan; was 4.0), Blue Hole 3.7 (outcrop still reads as a small brown leaf, no hood), Bismarck 3.6 (hull a distant slab, sub overlaps its stern). All 13 openings pass the readability screen.
+- **Biggest gaps:** Blue Hole hood (needs a pose table or a code hood), small-subject openings (Lost City, Bismarck, Endurance), Monterey wall clarity, and the real-phone retest.
+- **Play flow:** not re-captured; U-play-walkthrough-3 waits for the phone retest (Claude week 10%, reset Nov 5). Codex S-verify-phone-hud (135) covers the phone HUD in the meantime.
+- **Process:** efficiency shows 0 failed timer runs; Claude week 10% (reset Nov 5) gates most runs by design, Codex week 86% with three verification tasks running. `tools/golden.sh` still exceeds the 10 min foreground limit; run it in the background. DIRECTOR.md Backlog trimmed: 14 DONE items moved to `plan/archive/DIRECTOR-HISTORY-2026-11-04-backlog.md`. No tooling change.
+- **New priorities:** V-lostcity-tower-scale, V-bismarck-hull-scale, V-monterey-wall-clarity, V-bluehole-opening-hood (after Codex 133), V-endurance-hull-scale; Codex 133-135 queued (T-bluehole-hood-poses, T-framing-metrics, S-verify-phone-hud).
+- **Needs owner:** phone retest (4410-P2 checklist).
+
 ## 2026-11-04 comprehensive review (trigger: 8+ merges; Claude alone, Sol skipped: Codex week 3% until Nov 4 00:45)
 
 - **Stage:** about 91% to 1.0 (range 88-92%); 3 weeks. Golden `2026-11-04-033854` vs `2026-11-03-044523`. Not agreed with Sol (Codex budget low).

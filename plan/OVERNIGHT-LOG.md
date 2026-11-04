@@ -3153,3 +3153,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 ## 2026-11-04 02:38 CST run 344 addendum: Codex collection
 
 - Merged Codex 120 (T-opening-geometry tests), 121 (CI verify: green), 122 (S-dead second sweep, 25 unused UI exports), 123 and 125 (verification: no production bugs; dropstone test fixed for four clusters). Gates smoke green after fixing one stale count; pushed. **124 (R-ci-speed 19 shards x 2 workers) NOT merged**: unmeasured and may flake on SwiftShader; worktree kept; follow-up 131 queued as a manual-dispatch experiment. Queued 130-132. Findings: Axial and Endurance flag small objective height in the 120 geometry diagnostics.
+
+## 2026-11-04 03:00 CST headless run 345 (Claude): comprehensive review
+
+- Comprehensive review, Claude alone (Sol start exited 75, Codex 5h 6%). Stage ~92%. Scores: Beebe 4.1, Titanic 3.9, Lost City 3.9, Endurance 3.8, Monterey 3.7, Blue Hole 3.7, Bismarck 3.6. Backlog refilled (V-lostcity-tower-scale, V-bismarck-hull-scale, V-monterey-wall-clarity, V-bluehole-opening-hood, V-endurance-hull-scale); Codex briefs 133-135 queued; 14 DONE items archived. Tag f73 on af8fbce2 (CI green). No package started (Claude week ~10%, reset Nov 5).
+- **Needs owner:** phone retest (4410-P2 checklist).
