@@ -20,12 +20,14 @@
     "freeDive": {
       "hero": "karst-grotto",
       "bearing": 90,
-      "range": 58,
+      "range": 50,
       "fromCentre": true,
       "altitude": -28,
       "minSeabedAltitudeM": 26,
       "openWater": true,
-      "chaseOffsetY": 10
+      "chaseOffsetY": -45,
+      "chaseRadius": 60,
+      "chaseOffsetX": -30
     }
   },
   "atmosphere": {
