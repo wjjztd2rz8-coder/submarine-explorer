@@ -3164,3 +3164,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged Codex 130 (S-verify-opening-poses) and 132 (S-fact-check-journal; corrections and unsupported claims logged in plan/progress/S-fact-check-journal.md). Main's unit tests were red (deepOpening: Endurance dropstones-a overlapped the wreck bounds on all tiers); fixed by moving that cluster ~14 m east (data only). gates.sh (smoke) green on main, pushed.
 - **Held: 131 (CI shard experiment)**: workflow_dispatch + fromJSON matrix, defaults unchanged, but untested on hosted CI; worktree kept for review. 124 also kept. No Claude package started (Claude week ~10%, reset Nov 5). Codex briefs 133-135 queued.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-04 04:29 CST headless run 347 (Claude): idle check
+
+- Nothing new to collect (124 and 131 still held for review). No Claude package started: Claude week ~10% (reset Nov 5 06:00), keeping the headroom. Codex 5h 5% (resets 05:45), week 85%; briefs 133-135 queued for dispatch.
+- **Needs owner:** phone retest (4410-P2 checklist).
