@@ -4,9 +4,12 @@ import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { afterAll, expect, it, vi } from 'vitest';
 import {
   Box2,
+  BoxGeometry,
+  Group,
   InstancedMesh,
   Matrix4,
   Mesh,
+  MeshBasicMaterial,
   Raycaster,
   Vector2,
   Vector3,
@@ -44,6 +47,8 @@ import { hullClearance } from './helpers/hullClearance.js';
 import { siteManifest } from '../../src/core/SiteManifest.js';
 import { requiredHull } from '../../src/game/Progress.js';
 import { solidMeshes, subjectVisibility } from './helpers/subjectVisibility.js';
+// @ts-expect-error Diagnostics share their fixed capture sizes with Node tools.
+import { diagnosticViewports } from '../../tools/diagnostic-tiers.mjs';
 
 const sites: string[] = readdirSync('data/landmarks').filter(
   (site: string) => !site.startsWith('_') && !site.endsWith('.json'),
@@ -312,10 +317,114 @@ function screenBounds(root: Object3D, rig: CameraRig): Box2 {
 const minimumObjectiveHeightDeg = 5;
 // Reviewed small openings remain visible in the audit; a new flag fails the test.
 const reviewedSmallOpenings = ['axial-seamount-ashes', 'endurance'];
+// Preserve the measured scale achieved by the shipped opening fixes on both layouts.
+// These are regression floors, not the aspirational 30% width for future pose work.
+const fixedOpeningWidthFloors: Record<string, number> = {
+  'beebe-vent-field': 0.25,
+  bismarck: 0.5,
+  'great-blue-hole': 0.21,
+  'hunga-tonga-caldera': 0.33,
+  'lost-city': 0.23,
+  'monterey-canyon': 0.2,
+  titanic: 0.3,
+};
 
-it.each(sites.map((site) => ({ site, expectedFlag: reviewedSmallOpenings.includes(site) })))(
-  '$site: mission opening objective angular size review',
-  async ({ site, expectedFlag }) => {
+function targetFrame(subject: Object3D, rig: CameraRig) {
+  const bounds = new Box2();
+  for (const mesh of solidMeshes(subject)) bounds.union(screenBounds(mesh, rig));
+  bounds.intersect(new Box2(new Vector2(-1, -1), new Vector2(1, 1)));
+  expect(bounds.isEmpty(), 'first scan subject intersects the frame').toBe(false);
+  const tanY = Math.tan((rig.camera.fov * Math.PI) / 360);
+  const degrees = 180 / Math.PI;
+  return {
+    widthFraction: (bounds.max.x - bounds.min.x) / 2,
+    heightFraction: (bounds.max.y - bounds.min.y) / 2,
+    topFraction: (1 - bounds.max.y) / 2,
+    centreYFraction: (1 - (bounds.max.y + bounds.min.y) / 2) / 2,
+    bottomFraction: (1 - bounds.min.y) / 2,
+    widthDeg:
+      (Math.atan(bounds.max.x * tanY * rig.camera.aspect) -
+        Math.atan(bounds.min.x * tanY * rig.camera.aspect)) *
+      degrees,
+    heightDeg: (Math.atan(bounds.max.y * tanY) - Math.atan(bounds.min.y * tanY)) * degrees,
+  };
+}
+
+/** Geometry-only water above the world-horizontal horizon, sampled at cell centres. */
+function emptyAboveHorizon(
+  rig: CameraRig,
+  terrain: Pick<Terrain, 'group' | 'update'>,
+  props: Pick<Props, 'group'>,
+) {
+  terrain.update(rig.camera);
+  const solids = [...solidMeshes(terrain.group), ...solidMeshes(props.group)];
+  const ray = new Raycaster();
+  ray.near = rig.camera.near;
+  ray.far = rig.camera.far;
+  const columns = 40;
+  const rows = 24;
+  let above = 0;
+  let empty = 0;
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < columns; x++) {
+      ray.setFromCamera(
+        new Vector2((2 * (x + 0.5)) / columns - 1, 1 - (2 * (y + 0.5)) / rows),
+        rig.camera,
+      );
+      if (ray.ray.direction.y <= 0) continue;
+      above++;
+      if (!ray.intersectObjects(solids, false).length) empty++;
+    }
+  }
+  const forward = rig.camera.getWorldDirection(new Vector3()).setY(0).normalize();
+  const horizon = rig.camera.position.clone().addScaledVector(forward, 10000).project(rig.camera);
+  return {
+    horizonYFraction: (1 - horizon.y) / 2,
+    emptyAboveHorizonFraction: empty / (columns * rows),
+    emptyShareAboveHorizon: above ? empty / above : 0,
+    horizonSamples: { columns, rows, above, empty },
+  };
+}
+
+it('opening water fractions exclude solid scenery above the horizon and ignore transparent effects', () => {
+  const rig = new CameraRig(makeConfig().camera, 16 / 9);
+  rig.camera.position.set(0, 0, 0);
+  rig.camera.lookAt(0, 0, -1);
+  rig.camera.updateMatrixWorld(true);
+  const terrain = { group: new Group(), update: () => {} };
+  const props = { group: new Group() };
+  const geometry = new BoxGeometry(200, 200, 1);
+  const material = new MeshBasicMaterial();
+  const wall = new Mesh(geometry, material);
+  wall.position.set(0, 100, -10);
+  try {
+    expect(emptyAboveHorizon(rig, terrain, props)).toMatchObject({
+      horizonYFraction: 0.5,
+      emptyAboveHorizonFraction: 0.5,
+      emptyShareAboveHorizon: 1,
+    });
+    terrain.group.add(wall);
+    expect(emptyAboveHorizon(rig, terrain, props).emptyAboveHorizonFraction).toBe(0);
+    material.transparent = true;
+    material.opacity = 0.5;
+    expect(emptyAboveHorizon(rig, terrain, props).emptyAboveHorizonFraction).toBe(0.5);
+  } finally {
+    geometry.dispose();
+    material.dispose();
+  }
+});
+
+it.each(
+  sites.flatMap((site) =>
+    diagnosticViewports.map((viewport: { width: number; height: number }) => ({
+      site,
+      ...viewport,
+      expectedFlag: reviewedSmallOpenings.includes(site),
+    })),
+  ),
+)(
+  '$site $width×$height: mission opening objective angular size review and frame fractions',
+  async ({ site, width, height, expectedFlag }) => {
     const config = makeConfig();
     const effective = resolveEffective(defaultSettings(config), 'arcade', null, config);
     const meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;
@@ -354,8 +463,13 @@ it.each(sites.map((site) => ({ site, expectedFlag: reviewedSmallOpenings.include
       );
       expect(pose).not.toBeNull();
       const position = new Vector3(pose!.x, pose!.y, pose!.z);
-      const rig = new CameraRig(effective.camera, 16 / 9, terrain);
-      rig.setChaseRadiusDefault(pose!.chaseRadius, pose!.chaseOffsetX, pose!.chaseOffsetY);
+      const rig = new CameraRig(effective.camera, width / height, terrain);
+      rig.setChaseRadiusDefault(
+        pose!.chaseRadius,
+        pose!.chaseOffsetX,
+        pose!.chaseOffsetY,
+        pose!.portraitChaseOffset,
+      );
       rig.snap(position, pose!.yaw, 0);
       rig.camera.updateMatrixWorld(true);
       props.update(rig.camera);
@@ -368,34 +482,43 @@ it.each(sites.map((site) => ({ site, expectedFlag: reviewedSmallOpenings.include
       expect(subject.root.position.distanceTo(primaries[0].position)).toBeLessThan(
         primaries[0].radius,
       );
-      const bounds = new Box2();
-      for (const mesh of solidMeshes(subject.root)) bounds.union(screenBounds(mesh, rig));
-      bounds.intersect(new Box2(new Vector2(-1, -1), new Vector2(1, 1)));
-      expect(bounds.isEmpty()).toBe(false);
-      const tanY = Math.tan((rig.camera.fov * Math.PI) / 360);
+      const frame = targetFrame(subject.root, rig);
       const degrees = 180 / Math.PI;
-      const widthDeg =
-        (Math.atan(bounds.max.x * tanY * rig.camera.aspect) -
-          Math.atan(bounds.min.x * tanY * rig.camera.aspect)) *
-        degrees;
-      const heightDeg = (Math.atan(bounds.max.y * tanY) - Math.atan(bounds.min.y * tanY)) * degrees;
+      const { heightDeg } = frame;
       const flagged = heightDeg < minimumObjectiveHeightDeg;
       const row = {
         site,
         objective: primaries[0].id,
         subject: subjectId,
+        viewport: { width, height },
+        pose,
         configuredCameraDistanceM: rig.chaseRadius,
         cameraDistanceM: rig.camera.position.distanceTo(position),
         cameraPitchDeg: Math.asin(rig.camera.getWorldDirection(new Vector3()).y) * degrees,
         objectiveDistanceM: position.distanceTo(primaries[0].position),
-        widthDeg,
-        heightDeg,
-        heightPx: ((bounds.max.y - bounds.min.y) / 2) * 900,
+        ...frame,
+        ...emptyAboveHorizon(rig, terrain, props),
+        heightPx: frame.heightFraction * height,
         flagged,
       };
       geometryAudit.push(row);
       expect(Number.isFinite(heightDeg)).toBe(true);
       expect(heightDeg).toBeGreaterThan(0);
+      const widthFloor = fixedOpeningWidthFloors[site];
+      if (widthFloor !== undefined)
+        expect(
+          frame.widthFraction,
+          `${site} ${width}×${height}: fixed opening target width`,
+        ).toBeGreaterThanOrEqual(widthFloor);
+      for (const fraction of [
+        frame.widthFraction,
+        frame.heightFraction,
+        frame.topFraction,
+        frame.bottomFraction,
+      ]) {
+        expect(fraction).toBeGreaterThanOrEqual(0);
+        expect(fraction).toBeLessThanOrEqual(1);
+      }
       expect(flagged, `${site}: objective height ${heightDeg.toFixed(2)}°; review below 5°`).toBe(
         expectedFlag,
       );

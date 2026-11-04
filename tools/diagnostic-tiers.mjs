@@ -7,3 +7,9 @@ export function diagnosticTiers(value = 'low,medium,high') {
   }
   return tiers;
 }
+
+/** Match the desktop and portrait mission captures; use CSS pixels, not render scale. */
+export const diagnosticViewports = [
+  { width: 1600, height: 900 },
+  { width: 390, height: 844 },
+];
