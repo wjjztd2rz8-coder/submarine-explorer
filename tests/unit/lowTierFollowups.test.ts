@@ -1,6 +1,15 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
-import { BoxGeometry, Mesh, MeshBasicMaterial, Raycaster, Vector2, Vector3 } from 'three';
+import {
+  Box3,
+  BoxGeometry,
+  Mesh,
+  MeshBasicMaterial,
+  Raycaster,
+  Sphere,
+  Vector2,
+  Vector3,
+} from 'three';
 import { expect, test } from 'vitest';
 import { makeConfig } from '../../src/core/Config.js';
 import type { GraphicsTier } from '../../src/core/Config.js';
@@ -10,6 +19,8 @@ import { parsePois, placePois, spawnPoseForPoi } from '../../src/game/Pois.js';
 import { Scanner } from '../../src/game/Scanner.js';
 import { spawnSettings } from '../../src/game/Spawn.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
+import { SubMesh } from '../../src/sub/SubMesh.js';
+import { visitHullVertices } from './helpers/hullClearance.js';
 import { reticleClearOfControls } from '../../src/ui/ScanReticleLayout.js';
 import type { TileMeta } from '../../src/util/types.js';
 import { Props } from '../../src/world/Props.js';
@@ -402,6 +413,71 @@ test.each(['low', 'medium', 'high'] as const)(
         }
       }
     } finally {
+      terrain.dispose();
+    }
+  },
+);
+
+// Regression guard: candidate captures must not conceal an embedded hull or
+// crop it while moving the hood into the upper part of either viewport.
+test.each(['low', 'medium', 'high'] as const)(
+  'Blue Hole %s: saved hood candidates keep the full hull and chase arm clear',
+  async (tier) => {
+    const { config, terrain, props } = await scene('great-blue-hole', tier);
+    const sub = new SubMesh({ length: 26, hullClass: 'B', tier });
+    sub.setView('chase');
+    try {
+      const hero = props.placed.find((p) => p.def.id === 'karst-grotto-east')!;
+      const target = hero.root.localToWorld(new Vector3().fromArray(blueHolePoses.east.target));
+      for (const tuning of blueHolePoses.hoodCandidates) {
+        const bearing = (tuning.bearing * Math.PI) / 180;
+        const position = target
+          .clone()
+          .add(new Vector3(Math.sin(bearing) * tuning.range, 0, -Math.cos(bearing) * tuning.range));
+        position.y = hero.root.position.y + tuning.altitude;
+        const yaw = Math.atan2(target.x - position.x, -(target.z - position.z));
+        sub.setPose(position, yaw, 0, 0);
+        sub.group.updateMatrixWorld(true);
+        const vertices: Vector3[] = [];
+        const bounds = new Box3();
+        visitHullVertices(sub.vehicle.root, (point) => {
+          vertices.push(point.clone());
+          bounds.expandByPoint(point);
+          expect(point.y - terrain.sampleHeight(point.x, point.z), tuning.id).toBeGreaterThan(0.8);
+        });
+        const sphere = bounds.getBoundingSphere(new Sphere());
+        // A clear enclosing sphere protects every hull face, as well as its vertices.
+        expect(
+          props.collide(sphere.center.clone(), sphere.radius + 0.1, new Vector3()),
+          tuning.id,
+        ).toBe(false);
+        expect(
+          props.collide(position.clone(), config.submarine.hullRadius + 4, new Vector3()),
+          tuning.id,
+        ).toBe(false);
+        for (const aspect of [1600 / 900, 390 / 844]) {
+          const rig = new CameraRig(config.camera, aspect, terrain);
+          rig.setChaseRadiusDefault(tuning.radius, tuning.offsetX, tuning.offsetY);
+          rig.snap(position, yaw, 0);
+          rig.camera.updateMatrixWorld(true);
+          for (const point of vertices) {
+            const ndc = point.clone().project(rig.camera);
+            expect(Math.abs(ndc.x), `${tuning.id} horizontal hull`).toBeLessThan(1);
+            expect(Math.abs(ndc.y), `${tuning.id} vertical hull`).toBeLessThan(1);
+            expect(Math.abs(ndc.z), `${tuning.id} near/far hull`).toBeLessThan(1);
+          }
+          for (let step = 0; step <= 128; step++) {
+            const point = position.clone().lerp(rig.camera.position, step / 128);
+            expect(props.collide(point.clone(), 6, new Vector3()), `${tuning.id} arm`).toBe(false);
+            expect(point.y - terrain.sampleHeight(point.x, point.z)).toBeGreaterThanOrEqual(
+              config.camera.terrainClearance - 1e-6,
+            );
+          }
+        }
+      }
+    } finally {
+      sub.dispose();
+      props.dispose();
       terrain.dispose();
     }
   },

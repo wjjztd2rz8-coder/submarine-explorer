@@ -5,5 +5,34 @@
     "approachRange": 55,
     "target": [0, 6.2, -9],
     "close": { "range": 42, "above": 6.5, "lateral": 8 }
-  }
+  },
+  "hoodCandidates": [
+    {
+      "id": "A",
+      "bearing": 327,
+      "range": 55,
+      "altitude": -55,
+      "radius": 35,
+      "offsetY": -50,
+      "offsetX": 0
+    },
+    {
+      "id": "B",
+      "bearing": 327,
+      "range": 55,
+      "altitude": -50,
+      "radius": 35,
+      "offsetY": -50,
+      "offsetX": 0
+    },
+    {
+      "id": "C",
+      "bearing": 334.5,
+      "range": 55,
+      "altitude": -50,
+      "radius": 35,
+      "offsetY": -50,
+      "offsetX": 0
+    }
+  ]
 }
