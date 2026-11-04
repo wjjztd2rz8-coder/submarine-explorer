@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- No package running. Briefs 120-124 queued, waiting for the Nov 4 Codex reset. Claude lane: V-bismarck-framing, V-hudson-ledge, then U-play-walkthrough-3 and V-golden-refresh.
+- V-bluehole-pitchup IN FLIGHT (Sonnet, 2026-11-03). Otherwise none running. Briefs 120-124 queued, waiting for the Nov 4 Codex reset. Claude lane: V-bismarck-framing, V-hudson-ledge, then U-play-walkthrough-3 and V-golden-refresh.
 
 ## Backlog
 
