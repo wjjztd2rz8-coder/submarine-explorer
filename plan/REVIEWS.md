@@ -1,5 +1,16 @@
 # Reviews
 
+## 2026-11-04 comprehensive review (trigger: 8+ merges; Claude alone, Sol skipped: Codex week 3% until Nov 4 00:45)
+
+- **Stage:** about 91% to 1.0 (range 88-92%); 3 weeks. Golden `2026-11-04-033854` vs `2026-11-03-044523`. Not agreed with Sol (Codex budget low).
+- **Changed since the last review (runs 328-340):** U-* first-minute fixes (Home 720 fit, tutorial depth skip, phone guidance distance, phone sheet half), Hunga talus apron, Blake/Endurance tint, Kama outlier vents, `dropstones` feature, Axial outlying vent clusters.
+- **Scores (opening poses, viewed):** Axial ~4.0 (three plume clusters read, up from ~3.6; upper third still empty), Kama ~3.7 (two wisps plus glow pools, but a large dark slope remains), Blue Hole 3.85 (unchanged: small brown leaf, open water above), Endurance ~3.8 (hull readable; sub overlaps the stern and the dropstones are not in frame). Others unchanged (data not touched). Readability screen 0/13 flagged.
+- **Biggest gaps:** Blue Hole hood, Bismarck framing, Endurance framing, phone retest (still the main unknown).
+- **Play flow:** not re-captured (Claude week 16%); U-play-walkthrough-3 waits for the phone retest.
+- **Process:** efficiency shows no failed timer runs; Claude idle by budget (week 16%, reset Nov 5), Codex idle by design until Nov 4 00:45 (briefs 120-125 queued). `tools/golden.sh` takes more than 10 min, so run it in the background. No tooling change.
+- **New priorities:** V-bismarck-framing, V-bluehole-pitchup (owner did not answer, so the default proceeds), V-endurance-dropstone-tone, V-hudson-ledge, V-axial-sky-band; R-release f73 after the next green CI.
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole pitch-up is now the default unless overruled.
+
 ## 2026-11-03 evening targeted review (trigger: last 3 runs merged nothing)
 
 - **Cause:** runs 336-338 correctly found no unblocked Claude item: the backlog was V-* items already merged plus owner and Codex-reset waits. Not a tooling fault. Claude week 17% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-125 queued, nothing to add before the reset).
