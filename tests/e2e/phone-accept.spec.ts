@@ -1,7 +1,8 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
-import { homeReady } from './helpers/home.js';
+import { homeReady, openSiteList } from './helpers/home.js';
 import { expectHudClear } from './helpers/phoneHud.js';
+import { dismissTutorial } from './helpers/tutorial.js';
 import { completeScan } from './helpers/scan.js';
 import { journalEntries, openJournalSite } from './helpers/journal.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
@@ -9,6 +10,7 @@ import type { CameraRig } from '../../src/sub/CameraRig.js';
 import type { Discovery } from '../../src/game/Discovery.js';
 import type { AnchoredEvents, EventContact } from '../../src/game/Events.js';
 import type { Scene } from 'three';
+import catalog from '../../data/landmarks/index.json' with { type: 'json' };
 
 type Game = {
   sub: Submarine;
@@ -341,6 +343,146 @@ for (const viewport of [
       // Keep evidence in ordinary runs, including immediately after an assertion failure.
       await page.screenshot({ path: info.outputPath('phone.png') });
     });
+
+    for (const site of catalog.landmarks) {
+      test(`${site}: site picker, briefing, first minute and Surface stay reachable`, async ({
+        page,
+      }, info) => {
+        // Regression guard: changed opening poses and long site titles must not hide
+        // touch HUD controls, the half-height picker, or the full-row Surface exit.
+        test.setTimeout(600_000);
+        await page.addInitScript(() => {
+          localStorage.setItem(
+            'subexplorer.progress.v1',
+            JSON.stringify({
+              version: 1,
+              points: 0,
+              lifetime: 900,
+              awarded: [],
+              upgrades: {},
+              ratings: {},
+            }),
+          );
+          const key = 'subexplorer.settings.v3';
+          localStorage.setItem(
+            key,
+            JSON.stringify({ ...JSON.parse(localStorage.getItem(key)!), reduceMotion: true }),
+          );
+        });
+        const errors: string[] = [];
+        page.on('pageerror', (error) => errors.push(error.message));
+        const shot = async (name: string): Promise<void> => {
+          const path = info.outputPath(`${name}.png`);
+          await page.screenshot({ path });
+          await info.attach(name, { path, contentType: 'image/png' });
+        };
+        await page.goto('/?tier=low&touch=1', { waitUntil: 'domcontentloaded' });
+        await homeReady(page, true);
+        await reachable(page.locator('.home-primary'));
+        const sites = page.locator('.home-menu').getByRole('button', { name: 'Dive sites' });
+        await reachable(sites);
+        await shot('home');
+        await sites.tap();
+        const sheet = page.locator('.home-sites');
+        await reachable(sheet.getByRole('button', { name: 'Back to menu' }));
+        if (viewport.width < viewport.height) {
+          await expect(sheet.locator('.home-sites-grab')).toHaveAttribute('aria-expanded', 'false');
+          expect((await sheet.boundingBox())!.height, 'picker starts at half height').toBeCloseTo(
+            viewport.height / 2,
+            0,
+          );
+        }
+        await shot('site-picker');
+        await openSiteList(page, true, true);
+        const choice = sheet.locator(`[data-mission="${site}"]`);
+        // Scrolling the list is deliberate; reachability is measured before tapping.
+        await choice.evaluate((element) => element.scrollIntoView({ block: 'nearest' }));
+        await reachable(choice);
+        await choice.tap();
+        await expect(page).toHaveURL((url) => url.searchParams.get('mission') === site);
+        await clockFramesUntil(page, () => {
+          const g = window.__game as unknown as Game;
+          return !!(window.__gameReady && g.discovery?.loaded && g.props.loaded);
+        });
+        const briefing = page.getByRole('dialog', { name: 'Mission briefing' });
+        await expect(briefing).toBeVisible();
+        await expect(briefing).not.toContainText(keyNames, { useInnerText: true });
+        for (const objective of await briefing.locator('.briefing-objectives li').all())
+          await expect(objective).toBeInViewport({ ratio: 1 });
+        await reachable(briefing.locator('.briefing-begin'));
+        await shot('briefing');
+        await briefing.locator('.briefing-begin').tap();
+        await page.clock.runFor(50);
+        await expect(briefing).toBeHidden();
+
+        const elapsed = (): Promise<number> =>
+          page.evaluate(
+            () =>
+              (window.__game as unknown as { missionRouter: { mission: { elapsedS: number } } })
+                .missionRouter.mission.elapsedS,
+          );
+        const start = await elapsed();
+        // Keep normal physics and wildlife running at the authored pose. Small
+        // advances stay below the clock's physics backlog limit; a single 60 s
+        // fastForward would render only one clamped frame, not a minute of play.
+        for (let second = 0; second <= 60; second++) {
+          if (second > 0)
+            for (let frame = 0; frame < 10; frame++) await page.clock.fastForward(100);
+          await expect(page.locator('.sonar')).toBeVisible();
+          await expect(page.locator('.guidance-slot')).toBeVisible();
+          await expectHudClear(page, `${site} idle ${second}s`);
+          if ([0, 21, 60].includes(second)) {
+            await reachableTouchControls(page);
+            await shot(`hud-${second}s`);
+          }
+          if (second === 21 && site === 'titanic') {
+            await expect(page.locator('.guidance-slot')).toHaveAttribute('data-step', 'move');
+            await expect(page.locator('.guidance-name')).toHaveText(/Marker \d+ m ahead/);
+          }
+        }
+        expect((await elapsed()) - start, 'a full minute of unfrozen mission time').toBeCloseTo(
+          60,
+          1,
+        );
+        // Also measure the standing objective after the tutorial yields the slot.
+        await dismissTutorial(page, true, true);
+        await expect(page.locator('.guidance-slot')).toBeVisible();
+        await expectHudClear(page, `${site} after tutorial`);
+        await reachable(page.locator('.hud-journal'));
+        await page.locator('.tc-btn-pause').tap();
+        const pause = page.locator('.pause-menu');
+        await expect(pause).toBeVisible();
+        const surface = pause.getByRole('button', { name: 'Surface and debrief', exact: true });
+        await reachable(surface);
+        const actionsBox = (await pause.locator('.pause-actions').boundingBox())!;
+        const surfaceBox = (await surface.boundingBox())!;
+        expect(surfaceBox.x).toBeCloseTo(actionsBox.x, 0);
+        expect(surfaceBox.width, 'Surface spans the full pause grid').toBeCloseTo(
+          actionsBox.width,
+          0,
+        );
+        await shot('pause');
+        await surface.tap();
+        const debrief = page.locator('.mission-debrief');
+        await expect(debrief).toBeVisible();
+        await reachable(debrief.locator('.debrief-btn.is-primary'));
+        const more = debrief.getByRole('button', { name: 'More options', exact: true });
+        await reachable(more);
+        await shot('debrief');
+        await more.tap();
+        for (const button of await debrief.getByRole('button').all()) {
+          // Short landscape debriefs intentionally scroll inside their panel.
+          await button.evaluate((element) => element.scrollIntoView({ block: 'nearest' }));
+          await reachable(button);
+        }
+        const home = debrief.getByRole('button', { name: 'Home', exact: true });
+        await home.evaluate((element) => element.scrollIntoView({ block: 'nearest' }));
+        await home.tap();
+        await homeReady(page, true);
+        await reachable(page.locator('.home-primary'));
+        expect(errors).toEqual([]);
+      });
+    }
 
     test('Home names the next site and launches that destination', async ({ page }) => {
       await page.goto('/?tier=low&touch=1');
