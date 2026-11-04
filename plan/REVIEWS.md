@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-11-03 evening targeted review (trigger: last 3 runs merged nothing)
+
+- **Cause:** runs 336-338 correctly found no unblocked Claude item: the backlog was V-* items already merged plus owner and Codex-reset waits. Not a tooling fault. Claude week 17% (reset Nov 5), Codex week 3% until Nov 4 (briefs 120-125 queued, nothing to add before the reset).
+- **Refill from golden `2026-11-03-044523` (non-hero frames viewed):** Axial ~3.6 (small vent cluster on a huge dark slope, same as Kama), Bismarck ~3.5 (hull small and off-frame, heavy snow), Hudson ~3.8 (empty upper 40%). Queued V-axial-subject, V-bismarck-framing, V-hudson-ledge, U-play-walkthrough-3, V-golden-refresh.
+- **Needs owner:** phone retest (4410-P2 checklist); Blue Hole opening design call.
+
 ## 2026-11-03 targeted review (trigger: last 3 runs merged nothing)
 
 - **Cause:** the backlog was not dry; runs 322-327 declined to start work (Claude week 25% left, Codex 3% until Nov 4) and the small art items were judged low value. With 99% in the 5 h window and a weekly reset on Nov 5, unspent weekly budget is wasted, so one bounded Sonnet agent ran U-play-walkthrough-2.
