@@ -1,12 +1,8 @@
 import { InstancedMesh, Matrix4, Mesh, Vector3, type Object3D } from 'three';
 
-/** Check actual visible hull vertices, independently of the physics sphere. */
-export function hullClearance(
-  root: Object3D,
-  terrain: { sampleHeight(x: number, z: number): number },
-): number {
+/** Visit actual visible hull vertices, independently of the physics sphere. */
+export function visitHullVertices(root: Object3D, visit: (point: Vector3) => void): void {
   root.updateMatrixWorld(true);
-  let minimum = Infinity;
   const instance = new Matrix4();
   const world = new Matrix4();
   const point = new Vector3();
@@ -19,9 +15,20 @@ export function hullClearance(
       world.multiplyMatrices(object.matrixWorld, instance);
       for (let j = 0; j < positions.count; j++) {
         point.fromBufferAttribute(positions, j).applyMatrix4(world);
-        minimum = Math.min(minimum, point.y - terrain.sampleHeight(point.x, point.z));
+        visit(point);
       }
     }
+  });
+}
+
+/** Check actual visible hull vertices, independently of the physics sphere. */
+export function hullClearance(
+  root: Object3D,
+  terrain: { sampleHeight(x: number, z: number): number },
+): number {
+  let minimum = Infinity;
+  visitHullVertices(root, (point) => {
+    minimum = Math.min(minimum, point.y - terrain.sampleHeight(point.x, point.z));
   });
   return minimum;
 }

@@ -559,7 +559,7 @@ freshTest.describe('mission preview and approach', () => {
 freshTest.describe('live portrait opening', () => {
   const test = freshTest;
   const shots = '.cache/codex/shots/opening-framing/live';
-  const sites = ['titanic', 'lost-city', 'great-blue-hole', 'beebe-vent-field', 'monterey-canyon'];
+  const sites = catalog.landmarks;
   // Audit panel bounds, not full-screen transparent overlay containers or their
   // nested labels. Optional panels count whenever the real UI displays them.
   const hudSelectors = [
@@ -587,7 +587,9 @@ freshTest.describe('live portrait opening', () => {
     subMesh: SubMesh;
     rig: CameraRig;
     save: Save;
-    props: { loaded: boolean; stats: { failed: number; skipped: number } };
+    props: Props;
+    terrain: Terrain;
+    config: GameConfig;
     discovery: { loaded: boolean };
     presets: { entered: boolean };
     explore: { ready: boolean };
@@ -607,7 +609,7 @@ freshTest.describe('live portrait opening', () => {
     );
   }
 
-  test.describe('live portrait Low opening', () => {
+  test.describe('live portrait opening matrix', () => {
     test.describe.configure({ timeout: 180_000 });
     test.use({
       viewport: { width: 390, height: 844 },
@@ -618,17 +620,27 @@ freshTest.describe('live portrait opening', () => {
       serviceWorkers: 'block',
     });
 
-    for (const site of sites) {
-      // Regression guard: live portrait opening clipped hull geometry or covered it with HUD; map records uncertain bug attribution.
-      test(`${site}: sub and HUD remain fully visible after 3 s`, async ({ page }, testInfo) => {
+    for (const { site, tier, route } of sites.flatMap((site) =>
+      (['low', 'medium', 'high'] as const).flatMap((tier) =>
+        (['free-dive', 'mission'] as const).map((route) => ({ site, tier, route })),
+      ),
+    )) {
+      // Regression guard: authored pose/prop edits must keep both routes clear of terrain, props and the portrait HUD on every tier, without spawn warnings.
+      test(`${site} ${tier} ${route}: sub and HUD remain fully visible after 3 s`, async ({
+        page,
+      }, testInfo) => {
         const errors: string[] = [];
         page.on('pageerror', (error) => errors.push(error.message));
         page.on('console', (message) => {
-          if (message.type() === 'error') errors.push(message.text());
+          if (message.type() === 'error' || message.type() === 'warning')
+            errors.push(message.text());
         });
-        await page.goto(`/?tile=${site}&tier=low&dynres=0&tutorial=0&lifeSeed=42`, {
-          waitUntil: 'domcontentloaded',
-        });
+        await page.goto(
+          `/?tile=${site}&tier=${tier}&dynres=0&tutorial=0&lifeSeed=42${route === 'mission' ? `&mission=${site}&skipBriefing=1` : ''}`,
+          {
+            waitUntil: 'domcontentloaded',
+          },
+        );
         await page.waitForFunction(() => {
           const g = window.__game as unknown as Game | undefined;
           return (
@@ -659,6 +671,12 @@ freshTest.describe('live portrait opening', () => {
           const hull = g.subMesh.vehicle.root;
           hull.updateWorldMatrix(true, true);
           const projected: { x: number; y: number; z: number }[] = [];
+          let terrainClearance = Infinity;
+          let propContact = g.props.collide(
+            g.sub.position.clone(),
+            g.config.submarine.hullRadius,
+            g.sub.position.clone(),
+          );
           // Project every visible mesh's box in its own local frame. The root's
           // world AABB would overstate rotated hull corners; the cockpit is not
           // part of this chase hull. Instanced thrusters include their transforms.
@@ -666,6 +684,26 @@ freshTest.describe('live portrait opening', () => {
             const mesh = object as Mesh;
             if (!mesh.isMesh) return;
             const instance = mesh as InstancedMesh;
+            const positions = mesh.geometry.getAttribute('position');
+            const transform = mesh.matrixWorld.clone();
+            const instanceMatrix = mesh.matrixWorld.clone();
+            for (let i = 0; i < (instance.isInstancedMesh ? instance.count : 1); i++) {
+              if (instance.isInstancedMesh) {
+                instance.getMatrixAt(i, instanceMatrix);
+                transform.multiplyMatrices(mesh.matrixWorld, instanceMatrix);
+              }
+              for (let j = 0; j < positions.count; j++) {
+                const point = g.sub.position
+                  .clone()
+                  .fromBufferAttribute(positions, j)
+                  .applyMatrix4(transform);
+                terrainClearance = Math.min(
+                  terrainClearance,
+                  point.y - g.terrain.sampleHeight(point.x, point.z),
+                );
+                if (!propContact) propContact = g.props.collide(point, 0.01, point.clone());
+              }
+            }
             let box;
             if (instance.isInstancedMesh) {
               instance.computeBoundingBox();
@@ -705,6 +743,9 @@ freshTest.describe('live portrait opening', () => {
             return [{ selector, x: rect.x, y: rect.y, width: rect.width, height: rect.height }];
           });
           return {
+            terrainClearance,
+            propContact,
+            hullBreached: g.sub.hullBreached,
             mode: g.save.get().gameplayMode,
             tier: g.perf.tier,
             view: g.rig.mode,
@@ -731,7 +772,7 @@ freshTest.describe('live portrait opening', () => {
 
         // Persist evidence before assertions so a failed composition is reviewable.
         await mkdir(shots, { recursive: true });
-        const name = `${site}-low-390x844-round-${testInfo.repeatEachIndex + 1}${testInfo.retry ? `-retry-${testInfo.retry}` : ''}`;
+        const name = `${site}-${tier}-${route}-390x844-round-${testInfo.repeatEachIndex + 1}${testInfo.retry ? `-retry-${testInfo.retry}` : ''}`;
         const screenshot = `${shots}/${name}.png`;
         await reviewScreenshot(page, { path: screenshot, timeout: 60_000 });
         const diagnostics = `${shots}/${name}.json`;
@@ -750,7 +791,10 @@ freshTest.describe('live portrait opening', () => {
         expect.soft(opening.viewport).toEqual({ width: 390, height: 844 });
         expect.soft(opening.touch).toBe(true);
         expect.soft(opening.mode).toBe('arcade');
-        expect.soft(opening.tier).toBe('low');
+        expect.soft(opening.tier).toBe(tier);
+        expect.soft(opening.terrainClearance, 'complete hull clears terrain').toBeGreaterThan(0);
+        expect.soft(opening.propContact, 'complete hull clears prop colliders').toBe(false);
+        expect.soft(opening.hullBreached).toBe(false);
         expect.soft(opening.view).toBe('chase');
         expect.soft(opening.hullVisible).toBe(true);
         expect.soft(opening.props.failed).toBe(0);

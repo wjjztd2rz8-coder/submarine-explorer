@@ -11,7 +11,7 @@
     "mission": {
       "rangeM": 125,
       "chaseRadius": 46,
-      "chaseOffsetX": -44,
+      "chaseOffsetX": -36,
       "openingDepthM": 44,
       "chaseOffsetY": -50,
       "localAltitudeWeight": -0.1,
