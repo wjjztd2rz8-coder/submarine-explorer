@@ -235,6 +235,7 @@ export class WreckPreset implements EnvPreset {
       ctx.atmo.ambientIntensity += fill;
       ctx.atmo.ambientColor.lerp(FILL_TINT, 0.7);
     }
+    ctx.atmo.snowDensity *= num(this.params.snowScale, 1);
     if (!this.visuals) return;
     ctx.atmo.vignette += num(this.params.vignetteAdd, 0.06);
     if (this.haze) {
