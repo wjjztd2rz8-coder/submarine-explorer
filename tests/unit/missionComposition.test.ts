@@ -49,6 +49,7 @@ const sites: string[] = readdirSync('data/landmarks').filter(
   (site: string) => !site.startsWith('_') && !site.endsWith('.json'),
 );
 const audit: unknown[] = [];
+const geometryAudit: unknown[] = [];
 const captureAudit =
   (globalThis as { process?: { env?: Record<string, string> } }).process?.env?.SPAWN_AUDIT === '1';
 // Keep known clear compositions separate from the unresolved visual framing audit.
@@ -60,6 +61,11 @@ const separatedWreckOpenings: Record<string, readonly string[]> = {
 const missionSightlineSites = ['kamaehuakanaloa'];
 afterAll(() => {
   if (captureAudit) writeFileSync('.cache/spawn-audit.json', JSON.stringify(audit, null, 2) + '\n');
+  if (
+    (globalThis as { process?: { env?: Record<string, string> } }).process?.env
+      ?.OPENING_GEOMETRY_AUDIT === '1'
+  )
+    writeFileSync('.cache/opening-geometry.json', JSON.stringify(geometryAudit, null, 2) + '\n');
 });
 
 /** Load every shipped prop with real geometry; image decoding alone is replaced in Node. */
@@ -300,6 +306,107 @@ function screenBounds(root: Object3D, rig: CameraRig): Box2 {
   });
   return bounds;
 }
+
+// Five vertical degrees occupy about 65 px in a 900 px / 62 degree opening.
+// This is a subject-scale review proxy, independent of scan radius and luminance.
+const minimumObjectiveHeightDeg = 5;
+// Reviewed small openings remain visible in the audit; a new flag fails the test.
+const reviewedSmallOpenings = ['axial-seamount-ashes', 'endurance'];
+
+it.each(sites.map((site) => ({ site, expectedFlag: reviewedSmallOpenings.includes(site) })))(
+  '$site: mission opening objective angular size review',
+  async ({ site, expectedFlag }) => {
+    const config = makeConfig();
+    const effective = resolveEffective(defaultSettings(config), 'arcade', null, config);
+    const meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;
+    const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
+    const terrain = new Terrain(
+      { meta, heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows) },
+      config.terrain,
+      'high',
+    );
+    const props = new Props(meta, terrain, config.props, 'high');
+    try {
+      await placeProps(props, site);
+      const mission = parseMission(
+        JSON.parse(readFileSync(`data/landmarks/${site}/mission.json`, 'utf8')),
+        site,
+      )!;
+      const pois = placePois(
+        parsePois(JSON.parse(readFileSync(`data/landmarks/${site}/pois.json`, 'utf8'))),
+        meta,
+        terrain,
+        config.scan,
+        site,
+      );
+      const primaries = mission.objectives
+        .filter((o) => o.primary)
+        .map((o) => pois.find((p) => p.id === o.poi)!);
+      const pose = runtimeMissionSpawn(
+        site,
+        primaries,
+        meta,
+        terrain,
+        props,
+        spawnSettings(config),
+        config.submarine.hullClasses[mission.hull_class!].ratedDepth,
+        effective.camera,
+      );
+      expect(pose).not.toBeNull();
+      const position = new Vector3(pose!.x, pose!.y, pose!.z);
+      const rig = new CameraRig(effective.camera, 16 / 9, terrain);
+      rig.setChaseRadiusDefault(pose!.chaseRadius, pose!.chaseOffsetX, pose!.chaseOffsetY);
+      rig.snap(position, pose!.yaw, 0);
+      rig.camera.updateMatrixWorld(true);
+      props.update(rig.camera);
+      // The manifest's opening hero represents the first objective at every shipped site.
+      // Do not substitute the much larger POI scan sphere for physical subject geometry.
+      const subjectId = siteManifest(site)!.opening!.freeDive!.hero;
+      const subject = props.placed.find((p) => p.def.id === subjectId)!;
+      expect(subject).toBeDefined();
+      expect(subject.root.visible).toBe(true);
+      expect(subject.root.position.distanceTo(primaries[0].position)).toBeLessThan(
+        primaries[0].radius,
+      );
+      const bounds = new Box2();
+      for (const mesh of solidMeshes(subject.root)) bounds.union(screenBounds(mesh, rig));
+      bounds.intersect(new Box2(new Vector2(-1, -1), new Vector2(1, 1)));
+      expect(bounds.isEmpty()).toBe(false);
+      const tanY = Math.tan((rig.camera.fov * Math.PI) / 360);
+      const degrees = 180 / Math.PI;
+      const widthDeg =
+        (Math.atan(bounds.max.x * tanY * rig.camera.aspect) -
+          Math.atan(bounds.min.x * tanY * rig.camera.aspect)) *
+        degrees;
+      const heightDeg = (Math.atan(bounds.max.y * tanY) - Math.atan(bounds.min.y * tanY)) * degrees;
+      const flagged = heightDeg < minimumObjectiveHeightDeg;
+      const row = {
+        site,
+        objective: primaries[0].id,
+        subject: subjectId,
+        configuredCameraDistanceM: rig.chaseRadius,
+        cameraDistanceM: rig.camera.position.distanceTo(position),
+        cameraPitchDeg: Math.asin(rig.camera.getWorldDirection(new Vector3()).y) * degrees,
+        objectiveDistanceM: position.distanceTo(primaries[0].position),
+        widthDeg,
+        heightDeg,
+        heightPx: ((bounds.max.y - bounds.min.y) / 2) * 900,
+        flagged,
+      };
+      geometryAudit.push(row);
+      expect(Number.isFinite(heightDeg)).toBe(true);
+      expect(heightDeg).toBeGreaterThan(0);
+      expect(flagged, `${site}: objective height ${heightDeg.toFixed(2)}°; review below 5°`).toBe(
+        expectedFlag,
+      );
+      console.log(`OPENING-GEOMETRY ${JSON.stringify(row)}`);
+      if (flagged) console.warn(`${site}: FLAG objective height ${heightDeg.toFixed(2)}° < 5°`);
+    } finally {
+      props.dispose();
+      terrain.dispose();
+    }
+  },
+);
 
 it.each(
   sites.flatMap((site) => (['low', 'medium', 'high'] as const).map((tier) => ({ site, tier }))),
