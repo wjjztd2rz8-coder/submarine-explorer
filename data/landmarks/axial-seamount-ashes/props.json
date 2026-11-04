@@ -91,6 +91,54 @@
       "collision": "box",
       "reconstruction": true,
       "note": "Game addition: a sulfide mound carrying a group of black-smoker chimneys, tubeworm clumps and bacterial mats, modelled on the way ASHES chimneys cluster on their mounds (UW Interactive Oceans). Layout is invented; stack heights follow the field, where chimneys are generally under about 4-5 m (Mushroom and Inferno are both roughly 4 m)."
+    },
+    {
+      "id": "ashes-outlier-1",
+      "model": "procedural:chimney",
+      "feature": "smoker-cluster",
+      "lat": 45.93352,
+      "lon": -130.01318,
+      "snap_to_seabed": true,
+      "heading_deg": 310,
+      "scale": 1,
+      "dimensions_m": [16, 14, 6],
+      "material_hint": "sulfide",
+      "lod_distance_m": 500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: an outlying vent cluster on the approach to Mushroom, so the vent field reads as a field from the opening. Small sulfide chimneys do ring the ASHES field; this layout and size are invented."
+    },
+    {
+      "id": "ashes-outlier-2",
+      "model": "procedural:chimney",
+      "feature": "smoker-cluster",
+      "lat": 45.93405,
+      "lon": -130.01295,
+      "snap_to_seabed": true,
+      "heading_deg": 70,
+      "scale": 1,
+      "dimensions_m": [12, 10, 4.5],
+      "material_hint": "sulfide",
+      "lod_distance_m": 500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: an outlying vent cluster on the approach to Mushroom, so the vent field reads as a field from the opening. Small sulfide chimneys do ring the ASHES field; this layout and size are invented."
+    },
+    {
+      "id": "ashes-outlier-3",
+      "model": "procedural:chimney",
+      "feature": "smoker-cluster",
+      "lat": 45.93385,
+      "lon": -130.01345,
+      "snap_to_seabed": true,
+      "heading_deg": 200,
+      "scale": 1,
+      "dimensions_m": [10, 9, 4],
+      "material_hint": "sulfide",
+      "lod_distance_m": 500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: an outlying vent cluster on the approach to Mushroom, so the vent field reads as a field from the opening. Small sulfide chimneys do ring the ASHES field; this layout and size are invented."
     }
   ]
 }
