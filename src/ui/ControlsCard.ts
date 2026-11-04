@@ -11,15 +11,15 @@ import { FocusTrap } from './FocusTrap.js';
 import { buildHowToPlay } from './HowToPlay.js';
 
 export type InputDevice = 'keyboard' | 'gamepad' | 'touch';
-export const INPUT_DEVICES: readonly InputDevice[] = ['keyboard', 'gamepad', 'touch'];
+const INPUT_DEVICES: readonly InputDevice[] = ['keyboard', 'gamepad', 'touch'];
 const DEVICE_NAME: Record<InputDevice, string> = {
   keyboard: 'Keyboard and mouse',
   gamepad: 'Gamepad',
   touch: 'Touch',
 };
 
-export type ControlRow = readonly [control: string, does: string];
-export interface ControlGroup {
+type ControlRow = readonly [control: string, does: string];
+interface ControlGroup {
   heading: string;
   rows: ControlRow[];
 }
@@ -120,7 +120,7 @@ export function controlGroups(device: InputDevice, key: KeyOf, input?: Input): C
   ];
 }
 
-export interface ControlsCardOptions {
+interface ControlsCardOptions {
   key: KeyOf;
   input?: Input;
   initialDevice: InputDevice;

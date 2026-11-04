@@ -4,7 +4,7 @@ import { hudRegions } from './hudRegions.js';
 import { nextScanObjective, type ObjectiveStatus } from '../game/Mission.js';
 
 /** The completion banner: a title, a detail line and the two end-of-dive choices. */
-export interface CompletionBanner {
+interface CompletionBanner {
   /** 0 to 3; omitted when the dive is not rated. */
   stars?: number;
   title: string;
@@ -14,7 +14,7 @@ export interface CompletionBanner {
 }
 
 /** The progress line: "1 of 4 objectives · 1 of 2 primary" (resolvable objectives only). */
-export function formatProgress(objectives: readonly ObjectiveStatus[]): string {
+function formatProgress(objectives: readonly ObjectiveStatus[]): string {
   const live = objectives.filter((o) => o.resolved);
   const done = live.filter((o) => o.complete).length;
   const primary = live.filter((o) => o.primary);

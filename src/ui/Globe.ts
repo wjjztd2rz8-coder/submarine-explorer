@@ -45,13 +45,13 @@ import {
 } from './GlobeModel.js';
 import { missionUrl, tileUrl } from './MissionSelect.js';
 
-export interface GlobeEmitter {
+interface GlobeEmitter {
   emit<K extends keyof GameEvents>(name: K, payload: GameEvents[K]): void;
 }
 
-export type GlobeOpenSource = GameEvents['globe:opened']['source'];
+type GlobeOpenSource = GameEvents['globe:opened']['source'];
 
-export interface GlobeOptions {
+interface GlobeOptions {
   config: GlobeConfig;
   bus?: GlobeEmitter | null;
   /** Ids from data/tiles/index.json (free-dive availability). */

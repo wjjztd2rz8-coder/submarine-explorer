@@ -37,7 +37,7 @@ export interface BriefingContent {
   startPosition?: MissionStartPosition;
 }
 
-export interface BriefingOptions {
+interface BriefingOptions {
   onBegin: (choice: MissionStartPosition) => void;
   onCancel?: () => void;
   parent?: HTMLElement;
@@ -47,7 +47,7 @@ export interface BriefingOptions {
  * What the briefing's Dive settings panel edits. Without it the
  * panel shows only the start choice, for this launch.
  */
-export interface DiveSettingsOptions {
+interface DiveSettingsOptions {
   settings: GameplaySettingsSource;
   /** `Config.settings.gameplayOptions`: the values each option offers. */
   choices: { readonly [K in keyof GameplayOptions]: readonly GameplayOptions[K][] };

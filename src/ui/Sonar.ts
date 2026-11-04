@@ -230,7 +230,7 @@ export function easeSonarRange(from: number, to: number, progress: number): numb
 /** Minimum clear pixels between two map labels (box to box). */
 export const LABEL_GAP_PX = 4;
 
-export interface LabelBox {
+interface LabelBox {
   x0: number;
   y0: number;
   x1: number;

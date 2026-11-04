@@ -49,7 +49,7 @@ import { PhotoGallery } from './PhotoGallery.js';
 import { PHOTO_LIMIT, type PhotoStore } from '../game/PhotoStore.js';
 // --- D-PHOTO end ---
 
-export interface GuideEmitter {
+interface GuideEmitter {
   emit<K extends keyof GameEvents>(name: K, payload: GameEvents[K]): void;
 }
 

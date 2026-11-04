@@ -34,9 +34,9 @@ import { el } from './dom.js';
 import { FocusTrap, onUnhandledKeyDown } from './FocusTrap.js';
 import { ModeSelector } from './ModeSelector.js';
 
-export const UI_SCALE_MIN = 80;
-export const UI_SCALE_MAX = 150;
-export const UI_SCALE_STEP = 5;
+const UI_SCALE_MIN = 80;
+const UI_SCALE_MAX = 150;
+const UI_SCALE_STEP = 5;
 
 /** A UI scale percent, rounded and clamped to [80, 150]. */
 export function clampUiScale(value: number): number {
@@ -57,16 +57,16 @@ export function stepUiScale(value: number, dir: -1 | 1): number {
 export { GAMEPLAY_LABELS, GAMEPLAY_NOTES, gameplayKeysInOrder } from '../core/config/modes.js';
 
 /** Keys the dialog itself needs; never offered as a binding. */
-export const RESERVED_KEYS: readonly string[] = ['Escape', 'Tab'];
+const RESERVED_KEYS: readonly string[] = ['Escape', 'Tab'];
 
 /** The subset of `Input` the screen uses. */
-export interface SettingsInput {
+interface SettingsInput {
   readonly actions: ActionBinding[];
   rebind(id: ActionId, keys: string[]): boolean;
   resetBindings(): void;
 }
 
-export interface RebindPlan {
+interface RebindPlan {
   /** The action's new key list (the pressed key first). */
   keys: string[];
   /** Other actions that lose the key, with what they keep. */
@@ -110,7 +110,7 @@ export function keysText(keys: readonly string[]): string {
   return keys.length ? [...new Set(keys.map(keyLabel))].join(' / ') : 'Unbound';
 }
 
-export interface SettingsScreenOptions {
+interface SettingsScreenOptions {
   save: Save;
   input: SettingsInput;
   config: Pick<GameConfig, 'settings' | 'sonarPalettes'>;

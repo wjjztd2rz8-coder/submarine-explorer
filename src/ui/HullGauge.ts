@@ -9,7 +9,7 @@ import type { SubmarineState } from '../sub/Submarine.js';
  * 99%, always shows it.
  */
 export const HULL_GAUGE_SHOW_RATIO = 0.8;
-export const HULL_GAUGE_HIDE_RATIO = 0.75;
+const HULL_GAUGE_HIDE_RATIO = 0.75;
 
 /** Gauge visibility with a little hysteresis so it does not flicker at the edge. */
 export function hullGaugeVisible(ratio: number, wasVisible: boolean): boolean {

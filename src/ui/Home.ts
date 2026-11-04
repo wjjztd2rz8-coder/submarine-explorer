@@ -3,7 +3,7 @@ import mark from '../../public/bathyline-mark.svg?raw';
 import { FocusTrap, observeOverlayOpen } from './FocusTrap.js';
 import { ModeSelector, type GameplaySettingsSource } from './ModeSelector.js';
 
-export interface HomeActions {
+interface HomeActions {
   /** The one primary action: first run opens the opening briefing, afterwards the last mission. */
   dive(): void;
   journal(): void;
