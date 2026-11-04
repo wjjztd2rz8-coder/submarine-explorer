@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- V-bluehole-pitchup IN FLIGHT (Sonnet, 2026-11-03). Otherwise none running. Briefs 120-124 queued, waiting for the Nov 4 Codex reset. Claude lane: V-bismarck-framing, V-hudson-ledge, then U-play-walkthrough-3 and V-golden-refresh.
+- No package running. Briefs 120-124 queued, waiting for the Nov 4 Codex reset. Claude lane: V-bismarck-framing, V-hudson-ledge, then U-play-walkthrough-3 and V-golden-refresh.
 
 ## Backlog
 
@@ -97,7 +97,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 - **V-hudson-ledge [Sonnet] (golden 2026-11-03, ~3.8):** coral heads are lit and readable but the top 40% is plain dark water. Target: a horizon wall or ledge lip in the upper third (generic `cliff` field, as Hunga). Lowest priority of the three.
 - **U-play-walkthrough-3 [Haiku, after the next phone retest]:** re-run the first-60-s capture (Home, site pick, briefing, first scan, debrief) at 1280x720 and 390x844 and list confusions in `plan/progress/`; file each as a U-* item.
 - **V-golden-refresh [Haiku]:** run `GOLDEN_MODE=mission tools/golden.sh` in the background (about 15 min) after the V-axial-subject and V-bismarck-framing merges and note which frames changed; feeds the next review.
-- **V-bluehole-pitchup [Sonnet, owner did not answer by review 2026-11-04, so proceed]:** opening pose pitched up under the hood so the gallery fills the top third (the default from the old V-bluehole-opening-decision; the owner may still overrule). Golden 2026-11-04 is unchanged at ~3.85 (small brown leaf, open water above). Run the Blue Hole specs (R-site-specs); the hull-safe check may need a pose-specific relaxation as data, not a site branch.
+- **V-bluehole-pitchup DONE 2026-11-04 (b426b6c4; free-dive pose data only, ~4.0; hood large with stalactites but reads as outcrop ahead, lower half very dark; real overhang needs pose search to accept under-lip or hood geometry change) [Sonnet, owner did not answer by review 2026-11-04, so proceed]:** opening pose pitched up under the hood so the gallery fills the top third (the default from the old V-bluehole-opening-decision; the owner may still overrule). Golden 2026-11-04 is unchanged at ~3.85 (small brown leaf, open water above). Run the Blue Hole specs (R-site-specs); the hull-safe check may need a pose-specific relaxation as data, not a site branch.
 - **V-endurance-dropstone-tone [Sonnet] (golden 2026-11-04, ~3.8):** dropstones are not visible in the opening frame; the sub sits over the hull and hides the stern. Target: hull left of centre with two pale lit stones in the lower-right, sub clear of the hull. Route: opening pose and stone placement data.
 - **V-axial-sky-band [Sonnet, optional] (golden 2026-11-04, Axial ~4.0):** upper third is still empty dark water above the ridge; add a faint far ridge or particle haze via the generic `fogHaze` horizon option.
 
