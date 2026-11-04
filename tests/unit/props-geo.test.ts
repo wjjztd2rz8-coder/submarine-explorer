@@ -361,6 +361,63 @@ function firstPositions(o: THREE.Object3D): number[] {
   return out;
 }
 
+describe('dropstone buffers and terrain grounding', () => {
+  const definitions = parsePropsDoc(
+    JSON.parse(readFileSync('data/landmarks/endurance/props.json', 'utf8')),
+    cfg,
+  ).props.filter((def) => def.feature === 'dropstones');
+
+  for (const tier of ['low', 'medium', 'high']) {
+    it(`${tier}: repeats all buffers, bounds and colliders on flat and sloped ground`, () => {
+      expect(definitions).toHaveLength(2);
+      for (const def of definitions) {
+        for (const slope of [0, 0.15]) {
+          const source = JSON.stringify(def);
+          const input = {
+            def,
+            dims: def.dimensionsM!,
+            seed: hashString(def.id),
+            cfg,
+            tier,
+            groundHeight: () => (x: number, z: number) => slope * (x - z),
+          };
+          const a = buildGeo(input);
+          const b = buildGeo(input);
+          const other = buildGeo({ ...input, seed: input.seed + 1 });
+          try {
+            expect(propEvidence(a)).toEqual(propEvidence(b));
+            expect(propEvidence(a).buffers).not.toBe(propEvidence(other).buffers);
+            expect(JSON.stringify(def)).toBe(source);
+            for (const box of [a.bounds, ...a.colliders!]) {
+              expect(box.isEmpty()).toBe(false);
+              expect([...box.min.toArray(), ...box.max.toArray()].every(Number.isFinite)).toBe(
+                true,
+              );
+            }
+            a.full.traverse((object) => {
+              if (!(object instanceof THREE.Mesh)) return;
+              for (const attribute of Object.values(
+                object.geometry.attributes as Record<string, THREE.BufferAttribute>,
+              ))
+                expect(Array.from(attribute.array).every(Number.isFinite)).toBe(true);
+              // Each cluster straddles the mud and has above-ground relief.
+              const p = object.geometry.getAttribute('position');
+              const relief = Array.from(
+                { length: p.count },
+                (_, i) => p.getY(i) - slope * (p.getX(i) - p.getZ(i)),
+              );
+              expect(Math.min(...relief)).toBeLessThan(0);
+              expect(Math.max(...relief)).toBeGreaterThan(def.dimensionsM![2] * 0.8);
+            });
+          } finally {
+            for (const built of [a, b, other]) disposeProp(built);
+          }
+        }
+      }
+    });
+  }
+});
+
 describe('procedural:geo features', () => {
   for (const f of GEO_FEATURES) {
     it(`${f}: builds a finite, non-empty prop with colliders and an impostor`, () => {
