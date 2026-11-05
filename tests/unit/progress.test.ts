@@ -12,6 +12,8 @@ import {
 import { Progress, diveStars, requiredHull } from '../../src/game/Progress.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { Mission, parseMission } from '../../src/game/Mission.js';
+import { createProgressSystem } from '../../src/app/systems/progress.js';
+import type { GameContext } from '../../src/app/context.js';
 
 function storage(): SettingsStorage {
   const values = new Map<string, string>();
@@ -179,6 +181,69 @@ describe('research rewards and save migration', () => {
 });
 
 describe('ratings and hull unlocks', () => {
+  it.each(
+    [
+      ['shallow', 'middle', 'deep'],
+      ['shallow', 'deep', 'middle'],
+      ['middle', 'shallow', 'deep'],
+      ['middle', 'deep', 'shallow'],
+      ['deep', 'shallow', 'middle'],
+      ['deep', 'middle', 'shallow'],
+    ].map((order) => ({ order, label: order.join(', ') })),
+  )('keeps rewards and best ratings when completing missions in order $label', ({ order }) => {
+    const store = storage();
+    let progress = new Progress(new ProgressSave(store));
+    progress.completeLegacyCredit();
+    // Revisit every site with fewer completed objectives, then abort a full replay.
+    for (const outcome of ['all', 'primary', 'abort']) {
+      for (const site of order) {
+        const bus = new EventBus();
+        const rewards = createProgressSystem();
+        rewards.init?.({ bus, progress, expose: () => {} } as unknown as GameContext);
+        const mission = new Mission({
+          bus,
+          def: parseMission(
+            {
+              spawn: { lat: 0, lon: 0 },
+              objectives: [
+                { id: 'primary', poi: 'a', primary: true },
+                { id: 'optional', poi: 'b', primary: false },
+              ],
+            },
+            site,
+          )!,
+        });
+        try {
+          mission.start(site);
+          for (const poiId of outcome === 'primary' ? ['a', 'a'] : ['b', 'a', 'b', 'a'])
+            bus.emit('scan:complete', { landmarkId: site, poiId, firstTime: false });
+          if (outcome === 'abort') mission.abort('power');
+          mission.end();
+          const rating = progress.finish(site, mission.objectives, mission.endReason === 'abort');
+          expect(rating).toEqual({
+            stars: outcome === 'all' ? 2 : outcome === 'primary' ? 1 : 0,
+            best: 2,
+            points: 0,
+          });
+          expect(progress.points).toBe(0);
+          expect(progress.bonus).toBe(false);
+          const snapshot = progress.snapshot();
+          expect(
+            snapshot.awarded.filter((token) => token === `objective:${site}/primary`),
+          ).toHaveLength(1);
+          expect(snapshot.awarded.filter((token) => token === `primary:${site}`)).toHaveLength(1);
+          progress = new Progress(new ProgressSave(store));
+          expect(progress.snapshot()).toEqual(snapshot);
+        } finally {
+          mission.dispose();
+          rewards.dispose?.();
+        }
+      }
+    }
+    expect(progress.stars).toBe(6);
+    expect(progress.snapshot().awarded).toHaveLength(21);
+  });
+
   const primary = { primary: true, complete: true };
   const secondary = { primary: false, complete: false };
   it.each(['_test', 'Hero_Site', 'constructor', '__proto__'])(

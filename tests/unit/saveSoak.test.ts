@@ -113,6 +113,104 @@ it.each(['quota', 'dropped write', 'interrupted reward'])(
 );
 
 describe('save schema soak', () => {
+  it.each([undefined, 0, 1, 2])(
+    'mutation-fuzzes progress v%s fields without losing intact evidence across reloads',
+    (version) => {
+      const intact = {
+        version,
+        points: 75,
+        lifetime: 400,
+        awarded: ['poi:survey/a', 'species:ray', 'rating:survey/2'],
+        upgrades: { boost: 1 },
+        ratings: { archive: 3, survey: 2 },
+        cosmeticGrants: ['paint:violet'],
+        cosmetics: { paint: 'violet', trim: 'stock', decal: 'stock', frame: 'stock' },
+        dailyBestStreak: 4,
+        legacyCredited: false,
+        legacyPending: [{ site: 'survey', keys: ['survey/a'], bonus: false }],
+      };
+      // Exhaustive single-field mutations make failures reproducible without random seeds.
+      const mutations = [undefined, null, false, -1, 1.5, 'damaged', [], { extra: true }];
+      for (const field of Object.keys(intact).filter((key) => key !== 'version')) {
+        for (const mutation of mutations) {
+          const storage = new MemoryStorage();
+          storage.setItem('unrelated', 'keep');
+          storage.setItem(
+            PROGRESS_STORAGE_KEY,
+            JSON.stringify({ ...intact, [field]: mutation, extra: { nested: ['unknown', 1] } }),
+          );
+          let save = new ProgressSave(storage);
+          const migrated = save.get();
+          if (field !== 'awarded') expect(migrated.awarded).toEqual(intact.awarded);
+          if (field !== 'ratings') expect(migrated.ratings.archive).toBe(3);
+          // Either intact ratings or intact star tokens still prove these two stars.
+          expect(migrated.ratings.survey).toBe(2);
+          if (field !== 'upgrades') expect(migrated.upgrades.boost).toBe(1);
+          if (field !== 'dailyBestStreak') expect(migrated.dailyBestStreak).toBe(4);
+          if (field !== 'legacyPending')
+            expect(migrated.legacyPending).toEqual(intact.legacyPending);
+          if (field !== 'cosmeticGrants') expect(migrated.cosmeticGrants).toContain('paint:violet');
+          if (field !== 'cosmetics' && field !== 'cosmeticGrants')
+            expect(migrated.cosmetics.paint).toBe('violet');
+          expect(migrated.points).toBeGreaterThanOrEqual(0);
+          expect(migrated.lifetime).toBeGreaterThanOrEqual(migrated.points);
+          for (let reload = 0; reload < 2; reload++) {
+            save.save(save.get());
+            save = new ProgressSave(storage);
+            expect(save.get()).toEqual(migrated);
+          }
+          expect(storage.getItem('unrelated')).toBe('keep');
+        }
+      }
+    },
+  );
+
+  it.each([undefined, 0, 1])(
+    'mutation-fuzzes discovery v%s metadata while preserving Journal keys and repeat counts',
+    (version) => {
+      const mutations = [undefined, null, false, -1, 1.5, 'damaged', [], { extra: true }];
+      for (const field of ['at', 'count', 'stats']) {
+        for (const mutation of mutations) {
+          const storage = new MemoryStorage();
+          const raw = {
+            version,
+            discovered: {
+              'survey/a': { at, count: 3, extra: { keep: true } },
+              'survey/life:ray': {
+                at,
+                count: 1,
+                ...(field === 'stats' ? {} : { [field]: mutation }),
+              },
+            },
+            stats: field === 'stats' ? mutation : { scans: 4, extra: true },
+            extra: ['unknown'],
+          };
+          storage.setItem(DISCOVERY_STORAGE_KEY, JSON.stringify(raw));
+          let discoveries = new DiscoveryStore(storage, now);
+          expect(discoveries.keys()).toEqual(['survey/a', 'survey/life:ray']);
+          expect(discoveries.get('survey', 'a')).toEqual({ at, count: 3 });
+          const animal = discoveries.get('survey', 'life:ray')!;
+          expect(animal.at).toBe(at);
+          expect(animal.count).toBeGreaterThanOrEqual(1);
+          expect(discoveries.stats.scans).toBeGreaterThanOrEqual(3 + animal.count);
+          expect(discoveries.record('survey', 'a').firstTime).toBe(false);
+          expect(discoveries.get('survey', 'a')).toEqual({ at, count: 4 });
+          for (let reload = 0; reload < 2; reload++) {
+            const restored = new DiscoveryStore(storage, now);
+            expect(restored.snapshot()).toEqual(discoveries.snapshot());
+            expect(restored.discoveredFor('survey')).toEqual(['a', 'life:ray']);
+            expect(restored.record('survey', 'life:ray').firstTime).toBe(false);
+            expect(restored.get('survey', 'life:ray')).toEqual({
+              at,
+              count: animal.count + reload + 1,
+            });
+            discoveries = restored;
+          }
+        }
+      }
+    },
+  );
+
   it.each(['legacy', 'partial'])(
     'keeps Journal namespaces through a %s migration and reload',
     (shape) => {
