@@ -3198,3 +3198,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged Sonnet V-monterey-wall-clarity (pose data: low-sitting, wall-facing mission opening; I rate it ~4.5/10, only a modest gain; striation distance fade in scarp.ts still open). Fixed two red main specs found by its gates: sea-pen head built with a redundant toNonIndexed (THREE warning failed 12 portrait opening specs for Hudson/Monterey) and a stale Lost City arcade-mission reset-radius expectation. gates smoke green on main, pushed. 124/131 still held; Codex briefs 143-146 queued.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-05 13:26 CST headless run 353 (Claude): false review trigger + Monterey striation
+
+- Comprehensive flag fired 5 h after the joint review (sync merges counted); fixed tools/review-triggers.sh, short targeted entry in REVIEWS.md. Merged Sonnet V-monterey-striation (distance-calmed scarp colour, ~5/10; stripes remain from ledge geometry). gates smoke green on branch and main. Codex briefs 143-146 queued; 124/131 still held.
+- **Needs owner:** phone retest (4410-P2 checklist).
