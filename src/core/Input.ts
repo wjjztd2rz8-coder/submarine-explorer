@@ -212,7 +212,7 @@ export interface BindingStore {
   removeItem(key: string): void;
 }
 
-export interface InputOptions {
+interface InputOptions {
   /** Element that receives mouse events (usually the canvas). */
   target?: HTMLElement | null;
   /** Defaults to `window.localStorage` when it exists. */

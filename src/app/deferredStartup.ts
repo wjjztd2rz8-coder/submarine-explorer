@@ -7,7 +7,7 @@ export interface DiveSelection<Request> {
 }
 
 /** Boot owns route policy; this boundary receives its existing Home/dive decision. */
-export type StartupRoute<Request> =
+type StartupRoute<Request> =
   | { readonly state: Extract<AppState, 'home'> }
   | { readonly state: Extract<AppState, 'dive'>; readonly dive: DiveSelection<Request> };
 
@@ -17,7 +17,7 @@ export interface DiveLifetime {
   addCleanup(cleanup: () => void): void;
 }
 
-export interface StartupOperations<Request, Tile> {
+interface StartupOperations<Request, Tile> {
   load(request: Request, signal: AbortSignal): Promise<Tile>;
   /** Release a loaded tile, including one returned after cancellation. */
   release(tile: Tile): void;

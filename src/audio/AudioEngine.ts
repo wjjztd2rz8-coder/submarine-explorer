@@ -16,7 +16,7 @@
 
 import type { AudioConfig } from '../core/Config.js';
 
-export type BusName = 'ambient' | 'sub' | 'ui' | 'sonar' | 'music';
+type BusName = 'ambient' | 'sub' | 'ui' | 'sonar' | 'music';
 
 export class AudioEngine {
   readonly ctx: AudioContext;

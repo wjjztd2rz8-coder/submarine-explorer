@@ -29,7 +29,7 @@ interface BoxCollider {
 }
 
 /** A solid floor below its rendered triangles; cached in world space at placement. */
-export interface SurfaceCollider {
+interface SurfaceCollider {
   kind: 'surface';
   center: THREE.Vector3;
   boundRadius: number;

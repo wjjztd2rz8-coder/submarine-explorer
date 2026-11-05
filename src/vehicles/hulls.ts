@@ -55,7 +55,7 @@ export type HullClassId = 'A' | 'B' | 'C';
 const V = (x: number, y: number, z: number): THREE.Vector3 => new THREE.Vector3(x, y, z);
 
 /** Low LOD folds the machined-metal slot into the frame (one draw call fewer). */
-export function slotMapFor(low: boolean): Partial<Record<Slot, Slot | null>> {
+function slotMapFor(low: boolean): Partial<Record<Slot, Slot | null>> {
   return low ? { metal: 'frame' } : {};
 }
 
@@ -88,7 +88,7 @@ function sidePair(
 
 // ------------------------------------------------------------------ Class B
 
-export function classB(low: boolean): Blueprint {
+function classB(low: boolean): Blueprint {
   const pb = new PartBuilder(slotMapFor(low));
   const radial = low ? 24 : 48;
   const steps = low ? 22 : 56;
@@ -339,7 +339,7 @@ export function classB(low: boolean): Blueprint {
 
 // ------------------------------------------------------------------ Class A
 
-export function classA(low: boolean): Blueprint {
+function classA(low: boolean): Blueprint {
   const pb = new PartBuilder(slotMapFor(low));
   const radial = low ? 20 : 40;
   const steps = low ? 16 : 40;
@@ -595,7 +595,7 @@ export function classA(low: boolean): Blueprint {
 
 // ------------------------------------------------------------------ Class C
 
-export function classC(low: boolean): Blueprint {
+function classC(low: boolean): Blueprint {
   const pb = new PartBuilder(slotMapFor(low));
   const radial = low ? 24 : 44;
   const steps = low ? 20 : 48;

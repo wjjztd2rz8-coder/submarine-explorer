@@ -68,7 +68,7 @@ export function creatureHintAllowed(diveS: number, scanCardVisible: boolean): bo
   return !scanCardVisible || diveS >= 8;
 }
 
-export function hintDue(id: HintId, c: HintContext): boolean {
+function hintDue(id: HintId, c: HintContext): boolean {
   switch (id) {
     case 'battery-low':
       return c.battery !== null && c.battery < HINT_THRESHOLDS.battery;

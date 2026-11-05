@@ -7,9 +7,9 @@
 import type { InputDevice } from '../ui/ControlsCard.js';
 
 export type TutorialStepId = 'move' | 'depth' | 'scan';
-export type TutorialEvent = 'scan:complete' | 'scan:started' | 'scan:aborted';
+type TutorialEvent = 'scan:complete' | 'scan:started' | 'scan:aborted';
 
-export interface TutorialStep {
+interface TutorialStep {
   id: TutorialStepId;
   title: string;
 }
@@ -23,14 +23,14 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
 /** Seconds of held input before a movement step counts as done. */
 export const MOVE_HOLD_S = 0.8;
 export const TURN_HOLD_S = 0.5;
-export const DEPTH_HOLD_S = 0.8;
+const DEPTH_HOLD_S = 0.8;
 /** A first target this close in depth (m) makes the depth step pointless: skip it. */
 export const DEPTH_SKIP_M = 15;
 /** Seconds on the move step with no input before the text adds the marker distance. */
 export const MOVE_IDLE_S = 20;
 const AXIS_MIN = 0.25;
 
-export interface TutorialSample {
+interface TutorialSample {
   /** Unfrozen seconds since the last sample. */
   dt: number;
   throttle: number;

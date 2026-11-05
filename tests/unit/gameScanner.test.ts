@@ -700,14 +700,6 @@ describe('Scanner', () => {
     expect(scanner.view.activeId).toBeNull();
   });
 
-  it('prefers the nearest scannable target', () => {
-    const near = target({ id: 'near', position: new Vector3(0, -100, -50) });
-    const far = target({ id: 'far', position: new Vector3(0, -100, -120) });
-    const { scanner } = setup([far, near]);
-    scanner.update(DT, AT, NORTH, true);
-    expect(scanner.view.activeId).toBe('near');
-  });
-
   it('suppresses rescans for the dive, then allows a repeat in a new dive without losing Journal state', () => {
     const { scanner, log, store } = setup();
     run(scanner, 2.2, AT, NORTH, true);

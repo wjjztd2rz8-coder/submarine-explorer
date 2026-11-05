@@ -28,7 +28,7 @@ export const GUIDANCE_ORDER: readonly GuidanceKind[] = [
   'objective',
 ];
 
-export type GuidanceTone = 'cyan' | 'amber' | 'dim' | 'alert';
+type GuidanceTone = 'cyan' | 'amber' | 'dim' | 'alert';
 
 export interface GuidanceMessage {
   /** Small label above the text, e.g. "New Journal entry". */

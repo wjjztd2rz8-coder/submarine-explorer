@@ -67,7 +67,7 @@ export const FRAME_STAGES = [
   'late.perf', // quality: perf counters and dynamic resolution
 ] as const;
 
-export type FrameStage = (typeof FRAME_STAGES)[number];
+type FrameStage = (typeof FRAME_STAGES)[number];
 
 /**
  * Per-frame values shared between stages. The loop resets the gate fields each

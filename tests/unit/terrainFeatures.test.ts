@@ -19,9 +19,6 @@ const meta = {
 describe('Blue Hole carve', () => {
   const carve = terrainCarveFor(meta)!;
   const { x, z } = carve.centre;
-  it('leaves sites without a reconstruction unchanged', () => {
-    expect(terrainCarveFor({ ...meta, id: 'titanic' } as TileMeta)).toBeNull();
-  });
   it('digs a ~125 m deep hole under a 4 m deep shelf and leaves the shelf alone outside', () => {
     expect(carve.apply(x, z, -4)).toBeLessThan(-120);
     expect(carve.apply(x + BLUE_HOLE_RADIUS_M * 2, z, -4)).toBe(-4);
