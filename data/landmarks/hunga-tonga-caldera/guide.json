@@ -49,6 +49,10 @@
         {
           "title": "Ribó et al. 2026 — repeat bathymetry of Hunga",
           "url": "https://www.nature.com/articles/s41561-026-02099-7"
+        },
+        {
+          "title": "Ribó et al. 2026 — author-deposited full text",
+          "url": "https://openrepository.aut.ac.nz/items/739ece41-4021-4129-b3ee-d2928eea8089"
         }
       ],
       "confidence": "high"
@@ -71,7 +75,7 @@
         },
         {
           "label": "Pre-eruption survey",
-          "value": "WASSP multibeam, Nov 2015; further multibeam, Sep 2017"
+          "value": "November 2015 WASSP multibeam; May 2016 R/V Falkor multibeam (Ribó et al. 2026)"
         }
       ],
       "reconstruction": false,
@@ -87,6 +91,10 @@
         {
           "title": "Ribó et al. 2026 — repeat bathymetry of Hunga",
           "url": "https://www.nature.com/articles/s41561-026-02099-7"
+        },
+        {
+          "title": "Ribó et al. 2026 — author-deposited full text",
+          "url": "https://openrepository.aut.ac.nz/items/739ece41-4021-4129-b3ee-d2928eea8089"
         }
       ],
       "confidence": "high"
@@ -121,6 +129,10 @@
         {
           "title": "Ribó et al. 2026 — island connection and caldera changes",
           "url": "https://www.nature.com/articles/s41561-026-02099-7"
+        },
+        {
+          "title": "Ribó et al. 2026 — author-deposited full text",
+          "url": "https://openrepository.aut.ac.nz/items/739ece41-4021-4129-b3ee-d2928eea8089"
         }
       ],
       "confidence": "high"
@@ -159,7 +171,7 @@
       "id": "outer-flank",
       "title": "The outer flank of a 2-km volcano",
       "paragraphs": [
-        "Beyond the caldera rim, the seafloor drops away down the outer flank of the wider volcanic edifice -- this tile reads roughly 1,029 m deep here. The whole structure, from this outer base to the summit islands, rises about 2 km from the surrounding seafloor, making Hunga Tonga-Hunga Ha'apai one of the larger submarine volcanoes in the Tonga-Kermadec arc.",
+        "Beyond the caldera rim, the seafloor drops away down the volcano's outer flank. This grid reads about 1,029 m at the reference point. The wider volcanic edifice rises roughly 2 km from the surrounding seafloor to the summit islands; this scan is partway down the flank.",
         "The flank is part of the wider volcanic edifice. The 2022 eruption also scoured slopes outside the caldera through fast-moving volcanic sediment flows."
       ],
       "facts": [
@@ -185,6 +197,10 @@
         {
           "title": "Ribó et al. 2026 — flank erosion",
           "url": "https://www.nature.com/articles/s41561-026-02099-7"
+        },
+        {
+          "title": "Ribó et al. 2026 — author-deposited full text",
+          "url": "https://openrepository.aut.ac.nz/items/739ece41-4021-4129-b3ee-d2928eea8089"
         }
       ],
       "confidence": "high"

@@ -127,8 +127,8 @@
       "id": "vent-life",
       "title": "Life on the chimneys",
       "paragraphs": [
-        "ASHES supports a dense community built entirely on chemosynthesis: bacteria that oxidise hydrogen sulfide from the vent fluid form the base of a food web with no sunlight at all. Ridgeia tube worms, palm worms and sulfide worms crowd the warmest chimney surfaces, while limpets and scale worms graze among them and spider crabs pick through the debris.",
-        "Filamentous bacterial mats and lavender-blue ciliate protists coat rock surfaces near diffuse, lower-temperature flow. Notably, the large clams common at many black-smoker fields are absent from ASHES's chimney faces -- they turn up instead at the field's diffuse-flow sites, away from the hottest fluid."
+        "Chemosynthetic microbes use chemicals in vent fluid to produce organic matter, supporting ASHES's animal communities. University of Washington imagery documents Ridgeia tube worms, palm worms, sulfide worms, limpets, scale worms and spider crabs. The animals occupy surfaces where vent fluids mix with cold seawater.",
+        "Filamentous bacteria coat surfaces around the vents. The field description reports rare clams at diffusely venting fractures, while chimney communities lack clams."
       ],
       "facts": [
         {
@@ -147,8 +147,8 @@
           "url": "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes/"
         },
         {
-          "title": "data/landmarks.json notable_species (this repo, sourced from Wikipedia's Axial Seamount article)",
-          "url": "https://en.wikipedia.org/wiki/Axial_Seamount"
+          "title": "University of Washington Regional Cabled Array — Inferno vent community",
+          "url": "https://interactiveoceans.washington.edu/inferno-vent-at-axial/"
         }
       ],
       "confidence": "medium"

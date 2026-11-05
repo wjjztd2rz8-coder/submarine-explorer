@@ -1,5 +1,12 @@
 # Hudson Canyon content: sources and notes (package C4, hudson-canyon)
 
+## S-fact-check-journal-2 — 2026-11-05
+
+The [second Journal fact-check](../../../plan/progress/S-fact-check-journal-2.md)
+records source checks, corrections, species-export limits and unresolved claims.
+It supplements the first pass and supersedes conflicting historical notes below.
+Existing Journal tags identify each scene addition once.
+
 Researched 2026-09-23. Files: `pois.json`, `guide.json`, `mission.json`, `props.json` (empty),
 `species.json` in this folder. Tile: `data/tiles/hudson-canyon` (GMRT Synthesis, Ryan et al.
 2009, doi:10.1029/2008GC002332; bbox N 39.65009 / S 39.15021 / E -72.09998 / W -72.70038;

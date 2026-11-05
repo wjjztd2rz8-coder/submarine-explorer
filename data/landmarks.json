@@ -409,7 +409,7 @@
         "west": 142.4
       },
       "region": "Western Pacific",
-      "country_eez": "Federated States of Micronesia / international (Mariana Trench)",
+      "country_eez": "Federated States of Micronesia",
       "confidence": "high",
       "coordinate_source": "https://doi.org/10.1016/j.earscirev.2019.102896",
       "summary": "The deepest known region of Earth's oceans, in the southern Mariana Trench, with three elongated sub-basins known as the Western, Central and Eastern Pools.",
@@ -426,12 +426,12 @@
         "Deploy a lander to the eastern pool"
       ],
       "hazards": ["crush depth", "near-total darkness", "extreme pressure", "long transit time"],
-      "notable_species": [
-        "Amphipods (Hirondellea gigas)",
-        "Xenophyophores",
-        "Deep-sea holothurians"
+      "notable_species": ["Amphipods (Hirondellea gigas)", "sediment-dwelling microbes"],
+      "external_links": [
+        "https://en.wikipedia.org/wiki/Challenger_Deep",
+        "https://fivedeeps.com/",
+        "https://doi.org/10.1016/j.earscirev.2019.102896"
       ],
-      "external_links": ["https://en.wikipedia.org/wiki/Challenger_Deep", "https://fivedeeps.com/"],
       "wreck_meta": null
     },
     {
@@ -1068,8 +1068,11 @@
         "New-sanctuary conservation-baseline survey mission"
       ],
       "hazards": ["strong currents", "commercial fishing activity"],
-      "notable_species": ["deep-sea corals", "sand tiger sharks", "squid"],
-      "external_links": ["https://en.wikipedia.org/wiki/Hudson_Canyon"],
+      "notable_species": ["deep-sea corals", "sperm whales", "squid"],
+      "external_links": [
+        "https://en.wikipedia.org/wiki/Hudson_Canyon",
+        "https://sanctuaries.noaa.gov/hudson-canyon/"
+      ],
       "wreck_meta": null
     },
     {
@@ -1365,8 +1368,8 @@
       "summary": "A vast deep-sea coral reef province beneath the Gulf Stream off the southeastern US, with about 6.4 million acres of cold-water coral mound habitat mapped in the 2024 study.",
       "facts": [
         "Announced by NOAA in 2024 as the largest deep-sea coral reef habitat yet mapped, roughly 500 km long",
-        "Comprises thousands of individual coral mounds up to tens of meters tall",
-        "Sits beneath the Gulf Stream at depths of roughly 200-1,000 m",
+        "Comprises thousands of coral mounds with typical relief of tens of meters",
+        "Sits beneath the Gulf Stream at depths of roughly 500-1,000 m",
         "Provides critical deep-sea fish and invertebrate habitat despite total darkness"
       ],
       "gameplay_hooks": [
@@ -1374,10 +1377,15 @@
         "Gulf Stream current-navigation challenge"
       ],
       "hazards": ["strong Gulf Stream currents", "fragile coral habitat (no-touch)"],
-      "notable_species": ["Lophelia pertusa coral", "deep-sea sharks", "squat lobsters"],
+      "notable_species": [
+        "Desmophyllum pertusum coral (formerly Lophelia pertusa)",
+        "deep-sea sharks",
+        "squat lobsters"
+      ],
       "external_links": [
         "https://oceanexplorer.noaa.gov/",
-        "https://oceanexplorer.noaa.gov/news/million-mounds-news/"
+        "https://oceanexplorer.noaa.gov/news/million-mounds-news/",
+        "https://doi.org/10.3390/geomatics4010002"
       ],
       "wreck_meta": null
     },

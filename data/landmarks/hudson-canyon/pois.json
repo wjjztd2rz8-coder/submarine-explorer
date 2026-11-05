@@ -17,9 +17,9 @@
       "reconstruction": true,
       "sources": [
         "https://sanctuaries.noaa.gov/news/2025/explore-the-depths-hudson-canyon-live.html",
-        "https://en.wikipedia.org/wiki/Frank_R._Lautenberg_Deep-Sea_Coral_Protection_Area"
+        "https://www.mafmc.org/newsfeed/2016/noaa-fisheries-announces-final-rule-on-mid-atlantic-councils-frank-r-lautenberg-deep-sea-coral-protection-area"
       ],
-      "note": "Real GMRT terrain (941.9 m deep, steep mid-canyon flank a little over 2.5 km from the wall POI) inside the Frank R. Lautenberg Deep Sea Coral Protection Area, which closes bottom-tending fishing gear across roughly 38,000 sq mi of Mid-Atlantic canyon and slope habitat including Hudson Canyon. In September 2025 a NOAA/Ocean Exploration Trust expedition used ROV Global Explorer to survey Hudson Canyon's coral and sponge communities for the first time in years, live-streamed as part of the sanctuary-designation science effort. No public dataset from that cruise gives an exact coral colony position usable here, so this POI's precise coordinate is an invented stand-in for that habitat type on a real steep ledge; `reconstruction: true` because no coral model is rendered -- the field guide entry, not a placed prop, carries the biology."
+      "note": "The GMRT grid reads 941.9 m at this canyon-flank marker. NOAA's September 2025 Global Explorer expedition documented Hudson Canyon's coral and sponge habitats, but does not establish a coral colony or protection-area boundary at this exact coordinate. The placed coral mound's position and layout are authored; reconstruction remains true. Regional fisheries protection restricts most bottom-tending commercial gear, with lobster and deep-sea red crab trap exceptions; the Council's corrected area is about 41,440 sq mi."
     },
     {
       "id": "hc-wall-transect",

@@ -1,5 +1,12 @@
 # Kama'ehuakanaloa content: sources and notes (package C4, kamaehuakanaloa)
 
+## S-fact-check-journal-2 — 2026-11-05
+
+The [second Journal fact-check](../../../plan/progress/S-fact-check-journal-2.md)
+records source checks, corrections, species-export limits and unresolved claims.
+It supplements the first pass and supersedes conflicting historical notes below.
+Existing Journal tags identify each scene addition once.
+
 ## S-fact-check-journal — 2026-11-04
 
 The current audit, sourced corrections, coordinate and grid checks, and unresolved

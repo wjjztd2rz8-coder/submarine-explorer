@@ -36,7 +36,7 @@
       "reconstruction": true,
       "sources": [
         "https://oceanexplorer.noaa.gov/news/million-mounds-news/",
-        "https://en.wikipedia.org/wiki/Blake_Plateau"
+        "https://doi.org/10.3390/geomatics4010002"
       ],
       "note": "The mound terrain here is real (this tile), but the coral colonies themselves are placed reconstructions -- this game's terrain resolution cannot show individual coral heads. Desmophyllum pertusum is documented as the dominant reef-building species across the wider Blake Plateau province (Sowers et al. 2024, NOAA); its presence at this exact point is inferred from that province-wide finding, not a site-specific survey record, hence medium rather than high confidence."
     },
@@ -57,7 +57,7 @@
         "https://www.gmrt.org/",
         "https://oceanexplorer.noaa.gov/news/million-mounds-news/"
       ],
-      "note": "Real survey terrain, about 400 m south-west of the core cluster (775.5 m at the sample coordinate), illustrating that the province's 83,908 mapped mound-like peaks form a near-continuous field rather than isolated features."
+      "note": "The GMRT grid reads 775.5 m at this marker, about 294 m southwest of the core scan. These local depths do not establish the position of an individual coral mound in the Sowers et al. 2024 classification. The scan samples regional terrain; no colony coordinate is claimed."
     },
     {
       "id": "blake-inter-mound-channel",
@@ -73,7 +73,7 @@
       "confidence": "high",
       "reconstruction": false,
       "sources": ["https://www.gmrt.org/"],
-      "note": "Real survey terrain: a lower stretch of seabed (779.7 m at the sample coordinate) between the two mapped mounds, part of the same tile data used for the mound POIs."
+      "note": "The GMRT grid reads 779.7 m at this point, lower than the core marker at 744.2 m. The terrain depth alone does not establish a surveyed channel between individual coral mounds."
     }
   ]
 }
