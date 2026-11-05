@@ -1,5 +1,16 @@
 # Reviews
 
+## 2026-11-05 evening comprehensive review (trigger: 8+ merges; Claude + Sol first round; reconcile failed on the Codex 5h limit)
+
+- **Stage:** about 86% to 1.0 (Claude 88%, Sol 85%); 3-4 weeks. Golden `2026-11-05-222844` vs `2026-11-05-121524`. Reconcile round did not run (Codex 5h limit), so the points below are settled by me on the images and files.
+- **Changed since the morning review:** Codex 140-145 (touch bug hunt, Lost City perf audit, hood scale table, three verification/sweep packages) and Sonnet V-endurance-seabed-patches, V-endurance-hull-scale, V-monterey-wall-clarity and striation. Openings now: Beebe 4.1, Titanic 3.9, Endurance 3.9 (was 3.3: ribbons gone, hull a third of the width), Blue Hole 3.8 (was 3.4: the stalactite gallery now reads beside the sub), Lost City 3.7, Bismarck 3.6, Monterey 3.6 (pale wall face centre-right; objective marker is on the far ridge). Readability screen 0/13.
+- **Sol (independent, scores approach and detail too):** Titanic 3.5, Beebe 3.5, Lost City 3.25, Blue Hole 3.0, Monterey 3.0, none holding 4 at all three distances. Accepted: openings flatter the heroes; close-up materials are the next gap (V-closeup-materials). **Credited to Sol, confirmed by me:** (1) Pages deploys wait for CI success on the exact SHA (`deploy.yml`), so red CI has frozen the public build since 18:29; (2) first-five-minutes evidence is stale (newest unaided capture 2026-11-02); (3) CI failures are invalid post-rotation test gestures, not product bugs. **Still disputed:** my openings-only scores vs Sol's detail-weighted ones; not resolved, both reported.
+- **Biggest gaps:** red hosted CI (four touch specs plus phone-accept Monterey; same five shards fail every run since Codex 140), close-up material quality, Bismarck debris plates and hull texture, Monterey objective marker, weaker-phone performance, current unaided first five minutes.
+- **Play flow:** not re-captured; U-play-walkthrough-3 is now unblocked (Haiku, unassisted, three sizes).
+- **Process:** see PROCESS-LOG.md: the CI-red trigger now ignores queued runs; R-ci-red-5 and R-deploy-gate queued. Claude week 92% (idle by the reset until today, now two Sonnet packages), Codex week 39% and 5h empty until 17:45.
+- **New priorities:** R-ci-red-5 (in flight, Sonnet), V-bismarck-debris (in flight), U-play-walkthrough-3, V-monterey-wall-marker, V-closeup-materials, R-deploy-gate, V-horizon-upper-half; Codex 146-148 queued. No tag f74 until CI is green.
+- **Needs owner:** phone retest (4410-P2 checklist).
+
 ## 2026-11-05 afternoon targeted review (trigger: false "8+ merges" comprehensive flag)
 
 - **Finding:** the 8-merge trigger counted two `Merge branch 'main' into claude/...` sync merges and the same-morning joint review's own window (marker touched 06:56, joint review with Sol already done), so a second comprehensive review fired five hours after the first with only 6 real merges. No new golden set, no second Sol review (it would cost Codex budget for no new evidence). Scores, stage (about 86%) and priorities from the morning entry below stand.

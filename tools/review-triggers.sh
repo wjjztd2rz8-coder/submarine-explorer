@@ -33,7 +33,7 @@ log=open('plan/OVERNIGHT-LOG.md').read()
 runs=re.split(r'\n## ',log)[-3:]
 if len(runs)==3 and all(re.search(r'Nothing merged|nothing to do|no unblocked',r,re.I) for r in runs):
     why['targeted'].append('last 3 runs merged nothing (backlog dry?)')
-ci=sh('gh run list -w CI -b main -L 3 --json conclusion -q ".[].conclusion" 2>/dev/null').split()
+ci=sh('gh run list -w CI -b main -s completed -L 3 --json conclusion -q ".[].conclusion" 2>/dev/null').split()
 if len(ci)==3 and all(c=='failure' for c in ci): why['targeted'].append('CI red on main for 3 runs')
 try:
     rows=list(csv.DictReader(open('.cache/metrics/usage.csv')))[-4:]

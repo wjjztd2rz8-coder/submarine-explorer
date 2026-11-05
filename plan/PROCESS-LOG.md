@@ -387,3 +387,9 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 ## 2026-11-05 review trigger counted sync merges
 
 - Symptom: a comprehensive review fired five hours after the previous one (8 "merges", two of them `Merge branch 'main' into claude/...` syncs). Change: `tools/review-triggers.sh` ignores merges whose subject starts `Merge branch 'main'`. Reason: sync merges add no reviewable work and each false trigger costs a Claude run (and a Sol review if followed).
+
+## 2026-11-05 evening review: red CI undetected for six runs, Pages frozen
+
+- Symptom: the same five e2e shards failed on every main run after the Codex 140 touch specs merged (gates smoke never runs them), and `review-triggers.sh` ("CI red 3 runs") did not fire because the newest run was still queued. Pages deploys wait for CI success on the exact SHA, so every deploy since 18:29 was skipped (Sol's finding).
+- Change: the trigger now reads the last three COMPLETED CI runs (`-s completed`). R-ci-red-5 (Sonnet) fixes the specs and proposes running changed specs in the merge gate; R-deploy-gate decides whether Pages should deploy on smoke-green. Reason: a red main must surface in one run, and the owner's phone should get builds.
+- Also: `tools/codex-review.sh reconcile` must be started with `run_in_background` and polled; a foreground Bash call is moved to the background after 10 min and killed. The reconcile round failed here because Codex hit its 5h limit (Sol's first-round review was kept).

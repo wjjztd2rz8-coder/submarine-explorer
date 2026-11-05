@@ -1,26 +1,26 @@
-# Status (2026-11-05 review, joint with Codex Sol)
+# Status (2026-11-05 evening review, Claude + Codex Sol first round)
 
-**Stage:** about 86% to 1.0 (Claude 92%, Sol 82%); 3-4 weeks. Tag **f73** is the newest green release.
+**Stage:** about 86% to 1.0 (Claude 88%, Sol 85%); 3-4 weeks. Tag **f73** is the newest green release; **f74 is blocked because hosted CI is red** (five touch/phone specs, test defects, fix in flight) and Pages has not deployed since 18:29.
 
 ## 1.0 table
 
-| Requirement                               | State                                                                                                                             |
-| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Five heroes beautiful (4 of 5)            | Beebe 3.8, Titanic 3.7, Lost City 3.4, Blue Hole 3.4, Monterey 3.3 (agreed with Sol); all 13 openings pass the readability screen |
-| Other eight sites coherent                | Axial ~4.0, Hunga 4.0, Kama ~3.7, Endurance 3.3 (seabed patches), Challenger ~3.5; three sites unrated                            |
-| New player understands first five minutes | No dead ends; walk-through found 8 confusions, 3 fixed (touch wording, one Home primary, dive-start HUD), 5 queued                |
-| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great; Medium auto-tier and weaker phones untested                                                              |
-| Hosted CI green, releases tagged          | f72 tagged on green CI                                                                                                            |
-| Code simple enough                        | Dead-code and test sweeps merged; standing S-* audits                                                                             |
+| Requirement                               | State                                                                                                                                       |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Five heroes beautiful (4 of 5)            | Openings: Beebe 4.1, Titanic 3.9, Blue Hole 3.8, Lost City 3.7, Monterey 3.6; Sol, counting close-ups: 3.0-3.5. Close-up materials are next |
+| Other eight sites coherent                | Endurance 3.9 (seabed fixed, hull a third of the frame), Bismarck 3.6 (debris plates being fixed), Axial ~4.0, others coherent              |
+| New player understands first five minutes | No dead ends in the last walk-through (Nov 3); a fresh unassisted capture is queued                                                         |
+| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great; weaker phones and Medium untested                                                                                  |
+| Hosted CI green, releases tagged          | RED since Codex 140 touch specs; R-ci-red-5 in flight                                                                                       |
+| Code simple enough                        | Dead-code and verification sweeps merged                                                                                                    |
 
 ## Done recently
 
-Lost City tower-top streaks, Kama thin plume, Journal first visit, sonar labels, CI spec fixes, Beebe horizon gradient (Beebe now 4.0), Hunga bed scale, Kama vent glow, Lost City tower glow cut, play walk-through, three first-minute UI fixes, CI-green and readability tooling.
+Lost City tower and Bismarck hull scale, Endurance seabed and hull framing, Monterey wall pose and striation fade, Blue Hole gallery reads, touch cancellation fix, Lost City perf audit, Journal fact-check pass 2, dead-code sweep 3.
 
 ## Left
 
-Endurance seabed patches, Monterey wall clarity, Blue Hole hood (scale table first), Lost City and Bismarck subject scale (in flight), Hudson ledge; Codex 140-142 running; real-phone retest and a current unaided first-five-minutes check.
+CI fix, Bismarck debris, Monterey objective marker, close-up materials for the heroes, deploy gate, unassisted first-five-minutes check, weaker-phone performance.
 
 ## Needs owner
 
-- A short phone retest on the newest build using `plan/progress/4410-P2-phone-accept-checklist.md`.
+- A short phone retest on the newest build using `plan/progress/4410-P2-phone-accept-checklist.md` (note: the public build is stale until CI is green).
