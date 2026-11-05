@@ -200,7 +200,7 @@ export const BIOMES: Record<string, Biome> = {
     rockBias: 0.12,
     scatter: [
       { kind: 'dropstone', density: 0.7, slopeMaxDeg: 22, on: 'any' },
-      { kind: 'boulder', density: 0.5, slopeMaxDeg: 35, on: 'rock' },
+      { kind: 'boulder', density: 0.5, slopeMaxDeg: 35, on: 'rock', sizeMul: 0.4 },
       { kind: 'mound', density: 3, slopeMaxDeg: 10, on: 'flat' },
     ],
   },
