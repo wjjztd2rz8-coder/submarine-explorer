@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Codex 133-135 merged 2026-11-04; 136-138 queued (S-verify-pose-tools, S-bughunt-progression, S-verify-audio-settings). Claude lane: next is V-lostcity-tower-scale (waiting for Claude week reset Nov 5 06:00).
+- Codex 133-138 merged by 2026-11-05 (136-138 found one audio gesture-recovery fix; no other production bugs). 139-141 queued. Claude: V-lostcity-tower-scale and V-bismarck-hull-scale in flight; next V-monterey-wall-clarity, V-bluehole-opening-hood (needs T-hood-scale-table), V-endurance-hull-scale.
 
 ## Backlog
 
@@ -91,9 +91,16 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 - **V-bismarck-hull-scale [Sonnet] (golden 2026-11-04, ~3.6):** hull is a distant flat slab (about a quarter width) with the sub overlapping its stern; foreground is grey slabs and snow. Target: hull fills about half the width, sub clear of it, foreground boulders smaller. Route: pose data, boulder scale via the preset.
 - **V-monterey-wall-clarity [Sonnet] (golden 2026-11-04, ~3.7, was 4.0):** the opening is a busy ridge of layered rock with no obvious wall to scan; objective reads "North canyon wall" but nothing marks it. Target: one clear wall face in the centre-right with the sub in the canyon, not on the ridge. Route: pose data; check whether the 11-02 pose change regressed it.
 - **V-bluehole-opening-hood [Sonnet, after T-bluehole-hood-poses]:** mission opening still shows a small brown leaf-shaped outcrop (golden 2026-11-04, ~3.7). Use the Codex pose table; if no pose passes, a code-level hood (generic overhang capability) is the next step. Do not repeat data-only tweaks.
+- **V-endurance-seabed-patches [Sonnet, NEW 2026-11-05, top Sonnet item after the in-flight pair] (Sol, confirmed by Claude on endurance-1-mission.png):** the opening seabed is dominated by smooth dark hard-edged ribbons and blotches (reads as stains, not terrain). Target: a continuous sand/silt floor with soft, low-contrast variation and a few ripples; the hull and dropstones are the only strong shapes. Route: seabed material/tint for the Endurance preset (data), no site branch.
+- **V-monterey-wall-clarity addendum (2026-11-05):** the opening is repetitive striped rock everywhere; reduce the striation contrast/frequency at distance so one wall face reads.
 - **V-endurance-hull-scale [Sonnet, optional] (golden 2026-11-04, ~3.8):** hull is a small sliver mid-frame and the upper 45% is empty dark water. Target: hull fills a third of the width. Route: pose data after T-framing-metrics.
 - **T-bluehole-hood-poses [Codex] DONE 2026-11-04 (a8317e5e)** and **T-framing-metrics [Codex] DONE 2026-11-04 (merged after it)** feed the V-* items above; **S-verify-phone-hud [Codex, queued 135]** verifies the phone fixes merged since f72.
 - **V-axial-sky-band [Sonnet, optional] (golden 2026-11-04, Axial ~4.0):** upper third is still empty dark water above the ridge; add a faint far ridge or particle haze via the generic `fogHaze` horizon option.
+
+- **T-hood-scale-table [Codex, queued 142]:** (replaces T-overhang-capability; Sol 2026-11-05: `grotto-overhang`/`stalactite-gallery` already exist and fill only 2-3% of the screen, so first find the scale/pose that reaches ~25-30%, then Claude wires it into V-bluehole-opening-hood.)
+- **S-bughunt-touch-input [Codex, queued 140]:** audit touch controls (stick, swipe-up list, scan hold, rotate, blur/visibility release) for stuck input, double-fire and layout-dependent bugs at 390x844 and 844x390; test and fix minimally.
+- **S-perf-lostcity-audit [Codex, queued 141] (P2-lostcity-perf):** static audit of Lost City per-frame cost on the Low tier (triangle and draw-call counts per prop group, particle counts, shadow and post passes); report ranked reductions with numbers and implement only safe, generic ones.
+- **V-lostcity-tower-scale + V-bismarck-hull-scale [Sonnet, IN FLIGHT (Claude, 2026-11-05) branch claude/V-lostcity-tower-scale]**
 
 11. **R-ci-speed [Codex, 124 NOT merged 2026-11-04 (19x2 unmeasured, may flake); follow-up queued 131 as workflow_dispatch experiment]:** hosted CI takes 30+ min, so failures surface 1-2 runs late. Audit shard balance and slow specs; target under 20 min without dropping coverage.
 12. **P2-phone-accept [owner + Codex; browser-checkable items automated in tests/e2e/phone-accept.spec.ts]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.

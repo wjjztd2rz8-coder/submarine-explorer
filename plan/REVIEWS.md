@@ -1,5 +1,17 @@
 # Reviews
 
+## 2026-11-05 comprehensive review (trigger: 24 h, Claude idle, Codex starved; joint with Codex Sol, one reconcile round)
+
+- **Stage (agreed):** about 86% to 1.0 (Claude 92%, Sol 82%; the gap is scope: Claude scored mission openings, Sol also scored approach, detail and verification); 3-4 weeks. Golden `2026-11-05-121524` vs `2026-11-04-083927`.
+- **Changed since the last review:** Codex 133-138 merged: hood pose table, framing metrics, phone-HUD verification, pose-tool verification, progression bug hunt (no production bug) and one production fix (audio gesture recovery, 138). Pose data changed slightly (Blue Hole camera offset, Endurance dropstones moved east); Sol corrected my "no data changed".
+- **Scores (agreed, openings plus detail frames):** Beebe 3.8, Titanic 3.7, Lost City 3.4, Bismarck 3.5, Blue Hole 3.4, Monterey 3.3, Endurance 3.3. Claude had 4.1/3.9/3.9/3.6/3.7/3.7/3.8; Sol 3.5/3.5/3.0/3.5/3.0/3.0/3.0. **Credited to Sol, confirmed by Claude on the images:** Endurance's opening seabed is smooth dark hard-edged ribbons that read as stains (missed in four reviews), and Monterey is repetitive striped rock with no wall face.
+- **Disputed (still):** Sol holds Beebe, Titanic and Lost City at 3.5 or below because of faceting and plating repetition in the detail frames; Claude scores them from the opening and sees them nearer 3.8. Sol also doubts that "too far/high" is the common cause of small subjects (the width metric includes foundations, and metric-driven poses can clip: Axial). Accepted: review the images, not the numbers, before adopting any pose.
+- **Biggest gaps:** (1) Endurance seabed patches, (2) Monterey wall clarity, (3) Blue Hole hood, whose existing `grotto-overhang` geometry fills only 2-3% of the screen (Sol; the new-capability plan was dropped for a scale table), (4) Lost City and Bismarck subject scale, (5) first five minutes and phone retest, never unaided-verified by Sol (golden skips tutorials, briefings and phones).
+- **Play flow:** not re-captured; U-play-walkthrough-3 stays after the owner's phone retest.
+- **Process:** Claude week reset Nov 5, so Claude idled most of the last 24 h by the budget gate (efficiency shows ~23-45 h idle; expected). Codex week 64% and 3 tasks running. `tools/golden.sh` still needs a background run. Sol's note that golden defaults omit phones and briefings is true; first-five-minutes evidence must come from U-play-walkthrough-3. No tooling change.
+- **New priorities:** V-lostcity-tower-scale and V-bismarck-hull-scale (in flight), V-endurance-seabed-patches (new), V-monterey-wall-clarity (with striation addendum), V-bluehole-opening-hood after T-hood-scale-table (Codex 142); Codex 140 (touch bug hunt), 141 (Lost City perf audit) running.
+- **Needs owner:** phone retest (4410-P2 checklist).
+
 ## 2026-11-04 afternoon comprehensive review (trigger: 8+ merges; Claude alone, Sol start exited 75: Codex 5h at 6% with three tasks running)
 
 - **Stage:** about 92% to 1.0 (range 89-93%); 2.5-3 weeks. Golden `2026-11-04-083927` vs `2026-11-04-033854`. Not agreed with Sol.

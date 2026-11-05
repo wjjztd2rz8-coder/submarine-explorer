@@ -1,17 +1,17 @@
-# Status (2026-11-04 afternoon review, Claude alone)
+# Status (2026-11-05 review, joint with Codex Sol)
 
-**Stage:** about 92% to 1.0 (range 89-93%); 2.5-3 weeks. Tag **f73** is the newest green release.
+**Stage:** about 86% to 1.0 (Claude 92%, Sol 82%); 3-4 weeks. Tag **f73** is the newest green release.
 
 ## 1.0 table
 
-| Requirement                               | State                                                                                                              |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Five heroes beautiful (4 of 5)            | Beebe 4.1, Titanic 3.9, Lost City 3.9, Monterey 3.7, Blue Hole 3.7; all 13 openings pass the readability screen    |
-| Other eight sites coherent                | Axial ~4.0, Hunga 4.0, Kama ~3.7, Endurance ~3.8, Challenger ~3.5; three sites unrated                             |
-| New player understands first five minutes | No dead ends; walk-through found 8 confusions, 3 fixed (touch wording, one Home primary, dive-start HUD), 5 queued |
-| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great; Medium auto-tier and weaker phones untested                                               |
-| Hosted CI green, releases tagged          | f72 tagged on green CI                                                                                             |
-| Code simple enough                        | Dead-code and test sweeps merged; standing S-* audits                                                              |
+| Requirement                               | State                                                                                                                             |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Five heroes beautiful (4 of 5)            | Beebe 3.8, Titanic 3.7, Lost City 3.4, Blue Hole 3.4, Monterey 3.3 (agreed with Sol); all 13 openings pass the readability screen |
+| Other eight sites coherent                | Axial ~4.0, Hunga 4.0, Kama ~3.7, Endurance 3.3 (seabed patches), Challenger ~3.5; three sites unrated                            |
+| New player understands first five minutes | No dead ends; walk-through found 8 confusions, 3 fixed (touch wording, one Home primary, dive-start HUD), 5 queued                |
+| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great; Medium auto-tier and weaker phones untested                                                              |
+| Hosted CI green, releases tagged          | f72 tagged on green CI                                                                                                            |
+| Code simple enough                        | Dead-code and test sweeps merged; standing S-* audits                                                                             |
 
 ## Done recently
 
@@ -19,7 +19,7 @@ Lost City tower-top streaks, Kama thin plume, Journal first visit, sonar labels,
 
 ## Left
 
-Small-subject openings (Lost City, Bismarck, Endurance), Monterey wall clarity, Blue Hole hood, Hudson ledge; Codex 130-135 (verification and framing numbers); real-phone retest.
+Endurance seabed patches, Monterey wall clarity, Blue Hole hood (scale table first), Lost City and Bismarck subject scale (in flight), Hudson ledge; Codex 140-142 running; real-phone retest and a current unaided first-five-minutes check.
 
 ## Needs owner
 
