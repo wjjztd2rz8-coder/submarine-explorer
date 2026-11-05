@@ -383,3 +383,7 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 ## 2026-11-03 targeted review: CI red 3 runs from unformatted plan docs
 
 - Runs 321-323 failed only the static gate: `prettier --check` flagged plan/DIRECTOR.md and plan/STATUS.md (written by the review run, never formatted). All 38 e2e shards passed. Fixed by formatting; REVIEW-PROMPT.md step 5 now says to run `npx prettier --write plan/*.md` before committing review docs.
+
+## 2026-11-05 review trigger counted sync merges
+
+- Symptom: a comprehensive review fired five hours after the previous one (8 "merges", two of them `Merge branch 'main' into claude/...` syncs). Change: `tools/review-triggers.sh` ignores merges whose subject starts `Merge branch 'main'`. Reason: sync merges add no reviewable work and each false trigger costs a Claude run (and a Sol review if followed).

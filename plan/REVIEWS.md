@@ -1,5 +1,12 @@
 # Reviews
 
+## 2026-11-05 afternoon targeted review (trigger: false "8+ merges" comprehensive flag)
+
+- **Finding:** the 8-merge trigger counted two `Merge branch 'main' into claude/...` sync merges and the same-morning joint review's own window (marker touched 06:56, joint review with Sol already done), so a second comprehensive review fired five hours after the first with only 6 real merges. No new golden set, no second Sol review (it would cost Codex budget for no new evidence). Scores, stage (about 86%) and priorities from the morning entry below stand.
+- **Fix:** `tools/review-triggers.sh` now excludes sync merges of main from the merge count (logged in PROCESS-LOG.md).
+- **Work:** Sonnet V-monterey-striation (distance fade of scarp striation, the open half of V-monterey-wall-clarity) started; Codex briefs 143-146 remain queued.
+- **Needs owner:** phone retest (4410-P2 checklist).
+
 ## 2026-11-05 comprehensive review (trigger: 24 h, Claude idle, Codex starved; joint with Codex Sol, one reconcile round)
 
 - **Stage (agreed):** about 86% to 1.0 (Claude 92%, Sol 82%; the gap is scope: Claude scored mission openings, Sol also scored approach, detail and verification); 3-4 weeks. Golden `2026-11-05-121524` vs `2026-11-04-083927`.

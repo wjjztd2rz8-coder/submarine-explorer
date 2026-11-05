@@ -4,7 +4,7 @@
 # it absent. Called every timer tick from tools/resume.sh. The review run
 # deletes the flag and touches .cache/last-review-<type> when done.
 #   Comprehensive: >= 24 h since the last one, a new release tag (>= 12 h after
-#   the last review; f22-f25 each got one), or >= 8 merges.
+#   the last review; f22-f25 each got one), or >= 8 merges (sync merges of main into a branch excluded).
 #   Targeted: the Claude backlog ran dry (3 runs in a row merged nothing),
 #   CI red on main for 3+ runs, Claude idle at >= 50% for 2+ h, the Codex queue
 #   empty with < 2 tasks for 2+ h, or the same gate failing repeatedly.
@@ -18,7 +18,8 @@ if last>24*3600: why['comprehensive'].append('24 h since the last comprehensive 
 sh=lambda c: subprocess.run(c,shell=True,capture_output=True,text=True).stdout
 since=f'--since=@{int(now-last)}' if last<1e8 else ''
 if last<1e8:
-    if sh(f'git log {since} --merges --oneline | wc -l').strip().isdigit() and int(sh(f'git log {since} --merges --oneline | wc -l'))>=8: why['comprehensive'].append('8+ merges since the last review')
+    nm=int(sh(f'git log {since} --merges --format=%s | grep -v -c "^Merge branch .main."').strip() or 0)  # sync merges of main into a branch don't count
+    if nm>=8: why['comprehensive'].append('8+ merges since the last review')
     if sh(f'git log {since} --simplify-by-decoration --decorate --oneline | grep -c "tag: f"').strip() not in ('','0') and last>12*3600: why['comprehensive'].append('new release tag')
 def claude_week_ok():
     # Same weekly pacing as resume.sh claude_ok: a run blocked by the weekly gate is deliberate, not idle.
