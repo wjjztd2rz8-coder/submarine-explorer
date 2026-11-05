@@ -131,7 +131,8 @@ for (const viewport of [
         await expect.poll(state).toEqual(neutral);
         await shot(page, `interruptions-${viewport.width}x${viewport.height}`);
       } finally {
-        await touch(cdp, 'touchCancel', []);
+        // Cleanup only: the browser rejects a cancel when no touch is live.
+        await touch(cdp, 'touchCancel', []).catch(() => undefined);
         await cdp.detach();
       }
     });

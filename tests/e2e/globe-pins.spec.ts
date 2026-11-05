@@ -76,7 +76,10 @@ for (const viewport of [
         // Its trailing click must not close the list again.
         await expect(sheet.locator('.home-sites-grab')).toHaveAttribute('aria-expanded', 'true');
       } finally {
-        await cdp.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
+        // Cleanup only: the browser rejects a cancel when no touch is live.
+        await cdp
+          .send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] })
+          .catch(() => undefined);
         await cdp.detach();
       }
     });
