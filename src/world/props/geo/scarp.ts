@@ -58,6 +58,27 @@ import type { GeoBuildInput } from './types.js';
 
 export type ScarpPresetId = 'tuff' | 'canyon' | 'hadal';
 
+/**
+ * Beds and laminae are painted into vertex colour, so at range they read as dense stripes
+ * everywhere. Fade each vertex colour toward the wall's mean tone with camera distance:
+ * near rock keeps its bedding, far rock is calm, and the nearest face reads as the subject.
+ */
+function calmWithDistance(m: THREE.MeshStandardMaterial, calm: THREE.Color): void {
+  const compile = m.onBeforeCompile;
+  const key = m.customProgramCacheKey();
+  m.onBeforeCompile = (shader, renderer) => {
+    compile.call(m, shader, renderer);
+    shader.vertexShader = shader.vertexShader.replace(
+      '#include <color_vertex>',
+      `#include <color_vertex>
+#ifdef USE_COLOR
+vColor.rgb = mix(vColor.rgb, vec3(${calm.r.toFixed(3)}, ${calm.g.toFixed(3)}, ${calm.b.toFixed(3)}), 0.9 * smoothstep(20.0, 80.0, length((modelViewMatrix * vec4(position, 1.0)).xyz)));
+#endif`,
+    );
+  };
+  m.customProgramCacheKey = () => `${key}-calm-${calm.getHexString()}`;
+}
+
 /** Metres of surface per texture tile on the walls (world-scale mapping). */
 const TILE_M = 5;
 
@@ -822,6 +843,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   };
   glow(wallMat, 'wall');
   if (fidelity) canyonRockDetail(wallMat, fidelity.normalStrength);
+  calmWithDistance(wallMat, P.base);
   full.add(new THREE.Mesh(wall, wallMat));
   const tone = new THREE.Color();
   const apronCols = Math.min(220, Math.round(Math.max(24, W * 1.1) * d.meshDensity));
