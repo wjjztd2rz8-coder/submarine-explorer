@@ -113,7 +113,11 @@ export function buildEnduranceRelief(terrain: PresetTerrain, centre: THREE.Vecto
     const shade = 0.8 + 0.35 * Math.max(0, n.getX(i) * 0.5 + n.getY(i) * 0.8 - n.getZ(i) * 0.3);
     c.setXYZW(i, c.getX(i) * shade, c.getY(i) * shade, c.getZ(i) * shade, c.getW(i));
   }
-  const mat = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false });
+  const mat = new THREE.MeshBasicMaterial({
+    vertexColors: true,
+    transparent: true,
+    depthWrite: false,
+  });
   mat.name = 'enduranceRelief';
   const mesh = new THREE.Mesh(g, mat);
   mesh.name = 'enduranceRelief';
