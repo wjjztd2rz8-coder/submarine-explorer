@@ -3,8 +3,6 @@ import { readFileSync } from 'node:fs';
 import {
   Box3,
   BoxGeometry,
-  BufferAttribute,
-  BufferGeometry,
   Mesh,
   MeshBasicMaterial,
   Raycaster,
@@ -23,6 +21,7 @@ import { spawnSettings } from '../../src/game/Spawn.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
 import { visitHullVertices } from './helpers/hullClearance.js';
+import { partitionedRaycast } from './helpers/partitionedRaycast.js';
 import { reticleClearOfControls } from '../../src/ui/ScanReticleLayout.js';
 import type { TileMeta } from '../../src/util/types.js';
 import { Props } from '../../src/world/Props.js';
@@ -525,31 +524,6 @@ test('Blue Hole saved hood pose B agrees with pinhole rays on both actual viewpo
         ...solidMeshes(sub.vehicle.root),
       ];
       const solids = [...ground, ...scenery];
-      // Keep every triangle, but bound small batches so intersecting a dense
-      // terrain chunk's box does not require scanning the whole chunk per ray.
-      const rayGround = ground.flatMap((mesh) => {
-        const index = mesh.geometry.index!;
-        const vertices = mesh.geometry.getAttribute('position');
-        const parts: Mesh[] = [];
-        const point = new Vector3();
-        const batchIndices = 3 * 1024;
-        for (let start = 0; start < index.count; start += batchIndices) {
-          const end = Math.min(start + batchIndices, index.count);
-          const geometry = new BufferGeometry();
-          geometry.setAttribute('position', vertices);
-          geometry.setIndex(new BufferAttribute(index.array.subarray(start, end), 1));
-          const bounds = new Box3();
-          for (let i = start; i < end; i++)
-            bounds.expandByPoint(point.fromBufferAttribute(vertices, index.getX(i)));
-          geometry.boundingBox = bounds;
-          geometry.boundingSphere = bounds.getBoundingSphere(new Sphere());
-          const part = new Mesh(geometry, mesh.material);
-          part.matrixWorld.copy(mesh.matrixWorld);
-          parts.push(part);
-        }
-        return parts;
-      });
-      const raySolids = [...rayGround, ...scenery];
       const projected = projectCoverage(
         rig.camera,
         width,
@@ -562,6 +536,9 @@ test('Blue Hole saved hood pose B agrees with pinhole rays on both actual viewpo
         height,
         solids.map((mesh) => ({ mesh, label: hood.includes(mesh) ? 1 : 2 })),
       );
+      // Cache exact triangle batches after terrain.update selects this layout's LOD.
+      // Keep every ray and assertion; only reject batches whose bounds the ray misses.
+      const intersections = solids.map(partitionedRaycast);
       // Construct pinhole rays from an orthonormal basis and FOV, without
       // projection/inverse matrices or Raycaster.setFromCamera. Query the real
       // triangles at exact pixel centres used by the rasterizer, including
@@ -589,8 +566,12 @@ test('Blue Hole saved hood pose B agrees with pinhole rays on both actual viewpo
           // Near/far planes bound forward depth, not distance along oblique rays.
           ray.near = rig.camera.near / direction.dot(forward);
           ray.far = rig.camera.far / direction.dot(forward);
-          const hitsHood = ray.intersectObjects(hood, false).length > 0;
-          const hit = ray.intersectObjects(raySolids, false)[0];
+          const hits = intersections
+            .flatMap((intersect) => intersect(ray))
+            .sort((a, b) => a.distance - b.distance);
+          // Keep all intersections so hood behind terrain still counts as projected.
+          const hitsHood = hits.some((hit) => hood.includes(hit.object as Mesh));
+          const hit = hits[0];
           const label = hit ? (hood.some((mesh) => mesh === hit.object) ? 1 : 2) : 0;
           const pixel = y * width + x;
           const message = `${width}×${height} pixel ${x},${y}`;
