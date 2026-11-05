@@ -3203,3 +3203,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Comprehensive flag fired 5 h after the joint review (sync merges counted); fixed tools/review-triggers.sh, short targeted entry in REVIEWS.md. Merged Sonnet V-monterey-striation (distance-calmed scarp colour, ~5/10; stripes remain from ledge geometry). gates smoke green on branch and main. Codex briefs 143-146 queued; 124/131 still held.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-05 15:17 CST headless run 354 (Claude): Endurance hull scale
+
+- Merged Sonnet V-endurance-hull-scale (~6.5/10): broadside opening pose in site data; hull width 11% to 36% desktop, sub clear. Upper half of frame still empty (needs camera pitch or far ridge; not done). Opening 106 m, just outside the 100 m scan floor (rule bent, reasoning in progress note). gates smoke green on branch, pushed. Codex 143-145 running, 146-148 queued. 124/131 still held.
+- **Needs owner:** phone retest (4410-P2 checklist).
