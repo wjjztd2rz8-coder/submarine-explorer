@@ -1,5 +1,6 @@
 /** CPU companion to golden-shots: search poses, never edit site data or render materials.
- * node tools/blue-hole-pose-search.mjs [--verify] [output.json]
+ * node tools/blue-hole-pose-search.mjs [--verify | --scale-table] [output.json]
+ * BLUEHOLE_OFFSETS=-40,-20,0,20,40 controls the scale-table mount offsets in metres.
  * BLUEHOLE_TIERS=low,medium,high (default all); two deterministic search rounds on the first tier (Low by default).
  */
 import { createServer } from 'vite';
@@ -14,8 +15,10 @@ const authored = json('tools/blue-hole-poses.json');
 const fixed = authored.east;
 const args = process.argv.slice(2);
 const verify = args.includes('--verify');
-if (args.some((arg) => arg.startsWith('--') && arg !== '--verify'))
+const scaleTable = args.includes('--scale-table');
+if (args.some((arg) => arg.startsWith('--') && !['--verify', '--scale-table'].includes(arg)))
   throw new Error('Unknown option');
+if (verify && scaleTable) throw new Error('Choose --verify or --scale-table');
 const site = 'great-blue-hole';
 const layouts = [
   [1600, 900],
@@ -36,6 +39,7 @@ try {
         '/src/core/Config.ts',
         '/src/world/Terrain.ts',
         '/src/world/Props.ts',
+        '/src/world/props/Collision.ts',
         '/src/sub/CameraRig.ts',
         '/src/game/Spawn.ts',
         '/src/game/DeepOpeningSpawn.ts',
@@ -60,7 +64,7 @@ try {
     search: {},
     tiers: [],
   };
-  let candidates = verify ? authored.hoodCandidates : undefined;
+  let candidates = verify || scaleTable ? authored.hoodCandidates : undefined;
   for (const tier of diagnosticTiers(process.env.BLUEHOLE_TIERS)) {
     const terrain = new m.Terrain(data, c.terrain, tier);
     const props = new m.Props(meta, terrain, c.props, tier);
@@ -90,7 +94,7 @@ try {
       );
       const primary = pois.find((p) => p.id === 'great-blue-hole-stalactites');
       const east = pois.find((p) => p.id === 'great-blue-hole-stalactites-east');
-      const hood = ['grotto-overhang', 'stalactite-gallery'].map((name) =>
+      let hood = ['grotto-overhang', 'stalactite-gallery'].map((name) =>
         hero.root.getObjectByName(name),
       );
       const sampled = hood.flatMap((mesh) => {
@@ -347,6 +351,90 @@ try {
         }
         return entry;
       }
+      if (scaleTable) {
+        // Keep the original sub, heading and camera fixed when the prop moves/scales.
+        const poses = candidates.map((tuning) => ({ tuning, original: pose(tuning) }));
+        const baseScale = [...hero.def.scale],
+          baseOffset = hero.def.yOffsetM;
+        const offsets = (process.env.BLUEHOLE_OFFSETS ?? '-40,-20,0,20,40').split(',').map(Number);
+        if (offsets.some((v) => !Number.isFinite(v))) throw new Error('Invalid offsets');
+        const rows = [];
+        const hitEast = (p, r) => m.collideAll(hero.colliders, p.clone(), r, 0, out);
+        const pathAudit = (p, contact) => {
+          const range = p.distanceTo(contact.position);
+          let firstTerrainM = null,
+            firstPropsM = null,
+            firstEastM = null;
+          // Same fixed-depth route, 8 m steps, 12 m keepout and scan-cap endpoint
+          // as the previous pose audit; preserve that comparison exactly.
+          for (let d = 8; d < range - m.missionApproachScanRadius(site, Infinity); d += 8) {
+            const q = p.clone().lerp(contact.position.clone().setY(p.y), d / range);
+            if (
+              firstTerrainM === null &&
+              q.y - terrain.sampleHeight(q.x, q.z) < settings.hullRadius + settings.seabedClearance
+            )
+              firstTerrainM = d;
+            if (firstPropsM === null && props.collide(q.clone(), settings.hullRadius + 4, out))
+              firstPropsM = d;
+            if (firstEastM === null && hitEast(q, settings.hullRadius + 4)) firstEastM = d;
+          }
+          return { firstTerrainM, firstPropsM, firstEastM };
+        };
+        output.scaleAudit = {
+          scales: [1, 1.5, 2, 3],
+          offsetsM: offsets,
+          transform:
+            'Whole existing east prop via def.scale and def.yOffsetM, Props.replace; poses/cameras and both POIs remain fixed at baseline world positions.',
+          route:
+            'Prior fixed-depth 8 m sampled route, radius hullRadius+4, ending at mission scan cap; not a piloted 3D path.',
+          scan: 'East-prop collider overlap with fixed authored 36 m and Arcade-resolved 100 m scan spheres at both gallery contacts; overlap does not imply entire scan region blocked.',
+        };
+        for (const scale of [1, 1.5, 2, 3]) {
+          for (const offsetM of scale === 1 ? [0] : offsets) {
+            hero.def.scale = baseScale.map((s) => s * scale);
+            hero.def.yOffsetM = baseOffset + offsetM;
+            // Rebuild terrain-following geometry, just as a real existing-field edit would.
+            await props.replace(hero);
+            hood = ['grotto-overhang', 'stalactite-gallery'].map((name) =>
+              hero.root.getObjectByName(name),
+            );
+            const scan = [primary, east].map((contact) => ({
+              id: contact.id,
+              position: contact.position.toArray(),
+              authoredRadiusM: contact.radius,
+              authoredSphereOverlap: hitEast(contact.position, contact.radius),
+              arcadeSphereOverlap: hitEast(contact.position, Math.max(contact.radius, 100)),
+              centreBlocked: hitEast(contact.position, 0.001),
+            }));
+            for (const { tuning, original } of poses) {
+              const entry = measure(tuning, tuning.id, original);
+              entry.scale = scale;
+              entry.offsetM = offsetM;
+              entry.heroPosition = hero.root.position.toArray();
+              const bounds = new T.Box3().setFromObject(hero.full);
+              entry.heroBounds = { min: bounds.min.toArray(), max: bounds.max.toArray() };
+              entry.paths = [primary, east].map((contact) => ({
+                id: contact.id,
+                ...pathAudit(original.p, contact),
+              }));
+              entry.scan = scan;
+              rows.push(entry);
+              console.log(
+                tier,
+                tuning.id,
+                scale,
+                offsetM,
+                entry.layouts
+                  .map((l) => (100 * l.visible.topThirdScreenFraction).toFixed(3))
+                  .join('/'),
+                entry.clearance.minimumM.toFixed(3),
+              );
+            }
+          }
+        }
+        output.tiers.push({ tier, candidates: rows });
+        continue;
+      }
       const entries = candidates.map((p, i) => measure(p, p.id ?? `candidate-${i + 1}`));
       if (
         verify &&
@@ -418,7 +506,9 @@ try {
       terrain.dispose();
     }
   }
-  const path = args.find((arg) => arg !== '--verify') ?? '.cache/hood-poses/results.json';
+  const path =
+    args.find((arg) => !['--verify', '--scale-table'].includes(arg)) ??
+    '.cache/hood-poses/results.json';
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, JSON.stringify(output, null, 2) + '\n');
 } finally {

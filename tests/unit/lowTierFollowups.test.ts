@@ -21,6 +21,7 @@ import { spawnSettings } from '../../src/game/Spawn.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
 import { visitHullVertices } from './helpers/hullClearance.js';
+import { partitionedRaycast } from './helpers/partitionedRaycast.js';
 import { reticleClearOfControls } from '../../src/ui/ScanReticleLayout.js';
 import type { TileMeta } from '../../src/util/types.js';
 import { Props } from '../../src/world/Props.js';
@@ -534,6 +535,9 @@ test('Blue Hole saved hood pose B agrees with pinhole rays on both actual viewpo
         height,
         solids.map((mesh) => ({ mesh, label: hood.includes(mesh) ? 1 : 2 })),
       );
+      // Cache exact triangle batches after terrain.update selects this layout's LOD.
+      // Keep every ray and assertion; only reject batches whose bounds the ray misses.
+      const intersections = solids.map(partitionedRaycast);
       // Construct pinhole rays from an orthonormal basis and FOV, without
       // projection/inverse matrices or Raycaster.setFromCamera. Query the real
       // triangles at exact pixel centres used by the rasterizer, including
@@ -561,8 +565,12 @@ test('Blue Hole saved hood pose B agrees with pinhole rays on both actual viewpo
           // Near/far planes bound forward depth, not distance along oblique rays.
           ray.near = rig.camera.near / direction.dot(forward);
           ray.far = rig.camera.far / direction.dot(forward);
-          const hitsHood = ray.intersectObjects(hood, false).length > 0;
-          const hit = ray.intersectObjects(solids, false)[0];
+          const hits = intersections
+            .flatMap((intersect) => intersect(ray))
+            .sort((a, b) => a.distance - b.distance);
+          // Keep all intersections so hood behind terrain still counts as projected.
+          const hitsHood = hits.some((hit) => hood.includes(hit.object as Mesh));
+          const hit = hits[0];
           const label = hit ? (hood.some((mesh) => mesh === hit.object) ? 1 : 2) : 0;
           const pixel = y * width + x;
           const message = `${width}×${height} pixel ${x},${y}`;
