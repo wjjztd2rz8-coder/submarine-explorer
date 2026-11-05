@@ -27,6 +27,8 @@ import { Props } from '../../src/world/Props.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import poses from '../../tools/lowtier-poses.json';
 import blueHolePoses from '../../tools/blue-hole-poses.json';
+// @ts-expect-error CPU diagnostic projection is shared with Node tools.
+import { projectCoverage } from '../../tools/lib/pose-projection.mjs';
 import titanicPoses from '../../tools/titanic-poses.json';
 import { withArcadeReach } from './helpers.js';
 import { siteManifest } from '../../src/core/SiteManifest.js';
@@ -482,3 +484,101 @@ test.each(['low', 'medium', 'high'] as const)(
     }
   },
 );
+
+// Regression guard: validate real candidate geometry independently of the rasterizer's matrices.
+test('Blue Hole saved hood pose B agrees with pinhole rays on both actual viewports', async () => {
+  const { config, terrain, props } = await scene('great-blue-hole', 'high');
+  const sub = new SubMesh({ length: 26, hullClass: 'B', tier: 'high' });
+  sub.setView('chase');
+  try {
+    const authored = blueHolePoses;
+    const tuning = authored.hoodCandidates.find((pose) => pose.id === 'B')!;
+
+    const hero = props.placed.find((prop) => prop.def.id === 'karst-grotto-east')!;
+    hero.root.updateMatrixWorld(true);
+    const target = hero.root.localToWorld(new Vector3(...authored.east.target));
+    const bearing = (tuning.bearing * Math.PI) / 180;
+    const position = target
+      .clone()
+      .add(new Vector3(Math.sin(bearing) * tuning.range, 0, -Math.cos(bearing) * tuning.range));
+    position.y = hero.root.position.y + tuning.altitude;
+    const yaw = Math.atan2(target.x - position.x, -(target.z - position.z));
+    sub.setPose(position, yaw, 0, 0);
+    const hood = ['grotto-overhang', 'stalactite-gallery'].map(
+      (name) => hero.root.getObjectByName(name) as Mesh,
+    );
+    const ray = new Raycaster();
+    for (const [width, height] of [
+      [1600, 900],
+      [390, 844],
+    ]) {
+      const rig = new CameraRig(config.camera, width / height, terrain);
+      rig.setChaseRadiusDefault(tuning.radius, tuning.offsetX, tuning.offsetY);
+      rig.snap(position, yaw, 0);
+      rig.camera.updateMatrixWorld(true);
+      terrain.update(rig.camera);
+      const solids = [
+        ...solidMeshes(terrain.group),
+        ...props.placed.flatMap((prop) => solidMeshes(prop.full)),
+        ...solidMeshes(sub.vehicle.root),
+      ];
+      const projected = projectCoverage(
+        rig.camera,
+        width,
+        height,
+        hood.map((mesh) => ({ mesh, label: 1 })),
+      );
+      const visible = projectCoverage(
+        rig.camera,
+        width,
+        height,
+        solids.map((mesh) => ({ mesh, label: hood.includes(mesh) ? 1 : 2 })),
+      );
+      // Construct pinhole rays from an orthonormal basis and FOV, without
+      // projection/inverse matrices or Raycaster.setFromCamera. Query the real
+      // triangles at exact pixel centres used by the rasterizer, including
+      // off-subject pixels, terrain occlusion and the upper-third boundary.
+      const forward = rig.camera.getWorldDirection(new Vector3());
+      const right = forward
+        .clone()
+        .cross(new Vector3(0, 1, 0))
+        .normalize();
+      const up = right.clone().cross(forward).normalize();
+      const tanY = Math.tan((rig.camera.fov * Math.PI) / 360);
+      let projectedHits = 0,
+        visibleHits = 0,
+        occludedHits = 0;
+      for (let row = 0; row < 24; row++)
+        for (let column = 0; column < 40; column++) {
+          const x = Math.floor(((column + 0.5) * width) / 40);
+          const y = Math.floor(((row + 0.5) * height) / 24);
+          const direction = forward
+            .clone()
+            .addScaledVector(right, ((2 * (x + 0.5)) / width - 1) * tanY * (width / height))
+            .addScaledVector(up, (1 - (2 * (y + 0.5)) / height) * tanY)
+            .normalize();
+          ray.set(rig.camera.position, direction);
+          // Near/far planes bound forward depth, not distance along oblique rays.
+          ray.near = rig.camera.near / direction.dot(forward);
+          ray.far = rig.camera.far / direction.dot(forward);
+          const hitsHood = ray.intersectObjects(hood, false).length > 0;
+          const hit = ray.intersectObjects(solids, false)[0];
+          const label = hit ? (hood.some((mesh) => mesh === hit.object) ? 1 : 2) : 0;
+          const pixel = y * width + x;
+          const message = `${width}×${height} pixel ${x},${y}`;
+          expect(projected.labels[pixel], message).toBe(hitsHood ? 1 : 0);
+          expect(visible.labels[pixel], message).toBe(label);
+          projectedHits += Number(hitsHood);
+          visibleHits += Number(label === 1);
+          occludedHits += Number(hitsHood && label !== 1);
+        }
+      expect(projectedHits).toBeGreaterThan(visibleHits);
+      expect(visibleHits).toBeGreaterThan(0);
+      expect(occludedHits).toBeGreaterThan(0);
+    }
+  } finally {
+    sub.dispose();
+    props.dispose();
+    terrain.dispose();
+  }
+});
