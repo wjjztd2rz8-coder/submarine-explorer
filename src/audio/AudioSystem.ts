@@ -145,7 +145,8 @@ export class AudioSystem {
   unlock(): void {
     if (this.disposed) return;
     if (this.engine) {
-      if (this.playbackBlocked && this.engine.isUnlocked) return;
+      if (this.playbackBlocked && this.engine.isUnlocked && this.engine.ctx.state === 'suspended')
+        return;
       void this.engine.unlock().then(() => this.syncPlayback());
       return;
     }
@@ -166,7 +167,6 @@ export class AudioSystem {
     this.score = new AmbientScore(this.engine, this.config);
     this.soundscape = new Soundscape(this.engine, this.config, this.captions);
     this.scanHum = new MachineLoop(this.engine, 380);
-    this.setSettings(this.settings);
     this.wireBusEvents();
   }
 

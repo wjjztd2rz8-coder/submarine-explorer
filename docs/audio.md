@@ -33,6 +33,8 @@ and ambience available. Hidden tabs suspend independently of shell pause. The ma
 while suspension completes; returning to a paused tab keeps it silent.
 If AudioContext construction fails, the system stays locked and a later gesture
 can retry with the current saved settings.
+An interrupted context also retries gesture warmup while paused or hidden,
+keeping the master silent until playback is allowed again.
 One-shots disconnect their complete graphs after their last source ends.
 Disposal stops and disconnects every source and processor, unsubscribes
 handlers and closes the context. A caption callback that tears down the scene

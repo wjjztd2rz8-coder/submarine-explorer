@@ -585,6 +585,48 @@ describe('audio lifecycle', () => {
     audio.dispose();
   });
 
+  it.each([
+    ['pause', false],
+    ['pause', true],
+    ['hidden', false],
+    ['hidden', true],
+  ] as const)(
+    'warms an interrupted context on a gesture during %s with mute=%s without unpausing it',
+    async (blocked, muted) => {
+      const audio = system();
+      audio.unlock();
+      await flush();
+      if (blocked === 'pause') audio.setPaused(true);
+      else visibility(true);
+      audio.setSettings({ masterVolume: 0.43, musicVolume: 0.19, sfxVolume: 0, muted });
+      const ctx = context();
+      const nodes = [...ctx.nodes];
+      ctx.state = 'interrupted';
+      audio.unlock();
+      // Recovery must start its warmup in the gesture, even behind a modal.
+      const warmup = ctx.nodes.slice(nodes.length);
+      expect(warmup).toHaveLength(1);
+      expect(warmup[0].start).toHaveBeenCalledOnce();
+      expect(audio.diagnostics.masterGain).toBe(0);
+      await flush();
+      expect(ctx.state).toBe('suspended');
+      audio.unlock();
+      expect(ctx.nodes).toHaveLength(nodes.length + 1);
+      if (blocked === 'pause') audio.setPaused(false);
+      else visibility(false);
+      await flush();
+      expect(audio.diagnostics).toMatchObject({
+        state: 'running',
+        masterGain: muted ? 0 : 0.43,
+        musicGain: 0.19,
+        sfxGain: 0,
+      });
+      expect(Context.instances).toHaveLength(1);
+      audio.dispose();
+      for (const node of ctx.nodes) expect(node.connections).toEqual([]);
+    },
+  );
+
   it('keeps hidden and paused states independent and does not recreate voices on mode changes', async () => {
     const audio = system();
     audio.unlock();
