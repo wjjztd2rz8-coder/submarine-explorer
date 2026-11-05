@@ -119,7 +119,7 @@ export function canyonRockDetail(m: THREE.MeshStandardMaterial, strength: number
       grad += vec3(0.07, 1.0, 0.03) * cos(bed) * (0.25 + 0.75 * swell) * (1.0 - smoothstep(0.8, 2.5, fwidth(bed)));
       grad = mat3(viewMatrix) * grad;
       grad -= normal * dot(normal, grad);
-      normal = normalize(normal - grad * ${strength.toFixed(3)} * (1.0 - smoothstep(45.0, 160.0, length(vViewPosition))));`,
+      normal = normalize(normal - grad * ${strength.toFixed(3)} * (1.0 - smoothstep(20.0, 80.0, length(vViewPosition))));`,
       );
   };
   m.customProgramCacheKey = () => `${cacheKey}-canyon-detail-${strength}`;
