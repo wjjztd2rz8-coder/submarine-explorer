@@ -366,6 +366,9 @@ const disc = (dims: readonly [number, number, number]): { rx: number; rz: number
   rx: dims[0],
   rz: dims[0],
 });
+/** Dark silt greys for slide blocks: they read as bed, not as boulders. */
+const SLIDE_TINTS = [0x6a6258, 0x5c554c, 0x72695d] as const;
+
 /** Warm rust tones: debris plates must read against grey-brown silt. */
 const TRAIL_TINTS = [0xffdcb8, 0xf0b890, 0xffe8d0] as const;
 const CREAM = [0xd7d0c4, 0xcfc6b5, 0xbdb3a2] as const;
@@ -713,12 +716,13 @@ const KITS: Record<WreckScatterId, Kit> = {
             big: true,
             count: 20,
             size: [
-              [1.5, 5],
-              [1, 1.5],
-              [1.5, 6],
+              [0.8, 2.5],
+              [0.5, 1],
+              [0.8, 3],
             ],
             pose: 'lie',
-            sink: 0.03,
+            sink: 0.35,
+            gain: 0.8,
           },
           {
             name: 'mud',
@@ -726,13 +730,14 @@ const KITS: Record<WreckScatterId, Kit> = {
             mat: 'sediment',
             count: 24,
             size: [
-              [2, 5],
-              [0.8, 1.6],
-              [2, 6],
+              [1, 3],
+              [0.4, 1],
+              [1, 3.5],
             ],
             pose: 'upright',
-            sink: 0.15,
+            sink: 0.45,
             ring: [0.1, 1],
+            tints: SLIDE_TINTS,
           },
         ],
       };
@@ -747,15 +752,33 @@ const KITS: Record<WreckScatterId, Kit> = {
           geom: 'plate',
           mat: 'steel',
           big: true,
-          count: 45,
+          count: 28,
           size: [
-            [2, 7],
-            [1, 2],
-            [2, 8],
+            [1.2, 3.5],
+            [0.6, 1.2],
+            [1.2, 4],
           ],
           pose: 'lie',
-          sink: 0.03,
+          sink: 0.35,
           cluster: 0.3,
+          gain: 0.8,
+        },
+        {
+          // Small fragments: the bulk of what a plated hull sheds.
+          name: 'shards',
+          geom: 'plate',
+          mat: 'steel',
+          count: 60,
+          size: [
+            [0.3, 1],
+            [0.3, 0.8],
+            [0.3, 1.2],
+          ],
+          pose: 'tumble',
+          sink: 0.4,
+          cluster: 0.5,
+          gain: 0.8,
+          small: true,
         },
         {
           name: 'frames',
@@ -830,16 +853,17 @@ const KITS: Record<WreckScatterId, Kit> = {
           geom: 'mudBlock',
           mat: 'sediment',
           big: true,
-          count: 140,
+          count: 180,
           size: [
-            [3, 12],
-            [1, 3.5],
-            [3, 14],
+            [1.2, 4.5],
+            [0.5, 1.5],
+            [1.2, 5.5],
           ],
           pose: 'upright',
-          sink: 0.2,
+          sink: 0.5,
           align: 1.2,
           cluster: 0.2,
+          tints: SLIDE_TINTS,
         },
         {
           name: 'berms',
@@ -849,11 +873,11 @@ const KITS: Record<WreckScatterId, Kit> = {
           count: 26,
           size: [
             [4, 7],
-            [1.5, 2.5],
+            [0.7, 1.3],
             [25, 45],
           ],
           pose: 'upright',
-          sink: 0.25,
+          sink: 0.4,
           align: 0.12,
           ring: [0.8, 1],
         },
