@@ -4,6 +4,10 @@
     "mission": {
       "rangeM": 110,
       "yawOffset": 8,
+      "bearing": 90,
+      "chaseRadius": 80,
+      "chaseOffsetX": 40,
+      "chaseOffsetY": 30,
       "destinationLabel": "the main hull"
     },
     "freeDive": {

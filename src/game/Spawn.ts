@@ -60,7 +60,7 @@ export function composedMissionSpawn(
   const arm = siteManifest(siteId)?.opening?.mission;
   const authored = siteManifest(siteId)?.opening?.freeDive;
   const hero = props.placed.find((p) => p.def.id === authored?.hero);
-  let bearing = ((authored?.bearing ?? 180) * Math.PI) / 180;
+  let bearing = ((arm?.bearing ?? authored?.bearing ?? 180) * Math.PI) / 180;
   if (hero) {
     hero.root.updateMatrixWorld(true);
     const direction = hero.root

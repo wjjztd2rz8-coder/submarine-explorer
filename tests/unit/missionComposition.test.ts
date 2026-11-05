@@ -321,10 +321,10 @@ const reviewedSmallOpenings = ['axial-seamount-ashes', 'endurance'];
 // These are regression floors, not the aspirational 30% width for future pose work.
 const fixedOpeningWidthFloors: Record<string, number> = {
   'beebe-vent-field': 0.25,
-  bismarck: 0.5,
+  bismarck: 0.6,
   'great-blue-hole': 0.21,
   'hunga-tonga-caldera': 0.33,
-  'lost-city': 0.23,
+  'lost-city': 0.38,
   'monterey-canyon': 0.2,
   titanic: 0.3,
 };
