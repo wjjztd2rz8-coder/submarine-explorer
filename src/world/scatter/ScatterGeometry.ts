@@ -251,7 +251,7 @@ export function spongeGeometry(): THREE.BufferGeometry {
 export function seaPenGeometry(): THREE.BufferGeometry {
   const stalk = new THREE.CylinderGeometry(0.02, 0.035, 0.5, 5, 1).toNonIndexed();
   stalk.translate(0, 0.25, 0);
-  const head = new THREE.IcosahedronGeometry(0.5, 1).toNonIndexed();
+  const head = new THREE.IcosahedronGeometry(0.5, 1);
   head.scale(0.16, 0.55, 0.045);
   head.translate(0, 0.72, 0);
   const pos = head.getAttribute('position');
