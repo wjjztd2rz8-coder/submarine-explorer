@@ -626,6 +626,40 @@ def check_species(doc, report, landmark):
 # --------------------------------------------------------------------------- driver
 
 
+def check_site_opening(doc, report, landmark):
+    """Check optional mission framing at the content gate (runtime: SiteManifest.ts)."""
+    where = "site.json"
+    if not isinstance(doc, dict) or doc.get("id") != landmark:
+        report.err(where, '"id" must match the landmark folder')
+        return
+    opening = doc.get("opening", {})
+    if not isinstance(opening, dict):
+        report.err(where + " opening", "must be an object")
+        return
+    if "mission" not in opening:
+        return
+    mission = opening["mission"]
+    where += " opening.mission"
+    if not isinstance(mission, dict):
+        report.err(where, "must be an object")
+        return
+    positive = {"rangeM", "openingDepthM", "chaseRadius"}
+    numeric = positive | {"bearing", "yawOffset", "localAltitudeWeight",
+                          "chaseOffsetX", "chaseOffsetY"}
+    for key in mission.keys() - numeric - {"destinationLabel"}:
+        report.err(where + "." + key, "unknown field")
+    if "rangeM" not in mission:
+        report.err(where + ".rangeM", "required")
+    for key in numeric & mission.keys():
+        value = mission[key]
+        if not _is_num(value):
+            report.err(where + "." + key, "must be a finite number")
+        elif key in positive and value <= 0:
+            report.err(where + "." + key, "must be positive")
+    if "destinationLabel" in mission and not _nonempty_str(mission["destinationLabel"]):
+        report.err(where + ".destinationLabel", "must be a non-empty string")
+
+
 def validate_landmark(landmark, repo=REPO, tolerance=DEFAULT_DEPTH_TOLERANCE_M, hulls=None):
     """Validate data/landmarks/<landmark>/ under `repo`. Returns a Report."""
     report = Report(landmark)
@@ -643,6 +677,8 @@ def validate_landmark(landmark, repo=REPO, tolerance=DEFAULT_DEPTH_TOLERANCE_M, 
     for name in REQUIRED_FILES:
         if name not in docs:
             report.err(name, "missing")
+    if "site.json" in docs:
+        check_site_opening(docs["site.json"], report, landmark)
     if "species.json" not in docs:
         report.warn("species.json", "missing (every Phase C pack should ship one)")
     if not os.path.isfile(os.path.join(folder, "sources.md")):

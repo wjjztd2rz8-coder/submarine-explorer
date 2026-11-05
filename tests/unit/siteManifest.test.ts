@@ -21,6 +21,22 @@ const ids = (
 ).landmarks;
 
 describe('site manifest validator', () => {
+  it.each([undefined, 0, 90, -90, 450])('accepts optional mission bearing %s', (bearing) => {
+    const mission = { rangeM: 110, ...(bearing === undefined ? {} : { bearing }) };
+    expect(validateSiteManifest({ id: 's', opening: { mission } }, 's').opening?.mission).toEqual(
+      mission,
+    );
+  });
+
+  it.each([null, true, '90', [], {}, NaN, Infinity, -Infinity])(
+    'rejects invalid mission bearing %s',
+    (bearing) => {
+      expect(() =>
+        validateSiteManifest({ id: 's', opening: { mission: { rangeM: 110, bearing } } }, 's'),
+      ).toThrow('opening.mission.bearing');
+    },
+  );
+
   it('resolves omitted smoker defaults without changing the source profile', () => {
     const {
       topFraction: _top,
