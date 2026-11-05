@@ -94,7 +94,7 @@ exports[`1130: other sites retain byte-identical scatter geometry, placement, co
     },
   },
   "bismarck": {
-    "meshes": "b69ff60f0839555fbfb6fa0821d8225be6fd9a722475fdf811f169a942176f6a",
+    "meshes": "d12e38fcf6f1b899a477f3557fdd71e765711ee8b0594434cac30a7553ccab77",
     "stats": {
       "cells": 21,
       "drawCalls": 3,

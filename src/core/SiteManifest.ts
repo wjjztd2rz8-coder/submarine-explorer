@@ -224,6 +224,8 @@ export interface SiteManifest {
       /** Opening depth below the surface, for sites whose subject needs a deeper vantage than the shallowest safe pose. */
       openingDepthM?: number;
       yawOffset?: number;
+      /** Approach bearing from the free-dive hero, when the mission wants a different side. */
+      bearing?: number;
       /** Opening chase arm, same meaning as the free-dive fields. */
       chaseRadius?: number;
       chaseOffsetX?: number;
@@ -323,6 +325,7 @@ const openingCheck = fields(
         localAltitudeWeight: finite,
         openingDepthM: aboveZero,
         yawOffset: finite,
+        bearing: finite,
         ...cameraFields,
       },
     ),

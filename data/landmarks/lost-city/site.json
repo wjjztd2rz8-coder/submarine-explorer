@@ -5,7 +5,7 @@
       "rangeM": 130,
       "chaseRadius": 80,
       "chaseOffsetX": 40,
-      "chaseOffsetY": 45,
+      "chaseOffsetY": 40,
       "destinationLabel": "Poseidon",
       "localAltitudeWeight": 1
     },
