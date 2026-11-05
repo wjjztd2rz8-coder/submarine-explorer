@@ -42,6 +42,15 @@ const MINIMAL = {
   completion: 'all_primary',
 };
 
+const scanOrders = [
+  ['poi-a', 'poi-b', 'poi-c'],
+  ['poi-a', 'poi-c', 'poi-b'],
+  ['poi-b', 'poi-a', 'poi-c'],
+  ['poi-b', 'poi-c', 'poi-a'],
+  ['poi-c', 'poi-a', 'poi-b'],
+  ['poi-c', 'poi-b', 'poi-a'],
+];
+
 function def(overrides: Record<string, unknown> = {}): MissionDef {
   const d = parseMission({ ...MINIMAL, ...overrides }, 'site', quiet);
   if (!d) throw new Error('fixture failed to parse');
@@ -56,68 +65,87 @@ function fakeFetch(files: Record<string, unknown>): FetchJson {
   };
 }
 
-it('reloads a mid-mission save with Journal discoveries intact and a scannable opening objective', () => {
-  const values = new Map<string, string>();
-  const storage = {
-    getItem: (key: string) => values.get(key) ?? null,
-    setItem: (key: string, value: string) => {
-      values.set(key, value);
-    },
-    removeItem: (key: string) => {
-      values.delete(key);
-    },
-  };
-  const bus = new EventBus();
-  const mission = new Mission({ def: def(), bus });
-  const store = new DiscoveryStore(storage);
-  const scanner = new Scanner(DEFAULT_CONFIG.scan, bus, store);
-  const target = (id: string) => ({
-    id,
-    name: id,
-    landmarkId: 'site',
-    position: new Vector3(0, -100, -10),
-    radius: 20,
-    scanSeconds: 2,
-  });
-  const position = new Vector3(0, -100, 0);
-  const forward = new Vector3(0, 0, -1);
-  mission.start('site-tile');
-  mission.update(30);
-  scanner.setTargets([target('poi-a')]);
-  scanner.update(2, position, forward, true);
-  expect(mission.counts()).toEqual({ completed: 1, total: 3 });
-  expect(store.isDiscovered('site', 'poi-a')).toBe(true);
-  scanner.setTargets([target('poi-b')]);
-  scanner.update(1, position, forward, true);
-  expect(scanner.view.progress).toBe(0.5);
-  expect(store.isDiscovered('site', 'poi-b')).toBe(false);
-  const saved = new Map(values);
-  const firstRecord = store.get('site', 'poi-a');
-  mission.dispose();
+it.each(scanOrders.map((order) => ({ order, label: order.join(', ') })))(
+  'reloads mid-mission after $label with Journal discoveries intact and every target scannable',
+  ({ order }) => {
+    const values = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        values.set(key, value);
+      },
+      removeItem: (key: string) => {
+        values.delete(key);
+      },
+    };
+    const bus = new EventBus();
+    const mission = new Mission({ def: def(), bus });
+    const store = new DiscoveryStore(storage);
+    const scanner = new Scanner(DEFAULT_CONFIG.scan, bus, store);
+    const target = (id: string) => ({
+      id,
+      name: id,
+      landmarkId: 'site',
+      position: new Vector3(0, -100, -10),
+      radius: 20,
+      scanSeconds: 2,
+    });
+    const position = new Vector3(0, -100, 0);
+    const forward = new Vector3(0, 0, -1);
+    mission.start('site-tile');
+    mission.update(30);
+    scanner.setTargets([target(order[0])]);
+    scanner.update(2, position, forward, true);
+    expect(mission.counts()).toEqual({ completed: 1, total: 3 });
+    expect(store.isDiscovered('site', order[0])).toBe(true);
+    scanner.setTargets([target(order[1])]);
+    scanner.update(1, position, forward, true);
+    expect(scanner.view.progress).toBe(0.5);
+    expect(store.isDiscovered('site', order[1])).toBe(false);
+    const saved = new Map(values);
+    const firstRecord = store.get('site', order[0]);
+    mission.dispose();
 
-  const reloadedBus = new EventBus();
-  const reloaded = new Mission({ def: def(), bus: reloadedBus });
-  const journal = new DiscoveryStore(storage);
-  const beam = new Scanner(DEFAULT_CONFIG.scan, reloadedBus, journal);
-  expect(reloaded.state).toBe('briefing');
-  expect(reloaded.elapsedS).toBe(0);
-  expect(reloaded.counts()).toEqual({ completed: 0, total: 3 });
-  expect(nextScanObjective(reloaded.objectives)?.poiId).toBe('poi-a');
-  expect(beam.view.progress).toBe(0);
-  expect(beam.view.completed).toBe(0);
-  expect(journal.keys()).toEqual(['site/poi-a']);
-  expect(values).toEqual(saved);
-  reloaded.start('site-tile');
-  beam.setTargets([target('poi-a')]);
-  beam.update(2, position, forward, true);
-  expect(beam.view.lastCompleteFirstTime).toBe(false);
-  expect(reloaded.counts()).toEqual({ completed: 1, total: 3 });
-  expect(reloaded.state).toBe('diving');
-  expect(nextScanObjective(reloaded.objectives)?.poiId).toBe('poi-b');
-  expect(journal.get('site', 'poi-a')).toEqual({ ...firstRecord, count: 2 });
-  expect(new DiscoveryStore(storage).keys()).toEqual(['site/poi-a']);
-  reloaded.dispose();
-});
+    const reloadedBus = new EventBus();
+    const reloaded = new Mission({ def: def(), bus: reloadedBus });
+    const journal = new DiscoveryStore(storage);
+    const beam = new Scanner(DEFAULT_CONFIG.scan, reloadedBus, journal);
+    expect(reloaded.state).toBe('briefing');
+    expect(reloaded.elapsedS).toBe(0);
+    expect(reloaded.counts()).toEqual({ completed: 0, total: 3 });
+    expect(nextScanObjective(reloaded.objectives)?.poiId).toBe('poi-a');
+    expect(beam.view.progress).toBe(0);
+    expect(beam.view.completed).toBe(0);
+    expect(journal.keys()).toEqual([`site/${order[0]}`]);
+    expect(values).toEqual(saved);
+    reloaded.start('site-tile');
+    beam.setTargets([target(order[0])]);
+    beam.update(2, position, forward, true);
+    expect(beam.view.lastCompleteFirstTime).toBe(false);
+    expect(reloaded.counts()).toEqual({ completed: 1, total: 3 });
+    expect(reloaded.state).toBe('diving');
+    expect(nextScanObjective(reloaded.objectives)?.poiId).toBe(
+      order[0] === 'poi-a' ? 'poi-b' : 'poi-a',
+    );
+    expect(journal.get('site', order[0])).toEqual({ ...firstRecord, count: 2 });
+    for (const poiId of order.slice(1)) {
+      beam.setTargets([target(poiId)]);
+      beam.update(2, position, forward, true);
+      // Holding the control after completion must not duplicate persisted scans or events.
+      beam.update(10, position, forward, true);
+    }
+    expect(reloaded.allComplete).toBe(true);
+    expect(reloaded.end()).toBe(true);
+    expect(reloaded.endReason).toBe('all');
+    expect(reloaded.emitted.filter((event) => event.name === 'mission:objective')).toHaveLength(3);
+    expect(
+      reloaded.emitted.filter((event) => event.name === 'mission:primaryComplete'),
+    ).toHaveLength(1);
+    expect(new DiscoveryStore(storage).snapshot()).toEqual(journal.snapshot());
+    expect(journal.stats.scans).toBe(4);
+    reloaded.dispose();
+  },
+);
 
 describe('parseMission', () => {
   it('accepts the contracts §2.4 shape', () => {
@@ -426,6 +454,36 @@ describe('Mission state machine (D-FLOW)', () => {
   }
   const scan = (bus: EventBus, poiId: string): void =>
     bus.emit('scan:complete', { poiId, landmarkId: 'site', firstTime: true });
+
+  it.each(scanOrders.map((order) => ({ order, label: order.join(', ') })))(
+    'completes objectives in order $label across early debriefs and repeated scans',
+    ({ order }) => {
+      const { m, bus } = setup();
+      m.start('site-tile');
+      for (let i = 0; i < order.length; i++) {
+        for (let repeat = 0; repeat < 3; repeat++)
+          bus.emit('scan:complete', {
+            poiId: order[i],
+            landmarkId: 'site',
+            firstTime: false,
+          });
+        expect(m.counts().completed).toBe(i + 1);
+        expect(m.primaryComplete).toBe(
+          order.slice(0, i + 1).includes('poi-a') && order.slice(0, i + 1).includes('poi-b'),
+        );
+        expect(m.end()).toBe(true);
+        expect(m.end()).toBe(false);
+        scan(bus, order[(i + 1) % order.length]);
+        expect(m.counts().completed).toBe(i + 1);
+        expect(m.resume()).toBe(true);
+      }
+      expect(m.allComplete).toBe(true);
+      for (const name of ['mission:primaryComplete', 'mission:complete'])
+        expect(m.emitted.filter((event) => event.name === name)).toHaveLength(1);
+      expect(m.emitted.filter((event) => event.name === 'mission:objective')).toHaveLength(3);
+      m.dispose();
+    },
+  );
 
   it('starts in the briefing and ignores scans until started', () => {
     const { m, bus, log } = setup();
