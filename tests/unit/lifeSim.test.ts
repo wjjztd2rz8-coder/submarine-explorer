@@ -1,14 +1,49 @@
 import { describe, expect, it } from 'vitest';
-import { MeshStandardMaterial, PerspectiveCamera, Scene, ShaderLib } from 'three';
+import { BufferAttribute, MeshStandardMaterial, PerspectiveCamera, Scene, ShaderLib } from 'three';
 import lifeJson from '../../data/life/life.json';
 import type { SimEnv, SubInfo } from '../../src/world/life/agent.js';
 import { SPECIES } from '../../src/world/life/catalogue.js';
 import { Life } from '../../src/world/life/Life.js';
 import { LifeSim, TICK } from '../../src/world/life/LifeSim.js';
+import { Sparks } from '../../src/world/life/Sparks.js';
 import { mulberry32 } from '../../src/world/life/rng.js';
 import { bodyLen } from '../../src/world/life/steer.js';
 import { buildEntries, parseLifeDoc } from '../../src/world/life/tables.js';
 import { LIFE_TIERS, type SiteTable } from '../../src/world/life/types.js';
+
+it.each(['low', 'medium', 'high'] as const)(
+  '%s sparks upload colours on emission and ring reuse, preserving them while drifting',
+  (tier) => {
+    const sparks = new Sparks(LIFE_TIERS[tier].sparks);
+    const colours = sparks.points.geometry.getAttribute('aColor') as BufferAttribute;
+    const positions = sparks.points.geometry.getAttribute('position') as BufferAttribute;
+    try {
+      sparks.emit(0, 0, 0, 1, 0, 0, 10, 0.1, 0xff0000);
+      expect(colours.version).toBe(1);
+      const emitted = Array.from(colours.array);
+      for (let frame = 0; frame < 60; frame++) sparks.update(1 / 60, 800, 0);
+      expect(sparks.activeCount).toBe(1);
+      expect(sparks.points.visible).toBe(true);
+      expect(positions.getX(0)).toBeGreaterThan(0);
+      expect(positions.version).toBe(60);
+      expect(Array.from(colours.array)).toEqual(emitted);
+      expect(colours.version).toBe(1);
+      // Wrap the real ring and change the original slot's colour.
+      for (let i = 0; i < sparks.capacity; i++) sparks.emit(0, 0, 0, 0, 0, 0, 10, 0.1, 0x00ff00);
+      expect(colours.version).toBe(1 + sparks.capacity);
+      expect([colours.getX(0), colours.getY(0), colours.getZ(0)]).toEqual([0, 1, 0]);
+      sparks.clear();
+      sparks.update(0, 800, 0);
+      expect(sparks.points.visible).toBe(false);
+      sparks.emit(0, 0, 0, 0, 0, 0, 10, 0.1, 0x0000ff);
+      sparks.update(0.1, 800, 0);
+      expect(sparks.points.visible).toBe(true);
+      expect(colours.version).toBe(2 + sparks.capacity);
+    } finally {
+      sparks.dispose();
+    }
+  },
+);
 
 /** A seabed that slopes from 500 m deep in the west to 900 m in the east, with a gentle ridge. */
 const env: SimEnv = {

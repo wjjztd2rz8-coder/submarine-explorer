@@ -17,19 +17,27 @@ import * as geo from '../../src/world/props/geo/detail.js';
 import { composedFreeDiveSpawn, chooseFreeDiveHull, spawnSettings } from '../../src/game/Spawn.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import blueHolePoses from '../../tools/blue-hole-poses.json';
+import lostCityPoses from '../../tools/lostcity-poses.json';
+import { Scatter } from '../../src/world/scatter/Scatter.js';
+import { hashStringSigned } from '../../src/util/rng.js';
+import { siteManifest } from '../../src/core/SiteManifest.js';
+import { LIFE_TIERS } from '../../src/world/life/types.js';
 import { propData, siteIds } from '../content.js';
 
 /**
  * Conservative static prop cost: every prop at once, with BOTH internal LOD
  * branches included. Count material groups, transparent double-sided passes
- * and instances. This is a guard on content growth, not a rendered-frame
- * measurement (terrain, vehicles, life, frustum/LOD selection are excluded).
+ * and instances. With a frustum, walk visible branches and apply object culling
+ * for fixed-view CPU estimates. Neither mode measures rasterization or GPU time.
  */
-function staticCost(root: THREE.Object3D): { calls: number; triangles: number } {
+function staticCost(root: THREE.Object3D, frustum?: THREE.Frustum) {
   let calls = 0;
   let triangles = 0;
-  root.traverse((object) => {
+  let instances = 0;
+  let points = 0;
+  const visit = (object: THREE.Object3D): void => {
     if ((object as THREE.Sprite).isSprite) {
+      if (frustum && object.frustumCulled && !frustum.intersectsObject(object)) return;
       if ((object as THREE.Sprite).material.visible) {
         calls++;
         triangles += 2;
@@ -39,10 +47,11 @@ function staticCost(root: THREE.Object3D): { calls: number; triangles: number } 
     const mesh = object as THREE.Mesh;
     if (!mesh.isMesh && !(object as THREE.Points).isPoints && !(object as THREE.Line).isLine)
       return;
-    const instances = (mesh as THREE.InstancedMesh).isInstancedMesh
+    if (frustum && object.frustumCulled && !frustum.intersectsObject(object)) return;
+    const instanceCount = (mesh as THREE.InstancedMesh).isInstancedMesh
       ? (mesh as THREE.InstancedMesh).count
       : 1;
-    if (!instances) return;
+    if (!instanceCount) return;
     const geometry = mesh.geometry;
     const vertices = geometry.index?.count ?? geometry.getAttribute('position').count;
     const drawStart = geometry.drawRange.start;
@@ -59,14 +68,19 @@ function staticCost(root: THREE.Object3D): { calls: number; triangles: number } 
           ? 2
           : 1;
       calls += passes;
-      if (mesh.isMesh) triangles += (actual / 3) * instances * passes;
+      if (mesh.isMesh) triangles += (actual / 3) * instanceCount * passes;
+      if ((object as THREE.Points).isPoints) points += actual * passes;
     };
+    const before = calls;
     if (Array.isArray(mesh.material)) {
       for (const group of geometry.groups)
         add(mesh.material[group.materialIndex ?? 0], group.start, group.count);
     } else add(mesh.material, 0, vertices);
-  });
-  return { calls, triangles };
+    if (calls > before && (mesh as THREE.InstancedMesh).isInstancedMesh) instances += instanceCount;
+  };
+  if (frustum) root.traverseVisible(visit);
+  else root.traverse(visit);
+  return { calls, triangles, instances, points };
 }
 
 /** Read actual GLB geometry/materials; image decoding is irrelevant to this census. */
@@ -152,6 +166,179 @@ describe('catalog site static prop budgets', () => {
         }
       });
     }
+  }
+});
+
+describe('Lost City static frame census', () => {
+  for (const tier of ['low', 'medium', 'high'] as const) {
+    it(`${tier}: accounts for every prop, terrain LOD, scatter instance and particle pool`, async () => {
+      const meta = validateMeta(
+        JSON.parse(readFileSync('data/tiles/lost-city/meta.json', 'utf8')),
+        'lost-city',
+      );
+      const bytes = readFileSync('data/tiles/lost-city/heightmap.bin');
+      const config = DEFAULT_CONFIG;
+      const terrain = new Terrain(
+        { meta, heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows) },
+        config.terrain,
+        tier,
+      );
+      const props = new Props(meta, terrain, config.props, tier);
+      try {
+        await props.placeAll(propData('lost-city'), 'lost-city');
+        expect(props.stats.failed).toBe(0);
+        expect(props.placed).toHaveLength(propData('lost-city').props.length);
+        const resident = props.placed.map((p) => ({ id: p.def.id, ...staticCost(p.full) }));
+        const pose = composedFreeDiveSpawn(
+          'lost-city',
+          meta,
+          terrain,
+          props,
+          spawnSettings(config),
+          -6000,
+          config.camera,
+          'arcade',
+        )!;
+        expect(pose).toBeTruthy();
+        const hero = props.placed.find((p) => p.def.id === 'poseidon-tower')!;
+        hero.root.updateMatrixWorld(true);
+        const fixed = lostCityPoses['poseidon-tower'];
+        const target = hero.root.localToWorld(new THREE.Vector3(...fixed.target));
+        const views = [];
+        for (const [width, height] of [
+          [1600, 900],
+          [390, 844],
+        ]) {
+          const rig = new CameraRig(config.camera, width / height, terrain);
+          rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
+          for (const view of ['opening', 'approach', 'detail'] as const) {
+            if (view === 'opening') {
+              rig.setMode('chase');
+              rig.snap(new THREE.Vector3(pose.x, pose.y, pose.z), pose.yaw, 0);
+            } else {
+              const range = view === 'approach' ? fixed.approachRange : fixed.close.range;
+              const position = target
+                .clone()
+                .addScaledVector(new THREE.Vector3(...fixed.direction), range);
+              position.y =
+                hero.root.position.y + (view === 'approach' ? fixed.above : fixed.close.above);
+              const yaw = Math.atan2(target.x - position.x, -(target.z - position.z));
+              const pitch = THREE.MathUtils.clamp(
+                Math.atan2(target.y - position.y, range),
+                -config.submarine.maxPitch,
+                config.submarine.maxPitch,
+              );
+              rig.setMode('first-person');
+              rig.snap(position, yaw, pitch);
+              const eye = rig.camera.position;
+              rig.lookElevation =
+                (Math.atan2(target.y - eye.y, Math.hypot(target.x - eye.x, target.z - eye.z)) -
+                  pitch) /
+                0.55;
+              rig.snap(position, yaw, pitch);
+            }
+            terrain.update(rig.camera);
+            props.update(rig.camera);
+            props.group.updateMatrixWorld(true);
+            const frustum = new THREE.Frustum().setFromProjectionMatrix(
+              new THREE.Matrix4().multiplyMatrices(
+                rig.camera.projectionMatrix,
+                rig.camera.matrixWorldInverse,
+              ),
+            );
+            const parts = props.placed.map((p) => ({
+              id: p.def.id,
+              lod: p.lod,
+              ...staticCost(p.root, frustum),
+            }));
+            // Enable only Scatter's DOM guard; its materials/placement are real.
+            // Terrain's browser texture loading remains disabled in this CPU census.
+            vi.stubGlobal('document', {});
+            const normal = new THREE.Vector3();
+            const scatter = new Scatter({
+              ground: {
+                sampleHeight: (x, z) => terrain.sampleHeight(x, z),
+                normalAt: (x, z, out) => {
+                  terrain.getNormal(x, z, normal);
+                  out[0] = normal.x;
+                  out[1] = normal.y;
+                  out[2] = normal.z;
+                },
+                contains: (x, z) => terrain.contains(x, z),
+              },
+              biome: terrain.biome,
+              density: config.terrain.tiers[tier].scatterDensity,
+              rangeM: config.terrain.tiers[tier].scatterRangeM,
+              seed: config.terrain.detailSeed ^ hashStringSigned(meta.id),
+              rockLo: 1 - Math.cos((config.terrain.rockSlopeLoDeg * Math.PI) / 180),
+              rockHi: 1 - Math.cos((config.terrain.rockSlopeHiDeg * Math.PI) / 180),
+            });
+            vi.unstubAllGlobals();
+            try {
+              if (props.placed.some((p) => p.def.clearsGround))
+                scatter.setGroundKeepout((x, z) => props.coversGround(x, z));
+              if (siteManifest('lost-city')?.scatter?.keepoutHero)
+                scatter.setBoulderKeepout(
+                  hero.localBounds.clone().applyMatrix4(hero.root.matrixWorld),
+                );
+              // At most two cells generated per call: settle the complete fixed-view stream.
+              for (let frame = 0; frame < 100; frame++) scatter.update(rig.camera);
+              expect(scatter.stats.instances).toBeGreaterThan(0);
+              const terrainCost = {
+                calls: terrain.stats.visibleChunks,
+                triangles: terrain.stats.drawnTriangles,
+              };
+              expect(staticCost(terrain.group, frustum).triangles).toBe(terrainCost.triangles);
+              views.push({
+                view,
+                viewport: [width, height],
+                terrain: { ...terrainCost, lodCounts: [...terrain.stats.lodCounts] },
+                props: parts,
+                scatter: { ...scatter.stats, ...staticCost(scatter.group, frustum) },
+              });
+            } finally {
+              scatter.dispose();
+            }
+          }
+        }
+        const water = config.water.tiers[tier];
+        const particlePools = {
+          snow: water.snowCount,
+          sparks: LIFE_TIERS[tier].sparks,
+          lifeAgents: LIFE_TIERS[tier].maxAgents,
+          lifeSpecies: LIFE_TIERS[tier].maxSpecies,
+        };
+        expect(resident.reduce((sum, p) => sum + p.points, 0)).toBe(tier === 'low' ? 742 : 1078);
+        if (diagnostics) {
+          mkdirSync('.cache/perf-budget', { recursive: true });
+          writeFileSync(
+            `.cache/perf-budget/lost-city-census-${tier}.json`,
+            JSON.stringify(
+              {
+                tier,
+                resident,
+                terrain: {
+                  ...terrain.stats,
+                  widthM: terrain.widthM,
+                  depthM: terrain.depthM,
+                  cols: meta.cols,
+                  rows: meta.rows,
+                },
+                particlePools,
+                water,
+                views,
+              },
+              null,
+              2,
+            ),
+          );
+        }
+      } finally {
+        vi.unstubAllGlobals();
+        props.dispose();
+        terrain.dispose();
+      }
+    }, 30_000);
   }
 });
 
@@ -533,7 +720,7 @@ describe('Blue Hole transparent shaft budget', () => {
         expect(shaft.renderOrder).toBe(0);
         expect(shaft.frustumCulled).toBe(false);
         expect(shaft.geometry.groups).toEqual([]);
-        expect(staticCost(shaft)).toEqual({ calls: 1, triangles: 384 });
+        expect(staticCost(shaft)).toEqual({ calls: 1, triangles: 384, instances: 0, points: 0 });
         const transparent: THREE.Object3D[] = [];
         for (const p of props.placed)
           p.full.traverse((o) => {
