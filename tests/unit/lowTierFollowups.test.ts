@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs';
 import {
   Box3,
   BoxGeometry,
+  BufferAttribute,
+  BufferGeometry,
   Mesh,
   MeshBasicMaterial,
   Raycaster,
@@ -517,11 +519,37 @@ test('Blue Hole saved hood pose B agrees with pinhole rays on both actual viewpo
       rig.snap(position, yaw, 0);
       rig.camera.updateMatrixWorld(true);
       terrain.update(rig.camera);
-      const solids = [
-        ...solidMeshes(terrain.group),
+      const ground = solidMeshes(terrain.group);
+      const scenery = [
         ...props.placed.flatMap((prop) => solidMeshes(prop.full)),
         ...solidMeshes(sub.vehicle.root),
       ];
+      const solids = [...ground, ...scenery];
+      // Keep every triangle, but bound small batches so intersecting a dense
+      // terrain chunk's box does not require scanning the whole chunk per ray.
+      const rayGround = ground.flatMap((mesh) => {
+        const index = mesh.geometry.index!;
+        const vertices = mesh.geometry.getAttribute('position');
+        const parts: Mesh[] = [];
+        const point = new Vector3();
+        const batchIndices = 3 * 1024;
+        for (let start = 0; start < index.count; start += batchIndices) {
+          const end = Math.min(start + batchIndices, index.count);
+          const geometry = new BufferGeometry();
+          geometry.setAttribute('position', vertices);
+          geometry.setIndex(new BufferAttribute(index.array.subarray(start, end), 1));
+          const bounds = new Box3();
+          for (let i = start; i < end; i++)
+            bounds.expandByPoint(point.fromBufferAttribute(vertices, index.getX(i)));
+          geometry.boundingBox = bounds;
+          geometry.boundingSphere = bounds.getBoundingSphere(new Sphere());
+          const part = new Mesh(geometry, mesh.material);
+          part.matrixWorld.copy(mesh.matrixWorld);
+          parts.push(part);
+        }
+        return parts;
+      });
+      const raySolids = [...rayGround, ...scenery];
       const projected = projectCoverage(
         rig.camera,
         width,
@@ -562,7 +590,7 @@ test('Blue Hole saved hood pose B agrees with pinhole rays on both actual viewpo
           ray.near = rig.camera.near / direction.dot(forward);
           ray.far = rig.camera.far / direction.dot(forward);
           const hitsHood = ray.intersectObjects(hood, false).length > 0;
-          const hit = ray.intersectObjects(solids, false)[0];
+          const hit = ray.intersectObjects(raySolids, false)[0];
           const label = hit ? (hood.some((mesh) => mesh === hit.object) ? 1 : 2) : 0;
           const pixel = y * width + x;
           const message = `${width}×${height} pixel ${x},${y}`;

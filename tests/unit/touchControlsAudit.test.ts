@@ -1173,6 +1173,8 @@ describe('phone home gestures', () => {
     'pointercancel',
     'lostpointercapture',
     'blur',
+    'resize',
+    'orientationchange',
     'visibilitychange',
     'close sites',
     'hide home',
@@ -1195,8 +1197,10 @@ describe('phone home gestures', () => {
         f.doc.hidden = true;
         f.doc.dispatchEvent(new Event(interruption));
         f.doc.hidden = false;
-      } else if (interruption === 'blur') f.win.dispatchEvent(new Event(interruption));
+      } else if (['blur', 'resize', 'orientationchange'].includes(interruption))
+        f.win.dispatchEvent(new Event(interruption));
       else pointer(f.grab, interruption, 1);
+      expect(f.grab.hasPointerCapture(1)).toBe(false);
       pointer(f.grab, 'pointerup', 1, 60, 50);
       expect(f.sites.classList.contains('is-collapsed')).toBe(true);
       expect(f.grab.hasPointerCapture(1)).toBe(false);
