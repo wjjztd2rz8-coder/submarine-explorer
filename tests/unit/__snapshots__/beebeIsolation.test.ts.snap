@@ -34,7 +34,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
     },
   },
   "bismarck": {
-    "biome": "410b7700e489cc8c3cdbe1fa613d77160bd48ef04b7a7895b41c4570caab6df0",
+    "biome": "5c6525d201587fa04ade642a0a30f2ec193213d99e3db6913741ecfa3cb0ea9c",
     "tiers": {
       "high": {
         "buffers": [
