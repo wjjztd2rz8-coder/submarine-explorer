@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Codex 133-138 merged by 2026-11-05 (136-138 found one audio gesture-recovery fix; no other production bugs). 139-141 queued. Claude: V-lostcity-tower-scale and V-bismarck-hull-scale in flight; next V-monterey-wall-clarity, V-bluehole-opening-hood (needs T-hood-scale-table), V-endurance-hull-scale.
+- Codex 140-142 finished 2026-11-05 (uncollected: review next run); 143-145 queued (S-verify-openings-2, S-fact-check-journal-2, S-dead). Codex 133-138 merged by 2026-11-05 (136-138 found one audio gesture-recovery fix; no other production bugs). 139-141 queued. Claude: V-lostcity-tower-scale and V-bismarck-hull-scale in flight; next V-monterey-wall-clarity, V-bluehole-opening-hood (needs T-hood-scale-table), V-endurance-hull-scale.
 
 ## Backlog
 
