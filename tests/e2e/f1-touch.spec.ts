@@ -1,4 +1,5 @@
 import { completeScan } from './helpers/scan.js';
+import type { Input } from '../../src/core/Input.js';
 /**
  * Touch play on emulated phones and a tablet. Real touches go through
  * the CDP `Input.dispatchTouchEvent`, so the pointer events the controls listen
@@ -37,12 +38,12 @@ async function centre(page: Page, selector: string): Promise<{ x: number; y: num
 
 async function touch(
   cdp: CDPSession,
-  type: 'touchStart' | 'touchMove' | 'touchEnd',
+  type: 'touchStart' | 'touchMove' | 'touchEnd' | 'touchCancel',
   points: Array<{ x: number; y: number; id: number }>,
 ): Promise<void> {
   await cdp.send('Input.dispatchTouchEvent', {
     type,
-    touchPoints: type === 'touchEnd' ? [] : points,
+    touchPoints: type === 'touchEnd' || type === 'touchCancel' ? [] : points,
   });
 }
 
@@ -57,6 +58,84 @@ async function subPos(page: Page): Promise<[number, number, number]> {
 async function shot(page: Page, name: string): Promise<void> {
   await mkdir(shots, { recursive: true });
   await page.screenshot({ path: `${shots}/${name}.png` });
+}
+
+for (const viewport of [
+  { width: 390, height: 844 },
+  { width: 844, height: 390 },
+]) {
+  test.describe(`touch interruptions ${viewport.width}x${viewport.height}`, () => {
+    test.use({ ...phonePortrait, viewport });
+
+    test('simultaneous flight and scan release on cancellation, blur, hiding and rotation', async ({
+      page,
+    }) => {
+      // Regression guard: interrupted native pointers must not resume flight or Scan.
+      await boot(page, diveUrl + '&tier=low');
+      const cdp = await page.context().newCDPSession(page);
+      const state = () =>
+        page.evaluate(() => {
+          const input = (window.__game as unknown as { input: Input }).input;
+          return { ...input.touchAxes, scan: input.touchHeld.has('scan') };
+        });
+      const neutral = { throttle: 0, yaw: 0, pitch: 0, ballast: 0, scan: false };
+      try {
+        for (const interruption of ['cancel', 'blur', 'hidden', 'rotate']) {
+          const stick = (await page.locator('.tc-stick').boundingBox())!;
+          const slider = (await page.locator('.tc-slider').boundingBox())!;
+          const scan = await centre(page, '.tc-btn-scan');
+          const points = [
+            { id: 1, x: stick.x + stick.width / 2, y: stick.y + 4 },
+            { id: 2, x: slider.x + slider.width / 2, y: slider.y + slider.height - 4 },
+            { id: 3, ...scan },
+          ];
+          await touch(cdp, 'touchStart', points);
+          await expect.poll(async () => (await state()).throttle).toBeGreaterThan(0.8);
+          await expect.poll(async () => (await state()).ballast).toBeLessThan(-0.8);
+          await expect.poll(async () => (await state()).scan).toBe(true);
+          if (interruption === 'cancel') await touch(cdp, 'touchCancel', []);
+          else if (interruption === 'rotate')
+            await page.setViewportSize({ width: viewport.height, height: viewport.width });
+          else
+            await page.evaluate((interruption) => {
+              if (interruption === 'blur') window.dispatchEvent(new Event('blur'));
+              else {
+                Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+                document.dispatchEvent(new Event('visibilitychange'));
+                Reflect.deleteProperty(document, 'hidden');
+                document.dispatchEvent(new Event('visibilitychange'));
+              }
+            }, interruption);
+          await expect.poll(state).toEqual(neutral);
+          await expect(page.locator('.tc-root .is-held')).toHaveCount(0);
+          if (interruption !== 'cancel') {
+            await touch(
+              cdp,
+              'touchMove',
+              points.map((p) => ({ ...p, y: p.y - 2 })),
+            );
+            await expect.poll(state).toEqual(neutral);
+            await touch(cdp, 'touchEnd', []);
+          }
+          await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+        }
+        // A fresh hold still reaches the real input consumer after every interruption.
+        const scan = await centre(page, '.tc-btn-scan');
+        await touch(cdp, 'touchStart', [{ id: 4, ...scan }]);
+        expect(
+          await page.evaluate(
+            () => (window.__game as unknown as { input: Input }).input.sample().scan,
+          ),
+        ).toBe(true);
+        await touch(cdp, 'touchEnd', []);
+        await expect.poll(state).toEqual(neutral);
+        await shot(page, `interruptions-${viewport.width}x${viewport.height}`);
+      } finally {
+        await touch(cdp, 'touchCancel', []);
+        await cdp.detach();
+      }
+    });
+  });
 }
 
 test.describe('phone landscape', () => {

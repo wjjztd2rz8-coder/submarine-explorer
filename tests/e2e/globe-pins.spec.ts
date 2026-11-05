@@ -29,6 +29,60 @@ async function openHomeGlobe(page: Page): Promise<void> {
 const distance = (page: Page): Promise<number> =>
   page.evaluate(() => (window.__game as { homeGlobe: HomeGlobe }).homeGlobe.orbit.distance);
 
+for (const viewport of [
+  { width: 390, height: 844 },
+  { width: 844, height: 390 },
+]) {
+  test.describe(`site sheet rotation ${viewport.width}x${viewport.height}`, () => {
+    test.use({ viewport, hasTouch: true, isMobile: true });
+
+    test('rotation discards a held site-list swipe and a fresh swipe works', async ({ page }) => {
+      // Regression: releasing a pre-rotation finger expanded the list using its old Y coordinate.
+      await page.goto('/?tier=low', { waitUntil: 'domcontentloaded' });
+      await page.waitForFunction(() => window.__gameReady === true);
+      await page
+        .locator('.home-menu')
+        .getByRole('button', { name: 'Dive sites', exact: true })
+        .tap();
+      const sheet = page.locator('.home-sites');
+      const header = sheet.locator('.home-sites-head h2');
+      await header.evaluate((element) =>
+        element.addEventListener(
+          'pointerdown',
+          (e) => (element.dataset.pointerId = String((e as PointerEvent).pointerId)),
+          { once: true },
+        ),
+      );
+      const captured = () =>
+        header.evaluate((element) =>
+          element.parentElement!.hasPointerCapture(Number(element.dataset.pointerId)),
+        );
+      const box = (await header.boundingBox())!;
+      const point = { id: 1, x: box.x + box.width / 2, y: box.y + box.height / 2 };
+      const cdp = await page.context().newCDPSession(page);
+      try {
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
+        await expect.poll(captured).toBe(true);
+        await page.setViewportSize({ width: viewport.height, height: viewport.width });
+        await expect.poll(captured).toBe(false);
+        await cdp.send('Input.dispatchTouchEvent', {
+          type: 'touchMove',
+          touchPoints: [{ ...point, y: Math.max(1, point.y - 60) }],
+        });
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+        await expect(sheet).toHaveClass(/is-collapsed/);
+        await page.setViewportSize({ width: 390, height: 844 });
+        await swipeSiteList(page);
+        // Its trailing click must not close the list again.
+        await expect(sheet.locator('.home-sites-grab')).toHaveAttribute('aria-expanded', 'true');
+      } finally {
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
+        await cdp.detach();
+      }
+    });
+  });
+}
+
 test.describe('globe pins', () => {
   test('pins sit on their location: no leaders, small dot, padded hit area, faint catalogue', async ({
     page,
