@@ -441,7 +441,7 @@ export function buildBismarck(
     mudBand: 2.4,
     shadeAt: endShade,
   });
-  projectUVs(hullGeom, 14);
+  projectUVs(hullGeom, 20);
   const deckGeom = deck.merge()!;
   paintWreck(deckGeom, {
     seed: seed ^ 0xd,
