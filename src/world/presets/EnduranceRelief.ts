@@ -87,8 +87,9 @@ export function buildEnduranceRelief(terrain: PresetTerrain, centre: THREE.Vecto
         const y = terrain.sampleHeight(x, z) + height * env * prof - 0.25;
         pos.push(x, y, z);
         const lift = 0.85 + 0.3 * prof * env;
-        tint.setRGB(0.135 * lift, 0.122 * lift, 0.09 * lift);
-        col.push(tint.r, tint.g, tint.b);
+        tint.setRGB(0.2 * lift, 0.18 * lift, 0.13 * lift);
+        // Edges fade to nothing so a swell melts into the floor instead of outlining it.
+        col.push(tint.r, tint.g, tint.b, Math.min(1, prof * env * 2.5));
       }
     }
     for (let i = 0; i < LONG; i++) {
@@ -101,7 +102,7 @@ export function buildEnduranceRelief(terrain: PresetTerrain, centre: THREE.Vecto
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 4));
   g.setIndex(idx);
   g.computeVertexNormals();
   // Unlit (the site's ambient is very strong): bake a soft key light so the
@@ -110,9 +111,13 @@ export function buildEnduranceRelief(terrain: PresetTerrain, centre: THREE.Vecto
   const c = g.getAttribute('color');
   for (let i = 0; i < n.count; i++) {
     const shade = 0.8 + 0.35 * Math.max(0, n.getX(i) * 0.5 + n.getY(i) * 0.8 - n.getZ(i) * 0.3);
-    c.setXYZ(i, c.getX(i) * shade, c.getY(i) * shade, c.getZ(i) * shade);
+    c.setXYZW(i, c.getX(i) * shade, c.getY(i) * shade, c.getZ(i) * shade, c.getW(i));
   }
-  const mat = new THREE.MeshBasicMaterial({ vertexColors: true });
+  const mat = new THREE.MeshBasicMaterial({
+    vertexColors: true,
+    transparent: true,
+    depthWrite: false,
+  });
   mat.name = 'enduranceRelief';
   const mesh = new THREE.Mesh(g, mat);
   mesh.name = 'enduranceRelief';
