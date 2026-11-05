@@ -6,10 +6,10 @@
 
 `data/landmarks/lost-city/site.json` mission: `rangeM` 220 to 130, chase arm 80 m, offset X 40 / Y 40 (camera sits right and above the sub, so the sub reads low-left and clear of the tower).
 
-| Layout | Before | After |
-| --- | --- | --- |
+| Layout                                       | Before | After |
+| -------------------------------------------- | ------ | ----- |
 | Desktop width (clipped envelope incl. flank) | 23.96% | 39.3% |
-| Phone width | 42.60% | 69.9% |
+| Phone width                                  | 42.60% | 69.9% |
 
 The first scan is still outside the effective scan radius (100 m Arcade floor; 130 m away). Visual: the tower and its two satellite spires plus flank now fill the centre third (about 30-35% of frame width by eye), the sub sits low-left and does not cover the tower. Honest score: clearly better, target met for width and sub placement. Remaining gap: the upper ~40% of the frame is still open water (the hill crest is on the horizon, no pose can raise it without losing the tower base), and the tower top is ~47% down the frame.
 
@@ -19,10 +19,10 @@ An earlier attempt with only `rangeM` 130 and the default arm put the sub on the
 
 `data/landmarks/bismarck/site.json` mission: `bearing` 90 (broadside; mission-only, free-dive stays 50), chase arm 80 m, offset X 40 / Y 30. Range stays 110 m (already the floor).
 
-| Layout | Before | After |
-| --- | --- | --- |
-| Desktop width (clipped envelope) | 53.1% | 62.7% |
-| Phone width | 89.0% | 100% (clipped) |
+| Layout                           | Before | After          |
+| -------------------------------- | ------ | -------------- |
+| Desktop width (clipped envelope) | 53.1%  | 62.7%          |
+| Phone width                      | 89.0%  | 100% (clipped) |
 
 Visual: the hull spans roughly 18-56% of the frame width (about 38%), up from about a quarter, and the sub is below and clear of it. Honest score: improved but short of "about half the width" by eye; the envelope metric overstates visible hull. Going closer is blocked by the 110 m out-of-scan floor.
 
