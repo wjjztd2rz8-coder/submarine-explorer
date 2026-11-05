@@ -125,6 +125,8 @@ export class Sparks {
     this.color[i3] = this.c.r;
     this.color[i3 + 1] = this.c.g;
     this.color[i3 + 2] = this.c.b;
+    // Colour stays fixed while a spark ages; upload it only when a slot is written.
+    (this.points.geometry.getAttribute('aColor') as THREE.BufferAttribute).needsUpdate = true;
   }
 
   /** Age and move every spark; `scale` converts metres to pixels at distance 1. */
@@ -156,7 +158,6 @@ export class Sparks {
     const g = this.points.geometry;
     (g.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
     (g.getAttribute('aSpark') as THREE.BufferAttribute).needsUpdate = true;
-    (g.getAttribute('aColor') as THREE.BufferAttribute).needsUpdate = true;
     const u = this.material.uniforms as { uScale: { value: number }; uFog: { value: number } };
     u.uScale.value = scale;
     u.uFog.value = fogDensity;
