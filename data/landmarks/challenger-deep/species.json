@@ -14,7 +14,7 @@
   "taxa_in_bbox": 180,
   "taxa_matching_rank": 69,
   "records_in_bbox": 482,
-  "note": "A --depth-min 6000 --depth-max 11000 query (species rank, then genus, then any) returned 0 taxa: OBIS has almost no hadal-depth records inside this specific 50x50 km tile bbox. This file instead uses --rank genus with no depth filter (180 taxa in the bbox, 69 at species/genus rank, kept the top 30 by record count). Nearly all of them are bacteria/archaea genera with minimumDepthInMeters/maximumDepthInMeters of 0-1.6 m in their OBIS records -- i.e. near-surface water samples taken somewhere over this bbox, not hadal organisms from the trench floor 10+ km below. They are kept here for completeness but should not be read as trench-floor fauna. The one metazoan present, Hirondellea gigas (the hadal amphipod famously recovered from Challenger Deep baited traps -- see sources.md/guide.json), has 6 occurrence records in the bbox but none report a depth. Species placement in the game (field guide only; no species POIs/props are placed) is invented and unrelated to any of these coordinates.",
+  "note": "The OBIS snapshot uses a genus-rank selection without a depth filter and includes the species Hirondellea gigas. Many microbial records report depths of 0–1.6 m; those metadata alone do not establish their sampling habitat or demonstrate trench-floor occurrence. The amphipod records in this export have no reported depth. Independent baited-lander research documents H. gigas at Challenger Deep. Counts are from the dated export and reflect occurrence records, not abundance. Placement of animals in the game is invented.",
   "species": [
     {
       "scientificName": "Hirondellea gigas",

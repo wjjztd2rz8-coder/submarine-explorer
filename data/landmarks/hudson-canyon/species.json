@@ -14,7 +14,7 @@
   "taxa_in_bbox": 1524,
   "taxa_matching_rank": 786,
   "records_in_bbox": 45826,
-  "note": "Occurrence records within the tile bbox from OBIS; record counts reflect sampling effort, not abundance. Placement of animals in the game is invented.",
+  "note": "The OBIS snapshot covers the full tile bounding box without a depth filter, including seabirds and upper-water species as well as deeper records. Recorded depth ranges describe source records, not each species’ full habitat range or presence at a scan point. Counts are from the dated export and reflect occurrence records, not abundance. Placement of animals in the game is invented.",
   "species": [
     {
       "scientificName": "Larus argentatus",

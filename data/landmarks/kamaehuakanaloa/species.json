@@ -14,7 +14,7 @@
   "taxa_in_bbox": 700,
   "taxa_matching_rank": 55,
   "records_in_bbox": 5690,
-  "note": "Occurrence records within the tile bbox from OBIS; record counts reflect sampling effort, not abundance. Placement of animals in the game is invented.",
+  "note": "The OBIS snapshot covers the full tile bounding box without a depth filter. It includes deep-water corals, fish, a vent shrimp and records without depth. These records do not establish that every listed taxon inhabits the Hiolo vents. Reported depth values, including unusual entries, are retained as source metadata and require record-level checks before ecological interpretation. Counts are from the dated export and reflect occurrence records, not abundance. Placement of animals in the game is invented.",
   "species": [
     {
       "scientificName": "Chrysogorgia geniculata",

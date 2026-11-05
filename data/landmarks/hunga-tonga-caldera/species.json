@@ -14,7 +14,7 @@
   "taxa_in_bbox": 175,
   "taxa_matching_rank": 134,
   "records_in_bbox": 1068,
-  "note": "Occurrence records within the tile bbox from OBIS; record counts reflect sampling effort, not abundance. Kept taxa are mostly reef fish (damselfish, wrasses, surgeonfish, butterflyfish) typical of shallow Tongan reef habitat around the islands -- most records likely predate the 15 January 2022 eruption, which devastated shallow reef life at the site; some may postdate it and reflect early recolonisation, but OBIS records consulted here do not reliably distinguish before/after. This file makes no claim about which. Placement of any animal in the game is invented.",
+  "note": "The OBIS snapshot covers the full tile bounding box without a depth filter. Listed taxa are mostly reef fish with reported depths of 4–10 m. The checklist export does not provide event dates, so it does not establish whether these records precede or follow the January 2022 eruption, or demonstrate recolonisation. Counts are from the dated export and reflect occurrence records, not abundance. Placement of animals in the game is invented.",
   "species": [
     {
       "scientificName": "Pycnochromis margaritifer",

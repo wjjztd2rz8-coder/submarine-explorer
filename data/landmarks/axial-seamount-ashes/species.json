@@ -15,7 +15,7 @@
   "taxa_in_bbox": 157,
   "taxa_matching_rank": 39,
   "records_in_bbox": 823,
-  "note": "Occurrence records within the tile bbox from OBIS; record counts reflect sampling effort, not abundance. Placement of animals in the game is invented.",
+  "note": "The OBIS snapshot uses a 1,300–1,700 m depth filter across the full tile bounding box. It includes vent-associated worms and molluscs as well as other taxa. The regional records do not establish that every listed taxon occurs on ASHES chimney faces. Counts are from the dated export and reflect occurrence records, not abundance. Placement of animals in the game is invented.",
   "species": [
     {
       "scientificName": "Heteropolypus ritteri",

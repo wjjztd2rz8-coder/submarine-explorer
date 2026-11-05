@@ -1,5 +1,12 @@
 # Challenger Deep content: sources and notes (package C4)
 
+## S-fact-check-journal-2 — 2026-11-05
+
+The [second Journal fact-check](../../../plan/progress/S-fact-check-journal-2.md)
+records source checks, corrections, species-export limits and unresolved claims.
+It supplements the first pass and supersedes conflicting historical notes below.
+Existing Journal tags identify each scene addition once.
+
 ## 1400 content fact audit — 2026-10-11
 
 The current claim checks, corrections, primary references and unresolved items are

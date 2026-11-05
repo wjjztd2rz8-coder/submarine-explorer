@@ -1,5 +1,12 @@
 # Hunga Tonga caldera site content: sources and notes (package C4)
 
+## S-fact-check-journal-2 — 2026-11-05
+
+The [second Journal fact-check](../../../plan/progress/S-fact-check-journal-2.md)
+records source checks, corrections, species-export limits and unresolved claims.
+It supplements the first pass and supersedes conflicting historical notes below.
+Existing Journal tags identify each scene addition once.
+
 ## Phase F era and route decision — 2026-10-01
 
 Retain the historical pre-January-2022 experience. [Ribó et al. 2026, repeat bathymetry](https://www.nature.com/articles/s41561-026-02099-7) documents the pre-eruption central basin at 150–200 m, the 2014–2015 cone joining the islands, and the later ~850 m basin. The fetched tile metadata provides GMRT provenance but no per-cell survey year; its shallow ~132 m basin is consistent with the earlier morphology. This is an era choice grounded in morphology, not new verification of an exact tile survey vintage.

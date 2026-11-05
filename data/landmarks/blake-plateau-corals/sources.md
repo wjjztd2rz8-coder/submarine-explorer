@@ -1,5 +1,12 @@
 # Blake Plateau coral mounds site content: sources and notes (package C4)
 
+## S-fact-check-journal-2 — 2026-11-05
+
+The [second Journal fact-check](../../../plan/progress/S-fact-check-journal-2.md)
+records source checks, corrections, species-export limits and unresolved claims.
+It supplements the first pass and supersedes conflicting historical notes below.
+Existing Journal tags identify each scene addition once.
+
 ## Phase F colour review — 2026-10-01
 
 [NOAA’s mapped coral-habitat account](https://oceanexplorer.noaa.gov/news/million-mounds-news/) explicitly identifies healthy white Desmophyllum pertusum. The Journal now states that natural white colour is not bleaching. Preserve the supported mound hero; crown density, rubble and contact changes belong to the visual geometry pass.

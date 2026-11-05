@@ -15,7 +15,7 @@
   "taxa_in_bbox": 95,
   "taxa_matching_rank": 32,
   "records_in_bbox": 843,
-  "note": "Occurrence records within the tile bbox from OBIS, filtered to 500-1,000 m depth (the province's published depth range). Desmophyllum pertusum (the reef-building coral named in guide.json's coral-thicket entry) is directly present in this export, alongside other deep-sea corals (Madrepora oculata, Enallopsammia profunda, several octocorals) and associated fauna (brittle stars, sea urchins, molluscs, a glass sponge) consistent with a cold-water coral mound habitat. Record counts reflect sampling effort, not abundance. Placement of any animal at a specific POI in the game is invented; this file only reports what OBIS has recorded in the wider bbox.",
+  "note": "The OBIS snapshot uses a 500–1,000 m depth filter within the tile bounding box. It includes Desmophyllum pertusum and other corals and associated taxa. Source-record depths do not establish a colony at an individual scan point or a species’ full depth range. Counts are from the dated export and reflect occurrence records, not abundance. Placement of animals in the game is invented.",
   "species": [
     {
       "scientificName": "Enallopsammia profunda",

@@ -6,7 +6,7 @@
       "id": "overview",
       "title": "Challenger Deep",
       "paragraphs": [
-        "The Mariana Trench is the deepest oceanic trench on Earth: a crescent-shaped scar in the western Pacific seafloor, more than 1,500 miles (2,550 km) long and about 43 miles (69 km) wide on average. It formed as the old, dense Pacific Plate subducts (is thrust downward) beneath the smaller Mariana Arc system, part of the Philippine Plate, to the west. Near its southern end lies the Challenger Deep, the deepest known point in any ocean.",
+        "The Mariana Trench is the deepest oceanic trench on Earth: a crescent-shaped scar in the western Pacific seafloor, more than 1,500 miles (2,550 km) long and about 43 miles (69 km) wide on average. It formed as the old, dense Pacific Plate subducts (is thrust downward) beneath the smaller Mariana Arc system, part of the Philippine Sea Plate, to the west. Near its southern end lies the Challenger Deep, the deepest known point in any ocean.",
         "Researchers measured a deepest observed seafloor depth of 10,935 m (+/- 6 m at 95% confidence) during submersible dives in June 2020. They corrected pressure readings for local gravity and water conditions. At this depth, the water presses down with roughly 16,000 psi (about 1,100 bar), more than a thousand times sea-level atmospheric pressure.",
         "Challenger Deep is not one single pit but at least three separate, elongated sub-basins along the trench axis, informally called the Western, Central and Eastern Pools; a 2019 bathymetric review placed its deepest soundings in the Western Pool. Other surveys differ on which pool holds the deepest point. The Five Deeps Expedition's 2019 dive program explicitly targeted the Eastern and Central Pools by name. NOAA identifies the survey ship Challenger II, which surveyed the area in 1951, as Challenger Deep’s namesake. HMS Challenger’s crew first sounded a depth of 4,475 fathoms (8,184 m) near here in 1875 using a weighted rope -- a record for its time.",
         "The Challenger Deep lies south of the Marianas Trench Marine National Monument. Its depth makes every descent a journey through kilometres of dark water."
@@ -149,9 +149,9 @@
       "title": "Life at full ocean depth",
       "paragraphs": [
         "No dive to the Challenger Deep floor has confirmed a fish sighting (the 1960 Trieste report is doubted); fish filmed at over 8,300 m in the Izu–Ogasawara Trench are still far above this floor. What thrives here instead is Hirondellea gigas, a small orange hadal amphipod. In December 2014 Schmidt Ocean Institute's RV Falkor deployed the baited lander 'Leggo' to 11.368536 deg N, 142.5875166 deg E in the eastern part of the Challenger Deep, recording a depth of 10,929 m and filming swarms of pink amphipods 'scurrying gracefully' about the bait despite roughly 16,000 psi of pressure bearing down on them.",
-        "A separate JAMSTEC expedition using the lander 'ASHURA' recovered 185 Hirondellea gigas individuals in a single 2.5-hour deployment at 11 deg 22.11' N, 142 deg 25.86' E, 10,897 m, on 10 September 2009. Laboratory analysis of those specimens found a unique cellulase enzyme in the amphipod's gut that becomes more active, not less, under the Challenger Deep's own pressure and cold (100 MPa, 2 degC) -- letting it digest sunken wood and plant debris as a food source in an environment with almost nothing else to eat. The Five Deeps Expedition's 2019 science team reported finding several apparently new amphipod species during their dives, including one long-appendaged form, at the bottom of the Challenger Deep.",
+        "A separate JAMSTEC expedition using the lander 'ASHURA' recovered 185 Hirondellea gigas individuals during a deployment at 11 deg 22.11' N, 142 deg 25.86' E, 10,897 m, in 2009. Laboratory analysis of those specimens found a unique cellulase enzyme in the amphipod's gut that becomes more active, not less, under the Challenger Deep's own pressure and cold (100 MPa, 2 degC) -- letting it digest sunken wood and plant debris as a food source in an environment with almost nothing else to eat. The Five Deeps Expedition's 2019 science team reported finding several apparently new amphipod species during their dives, including one long-appendaged form, at the bottom of the Challenger Deep.",
         "Xenophyophores -- giant single-celled foraminifera that build elaborate shells ('tests') from seafloor sediment and can exceed 10 cm across, among the largest single cells known -- have also been filmed in the Mariana Trench system, but at the Sirena Deep, a separate deep about 128 miles (206 km) northeast of Challenger Deep, not at Challenger Deep itself. A July 2011 Scripps Institution of Oceanography expedition, using National-Geographic-built 'Dropcam' landers, filmed them there down to 10,641 m, at the time nearly 3,000 m deeper than the previous xenophyophore depth record (~7,500 m, New Hebrides Trench).",
-        "Tiny amphipods and sediment-dwelling microbes fit the floor’s sparse ecology; the immense pressure keeps fish far above it."
+        "Amphipods and sediment-dwelling microbes are part of this deep-sea ecosystem. Sinking organic material supplies food far below the sunlit surface."
       ],
       "facts": [
         {
@@ -163,8 +163,8 @@
           "value": "11.368536 N, 142.5875166 E, 10,929 m"
         },
         {
-          "label": "ASHURA lander (JAMSTEC, Sep 2009)",
-          "value": "11 22.11' N, 142 25.86' E, 10,897 m, 185 amphipods in 2.5 h"
+          "label": "ASHURA lander (JAMSTEC, 2009)",
+          "value": "11°22.11′N, 142°25.86′E, 10,897 m; 185 amphipods"
         },
         {
           "label": "Deepest fish filmed (2023 publication)",
@@ -242,13 +242,13 @@
       "id": "trench-walls",
       "title": "Subduction and the trench walls",
       "paragraphs": [
-        "The Mariana Trench marks a convergent plate boundary: the Pacific Plate subducts (is thrust downward) beneath the smaller Mariana Arc system, part of the Philippine Plate, to the west -- one plate diving into the Earth's mantle while the other rides up over it, the same basic mechanism that produces every ocean trench on the planet.",
+        "The Mariana Trench marks a convergent plate boundary: the Pacific Plate subducts (is thrust downward) beneath the smaller Mariana Arc system, part of the Philippine Sea Plate, to the west -- one plate diving into the Earth's mantle while the other rides up over it, the same basic mechanism that produces every ocean trench on the planet.",
         "This mission’s north-wall scan point, on the trench’s landward inner wall, reads 9,977.7 m on the shipped GMRT grid. Its sampled slope is roughly 25–29° depending on the sampling baseline; this approximately 60 m grid cannot establish the slope of smaller features."
       ],
       "facts": [
         {
           "label": "Plate boundary type",
-          "value": "convergent; Pacific Plate subducts beneath the Mariana Arc / Philippine Plate"
+          "value": "convergent; Pacific Plate subducts beneath the Mariana Arc / Philippine Sea Plate"
         },
         {
           "label": "North wall depth (this scan point)",
