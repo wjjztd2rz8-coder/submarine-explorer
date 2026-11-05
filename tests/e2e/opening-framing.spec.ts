@@ -1867,3 +1867,145 @@ freshTest.describe('settled landscape light and budget', () => {
     });
   }
 });
+
+freshTest.describe('closer mission scan and camera safety', () => {
+  interface Game {
+    sub: Submarine;
+    rig: CameraRig;
+    props: Props;
+    terrain: Terrain;
+    discovery: Discovery;
+    mission: Mission;
+    scanner: Scanner;
+    save: Save;
+    perf: PerfStats;
+    config: GameConfig;
+  }
+  for (const layout of [
+    { name: 'desktop', width: 1600, height: 900, touch: false },
+    { name: 'portrait', width: 390, height: 844, touch: true },
+    { name: 'landscape', width: 844, height: 390, touch: true },
+  ]) {
+    experiencedTest.describe(layout.name, () => {
+      experiencedTest.use({
+        viewport: { width: layout.width, height: layout.height },
+        hasTouch: layout.touch,
+        isMobile: layout.touch,
+        deviceScaleFactor: 1,
+        serviceWorkers: 'block',
+        storageState: { cookies: [], origins: [] },
+      });
+      for (const site of ['lost-city', 'bismarck'])
+        for (const tier of ['low', 'medium', 'high'])
+          for (const mode of ['arcade', 'realistic']) {
+            // Regression guard: closer mission frames must leave a scan approach and a clear camera arm in both modes.
+            experiencedTest(
+              `${site} ${tier} ${mode}: closer mission stays outside scan range with a clear camera arm`,
+              async ({ page }, info) => {
+                const errors: string[] = [];
+                page.on('pageerror', (error) => errors.push(error.message));
+                await page.addInitScript(
+                  (mode) =>
+                    localStorage.setItem(
+                      'subexplorer.settings.v3',
+                      JSON.stringify({ version: 2, gameplayMode: mode }),
+                    ),
+                  mode,
+                );
+                await pauseClockBeforeNavigation(page);
+                // Compare the live briefing preview with Begin, holding physics as in the approach specs.
+                await page.goto(
+                  `/?mission=${site}&tier=${tier}&tutorial=0&dynres=0&lifeSeed=42${layout.touch ? '&touch=1' : ''}`,
+                  { waitUntil: 'domcontentloaded' },
+                );
+                await clockFramesUntil(page, () => {
+                  const g = window.__game as unknown as Game;
+                  return !!(
+                    window.__gameReady &&
+                    g.props.loaded &&
+                    g.discovery.loaded &&
+                    g.mission
+                  );
+                });
+                const preview = await page.evaluate(() => {
+                  const g = window.__game as unknown as Game;
+                  g.sub.step = () => {};
+                  return { position: g.sub.position.toArray(), yaw: g.sub.yaw };
+                });
+                await page.locator('.briefing-begin').click();
+                await expect(page.locator('.briefing')).toBeHidden();
+                await page.clock.fastForward(50);
+                const probe = await page.evaluate(() => {
+                  const g = window.__game as unknown as Game;
+                  const target = g.discovery.pois.find(
+                    (p) => p.id === g.mission.objectives.find((o) => o.primary)!.poiId,
+                  )!;
+                  const camera = g.rig.camera;
+                  camera.updateMatrixWorld(true);
+                  let armClearance = Infinity;
+                  let propContact = false;
+                  for (let step = 0; step <= 100; step++) {
+                    const point = g.sub.position.clone().lerp(camera.position, step / 100);
+                    armClearance = Math.min(
+                      armClearance,
+                      point.y - g.terrain.sampleHeight(point.x, point.z),
+                    );
+                    propContact ||= g.props.collide(point, 1, point.clone().set(0, 0, 0));
+                  }
+                  let nearClearance = Infinity;
+                  for (const x of [-1, 0, 1])
+                    for (const y of [-1, 0, 1]) {
+                      const point = g.sub.position.clone().set(x, y, -1).unproject(camera);
+                      nearClearance = Math.min(
+                        nearClearance,
+                        point.y - g.terrain.sampleHeight(point.x, point.z),
+                      );
+                      propContact ||= g.props.collide(
+                        point,
+                        camera.near,
+                        point.clone().set(0, 0, 0),
+                      );
+                    }
+                  return {
+                    position: g.sub.position.toArray(),
+                    yaw: g.sub.yaw,
+                    mode: g.save.get().gameplayMode,
+                    tier: g.perf.tier,
+                    distance: g.sub.position.distanceTo(target.position),
+                    radius: target.radius,
+                    scannerRadius: g.scanner.view.objectiveRadius,
+                    arm: g.rig.chaseRadius,
+                    armClearance,
+                    nearClearance,
+                    propContact,
+                    failed: g.props.stats.failed,
+                    eyeClearance:
+                      camera.position.y -
+                      g.terrain.sampleHeight(camera.position.x, camera.position.z),
+                  };
+                });
+                await info.attach('mission-opening-safety', {
+                  body: JSON.stringify(probe, null, 2),
+                  contentType: 'application/json',
+                });
+                expect(probe.mode).toBe(mode);
+                expect(probe.position).toEqual(preview.position);
+                expect(probe.yaw).toEqual(preview.yaw);
+                expect(probe.tier).toBe(tier);
+                expect(probe.distance).toBeCloseTo(MISSION_APPROACH_M[site], 4);
+                expect(probe.distance).toBeGreaterThan(probe.radius);
+                expect(probe.scannerRadius).toBeCloseTo(probe.radius, 6);
+                if (mode === 'arcade') expect(probe.radius).toBe(100);
+                expect(probe.arm).toBe(siteData(site).opening!.mission!.chaseRadius);
+                expect(probe.eyeClearance).toBeGreaterThanOrEqual(6 - 1e-8);
+                expect(probe.armClearance).toBeGreaterThan(0);
+                expect(probe.nearClearance).toBeGreaterThan(0);
+                expect(probe.propContact).toBe(false);
+                expect(probe.failed).toBe(0);
+                expect(errors).toEqual([]);
+              },
+            );
+          }
+    });
+  }
+});

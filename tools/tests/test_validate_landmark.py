@@ -135,6 +135,25 @@ class ValidateLandmarkTests(unittest.TestCase):
         self.assertEqual(rep.errors, [])
         self.assertEqual(rep.warnings, [])
 
+    def test_optional_mission_bearing(self):
+        for mission in ({"rangeM": 110}, *({"rangeM": 110, "bearing": b}
+                                         for b in (0, 90, -90, 450))):
+            with self.subTest(mission=mission):
+                self.write({"site.json": {"id": LM, "opening": {"mission": mission}}})
+                self.assertEqual(self.validate().errors, [])
+        for bad in (None, True, "90", [], {}, float("nan"), float("inf"), -float("inf")):
+            with self.subTest(bearing=bad):
+                self.write({"site.json": {"id": LM, "opening": {
+                    "mission": {"rangeM": 110, "bearing": bad}}}})
+                self.assertError(self.validate(), "opening.mission.bearing")
+
+    def test_mission_opening_shape(self):
+        for mission in (None, [], {"rangeM": 110, "bearng": 90},
+                        {"bearing": 90}, {"rangeM": 0}, {"rangeM": 110, "chaseRadius": -1}):
+            with self.subTest(mission=mission):
+                self.write({"site.json": {"id": LM, "opening": {"mission": mission}}})
+                self.assertError(self.validate(), "opening.mission")
+
     def test_terrain_sampling(self):
         tile = vl.Tile(os.path.join(self.repo, "data", "tiles", LM))
         lat, lon = cell_centre(3, 4)

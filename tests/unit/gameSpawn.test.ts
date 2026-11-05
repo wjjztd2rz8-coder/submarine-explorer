@@ -1,7 +1,7 @@
 /** Guard depth-rated free-dive hull selection and safe shallow-tile spawning. */
 
 import { describe, expect, it, vi } from 'vitest';
-import { Vector3 } from 'three';
+import { Object3D, Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import * as manifests from '../../src/core/SiteManifest.js';
 const { allSiteManifests } = manifests;
@@ -22,6 +22,48 @@ const HULLS = DEFAULT_CONFIG.submarine.hullClasses;
 const MARGIN = DEFAULT_CONFIG.submarine.freeDiveHullMarginM;
 const S = spawnSettings(DEFAULT_CONFIG);
 const R = S.hullRadius;
+
+it.each([undefined, 0, 90])(
+  'mission bearing %s uses the hero local frame and inherits only when omitted',
+  (bearing) => {
+    const root = new Object3D();
+    root.rotation.y = Math.PI / 3;
+    const lookup = vi.spyOn(manifests, 'siteManifest').mockReturnValue({
+      id: 'bearing-fixture',
+      opening: {
+        mission: { rangeM: 220, ...(bearing === undefined ? {} : { bearing }) },
+        freeDive: { hero: 'subject', bearing: 50, range: 85 },
+      },
+    });
+    try {
+      const target = new Vector3(0, -480, 0);
+      const pose = composedMissionSpawn(
+        'bearing-fixture',
+        [{ position: target }],
+        {
+          center: { lat: 0, lon: 0 },
+          bbox: { north: 0.01, south: -0.01, west: -0.01, east: 0.01 },
+        } as import('../../src/util/types.js').TileMeta,
+        { sampleHeight: () => -500 },
+        {
+          placed: [
+            { def: { id: 'subject' }, root },
+          ] as import('../../src/world/Props.js').Props['placed'],
+          collide: () => false,
+        },
+        S,
+        -1000,
+      )!;
+      expect(pose).not.toBeNull();
+      const direction = root
+        .worldToLocal(new Vector3(pose.x, pose.y, pose.z))
+        .sub(root.worldToLocal(target));
+      expect((Math.atan2(direction.x, -direction.z) * 180) / Math.PI).toBeCloseTo(bearing ?? 50, 6);
+    } finally {
+      lookup.mockRestore();
+    }
+  },
+);
 
 it.each(
   (['x', 'y', 'z'] as const).flatMap((axis) =>
