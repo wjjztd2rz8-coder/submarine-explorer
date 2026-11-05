@@ -17,9 +17,9 @@
 import * as THREE from 'three';
 
 /** Distance of the overlay in front of the eye (just past the 0.5 m near plane). */
-export const COCKPIT_DEPTH_M = 0.62;
+const COCKPIT_DEPTH_M = 0.62;
 
-export interface Aperture {
+interface Aperture {
   /** Half-width and half-height of the visible frustum at the overlay depth. */
   halfW: number;
   halfH: number;

@@ -11,12 +11,12 @@
 
 import type { TerrainSampler } from './events.js';
 
-export interface EchoResult {
+interface EchoResult {
   rangeM: number;
   delayS: number;
 }
 
-export interface SonarRayOptions {
+interface SonarRayOptions {
   maxRangeM: number;
   stepM: number;
   speedOfSoundMps: number;

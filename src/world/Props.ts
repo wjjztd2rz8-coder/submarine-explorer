@@ -42,7 +42,7 @@ export interface PropsHeightField {
   getNormal(x: number, z: number, out?: THREE.Vector3): THREE.Vector3;
 }
 
-export type PropLod = 'full' | 'impostor' | 'hidden';
+type PropLod = 'full' | 'impostor' | 'hidden';
 
 export interface PlacedProp {
   /** Builder-owned textures, excluding shared asset and generated-map caches. */
@@ -66,7 +66,7 @@ export interface PlacedProp {
   lod: PropLod;
 }
 
-export interface PropsStats {
+interface PropsStats {
   landmarkId: string;
   /** Props placed. */
   count: number;

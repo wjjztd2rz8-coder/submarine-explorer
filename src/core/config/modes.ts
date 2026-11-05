@@ -20,7 +20,7 @@ export const GAMEPLAY_LABELS: Record<keyof GameplayOptions, string> = {
   visualHints: 'Visual waypoints',
   startPosition: 'Start at surface',
 };
-export const GAMEPLAY_ORDER: ReadonlyArray<keyof GameplayOptions> = [
+const GAMEPLAY_ORDER: ReadonlyArray<keyof GameplayOptions> = [
   'batteryOxygen',
   'currents',
   'visualHints',

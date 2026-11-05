@@ -15,14 +15,14 @@ import {
   type CosmeticSlot,
 } from './Cosmetics.js';
 
-export type AwardKind =
+type AwardKind =
   'poi' | 'objective' | 'species' | 'photo' | 'primary' | 'rating' | 'secret' | 'sample';
 export interface DiveRating {
   stars: number;
   points: number;
   best: number;
 }
-export interface RatingObjective {
+interface RatingObjective {
   primary: boolean;
   complete: boolean;
   resolved?: boolean;

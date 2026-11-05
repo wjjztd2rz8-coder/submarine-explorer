@@ -69,7 +69,7 @@ export interface Blueprint {
   blades?: number;
 }
 
-export interface VehicleStats {
+interface VehicleStats {
   drawCalls: number;
   triangles: number;
 }

@@ -55,6 +55,7 @@ without an entry here is not done.
 
 ### Removed
 
+- **S-dead third sweep:** remove unused export modifiers and two basic tests covered by the uncarved-site and nearest-contact tables; live code and regression assertions remain.
 - **S-dead second sweep:** remove 25 unused UI exports (private options, helper types and local constants/functions); their local implementations and consumed exports remain.
 - **S-dead second sweep:** delete guidance's unread `fadeMs` tuning field and the unproduced `.mission-badge.is-available` selector; guidance timing and live mission badges are unchanged.
 

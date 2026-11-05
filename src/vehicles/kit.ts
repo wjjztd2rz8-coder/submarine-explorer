@@ -399,7 +399,7 @@ export function sideProfile(
 }
 
 /** A keyframe of a lofted body: z and the section values at that station. */
-export type ProfileKey = [z: number, w: number, top: number, bottom: number];
+type ProfileKey = [z: number, w: number, top: number, bottom: number];
 
 /**
  * Catmull-Rom interpolation through profile keys (sorted by z), clamped at

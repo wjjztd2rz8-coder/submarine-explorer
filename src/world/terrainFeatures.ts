@@ -231,7 +231,7 @@ const TALUS_CELLS = 22;
  * and 5-8 m across at hashed bearings. Part of the heightfield (no draw calls), so
  * they also read as boulders in the baked colour and shadow the riser foot.
  */
-export function blueHoleTalus(a: number, r: number): number {
+function blueHoleTalus(a: number, r: number): number {
   if (r < 100 || r > 152) return 0;
   const cell = (Math.PI * 2) / TALUS_CELLS;
   const base = Math.floor((a + Math.PI) / cell);

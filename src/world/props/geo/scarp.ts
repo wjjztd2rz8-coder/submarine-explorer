@@ -356,7 +356,7 @@ export function endSink(x: number, width: number, height: number): number {
 }
 
 /** Optional extras for `extrudeProfile`. */
-export interface ExtrudeOpts {
+interface ExtrudeOpts {
   /** Plan offset: extra z of the whole section at x (curvature of the wall in plan). */
   plan?: (x: number) => number;
   /** Extra downward y at x (burying the ends). */
@@ -1103,7 +1103,7 @@ export function talusColliders(t: TalusShape, W: number): THREE.Box3[] {
  * under it, the upper wall follows the ground under its foot (so it stays
  * upright). `gnd` is the local ground height (0 when the prop is not snapped).
  */
-export function wallLift(
+function wallLift(
   gnd: (x: number, z: number) => number,
   H: number,
 ): (x: number, y: number, z: number) => number {
@@ -1114,7 +1114,7 @@ export function wallLift(
 }
 
 /** Deformation of the rendered wall that its colliders must follow. */
-export interface WallShape {
+interface WallShape {
   /** Extra z offset at (x, profile y, profile z); the same callback given to `extrudeProfile`. */
   disp: (x: number, y: number, z: number) => number;
   /** Pinch start passed to `extrudeProfile` (default 0.4). */

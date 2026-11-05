@@ -278,7 +278,7 @@ export function composedFreeDiveSpawn(
 
 // ---------------------------------------------------------------- hull class
 
-export interface HullChoice {
+interface HullChoice {
   classId: string;
   hull: HullClass;
   /** False when no class cleared the margin and the deepest one was fitted anyway. */
@@ -315,7 +315,7 @@ export interface SpawnGrid {
   sampleHeight(x: number, z: number): number;
 }
 
-export interface SpawnGridMeta {
+interface SpawnGridMeta {
   cols: number;
   rows: number;
   cellsize_m_x: number;
@@ -333,7 +333,7 @@ export interface SpawnSettings {
   freeDiveSpawnAltitudeM: number;
 }
 
-export interface FreeDiveSpawn {
+interface FreeDiveSpawn {
   x: number;
   y: number;
   z: number;
@@ -524,7 +524,7 @@ export function spawnSettings(config: GameConfig): SpawnSettings {
 }
 
 /** The Submarine surface the free-dive loadout needs (Submarine satisfies it). */
-export interface HullFittable {
+interface HullFittable {
   setHullClass(classId: string): boolean;
 }
 

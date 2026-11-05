@@ -3,7 +3,7 @@ import type { AudioEngine } from './AudioEngine.js';
 import { publicUrl } from '../util/publicUrl.js';
 import type { CaptionBus } from './events.js';
 
-export type SoundPosition = { x: number; y: number; z: number };
+type SoundPosition = { x: number; y: number; z: number };
 export interface SoundSite {
   id: string;
   kind: 'vent' | 'wreck' | 'reef';

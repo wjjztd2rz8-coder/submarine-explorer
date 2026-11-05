@@ -38,12 +38,12 @@ export interface ScanTarget {
 }
 
 /** Records a completed scan; returns true if it was the first time. */
-export interface DiscoveryRecorder {
+interface DiscoveryRecorder {
   record(landmarkId: string, poiId: string): { firstTime: boolean };
 }
 
 /** The part of EventBus the scanner emits on. */
-export interface ScanEmitter {
+interface ScanEmitter {
   emit<K extends keyof GameEvents>(name: K, payload: GameEvents[K]): void;
 }
 
@@ -60,7 +60,7 @@ export function resolveScanRadius(
   return Math.max(radius, config.radiusFloorM ?? 0);
 }
 
-export type ScanPhase = 'idle' | 'scanning' | 'interrupted';
+type ScanPhase = 'idle' | 'scanning' | 'interrupted';
 export type AbortReason = GameEvents['scan:aborted']['reason'];
 
 /** Read-only snapshot for the overlay (and e2e). Updated in place every call. */

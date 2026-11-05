@@ -38,7 +38,7 @@ export function mineralCrust(
   colors.needsUpdate = true;
 }
 
-export interface GeoMaterialOpts {
+interface GeoMaterialOpts {
   roughness?: number;
   bumpScale?: number;
   side?: THREE.Side;

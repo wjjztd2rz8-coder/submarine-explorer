@@ -2,7 +2,7 @@
 import { lostCityBedTint } from './LostCityBands.js';
 import { fbm3, smooth } from './props/geo/shared.js';
 
-export const MONTEREY_BANK_STRATA = { periodM: 6, amount: 0.9 };
+const MONTEREY_BANK_STRATA = { periodM: 6, amount: 0.9 };
 
 /** Bed tone plus a darker, patchy face on steep banks; level silt keeps its colour. */
 export function montereySlopeTint(

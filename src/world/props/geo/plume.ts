@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import { mulberry32 } from './shared.js';
 import { softDot } from './textures.js';
 
-export interface PlumeOpts {
+interface PlumeOpts {
   /** Rise height (m). */
   height: number;
   /** Radius (m) of the source orifice. */

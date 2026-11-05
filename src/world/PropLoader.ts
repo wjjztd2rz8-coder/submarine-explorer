@@ -81,7 +81,7 @@ export interface PropDef {
   raw: Record<string, unknown>;
 }
 
-export interface ParseResult {
+interface ParseResult {
   landmark: string | null;
   props: PropDef[];
   /** One human-readable line per skipped entry or file-level problem. */

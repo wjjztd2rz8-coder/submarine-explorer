@@ -51,7 +51,7 @@ export const DEFAULT_LOOK: VehicleLook = {
 };
 
 /** Shared uniforms: every lit vehicle material points at the same objects. */
-export interface LitUniforms {
+interface LitUniforms {
   uRimColor: { value: THREE.Color };
   uKeyColor: { value: THREE.Color };
   uKeyDir: { value: THREE.Vector3 };

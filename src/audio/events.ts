@@ -19,7 +19,7 @@ export interface CaptionEvent {
   durationS: number;
 }
 
-export type CaptionHandler = (event: CaptionEvent) => void;
+type CaptionHandler = (event: CaptionEvent) => void;
 
 /** Minimal pub/sub, mirroring EventBus's shape but scoped to captions only. */
 export class CaptionBus {

@@ -100,7 +100,7 @@ export function chooseTileId(
   return index[0]?.id ?? defaultTileId;
 }
 
-export interface SpawnLimits {
+interface SpawnLimits {
   hullRadius: number;
   seabedClearance: number;
   /** Extra metres above hullRadius + seabedClearance. */
@@ -130,7 +130,7 @@ export function missionSpawnPose(
 }
 
 /** The Submarine surface the mission needs (Submarine satisfies it). */
-export interface MissionSub {
+interface MissionSub {
   setHullClass(classId: string): boolean;
   setSimSpeed(multiplier: number): number;
   readonly simSpeed: number;
@@ -216,7 +216,7 @@ interface XYZ {
 // --------------------------------------------------------------- controller
 
 /** The parts of Discovery the mission uses (Discovery satisfies it). */
-export interface MissionDiscovery {
+interface MissionDiscovery {
   readonly ready: Promise<void>;
   readonly pois: ReadonlyArray<{ id: string; name: string; position: XYZ }>;
   readonly stats: { snapshot(extra?: Partial<DebriefStats>): DebriefStats };
@@ -246,13 +246,13 @@ export interface MissionRouterOptions {
 }
 
 /** The sub state the router watches for the crush-depth abort (SubmarineState satisfies it). */
-export interface MissionHullState {
+interface MissionHullState {
   emergencyBlow: boolean;
   depth: number;
 }
 
 /** Banner shown on the objectives panel while the emergency blow runs. */
-export const HULL_FAILURE_ALERT = 'HULL FAILURE — EMERGENCY ASCENT';
+const HULL_FAILURE_ALERT = 'HULL FAILURE — EMERGENCY ASCENT';
 
 /** Debrief heading and abort cause; the metric row owns objective counts. */
 export function debriefText(

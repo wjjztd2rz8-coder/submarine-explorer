@@ -8,9 +8,9 @@ import type { SettingsStorage } from '../core/Save.js';
 import { HINT_ORDER, type HintId } from './Hints.js';
 
 export const ONBOARD_STORAGE_KEY = 'subexplorer.onboard.v1';
-export const ONBOARD_VERSION = 1;
+const ONBOARD_VERSION = 1;
 
-export interface OnboardRecord {
+interface OnboardRecord {
   version: 1;
   /** True once the tutorial was completed or skipped. */
   tutorialDone: boolean;

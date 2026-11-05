@@ -19,7 +19,7 @@ import {
 import type { EventBus } from './EventBus.js';
 
 export const SETTINGS_STORAGE_KEY = 'subexplorer.settings.v3';
-export const SETTINGS_VERSION = 3;
+const SETTINGS_VERSION = 3;
 const LEGACY_SETTINGS_KEYS = ['subexplorer.settings.v2', 'subexplorer.settings.v1'];
 export const SAVE_KEYS = {
   settings: SETTINGS_STORAGE_KEY,
@@ -29,7 +29,7 @@ export const SAVE_KEYS = {
 
 export type GameplayMode = 'arcade' | 'realistic' | 'custom';
 export type HullWarningStyle = 'vignette' | 'gauge' | 'both';
-export const HULL_WARNING_STYLES: readonly HullWarningStyle[] = ['vignette', 'gauge', 'both'];
+const HULL_WARNING_STYLES: readonly HullWarningStyle[] = ['vignette', 'gauge', 'both'];
 export interface SettingsValues {
   /** `auto` (the default for new players) or a fixed tier. Saved tiers are kept. */
   graphicsTier: GraphicsTierSetting;
@@ -49,7 +49,7 @@ export interface SettingsValues {
   gameplayBaseMode: Exclude<GameplayMode, 'custom'>;
   gameplay: GameplayOptions;
 }
-export type SettingKey = keyof SettingsValues;
+type SettingKey = keyof SettingsValues;
 export interface SettingsData extends SettingsValues {
   version: 3;
   bindings?: string;
@@ -59,10 +59,7 @@ export interface SettingsStorage {
   setItem(key: string, value: string): void;
   removeItem(key: string): void;
 }
-export type SettingsConfigSource = Pick<
-  GameConfig,
-  'graphicsTier' | 'settings' | 'sonarPalettes'
-> & {
+type SettingsConfigSource = Pick<GameConfig, 'graphicsTier' | 'settings' | 'sonarPalettes'> & {
   terrain: Pick<GameConfig['terrain'], 'detailStrength'>;
   audio?: Pick<GameConfig['audio'], 'masterVolume' | 'sfxVolume' | 'musicVolume'>;
 };
@@ -88,7 +85,7 @@ const REMOVED_GAMEPLAY_KEYS = [
   'sonarMarkers',
   'simSpeed',
 ];
-export const SETTING_KEYS: readonly SettingKey[] = [
+const SETTING_KEYS: readonly SettingKey[] = [
   ...DISPLAY_KEYS,
   'uiScale',
   'hullWarningStyle',
@@ -226,12 +223,12 @@ function safeStorage(): SettingsStorage | null {
     return null;
   }
 }
-export interface SaveOptions {
+interface SaveOptions {
   config: SettingsConfigSource;
   storage?: SettingsStorage | null;
   bus?: Pick<EventBus, 'emit'>;
 }
-export type SettingsListener = (settings: SettingsData, changed: SettingKey[]) => void;
+type SettingsListener = (settings: SettingsData, changed: SettingKey[]) => void;
 
 export class Save {
   private data: SettingsData;
@@ -415,7 +412,7 @@ export class Save {
 
 /** Research is separate from settings and discoveries, so their resets and migrations stay independent. */
 export const PROGRESS_STORAGE_KEY = 'subexplorer.progress.v1';
-export const PROGRESS_VERSION = 2;
+const PROGRESS_VERSION = 2;
 export interface LegacyEvidence {
   site: string;
   keys: string[];
