@@ -382,19 +382,23 @@ freshTest.describe('route and mode camera poses', () => {
           expect(opening.heroRange).toBeLessThanOrEqual(40);
           expect(opening.chaseRadius).toBe(66);
         } else {
-          expect(opening.primaryRange).toBeCloseTo(220, 0);
+          expect(opening.primaryRange).toBeCloseTo(
+            siteData('lost-city').opening!.mission!.rangeM,
+            0,
+          );
           expect(opening.primaryRange!).toBeGreaterThan(opening.scanRadius!);
-          expect(opening.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
+          expect(opening.chaseRadius).toBeCloseTo(
+            siteData('lost-city').opening!.mission!.chaseRadius!,
+            6,
+          );
         }
         const tuning = siteData('lost-city').opening!.freeDive!.modes!.arcade!;
-        const expectedEye =
-          route === 'tile'
-            ? [
-                tuning.chaseOffsetX!,
-                DEFAULT_CAMERA.chaseOffset.y + tuning.chaseOffsetY!,
-                DEFAULT_CAMERA.chaseOffset.z,
-              ]
-            : [0, DEFAULT_CAMERA.chaseOffset.y, DEFAULT_CAMERA.chaseOffset.z];
+        const arm = route === 'tile' ? tuning : siteData('lost-city').opening!.mission!;
+        const expectedEye = [
+          arm.chaseOffsetX!,
+          DEFAULT_CAMERA.chaseOffset.y + arm.chaseOffsetY!,
+          DEFAULT_CAMERA.chaseOffset.z,
+        ];
         const armScale = opening.chaseRadius / Math.hypot(...expectedEye);
         for (let axis = 0; axis < 3; axis++)
           expect(opening.localEye[axis]).toBeCloseTo(expectedEye[axis] * armScale, 1);

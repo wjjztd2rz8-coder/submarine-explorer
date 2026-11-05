@@ -20,6 +20,8 @@ const shots = '.cache/bughunt18/screenshots';
 // F-LOSTCITY-TOWER pins the opening/reset arm at 66 m to clear the tower tip.
 const lostCityRadius = 66;
 const defaultRadius = Math.hypot(38, 90);
+// The mission opening authors its own chase arm; free dives and surface starts keep the default.
+const missionRadius = 80;
 
 test.beforeEach(async ({ page }) => pauseClockBeforeNavigation(page));
 
@@ -74,7 +76,7 @@ for (const size of [
     test(`Lost City ${route}: reset, wheel and photo at ${size.width}x${size.height}`, async ({
       page,
     }) => {
-      const resetRadius = route === 'mission' ? defaultRadius : lostCityRadius;
+      const resetRadius = route === 'mission' ? missionRadius : lostCityRadius;
       await page.setViewportSize(size);
       await mkdir(shots, { recursive: true });
       await ready(page, `${route}=lost-city`);
@@ -148,15 +150,15 @@ test('Lost City briefing mode changes and surface starts restore the appropriate
   page,
 }) => {
   await ready(page, 'mission=lost-city');
-  await expect.poll(async () => (await camera(page)).radius).toBeCloseTo(defaultRadius, 6);
+  await expect.poll(async () => (await camera(page)).radius).toBeCloseTo(missionRadius, 6);
   const briefing = page.locator('.briefing');
   await briefing.getByRole('radio', { name: 'Realistic', exact: true }).check();
-  await expect.poll(async () => (await camera(page)).radius).toBeCloseTo(defaultRadius, 6);
+  await expect.poll(async () => (await camera(page)).radius).toBeCloseTo(missionRadius, 6);
   const preview = (await camera(page)).position;
   await briefing.getByRole('button', { name: 'Begin dive', exact: true }).click();
   await expect(briefing).toBeHidden();
   await page.keyboard.press('x');
-  expect((await camera(page)).radius).toBeCloseTo(defaultRadius, 6);
+  expect((await camera(page)).radius).toBeCloseTo(missionRadius, 6);
   const started = (await camera(page)).position;
   for (let i = 0; i < 3; i++) expect(started[i]).toBeCloseTo(preview[i]!, 0);
 
@@ -184,7 +186,9 @@ for (const mode of ['realistic', 'custom'])
       );
       await ready(page, `${route}=lost-city&skipBriefing=1`);
       await page.keyboard.press('x');
-      await expect.poll(async () => (await camera(page)).radius).toBeCloseTo(defaultRadius, 6);
+      await expect
+        .poll(async () => (await camera(page)).radius)
+        .toBeCloseTo(route === 'mission' ? missionRadius : defaultRadius, 6);
       if (route === 'tile') {
         const range = await page.evaluate(() => {
           const g = window.__game as unknown as Game;
