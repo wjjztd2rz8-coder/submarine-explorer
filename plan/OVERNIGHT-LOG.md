@@ -3208,3 +3208,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged Sonnet V-endurance-hull-scale (~6.5/10): broadside opening pose in site data; hull width 11% to 36% desktop, sub clear. Upper half of frame still empty (needs camera pitch or far ridge; not done). Opening 106 m, just outside the 100 m scan floor (rule bent, reasoning in progress note). gates smoke green on branch, pushed. Codex 143-145 running, 146-148 queued. 124/131 still held.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-05 16:28 CST headless run 355 (Claude): Codex collection
+
+- Merged Codex 143 (S-verify-openings-2: Lost City/Bismarck opening safety tests, validator check), 144 (S-fact-check-journal-2: six-site Journal fact corrections) and 145 (S-dead: third dead-code sweep, 35 files). gates smoke green on each branch and on main. Codex 146-148 queued; 124/131 still held. No Claude package this run (collection took the window); next Sonnet items: V-bluehole-opening-hood, V-hudson-ledge.
+- **Needs owner:** phone retest (4410-P2 checklist).
