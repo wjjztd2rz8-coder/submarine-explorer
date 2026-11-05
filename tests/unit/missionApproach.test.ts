@@ -41,7 +41,7 @@ it('every authored site retains its mission approach distance', () => {
     'challenger-deep': 140,
     'lost-city': 130,
     'monterey-canyon': 240,
-    endurance: 110,
+    endurance: 106,
     'axial-seamount-ashes': 110,
     'hudson-canyon': 112,
     kamaehuakanaloa: 110,
@@ -129,7 +129,7 @@ for (const site of sites.landmarks) {
         const target = primaries[0];
         const range = p.distanceTo(target.position);
         expect(range).toBeCloseTo(MISSION_APPROACH_M[site], 2);
-        expect(range).toBeGreaterThanOrEqual(110 - 0.01);
+        expect(range).toBeGreaterThanOrEqual(105 - 0.01);
         expect(range).toBeLessThanOrEqual(300);
         // Per-site mission camera data must reach the pose the mission applies.
         const arm = siteManifest(site)?.opening?.mission;

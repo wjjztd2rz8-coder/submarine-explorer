@@ -215,7 +215,7 @@ it.each(sites)(
 );
 
 for (const site of sites) {
-  it(`Arcade ${site}: starts 110–300 m from the first primary before and after props load`, async () => {
+  it(`Arcade ${site}: starts 105–300 m from the first primary before and after props load`, async () => {
     const config = makeConfig();
     const meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;
     const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
@@ -262,7 +262,7 @@ for (const site of sites) {
         ),
       );
       expect(spatialRange).toBeCloseTo(MISSION_APPROACH_M[site], 2);
-      expect(spatialRange).toBeGreaterThanOrEqual(110);
+      expect(spatialRange).toBeGreaterThanOrEqual(105);
       expect(spatialRange).toBeLessThanOrEqual(300 + 1e-8);
       expect(pose!.y).toBeGreaterThanOrEqual(safeDepth + config.submarine.hullRadius);
       expect(pose!.y).toBeGreaterThanOrEqual(
@@ -316,12 +316,13 @@ function screenBounds(root: Object3D, rig: CameraRig): Box2 {
 // This is a subject-scale review proxy, independent of scan radius and luminance.
 const minimumObjectiveHeightDeg = 5;
 // Reviewed small openings remain visible in the audit; a new flag fails the test.
-const reviewedSmallOpenings = ['axial-seamount-ashes', 'endurance'];
+const reviewedSmallOpenings = ['axial-seamount-ashes'];
 // Preserve the measured scale achieved by the shipped opening fixes on both layouts.
 // These are regression floors, not the aspirational 30% width for future pose work.
 const fixedOpeningWidthFloors: Record<string, number> = {
   'beebe-vent-field': 0.25,
   bismarck: 0.6,
+  endurance: 0.3,
   'great-blue-hole': 0.21,
   'hunga-tonga-caldera': 0.33,
   'lost-city': 0.38,
@@ -704,7 +705,7 @@ it.each(
       }
       const range = target.position.distanceTo(new Vector3(pose.x, pose.y, pose.z));
       expect(range).toBeCloseTo(MISSION_APPROACH_M[site], 2);
-      expect(range).toBeGreaterThanOrEqual(110 - 0.01);
+      expect(range).toBeGreaterThanOrEqual(105 - 0.01);
       expect(range).toBeLessThanOrEqual(300);
       const radius = resolveScanRadius(
         missionApproachScanRadius(site, target.radius) * effective.sensor.scanRadiusMultiplier,

@@ -27,9 +27,12 @@
   },
   "opening": {
     "mission": {
-      "rangeM": 110,
-      "yawOffset": 25,
-      "destinationLabel": "the main hull"
+      "rangeM": 106,
+      "yawOffset": -90,
+      "destinationLabel": "the main hull",
+      "chaseRadius": 150,
+      "chaseOffsetX": 360,
+      "chaseOffsetY": -80
     },
     "freeDive": {
       "hero": "main-hull",
