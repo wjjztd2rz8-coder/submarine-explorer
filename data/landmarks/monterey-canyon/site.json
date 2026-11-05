@@ -33,7 +33,9 @@
   "opening": {
     "mission": {
       "rangeM": 240,
-      "destinationLabel": "the north canyon wall"
+      "destinationLabel": "the north canyon wall",
+      "localAltitudeWeight": 6,
+      "yawOffset": 14
     },
     "freeDive": {
       "hero": "canyon-wall-ledge",
