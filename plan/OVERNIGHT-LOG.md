@@ -3187,3 +3187,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged Codex 136-138 (one audio gesture-recovery fix, tests) and Sonnet V-lostcity-tower-scale + V-bismarck-hull-scale (Lost City tower width 24% to 39%; Bismarck broadside, hull ~38%; debris plates still large). gates smoke green on main, pushed.
 - Codex 139 stopped and replaced by 142 (T-hood-scale-table; existing overhang geometry exists, Sol's point). 140 (touch bug hunt), 141 (Lost City perf audit), 142 running/queued.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-05 10:51 CST headless run 351 (Claude): Codex collection + Endurance seabed
+
+- Merged Codex 140 (touch: held touch cancelled on resize/rotation, new specs), 141 (Lost City perf audit; one Sparks upload fix), 142 (hood scale table: no pose reaches 25-30% hood on both layouts, best 3x B at -25 m = 10% desktop / 24% portrait, so V-bluehole-opening-hood likely needs a code-level hood or a portrait-only composition). Resolved a lowTierFollowups conflict onto the partitioned raycast.
+- Merged Sonnet V-endurance-seabed-patches (~8/10): the dark ribbons were the scour-ridge mesh; now faded soft swells. gates smoke green on main, pushed. 124/131 still held. Codex briefs 143-146 queued.
+- **Needs owner:** phone retest (4410-P2 checklist).
