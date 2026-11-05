@@ -3180,3 +3180,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged Codex 133 (T-bluehole-hood-poses: three candidate hood poses, B preferred at 5.87 m clearance; intended 30% hood composition still unresolved) and 134 (T-framing-metrics: opening width/height/empty-sky table; worst sites Axial 0.9% width, Kamaehuakanaloa 8%, Blake 10%, Endurance 11.5%). Both tools/tests only. gates.sh (smoke) green on branch and main, pushed. Codex 136-138 (verify pose tools, progression bug hunt, audio/settings audit) launched. 124 and 131 still held.
 - No Claude package: Claude week ~9% (reset Nov 5 06:00); V-bluehole-opening-hood and V-lostcity-tower-scale are next after the reset.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-05 08:29 CST headless run 350 (Claude): comprehensive review, joint with Sol
+
+- Joint review (Sol reconcile, one round): stage ~86% (Claude 92 / Sol 82), 3-4 weeks. Sol's Endurance seabed-ribbon and Monterey-striation findings confirmed on the images; REVIEWS.md and STATUS.md updated and pushed; tag f74 not cut (CI not yet checked for the new SHAs).
+- Merged Codex 136-138 (one audio gesture-recovery fix, tests) and Sonnet V-lostcity-tower-scale + V-bismarck-hull-scale (Lost City tower width 24% to 39%; Bismarck broadside, hull ~38%; debris plates still large). gates smoke green on main, pushed.
+- Codex 139 stopped and replaced by 142 (T-hood-scale-table; existing overhang geometry exists, Sol's point). 140 (touch bug hunt), 141 (Lost City perf audit), 142 running/queued.
+- **Needs owner:** phone retest (4410-P2 checklist).
