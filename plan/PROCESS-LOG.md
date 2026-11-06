@@ -397,3 +397,7 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 ## 2026-11-05 deploy gate kept
 
 - R-deploy-gate: Pages still deploys only after green push CI on the exact SHA. The freeze (18:29 to 22:45) came from red CI, which R-ci-red-5/7 fixed; a smoke-green deploy would ship builds the full suite rejects. Pages deployed again at 04:45Z after the green run; f74 is tagged on the green commit 8fa223d8.
+
+## 2026-11-06 golden.sh stale-server guard
+
+- Sol found that `tools/golden.sh` broke out of its wait loop on the first successful curl, so a stale server already on the port could satisfy it and produce old-code captures (a Blue Hole journey captured nothing for that reason). The loop now checks its own preview process first and exits if it died (port busy).

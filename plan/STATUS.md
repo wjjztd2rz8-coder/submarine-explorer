@@ -1,26 +1,26 @@
-# Status (2026-11-05 evening review, Claude + Codex Sol first round)
+# Status (2026-11-06 comprehensive review, Claude + Codex Sol, one reconcile round)
 
-**Stage:** about 86% to 1.0 (Claude 88%, Sol 85%); 3-4 weeks. Tag **f73** is the newest green release; **f74 is blocked because hosted CI is red** (five touch/phone specs, test defects, fix in flight) and Pages has not deployed since 18:29.
+**Stage:** about 85% to 1.0; 4-5 weeks. Hosted CI is green; **f75** is the newest tag and Pages is deployed.
 
 ## 1.0 table
 
-| Requirement                               | State                                                                                                                                       |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Five heroes beautiful (4 of 5)            | Openings: Beebe 4.1, Titanic 3.9, Blue Hole 3.8, Lost City 3.7, Monterey 3.6; Sol, counting close-ups: 3.0-3.5. Close-up materials are next |
-| Other eight sites coherent                | Endurance 3.9 (seabed fixed, hull a third of the frame), Bismarck 3.6 (debris plates being fixed), Axial ~4.0, others coherent              |
-| New player understands first five minutes | No dead ends in the last walk-through (Nov 3); a fresh unassisted capture is queued                                                         |
-| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great; weaker phones and Medium untested                                                                                  |
-| Hosted CI green, releases tagged          | RED since Codex 140 touch specs; R-ci-red-5 in flight                                                                                       |
-| Code simple enough                        | Dead-code and verification sweeps merged                                                                                                    |
+| Requirement                               | State                                                                                                                                                         |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Five heroes beautiful (4 of 5)            | Openings: Beebe 4.1, Lost City 4.1, Titanic 3.9, Monterey 3.8, Blue Hole 3.8. Counting approach and detail (Sol): 3-3.5; none holds 4 yet. Close-ups are next |
+| Other eight sites coherent                | Endurance 4.0 opening, Bismarck 3.5 (dome horizon, slab hull), Axial ~4.0; Blake and Hunga need another pass                                                  |
+| New player understands first five minutes | Evidence is stale (last unaided capture Nov 2); a fresh unassisted run is the top item                                                                        |
+| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great; weaker phones and Medium untested                                                                                                    |
+| Hosted CI green, releases tagged          | Green; f75 tagged                                                                                                                                             |
+| Code simple enough                        | Dead-code and verification sweeps merged                                                                                                                      |
 
 ## Done recently
 
-Lost City tower and Bismarck hull scale, Endurance seabed and hull framing, Monterey wall pose and striation fade, Blue Hole gallery reads, touch cancellation fix, Lost City perf audit, Journal fact-check pass 2, dead-code sweep 3.
+CI red fixed, Lost City tower scale and fluted towers, Hudson ledge, Bismarck debris, Endurance seabed and hull framing, deploy gate kept, golden.sh stale-server guard.
 
 ## Left
 
-CI fix, Bismarck debris, Monterey objective marker, close-up materials for the heroes, deploy gate, unassisted first-five-minutes check, weaker-phone performance.
+Unaided first-five-minutes check, close-up materials (Titanic, Blue Hole, Beebe), Monterey marker, Bismarck dome horizon, horizon haze for empty upper water, weaker-phone performance, release verification time.
 
 ## Needs owner
 
-- A short phone retest on the newest build using `plan/progress/4410-P2-phone-accept-checklist.md` (note: the public build is stale until CI is green).
+- A short phone retest on the newest build using `plan/progress/4410-P2-phone-accept-checklist.md`.

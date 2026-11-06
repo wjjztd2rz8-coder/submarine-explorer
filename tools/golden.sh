@@ -25,8 +25,9 @@ npm run build -- "${config_args[@]}" > .cache/golden-build.log 2>&1 || { echo "b
 npx vite preview "${config_args[@]}" --port $port --strictPort --host 127.0.0.1 > .cache/golden-preview.log 2>&1 &
 srv=$!; trap 'kill $srv 2>/dev/null' EXIT
 for i in $(seq 1 30); do
+  # Check our own server first: a stale server on the port must not satisfy the curl (old-code captures).
+  kill -0 "$srv" 2>/dev/null || { cat .cache/golden-preview.log; echo "preview exited (port $port busy?)"; exit 1; }
   curl -s -o /dev/null "http://127.0.0.1:$port/" && break
-  kill -0 "$srv" 2>/dev/null || { cat .cache/golden-preview.log; exit 1; }
   sleep 1
 done
 # Capture prints one advisory readability summary for this exact output set (no gate).
