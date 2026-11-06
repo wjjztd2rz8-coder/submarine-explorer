@@ -393,3 +393,7 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 - Symptom: the same five e2e shards failed on every main run after the Codex 140 touch specs merged (gates smoke never runs them), and `review-triggers.sh` ("CI red 3 runs") did not fire because the newest run was still queued. Pages deploys wait for CI success on the exact SHA, so every deploy since 18:29 was skipped (Sol's finding).
 - Change: the trigger now reads the last three COMPLETED CI runs (`-s completed`). R-ci-red-5 (Sonnet) fixes the specs and proposes running changed specs in the merge gate; R-deploy-gate decides whether Pages should deploy on smoke-green. Reason: a red main must surface in one run, and the owner's phone should get builds.
 - Also: `tools/codex-review.sh reconcile` must be started with `run_in_background` and polled; a foreground Bash call is moved to the background after 10 min and killed. The reconcile round failed here because Codex hit its 5h limit (Sol's first-round review was kept).
+
+## 2026-11-05 deploy gate kept
+
+- R-deploy-gate: Pages still deploys only after green push CI on the exact SHA. The freeze (18:29 to 22:45) came from red CI, which R-ci-red-5/7 fixed; a smoke-green deploy would ship builds the full suite rejects. Pages deployed again at 04:45Z after the green run; f74 is tagged on the green commit 8fa223d8.
