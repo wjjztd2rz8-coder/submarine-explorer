@@ -3285,3 +3285,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Fixed red hosted CI (static gates: prettier on plan/archive/DIRECTOR-HISTORY-2026-11-06-backlog.md; e2e shards were green). Merged Sonnet V-closeup-materials-titanic (shared steel shader: seam rust runs and softer plate tone within 20-55 m, ochre rusticles, more porthole drips; ~5.5/10 detail frame, was ~4; hull still salmon-pink, seams still gridlike; openings unchanged). Gates smoke + project-base green on main; pushed. Codex 146-151 queued (dispatcher holds on Codex weekly pace, 28% left); 124/131 held. Next Sonnet: V-bismarck-seabed-dome, V-monterey-wall-marker (code), V-horizon-upper-half.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-06 13:38 CST headless run (Claude): V-bismarck-seabed-dome
+
+- Merged Sonnet V-bismarck-seabed-dome (partial, ~4.0/10, was ~3.5): generic `horizonFadeM` on the Bismarck biome dissolves the dome limb; haze particles smaller/darker via mission.json. Hull still floats (collar attempts failed footprint tests; needs a carved scour in the heightfield; remains in DIRECTOR). gates smoke + project-base green on branch. Agent took ~100 min. Codex 146-151 queued (dispatcher holds on weekly pace); 124/131 held. Next Sonnet: V-monterey-wall-marker (code), V-horizon-upper-half.
+- **Needs owner:** phone retest (4410-P2 checklist).
