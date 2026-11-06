@@ -139,11 +139,11 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       segs: 40 * dens + 4,
       rings: (h / 0.9) * dens + 8,
       tiers: Math.max(2, Math.round(h / (main ? 6.5 : 5))),
-      ledge: 0.06,
+      ledge: 0.09,
       wobble: 0.1,
       rough: 0.035,
       ridges: main ? 7 : 5,
-      ridgeAmp: main ? 0.13 : 0.1,
+      ridgeAmp: main ? 0.18 : 0.14,
       flare: main ? 0.7 : 0.5,
       lip: 0.1,
       crater: main ? 0.9 : 0.7,
@@ -477,6 +477,9 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       if (below > 0 && below < 1 && Math.hypot(x - orifice.x, z - orifice.z) < orifaceR * 0.8)
         out.multiplyScalar(1 - 0.3 * (1 - below));
     }
+    // Soft biofilm and sediment tint hugging the base: greener in the flutes, dusty on shelves.
+    const baseT = 1 - smooth(0.05, 0.35, (y - gnd(x, z)) / H);
+    out.lerp(BIOFILM, baseT * 0.32 * (1 - up * 0.5));
     if (ny > 0.8) out.multiplyScalar(0.95); // silt dusting on shelves
   });
   const material = createLostCityCarbonateMaterial(tier);
