@@ -3280,3 +3280,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: main clean and pushed; the previous run finished U-play-walkthrough-3 minutes earlier. Hosted CI for the latest pushes pending, tag waits. Codex 146-151 queued (dispatcher holds them on Codex weekly pace, 28% left); 124/131 held. No Claude package this run (next: V-monterey-wall-marker code route, V-closeup-materials-titanic).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-06 10:59 CST headless run (Claude): V-closeup-materials-titanic
+
+- Fixed red hosted CI (static gates: prettier on plan/archive/DIRECTOR-HISTORY-2026-11-06-backlog.md; e2e shards were green). Merged Sonnet V-closeup-materials-titanic (shared steel shader: seam rust runs and softer plate tone within 20-55 m, ochre rusticles, more porthole drips; ~5.5/10 detail frame, was ~4; hull still salmon-pink, seams still gridlike; openings unchanged). Gates smoke + project-base green on main; pushed. Codex 146-151 queued (dispatcher holds on Codex weekly pace, 28% left); 124/131 held. Next Sonnet: V-bismarck-seabed-dome, V-monterey-wall-marker (code), V-horizon-upper-half.
+- **Needs owner:** phone retest (4410-P2 checklist).
