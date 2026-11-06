@@ -205,7 +205,11 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
       f *=
         1 +
         (o.trunk
-          ? amp * 1.2 * (Math.sin((crest * Math.PI) / 2) ** 2 - 0.5)
+          ? // Flutes ease off toward the torn rim so strong ridges do not serrate its edge.
+            amp *
+            1.2 *
+            (1 - 0.45 * smooth(0.8, 0.97, t)) *
+            (Math.sin((crest * Math.PI) / 2) ** 2 - 0.5)
           : amp * 2.2 * (crest * crest - 0.35));
     } else f *= 1 + amp * Math.sin(ang * flutes + n * 5 + t * 2.5);
     // The top cap's centre vertex sinks to make a crater: the vent orifice.
