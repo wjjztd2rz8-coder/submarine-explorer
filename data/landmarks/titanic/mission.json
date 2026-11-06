@@ -14,7 +14,8 @@
       "hazeOpacity": 0.05,
       "motesPerHull": 180,
       "moteSizeM": 0.15,
-      "moteOpacity": 0.16
+      "moteOpacity": 0.16,
+      "horizonRidge": 0.5
     }
   },
   "spawn": {

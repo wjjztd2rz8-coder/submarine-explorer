@@ -18,7 +18,8 @@
       "glowDistanceM": 90,
       "glowDropM": 8,
       "glowStandoffM": 8,
-      "shimmerStrength": 0
+      "shimmerStrength": 0,
+      "horizonRidge": 0.5
     }
   },
   "species_file": "species.json",

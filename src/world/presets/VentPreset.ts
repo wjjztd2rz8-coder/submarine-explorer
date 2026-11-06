@@ -112,7 +112,7 @@ export class VentPreset implements EnvPreset {
     this.scene = ctx.scene;
     // Opt-in graded water backdrop (site data): gives the far water a horizon, even on Low.
     if (ctx.site?.horizon) {
-      this.horizon = new TitanicHorizon(ctx.scene, ctx.site.horizon);
+      this.horizon = new TitanicHorizon(ctx.scene, ctx.site.horizon, num(p.horizonRidge, 0));
       this.stats.draws += 1;
     }
     this.sources = ventSources(ctx, num(p.maxSources, 12));

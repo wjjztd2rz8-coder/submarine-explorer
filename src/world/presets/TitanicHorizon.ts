@@ -27,6 +27,7 @@ export class TitanicHorizon {
   private readonly color = new THREE.Color();
   private readonly weights: Float32Array;
   private readonly upperWeights: Float32Array;
+  private readonly ridgeWeights: Float32Array;
 
   private readonly fadeStartM: number;
   private readonly fadeEndM: number;
@@ -38,6 +39,7 @@ export class TitanicHorizon {
   constructor(
     private readonly scene: THREE.Scene,
     look: HorizonLook = {},
+    ridge = 0,
   ) {
     this.fadeStartM = look.fadeStartM ?? ABYSS_HORIZON.fadeStartM;
     this.fadeEndM = look.fadeEndM ?? ABYSS_HORIZON.fadeEndM;
@@ -47,10 +49,11 @@ export class TitanicHorizon {
       look.upperColor === undefined ? UPPER_WATER : new THREE.Color(look.upperColor);
     this.hazeWater = look.hazeColor === undefined ? HAZE_WATER : new THREE.Color(look.hazeColor);
     const peak = look.hazePeakElevation ?? ABYSS_HORIZON.hazePeakElevation;
-    const geometry = new THREE.SphereGeometry(1, 32, 16);
+    const geometry = new THREE.SphereGeometry(1, ridge > 0 ? 64 : 32, ridge > 0 ? 64 : 16);
     const position = geometry.getAttribute('position');
     this.weights = new Float32Array(position.count);
     this.upperWeights = new Float32Array(position.count);
+    this.ridgeWeights = new Float32Array(position.count);
     for (let i = 0; i < position.count; i++) {
       // World up, rather than screen up, so cockpit pitch keeps a level horizon.
       // Carry the exact fog colour through the first ring above level. Far
@@ -62,6 +65,18 @@ export class TitanicHorizon {
         1 - ABYSS_HORIZON.glowVariation * (0.5 + 0.5 * Math.cos(azimuth * ABYSS_HORIZON.glowLobes));
       this.weights[i] =
         glow * THREE.MathUtils.smoothstep(elevation, ABYSS_HORIZON.fogMatchElevation, peak);
+      // Far ridge: a lighter haze bank below a wavy skyline, drawn only when asked for.
+      const top =
+        ABYSS_HORIZON.ridgeBase +
+        ABYSS_HORIZON.ridgeLobes.reduce(
+          (sum, l) => sum + l.amplitude * Math.sin(azimuth * l.count + l.phase),
+          0,
+        );
+      const w = ABYSS_HORIZON.ridgeEdgeWidth;
+      this.ridgeWeights[i] =
+        ridge *
+        THREE.MathUtils.smoothstep(elevation, 0, w * 2) *
+        (1 - THREE.MathUtils.smoothstep(elevation, top - w, top + w));
       this.upperWeights[i] = THREE.MathUtils.smoothstep(
         elevation,
         peak,
@@ -117,6 +132,7 @@ export class TitanicHorizon {
     for (let i = 0; i < this.weights.length; i++) {
       this.color.copy(atmo.fogColor).lerp(this.haze, this.weights[i]!);
       this.color.lerp(this.upper, this.upperWeights[i]!);
+      this.color.lerp(this.haze, this.ridgeWeights[i]!);
       colors.setXYZ(i, this.color.r, this.color.g, this.color.b);
     }
     colors.needsUpdate = true;

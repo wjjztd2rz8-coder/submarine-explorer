@@ -101,7 +101,7 @@ export class WreckPreset implements EnvPreset {
     this.scene = ctx.scene;
     this.visuals = ctx.visuals;
     if (ctx.params.titanicHorizon === true || wreck) {
-      this.horizon = new TitanicHorizon(ctx.scene, wreck?.horizon);
+      this.horizon = new TitanicHorizon(ctx.scene, wreck?.horizon, num(ctx.params.horizonRidge, 0));
       if (wreck) this.horizon.dome.name = wreck.horizon.name;
       this.stats.draws = 1;
     }
