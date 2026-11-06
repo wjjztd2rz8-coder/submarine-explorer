@@ -652,8 +652,8 @@ export function buildTitanicBow(
   for (let y = 1; y < T.forecastleY; y += 0.6)
     hangRusticle(rust, v3(0, y, -L / 2 - 0.05), 0.3 + rnd() * 0.9, rnd, HEAVY_RUSTICLES);
   for (const p of under)
-    if (rnd() < 0.45)
-      hangRusticle(rust, p.clone().add(v3(0, -0.28, 0)), 0.25 + rnd() * 0.7, rnd, HEAVY_RUSTICLES);
+    if (rnd() < 0.8)
+      hangRusticle(rust, p.clone().add(v3(0, -0.28, 0)), 0.25 + rnd() * 0.9, rnd, HEAVY_RUSTICLES);
   for (let i = 0; i < 160; i++) {
     const s = L - rnd() * 12;
     const y = 2 + rnd() * 11;

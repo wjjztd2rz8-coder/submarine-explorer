@@ -143,9 +143,9 @@ export function hangRusticle(
     _up.set(r * 2, L, r * 2),
   );
   // Deep ochre to brown, subtle; never neon.
-  const shade = 0.66 + rnd() * 0.26;
+  const shade = 0.6 + rnd() * 0.26;
   const warm = rnd();
-  list.push(m, new THREE.Color(shade, shade * (0.8 + warm * 0.15), shade * (0.7 + warm * 0.15)));
+  list.push(m, new THREE.Color(shade, shade * (0.68 + warm * 0.14), shade * (0.5 + warm * 0.14)));
 }
 
 // ------------------------------------------------------------- openings
