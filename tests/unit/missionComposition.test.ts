@@ -326,7 +326,8 @@ const fixedOpeningWidthFloors: Record<string, number> = {
   'great-blue-hole': 0.21,
   'hunga-tonga-caldera': 0.33,
   'lost-city': 0.38,
-  'monterey-canyon': 0.2,
+  // Centring the marker shows the ledge more end-on (0.195 measured); the 0.19 floor still stops it shrinking.
+  'monterey-canyon': 0.19,
   titanic: 0.3,
 };
 
