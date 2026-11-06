@@ -99,12 +99,12 @@ export function scourCollar(
 ): THREE.BufferGeometry | null {
   // [outward distance from the side at the mud line (m), height (m), 0 = gap tone .. 1 = berm tone]
   const profile = [
-    [-1, 0.3, 0],
-    [0.4, 0.15, 0],
-    [2.2, 0.9, 0.7],
-    [4.5, 1.1, 1],
-    [8, 0.45, 1],
-    [12, 0, 1],
+    [-1, 1.2, 0],
+    [0.4, 0.7, 0],
+    [3, 1.5, 0.7],
+    [6, 1.7, 1],
+    [11, 0.8, 1],
+    [17, 0, 1],
   ] as const;
   const stations = [s0, ...spec.stations.filter((s) => s > s0 && s < s1), s1];
   const lo = new THREE.Color(gap);
