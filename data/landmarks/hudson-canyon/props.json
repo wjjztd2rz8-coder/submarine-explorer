@@ -25,15 +25,15 @@
       "id": "canyon-wall-south",
       "model": "procedural:geo",
       "feature": "canyon-ledge",
-      "lat": 39.40817,
-      "lon": -72.18096,
+      "lat": 39.4076,
+      "lon": -72.1812,
       "snap_to_seabed": true,
       "heading_deg": 22,
       "scale": 1,
       "dimensions_m": [
-        320,
-        70,
-        90
+        600,
+        80,
+        140
       ],
       "lod_distance_m": 900,
       "collision": "box",
