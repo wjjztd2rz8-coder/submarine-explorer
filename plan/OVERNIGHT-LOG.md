@@ -3244,3 +3244,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Hosted CI green on 8fa223d8, Pages deployed, f74 pushed. R-deploy-gate closed: gate kept (PROCESS-LOG). No Claude package this run. Codex 146-148 queued; 124/131 held. Next Sonnet items: V-closeup-materials, V-monterey-wall-marker (code route).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-06 01:02 CST headless run (Claude): V-closeup-materials (Lost City)
+
+- Merged Sonnet V-closeup-materials (Lost City towers: analytic flutes on medium+ tiers, stronger ridges, base biofilm; ~5.5/10, was ~4.5). First pass had a serrated crater-rim facet; sent back, fixed by easing flutes near the rim. gates smoke green on main; pushed. Hosted CI pending; tag waits. Codex 146-148 queued; 124/131 held.
+- Not rechecked: phone High-tier cost of the extra fragment ALU ops; Beebe/Axial use other builders.
+- **Needs owner:** phone retest (4410-P2 checklist).
