@@ -15,6 +15,8 @@ export type PresetParamValue = number | string | boolean | null;
 
 /** Vent field: chimney smoke, shimmer, warm glow, upwelling. */
 export interface VentPresetConfig {
+  /** 0..1 strength of a faint far-ridge haze bank on the water backdrop; 0 off. */
+  horizonRidge: number;
   /** `sulfide` (black smoker, dark grey smoke) or `carbonate` (Lost City: pale, faint). */
   fluid: string;
   /** 0..1 scales particle count per chimney and smoke opacity. */
@@ -170,6 +172,8 @@ export interface TrenchPresetConfig {
 export interface WreckPresetConfig {
   /** Titanic-only dim upper-water backdrop and far-field fog lift; opt-in. */
   titanicHorizon: boolean;
+  /** 0..1 strength of a faint far-ridge haze bank on the water backdrop; 0 off. */
+  horizonRidge: number;
   hazeParticles: number;
   /** Haze box edge around the camera (m) and band height above the seabed (m). */
   hazeBoxM: number;
@@ -242,6 +246,7 @@ export const DEFAULT_PRESETS: PresetsConfig = {
   particleHeadlightGain: 1.6,
   particleHeadlightFalloffM: 90,
   vent: {
+    horizonRidge: 0,
     fluid: 'sulfide',
     smokeIntensity: 1,
     smokeParticles: 12000,
@@ -346,6 +351,7 @@ export const DEFAULT_PRESETS: PresetsConfig = {
   },
   wreck: {
     titanicHorizon: false,
+    horizonRidge: 0,
     hazeParticles: 9000,
     hazeBoxM: 220,
     hazeBandM: 30,

@@ -23,6 +23,14 @@ export const ABYSS_HORIZON = {
   // Broad, faint suspended-sediment variation, baked into existing vertices.
   glowVariation: 0.08,
   glowLobes: 3,
+  // Optional far-ridge haze bank (preset param horizonRidge): ridge top elevation
+  // is base + two sine lobes over azimuth; the edge softens over edgeWidth.
+  ridgeBase: 0.2,
+  ridgeLobes: [
+    { count: 3, phase: 1, amplitude: 0.06 },
+    { count: 7, phase: 2, amplitude: 0.03 },
+  ],
+  ridgeEdgeWidth: 0.03,
 } as const;
 
 /** The four depth bands of docs/art-direction.md §0, shallowest first. */

@@ -5,7 +5,10 @@
   "title": "Endurance dive",
   "hull_class": "B",
   "environment": {
-    "preset": "wreck"
+    "preset": "wreck",
+    "overrides": {
+      "horizonRidge": 0.5
+    }
   },
   "species_file": "species.json",
   "spawn": {
