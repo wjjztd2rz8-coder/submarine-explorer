@@ -27,3 +27,5 @@ Honest rating of the opening: 5.5/10 (was about 5). The diamond is centred and s
 Other hero openings: untouched by construction (only Monterey data changed); Lost City, Blue Hole and Beebe mission openings re-captured and unchanged in framing.
 
 Gates: see result below.
+
+Gates (PW_PORT=4871 tools/gates.sh, smoke + project-base): python, content, build, unit, e2e, e2e-base, attribution all PASS; the only FAIL was prettier on this note, fixed and re-checked clean. An earlier run with the ledge widened failed 6 unit tests (reverted).
