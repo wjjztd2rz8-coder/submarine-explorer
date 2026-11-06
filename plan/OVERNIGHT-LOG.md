@@ -3270,3 +3270,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Joint review with Sol (one reconcile round): stage about 85%, 4-5 weeks; whole-site hero scores 3-3.5 (Sol) vs openings 3.8-4.1 (Claude), disputed and both recorded in REVIEWS.md. Backlog re-planned (U-play-walkthrough-3 and V-monterey-wall-marker first, then V-closeup-materials-titanic, V-bismarck-seabed-dome, V-horizon-upper-half); 15 DONE items archived; golden.sh stale-server guard fixed. No Claude package run. Codex 146-148 queued; 124/131 held. CI green on f75.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-06 08:13 CST headless run (Claude): U-play-walkthrough-3
+
+- Merged Haiku U-play-walkthrough-3 (evidence only, docs): unassisted Titanic + Blue Hole at desktop/phone/landscape, 77 screenshots, served SHA verified. Took ~55 min because Haiku stalled waiting on its own monitors twice; resume with "no Monitor, use `wait`" worked. Findings filed: U-scan-fish-vs-objective, U-depth-step-skip, U-journal-open-current (Codex briefs 149-151 queued with 146-148; dispatcher said Codex weekly pace is ahead, so they wait). 124/131 held. Touch Pause finding unconfirmed (script artifact). No code changes; CI for the prior main pushes pending, tag waits.
+- **Needs owner:** phone retest (4410-P2 checklist).
