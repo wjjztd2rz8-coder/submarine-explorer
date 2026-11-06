@@ -11,11 +11,34 @@
       "snap_to_seabed": true,
       "heading_deg": 0,
       "scale": 1,
-      "dimensions_m": [60, 44, 10],
+      "dimensions_m": [
+        60,
+        44,
+        10
+      ],
       "lod_distance_m": 800,
       "collision": "box",
       "reconstruction": true,
       "note": "Game addition: a cold-water coral mound with thickets and sponges on the canyon's coral-habitat ledge (Hudson Canyon hosts deep-sea coral habitat, NOAA). No published colony position exists, so the placement and layout are invented."
+    },
+    {
+      "id": "canyon-wall-south",
+      "model": "procedural:geo",
+      "feature": "canyon-ledge",
+      "lat": 39.40817,
+      "lon": -72.18096,
+      "snap_to_seabed": true,
+      "heading_deg": 22,
+      "scale": 1,
+      "dimensions_m": [
+        320,
+        70,
+        90
+      ],
+      "lod_distance_m": 900,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: a bedded canyon-wall ledge beyond the coral mound, so the flank has a visible rim. Hudson Canyon's walls are steep; this ledge's size and placement are invented."
     }
   ]
 }
