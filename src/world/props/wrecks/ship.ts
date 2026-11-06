@@ -5,7 +5,6 @@
  */
 
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { beam, loftPoint, trs, v3, type LoftSpec, type PartBin } from './kit.js';
 import { facingMatrix, hangRusticle, type InstanceList } from './instances.js';
 
@@ -83,66 +82,6 @@ export function edgePath(
     out.push(p);
   }
   return out;
-}
-
-/**
- * A scour collar: sediment pushed up beside a hull that sits in soft bed, a
- * dark gap against the plating, a rounded berm, then easing out to the bed.
- * Gives a hull on a slope a grounded contact line instead of a clean floating edge.
- */
-export function scourCollar(
-  spec: LoftSpec,
-  s0: number,
-  s1: number,
-  gap: THREE.ColorRepresentation,
-  berm: THREE.ColorRepresentation,
-): THREE.BufferGeometry | null {
-  // [outward distance from the side at the mud line (m), height (m), 0 = gap tone .. 1 = berm tone]
-  const profile = [
-    [-1, 1.2, 0],
-    [0.4, 0.7, 0],
-    [3, 1.5, 0.7],
-    [6, 1.7, 1],
-    [11, 0.8, 1],
-    [17, 0, 1],
-  ] as const;
-  const stations = [s0, ...spec.stations.filter((s) => s > s0 && s < s1), s1];
-  const lo = new THREE.Color(gap);
-  const hi = new THREE.Color(berm);
-  const p = new THREE.Vector3();
-  const col = new THREE.Color();
-  const out: THREE.BufferGeometry[] = [];
-  for (const side of [-1, 1] as const) {
-    const pos: number[] = [];
-    const rgb: number[] = [];
-    for (const st of stations) {
-      // Taper the collar to nothing at both ends.
-      const taper = THREE.MathUtils.smoothstep(Math.min(st - s0, s1 - st), 0, 12);
-      for (const [d, h, t] of profile) {
-        loftPoint(spec, st, 0, side, p);
-        pos.push(p.x + side * d * (0.4 + 0.6 * taper), h * taper - 0.05, p.z);
-        col.copy(lo).lerp(hi, t);
-        rgb.push(col.r, col.g, col.b);
-      }
-    }
-    const idx: number[] = [];
-    const nu = profile.length;
-    for (let i = 0; i < stations.length - 1; i++) {
-      for (let k = 0; k < nu - 1; k++) {
-        const a = i * nu + k;
-        const b = (i + 1) * nu + k;
-        if (side === 1) idx.push(a, b, b + 1, a, b + 1, a + 1);
-        else idx.push(a, b + 1, b, a, a + 1, b + 1);
-      }
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    g.setAttribute('color', new THREE.Float32BufferAttribute(rgb, 3));
-    g.setIndex(idx);
-    g.computeVertexNormals();
-    out.push(g);
-  }
-  return mergeGeometries(out);
 }
 
 /** Titanic's rusticles are thick, clumped columns (the real ones reach arm's width). */

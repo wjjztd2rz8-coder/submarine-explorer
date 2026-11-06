@@ -50,7 +50,6 @@ import {
 import {
   WRECK_COLORS as C,
   fittingMaterial,
-  sedimentMaterial,
   growthMaterial,
   paintWreck,
   silhouetteMaterial,
@@ -64,7 +63,6 @@ import {
   hullFrame,
   openingRow,
   rusticlesAlong,
-  scourCollar,
   stocklessAnchor,
 } from './ship.js';
 import { mulberry32, valueNoise3 } from './shared.js';
@@ -454,19 +452,8 @@ export function buildBismarck(
     wood: true,
   });
   projectUVs(deckGeom, 6, true);
-  const collar = scourCollar(spec, 4, endS - 6, 0x2a251f, C.silt);
-  if (collar)
-    paintWreck(collar, {
-      seed: seed ^ 0x5c,
-      rustiness: 0,
-      growth: 0,
-      silt: 0.5,
-      mudBand: 0,
-      wood: true,
-    });
   const core = [
     meshOf(hullGeom, steelMaterial(detail), 'bismarck-hull')!,
-    meshOf(collar, sedimentMaterial(), 'bismarck-scour')!,
     meshOf(deckGeom, woodMaterial(detail), 'bismarck-deck')!,
     meshOf(dark.merge(), voidMaterial(), 'bismarck-void')!,
   ];
