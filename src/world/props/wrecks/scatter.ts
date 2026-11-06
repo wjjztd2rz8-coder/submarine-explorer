@@ -722,7 +722,6 @@ const KITS: Record<WreckScatterId, Kit> = {
             ],
             pose: 'lie',
             sink: 0.35,
-            gain: 0.8,
           },
           {
             name: 'mud',
@@ -761,7 +760,6 @@ const KITS: Record<WreckScatterId, Kit> = {
           pose: 'lie',
           sink: 0.35,
           cluster: 0.3,
-          gain: 0.8,
         },
         {
           // Small fragments: the bulk of what a plated hull sheds.
@@ -777,7 +775,6 @@ const KITS: Record<WreckScatterId, Kit> = {
           pose: 'tumble',
           sink: 0.4,
           cluster: 0.5,
-          gain: 0.8,
           small: true,
         },
         {
