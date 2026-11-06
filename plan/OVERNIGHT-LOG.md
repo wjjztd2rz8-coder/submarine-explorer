@@ -3234,3 +3234,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - CI still red after the touch fix: the only failure is phone-accept 844x390 per-site first-minute test (a different site each run) hitting its 600 s timeout on hosted software GL. Fix: on CI the idle loop is 30 s and HUD sampling every 10 s (local keeps 60 s). gates smoke green; pushed. Hosted CI is the check; tag f74 waits. No Claude package this run.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-05 23:30 CST headless run (Claude): V-hudson-ledge
+
+- Merged Sonnet V-hudson-ledge (data only: canyon-ledge wall beyond the coral mound; upper third now holds a distant ridge, ~5.5/10, a little soft). Prettier fix needed on props.json. gates smoke green on branch and main; pushed. Hosted CI for 8fa223d8 was still running at start; tag f74 waits. Codex 146-148 queued; 124/131 held.
+- **Needs owner:** phone retest (4410-P2 checklist).
