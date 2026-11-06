@@ -3224,3 +3224,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Diagnosed 3 red CI runs: two touch specs sent CDP touchMove/End after a rotation that already ended the touch in CI Chromium. Made them tolerant (tests/e2e f1-touch, globe-pins); pass locally. Awaiting hosted CI; tag f74 still waits. No Claude package this run.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-05 19:29 CST headless run (Claude): V-monterey-wall-marker tried, nothing shipped
+
+- Sonnet tried pose-only fixes for the Monterey marker: yaw 0 centres it on the wall crest (~5/10) but fails two unit tests (safe spawn, 0.2 width floor); other poses worse. Pose-only is exhausted; DIRECTOR item notes the code route. No merge, main clean. Hosted CI for 65c211b8 was still running; tag f74 waits. Codex 146-148 queued; 124/131 held.
+- **Needs owner:** phone retest (4410-P2 checklist).
