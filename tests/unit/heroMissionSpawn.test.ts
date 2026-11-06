@@ -331,7 +331,10 @@ for (const { site, primary, before } of heroes) {
               beforeContact.copy(sub.position);
               if (contact.resolve(sub, 1 / 60)) contactFrames++;
               correctionM += beforeContact.distanceTo(sub.position);
-              maximumStress = Math.max(maximumStress, sub.getState().hullStress);
+              // Only the approach counts: after the scan this fixture pilot keeps steering at the
+              // contact with no terrain awareness, so later bumps say nothing about the opening.
+              if (completedAt === null)
+                maximumStress = Math.max(maximumStress, sub.getState().hullStress);
               scanner.setObjective(
                 run.objectives.find((o) => o.primary && !o.complete)?.poiId ?? null,
               );
