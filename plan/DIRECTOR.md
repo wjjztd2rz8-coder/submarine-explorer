@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: R-ci-red-5 and V-bismarck-debris merged 2026-11-05 evening; next Sonnet items V-monterey-wall-marker, V-closeup-materials. Codex 146-148 queued (Codex 5h limit hit 16:5x, back 17:45). 124/131 held.
+- Claude: V-closeup-materials IN FLIGHT (Sonnet, 2026-11-05, Lost City tower detail). Earlier: R-ci-red-5 and V-bismarck-debris merged 2026-11-05 evening; next Sonnet items V-monterey-wall-marker, V-closeup-materials. Codex 146-148 queued (Codex 5h limit hit 16:5x, back 17:45). 124/131 held.
 
 ## Backlog
 
