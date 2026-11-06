@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: V-monterey-wall-marker IN FLIGHT (Sonnet, 2026-11-06, branch claude/V-monterey-wall-marker). Codex 146-151 queued; 124/131 held.
+- Claude: none in flight. Next Sonnet: V-horizon-upper-half. Codex 146-151 queued; 124/131 held.
 
 ## Backlog
 
@@ -88,7 +88,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 - **U-scan-fish-vs-objective [Sonnet/Codex, TOP U-\*; from walkthrough-3]:** Blue Hole: scanning a nearby fish shows a success reward while the objective stays 0 of 2; the reward card should say it is a side find (or the lock should prefer the objective target in range). Evidence `desktop-great-blue-hole-09-reward.png`.
 - **U-depth-step-skip [Codex; from walkthrough-3 and walkthrough-2]:** the depth tutorial step ("Hold Space to rise" / right slider) persists 3-7 min when the target is at about the same depth; skip it when the first target is within ~15 m of current depth.
 - **U-journal-open-current [Codex; from walkthrough-3]:** Journal opens on "Loading the Journal..." / All dive sites; open on the current site's page instead.
-- **V-monterey-wall-marker [Sonnet, second, needs code: generic opening bias toward the face side or scarp.ts; see TRIED entry below]**
+- **V-monterey-wall-marker PARTIAL DONE 2026-11-06 (b9f74138; yawOffset 14 to 0, marker centred on the pale crest, ~5.5/10; reads as ridge end, not wall face; no generic opening or scarp.ts route found; real face needs moved scan target) [Sonnet]**
 - **U-play-walkthrough-3 [Haiku, UNBLOCKED 2026-11-05 (Sol: first-five-minutes evidence is stale, newest unaided capture 2026-11-02/10-26)]:** see item below; run at 1280x720, 390x844 and 844x390, unassisted (no teleported scan poses, real clock), Titanic and Blue Hole first.
 - **V-monterey-wall-marker [Sonnet] TRIED 2026-11-05 (no shippable pose: yaw 0 centres the marker but fails heroMissionSpawn and the 0.2 width floor; needs a generic opening bias toward the face side or scarp.ts work, not data) (review 2026-11-05):** the objective diamond sits on the far ridge, not on the pale wall face now visible centre-right; move the scan target/pose so the marker lands on the wall face and the sub looks at it. Data only.
 - **V-closeup-materials [Sonnet] Lost City DONE 2026-11-06 (3790ef12; fluted towers + base biofilm, ~5.5/10; Titanic/Blue Hole/Beebe heroes still open) (Sol 2026-11-05, Claude agrees on detail frames):** at scan distance the heroes lose to openings: Lost City towers are smooth and faceted, Titanic plating repeats, Blue Hole close view is terraced, Beebe chimneys angular. One hero per package; target the detail frame (`*-3.png`) not the opening; generic material/noise changes, no site branch.
