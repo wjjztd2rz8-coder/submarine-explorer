@@ -35,7 +35,7 @@
       "rangeM": 240,
       "destinationLabel": "the north canyon wall",
       "localAltitudeWeight": 6,
-      "yawOffset": 14
+      "yawOffset": 0
     },
     "freeDive": {
       "hero": "canyon-wall-ledge",
