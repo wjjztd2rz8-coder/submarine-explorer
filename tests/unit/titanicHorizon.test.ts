@@ -19,7 +19,8 @@ const mission = JSON.parse(readFileSync('data/landmarks/titanic/mission.json', '
 const params = mergePresetParams(
   'wreck',
   presetDefaults(config.presets, 'wreck'),
-  mission.environment.overrides,
+  // These tests pin the base backdrop; the optional far-ridge bank is covered separately below.
+  { ...mission.environment.overrides, horizonRidge: 0 },
 );
 
 function setup(enabled: boolean, visuals: boolean, depth = -3800) {
@@ -54,7 +55,7 @@ function setup(enabled: boolean, visuals: boolean, depth = -3800) {
 }
 
 describe('Titanic far-field horizon', () => {
-  it('is explicitly enabled only by Titanic; defaults and other golden sites stay off', () => {
+  it('is explicitly enabled only by Titanic and Bismarck (far-ridge backdrop); defaults and other golden sites stay off', () => {
     expect(config.presets.wreck.titanicHorizon).toBe(false);
     expect(params.titanicHorizon).toBe(true);
     for (const site of [
@@ -62,7 +63,6 @@ describe('Titanic far-field horizon', () => {
       'great-blue-hole',
       'beebe-vent-field',
       'monterey-canyon',
-      'bismarck',
       'endurance',
     ]) {
       const doc = JSON.parse(readFileSync(`data/landmarks/${site}/mission.json`, 'utf8'));
@@ -407,4 +407,28 @@ it('1360: pitched desktop/phone sky preserves its fog ring and dim upper gradien
   const env = (globalThis as { process?: { env?: Record<string, string> } }).process?.env;
   if (env?.VERIFY_1360 === '1')
     writeFileSync('.cache/1360/sky.json', JSON.stringify(samples, null, 2) + '\n');
+});
+
+describe('Far-ridge haze bank', () => {
+  it('lifts the water below a skyline but keeps the level ring on the fog colour', () => {
+    const camera = new THREE.PerspectiveCamera(60, 16 / 9, 0.1, 5000);
+    camera.position.set(0, -3800, 0);
+    const atmo = sampleAtmosphere(config.water, -3800);
+    const horizon = new TitanicHorizon(new THREE.Scene(), {}, 1);
+    horizon.update(camera, atmo);
+    const pos = horizon.dome.geometry.getAttribute('position');
+    const col = horizon.dome.geometry.getAttribute('color');
+    let level = 0;
+    let lifted = 0;
+    for (let i = 0; i < pos.count; i++) {
+      const y = pos.getY(i);
+      if (Math.abs(y) < 1e-6) {
+        expect(col.getZ(i)).toBeCloseTo(atmo.fogColor.b, 5);
+        level++;
+      }
+      if (y > 0.08 && y < 0.14 && col.getZ(i) > atmo.fogColor.b + 1e-3) lifted++;
+    }
+    expect(level).toBeGreaterThan(0);
+    expect(lifted).toBeGreaterThan(0);
+  });
 });
