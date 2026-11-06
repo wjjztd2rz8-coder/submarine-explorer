@@ -21,7 +21,7 @@ const shots = '.cache/bughunt18/screenshots';
 const lostCityRadius = 66;
 const defaultRadius = Math.hypot(38, 90);
 // The mission opening authors its own chase arm; free dives and surface starts keep the default.
-const missionRadius = 80;
+const missionRadius = 56;
 
 test.beforeEach(async ({ page }) => pauseClockBeforeNavigation(page));
 
