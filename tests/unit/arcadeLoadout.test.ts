@@ -539,27 +539,27 @@ describe('fresh-player mission routing and vehicle loadout', () => {
         );
         missionSystem.init?.(ctx);
         await Promise.resolve();
-        expect(ctx.rig.chaseRadius).toBeCloseTo(80, 6);
+        expect(ctx.rig.chaseRadius).toBeCloseTo(56, 6);
         const arcadePos = ctx.sub.position.clone();
         // Both boot directions must use current saved settings, even when the
         // near-site choice is unchanged. The preview must match Begin.
         ctx.save.setGameplayMode('realistic');
         await Promise.resolve();
-        if (!skipBriefing) expect(ctx.rig.chaseRadius).toBeCloseTo(80, 6);
+        if (!skipBriefing) expect(ctx.rig.chaseRadius).toBeCloseTo(56, 6);
         ctx.applyMissionStart('near-site');
         const first = pois.find(
           (p) => p.id === ctx.route!.def.objectives.find((o) => o.primary)!.poi,
         )!;
-        expect(ctx.sub.position.distanceTo(first.position)).toBeCloseTo(130, 2);
+        expect(ctx.sub.position.distanceTo(first.position)).toBeCloseTo(106, 2);
         expect(ctx.sub.position.distanceTo(arcadePos)).toBeLessThan(1e-6);
         ctx.rig.chaseRadius = 35;
         ctx.rig.resetView();
-        expect(ctx.rig.chaseRadius).toBeCloseTo(80, 6);
+        expect(ctx.rig.chaseRadius).toBeCloseTo(56, 6);
         ctx.save.setGameplayMode('arcade');
         await Promise.resolve();
         ctx.applyMissionStart('near-site');
         expect(ctx.sub.position.distanceTo(arcadePos)).toBeLessThan(1e-6);
-        expect(ctx.rig.chaseRadius).toBeCloseTo(80, 6);
+        expect(ctx.rig.chaseRadius).toBeCloseTo(56, 6);
         ctx.applyMissionStart('surface');
         const surface = missionStartPose(
           { ...ctx.route!.def, hull_class: ctx.sub.getState().hullClass },
@@ -573,18 +573,18 @@ describe('fresh-player mission routing and vehicle loadout', () => {
         ctx.rig.resetView();
         expect(ctx.rig.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
         ctx.applyMissionStart('near-site');
-        expect(ctx.rig.chaseRadius).toBeCloseTo(80, 6);
+        expect(ctx.rig.chaseRadius).toBeCloseTo(56, 6);
         ctx.daily = { start: { x: 0, z: 0, headingDeg: 0 } } as GameContext['daily'];
         ctx.applyMissionStart('near-site');
         ctx.rig.resetView();
-        expect(ctx.rig.chaseRadius).toBeCloseTo(80, 6);
+        expect(ctx.rig.chaseRadius).toBeCloseTo(56, 6);
         ctx.daily = null;
         ctx.applyMissionStart('near-site');
         // Losing optional content must also clear a previously shortened arm.
         ctx.props = new Props(ctx.meta, terrain, ctx.config.props, 'low');
         ctx.applyMissionStart('near-site');
         ctx.rig.resetView();
-        expect(ctx.rig.chaseRadius).toBeCloseTo(80, 6);
+        expect(ctx.rig.chaseRadius).toBeCloseTo(56, 6);
       } finally {
         missionSystem.dispose?.();
         ctx.missionRouter?.dispose();
