@@ -87,13 +87,26 @@ float pNoise(vec2 p) {
   float laneMix = 0.6 * pHash(vec2(floor(g.y * 0.5), 7.0)) + 0.4 * pHash(vec2(floor(g.x * 0.34), 1.0));
   vec3 lane = mix(vec3(0.93, 0.98, 1.02), vec3(1.07, 0.99, 0.92), smoothstep(0.25, 0.75, laneMix));
   // Per-plate brightness; some plates bleached grey-brown, a few sprung dark.
+  // Up close the plate-to-plate steps soften and a slow field that ignores the seams
+  // takes over, so the hull stops reading as a tile grid; far away the old look holds.
+  float near = 1.0 - smoothstep(20.0, 55.0, length(vViewPosition));
   float tone = 0.7 + 0.5 * h1 - 0.25 * smoothstep(0.82, 0.97, h2);
+  float drift = pNoise(vMapUv * vec2(1.7, 2.6)) + 0.5 * pNoise(vMapUv * vec2(6.0, 9.0)) - 0.75;
+  tone = mix(tone, mix(tone, 0.95, 0.55) * (1.0 + 0.7 * drift), near);
   diffuseColor.rgb = mix(diffuseColor.rgb, vec3(lum), (0.12 + 0.28 * smoothstep(0.3, 0.9, h2))) * tone * lane;
   // Stain band below the plate's upper seam, and long thin streaks running down.
   float down = 1.0 - fract(g.y);
   float band = smoothstep(0.0, 0.5, down) * (1.0 - smoothstep(0.5, 1.0, down));
   float streak = pNoise(vec2(vMapUv.x * 50.0, vMapUv.y * 3.0 + h1 * 9.0));
   float stain = clamp(band * (0.35 + h2) * 0.5 + smoothstep(0.6, 0.95, streak) * 0.4, 0.0, 0.75);
+  // Rust runs down from the rivet line under each seam in narrow runs of varied reach,
+  // and a few carry on across the next plate.
+  float run = pNoise(vec2(vMapUv.x * 70.0, cell.y * 5.3 + h1 * 7.0));
+  float reach = 0.25 + 1.3 * pHash(vec2(floor(vMapUv.x * 70.0), cell.y + 3.0));
+  float cluster = smoothstep(0.25, 0.7, pNoise(vMapUv * vec2(3.1, 2.3) + 4.0));
+  float bleed = smoothstep(0.5, 0.82, run) * (0.25 + 0.75 * cluster) * (1.0 - smoothstep(0.0, reach, down)) * (1.0 - 0.5 * smoothstep(0.85, 1.0, down));
+  stain = clamp(stain * (1.0 - 0.6 * near) + 0.45 * bleed * near, 0.0, 0.8);
+  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.42, 0.19, 0.07), 0.55 * bleed * near);
   diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.2, 0.09, 0.05), stain);
 }
 #endif`,
