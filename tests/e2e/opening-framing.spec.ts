@@ -1707,7 +1707,8 @@ freshTest.describe('rendered horizon readback', () => {
             };
           }, site);
           expect(probe.visible).toBe(true);
-          expect(probe.vertices).toBe(561);
+          // Both sites opt into the far-ridge bank, which uses the finer 64x64 dome (65 x 65 vertices).
+          expect(probe.vertices).toBe(4225);
           expect(probe.tier).toBe(tier);
           expect(probe.failed).toBe(0);
           expect(probe.canvas).toEqual({ width, height });
