@@ -198,6 +198,8 @@ export const BIOMES: Record<string, Biome> = {
     colorB: 0x4f4a44,
     colorC: 0x3f3d3c,
     rockBias: 0.12,
+    // The flank is real terrain, but its far crest should melt into the water, not cut a planet-like limb.
+    horizonFadeM: [90, 420],
     scatter: [
       { kind: 'dropstone', density: 0.7, slopeMaxDeg: 22, on: 'any' },
       { kind: 'boulder', density: 0.5, slopeMaxDeg: 35, on: 'rock' },

@@ -34,7 +34,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
     },
   },
   "bismarck": {
-    "biome": "5c6525d201587fa04ade642a0a30f2ec193213d99e3db6913741ecfa3cb0ea9c",
+    "biome": "ca55f3477386330bb58e6ee46810baa62a521ed402e399041297cc1380ac1651",
     "tiers": {
       "high": {
         "buffers": [
@@ -45,9 +45,9 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
             "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
           },
         ],
-        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
-        "shader": "ecee33e178410d74a6ac6899792d2c460eb035a134653f461838a31c14104abc",
-        "uniforms": "ef7195b95936d6bfab920e16c8ea4a27bcc2d29d16ba7bb637a78a97f44e8ff1",
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP-horizon-fade",
+        "shader": "54094009dc3afe0a0f3419a39fd32be5ab2324e4f1442b9a6e1902f603e665dd",
+        "uniforms": "004baa3e73b7c9faa622761df53069f25bebd99d4b4c970a6503005df40c03fd",
       },
       "low": {
         "buffers": [
@@ -58,9 +58,9 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
             "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
           },
         ],
-        "cache": "seabed-",
-        "shader": "278282786c2f1bd61b4ad34ff3999c314f5a808369c331d25f9b75f94ada5873",
-        "uniforms": "ef7195b95936d6bfab920e16c8ea4a27bcc2d29d16ba7bb637a78a97f44e8ff1",
+        "cache": "seabed--horizon-fade",
+        "shader": "1a7bbd563442f6a14fb6908d73c7cd4310d48cb360224e6e263b33e5c283facb",
+        "uniforms": "004baa3e73b7c9faa622761df53069f25bebd99d4b4c970a6503005df40c03fd",
       },
     },
   },

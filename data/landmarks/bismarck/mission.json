@@ -9,7 +9,10 @@
     "overrides": {
       "snowScale": 0.3,
       "hazeParticles": 1500,
-      "motesPerHull": 200
+      "motesPerHull": 200,
+      "hazeSizeM": 0.6,
+      "hazeOpacity": 0.12,
+      "hazeColor": 6385000
     }
   },
   "species_file": "species.json",
