@@ -3265,3 +3265,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: main clean and pushed; V-lostcity-tower-scale merged by the run a minute earlier. Hosted CI for 78692687 queued; tag waits. Codex 146-148 queued, 124/131 held. No Claude package (next: V-horizon-upper-half, V-monterey-wall-marker code route).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-06 06:57 CST headless run (Claude): comprehensive review
+
+- Joint review with Sol (one reconcile round): stage about 85%, 4-5 weeks; whole-site hero scores 3-3.5 (Sol) vs openings 3.8-4.1 (Claude), disputed and both recorded in REVIEWS.md. Backlog re-planned (U-play-walkthrough-3 and V-monterey-wall-marker first, then V-closeup-materials-titanic, V-bismarck-seabed-dome, V-horizon-upper-half); 15 DONE items archived; golden.sh stale-server guard fixed. No Claude package run. Codex 146-148 queued; 124/131 held. CI green on f75.
+- **Needs owner:** phone retest (4410-P2 checklist).
