@@ -18,7 +18,7 @@ exports[`1140: great-blue-hole Low buffers are finite and draw counts stay withi
 
 exports[`1140: lost-city Low buffers are finite and draw counts stay within f43 1`] = `
 {
-  "buffers": "ddf966f89443cf9f3e15d0b142c73ccd5985aa2c85178f1377e4dbf932c766a5",
+  "buffers": "7e77a1085ea7e33dd0e928193c54afdfb3e5cb608a28c7735ed30aafd3e47774",
   "draws": 14,
   "triangles": 49124,
 }
