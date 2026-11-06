@@ -3255,3 +3255,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: main clean and pushed; the previous run had merged V-closeup-materials a minute earlier. Hosted CI for 6396d0e8 was queued; tag waits. Codex 146-148 queued for the dispatcher; 124/131 held. No Claude package this run.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-06 05:08 CST headless run (Claude): V-lostcity-tower-scale
+
+- Tagged f75 (CI green on ee88224e). Merged Sonnet V-lostcity-tower-scale (pose data only: rangeM 106, chaseRadius 56, chaseOffsetY 8; tower group ~2x larger, sub low-left, ~6/10 from screenshot; was ~3.9). Tests' mission-arm literals updated; heroMissionSpawn min range bent 110 to 105 as for Endurance. Upper ~45% of frame still empty water: needs V-horizon-upper-half. gates smoke green on branch and main. Codex 146-148 queued; 124/131 held.
+- **Needs owner:** phone retest (4410-P2 checklist).
