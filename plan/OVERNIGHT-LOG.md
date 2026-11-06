@@ -3213,3 +3213,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged Codex 143 (S-verify-openings-2: Lost City/Bismarck opening safety tests, validator check), 144 (S-fact-check-journal-2: six-site Journal fact corrections) and 145 (S-dead: third dead-code sweep, 35 files). gates smoke green on each branch and on main. Codex 146-148 queued; 124/131 still held. No Claude package this run (collection took the window); next Sonnet items: V-bluehole-opening-hood, V-hudson-ledge.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-05 18:15 CST headless run 356 (Claude): comprehensive review
+
+- Joint review: stage ~86% (Claude 88 / Sol 85), 3-4 weeks; Sol's reconcile round failed on the Codex 5h limit, so disputed points are reported as such. Sol found that Pages deploys wait for green CI (frozen since 18:29) and that first-five-minutes evidence is stale. REVIEWS.md, STATUS.md, DIRECTOR.md updated.
+- Merged Sonnet R-ci-red-5 (touch spec cleanup; phone-accept monterey not reproducible) and V-bismarck-debris (~6/10). gates smoke green on main. CI-red trigger fixed (completed runs only). Codex 146-148 queued; 124/131 held. Tag f74 waits for green hosted CI.
+- **Needs owner:** phone retest (4410-P2 checklist).
