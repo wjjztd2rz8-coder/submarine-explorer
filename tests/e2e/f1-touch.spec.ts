@@ -109,13 +109,15 @@ for (const viewport of [
           await expect.poll(state).toEqual(neutral);
           await expect(page.locator('.tc-root .is-held')).toHaveCount(0);
           if (interruption !== 'cancel') {
+            // A resize may already have ended the browser's touch (CI Chromium does), so
+            // the late move/end can be rejected; the app state is what matters here.
             await touch(
               cdp,
               'touchMove',
               points.map((p) => ({ ...p, y: p.y - 2 })),
-            );
+            ).catch(() => undefined);
             await expect.poll(state).toEqual(neutral);
-            await touch(cdp, 'touchEnd', []);
+            await touch(cdp, 'touchEnd', []).catch(() => undefined);
           }
           await page.evaluate(() => window.dispatchEvent(new Event('focus')));
         }

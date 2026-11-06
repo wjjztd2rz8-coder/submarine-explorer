@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-11-06 targeted review: CI red on main for 3 runs
+
+- Trigger: CI red on runs 354/355 (and the V-endurance run). Failing specs in all three: `f1-touch` "simultaneous flight and scan release" and `globe-pins` "rotation discards a held site-list swipe", both with `Input.dispatchTouchEvent: Must send a TouchStart first`. Root cause: the app now cancels the held touch on rotation (S-bughunt-touch-input), and CI Chromium also ends the CDP touch on the viewport resize, so the specs' late `touchMove`/`touchEnd` were rejected. Local Chromium keeps the touch, which is why gates were green. R-ci-red-5 only fixed the cleanup cancel.
+- Fix: the late move/end in both specs tolerate rejection; assertions on app state unchanged. Both specs pass locally. Hosted CI on the next push is the check; Pages deploy and tag f74 wait on it.
+- Process: the sibling failure mode (a local-only pass of a touch spec) is the same one as R-ci-red-5; spec-level rule: any CDP touch call after a resize/rotation must tolerate rejection.
+
 ## 2026-11-05 evening comprehensive review (trigger: 8+ merges; Claude + Sol first round; reconcile failed on the Codex 5h limit)
 
 - **Stage:** about 86% to 1.0 (Claude 88%, Sol 85%); 3-4 weeks. Golden `2026-11-05-222844` vs `2026-11-05-121524`. Reconcile round did not run (Codex 5h limit), so the points below are settled by me on the images and files.

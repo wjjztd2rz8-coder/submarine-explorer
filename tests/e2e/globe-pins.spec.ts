@@ -65,11 +65,17 @@ for (const viewport of [
         await expect.poll(captured).toBe(true);
         await page.setViewportSize({ width: viewport.height, height: viewport.width });
         await expect.poll(captured).toBe(false);
-        await cdp.send('Input.dispatchTouchEvent', {
-          type: 'touchMove',
-          touchPoints: [{ ...point, y: Math.max(1, point.y - 60) }],
-        });
-        await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+        // A resize may already have ended the browser's touch (CI Chromium does), so the
+        // late move/end can be rejected; the app state is what matters here.
+        await cdp
+          .send('Input.dispatchTouchEvent', {
+            type: 'touchMove',
+            touchPoints: [{ ...point, y: Math.max(1, point.y - 60) }],
+          })
+          .catch(() => undefined);
+        await cdp
+          .send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+          .catch(() => undefined);
         await expect(sheet).toHaveClass(/is-collapsed/);
         await page.setViewportSize({ width: 390, height: 844 });
         await swipeSiteList(page);
