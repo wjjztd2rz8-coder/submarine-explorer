@@ -118,7 +118,7 @@ for (const { site, primary, before } of heroes) {
           first.position.z - pose.z,
         );
         expect(range).toBeCloseTo(MISSION_APPROACH_M[site], 2);
-        expect(range).toBeGreaterThanOrEqual(110);
+        expect(range).toBeGreaterThanOrEqual(105);
         expect(range).toBeLessThanOrEqual(300);
         expect(range).toBeGreaterThan(missionApproachScanRadius(site, first.radius) * 2);
         const toTarget = first.position

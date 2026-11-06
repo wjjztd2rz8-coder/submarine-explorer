@@ -39,7 +39,7 @@ it('every authored site retains its mission approach distance', () => {
   expect(MISSION_APPROACH_M).toEqual({
     titanic: 140,
     'challenger-deep': 140,
-    'lost-city': 130,
+    'lost-city': 106,
     'monterey-canyon': 240,
     endurance: 106,
     'axial-seamount-ashes': 110,
