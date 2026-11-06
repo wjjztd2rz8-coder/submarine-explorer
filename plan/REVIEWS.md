@@ -2,6 +2,8 @@
 
 ## 2026-11-06 targeted review: CI red on main for 3 runs
 
+- **Update (21:50, third look):** the touch fix held, but CI is still red on 65c211b8, 6ac2b233 and the two runs before: every failure is the same spec, `phone-accept` 844x390 `<site>: ... first minute` (Blake Plateau or Monterey, a different one each time, 1 failed in one shard). It hits the 600 s test timeout and the browser closes; locally the same test takes 5 s. Root cause: the 60 s idle loop renders 600 frames, and some hosted software-GL sites need about 1 s a frame. Fix: on CI the idle loop runs 30 s (still crosses the 21 s tutorial hand-off) and HUD clearance is sampled every 10 s; local runs keep the full minute. Hosted CI on the next push is the check; tag f74 and the Pages deploy still wait.
+
 - Trigger: CI red on runs 354/355 (and the V-endurance run). Failing specs in all three: `f1-touch` "simultaneous flight and scan release" and `globe-pins` "rotation discards a held site-list swipe", both with `Input.dispatchTouchEvent: Must send a TouchStart first`. Root cause: the app now cancels the held touch on rotation (S-bughunt-touch-input), and CI Chromium also ends the CDP touch on the viewport resize, so the specs' late `touchMove`/`touchEnd` were rejected. Local Chromium keeps the touch, which is why gates were green. R-ci-red-5 only fixed the cleanup cancel.
 - Fix: the late move/end in both specs tolerate rejection; assertions on app state unchanged. Both specs pass locally. Hosted CI on the next push is the check; Pages deploy and tag f74 wait on it.
 - Process: the sibling failure mode (a local-only pass of a touch spec) is the same one as R-ci-red-5; spec-level rule: any CDP touch call after a resize/rotation must tolerate rejection.
