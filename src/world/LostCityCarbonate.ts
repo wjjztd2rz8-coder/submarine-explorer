@@ -11,6 +11,10 @@ const LOST_CITY_SURFACE = {
   poreM: 0.065,
   poreStrength: 0.16,
   poreFadeM: [3, 18],
+  // Vertical flutes: the flow-striation field also bumps the normal (metres of relief), so the
+  // walls read as fluted ridges rather than printed stripes. Detail tiers only.
+  fluteM: 0.09,
+  fluteFadeM: [8, 55],
   // Highlight shoulder: lit radiance saturates toward this ceiling instead of clipping, so
   // faces next to the glow lights keep their carbonate texture rather than going flat white.
   shoulder: 0.55,
@@ -28,6 +32,8 @@ uniform vec2 carbonateNormalFade;
 uniform float carbonatePoreSize;
 uniform float carbonatePoreStrength;
 uniform vec2 carbonatePoreFade;
+uniform float carbonateFlute;
+uniform vec2 carbonateFluteFade;
 
 float carbonateHash(vec3 p) {
   uvec3 v = uvec3(ivec3(p)) * 1664525u + 1013904223u;
@@ -65,6 +71,7 @@ vec3 carbonateP = vCarbonatePosition / carbonateRepeat;
 float carbonateDistance = length(vViewPosition);
 float carbonateMip = 2.5 * smoothstep(5.0, 45.0, carbonateDistance);
 vec3 carbonatePattern = vec3(0.0);
+float fluteHeight = 0.0;
 vec3 carbonatePerturbed = carbonateWorldNormal;
 float carbonateRoughness = 0.86;
 #ifdef LOST_CITY_NORMALS
@@ -117,6 +124,17 @@ diffuseColor.rgb *= max(vec3(0.3), 1.0 + (carbonatePattern * 4.6 - 1.0) * carbon
   float stripe = (sx * 0.6 + sw * 0.4) * 4.6 - 1.0;
   float flow = clamp(stripe * 0.5 + 0.5, 0.0, 1.0);
   diffuseColor.rgb *= max(0.5, 1.0 + stripe * 0.35 * wall * far);
+#ifdef LOST_CITY_NORMALS
+  // Analytic (not texture-derived) so its screen derivatives stay smooth. The sine phase
+  // drifts with height so flutes meander and pinch out instead of forming a regular comb.
+  vec3 fp = vCarbonatePosition;
+  float fx = fp.z * 2.7 + 1.3 * sin(fp.y * 0.23 + fp.x * 0.4) + 0.8 * sin(fp.y * 0.61);
+  float fz = fp.x * 2.7 + 1.3 * sin(fp.y * 0.19 + fp.z * 0.4) + 0.8 * sin(fp.y * 0.53);
+  float gx = fp.z * 6.3 + 2.0 * sin(fp.y * 0.37);
+  float gz = fp.x * 6.3 + 2.0 * sin(fp.y * 0.41);
+  fluteHeight = wall * (carbonateWeights.x * (sin(fx) + 0.35 * sin(gx)) +
+    carbonateWeights.z * (sin(fz) + 0.35 * sin(gz)));
+#endif
   // Warm ivory/ochre on the pale runs, cool blue-grey in the shaded flutes.
   diffuseColor.rgb *= mix(vec3(0.84, 0.93, 1.14), vec3(1.16, 1.04, 0.78), flow) * wall * far + (1.0 - wall * far);
 }
@@ -139,6 +157,18 @@ if (poreFade > 0.001) {
 vec3 carbonateSlope = carbonatePerturbed - carbonateWorldNormal;
 carbonateSlope -= carbonateWorldNormal * dot(carbonateSlope, carbonateWorldNormal);
 normal = normalize((viewMatrix * vec4(normalize(carbonateWorldNormal + carbonateSlope), 0.0)).xyz);
+// Screen-space bump from the flute height field (surface-gradient form, in metres).
+{
+  float fluteGain = carbonateFlute *
+    (1.0 - smoothstep(carbonateFluteFade.x, carbonateFluteFade.y, carbonateDistance));
+  if (fluteGain > 0.0001) {
+    vec3 sX = dFdx(-vViewPosition), sY = dFdy(-vViewPosition);
+    vec3 r1 = cross(sY, normal), r2 = cross(normal, sX);
+    float det = dot(sX, r1);
+    vec3 grad = sign(det) * (dFdx(fluteHeight) * r1 + dFdy(fluteHeight) * r2) * fluteGain;
+    normal = normalize(abs(det) * normal - grad);
+  }
+}
 #endif
 `;
 
@@ -226,6 +256,8 @@ export function createLostCityCarbonateMaterial(tier: string): THREE.MeshStandar
     carbonatePoreSize: { value: LOST_CITY_SURFACE.poreM },
     carbonatePoreStrength: { value: LOST_CITY_SURFACE.poreStrength },
     carbonatePoreFade: { value: new THREE.Vector2(...LOST_CITY_SURFACE.poreFadeM) },
+    carbonateFlute: { value: LOST_CITY_SURFACE.fluteM },
+    carbonateFluteFade: { value: new THREE.Vector2(...LOST_CITY_SURFACE.fluteFadeM) },
   };
   const load = (file: string, uniform: { value: THREE.Texture }, srgb: boolean): Promise<void> => {
     if (typeof Image === 'undefined') return Promise.resolve();
