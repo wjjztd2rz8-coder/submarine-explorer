@@ -3320,3 +3320,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged Sonnet U-scan-fish-vs-objective: scanning a side target while the objective is pending now shows a "Side find" card (generic `lastCompleteSideFind` flag on ScanView; same card, detail still points at the objective). The scan lock already preferred an in-range objective; in the Blue Hole case the gallery was 125 m away, so only the fish was legal. No fresh screenshot (text-only change): glance at the next Blue Hole walkthrough. gates smoke + project-base green on branch and main; pushed. Codex brief 151 moved to queue/hold (Sonnet took it); 146-150 queued (held on Codex weekly pace, 28% left). Agent took ~22 min. Next: Blue Hole sediment apron silt.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-07 00:34 CST headless run (Claude): comprehensive review
+
+- Joint review with Sol done (see plan/REVIEWS.md): stage ~85%, 4-6 weeks. Backlog rewritten; Codex 149/150 rewritten (fixes already existed). No agent packages launched. Next: U-retest-walkthrough-4 (Haiku), V-bluehole-apron-silt.
+- **Needs owner:** phone retest (4410-P2 checklist).
