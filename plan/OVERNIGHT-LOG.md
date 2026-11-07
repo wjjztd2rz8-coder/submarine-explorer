@@ -3340,3 +3340,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: main clean, previous run merged U-seabed-warning-action minutes earlier. Skipped a new Sonnet package: Claude 5h at 55% with a reset at 04:10, too tight for a ~100 min agent. Codex 146-150 queued (weekly pacing, 23% left); 124/131 held. Next: V-bluehole-opening-gallery, U-* copy fixes (Haiku).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-07 05:39 CST headless run (Claude): CI triage + V-titanic-hull-tone
+
+- Hosted CI on main was red from the U-seabed-warning-action merge: the hud-touch Monterey catalog spec failed on all 6 viewports because the seabed-warning latch (3 s hold) still owned the guidance slot after the spec's `away()` (spec timing, not a product bug). Merged Sonnet U-ci-monterey-objective-slot: `away()` now advances the clock past the latch. Verified on the spec across 6 viewports.
+- Merged Sonnet V-titanic-hull-tone (partial): two paint values in titanicBow.ts; opening now dark rust-brown (~3.5/5 by my read), detail under the headlight is still pale tan with regular seams (needs a shared plate-shader change, shared with Bismarck). Site specs titanic green (94 passed). gates smoke + project-base green on branches and main; pushed. Codex 146-150 still queued (weekly pacing); 124/131 held. Next: V-bluehole-opening-gallery, V-bismarck-ground-scour.
+- **Needs owner:** phone retest (4410-P2 checklist).
