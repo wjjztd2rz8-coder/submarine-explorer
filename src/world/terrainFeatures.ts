@@ -13,7 +13,6 @@
 import { latLonToWorld } from '../util/geo.js';
 import type { TileMeta } from '../util/types.js';
 import { siteManifest } from '../core/SiteManifest.js';
-import { MONTEREY_FIDELITY } from '../core/config/terrain.js';
 
 /** Reported position of the Great Blue Hole (Wikipedia: 17 18 56 N, 87 32 08 W). */
 export const BLUE_HOLE_LAT = 17.3156;
@@ -476,7 +475,7 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
   if (carve === 'canyon-bend') {
     // A reconstructed S-bend beside the opening ledge. Its 180 m-wide floor
     // has shoulders smoothed out by the survey grid; retain the original wall seats.
-    const wall = latLonToWorld(meta, MONTEREY_FIDELITY.focus.lat, MONTEREY_FIDELITY.focus.lon);
+    const wall = latLonToWorld(meta, 36.7872, -122.0133);
     const centre = { x: wall.x + 170, z: wall.z };
     return {
       centre,

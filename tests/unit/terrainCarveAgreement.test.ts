@@ -86,7 +86,7 @@ describe('920 shipped carve surfaces', () => {
             site === 'monterey-canyon' ? 5 : 2,
           );
           if (site === 'monterey-canyon') {
-            expect(centre.x).toBeCloseTo(-3061.5, 0);
+            expect(centre.x).toBeCloseTo(-3230.9, 0);
             expect(centre.z).toBeCloseTo(-1358.8, 0);
             for (const along of [-400, -250, 0, 250]) {
               const x = centre.x + 20 * Math.sin(along / 220);
