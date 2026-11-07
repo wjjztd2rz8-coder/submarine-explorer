@@ -3356,3 +3356,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - CI red 3 runs: hud-touch catalog cases timing out (240 s). Cause was my U-ci-monterey-objective-slot fix running 3.1 s of frames on every away() try. Fixed to pay that only when the warning is latched; spec cases now 1.5-4 s. gates green, pushed. Confirm hosted CI next run; no tag until green. No agents launched. Codex 146-150 queued (weekly pacing).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-07 12:08 CST headless run (Claude): bismarck scour + beebe chimney
+
+- Merged two Sonnet packages in parallel (~74 min): V-bismarck-ground-scour (partial ~3.5/5: 4 m scour in Bismarck terrain data via the generic option, smaller darker debris, golden pose raised; subtle, far horizon still a dome) and V-beebe-chimney-form (partial ~3.6/5: shared spire builder is rounder with flange breaks; still a broad cone, no visible vent bore). Snapshots rebaselined (freeDiveComposition, beebeIsolation, props-geo, terrainMerge1140). gates smoke + project-base green on both branches and on main; pushed. Hosted CI for the last red-fix push was still queued at the start; no tag yet (f76 waits for green). Codex 146-150 queued (weekly pacing). Next: V-monterey-wall-face, V-golden-refresh (Haiku).
+- **Needs owner:** phone retest (4410-P2 checklist).
