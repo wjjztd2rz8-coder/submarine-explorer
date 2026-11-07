@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: none in flight. Next: V-closeup-materials (Blue Hole, Beebe), U-scan-fish-vs-objective. Next Sonnet: V-horizon-upper-half. Codex 146-151 queued; 124/131 held.
+- Claude: V-closeup-materials-bluehole IN FLIGHT (Sonnet, 2026-11-06). Next: V-closeup-materials (Blue Hole, Beebe), U-scan-fish-vs-objective. Next Sonnet: V-horizon-upper-half. Codex 146-151 queued; 124/131 held.
 
 ## Backlog
 
