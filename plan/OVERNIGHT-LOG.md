@@ -3295,3 +3295,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged Sonnet V-monterey-wall-marker (partial, ~5.5/10, was ~5): Monterey yawOffset 14 to 0 centres the marker on the pale crest; it still reads as a ridge end. Two thresholds bent and logged in plan/progress/V-monterey-wall-marker.md: Monterey width floor 0.2 to 0.19, and heroMissionSpawn hull stress counts only until the first scan (the test autopilot grazed the seabed after it). gates smoke + project-base green on branch and main. Other hero openings recaptured unchanged. The agent took ~107 min. Codex 146-151 queued (dispatcher holds on weekly pace); 124/131 held. Next Sonnet: V-horizon-upper-half.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-06 18:19 CST headless run (Claude): V-horizon-upper-half
+
+- Merged Sonnet V-horizon-upper-half: generic `horizonRidge` preset param (haze bank on the existing horizon dome), enabled by data for Titanic, Bismarck (also gets the dome), Endurance, Lost City; Blue Hole/Beebe/Monterey unchanged. Upper frame now a faint haze gradient instead of plain dark water (reads as haze, not rock; strength 0.5 untuned, Titanic/Bismarck could take ~0.7). gates smoke + project-base green on main. Agent took ~100 min. Codex 146-151 queued (dispatcher holds on weekly pace); 124/131 held. Next Sonnet: V-closeup-materials (Blue Hole, Beebe), U-scan-fish-vs-objective.
+- **Needs owner:** phone retest (4410-P2 checklist).
