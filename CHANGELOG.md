@@ -14,6 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
+- **U-scan-fish-vs-objective:** a completed scan of a non-objective contact while an objective is still pending now shows a "Side find" card (in place of "New Journal entry") whose detail line keeps the objective direction cue. Same card, no new element; the scan lock already preferred an in-range, facing objective. Nothing removed.
 - **V-bluehole-pitchup:** Blue Hole free-dive opening now sits 50 m (was 58 m) from the gallery with the chase camera lowered and swung to the side (data only: freeDive chaseOffsetY 10 to -45, chaseOffsetX -30, chaseRadius 60), so the camera looks up at the hood and its stalactites instead of across open water. Nothing removed; no code change, and no hull-safe relaxation was needed (the 110 m route floor belongs to the mission opening, which is unchanged).
 - **V-blake-endurance-tint:** Blake Plateau and Endurance each gain one foreground prop on the opening approach (data only: a low coral-mound-f ahead-left of the Blake spawn; fallen-spars, a second endurance-rigging scatter, ahead-right of the Endurance spawn). Nothing removed; no code change.
 - **V-kama-plume-scale:** Kama'ehuakanaloa vent plume is about a third as wide, shorter and translucent (data overrides only: spread, sprite sizes, opacity 0.55 to 0.14, rise 38 m, 7000 particles), and the warm glow pool at the vent base is larger (hazeGlow 0.8, size 16 m). Nothing removed.
