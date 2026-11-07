@@ -416,7 +416,10 @@ if (debriefT !== null) {
     .allInnerTexts()
     .catch(() => []);
   note('debrief-buttons', JSON.stringify(debriefButtons.slice(0, 14)));
-  const journal = page.getByRole('button', { name: /journal/i }).filter({ visible: true }).first();
+  const journal = page
+    .getByRole('button', { name: /journal/i })
+    .filter({ visible: true })
+    .first();
   if (await journal.isVisible().catch(() => false)) {
     note('journal-tap', (await journal.innerText()).replace(/\n+/g, ' '));
     await tapOrClick(journal);
