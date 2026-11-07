@@ -100,7 +100,7 @@ test('Blue Hole east gallery owns its scan card at both authored poses', async (
     await expect(page.locator('.guidance-slot .guidance-name')).toHaveText(
       'Eastern stalactite gallery',
     );
-    await expect(page.locator('.guidance-slot .guidance-hint')).toHaveText('HOLD SCAN TO SCAN');
+    await expect(page.locator('.guidance-slot .guidance-hint')).toHaveText('Hold SCAN');
     expect(
       await page.evaluate(() => (window.__game as unknown as Game).scanner.view.nearestId),
     ).toBe('great-blue-hole-stalactites-east');

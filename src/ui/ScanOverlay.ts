@@ -300,10 +300,11 @@ export class ScanOverlay {
         objective: {
           kicker: 'OBJECTIVE',
           text: view.objectiveName,
+          // One action per line: a turn cue replaces the distance.
           detail: view.objectiveInRange
             ? guide(turn, view.objectiveVertDeg, 'PITCH TOWARD TARGET')
-            : touch && Math.abs(turn) >= 10
-              ? `${near} · ${guide(turn, view.objectiveVertDeg, near)}`
+            : Math.abs(turn) >= 10
+              ? guide(turn, view.objectiveVertDeg, near)
               : near,
           tone: view.objectiveInRange ? 'amber' : 'dim',
           ring: { progress: 0, label: `${view.objectiveDistance.toFixed(0)} m` },
@@ -337,7 +338,7 @@ export class ScanOverlay {
           kicker: 'SCAN TARGET',
           text: view.nearestName,
           ready: true,
-          detail: `HOLD ${scan} TO SCAN`,
+          detail: touch ? 'Hold SCAN' : `HOLD ${keys.scan} TO SCAN`,
           tone: 'cyan',
           ring: { progress: 0, label: dist },
         },

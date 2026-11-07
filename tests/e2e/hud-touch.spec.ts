@@ -457,7 +457,7 @@ freshTest.describe('large UI and menu reachability', () => {
             });
           }, scale);
           await expect(page.locator('.guidance-slot')).toBeVisible();
-          await expect(page.locator('.guidance-hint')).toHaveText('HOLD SCAN TO SCAN');
+          await expect(page.locator('.guidance-hint')).toHaveText('Hold SCAN');
           const controls = [
             '.tc-stick',
             '.tc-slider',

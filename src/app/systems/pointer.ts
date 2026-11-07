@@ -183,7 +183,7 @@ export function createPointerSystem(): GameSystem {
         true,
       );
 
-      // D-INPUT-HUD: a one-time tip the first time Ctrl is pressed in a dive.
+      // A one-time tip the first time Ctrl+W is pressed in a dive.
       let ctrlTipShown = false;
       try {
         ctrlTipShown =
@@ -215,7 +215,7 @@ export function createPointerSystem(): GameSystem {
         const target = e.target as HTMLElement | null;
         if (
           ctrlTipShown ||
-          !['ControlLeft', 'ControlRight'].includes(e.code) ||
+          !(e.ctrlKey && e.key.toLowerCase() === 'w') ||
           e.repeat ||
           ctx.globe.isOpen ||
           ctx.settingsScreen.isOpen ||

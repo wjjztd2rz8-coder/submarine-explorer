@@ -186,7 +186,7 @@ for (const viewport of [
         const ready = async (): Promise<boolean> =>
           (await guidance.isVisible()) &&
           /Bow section/i.test(await guidance.innerText()) &&
-          /HOLD SCAN TO SCAN/i.test(await guidance.innerText());
+          /^Hold SCAN$/im.test(await guidance.innerText());
         for (let attempt = 0; attempt < 400 && !(await ready()); attempt++) {
           await expect(guidance).toBeVisible();
           const text = await guidance.innerText();

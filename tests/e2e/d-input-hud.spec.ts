@@ -124,6 +124,8 @@ test('Ctrl tip is once-only and C still descends if keyboard lock fails', async 
     .poll(() => page.evaluate(() => (window as unknown as { __lockCalls: number }).__lockCalls))
     .toBe(1);
   await page.keyboard.down('Control');
+  await expect(page.locator('.hud-ctrl-tip')).toBeHidden();
+  await page.keyboard.press('w');
   await expect(page.locator('.hud-ctrl-tip')).toContainText('Ctrl+W may close this tab');
   await page.screenshot({ path: `${shots}/ctrl-tip.png` });
   await page.keyboard.up('Control');
@@ -140,7 +142,9 @@ test('Ctrl tip is once-only and C still descends if keyboard lock fails', async 
   expect(after).toBeLessThan(before);
   await page.reload();
   await page.waitForFunction(() => window.__gameReady === true);
-  await page.keyboard.press('Control');
+  await page.keyboard.down('Control');
+  await page.keyboard.press('w');
+  await page.keyboard.up('Control');
   await expect(page.locator('.hud-ctrl-tip')).toBeHidden();
 });
 

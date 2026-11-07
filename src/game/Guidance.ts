@@ -35,7 +35,7 @@ export interface GuidanceMessage {
   kicker: string;
   /** The main line: a name or an instruction. */
   text: string;
-  /** Optional second line, e.g. "HOLD SCAN TO SCAN". */
+  /** Optional second line, e.g. "Hold SCAN". */
   detail?: string;
   tone: GuidanceTone;
   /** A progress ring with a short label (percent or range). */

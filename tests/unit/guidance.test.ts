@@ -248,7 +248,7 @@ describe('guidance slot', () => {
       expect(texts(overlay.slot)).toMatchObject({
         name: 'Bow',
         kind: 'scan',
-        detail: touch ? 'HOLD SCAN TO SCAN' : 'HOLD G TO SCAN',
+        detail: touch ? 'Hold SCAN' : 'HOLD G TO SCAN',
       });
       scanner.update(0.2, position, forward, true);
       position.z = 0;
@@ -336,9 +336,7 @@ describe('guidance slot', () => {
       expect(texts(overlay.slot)).toMatchObject({
         name: 'Next contact',
         kind: 'objective',
-        detail: touch
-          ? 'Get closer to scan · 100 m · TURN 90° STARBOARD'
-          : 'Get closer to scan · 100 m',
+        detail: 'TURN 90° STARBOARD',
       });
 
       // Free exploration retains its logged-contact confirmation without an objective.
@@ -429,9 +427,7 @@ describe('guidance slot', () => {
       expect(scanner.view.candidateId).toBe('memorial');
       expect(card.name).toBe('Stern');
       expect(card.kind).toBe('objective');
-      expect(card.detail).toBe(
-        touch ? 'Get closer to scan · 300 m · TURN 90° PORT' : 'Get closer to scan · 300 m',
-      );
+      expect(card.detail).toBe('TURN 90° PORT');
       // On touch a New Journal entry card keeps the direction to the objective; elsewhere it keeps its own line.
       overlay.showComplete('Memorial', true, keys);
       if (touch) expect(texts(overlay.slot).detail).toContain('Stern');
@@ -455,30 +451,26 @@ describe('guidance slot', () => {
       expect(f.step()).toMatchObject({
         name: 'Memorial',
         kicker: 'SCAN TARGET',
-        detail: touch ? 'HOLD SCAN TO SCAN' : 'HOLD G TO SCAN',
+        detail: touch ? 'Hold SCAN' : 'HOLD G TO SCAN',
       });
       f.scanner.setObjective(null);
       expect(f.step().kicker).toBe('SCAN TARGET');
       f.scanner.setObjective('stern');
       f.keys.scan = 'X';
-      expect(f.step().detail).toBe(
-        touch ? 'Get closer to scan · 300 m · TURN 90° PORT' : 'Get closer to scan · 300 m',
-      );
+      expect(f.step().detail).toBe('TURN 90° PORT');
       // The objective wins when it becomes eligible, even beside a nearer contact.
       f.targets[1].position.set(0, 0, -15);
       expect(f.step()).toMatchObject({
         name: 'Stern',
         kicker: 'SCAN TARGET',
-        detail: touch ? 'HOLD SCAN TO SCAN' : 'HOLD X TO SCAN',
+        detail: touch ? 'Hold SCAN' : 'HOLD X TO SCAN',
       });
       f.targets[1].position.set(-300, 0, 0);
       f.position.set(0, 0, 1000);
       expect(f.step()).toMatchObject({
         name: 'Stern',
         kind: 'objective',
-        detail: touch
-          ? 'Get closer to scan · 1044 m · TURN 17° PORT'
-          : 'Get closer to scan · 1044 m',
+        detail: 'TURN 17° PORT',
       });
       f.position.set(0, 0, 0);
       expect(f.step()).toMatchObject({ name: 'Stern', kicker: 'OBJECTIVE' });
@@ -526,9 +518,7 @@ describe('guidance slot', () => {
       expect(texts(f.overlay.slot)).toMatchObject({
         name: 'Stern',
         kind: 'objective',
-        detail: touch
-          ? 'Get closer to scan · 1044 m · TURN 17° PORT'
-          : 'Get closer to scan · 1044 m',
+        detail: 'TURN 17° PORT',
       });
       f.position.set(0, 0, 0);
       expect(f.step()).toMatchObject({ name: 'Stern', kicker: 'OBJECTIVE' });
@@ -807,13 +797,13 @@ describe('guidance slot', () => {
     },
   );
 
-  it('keeps the range and turn to a remote objective visible on touch', () => {
+  it('shows only the turn cue for a remote objective that needs a turn', () => {
     const f = contactGuidance(true);
     f.scanner.setTargets([f.targets[1]]);
     expect(f.step()).toMatchObject({
       name: 'Stern',
       kind: 'objective',
-      detail: 'Get closer to scan · 300 m · TURN 90° PORT',
+      detail: 'TURN 90° PORT',
     });
     f.overlay.dispose();
   });

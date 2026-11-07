@@ -208,7 +208,7 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
       tick(0);
       expect(card.children[1].textContent).toBe('Objective');
       expect(card.children[2].textContent).toBe(
-        `HOLD ${device === 'touch' ? 'SCAN' : 'G'} TO SCAN`,
+        device === 'touch' ? 'Hold SCAN' : 'HOLD G TO SCAN',
       );
       expect(overlay.slot.kind).toBe('scan');
       held(true);
@@ -679,7 +679,7 @@ it('scan instructions use on-screen controls on touch and key bindings on keyboa
     expect(hint.textContent).toBe('HOLD G TO SCAN');
     f.controls.setTouchMode(true);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
-    expect(hint.textContent).toBe('HOLD SCAN TO SCAN');
+    expect(hint.textContent).toBe('Hold SCAN');
     // The scanned contact is no longer a target, so the result takes the slot.
     Object.assign(view, { candidateId: null, nearestScanned: true });
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
@@ -728,7 +728,7 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
     expect(name.textContent).toBe('Stern section');
-    expect(hint.textContent).toBe('Get closer to scan · 692 m');
+    expect(hint.textContent).toBe('TURN 40° STARBOARD');
     // In scan range the card changes to an aim cue for the same target.
     view.objectiveInRange = true;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
@@ -739,7 +739,7 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
     expect(name.textContent).toBe('Stern section');
-    expect(hint.textContent).toBe('Get closer to scan · 692 m · TURN 40° STARBOARD');
+    expect(hint.textContent).toBe('TURN 40° STARBOARD');
     view.objectiveTurnDeg = 3;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(hint.textContent).toBe('Get closer to scan · 692 m');
