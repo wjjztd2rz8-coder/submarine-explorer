@@ -62,7 +62,7 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
 | No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
-Stage (review 2026-11-07; see REVIEWS.md for the agreed figure; prior 2026-11-06, Claude + Sol): about 85% to 1.0, 4-5 weeks (Claude opened at 87% and 3 weeks; Sol 84% and 4-6; agreed). Opening-only (Claude): Beebe 4.1, Lost City 4.1, Endurance 4.0, Titanic 3.9, Monterey 3.8, Blue Hole 3.8, Bismarck 3.5. Whole-site incl. approach and detail (Sol; the 1.0 rubric needs 4/5 at all three): Titanic 3.5, Lost City 3.5, Beebe 3.5, Blue Hole 3, Monterey 3; none yet holds 4. Blockers: unaided first-five-minutes evidence (phone and desktop), hero close-up materials, Monterey marker, phone Low-tier baseline, release verification time. Earlier stages in REVIEWS.md.
+Stage (review 2026-11-07 evening, Claude + Sol agreed): about 85% to 1.0, 4-6 weeks. Opening scores (Claude): Titanic 4.1, Lost City 4.1, Beebe 4.0, Monterey 3.8, Blue Hole 3.5, Bismarck 3.2. Whole-site incl. approach and detail (Sol; the 1.0 rubric needs 4/5 at all three): Titanic 3.5, Lost City 3.5, Beebe 3.5, Blue Hole 3, Monterey 3; none yet holds 4. Blockers: current-build unaided journeys, hero detail materials, phone Low-tier baseline, release verification time and a red Monterey catalog spec. Earlier stages in REVIEWS.md.
 
 ## Needs owner
 
@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: none. Merged 2026-11-07: V-bluehole-opening-gallery (partial), U-ci-monterey-objective-slot (spec now waits out the 3 s seabed latch), V-titanic-hull-tone (partial: opening rust-brown ~3.5/5, detail still pale tan under headlight; broken seams need shared plate shader). Earlier 2026-11-07: V-bluehole-apron-silt, U-retest-walkthrough-4. Last merged 2026-11-06: U-scan-fish-vs-objective (62cc2f0e). Codex 146-150 queued (held by weekly pacing, 28% left); 124/131 held.
+- Claude: none. Merged 2026-11-07 (all partial, remaining gaps are items 3-8): apron silt, opening gallery, Bismarck scour, Beebe chimney, Titanic hull tone, seabed warning action, walkthrough-4. Codex 146-150 queued (held by weekly pacing); 124/131 held.
 
 ## Backlog
 
@@ -81,27 +81,31 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 
 ### Claude lanes (Sonnet unless noted)
 
-1. **V-bluehole-apron-silt [DONE 2026-11-07 (6681839c), partial ~3.5/5: terraces now irregular, rocks varied; fine silt grain/ripple still missing]:** the grotto wall now reads as weathered limestone, but the sediment apron in the detail frame (`great-blue-hole-3.png`) is a stack of smooth, evenly spaced terraces with identical boulders. Target: one irregular silt slope with fine grain, ripple/slump breaks and varied rock size; reuse the shared silt/limestone shader, no site branch. Check the opening is unchanged.
-2. **V-bluehole-opening-gallery [DONE 2026-11-07 (5a5116bf), partial ~3/5: sub left, gallery centre-right with stalactites, gallery still ~20% of frame (range stays 125 m: pose search and scan radius block a closer opening); next lever is a larger gallery prop or an apron-clearing approach, which also moves the free-dive hero pose]:** the 2026-11-07 mission opening shows a big sub beside a small brown outcrop (gallery is ~15% of the frame). Target: the gallery fills the centre-right third with stalactites visible, sub smaller and to the left. Needs a closer-opening/pitch decision, not data nudges (see archive: two data-only passes failed, branch `claude/V-bluehole-hood-code` kept).
-3. **V-bismarck-ground-scour [DONE 2026-11-07 (2149e21b), partial ~3.5/5: 4 m scour + smaller darker debris, subtle in the dark; far horizon still a dome (coarse grid outside focus)]:** hull still floats on a dome seabed (opening ~3.4). Target: hull visibly sits in a shallow carved scour, debris darker and smaller, horizon no longer a perfect dome. Route: a generic terrain-carve option under a wreck footprint (as for other wrecks), not a pose; do not flatten the sourced seamount flank (`data/landmarks/bismarck/guide.json`).
-4. **V-beebe-chimney-form [DONE 2026-11-07 (2149e21b), partial ~3.6/5: rounder columns, flange breaks; still a broad cone, vent bore and separated slim stacks need shelf/stack placement follow-up]:** crust shader helped, but spires are still slab-like folded flanges. Target: tapering, irregular chimney columns with flange breaks and a vent orifice, readable at 20 m. Geometry change in the shared chimney builder.
-5. **V-monterey-wall-face [Sonnet]:** the marker now sits on the pale crest but reads as a ridge end; the opening is striped rock without a wall face. Needs a moved scan target onto the pale face (site data) plus the pose that frames it, and a generic scarp distance fade of displacement. Target: one clear wall face centre-right with the marker on it.
-6. **V-titanic-hull-tone [DONE 2026-11-07 (a96ad990), partial: paint darker, detail still pale, seams regular]:** hull is still salmon-pink with gridlike seams (detail ~4.0). Target: darker, desaturated rust-brown with deeper streaking and broken plate seams; shader params only.
-7. **U-retest-walkthrough-4 [DONE 2026-11-07 (e1a2e55c); note plan/progress/U-retest-walkthrough-4.md; first scan 146-211 s, debrief reached on desktop/phone; landscape stalled on seabed warning]. Follow-ups U-seabed-warning-action (DONE 2026-11-07 (e0f60c5c): warning names the rise cue, latch + scan card wins), U-depth-card-level-approach (extends 10), U-scan-interrupt-cue, U-side-find-clarity, U-ctrl-tip-timing, U-objective-two-cues, U-scan-prompt-copy (Haiku-sized copy fixes). Old text: [Haiku, TOP (Sol: first-five-minutes acceptance is blocker 1; walkthrough-3 used POI poses and a paused clock, landscape journey got no scan in 7 min)]:** real clock, no teleported poses, served SHA verified; unassisted capture at 1280x720, 390x844 and 844x390 (served SHA verified), Home to debrief; file confusions as U-* items.
-8. **V-golden-refresh [Haiku]:** run `GOLDEN_MODE=mission tools/golden.sh` detached after items 1-3 and note changed frames; feeds the next review.
-9. **V-axial-sky-band [Sonnet, optional]:** Axial upper third is empty dark water; enable `horizonRidge` in its preset data (generic option already exists).
+Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIEWS.md`. Partial art items (all marked "partial" earlier) are re-listed here with their remaining gap so nothing is lost when DONE items go to the archive.
+
+1. **U-ci-monterey-catalog [Haiku, TOP: CI red]:** hosted CI fails only `hud-touch.spec.ts:1814` "catalog tutorial and reload" for `monterey-canyon` (4.0 min timeout, several viewports; every other site passes). Locally it passes in seconds, so the cost is the seabed-latch wait inside `away()` under software GL. Make the spec cheaper for this site (fewer frames per try, or move the sub clear of the 25 m latch in one step) and check per-case time with `--repeat-each`. No product change. Brief 151 (Codex) is the same item; whichever lands first wins.
+2. **U-retest-walkthrough-5 [Haiku]:** unaided, real-clock journeys (desktop, portrait, landscape) on the current build, Titanic and Blue Hole, including scan recovery at 15-25 m altitude (does the seabed latch hide a ready-to-scan prompt?), the closer Blue Hole opening, Journal and debrief. File confusions as U-* items. Sol: scripted walkthrough-4 is not acceptance.
+3. **V-monterey-wall-face:** opening is striped rock with no clear wall face (Sol 3, me 3.8 by opening). Target: one wall face centre-right with the marker on it. Site data (scan target onto the pale face, pose) plus a generic scarp distance fade of displacement.
+4. **V-titanic-detail-plates:** opening is now rust-brown (4.1), but the detail frame (`titanic-3.png`) still has pale regular plating and angular rusticles. Shared plate shader: irregular seams, per-plate tone variance, rounded rusticles. Also helps Bismarck.
+5. **V-bismarck-hull-plates:** hull reads as a pale green-grey flat slab on a dome (opening 3-3.5; no demonstrated regression, plating was already pale). Target: darker streaked plating with broken seams (shared shader with 4), scour visible as a darker rim, far horizon not a perfect dome. Do not flatten the seamount flank (`data/landmarks/bismarck/guide.json`).
+6. **V-bluehole-gallery-2:** gallery is ~18% of frame width in the opening (3.5). Next lever: a larger gallery prop or an apron-clearing approach (moves the free-dive hero pose too); apron still lacks fine silt grain and ripples. Re-check scan reach (the closer opening changed it).
+7. **V-beebe-chimney-stacks:** still a broad folded cone (`beebe-vent-field-3.png`); a vent bore alone will not fix the silhouette. Target: separated slim stacks with a vent orifice, via shelf/stack placement in site data plus the shared builder.
+8. **V-lostcity-tower-forms:** readable cluster, but smooth forms and faceted hollow tubes in `lost-city-3.png`. Target: irregular tower profiles and rounded tubes.
+9. **U-copy-fixes [Haiku]:** U-depth-card-level-approach (extends 12), U-scan-interrupt-cue, U-side-find-clarity, U-ctrl-tip-timing, U-objective-two-cues, U-scan-prompt-copy (from walkthrough-4, `plan/progress/U-retest-walkthrough-4.md`).
+10. **V-golden-refresh [Haiku]:** `GOLDEN_MODE=mission tools/golden.sh` detached after items 3-8 land; feeds the next review.
+11. **V-axial-sky-band [optional]:** Axial upper third is empty dark water; enable `horizonRidge` in its preset data (generic option already exists).
 
 ### Codex lane (self-contained, not visual)
 
-10. **U-depth-step-skip [Codex, brief 149, rewritten 2026-11-07]:** the 15 m skip already exists (Tutorial.ts); reproduce why walkthrough-3 still saw the step for 3-7 min (targetGapM undefined?) and fix only that gap, or report not reproducible.
-11. **U-journal-open-current [Codex, brief 150, rewritten 2026-11-07]:** current-site opening already exists (Journal.ts); find the cold-load case that still shows 'Loading the Journal...' / All dive sites breadcrumb, fix that only.
-12. **S-verify-endurance-relief / T-verify-endurance-hull-pose / S-bughunt-scan-journal [Codex, briefs 146-148]:** verification and bug hunt over merged work; briefs 124/131 (R-ci-speed) stay held.
-13. **R-ci-speed [Codex, held 124/131]:** hosted CI takes 25-30 min; target under 20 min without dropping coverage; 124 was not merged (unmeasured, may flake), 131 is a workflow_dispatch experiment.
+12. **U-depth-step-skip [Codex, brief 149, rewritten 2026-11-07]:** the 15 m skip already exists (Tutorial.ts); reproduce why walkthrough-3 still saw the step for 3-7 min (targetGapM undefined?) and fix only that gap, or report not reproducible.
+13. **U-journal-open-current [Codex, brief 150, rewritten 2026-11-07]:** current-site opening already exists (Journal.ts); find the cold-load case that still shows 'Loading the Journal...' / All dive sites breadcrumb, fix that only.
+14. **S-verify-endurance-relief / T-verify-endurance-hull-pose / S-bughunt-scan-journal [Codex, briefs 146-148]:** verification and bug hunt over merged work; briefs 124/131 (R-ci-speed) stay held.
+15. **R-ci-speed [Codex, held 124/131]:** hosted CI takes 25-30 min; target under 20 min without dropping coverage; 124 was not merged (unmeasured, may flake), 131 is a workflow_dispatch experiment.
 
 ### Release and owner
 
-14. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
-15. **R-release [Haiku]:** tag the newest green-CI main after each review (f75 newest, 2026-11-06); next tag f76 once CI on main is green.
+16. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
+17. **R-release [Haiku]:** tag the newest green-CI main after each review (f75 newest, 2026-11-06); next tag f76 once CI on main is green (blocked by item 1).
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16), per-plate blockiness, Hunga silhouette (4.0, parked), V-bismarck-hull-scale (superseded by 3).
 

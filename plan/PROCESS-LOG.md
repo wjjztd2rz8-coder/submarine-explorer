@@ -405,3 +405,8 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 ## 2026-11-07
 
 - Review: Sol caught two queued briefs (149, 150) that asked for fixes already in the code; briefs are now reproduce-the-gap tasks. Rule: before queuing a Codex brief from a walkthrough finding, grep the code for an existing fix. Golden and reconcile exceed the foreground cap, so run both detached.
+
+## 2026-11-07 (evening review)
+
+- Claude weekly burn ~28%/day with 5 days to reset: limit each headless run to one package (Haiku first). Reason: efficiency.sh projects run-out in ~1.8 days.
+- Hosted-CI triage: `gh api repos/{owner}/{repo}/actions/jobs/<id>/logs | grep ✘` lists failing specs when `gh run view --log-failed` returns nothing. Spec-only fixes need a per-site, per-viewport cost check (`--repeat-each`), not just a local pass.

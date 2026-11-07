@@ -1,5 +1,19 @@
 # Reviews
 
+## 2026-11-07 evening comprehensive review (trigger: 8+ merges, CI red 3 runs; joint with Codex Sol, one reconcile round)
+
+- **Stage (agreed):** about 85% to 1.0; **4-6 weeks** (Claude 86% / 4-5 weeks, Sol 83% / 4-6; Sol's range kept, since art throughput is limited). Golden `2026-11-07-180922` vs `2026-11-07-055753`.
+- **Changed since the last review:** V-bluehole-apron-silt, V-bluehole-opening-gallery, V-bismarck-ground-scour, V-beebe-chimney-form, V-titanic-hull-tone (all partial), U-seabed-warning-action, U-retest-walkthrough-4, two CI fixes for the hud-touch catalog spec.
+- **Scores.** Openings (Claude): Titanic 4.1 (hull now dark rust: the one clear gain), Lost City 4.1, Beebe 4.0, Monterey 3.8, Blue Hole 3.5, Bismarck 3.2. Whole-site beauty at release scope (Sol, accepted as the release measure): Titanic 3.5, Lost City 3.5, Beebe 3.5, Blue Hole 3, Monterey 3; Bismarck opening 3-3.5.
+- **Disputes settled on evidence:** I drafted a Bismarck regression; Sol showed both dated captures already had pale plating on a dome, so it is not a regression (dropped). Blue Hole gallery grew ~15% to ~18% of frame width (Sol, from the progress note; accepted). Sol corrected that Pages deploys only after CI for the SHA succeeds. Still disputed: Claude would rank hero visuals and Bismarck below first-session usability less than Sol does; both orders are in the backlog (item 2 then 3-8).
+- **Missed by both drafts, found by Sol:** the seabed-warning fix may hide a ready-to-scan prompt at 15-25 m altitude; the closer Blue Hole spawn changed scan reach; marking partial art DONE risks losing the unresolved gap (fixed: remaining gaps are now re-listed as items 3-8).
+- **Biggest gaps:** (1) unaided current-build journeys on desktop and both phone orientations (walkthrough-4 was scripted), (2) hero detail materials: Titanic plates, Blue Hole gallery/apron, Beebe cone, Monterey wall, Lost City tubes, (3) real-phone Low-tier acceptance, (4) green hosted CI and a shorter release run, (5) Bismarck grounding.
+- **CI diagnosis:** hosted failures are now only `hud-touch.spec.ts:1814` catalog case for `monterey-canyon` (4 min timeout, several viewports). Other sites pass; my earlier latch fixes did not remove the Monterey cost. Queued as item 1 (Haiku) and Codex brief 151.
+- **Play flow:** not re-captured; relied on walkthrough-4 (desktop/phone reached the debrief, first objective scan 146-211 s) and queued walkthrough-5.
+- **Process:** Claude week 51% left at ~28%/day with 5 days to reset (projected run-out in ~1.8 days), so Claude runs are limited to one package each; Codex week 23% left, ~5%/day. 0 failed timer runs in 24 h. Lesson: a spec-only fix needs a per-site, per-viewport cost check; a local pass does not predict hosted time.
+- **New priorities:** U-ci-monterey-catalog, U-retest-walkthrough-5, V-monterey-wall-face, V-titanic-detail-plates, V-bismarck-hull-plates; Codex 146-151 queued.
+- **Needs owner:** phone retest (4410-P2 checklist).
+
 ## 2026-11-07 targeted review (trigger: CI red on main for 3 runs)
 
 - **Diagnosis:** failing specs were all `hud-touch.spec.ts` "catalog tutorial and reload" cases (about 22 of 36 sites x viewports across shards), each ending in the 240 s test timeout, not an assertion. Same shards took ~1200 s vs ~665 s on the last green run.
