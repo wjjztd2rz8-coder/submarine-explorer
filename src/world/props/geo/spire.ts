@@ -88,8 +88,9 @@ export function trunkCrest(
 /** Smooth, noise-free radius at height fraction t: the profile colliders and flanges follow. */
 export function spireRadius(o: SpireOpts, t0: number): number {
   const t = Math.min(1, Math.max(0, t0));
-  const taper = 1 - (1 - o.topFrac) * Math.pow(t, 0.8);
-  const flare = 1 + (o.flare ?? 0) * Math.exp(-t * 9);
+  // Crusted stacks hold their girth higher up before narrowing: columns, not cones.
+  const taper = 1 - (1 - o.topFrac) * Math.pow(t, o.crust ? 1.25 : 0.8);
+  const flare = 1 + (o.flare ?? 0) * (o.crust ? 0.45 : 1) * Math.exp(-t * 9);
   let ledge = 1;
   if (o.tiers) {
     const u = t * o.tiers;
@@ -177,11 +178,16 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
         f = plain === 0 ? 0 : plain * (1 + (f / plain - 1) * smooth(0.25, 0.7, m) * 1.7);
       }
       // Elliptical, twisting cross-section plus broad lumps: no lathe-like symmetry.
-      f *= 1 + irr * (o.trunk ? 0.1 : 0.22) * Math.cos(2 * (ang - t * 2.4 - o.seed * 0.37));
+      // Crusted sulfide stacks are rounder in section: big ellipses and lumps fold into slabs.
       f *=
         1 +
         irr *
-          (o.trunk ? 0.2 : 0.5) *
+          (o.trunk ? 0.1 : o.crust ? 0.07 : 0.22) *
+          Math.cos(2 * (ang - t * 2.4 - o.seed * 0.37));
+      f *=
+        1 +
+        irr *
+          (o.trunk ? 0.2 : o.crust ? 0.2 : 0.5) *
           (fbm3(Math.cos(ang) * 2.4 + 1, y * 0.05, Math.sin(ang) * 2.4 + 1, o.seed + 77, 2) - 0.5);
     }
     f *= 1 + (n - 0.5) * 2 * wob;
@@ -189,7 +195,23 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
       const b = crustBand(ang, y, o.seed);
       const nod = fbm3(Math.cos(ang) * 7 + 2, y * 1.7, Math.sin(ang) * 7 + 2, o.seed + 67, 2);
       // Overhanging crust flanges, pitted by knobbly sulfide nodules; fades near the rim.
-      f *= 1 + o.crust * (0.38 * (b.lip - 0.1) + (nod - 0.5) * 0.2) * (1 - smooth(0.9, 1, t));
+      f *= 1 + o.crust * (0.26 * (b.lip - 0.1) + (nod - 0.5) * 0.2) * (1 - smooth(0.9, 1, t));
+    }
+    if (o.crust) {
+      // Flange breaks: a few jittered, partial collars. Each swells out abruptly, is
+      // undercut beneath, and fades around the column, so the profile steps like a stacked
+      // chimney rather than one folded sheet.
+      const u = y / (1.1 + 1.5 * hash1(Math.floor(y / 1.6) + o.seed)) + hash1(o.seed) * 4;
+      const fu = u - Math.floor(u);
+      const side = fbm3(
+        Math.cos(ang) * 1.4 + 3,
+        Math.floor(u) * 2.7,
+        Math.sin(ang) * 1.4 + 3,
+        o.seed + 83,
+        2,
+      );
+      const collar = smooth(0, 0.1, fu) * Math.pow(1 - fu, 2.4) - 0.5 * smooth(0.82, 1, fu);
+      f *= 1 + 0.22 * o.crust * collar * smooth(0.42, 0.62, side) * (1 - smooth(0.88, 1, t));
     }
     if (o.rough)
       f *=
@@ -231,7 +253,13 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
       // back over it, so the rim has body instead of a paper edge.
       if (o.trunk) f *= 1 + 0.2 * (smooth(0.84, 0.94, t) - 0.65 * smooth(0.975, 1, t));
     }
-    p.setXYZ(i, x * f, yy, z * f);
+    // Crusted stacks wander off a straight axis, more toward the top: a column, not a cone.
+    const bend =
+      o.crust && o.irregular
+        ? o.r0 * 0.7 * t * t * (fbm3(y * 0.07, 2, o.seed * 0.1, o.seed + 5, 2) - 0.5) * 2
+        : 0;
+    const bendAng = o.seed * 1.7;
+    p.setXYZ(i, x * f + Math.cos(bendAng) * bend, yy, z * f + Math.sin(bendAng) * bend);
   }
   g.deleteAttribute('uv');
   g.computeVertexNormals();
