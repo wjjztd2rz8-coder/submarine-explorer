@@ -1,25 +1,25 @@
-# Status (2026-11-06 comprehensive review, Claude + Codex Sol, one reconcile round)
+# Status (2026-11-07 comprehensive review, Claude + Codex Sol, one reconcile round)
 
-**Stage:** about 85% to 1.0; 4-5 weeks. Hosted CI is green; **f75** is the newest tag and Pages is deployed.
+**Stage:** about 85% to 1.0; 4-6 weeks. **f75** is the newest tag; Pages is deployed.
 
 ## 1.0 table
 
-| Requirement                               | State                                                                                                                                                         |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Five heroes beautiful (4 of 5)            | Openings: Beebe 4.1, Lost City 4.1, Titanic 3.9, Monterey 3.8, Blue Hole 3.8. Counting approach and detail (Sol): 3-3.5; none holds 4 yet. Close-ups are next |
-| Other eight sites coherent                | Endurance 4.0 opening, Bismarck 3.5 (dome horizon, slab hull), Axial ~4.0; Blake and Hunga need another pass                                                  |
-| New player understands first five minutes | Evidence is stale (last unaided capture Nov 2); a fresh unassisted run is the top item                                                                        |
-| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great; weaker phones and Medium untested                                                                                                    |
-| Hosted CI green, releases tagged          | Green; f75 tagged                                                                                                                                             |
-| Code simple enough                        | Dead-code and verification sweeps merged                                                                                                                      |
+| Requirement                               | State                                                                                                                                        |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Five heroes beautiful (4 of 5)            | Whole-site (Sol): Titanic 3.5, Lost City 3.5, Beebe 3, Blue Hole 3, Monterey 3. Openings are 3.5-4.1 (Claude). None holds 4 at all distances |
+| Other eight sites coherent                | Bismarck 3.4 (hull still floats); Endurance, Axial about 4.0; Blake and Hunga need a pass                                                    |
+| New player understands first five minutes | Not yet verified unaided on current code (top item)                                                                                          |
+| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great; weaker phones untested                                                                                              |
+| Hosted CI green, releases tagged          | Green at last tag; CI takes 25-30 min                                                                                                        |
+| Code simple enough                        | Sweeps merged                                                                                                                                |
 
 ## Done recently
 
-CI red fixed, Lost City tower scale and fluted towers, Hudson ledge, Bismarck debris, Endurance seabed and hull framing, deploy gate kept, golden.sh stale-server guard.
+Titanic, Blue Hole and Beebe material shaders, horizon haze for empty upper water, Monterey marker centred on the crest, Side find card, walkthrough-3.
 
 ## Left
 
-Unaided first-five-minutes check, close-up materials (Titanic, Blue Hole, Beebe), Monterey marker, Bismarck dome horizon, horizon haze for empty upper water, weaker-phone performance, release verification time.
+Unaided first-five-minutes run, Blue Hole apron and opening gallery, Beebe chimney shape, Monterey wall face, Bismarck grounding, Low-tier check, release verification time.
 
 ## Needs owner
 

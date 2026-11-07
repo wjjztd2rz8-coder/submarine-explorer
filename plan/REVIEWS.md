@@ -1,5 +1,17 @@
 # Reviews
 
+## 2026-11-07 comprehensive review (trigger: 8+ merges; joint with Codex Sol, one reconcile round)
+
+- **Stage (agreed):** about 85% to 1.0; **4-6 weeks** (Claude said ~4; Sol's range kept, since geometry work remains and throughput is limited). Golden `2026-11-07-055753` vs `2026-11-06-121541`. Hosted CI for the newest main commits was still running when written; f75 is the newest tag.
+- **Changed since the last review:** V-monterey-wall-marker (partial), V-horizon-upper-half (haze bank on the dome), V-closeup-materials for Titanic, Blue Hole and Beebe, U-scan-fish-vs-objective (Side find card), U-play-walkthrough-3.
+- **Scores.** Openings / detail (Claude): Titanic 3.9/4.0, Lost City 4.1/4.1, Beebe 4.0/3.6, Blue Hole 3.5/3.4, Monterey 3.7/3.7, Bismarck 3.4. Whole-site release scores (Sol): Titanic 3.5, Lost City 3.5, Beebe 3, Blue Hole 3, Monterey 3. **Still disputed:** Claude scores Titanic and Lost City detail at 4+ (rust streaks, fluting), Sol holds 3.5 (pale even panelling and angular rusticles on Titanic; thin faceted hollow tubes on Lost City). The 1.0 bar needs 4 at all three distances, so Sol's numbers are the release scores; none of the five holds 4.
+- **Corrections credited to Sol (checked):** the Blue Hole "regression" I drafted is not real (framing is numerically the same as last set; my 3.8 was generous, 3.5 is the opening score). Briefs 149 and 150 asked for fixes that already exist (`Tutorial.ts` DEPTH_SKIP_M, `Journal.ts` current-site opening): rewritten to reproduce-the-gap tasks. U-play-walkthrough-3 used POI poses and a paused clock, so first-five-minutes acceptance is still open and is now the top item (I had ranked it fifth). Material gains on Beebe and Blue Hole do not fully transfer to the Low tier (normal grain and pit relief omitted). Monterey's contact-stress assertion now stops at the first scan.
+- **Biggest gaps:** (1) unaided first-five-minutes evidence on current code, (2) Blue Hole apron terraces and small gallery in the opening, (3) Beebe chimney geometry, (4) Monterey wall face, (5) Bismarck grounding, (6) Low-tier phone check, (7) release verification time.
+- **Play flow:** not re-captured; relied on walkthrough-3 notes (see above, treated as not accepted).
+- **Process:** efficiency: Claude week 66% (~20%/day), Codex week 28% (~6%/day; 5h empty periods earlier are dispatcher pacing), 0 failed timer runs in 24 h, no new gate problems. Golden and reconcile each need detached runs (over the 10 min foreground cap). Backlog rewritten: stale DONE/TRIED/duplicate lines moved to `plan/archive/DIRECTOR-HISTORY-2026-11-07-backlog.md`.
+- **New priorities:** U-retest-walkthrough-4 (Haiku, top), V-bluehole-apron-silt, V-bluehole-opening-gallery, V-bismarck-ground-scour, V-beebe-chimney-form, V-monterey-wall-face, V-titanic-hull-tone; Codex 146-150 queued (149/150 rewritten).
+- **Needs owner:** phone retest (4410-P2 checklist).
+
 ## 2026-11-06 comprehensive review (trigger: new release tag f75; joint with Codex Sol, one reconcile round)
 
 - **Stage (agreed):** about 85% to 1.0; 4-5 weeks (Claude opened at 87% and 3 weeks; Sol 84% and 4-6). Golden `2026-11-06-121541` vs `2026-11-05-222844`. CI green (f75 on ee88224e, Pages deployed); f75 predates the Lost City pose merge, so the golden depicts newer code.

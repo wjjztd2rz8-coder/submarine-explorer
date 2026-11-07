@@ -401,3 +401,7 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 ## 2026-11-06 golden.sh stale-server guard
 
 - Sol found that `tools/golden.sh` broke out of its wait loop on the first successful curl, so a stale server already on the port could satisfy it and produce old-code captures (a Blue Hole journey captured nothing for that reason). The loop now checks its own preview process first and exits if it died (port busy).
+
+## 2026-11-07
+
+- Review: Sol caught two queued briefs (149, 150) that asked for fixes already in the code; briefs are now reproduce-the-gap tasks. Rule: before queuing a Codex brief from a walkthrough finding, grep the code for an existing fix. Golden and reconcile exceed the foreground cap, so run both detached.
