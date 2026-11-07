@@ -114,8 +114,12 @@ if (site.viaPrimary) {
   note('tap-menu', 'Dive sites');
   await tapOrClick(page.getByRole('button', { name: 'Dive sites', exact: true }).first());
   await page.waitForTimeout(700);
-  const row = page.locator(`.mission-item.is-mission[data-mission="${site.mission}"]`).first();
-  await row.waitFor({ state: 'attached', timeout: 15000 });
+  // The same mission can appear in a hidden list too (the free-dive copy): take the visible row.
+  const row = page
+    .locator(`.mission-item.is-mission[data-mission="${site.mission}"]`)
+    .filter({ visible: true })
+    .first();
+  await row.waitFor({ state: 'visible', timeout: 15000 });
   if (layout.touch && (await page.locator('.home-sites.is-collapsed').count())) {
     note('tap-sheet-grab', 'Show all sites (bottom sheet was collapsed)');
     await tapOrClick(page.locator('.home-sites-grab').first());
