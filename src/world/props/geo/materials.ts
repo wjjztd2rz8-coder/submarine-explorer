@@ -124,3 +124,92 @@ export function canyonRockDetail(m: THREE.MeshStandardMaterial, strength: number
   };
   m.customProgramCacheKey = () => `${cacheKey}-canyon-detail-${strength}`;
 }
+
+/**
+ * Limestone weathering for karst walls and sediment ledges: solution pits at two scales, dark
+ * stain streaks running down the face and a paler silt film on shallow slopes. Wall-projected
+ * value noise on world position (no UVs, no texture fetches), so it layers over any vertex-painted
+ * material. `pits` and `streaks` are albedo strengths; `bumps` > 0 also perturbs the normal
+ * (detail tiers only; pass 0 on Low, which keeps just the albedo).
+ */
+export function limestoneWeathering(
+  m: THREE.MeshStandardMaterial,
+  o: { pits: number; streaks: number; bumps: number },
+): void {
+  const compile = m.onBeforeCompile;
+  const cacheKey = m.customProgramCacheKey();
+  m.onBeforeCompile = (shader, renderer) => {
+    compile.call(m, shader, renderer);
+    shader.vertexShader =
+      'varying vec3 vKarstPos;\n' +
+      shader.vertexShader.replace(
+        '#include <begin_vertex>',
+        '#include <begin_vertex>\nvKarstPos = (modelMatrix * vec4(transformed, 1.0)).xyz;',
+      );
+    shader.fragmentShader =
+      /* glsl */ `varying vec3 vKarstPos;
+float karstHash(vec2 i) { return fract(sin(dot(i, vec2(127.1, 311.7))) * 43758.5453); }
+float karstNoise(vec2 p) {
+  vec2 i = floor(p), f = fract(p), u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(karstHash(i), karstHash(i + vec2(1.0, 0.0)), u.x), mix(karstHash(i + vec2(0.0, 1.0)), karstHash(i + 1.0), u.x), u.y);
+}
+// Round pits, one per lattice cell at a random point: x = depth 0..1, yz = slope.
+vec3 karstPits(vec2 p) {
+  // Warp and stretch along the fall line so pockets read as dissolved runnels, not round dimples.
+  p += 1.1 * vec2(karstNoise(p * 0.6 + 2.0), karstNoise(p * 0.6 + 11.0)) - 0.55;
+  p.y *= 0.55;
+  vec2 i = floor(p);
+  vec3 acc = vec3(0.0);
+  for (int y = -1; y <= 1; y++) {
+    for (int x = -1; x <= 1; x++) {
+      vec2 c = i + vec2(float(x), float(y));
+      if (karstHash(c + 71.7) < 0.6) continue;
+      vec2 d = p - (c + 0.2 + 0.6 * vec2(karstHash(c), karstHash(c + 17.31)));
+      float r = 0.3 + 0.45 * karstHash(c + 5.5);
+      float q = 1.0 - dot(d, d) / (r * r);
+      if (q <= 0.0) continue;
+      acc.x += q * q;
+      acc.yz += (-4.0 * q / (r * r)) * d;
+    }
+  }
+  return acc;
+}
+` +
+      shader.fragmentShader.replace(
+        '#include <normal_fragment_maps>',
+        /* glsl */ `#include <normal_fragment_maps>
+{
+  vec3 kp = vKarstPos;
+  vec3 wn = inverseTransformDirection(normal, viewMatrix);
+  vec2 pw = vec2(abs(wn.z), abs(wn.x));
+  pw /= max(pw.x + pw.y, 1e-3);
+  float kd = length(vViewPosition);
+  float fine = 1.0 - smoothstep(35.0, 110.0, kd);
+  float far = 1.0 - smoothstep(110.0, 300.0, kd);
+  // Pits: ~1 m solution pockets near, ~3.5 m and ~9 m hollows carrying the face at range.
+  vec3 a1 = karstPits(kp.xy * 0.95) * fine, b1 = karstPits(kp.zy * 0.95 + 9.0) * fine;
+  vec3 a2 = karstPits(kp.xy * 0.29 + 40.0), b2 = karstPits(kp.zy * 0.29 + 70.0);
+  vec3 a3 = karstPits(kp.xy * 0.11 + 90.0), b3 = karstPits(kp.zy * 0.11 + 120.0);
+  float steep = smoothstep(0.15, 0.5, 1.0 - abs(wn.y));
+  float pit = (0.6 * (a1.x * pw.x + b1.x * pw.y) + (a2.x * pw.x + b2.x * pw.y) + 1.2 * (a3.x * pw.x + b3.x * pw.y)) * steep;
+  // Streaks: long vertical stains, stretched in height, with a fine broken second layer.
+  float s1 = karstNoise(vec2(kp.x * 0.8, kp.y * 0.07) + 3.7) * pw.x + karstNoise(vec2(kp.z * 0.8, kp.y * 0.07) + 8.1) * pw.y;
+  float s2 = karstNoise(vec2((kp.x + kp.z) * 2.4, kp.y * 0.3) + 1.3);
+  float streak = smoothstep(0.42, 0.68, s1 * 0.7 + s2 * 0.3) * steep * far;
+  // Silt film on shallow slopes, in broad patches.
+  float silt = smoothstep(0.45, 0.2, 1.0 - abs(wn.y)) * smoothstep(0.4, 0.75, karstNoise(kp.xz * 0.21 + 5.0));
+  diffuseColor.rgb *= 1.0 - ${o.pits.toFixed(3)} * smoothstep(0.05, 0.9, pit) * far - ${o.streaks.toFixed(3)} * streak;
+  diffuseColor.rgb *= mix(vec3(1.0), vec3(0.8, 0.85, 0.95), 0.6 * streak);
+  diffuseColor.rgb *= mix(vec3(1.0), vec3(1.14, 1.1, 1.0), 0.5 * silt);
+  if (${o.bumps.toFixed(3)} > 0.0) {
+    vec3 g = vec3((a1.y + 0.3 * a2.y) * pw.x, (a1.z + 0.3 * a2.z) * pw.x + (b1.z + 0.3 * b2.z) * pw.y, (b1.y + 0.3 * b2.y) * pw.y);
+    g = mat3(viewMatrix) * g;
+    g -= normal * dot(normal, g);
+    normal = normalize(normal - g * ${o.bumps.toFixed(3)} * steep * far);
+  }
+}
+`,
+      );
+  };
+  m.customProgramCacheKey = () => `${cacheKey}-karst-${o.pits}-${o.streaks}-${o.bumps}`;
+}
