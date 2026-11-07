@@ -3330,3 +3330,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged Sonnet V-bluehole-apron-silt (partial ~3.5/5: apron beds sway and slump, rocks vary; no fine grain/ripple yet; four Blue Hole buffer-hash snapshots rebaselined) and Haiku U-retest-walkthrough-4 (real clock, 3 viewports, SHA cbafe783). Findings: first scan 146-211 s, debrief reached on desktop/phone; landscape sat on the seabed ~8 min on "WARNING SEABED PROXIMITY" with no named action. 8 candidate U-* items added to DIRECTOR (top: U-seabed-warning-action). Prettier fix on archive file. Agents took ~78 min each in parallel. Codex 146-150 still queued (weekly pacing).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-07 03:07 CST headless run (Claude): U-seabed-warning-action
+
+- Merged Sonnet U-seabed-warning-action: seabed warning now reads "SEABED CLOSE · <rise cue>" (touch: slider up; keyboard/pad use the bound key), a `SeabedWarningLatch` (hold 3 s, clear above 25 m, config) stops the flicker, and a live scan card keeps the guidance slot unless contact is imminent. gates smoke + project-base green on branch and main; pushed. No fresh screenshot (HUD text): glance at the next walkthrough. Agent took ~11 min plus a slow unit stage (~50 min of load). Codex 146-150 still queued (weekly pacing); 124/131 held. Next: V-bluehole-opening-gallery, U-* copy fixes (Haiku).
+- **Needs owner:** phone retest (4410-P2 checklist).
