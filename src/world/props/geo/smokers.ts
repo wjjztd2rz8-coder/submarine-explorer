@@ -11,7 +11,7 @@
 import * as THREE from 'three';
 import { propManifest } from '../../../core/SiteManifest.js';
 import { geoDetail } from './detail.js';
-import { geoMaterial, LIFE_TINT, mineralCrust, vertexGlow } from './materials.js';
+import { geoMaterial, LIFE_TINT, mineralCrust, sulfideCrust, vertexGlow } from './materials.js';
 import { shimmerPlume, smokePlume, smokePlumeReach, smokePlumeTop } from './plume.js';
 import { paintCrust } from './crust.js';
 import { flange, tieredSpire } from './spire.js';
@@ -231,6 +231,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   // self-lit tint that follows the pale and rusty parts of the crust.
   bodyMat.color.multiplyScalar(profile ? profile.bodyShade : 1.25);
   vertexGlow(bodyMat, profile ? profile.bodyGlow : 0.13, 0xff9a68, 0.5);
+  sulfideCrust(bodyMat, { stain: 0.7, film: 0.6, grain: d.bump ? 0.18 : 0 });
   const body = new THREE.Mesh(geom, bodyMat);
   body.name = 'smoker-body';
   full.add(body);

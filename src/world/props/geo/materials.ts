@@ -213,3 +213,76 @@ vec3 karstPits(vec2 p) {
   };
   m.customProgramCacheKey = () => `${cacheKey}-karst-${o.pits}-${o.streaks}-${o.bumps}`;
 }
+
+/**
+ * Hydrothermal sulfide crust for chimney bodies: rough mineral grain at two scales, dark
+ * sulfide stain pooling in hollows and running down steep faces, and a pale microbial film on
+ * shallow shelves. Value noise on world position (no UVs, no texture fetches) over the vertex
+ * colours, so every vent site using the shared chimney builders gets it. `grain` is the normal
+ * perturbation strength (detail tiers only; pass 0 on Low, which keeps just the albedo).
+ */
+export function sulfideCrust(
+  m: THREE.MeshStandardMaterial,
+  o: { stain: number; film: number; grain: number },
+): void {
+  const compile = m.onBeforeCompile;
+  const cacheKey = m.customProgramCacheKey();
+  m.onBeforeCompile = (shader, renderer) => {
+    compile.call(m, shader, renderer);
+    shader.vertexShader =
+      'varying vec3 vSulfPos;\n' +
+      shader.vertexShader.replace(
+        '#include <begin_vertex>',
+        '#include <begin_vertex>\nvSulfPos = (modelMatrix * vec4(transformed, 1.0)).xyz;',
+      );
+    shader.fragmentShader =
+      /* glsl */ `varying vec3 vSulfPos;
+float sulfHash(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
+float sulfNoise(vec3 p) {
+  vec3 i = floor(p), f = fract(p), u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(mix(sulfHash(i), sulfHash(i + vec3(1,0,0)), u.x), mix(sulfHash(i + vec3(0,1,0)), sulfHash(i + vec3(1,1,0)), u.x), u.y),
+             mix(mix(sulfHash(i + vec3(0,0,1)), sulfHash(i + vec3(1,0,1)), u.x), mix(sulfHash(i + vec3(0,1,1)), sulfHash(i + vec3(1,1,1)), u.x), u.y), u.z);
+}
+// Crust relief: broken mineral islands (coarse) over knobbly grain (fine); 0..1.
+float sulfRelief(vec3 p, float fine) {
+  float coarse = sulfNoise(p * 2.2);
+  float knob = sulfNoise(p * 9.0) * 0.6 + sulfNoise(p * 21.0) * 0.4;
+  return coarse * 0.6 + knob * 0.4 * fine;
+}
+` +
+      shader.fragmentShader.replace(
+        '#include <normal_fragment_maps>',
+        /* glsl */ `#include <normal_fragment_maps>
+{
+  vec3 sp = vSulfPos;
+  vec3 wn = inverseTransformDirection(normal, viewMatrix);
+  float kd = length(vViewPosition);
+  float fine = 1.0 - smoothstep(18.0, 70.0, kd);
+  float far = 1.0 - smoothstep(70.0, 220.0, kd);
+  float steep = smoothstep(0.2, 0.7, 1.0 - abs(wn.y));
+  float h = sulfRelief(sp, fine);
+  // Stain: dark sulfide pooling in the low patches, plus long streaks stretched in height.
+  float pool = smoothstep(0.5, 0.3, h);
+  float streak = smoothstep(0.5, 0.78, sulfNoise(vec3(sp.x * 3.1, sp.y * 0.35, sp.z * 3.1) + 4.0)) * steep;
+  float stain = clamp(0.6 * pool + 0.7 * streak, 0.0, 1.0) * far;
+  // Microbial film: pale, patchy, on shelves and the upper rims of the crust islands.
+  float shelf = smoothstep(0.25, 0.75, wn.y);
+  float film = smoothstep(0.55, 0.8, sulfNoise(sp * 1.3 + 9.0) * 0.7 + h * 0.3) * (0.35 + 0.65 * shelf) * far;
+  diffuseColor.rgb *= 1.0 - ${o.stain.toFixed(3)} * stain;
+  diffuseColor.rgb *= mix(vec3(1.0), vec3(0.9, 0.82, 0.74), 0.5 * stain);
+  diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(1.18, 1.14, 1.0) + vec3(0.02), ${o.film.toFixed(3)} * film);
+  if (${o.grain.toFixed(3)} > 0.0) {
+    vec3 sPos = -vViewPosition;
+    vec3 dpx = dFdx(sPos), dpy = dFdy(sPos);
+    float dhx = dFdx(h), dhy = dFdy(h);
+    vec3 r1 = cross(dpy, normal), r2 = cross(normal, dpx);
+    float det = dot(dpx, r1);
+    vec3 grad = sign(det) * (dhx * r1 + dhy * r2);
+    normal = normalize(abs(det) * normal - grad * ${o.grain.toFixed(3)} * (0.4 + 0.6 * fine) * far);
+  }
+}
+`,
+      );
+  };
+  m.customProgramCacheKey = () => `${cacheKey}-sulfide-${o.stain}-${o.film}-${o.grain}`;
+}
