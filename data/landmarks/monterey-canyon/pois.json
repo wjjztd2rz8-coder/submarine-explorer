@@ -63,7 +63,7 @@
       "id": "monterey-canyon-wall",
       "name": "North canyon wall",
       "lat": 36.7872,
-      "lon": -122.0120,
+      "lon": -122.0113,
       "snap_to_seabed": true,
       "radius_m": 200,
       "kind": "geology",
