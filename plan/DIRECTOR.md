@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: none. Last merged 2026-11-07: V-bluehole-apron-silt, U-retest-walkthrough-4. Last merged 2026-11-06: U-scan-fish-vs-objective (62cc2f0e). Codex 146-150 queued (held by weekly pacing, 28% left); 124/131 held.
+- Claude IN FLIGHT (2026-11-07): U-ci-monterey-objective-slot (CI red: hud-touch monterey chip spec after seabed warning latch), V-titanic-hull-tone. Last merged 2026-11-07: V-bluehole-apron-silt, U-retest-walkthrough-4. Last merged 2026-11-06: U-scan-fish-vs-objective (62cc2f0e). Codex 146-150 queued (held by weekly pacing, 28% left); 124/131 held.
 
 ## Backlog
 
