@@ -3310,3 +3310,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged Sonnet V-closeup-materials-beebe: shared `sulfideCrust` shader (crust grain, sulfide stain, pale film) on smoker/crust chimneys; shader only, so spires are still slab-like flanges (~3.5/5 by agent, I read ~5/10, up from ~4). One unit test key assertion changed to a prefix match. gates smoke + project-base green on branch and main (gates take >10 min: run them detached, not as harness background jobs). Agent took ~28 min. Codex 146-151 queued, 124/131 held. Next: U-scan-fish-vs-objective, Blue Hole sediment apron silt.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-06 21:21 CST headless run (Claude): light run
+
+- Nothing to collect: main clean and pushed, previous run merged V-closeup-materials-beebe minutes earlier; its CI is queued (tag waits). Skipped a new Sonnet package: Claude 5h at 69% with a reset at 22:40, too tight for a ~100 min agent. Codex 146-151 queued (held on weekly pace, 28% left); 124/131 held. Next: U-scan-fish-vs-objective, Blue Hole sediment apron silt.
+- **Needs owner:** phone retest (4410-P2 checklist).
