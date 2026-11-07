@@ -59,8 +59,8 @@
         "normalSampleM": 0.7,
         "contactShade": 0.18,
         "roughnessVariation": 0.1,
-        "riserShade": 0.2,
-        "lipLight": 0.12
+        "riserShade": 0.12,
+        "lipLight": 0.06
       }
     }
   }

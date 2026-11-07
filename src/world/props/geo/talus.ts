@@ -42,7 +42,9 @@ function talusBedTop(t: TalusShape, x: number, j: number): number {
   // Each bed also swells and leans along the wall (bounded, so neighbours converge and part
   // without crossing).
   const lean = (Math.abs(Math.sin(j * 7.31 + t.seed * 0.02) * 12543.17) % 1) - 0.5;
-  return bed * (j - 0.2 * pick * (0.4 + 1.2 * along) + 0.5 * lean * Math.sin(x * 0.04 + j * 2.1));
+  // Two wavelengths of lean, kept under half a bed per term so neighbours still never cross.
+  const sway = Math.sin(x * 0.04 + j * 2.1) + 0.5 * Math.sin(x * 0.11 + j * 4.3);
+  return bed * (j - 0.2 * pick * (0.4 + 1.2 * along) + 0.4 * lean * sway);
 }
 
 /** Sediment bed index at height `h`; the fractional part is the position within that bed. */
@@ -80,7 +82,11 @@ export function talusDepth(t: TalusShape, x: number, z: number): number {
   const stepped =
     lo + (talusBedTop(t, x, k + 1) - lo) * smooth(0, t.terraces.riserFraction, level - k);
   const lift = Math.max(0, stepped - h);
-  const mask = smooth(0.04, 0.18, u) * (1 - smooth(0.78, 1, u));
+  // Slumped patches: where the silt has run over its own beds the slope is a smooth ramp, so the
+  // beds come and go along the wall instead of running as parallel treads. Keyed to height and
+  // along-wall position (never to the bed index), so the surface stays continuous across a riser.
+  const slump = smooth(0.4, 0.58, fbm3(x * 0.03, h * 0.14, t.seed + 21, t.seed + 9, 2));
+  const mask = smooth(0.04, 0.18, u) * (1 - smooth(0.78, 1, u)) * (1 - 0.92 * slump);
   return Math.max(0, d) + lift * mask;
 }
 
