@@ -2,7 +2,7 @@
 
 ## Changes
 
-- `data/landmarks/great-blue-hole/site.json` (`opening.mission`): chase arm 46 to 52, side offset -36 to +24, vertical offset -50 to -45, and a new `yawOffset` of -24 degrees. The sub is now smaller and left of centre, and the gallery sits centre-right. Existing per-site fields only; no code change, no site branch, no test change.
+- `data/landmarks/great-blue-hole/site.json` (`opening.mission`): chase arm 46 to 54, side offset -36 to +36, vertical offset -50 to -45, and a new `yawOffset` of -12 degrees (a larger heading miss would send a held-forward player past the gallery). The sub is now smaller and left of centre, and the gallery sits centre-right. Existing per-site fields only; no code change, no site branch, no test change.
 - Range stays 125 m and the opening depth stays 44 m.
 
 ## Why the range did not shorten
@@ -16,7 +16,7 @@ Shortening was tried and rejected:
 ## Rules-can-bend note
 
 Nothing was bent: the final change is camera and heading data only.
-The opening now adds a "TURN 24 STARBOARD" cue to the objective line, since the sub is deliberately not aimed at the gallery. It uses the existing guidance surface; no new element.
+The opening now adds a "TURN 12 STARBOARD" cue to the objective line, since the sub is deliberately not aimed at the gallery. It uses the existing guidance surface; no new element.
 
 ## Simplicity rules
 
