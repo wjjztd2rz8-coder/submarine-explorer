@@ -639,8 +639,11 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
       rockMatrix(spot, rnd() * 6.28, 0.55 + rnd() * 0.3, m);
       // One lump shape serves every block, so vary the outline: elongated or squat, and a wide
       // spread of size (most are cobbles, a few are boulders).
-      const stretch = 0.7 + 0.7 * rnd();
-      const size = 0.6 + 0.9 * rnd() * rnd();
+      // Hashed from the spot, not drawn from `rnd`, so the rest of the gallery's stream is unchanged.
+      const h1 = Math.abs(Math.sin(i * 12.9898 + seed) * 43758.5453) % 1;
+      const h2 = Math.abs(Math.sin(i * 78.233 + seed) * 24634.6345) % 1;
+      const stretch = 0.7 + 0.7 * h1;
+      const size = 0.6 + 0.9 * h1 * h2;
       m.multiply(rockVariation.makeScale(stretch * size, size, size / stretch));
       // The analytic tread can stand above its interpolated triangles. Lower
       // only detached blocks until their actual geometry touches the apron.
@@ -653,7 +656,7 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
       if (Number.isFinite(gap) && gap > 0) m.elements[13] -= gap;
       c.copy(WALL)
         .lerp(DRAPE, rnd() * 0.3 + 0.3 * spot.u)
-        .multiplyScalar(0.65 + rnd() * 0.5);
+        .multiplyScalar(0.8 + rnd() * 0.3 - 0.15 * h2);
       rocks.setMatrixAt(i, m);
       rocks.setColorAt(i, c);
     });

@@ -85,8 +85,8 @@ export function talusDepth(t: TalusShape, x: number, z: number): number {
   // Slumped patches: where the silt has run over its own beds the slope is a smooth ramp, so the
   // beds come and go along the wall instead of running as parallel treads. Keyed to height and
   // along-wall position (never to the bed index), so the surface stays continuous across a riser.
-  const slump = smooth(0.5, 0.68, fbm3(x * 0.045, h * 0.16, t.seed + 21, t.seed + 9, 2));
-  const mask = smooth(0.04, 0.18, u) * (1 - smooth(0.78, 1, u)) * (1 - 0.85 * slump);
+  const slump = smooth(0.4, 0.58, fbm3(x * 0.03, h * 0.14, t.seed + 21, t.seed + 9, 2));
+  const mask = smooth(0.04, 0.18, u) * (1 - smooth(0.78, 1, u)) * (1 - 0.92 * slump);
   return Math.max(0, d) + lift * mask;
 }
 
