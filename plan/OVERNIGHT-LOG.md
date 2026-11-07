@@ -3351,3 +3351,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged Sonnet V-bluehole-opening-gallery (partial ~3/5 by my read of the shots): data-only change to the Blue Hole mission opening (arm 54, side +36, yaw -12): sub now left, gallery centre-right with stalactites visible, but still ~20% of frame; range stays 125 m. Side effect: the objective shows a "turn 12° starboard" cue through the existing guidance surface. gates smoke + project-base green on main. Two Blue Hole high-tier cases in f-verify-1000 ("scan in <= 2 min") fail with and without the change (agent's claim; hosted CI will confirm). Agent took ~156 min (too long: brief a narrower scope next time). A stale vite preview on port 5794 from the agent blocked the first main gates run; killed. Claude 5h at ~45% after, so no second package. Codex 146-150 queued (weekly pacing, 23% left); 124/131 held. Next: V-bismarck-ground-scour, V-beebe-chimney-form.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-07 10:01 CST headless run (Claude): targeted review, red CI
+
+- CI red 3 runs: hud-touch catalog cases timing out (240 s). Cause was my U-ci-monterey-objective-slot fix running 3.1 s of frames on every away() try. Fixed to pay that only when the warning is latched; spec cases now 1.5-4 s. gates green, pushed. Confirm hosted CI next run; no tag until green. No agents launched. Codex 146-150 queued (weekly pacing).
+- **Needs owner:** phone retest (4410-P2 checklist).

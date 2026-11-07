@@ -1,5 +1,12 @@
 # Reviews
 
+## 2026-11-07 targeted review (trigger: CI red on main for 3 runs)
+
+- **Diagnosis:** failing specs were all `hud-touch.spec.ts` "catalog tutorial and reload" cases (about 22 of 36 sites x viewports across shards), each ending in the 240 s test timeout, not an assertion. Same shards took ~1200 s vs ~665 s on the last green run.
+- **Root cause:** my merge of U-ci-monterey-objective-slot made `away()` run `clock.runFor(3100)` on every offset attempt (up to 8 per call, several calls per test). Each ran ~190 software-GL frames, so the catalog cases crept past the timeout under hosted-runner load. Locally it passed, which is why gates were green.
+- **Fix:** `away()` runs 34 ms and only adds the 3.1 s when the guidance slot is still `urgent` (the latch case). Spec cases now take 1.5-4 s locally. Pushed; confirm hosted CI next run. Do not tag until it is green.
+- **Process lesson:** a spec-only "wait longer" fix needs a per-case cost check, since gates run smoke only. Blue Hole high-tier `f-verify-1000` failures claimed pre-existing: still unconfirmed by hosted CI.
+
 ## 2026-11-07 comprehensive review (trigger: 8+ merges; joint with Codex Sol, one reconcile round)
 
 - **Stage (agreed):** about 85% to 1.0; **4-6 weeks** (Claude said ~4; Sol's range kept, since geometry work remains and throughput is limited). Golden `2026-11-07-055753` vs `2026-11-06-121541`. Hosted CI for the newest main commits was still running when written; f75 is the newest tag.
