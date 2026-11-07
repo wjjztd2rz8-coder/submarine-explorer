@@ -11,7 +11,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { propManifest } from '../../../core/SiteManifest.js';
 import { geoDetail } from './detail.js';
-import { geoMaterial as baseGeoMaterial, vertexGlow } from './materials.js';
+import { geoMaterial as baseGeoMaterial, limestoneWeathering, vertexGlow } from './materials.js';
 import {
   endRatio,
   pinchScale,
@@ -493,6 +493,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   wallMat.map = null;
   wallMat.bumpMap = null;
   wallMat.color.multiplyScalar(hood ? 0.62 : 0.8);
+  limestoneWeathering(wallMat, { pits: 0.4, streaks: 0.45, bumps: d.bump ? 0.3 : 0 });
   full.add(wallMesh);
 
   // --- fallen blocks and sediment blending the foot into the seabed
