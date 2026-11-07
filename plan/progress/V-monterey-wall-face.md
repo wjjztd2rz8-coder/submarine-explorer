@@ -4,13 +4,13 @@ Result: no product change merged. Data left exactly as on main. Screenshots in `
 
 Tried (all through `tools/golden.sh`, Monterey mission opening, desktop):
 
-| Variant | Frame | Verdict |
-| --- | --- | --- |
-| baseline | `before.png` | marker on ridge crest, pale east face right of centre, striped rock left (about 3.8) |
-| scan POI lon -122.0120, yaw 0 | `try1.png` | face centre-right, marker on the crest left of it; slightly better |
-| POI lon -122.0113, yaw -10 | `try2.png` | best composition: one pale face dead centre, calm left; marker at the wall foot beside the sub, not on the face (about 4.0) |
-| POI lon -122.0116, yaw -5 | `try3.png` | worse: large striped wall fills the right |
-| yaw -10 only (POI unchanged) | `yaw-only.png` | slightly worse than baseline; face pushed to the edge |
+| Variant                       | Frame          | Verdict                                                                                                                     |
+| ----------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| baseline                      | `before.png`   | marker on ridge crest, pale east face right of centre, striped rock left (about 3.8)                                        |
+| scan POI lon -122.0120, yaw 0 | `try1.png`     | face centre-right, marker on the crest left of it; slightly better                                                          |
+| POI lon -122.0113, yaw -10    | `try2.png`     | best composition: one pale face dead centre, calm left; marker at the wall foot beside the sub, not on the face (about 4.0) |
+| POI lon -122.0116, yaw -5     | `try3.png`     | worse: large striped wall fills the right                                                                                   |
+| yaw -10 only (POI unchanged)  | `yaw-only.png` | slightly worse than baseline; face pushed to the edge                                                                       |
 
 Why not kept: moving `monterey-canyon-wall` east by 150 to 180 m breaks real invariants, not just snapshots. Unit failures: `montereyOpening.test.ts` (scan target must be within 60 m of the `canyon-wall-ledge` hero; got 156 m), and `terrainCarveAgreement.test.ts` for all three tiers (scan target must stay inside the 200 m carve focus at `terrain.ts` / `terrainFeatures.ts`; got 210 to 232 m). Loosening those is forbidden by this package, and the carve, hero ledge and POI share one coordinate on purpose.
 

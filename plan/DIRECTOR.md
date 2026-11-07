@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: none. Merged 2026-11-07 (all partial, remaining gaps are items 3-8): apron silt, opening gallery, Bismarck scour, Beebe chimney, Titanic hull tone, seabed warning action, walkthrough-4. Codex 146-150 queued (held by weekly pacing); 124/131 held.
+- Claude: none. U-copy-fixes items 6-8 DONE (this run); walkthrough-4 items 4-5 (scan-interrupt cue, side-find clarity) remain in item 9.
 
 ## Backlog
 
