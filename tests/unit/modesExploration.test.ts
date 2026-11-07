@@ -355,10 +355,15 @@ it.each([false, true])(
         sampleId: 'sediment',
         name: 'Sediment',
       });
-      expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith('Sediment', true, {
-        scan: 'F',
-        guide: 'J',
-      });
+      expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(
+        'Sediment',
+        true,
+        {
+          scan: 'F',
+          guide: 'J',
+        },
+        false,
+      );
       expect(secretFound).toHaveBeenCalledTimes(1);
       expect(scanner.view.completed).toBe(3);
       scan(sample);
@@ -412,10 +417,15 @@ it.each([false, true])(
         firstTime: false,
       });
       expect(collected).toHaveBeenCalledTimes(2);
-      expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith('Sediment', false, {
-        scan: 'F',
-        guide: 'J',
-      });
+      expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(
+        'Sediment',
+        false,
+        {
+          scan: 'F',
+          guide: 'J',
+        },
+        false,
+      );
       expect(summary()).toEqual({
         found: 1,
         total: 1,

@@ -201,7 +201,12 @@ export class Discovery {
     this.guide.refresh();
     // The card names the target the objective panel showed; the Journal
     // entry (guide title) can differ in wording.
-    this.overlay.showComplete(poi.name, !before.has(entryId), this.keys());
+    this.overlay.showComplete(
+      poi.name,
+      !before.has(entryId),
+      this.keys(),
+      this.scanner.view.lastCompleteSideFind,
+    );
   }
 
   /**
@@ -213,7 +218,12 @@ export class Discovery {
     if (firstTime) this.stats.noteNewEntry(entryId, title);
     this.guide.focus(entryId);
     this.guide.refresh();
-    this.overlay.showComplete(title, firstTime, this.keys());
+    this.overlay.showComplete(
+      title,
+      firstTime,
+      this.keys(),
+      this.scanner.view.lastCompleteSideFind,
+    );
   }
 
   /** Pose for the `?poi=` spawn, or null if the POI is unknown. */
