@@ -46,7 +46,7 @@ it('every authored site retains its mission approach distance', () => {
     'hudson-canyon': 112,
     kamaehuakanaloa: 110,
     'beebe-vent-field': 155,
-    'great-blue-hole': 116,
+    'great-blue-hole': 125,
     bismarck: 110,
     'hunga-tonga-caldera': 120,
     'blake-plateau-corals': 160,
@@ -137,33 +137,7 @@ for (const site of sites.landmarks) {
         expect(pose!.chaseOffsetX).toBe(arm?.chaseOffsetX);
         expect(pose!.chaseOffsetY).toBe(arm?.chaseOffsetY);
         // An authored opening depth is honoured exactly; without one the pose stays shallow-capped.
-        if (arm?.openingDepthM !== undefined) {
-          const wanted = -arm.openingDepthM;
-          if (pose!.y <= wanted + 1e-6) expect(pose!.y).toBeCloseTo(wanted, 6);
-          else {
-            // A close opening may sit over rising ground, which lifts it above the authored depth.
-            // The lift must match the hull's seabed clearance over the highest floor on the
-            // route to the scan radius, never an arbitrary shallower pose.
-            const reach = 1 - missionApproachScanRadius(site, Infinity) / MISSION_APPROACH_M[site];
-            let floor = terrain.sampleHeight(p.x, p.z);
-            for (let step = 1; step <= 24; step++) {
-              const t = (step / 24) * reach;
-              const q = p.clone().lerp(primaries[0].position, t);
-              floor = Math.max(floor, terrain.sampleHeight(q.x, q.z));
-            }
-            const clearance =
-              settings.hullRadius + settings.seabedClearance + settings.spawnClearanceM;
-            const lifted = Math.max(
-              Math.min(
-                floor + clearance,
-                -Math.max(settings.hullRadius, primaries[0].minDepthM ?? 0),
-              ),
-              floor + settings.hullRadius + settings.seabedClearance,
-            );
-            // The search settles over a few passes, so the final pose can differ by under a metre.
-            expect(Math.abs(pose!.y - lifted)).toBeLessThan(1);
-          }
-        }
+        if (arm?.openingDepthM !== undefined) expect(pose!.y).toBeCloseTo(-arm.openingDepthM, 6);
         expect(p.y).toBeGreaterThanOrEqual(ratedDepth + settings.hullRadius);
         expect(p.y).toBeLessThanOrEqual(-settings.hullRadius);
         expect(props.collide(p.clone(), settings.hullRadius + 4, new Vector3())).toBe(false);
