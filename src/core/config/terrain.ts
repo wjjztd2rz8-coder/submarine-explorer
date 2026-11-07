@@ -126,7 +126,7 @@ export interface TerrainFidelity {
 }
 
 export const MONTEREY_FIDELITY: TerrainFidelity = {
-  focus: { lat: 36.7872, lon: -122.0133, radiusM: 1400, fadeM: 450 },
+  focus: { lat: 36.7872, lon: -122.0114, radiusM: 1400, fadeM: 450 },
   chunkCells: 16,
   nearSubdiv: { low: 1, medium: 4, high: 8 },
   reliefM: 1.2,
