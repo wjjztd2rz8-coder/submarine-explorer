@@ -1763,21 +1763,26 @@ freshTest.describe('catalog tutorial and reload', () => {
       return { x: p.x, y: p.y, z: p.z };
     });
     for (const [dx, dz] of offsets) {
-      await page.evaluate(
+      const placed = await page.evaluate(
         ([base, dx, dz]) => {
           const g = window.__game as unknown as Game;
           // Hold well clear of the unknown terrain out there: the seabed warning is urgent and
-          // would own the slot, which is not what this test is about.
+          // would own the slot, which is not what this test is about. A spot where the surface
+          // clamp leaves the sub close to the seabed would arm that warning and its hold, so skip it.
           const x = base.x + dx;
           const z = base.z + dz;
           const ground = g.terrain.sampleHeight(x, z);
-          g.sub.position.set(x, Math.min(-3, Math.max(base.y, ground + 60)), z);
+          const y = Math.min(-3, Math.max(base.y, ground + 60));
+          if (y - ground < 40) return false;
+          g.sub.position.set(x, y, z);
           g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
           // Advance the completion banner without spending wall time or reward lifetime.
           g.discovery.update(0, 10, g.sub.position, g.sub.getForward(), { scan: false });
+          return true;
         },
         [base, dx, dz] as const,
       );
+      if (!placed) continue;
       await page.clock.runFor(34);
       // A seabed warning latched before the move holds the slot for 3 s: pay that only when it did.
       if (
