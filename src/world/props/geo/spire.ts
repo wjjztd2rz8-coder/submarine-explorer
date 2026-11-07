@@ -88,9 +88,10 @@ export function trunkCrest(
 /** Smooth, noise-free radius at height fraction t: the profile colliders and flanges follow. */
 export function spireRadius(o: SpireOpts, t0: number): number {
   const t = Math.min(1, Math.max(0, t0));
+  const crustAmt = Math.min(1, o.crust ?? 0);
   // Crusted stacks hold their girth higher up before narrowing: columns, not cones.
-  const taper = 1 - (1 - o.topFrac) * Math.pow(t, o.crust ? 1.25 : 0.8);
-  const flare = 1 + (o.flare ?? 0) * (o.crust ? 0.45 : 1) * Math.exp(-t * 9);
+  const taper = 1 - (1 - o.topFrac) * Math.pow(t, 0.8 + 0.45 * crustAmt);
+  const flare = 1 + (o.flare ?? 0) * (1 - 0.55 * crustAmt) * Math.exp(-t * 9);
   let ledge = 1;
   if (o.tiers) {
     const u = t * o.tiers;
@@ -254,10 +255,15 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
       if (o.trunk) f *= 1 + 0.2 * (smooth(0.84, 0.94, t) - 0.65 * smooth(0.975, 1, t));
     }
     // Crusted stacks wander off a straight axis, more toward the top: a column, not a cone.
-    const bend =
-      o.crust && o.irregular
-        ? o.r0 * 0.7 * t * t * (fbm3(y * 0.07, 2, o.seed * 0.1, o.seed + 5, 2) - 0.5) * 2
-        : 0;
+    const bend = o.crust
+      ? o.r0 *
+        0.7 *
+        Math.min(1, o.irregular ?? 0) *
+        t *
+        t *
+        (fbm3(y * 0.07, 2, o.seed * 0.1, o.seed + 5, 2) - 0.5) *
+        2
+      : 0;
     const bendAng = o.seed * 1.7;
     p.setXYZ(i, x * f + Math.cos(bendAng) * bend, yy, z * f + Math.sin(bendAng) * bend);
   }
