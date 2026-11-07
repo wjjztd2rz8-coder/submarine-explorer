@@ -34,4 +34,5 @@ Before about 2.5 of 5, after about 3.0. The sub is smaller and off to the left, 
 
 - The gallery is not a third of the frame. Getting there needs either a shorter scan reach with a gallery-specific approach that clears the apron, or a larger gallery prop. The prop change would also move the free-dive hero view.
 - The sub's rear edge nearly touches the gallery foot in the desktop crop.
+- `f-verify-1000` Blue Hole high-tier cases (both layouts) fail the same way on the unmodified baseline; Low and Medium pass.
 - Free-dive hero pose and the other 12 sites' openings are unchanged by construction (only the Blue Hole `opening.mission` data changed).
