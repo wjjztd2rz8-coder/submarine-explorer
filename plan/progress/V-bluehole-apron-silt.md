@@ -21,3 +21,9 @@ No new settings, no new draw calls, no new files. One shared field replaces noth
 ## Self-rating
 
 Detail frame about 3.5 of 5 (was about 2.5). The slope is now one irregular body with scarps that fade in and out and rocks of different size and outline. Not done: fine grain and ripple texture on the silt (the surface is still a smooth blend in colour), and the lower scarps still run roughly parallel for part of their length.
+
+## Gates and opening
+
+- `PW_PORT=4711 tools/gates.sh`: python, content, build, e2e (smoke), e2e-base, attribution pass. Unit failed on four buffer-hash snapshots only (three `props-geo` karst-grotto entries and `terrainMerge1140` Blue Hole Low); draw and triangle counts are unchanged, so they were re-baselined (intended: apron beds and rock matrices changed). Prettier fails only on `plan/archive/DIRECTOR-HISTORY-2026-11-07-backlog.md`, already on main. Re-run of those two unit files passes.
+- `tools/site-specs.sh great-blue-hole`: 89 passed, 3 skipped, no failures.
+- Opening: mission frame `plan/progress/shots/V-bluehole-apron-silt-opening-after.png` has the same composition, objective and framing as the previous golden (the grotto is a distant silhouette); about 0.4% of pixels differ by more than 4 levels, from the apron/rock change and life animation. No threshold was bent.
