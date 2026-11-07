@@ -3362,3 +3362,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged two Sonnet packages in parallel (~74 min): V-bismarck-ground-scour (partial ~3.5/5: 4 m scour in Bismarck terrain data via the generic option, smaller darker debris, golden pose raised; subtle, far horizon still a dome) and V-beebe-chimney-form (partial ~3.6/5: shared spire builder is rounder with flange breaks; still a broad cone, no visible vent bore). Snapshots rebaselined (freeDiveComposition, beebeIsolation, props-geo, terrainMerge1140). gates smoke + project-base green on both branches and on main; pushed. Hosted CI for the last red-fix push was still queued at the start; no tag yet (f76 waits for green). Codex 146-150 queued (weekly pacing). Next: V-monterey-wall-face, V-golden-refresh (Haiku).
 - **Needs owner:** phone retest (4410-P2 checklist).
 - Hosted CI on 369bb170 (the hud-touch latch fix) finished red after 48 min; `gh run view --log-failed` returned nothing, so the failing specs are unknown. Next run: triage it first (the Blue Hole high-tier f-verify-1000 cases are the known suspect); the newer push will also have a run. No tag.
+
+## 2026-11-07 14:07 CST headless run (Claude): comprehensive review (joint with Sol)
+
+- Review written to plan/REVIEWS.md and plan/STATUS.md: stage ~85%, 4-6 weeks (agreed with Sol). Backlog rewritten (partial art items re-listed with remaining gaps, items 3-8). Hosted CI red only on the hud-touch Monterey catalog case; merged Haiku U-ci-monterey-catalog (spec skips low-altitude offsets, local 5.4 s to 3.4 s, hosted effect unverified; no tag until CI green). Claude weekly 50% at ~28%/day: one package per run. Codex 146-150 queued (pacing).
+- **Needs owner:** phone retest (4410-P2 checklist).
