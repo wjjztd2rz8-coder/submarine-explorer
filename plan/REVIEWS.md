@@ -11,7 +11,7 @@
 - **CI diagnosis:** hosted failures are now only `hud-touch.spec.ts:1814` catalog case for `monterey-canyon` (4 min timeout, several viewports). Other sites pass; my earlier latch fixes did not remove the Monterey cost. Queued as item 1 (Haiku) and Codex brief 151.
 - **Play flow:** not re-captured; relied on walkthrough-4 (desktop/phone reached the debrief, first objective scan 146-211 s) and queued walkthrough-5.
 - **Process:** Claude week 51% left at ~28%/day with 5 days to reset (projected run-out in ~1.8 days), so Claude runs are limited to one package each; Codex week 23% left, ~5%/day. 0 failed timer runs in 24 h. Lesson: a spec-only fix needs a per-site, per-viewport cost check; a local pass does not predict hosted time.
-- **New priorities:** U-ci-monterey-catalog, U-retest-walkthrough-5, V-monterey-wall-face, V-titanic-detail-plates, V-bismarck-hull-plates; Codex 146-151 queued.
+- **New priorities:** U-ci-monterey-catalog, U-retest-walkthrough-5, V-monterey-wall-face, V-titanic-detail-plates, V-bismarck-hull-plates; Codex 146-150 queued.
 - **Needs owner:** phone retest (4410-P2 checklist).
 
 ## 2026-11-07 targeted review (trigger: CI red on main for 3 runs)
