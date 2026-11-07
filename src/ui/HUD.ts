@@ -32,6 +32,10 @@ export interface HudWarnConfig {
   seabedWarnAltitudeM: number;
   seabedWarnTimeToContactS: number;
   seabedApproachAltitudeM: number;
+  /** Once shown, the seabed warning clears only above this altitude... */
+  seabedClearAltitudeM: number;
+  /** ...and after this many seconds without a trigger. */
+  seabedHoldS: number;
   /** Altitude of first contact (hullRadius + seabedClearance). */
   contactAltitudeM: number;
 }
@@ -41,6 +45,8 @@ const DEFAULT_WARN: HudWarnConfig = {
   seabedWarnAltitudeM: 15,
   seabedWarnTimeToContactS: 4,
   seabedApproachAltitudeM: 60,
+  seabedClearAltitudeM: 25,
+  seabedHoldS: 3,
   contactAltitudeM: 12,
 };
 
@@ -48,6 +54,12 @@ const DEFAULT_WARN: HudWarnConfig = {
 interface HudContext {
   /** A scan target is within its scan radius: suppress the static proximity warning. */
   nearScanTarget?: boolean;
+  /** A scan is under way (or just interrupted): its card keeps the slot unless contact is imminent. */
+  scanLive?: boolean;
+  /** Frame seconds, for the warning's minimum hold. */
+  dt?: number;
+  /** What the pilot does to rise, in the current input device's words (e.g. "RISE · SLIDER UP"). */
+  riseCue?: string;
   simSpeed?: number;
 }
 
@@ -84,6 +96,37 @@ export function seabedWarning(
   return false;
 }
 
+/**
+ * {@link seabedWarning} with hysteresis: once on, it stays until the trigger has
+ * been absent for `seabedHoldS` and the altitude is above `seabedClearAltitudeM`,
+ * so hovering at the threshold does not flicker the guidance slot.
+ */
+export class SeabedWarningLatch {
+  private on = false;
+  private quietS = 0;
+
+  constructor(private readonly warn: HudWarnConfig) {}
+
+  /** True when the warning should take the slot; a live scan keeps it unless contact is imminent. */
+  update(
+    altitude: number,
+    verticalSpeed: number,
+    nearScanTarget: boolean,
+    dt: number,
+    scanLive = false,
+  ): boolean {
+    if (seabedWarning(altitude, verticalSpeed, this.warn, nearScanTarget)) {
+      this.on = true;
+      this.quietS = 0;
+    } else if (this.on) {
+      this.quietS += dt;
+      if (this.quietS >= this.warn.seabedHoldS && altitude >= this.warn.seabedClearAltitudeM)
+        this.on = false;
+    }
+    return this.on && (!scanLive || seabedWarning(altitude, verticalSpeed, this.warn, true));
+  }
+}
+
 /** The tile line: tile id + fitted hull class and rating. */
 export function formatTileLine(
   meta: Pick<TileMeta, 'id' | 'cols' | 'rows'>,
@@ -112,6 +155,7 @@ export class HUD {
   private hullNote = '';
   /** The urgent message for the guidance slot (hull, supplies, seabed), or null. */
   warning: string | null = null;
+  private readonly seabed: SeabedWarningLatch;
 
   constructor(
     private readonly meta: TileMeta,
@@ -119,6 +163,7 @@ export class HUD {
     private readonly warn: HudWarnConfig = DEFAULT_WARN,
     private readonly currentMinMps = 0.01,
   ) {
+    this.seabed = new SeabedWarningLatch(warn);
     this.root = document.createElement('div');
     this.root.className = 'hud';
     this.root.innerHTML = `
@@ -259,8 +304,16 @@ export class HUD {
       this.showWarning(`${this.powerState.critical.join(' & ').toUpperCase()} CRITICAL — ASCEND`);
     } else if (this.powerState?.enabled && this.powerState.low.length) {
       this.showWarning(`${this.powerState.low.join(' & ').toUpperCase()} LOW — PLAN ASCENT`);
-    } else if (seabedWarning(s.altitude, s.velocity.y, this.warn, ctx.nearScanTarget)) {
-      this.showWarning('SEABED PROXIMITY');
+    } else if (
+      this.seabed.update(
+        s.altitude,
+        s.velocity.y,
+        ctx.nearScanTarget ?? false,
+        ctx.dt ?? 0,
+        ctx.scanLive,
+      )
+    ) {
+      this.showWarning(ctx.riseCue ? `SEABED CLOSE · ${ctx.riseCue}` : 'SEABED CLOSE · RISE');
     } else {
       this.hideWarning();
     }

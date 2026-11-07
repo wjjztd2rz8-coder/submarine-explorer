@@ -26,7 +26,7 @@ if (!layout) throw new Error(`layout must be one of ${Object.keys(LAYOUTS).join(
 
 const base = process.env.WT_BASE ?? 'http://localhost:4721/';
 const capMs = Number(process.env.WT_CAP_S ?? 600) * 1000;
-const seabedRise = process.env.WT_SEABED_RISE === '1'; // v2: answer SEABED PROXIMITY by rising
+const seabedRise = process.env.WT_SEABED_RISE === '1'; // v2: answer SEABED CLOSE by rising
 const outDir = resolve(
   process.env.WT_OUT ?? '.cache/codex/shots/walkthrough-4',
   layoutName + (process.env.WT_TAG ? `-${process.env.WT_TAG}` : ''),
@@ -294,7 +294,7 @@ while (now() * 1000 < capMs) {
     else want.Control = true;
   }
   // v2 only: the seabed warning names no action; the RISE slider is the obvious answer.
-  if (seabedRise && /SEABED PROXIMITY/i.test(s.guide)) {
+  if (seabedRise && /SEABED CLOSE/i.test(s.guide)) {
     if (layout.touch) slider = 'up';
     else want.Space = true;
   }

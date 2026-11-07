@@ -10,6 +10,7 @@ import {
   formatDepth,
   formatTileLine,
   seabedWarning,
+  SeabedWarningLatch,
   uiScaleFactors,
   type HudWarnConfig,
 } from '../../src/ui/HUD.js';
@@ -20,6 +21,8 @@ const W: HudWarnConfig = {
   seabedWarnAltitudeM: s.seabedWarnAltitudeM,
   seabedWarnTimeToContactS: s.seabedWarnTimeToContactS,
   seabedApproachAltitudeM: s.seabedApproachAltitudeM,
+  seabedClearAltitudeM: s.seabedClearAltitudeM,
+  seabedHoldS: s.seabedHoldS,
   contactAltitudeM: s.hullRadius + s.seabedClearance,
 };
 
@@ -109,6 +112,31 @@ describe('seabedWarning', () => {
     expect(seabedWarning(40, -2, W, true)).toBe(false); // 14 s away
     expect(seabedWarning(40, 3, W, false)).toBe(false); // rising
     expect(seabedWarning(200, -20, W, false)).toBe(false); // above the approach band
+  });
+});
+
+describe('SeabedWarningLatch', () => {
+  it('holds through threshold flicker and clears only high and after the hold', () => {
+    const l = new SeabedWarningLatch(W);
+    expect(l.update(13, 0, false, 0.1)).toBe(true);
+    for (const alt of [16, 14, 17, 15.5, 18]) expect(l.update(alt, 0, false, 0.1)).toBe(true);
+    expect(l.update(30, 0, false, 0.1)).toBe(true);
+    expect(l.update(30, 0, false, W.seabedHoldS)).toBe(false);
+  });
+
+  it('stays on after the hold while below the clear altitude', () => {
+    const l = new SeabedWarningLatch(W);
+    l.update(13, 0, false, 0.1);
+    expect(l.update(20, 0, false, 60)).toBe(true);
+  });
+});
+
+describe('SeabedWarningLatch scan priority', () => {
+  it('a live scan keeps the slot unless hull contact is imminent', () => {
+    const l = new SeabedWarningLatch(W);
+    expect(l.update(13, 0, false, 0.1)).toBe(true);
+    expect(l.update(13, 0, true, 0.1, true)).toBe(false);
+    expect(l.update(40, -8, true, 0.1, true)).toBe(true);
   });
 });
 

@@ -115,7 +115,7 @@ export interface SubmarineConfig {
    */
   freeDiveHullMarginM: number;
   /**
-   * The HUD's SEABED PROXIMITY banner: shown below this altitude
+   * The HUD's seabed warning banner: shown below this altitude
    * (hull centre above the seabed; contact is at hullRadius + seabedClearance).
    */
   seabedWarnAltitudeM: number;
@@ -126,6 +126,10 @@ export interface SubmarineConfig {
    */
   seabedWarnTimeToContactS: number;
   seabedApproachAltitudeM: number;
+  /** Hysteresis: a shown banner clears only above this altitude (m)... */
+  seabedClearAltitudeM: number;
+  /** ...and once no trigger has held for this many seconds. */
+  seabedHoldS: number;
   /** Hull look below 300 m: a faint fresnel rim and an ambient floor. */
   hullRimColor: number;
   hullRimStrength: number;
@@ -202,6 +206,8 @@ export const DEFAULT_SUBMARINE: SubmarineConfig = {
   seabedWarnAltitudeM: 15,
   seabedWarnTimeToContactS: 4,
   seabedApproachAltitudeM: 60,
+  seabedClearAltitudeM: 25,
+  seabedHoldS: 3,
   hullRimColor: 0x6f93a3,
   hullRimStrength: 0.55,
   hullEmissive: 0x0b1318,
