@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: V-closeup-materials-beebe IN FLIGHT (Sonnet, 2026-11-06). Previously: none in flight. V-closeup-materials-bluehole DONE 2026-11-06 (c8be0474; shared limestoneWeathering shader on the grotto wall, wall ~4.5/10 up from ~3.5; sediment apron still terraced). Next: V-closeup-materials (Beebe), U-scan-fish-vs-objective. Next Sonnet: V-horizon-upper-half. Codex 146-151 queued; 124/131 held.
+- Claude: none in flight. V-closeup-materials-beebe DONE 2026-11-06 (f18b5b07; shared sulfideCrust shader on vent chimneys; geometry unchanged, still slab-like flanges). Next: U-scan-fish-vs-objective, sediment apron silt grain. V-closeup-materials-bluehole DONE 2026-11-06 (c8be0474; shared limestoneWeathering shader on the grotto wall, wall ~4.5/10 up from ~3.5; sediment apron still terraced). Next: V-closeup-materials (Beebe), U-scan-fish-vs-objective. Next Sonnet: V-horizon-upper-half. Codex 146-151 queued; 124/131 held.
 
 ## Backlog
 

@@ -3305,3 +3305,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged Sonnet V-closeup-materials-bluehole: shared `limestoneWeathering` shader (pits, stain streaks, silt) on the grotto wall; detail frame wall now reads as weathered limestone (~4.5/10 by my read, agent said 3.5/5). Opening unchanged. The sediment apron is still a stack of smooth terraces (needs its own silt grain). Gates smoke + project-base green on branch and main; site-specs blue-hole green; pushed. Agent took ~57 min. Codex 146-151 queued (dispatcher holds on weekly pace); 124/131 held. Next: V-closeup-materials (Beebe), U-scan-fish-vs-objective.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-06 21:20 CST headless run (Claude): V-closeup-materials-beebe
+
+- Merged Sonnet V-closeup-materials-beebe: shared `sulfideCrust` shader (crust grain, sulfide stain, pale film) on smoker/crust chimneys; shader only, so spires are still slab-like flanges (~3.5/5 by agent, I read ~5/10, up from ~4). One unit test key assertion changed to a prefix match. gates smoke + project-base green on branch and main (gates take >10 min: run them detached, not as harness background jobs). Agent took ~28 min. Codex 146-151 queued, 124/131 held. Next: U-scan-fish-vs-objective, Blue Hole sediment apron silt.
+- **Needs owner:** phone retest (4410-P2 checklist).
