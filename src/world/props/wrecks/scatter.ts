@@ -367,7 +367,7 @@ const disc = (dims: readonly [number, number, number]): { rx: number; rz: number
   rz: dims[0],
 });
 /** Dark silt greys for slide blocks: they read as bed, not as boulders. */
-const SLIDE_TINTS = [0x6a6258, 0x5c554c, 0x72695d] as const;
+const SLIDE_TINTS = [0x5a534a, 0x4c463f, 0x625a4f] as const;
 
 /** Warm rust tones: debris plates must read against grey-brown silt. */
 const TRAIL_TINTS = [0xffdcb8, 0xf0b890, 0xffe8d0] as const;
@@ -852,12 +852,12 @@ const KITS: Record<WreckScatterId, Kit> = {
           big: true,
           count: 180,
           size: [
-            [1.2, 4.5],
-            [0.5, 1.5],
-            [1.2, 5.5],
+            [0.8, 3],
+            [0.3, 1],
+            [0.8, 3.6],
           ],
           pose: 'upright',
-          sink: 0.5,
+          sink: 0.6,
           align: 1.2,
           cluster: 0.2,
           tints: SLIDE_TINTS,
