@@ -111,10 +111,15 @@ for (const site of [
           true,
         );
         expect(discovery.scanner.view.lastCompleteId).toBe(poi.id);
-        expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(poi.name, newEntry, {
-          scan: 'G',
-          guide: 'J',
-        });
+        expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(
+          poi.name,
+          newEntry,
+          {
+            scan: 'G',
+            guide: 'J',
+          },
+          false,
+        );
         expect(discovery.guide.focus).toHaveBeenLastCalledWith(entryId);
         expect(isEntryUnlocked(journal, entry, discovery.store)).toBe(true);
         expect(entry.title).toBe(discovery.entries.find((entry) => entry.id === entryId)!.title);
@@ -129,10 +134,15 @@ for (const site of [
         new Vector3(0, 0, -1),
         true,
       );
-      expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(poi.name, false, {
-        scan: 'G',
-        guide: 'J',
-      });
+      expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(
+        poi.name,
+        false,
+        {
+          scan: 'G',
+          guide: 'J',
+        },
+        false,
+      );
       expect(discovery.guide.focus).toHaveBeenLastCalledWith(entryIdForPoi(poi, discovery.entries));
     } finally {
       discovery.dispose();
@@ -186,10 +196,15 @@ it.each([5, 6])(
         if (animal) discovery.onLifeScan(target.name, true, `life/${target.id.slice(5)}`);
         if (animal)
           expect(discovery.guide.focus).toHaveBeenLastCalledWith(`life/${target.id.slice(5)}`);
-        expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(target.name, true, {
-          scan: 'G',
-          guide: 'J',
-        });
+        expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(
+          target.name,
+          true,
+          {
+            scan: 'G',
+            guide: 'J',
+          },
+          false,
+        );
         // Continuing to hold or releasing/repressing cannot count a discovery twice.
         discovery.scanner.update(0, target.position, new Vector3(0, 0, -1), false);
         discovery.scanner.update(
@@ -259,10 +274,15 @@ it('counts scanned secrets and samples and records the revealed discovery name',
       { poiId: sample.id, name: sample.name },
       { poiId: secret.id, name: secret.def.name },
     ]);
-    expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(secret.def.name, true, {
-      scan: 'G',
-      guide: 'J',
-    });
+    expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(
+      secret.def.name,
+      true,
+      {
+        scan: 'G',
+        guide: 'J',
+      },
+      false,
+    );
   } finally {
     discovery.dispose();
   }

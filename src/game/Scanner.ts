@@ -116,6 +116,8 @@ export interface ScanView {
   completed: number;
   lastCompleteId: string | null;
   lastCompleteFirstTime: boolean;
+  /** The last completed scan was not the outstanding objective, which is still pending. */
+  lastCompleteSideFind: boolean;
 }
 
 interface Geometry {
@@ -156,6 +158,7 @@ export class Scanner {
     completed: 0,
     lastCompleteId: null,
     lastCompleteFirstTime: false,
+    lastCompleteSideFind: false,
   };
 
   /** When false, a held control is treated as released (overlay open, cutscene...). */
@@ -267,6 +270,7 @@ export class Scanner {
     this.view.completed = 0;
     this.view.lastCompleteId = null;
     this.view.lastCompleteFirstTime = false;
+    this.view.lastCompleteSideFind = false;
     this.view.candidateId = null;
     this.view.nearestId = null;
     this.view.nearestScanned = false;
@@ -492,6 +496,7 @@ export class Scanner {
     v.completed = this.scannedThisDive.size;
     v.lastCompleteId = t.id;
     v.lastCompleteFirstTime = firstTime;
+    v.lastCompleteSideFind = v.objectiveId !== null && v.objectiveId !== t.id;
     this.bus.emit('scan:progress', { poiId: t.id, progress: 1 });
     this.bus.emit('scan:complete', { poiId: t.id, landmarkId: t.landmarkId, firstTime });
     this.clearActive();

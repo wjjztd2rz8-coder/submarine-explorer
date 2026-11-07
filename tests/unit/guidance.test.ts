@@ -160,7 +160,12 @@ describe('guidance slot', () => {
     const forward = new Vector3(0, 0, -1);
     const keys = { scan: 'G', guide: 'J' };
     bus.on('scan:complete', ({ poiId, firstTime }) =>
-      overlay.showComplete(targets.find((t) => t.id === poiId)!.name, firstTime, keys),
+      overlay.showComplete(
+        targets.find((t) => t.id === poiId)!.name,
+        firstTime,
+        keys,
+        scanner.view.lastCompleteSideFind,
+      ),
     );
     const step = (dt = 0, held = false) => {
       scanner.update(dt, position, forward, held);
@@ -169,6 +174,19 @@ describe('guidance slot', () => {
     };
     return { scanner, overlay, targets, position, forward, keys, step };
   };
+
+  it('labels a scan of a side contact as a side find and keeps pointing at the objective', () => {
+    const { scanner, step } = contactGuidance(false);
+    scanner.setTargets([
+      target('memorial', 'Memorial', 0, 0, -5),
+      target('stern', 'Stern', -300, 0, 0),
+    ]);
+    step(0.1, true);
+    const card = step(2, true);
+    expect(scanner.view.lastCompleteId).toBe('memorial');
+    expect(card).toMatchObject({ kicker: 'Side find', name: 'Memorial' });
+    expect(card.detail).toContain('TURN');
+  });
 
   it.each([false, true])(
     'offers named arrival contacts in the existing slot without a scan prompt (touch=%s)',

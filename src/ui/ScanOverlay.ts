@@ -40,6 +40,7 @@ export class ScanOverlay {
   private complete: {
     title: string;
     firstTime: boolean;
+    sideFind: boolean;
     left: number;
     holdsReady: boolean;
   } | null = null;
@@ -87,19 +88,23 @@ export class ScanOverlay {
     this.slot.clear();
   }
 
-  /** Show the completion confirmation for `completeBannerSeconds`. */
-  showComplete(title: string, firstTime: boolean, keys: ScanOverlayKeys): void {
+  /**
+   * Show the completion confirmation for `completeBannerSeconds`. A side find
+   * (the objective is still pending) keeps pointing at the objective.
+   */
+  showComplete(title: string, firstTime: boolean, keys: ScanOverlayKeys, sideFind = false): void {
     if (this.suppressed) return;
     this.complete = {
       title,
       firstTime,
+      sideFind,
       left: this.config.completeBannerSeconds,
       holdsReady: true,
     };
     this.slot.flash(
       'complete',
       'discovery',
-      this.completeMessage(title, firstTime, keys),
+      this.completeMessage(title, firstTime, sideFind, keys),
       this.config.completeBannerSeconds,
     );
   }
@@ -107,13 +112,14 @@ export class ScanOverlay {
   private completeMessage(
     title: string,
     firstTime: boolean,
+    sideFind: boolean,
     keys: ScanOverlayKeys,
   ): GuidanceMessage {
     return {
-      kicker: firstTime ? 'New Journal entry' : 'SCAN COMPLETE',
+      kicker: sideFind ? 'Side find' : firstTime ? 'New Journal entry' : 'SCAN COMPLETE',
       text: title,
       detail:
-        this.cue && isTouch()
+        this.cue && (sideFind || isTouch())
           ? this.cue
           : firstTime
             ? isTouch()
@@ -144,7 +150,12 @@ export class ScanOverlay {
       'complete',
       'discovery',
       this.complete
-        ? this.completeMessage(this.complete.title, this.complete.firstTime, keys)
+        ? this.completeMessage(
+            this.complete.title,
+            this.complete.firstTime,
+            this.complete.sideFind,
+            keys,
+          )
         : null,
     );
     const { scan, objective } = this.messages(view, keys);
