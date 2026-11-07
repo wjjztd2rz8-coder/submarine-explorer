@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: V-bluehole-apron-silt IN FLIGHT (Sonnet, 2026-11-07), U-retest-walkthrough-4 IN FLIGHT (Haiku, 2026-11-07). Last merged 2026-11-06: U-scan-fish-vs-objective (62cc2f0e). Codex 146-150 queued (held by weekly pacing, 28% left); 124/131 held.
+- Claude: none. Last merged 2026-11-07: V-bluehole-apron-silt, U-retest-walkthrough-4. Last merged 2026-11-06: U-scan-fish-vs-objective (62cc2f0e). Codex 146-150 queued (held by weekly pacing, 28% left); 124/131 held.
 
 ## Backlog
 
@@ -81,13 +81,13 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 
 ### Claude lanes (Sonnet unless noted)
 
-1. **V-bluehole-apron-silt [Sonnet]:** the grotto wall now reads as weathered limestone, but the sediment apron in the detail frame (`great-blue-hole-3.png`) is a stack of smooth, evenly spaced terraces with identical boulders. Target: one irregular silt slope with fine grain, ripple/slump breaks and varied rock size; reuse the shared silt/limestone shader, no site branch. Check the opening is unchanged.
+1. **V-bluehole-apron-silt [DONE 2026-11-07 (6681839c), partial ~3.5/5: terraces now irregular, rocks varied; fine silt grain/ripple still missing]:** the grotto wall now reads as weathered limestone, but the sediment apron in the detail frame (`great-blue-hole-3.png`) is a stack of smooth, evenly spaced terraces with identical boulders. Target: one irregular silt slope with fine grain, ripple/slump breaks and varied rock size; reuse the shared silt/limestone shader, no site branch. Check the opening is unchanged.
 2. **V-bluehole-opening-gallery [Sonnet, after 1]:** the 2026-11-07 mission opening shows a big sub beside a small brown outcrop (gallery is ~15% of the frame). Target: the gallery fills the centre-right third with stalactites visible, sub smaller and to the left. Needs a closer-opening/pitch decision, not data nudges (see archive: two data-only passes failed, branch `claude/V-bluehole-hood-code` kept).
 3. **V-bismarck-ground-scour [Sonnet]:** hull still floats on a dome seabed (opening ~3.4). Target: hull visibly sits in a shallow carved scour, debris darker and smaller, horizon no longer a perfect dome. Route: a generic terrain-carve option under a wreck footprint (as for other wrecks), not a pose; do not flatten the sourced seamount flank (`data/landmarks/bismarck/guide.json`).
 4. **V-beebe-chimney-form [Sonnet]:** crust shader helped, but spires are still slab-like folded flanges. Target: tapering, irregular chimney columns with flange breaks and a vent orifice, readable at 20 m. Geometry change in the shared chimney builder.
 5. **V-monterey-wall-face [Sonnet]:** the marker now sits on the pale crest but reads as a ridge end; the opening is striped rock without a wall face. Needs a moved scan target onto the pale face (site data) plus the pose that frames it, and a generic scarp distance fade of displacement. Target: one clear wall face centre-right with the marker on it.
 6. **V-titanic-hull-tone [Sonnet, small]:** hull is still salmon-pink with gridlike seams (detail ~4.0). Target: darker, desaturated rust-brown with deeper streaking and broken plate seams; shader params only.
-7. **U-retest-walkthrough-4 [Haiku, TOP (Sol: first-five-minutes acceptance is blocker 1; walkthrough-3 used POI poses and a paused clock, landscape journey got no scan in 7 min)]:** real clock, no teleported poses, served SHA verified; unassisted capture at 1280x720, 390x844 and 844x390 (served SHA verified), Home to debrief; file confusions as U-* items.
+7. **U-retest-walkthrough-4 [DONE 2026-11-07 (e1a2e55c); note plan/progress/U-retest-walkthrough-4.md; first scan 146-211 s, debrief reached on desktop/phone; landscape stalled on seabed warning]. Follow-ups U-seabed-warning-action (TOP, Sonnet: name the fix, stop flicker in guidance slot), U-depth-card-level-approach (extends 10), U-scan-interrupt-cue, U-side-find-clarity, U-ctrl-tip-timing, U-objective-two-cues, U-scan-prompt-copy (Haiku-sized copy fixes). Old text: [Haiku, TOP (Sol: first-five-minutes acceptance is blocker 1; walkthrough-3 used POI poses and a paused clock, landscape journey got no scan in 7 min)]:** real clock, no teleported poses, served SHA verified; unassisted capture at 1280x720, 390x844 and 844x390 (served SHA verified), Home to debrief; file confusions as U-* items.
 8. **V-golden-refresh [Haiku]:** run `GOLDEN_MODE=mission tools/golden.sh` detached after items 1-3 and note changed frames; feeds the next review.
 9. **V-axial-sky-band [Sonnet, optional]:** Axial upper third is empty dark water; enable `horizonRidge` in its preset data (generic option already exists).
 

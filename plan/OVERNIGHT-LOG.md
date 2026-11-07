@@ -3325,3 +3325,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Joint review with Sol done (see plan/REVIEWS.md): stage ~85%, 4-6 weeks. Backlog rewritten; Codex 149/150 rewritten (fixes already existed). No agent packages launched. Next: U-retest-walkthrough-4 (Haiku), V-bluehole-apron-silt.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-07 02:02 CST headless run (Claude): apron-silt + walkthrough-4
+
+- Merged Sonnet V-bluehole-apron-silt (partial ~3.5/5: apron beds sway and slump, rocks vary; no fine grain/ripple yet; four Blue Hole buffer-hash snapshots rebaselined) and Haiku U-retest-walkthrough-4 (real clock, 3 viewports, SHA cbafe783). Findings: first scan 146-211 s, debrief reached on desktop/phone; landscape sat on the seabed ~8 min on "WARNING SEABED PROXIMITY" with no named action. 8 candidate U-* items added to DIRECTOR (top: U-seabed-warning-action). Prettier fix on archive file. Agents took ~78 min each in parallel. Codex 146-150 still queued (weekly pacing).
+- **Needs owner:** phone retest (4410-P2 checklist).

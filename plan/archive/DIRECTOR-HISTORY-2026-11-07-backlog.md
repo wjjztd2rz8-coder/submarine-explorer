@@ -33,4 +33,3 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 13. **R-release [Haiku]:** tag the latest green-CI main after each review (f71 is the newest, 2026-11-01); f72 tagged 2026-11-03 (c985a29c, CI green); f73 tagged 2026-11-04 (af8fbce2, CI green); next tag after the next review.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16), Titanic per-plate blockiness (accepted ~3.7). Codex weekly burn is ~60%/day, so briefs stay rationed.
-
