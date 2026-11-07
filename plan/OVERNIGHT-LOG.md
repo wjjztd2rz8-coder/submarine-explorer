@@ -3383,3 +3383,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged Haiku U-copy-fixes (items 6-8 of walkthrough-4): Ctrl+W tip only on Ctrl+W (not plain Ctrl), touch scan prompt "Hold SCAN", objective line shows a turn cue or the distance, not both. Specs/unit strings updated, none loosened. gates smoke + project-base green on branch and main; pushed. Agent took ~48 min. Prettier failure on a main plan note fixed.
 - Hosted CI on the Monterey catalog fix was still queued at start; no tag (f76 waits for green). Remaining in DIRECTOR item 9: scan-interrupt cue, side-find clarity. Codex 146-150 queued (weekly pacing, 17% left). Claude weekly 49%: one package per run.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-07 16:55 CST headless run (Claude): V-monterey-wall-face-2 (no ship)
+
+- Sonnet moved carve focus, ledge hero and POI ~170 m east as one coordinate: opening got worse (~3.3 vs 3.8; no pale face, heading changed), so product change reverted; findings note merged. Item 3 marked tried twice: remaining lever is an authored pale face prop at the marker, or park at 3.8. Agent ~27 min. Hosted CI on the Monterey catalog fix still unconfirmed; no tag. Codex 146-150 queued (weekly pacing, 17% left). Next: item 2 U-retest-walkthrough-5 (Haiku), then 4/5 plating.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
