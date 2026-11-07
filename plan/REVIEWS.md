@@ -1,5 +1,9 @@
 # Reviews
 
+## 2026-11-07 late targeted review (trigger: CI red 3 runs)
+
+- All red runs (SHAs be6b14aa and earlier) fail only on the `hud-touch.spec.ts:1814` Monterey catalog case (240 s timeout). They predate the U-ci-monterey-catalog merge (spec is now at line 1819). Locally all 6 viewports of that case pass in 24 s on main. Hosted run 42409524890 (4582d7a7) is the first with the fix; confirm it next run. If it fails again, the next suspect is `away()` finding no offset with 40 m clearance (it then leaves the sub in range, so the chip never shows): fall back to teleporting to a fixed deep point. No tag until green.
+
 ## 2026-11-07 evening comprehensive review (trigger: 8+ merges, CI red 3 runs; joint with Codex Sol, one reconcile round)
 
 - **Stage (agreed):** about 85% to 1.0; **4-6 weeks** (Claude 86% / 4-5 weeks, Sol 83% / 4-6; Sol's range kept, since art throughput is limited). Golden `2026-11-07-180922` vs `2026-11-07-055753`.

@@ -3367,3 +3367,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Review written to plan/REVIEWS.md and plan/STATUS.md: stage ~85%, 4-6 weeks (agreed with Sol). Backlog rewritten (partial art items re-listed with remaining gaps, items 3-8). Hosted CI red only on the hud-touch Monterey catalog case; merged Haiku U-ci-monterey-catalog (spec skips low-altitude offsets, local 5.4 s to 3.4 s, hosted effect unverified; no tag until CI green). Claude weekly 50% at ~28%/day: one package per run. Codex 146-150 queued (pacing).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-07 14:09 CST headless run (Claude): targeted review, red CI
+
+- Red runs all predate the Monterey catalog spec fix; local spec passes on 6 viewports. Hosted run on 4582d7a7 pending. No agents launched, no code changes. Fallback plan logged in REVIEWS.md.
+- **Needs owner:** phone retest (4410-P2 checklist).
