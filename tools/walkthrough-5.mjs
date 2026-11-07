@@ -120,17 +120,23 @@ if (site.viaPrimary) {
     .filter({ visible: true })
     .first();
   await row.waitFor({ state: 'visible', timeout: 15000 });
-  if (layout.touch && (await page.locator('.home-sites.is-collapsed').count())) {
+  await page.waitForTimeout(400);
+  await shot(page, 'sites-list'); // before any scroll: what the player sees first
+  const grab = page.locator('.home-sites-grab').first();
+  const collapsed = await page.locator('.home-sites.is-collapsed').count();
+  const grabShown = await grab.isVisible().catch(() => false);
+  const rowBox = await row.boundingBox();
+  note(
+    'sites-state',
+    `collapsed=${collapsed} grabShown=${grabShown} rowBox=${JSON.stringify(rowBox && { y: Math.round(rowBox.y), h: Math.round(rowBox.height) })} viewportH=${H}`,
+  );
+  if (collapsed && grabShown) {
     note('tap-sheet-grab', 'Show all sites (bottom sheet was collapsed)');
-    await tapOrClick(page.locator('.home-sites-grab').first());
+    await tapOrClick(grab);
     await page.waitForTimeout(600);
   }
-  await row.scrollIntoViewIfNeeded().catch(() => {});
-  await page.waitForTimeout(400);
-  await shot(page, 'sites-list');
   const rowText = (await row.innerText()).replace(/\n+/g, ' | ');
-  const visible = await row.isVisible();
-  note('sites-row', `${rowText} visible=${visible}`);
+  note('sites-row', `${rowText} visible=${await row.isVisible()}`);
   await tapOrClick(row);
 }
 
