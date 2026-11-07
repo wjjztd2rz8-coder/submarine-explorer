@@ -3377,3 +3377,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Sonnet tried V-monterey-wall-face (~57 min): moving the scan target ~180 m east gave a ~4.0 frame (from 3.8) but breaks two coupled tests (hero within 60 m, carve focus within 200 m). Nothing shipped; findings note merged. Follow-up recorded in DIRECTOR item 3: move carve focus, hero and scan target together and rebaseline those tests. Hosted CI on the Monterey catalog fix still pending at last check; no tag. Codex 146-150 queued (weekly pacing, 17% left).
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-07 16:18 CST headless run (Claude): U-copy-fixes
+
+- Merged Haiku U-copy-fixes (items 6-8 of walkthrough-4): Ctrl+W tip only on Ctrl+W (not plain Ctrl), touch scan prompt "Hold SCAN", objective line shows a turn cue or the distance, not both. Specs/unit strings updated, none loosened. gates smoke + project-base green on branch and main; pushed. Agent took ~48 min. Prettier failure on a main plan note fixed.
+- Hosted CI on the Monterey catalog fix was still queued at start; no tag (f76 waits for green). Remaining in DIRECTOR item 9: scan-interrupt cue, side-find clarity. Codex 146-150 queued (weekly pacing, 17% left). Claude weekly 49%: one package per run.
+- **Needs owner:** phone retest (4410-P2 checklist).

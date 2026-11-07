@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: none. U-copy-fixes items 6-8 DONE (this run); walkthrough-4 items 4-5 (scan-interrupt cue, side-find clarity) remain in item 9.
+- Claude: none. U-copy-fixes items 6-8 DONE 2026-11-07 (39830258); walkthrough-4 items 4-5 (scan-interrupt cue, side-find clarity) remain in item 9.
 
 ## Backlog
 
