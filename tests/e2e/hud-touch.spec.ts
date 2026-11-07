@@ -1778,7 +1778,8 @@ freshTest.describe('catalog tutorial and reload', () => {
         },
         [base, dx, dz] as const,
       );
-      await page.clock.runFor(34);
+      // Long enough for a seabed warning latched before the move to release (its hold is 3 s).
+      await page.clock.runFor(3100);
       // A place with a contact in range, or whose terrain raises an urgent warning, is no good.
       const unsuitable = await page.evaluate(() => {
         const g = window.__game as unknown as Game;
