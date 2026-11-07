@@ -180,6 +180,30 @@ export const DEFAULT_TERRAIN: TerrainConfig = {
       normalStrength: 0,
       wallSegments: { low: [220, 150], medium: [230, 150], high: [220, 150] },
     },
+    // The hull sank into soft ooze on a seamount flank: a shallow scour around her footprint
+    // breaks the bed's smooth dome. The footprint is the 251 x 36 m hull envelope, so the wider
+    // seamount slope outside the focus keeps its surveyed shape.
+    bismarck: {
+      resolveLow: true,
+      focus: { lat: 48.15, lon: -16.117, radiusM: 150, fadeM: 60 },
+      chunkCells: 8,
+      nearSubdiv: { low: 6, medium: 8, high: 12 },
+      reliefM: 0,
+      reliefWavelengthM: 24,
+      scour: {
+        lat: 48.15,
+        lon: -16.117,
+        headingDeg: 20,
+        halfLengthM: 125,
+        halfWidthM: 18,
+        depthM: 4,
+        widthM: 26,
+        rimM: 1,
+        tint: 0.45,
+      },
+      normalStrength: 0,
+      wallSegments: { low: [220, 150], medium: [230, 150], high: [220, 150] },
+    },
     // The 320 m sinkhole fits inside six survey cells. Resolve its reconstructed
     // ledges on the sand/rock surface itself, avoiding intersecting prop skins.
     'great-blue-hole': {
