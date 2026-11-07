@@ -1736,7 +1736,7 @@ freshTest.describe('catalog tutorial and reload', () => {
       return window.__gameReady === true && g.discovery.loaded && g.props.loaded;
     });
     // Let the first frames publish the real altitude: an unstepped sub reads as on
-    // the seabed, and the urgent SEABED PROXIMITY warning would own the slot.
+    // the seabed, and the urgent SEABED CLOSE warning would own the slot.
     await page.clock.runFor(50);
     await page.evaluate(() => {
       (window.__game as unknown as Game).sub.step = () => {};

@@ -6,10 +6,22 @@
 
 import { HUD } from '../../ui/HUD.js';
 import { hudRegions } from '../../ui/hudRegions.js';
+import type { GameContext } from '../context.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
+
+/** How to rise, in the active input device's words. */
+function riseCue(ctx: GameContext): string {
+  const device = ctx.controlsCard.device;
+  if (device === 'touch') return 'RISE · SLIDER UP';
+  if (device === 'gamepad') {
+    const pad = ctx.input.actions.find((a) => a.id === 'ballastBlow')?.pad ?? 'A';
+    return `PRESS ${pad} TO RISE`;
+  }
+  return `HOLD ${ctx.input.primaryKeyLabel('ballastBlow')} TO RISE`;
+}
 
 export const hudSystem: GameSystem = {
   name: 'hud',
@@ -24,6 +36,8 @@ export const hudSystem: GameSystem = {
         seabedWarnAltitudeM: config.submarine.seabedWarnAltitudeM,
         seabedWarnTimeToContactS: config.submarine.seabedWarnTimeToContactS,
         seabedApproachAltitudeM: config.submarine.seabedApproachAltitudeM,
+        seabedClearAltitudeM: config.submarine.seabedClearAltitudeM,
+        seabedHoldS: config.submarine.seabedHoldS,
         contactAltitudeM: config.submarine.hullRadius + config.submarine.seabedClearance,
       },
       config.currents.hudMinMps,
@@ -49,6 +63,9 @@ export const hudSystem: GameSystem = {
         // Any contact in range (animals too): its result card must not lose the
         // slot to the static altitude warning the moment the pose is read as shallow.
         nearScanTarget: discovery.scanner.view.nearestInRange,
+        scanLive: discovery.scanner.view.phase !== 'idle',
+        dt: f.dt,
+        riseCue: riseCue(ctx),
         simSpeed: sub.simSpeed,
       });
       // Warnings are shown by the guidance slot, so they never need their own
