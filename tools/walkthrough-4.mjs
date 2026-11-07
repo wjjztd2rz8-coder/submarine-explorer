@@ -50,7 +50,9 @@ const shot = async (page, label, { extra = false } = {}) => {
   if (extra && extraShots >= MAX_EXTRA_SHOTS) return;
   if (extra) extraShots++;
   const n = String(++shotN).padStart(2, '0');
-  await page.screenshot({ path: `${outDir}/${n}-${label}.png` }).catch((e) => note('shot-failed', e.message));
+  await page
+    .screenshot({ path: `${outDir}/${n}-${label}.png` })
+    .catch((e) => note('shot-failed', e.message));
 };
 
 const browser = await chromium.launch({
@@ -101,7 +103,15 @@ const begin = page.getByRole('button', { name: /Begin dive/i }).first();
 await begin.waitFor({ state: 'visible', timeout: 60000 }).catch(() => note('no-briefing', ''));
 await page.waitForTimeout(800);
 await shot(page, 'briefing');
-note('briefing', (await page.locator('.briefing').innerText().catch(() => '?')).replace(/\n+/g, ' | '));
+note(
+  'briefing',
+  (
+    await page
+      .locator('.briefing')
+      .innerText()
+      .catch(() => '?')
+  ).replace(/\n+/g, ' | '),
+);
 await tapOrClick(begin);
 note('begin-dive');
 
@@ -111,9 +121,10 @@ const readState = () =>
     const vis = (el) => !!el && !el.hidden && el.getClientRects().length > 0;
     const q = (s) => document.querySelector(s);
     const marker = q('.d-scan-world-marker.is-current');
-    const m = marker && vis(marker)
-      ? { x: parseFloat(marker.style.left), y: parseFloat(marker.style.top) }
-      : null;
+    const m =
+      marker && vis(marker)
+        ? { x: parseFloat(marker.style.left), y: parseFloat(marker.style.top) }
+        : null;
     const edge = q('.d-scan-edge');
     const angle = edge && vis(edge) ? parseFloat(edge.style.getPropertyValue('--direction')) : null;
     const body = document.body.innerText;
@@ -204,8 +215,7 @@ while (now() * 1000 < capMs) {
   }
 
   // Surface when the player has had a fair go after a scan, or at the time limit.
-  const timeToSurface =
-    (firstScanT !== null && now() > firstScanT + 90) || now() >= surfaceT;
+  const timeToSurface = (firstScanT !== null && now() > firstScanT + 90) || now() >= surfaceT;
   if (timeToSurface && !surfaceStarted) {
     surfaceStarted = true;
     await setPoint(1, null);
@@ -213,7 +223,9 @@ while (now() * 1000 < capMs) {
     await setPoint(3, null);
     for (const k of Object.keys(keys)) await setKey(k, false);
     if (layout.touch) {
-      await tapOrClick(page.locator('.tc-btn-pause').first()).catch((e) => note('pause-tap-failed', e.message));
+      await tapOrClick(page.locator('.tc-btn-pause').first()).catch((e) =>
+        note('pause-tap-failed', e.message),
+      );
     } else {
       await page.keyboard.press('Escape');
     }
@@ -237,7 +249,10 @@ while (now() * 1000 < capMs) {
       .locator('button:visible')
       .allInnerTexts()
       .catch(() => []);
-    note('stuck-45s', `guide="${s.guide}" marker=${JSON.stringify(s.m)} buttons=${JSON.stringify(buttons.slice(0, 12))}`);
+    note(
+      'stuck-45s',
+      `guide="${s.guide}" marker=${JSON.stringify(s.m)} buttons=${JSON.stringify(buttons.slice(0, 12))}`,
+    );
     await shot(page, `stuck-${String(Math.round(now())).padStart(3, '0')}`, { extra: true });
   }
 
@@ -267,7 +282,12 @@ while (now() * 1000 < capMs) {
   const inReticle = s.m && dx !== null && Math.abs(dx) < 0.25 && dy !== null && Math.abs(dy) < 0.3;
   want.g = Boolean(inReticle && /HOLD (G|SCAN)|SCANNING/i.test(s.guide));
   // The card names the depth keys; the player presses the one toward the target.
-  const wantsDepth = /Space|Ctrl|rise|sink/i.test(s.guide) && !scanningText && s.m && dy !== null && Math.abs(dy) > 0.2;
+  const wantsDepth =
+    /Space|Ctrl|rise|sink/i.test(s.guide) &&
+    !scanningText &&
+    s.m &&
+    dy !== null &&
+    Math.abs(dy) > 0.2;
   if (wantsDepth) {
     if (layout.touch) slider = dy < 0 ? 'up' : 'down';
     else if (dy < 0) want.Space = true;
@@ -311,7 +331,10 @@ while (now() * 1000 < capMs) {
     const sl = await centerOf('.tc-slider');
     if (sl) {
       if (slider) {
-        const pos = { x: sl.x, y: slider === 'up' ? sl.y - sl.b.height * 0.35 : sl.y + sl.b.height * 0.35 };
+        const pos = {
+          x: sl.x,
+          y: slider === 'up' ? sl.y - sl.b.height * 0.35 : sl.y + sl.b.height * 0.35,
+        };
         await setPoint(3, pos);
       } else if (points.has(3)) {
         await setPoint(3, null);
@@ -328,7 +351,10 @@ if (!debriefT && now() * 1000 >= capMs) note('cap-reached', 'no debrief within t
 // Final frame.
 await page.waitForTimeout(1200);
 await shot(page, debriefT !== null ? 'debrief' : 'end-no-debrief');
-const debriefText = await page.locator('.mission-debrief').innerText().catch(() => null);
+const debriefText = await page
+  .locator('.mission-debrief')
+  .innerText()
+  .catch(() => null);
 if (debriefText) note('debrief-text', debriefText.replace(/\n+/g, ' | '));
 
 await writeFile(

@@ -22,71 +22,71 @@ Screenshots (gitignored, on disk): `.cache/codex/shots/walkthrough-4/<layout>/NN
 
 ### Desktop 1280x720 (final run; `desktop/`)
 
-| Time | Event |
-|---|---|
-| 0 | Home visible. Primary button "Dive: Titanic dive" |
-| 3.7 | Tapped primary. Briefing shows at 18.5, Begin dive at 18.6 |
-| 30.5 | Step 1 card: "Follow the marker toward the bow. Hold W to move, then A or D to turn." |
-| 33.6 | Step 2 card: "Hold Space to rise or Ctrl to sink." Sub is already at about 3770 m, level with the bow |
-| 37.0 | Reticle appears; 42.0 card "SCAN TARGET ... HOLD G TO SCAN" at 91 m |
-| 45.0 | 1% SCANNING, then at 48.2 the card silently returns to STEP 2 (scan dropped with no reason shown) |
-| 51.8 | STEP 3 card: "Hold G on a glowing target." Ctrl tip appears on the first Ctrl press (about 52 s) |
-| 83-148 | Objective cards "TURN 130° PORT", "TURN 85° STARBOARD" ... |
+| Time        | Event                                                                                                         |
+| ----------- | ------------------------------------------------------------------------------------------------------------- |
+| 0           | Home visible. Primary button "Dive: Titanic dive"                                                             |
+| 3.7         | Tapped primary. Briefing shows at 18.5, Begin dive at 18.6                                                    |
+| 30.5        | Step 1 card: "Follow the marker toward the bow. Hold W to move, then A or D to turn."                         |
+| 33.6        | Step 2 card: "Hold Space to rise or Ctrl to sink." Sub is already at about 3770 m, level with the bow         |
+| 37.0        | Reticle appears; 42.0 card "SCAN TARGET ... HOLD G TO SCAN" at 91 m                                           |
+| 45.0        | 1% SCANNING, then at 48.2 the card silently returns to STEP 2 (scan dropped with no reason shown)             |
+| 51.8        | STEP 3 card: "Hold G on a glowing target." Ctrl tip appears on the first Ctrl press (about 52 s)              |
+| 83-148      | Objective cards "TURN 130° PORT", "TURN 85° STARBOARD" ...                                                    |
 | 159.8-169.5 | Card switches to "Get closer to scan · 162 m" and the distance rises to 237 m in about 10 s (script steering) |
-| **210.9** | **First scan: Bow section ("OK New Journal entry", PRESS J)**. Scan run 197.8-204.7 |
-| 285.8-298.1 | Stern scan, "New Journal entry" |
-| 301.7 | Surface and debrief (pause menu) |
-| **301.7** | **Debrief reached**: "Primaries complete", 3 scans, 2 of 2 primary objectives, "Scanned Stern section." |
+| **210.9**   | **First scan: Bow section ("OK New Journal entry", PRESS J)**. Scan run 197.8-204.7                           |
+| 285.8-298.1 | Stern scan, "New Journal entry"                                                                               |
+| 301.7       | Surface and debrief (pause menu)                                                                              |
+| **301.7**   | **Debrief reached**: "Primaries complete", 3 scans, 2 of 2 primary objectives, "Scanned Stern section."       |
 
 First confusion: 33.6 s (depth card on a level approach). Scan result: a first-scan attempt was lost at 48 s with no message. No page errors.
 
 ### Phone 390x844 (touch; `phone/`, rerun after a script fix)
 
-| Time | Event |
-|---|---|
-| 0 | Home visible. Primary "Dive: Titanic dive" tapped at 1.9 s |
-| 17.8 | Briefing (Begin dive at 18.9) |
-| 31.2 | Guidance "Drag to follow the marker." |
-| 36.3 | "Right slider: up to rise, down to sink." while the sub is level with the bow |
-| 42.2 | "SCAN TARGET ... HOLD SCAN TO SCAN" at 42 s |
-| 46.2 | "SCAN INTERRUPTED ... BEAM OFF TARGET" at 30%. The card goes back to "Right slider" at 48.6 |
-| 67.8 | Second interruption at 38% |
-| 82-145 | "WARNING SEABED PROXIMITY" flickers in and out of the guidance slot (about nine flips in that minute), replacing the scan prompt |
-| 92.8 | "OK Side find Debris field (mid-site)": an off-objective scan completes |
-| 137.8 | "OK Side find White sea anemone" |
-| **145.7** | **First objective scan: Bow section ("OK New Journal entry")** |
-| 236.9 | Surface and debrief (90 s after the first scan) |
-| **237.2** | **Debrief reached**: "Dive summary", 5 scans, 1 of 2 primary objectives, "Scanned Bow section." |
+| Time      | Event                                                                                                                            |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| 0         | Home visible. Primary "Dive: Titanic dive" tapped at 1.9 s                                                                       |
+| 17.8      | Briefing (Begin dive at 18.9)                                                                                                    |
+| 31.2      | Guidance "Drag to follow the marker."                                                                                            |
+| 36.3      | "Right slider: up to rise, down to sink." while the sub is level with the bow                                                    |
+| 42.2      | "SCAN TARGET ... HOLD SCAN TO SCAN" at 42 s                                                                                      |
+| 46.2      | "SCAN INTERRUPTED ... BEAM OFF TARGET" at 30%. The card goes back to "Right slider" at 48.6                                      |
+| 67.8      | Second interruption at 38%                                                                                                       |
+| 82-145    | "WARNING SEABED PROXIMITY" flickers in and out of the guidance slot (about nine flips in that minute), replacing the scan prompt |
+| 92.8      | "OK Side find Debris field (mid-site)": an off-objective scan completes                                                          |
+| 137.8     | "OK Side find White sea anemone"                                                                                                 |
+| **145.7** | **First objective scan: Bow section ("OK New Journal entry")**                                                                   |
+| 236.9     | Surface and debrief (90 s after the first scan)                                                                                  |
+| **237.2** | **Debrief reached**: "Dive summary", 5 scans, 1 of 2 primary objectives, "Scanned Bow section."                                  |
 
 First confusion: 36.3 s (right-slider depth card on a level approach). No page errors.
 
 ### Landscape 844x390, v1 (touch; `landscape/`; primary result, same rules as the other runs)
 
-| Time | Event |
-|---|---|
-| 0 | Home visible; primary tapped at 1.7 s |
-| 7.8 | Briefing (Begin dive at 8.3) |
-| 28.2 | "Drag to follow the marker." |
-| 35.8 | "Right slider: up to rise, down to sink." |
-| 44.4 | "Hold SCAN on a glowing target." |
-| **47.8** | **"WARNING SEABED PROXIMITY" takes the guidance slot and stays there until the debrief at 541.5 s** |
-| 47.8-541.5 | Sub sits on the seabed at about 0.2 kn, 3780-3790 m. The v1 player never answers the warning with the RISE slider, so this stall is partly the script. The scan reticle sits on the Bow in the screenshots, but no scan progress is shown while the warning holds the slot |
-| **Never observed** | The script saw no first-scan text. The debrief counts 4 scans, which must have happened while the warning hid the slot |
-| 541.5 | Debrief reached at the cap: "Dive summary", 4 scans, 0 of 2 primary objectives, "Scanned Dumbo octopus." |
+| Time               | Event                                                                                                                                                                                                                                                                      |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0                  | Home visible; primary tapped at 1.7 s                                                                                                                                                                                                                                      |
+| 7.8                | Briefing (Begin dive at 8.3)                                                                                                                                                                                                                                               |
+| 28.2               | "Drag to follow the marker."                                                                                                                                                                                                                                               |
+| 35.8               | "Right slider: up to rise, down to sink."                                                                                                                                                                                                                                  |
+| 44.4               | "Hold SCAN on a glowing target."                                                                                                                                                                                                                                           |
+| **47.8**           | **"WARNING SEABED PROXIMITY" takes the guidance slot and stays there until the debrief at 541.5 s**                                                                                                                                                                        |
+| 47.8-541.5         | Sub sits on the seabed at about 0.2 kn, 3780-3790 m. The v1 player never answers the warning with the RISE slider, so this stall is partly the script. The scan reticle sits on the Bow in the screenshots, but no scan progress is shown while the warning holds the slot |
+| **Never observed** | The script saw no first-scan text. The debrief counts 4 scans, which must have happened while the warning hid the slot                                                                                                                                                     |
+| 541.5              | Debrief reached at the cap: "Dive summary", 4 scans, 0 of 2 primary objectives, "Scanned Dumbo octopus."                                                                                                                                                                   |
 
 Landscape v1 never got an objective scan, so the debrief shows 0 primaries. This matches the baseline "no scan in 7 min" for landscape.
 
 ### Landscape 844x390, v2 supplementary (`landscape-v2-seabed-rise/`; same rules plus RISE on the seabed warning)
 
-| Time | Event |
-|---|---|
-| 0 | Home visible |
-| 28.0-44.3 | Same first 45 s as v1: Drag, Right slider, Hold SCAN |
-| 47.9 | SEABED PROXIMITY warning, then the rise slider is held |
-| 53.9 | "SCANNING Bow section" at 72%, so the rise cleared the seabed warning in time |
-| about 54-58 | **First scan: Bow section** (bounded by the poll; screenshot at 58 s shows the bow checkmark) |
-| 57.9 | "SCAN INTERRUPTED White sea anemone" at 11% (the reticle moved off the bow). Later scans interrupted on a debris field and a crown jelly |
-| 541.3 | Debrief reached at the cap: 1 scan, 1 of 2 primary objectives, "Scanned Bow section." |
+| Time        | Event                                                                                                                                    |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 0           | Home visible                                                                                                                             |
+| 28.0-44.3   | Same first 45 s as v1: Drag, Right slider, Hold SCAN                                                                                     |
+| 47.9        | SEABED PROXIMITY warning, then the rise slider is held                                                                                   |
+| 53.9        | "SCANNING Bow section" at 72%, so the rise cleared the seabed warning in time                                                            |
+| about 54-58 | **First scan: Bow section** (bounded by the poll; screenshot at 58 s shows the bow checkmark)                                            |
+| 57.9        | "SCAN INTERRUPTED White sea anemone" at 11% (the reticle moved off the bow). Later scans interrupted on a debris field and a crown jelly |
+| 541.3       | Debrief reached at the cap: 1 scan, 1 of 2 primary objectives, "Scanned Bow section."                                                    |
 
 The v2 pass shows that the v1 stall was a script gap, not a game dead end: a player who rises clears the warning and gets a real scan in under a minute. The game still gives no hint to rise.
 
