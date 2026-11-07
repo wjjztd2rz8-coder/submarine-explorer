@@ -44,7 +44,7 @@ const outDir = resolve(
   `${siteName}-${layoutName}`,
 );
 const { width: W, height: H } = layout.viewport;
-const MAX_EXTRA_SHOTS = 40;
+const MAX_EXTRA_SHOTS = 200; // attempt 1 capped at 40 and lost the debrief and Journal shots
 
 await mkdir(outDir, { recursive: true });
 
@@ -205,6 +205,7 @@ const setKey = async (k, down) => {
 };
 
 let prevGuide = null;
+let prevWording = null;
 let guideSince = 0;
 let scanStartT = null;
 let firstScanT = null;
@@ -228,9 +229,14 @@ while (now() * 1000 < capMs) {
 
   if (s.guide !== prevGuide) {
     note('guide', s.guide);
+    // Shoot only when the card's wording changes, not when a distance number ticks.
+    const wording = s.guide.replace(/\d+/g, '#');
+    if (wording !== prevWording) {
+      await shot(page, `guide-${String(Math.round(now())).padStart(3, '0')}`, { extra: true });
+      prevWording = wording;
+    }
     prevGuide = s.guide;
     guideSince = now();
-    await shot(page, `guide-${String(Math.round(now())).padStart(3, '0')}`, { extra: true });
   }
   const seabedUp = /SEABED/.test(s.guide);
   if (seabedUp !== prevSeabed) {
@@ -416,17 +422,18 @@ if (debriefT !== null) {
     .allInnerTexts()
     .catch(() => []);
   note('debrief-buttons', JSON.stringify(debriefButtons.slice(0, 14)));
+  // The debrief's own "Journal" button (exact case); the HUD "JOURNAL" chip is not the debrief path.
   const journal = page
-    .getByRole('button', { name: /journal/i })
+    .getByRole('button', { name: 'Journal', exact: true })
     .filter({ visible: true })
     .first();
   if (await journal.isVisible().catch(() => false)) {
-    note('journal-tap', (await journal.innerText()).replace(/\n+/g, ' '));
+    note('journal-tap', 'Journal (debrief button)');
     await tapOrClick(journal);
     await page.waitForTimeout(1200);
     await shot(page, 'journal', { extra: true });
     const journalText = await page
-      .locator('.journal, [class*="journal"]:visible')
+      .locator('.field-guide.journal')
       .first()
       .innerText()
       .catch(() => '?');
