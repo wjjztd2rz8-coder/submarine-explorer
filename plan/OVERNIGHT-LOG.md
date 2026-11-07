@@ -3372,3 +3372,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Red runs all predate the Monterey catalog spec fix; local spec passes on 6 viewports. Hosted run on 4582d7a7 pending. No agents launched, no code changes. Fallback plan logged in REVIEWS.md.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-07 15:13 CST headless run (Claude): V-monterey-wall-face (no ship)
+
+- Sonnet tried V-monterey-wall-face (~57 min): moving the scan target ~180 m east gave a ~4.0 frame (from 3.8) but breaks two coupled tests (hero within 60 m, carve focus within 200 m). Nothing shipped; findings note merged. Follow-up recorded in DIRECTOR item 3: move carve focus, hero and scan target together and rebaseline those tests. Hosted CI on the Monterey catalog fix still pending at last check; no tag. Codex 146-150 queued (weekly pacing, 17% left).
+- **Needs owner:** phone retest (4410-P2 checklist).
