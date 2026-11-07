@@ -10,7 +10,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { propManifest } from '../../../core/SiteManifest.js';
 import { paintCrust } from './crust.js';
 import { geoDetail } from './detail.js';
-import { geoMaterial, vertexGlow } from './materials.js';
+import { geoMaterial, sulfideCrust, vertexGlow } from './materials.js';
 import { flange, tieredSpire } from './spire.js';
 import { fbm3, mulberry32, paint, place, projectUVs, type BuiltProp } from './shared.js';
 import type { GeoBuildInput } from './types.js';
@@ -134,6 +134,7 @@ export function buildCrustedChimney(input: GeoBuildInput): BuiltProp {
   // Same finish as the hero: lifted albedo plus a faint warm self-lit tint following the crust.
   mat.color.multiplyScalar(1.25);
   vertexGlow(mat, 0.13, 0xff9a68, 0.5);
+  sulfideCrust(mat, { stain: 0.7, film: 0.6, grain: d.bump ? 0.18 : 0 });
   const full = new THREE.Mesh(geom, mat);
   full.name = 'chimney';
   const imp = new THREE.Mesh(

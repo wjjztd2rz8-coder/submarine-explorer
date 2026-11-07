@@ -215,7 +215,7 @@ describe('smoker profile capability', () => {
           [...material.color.toArray(), ...material.emissive.toArray()].every(Number.isFinite),
         ).toBe(true);
         expect(material.emissiveIntensity).toBe(1);
-        expect(material.customProgramCacheKey()).toBe('vertexGlow2-0.5');
+        expect(material.customProgramCacheKey()).toMatch(/^vertexGlow2-0\.5-sulfide-/);
       };
       const sourceBefore = JSON.stringify(authored);
       try {
