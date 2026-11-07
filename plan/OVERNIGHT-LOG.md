@@ -3315,3 +3315,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: main clean and pushed, previous run merged V-closeup-materials-beebe minutes earlier; its CI is queued (tag waits). Skipped a new Sonnet package: Claude 5h at 69% with a reset at 22:40, too tight for a ~100 min agent. Codex 146-151 queued (held on weekly pace, 28% left); 124/131 held. Next: U-scan-fish-vs-objective, Blue Hole sediment apron silt.
 - **Needs owner:** phone retest (4410-P2 checklist).
+
+## 2026-11-06 23:57 CST headless run (Claude): U-scan-fish-vs-objective
+
+- Merged Sonnet U-scan-fish-vs-objective: scanning a side target while the objective is pending now shows a "Side find" card (generic `lastCompleteSideFind` flag on ScanView; same card, detail still points at the objective). The scan lock already preferred an in-range objective; in the Blue Hole case the gallery was 125 m away, so only the fish was legal. No fresh screenshot (text-only change): glance at the next Blue Hole walkthrough. gates smoke + project-base green on branch and main; pushed. Codex brief 151 moved to queue/hold (Sonnet took it); 146-150 queued (held on Codex weekly pace, 28% left). Agent took ~22 min. Next: Blue Hole sediment apron silt.
+- **Needs owner:** phone retest (4410-P2 checklist).
