@@ -96,8 +96,11 @@ export interface DebriefStats {
   /** Positive metres. */
   maxDepthM: number;
   elapsedS: number;
-  /** Primary objectives done this dive ("X of Y primary objectives"); absent in a free dive. */
-  objectives?: { completed: number; total: number };
+  /**
+   * Primary objectives done this dive ("X of Y primary objectives"); absent in a free dive.
+   * `remaining` is the title of the one primary still open, when exactly one is.
+   */
+  objectives?: { completed: number; total: number; remaining?: string };
   /** Distinct targets scanned this dive, in discovery order, including previously logged finds. */
   discoveries: Array<{ poiId: string; name: string }>;
   /** Journal entries first unlocked this session. */

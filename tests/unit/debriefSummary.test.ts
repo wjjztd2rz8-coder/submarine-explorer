@@ -55,6 +55,16 @@ describe('compact dive summary', () => {
     // Existing objectives can carry over to a return dive with no fresh scans.
     expect(summarizeDive(empty, { stars, points: 0, best: stars }).next).toBe(next);
   });
+  it('names the one primary still open, and stays generic with more than one', () => {
+    const one = {
+      ...scanned,
+      objectives: { completed: 1, total: 2, remaining: 'Scan the eastern stalactite gallery' },
+    };
+    expect(summarizeDive(one).next).toBe('Scan the eastern stalactite gallery.');
+    expect(summarizeDive({ ...scanned, objectives: { completed: 0, total: 3 } }).next).toBe(
+      'Keep exploring to finish the primary objectives.',
+    );
+  });
   it('uses the Journal as the next step on a free dive with a scan', () => {
     expect(summarizeDive({ ...scanned, objectives: undefined }).next).toBe(
       'Open the Journal to read your finds.',

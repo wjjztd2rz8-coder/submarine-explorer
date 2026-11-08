@@ -167,6 +167,16 @@ describe('tutorial progression', () => {
     hold(far, { ballast: -1 }, 30);
     expect(far.step?.id).toBe('scan');
   });
+  it('holds the depth step while the sub is on the approach (touch)', () => {
+    // Regression: the touch slider card showed on the approach, before any target was in range.
+    const t = new Tutorial();
+    hold(t, { throttle: 1 }, 30);
+    for (let i = 0; i < 60; i += 1)
+      t.update({ dt: 1 / 30, throttle: 0, yaw: 0, ballast: -1, depthReady: false });
+    expect(t.step?.id).toBe('depth');
+    hold(t, { ballast: -1 }, 30);
+    expect(t.step?.id).toBe('scan');
+  });
   it('keeps the depth step when no target is known', () => {
     const t = new Tutorial();
     hold(t, { throttle: 1 }, 30);
@@ -209,6 +219,18 @@ describe('tutorial progression', () => {
     expect(t.step?.id).toBe('depth');
     hold(t, { ballast: -1 }, 30);
     expect(t.step?.id).toBe('scan');
+  });
+  it('keeps the drop cue on the scan step until the next scan starts', () => {
+    const t = new Tutorial();
+    t.skipStep();
+    t.skipStep();
+    expect(t.step?.id).toBe('scan');
+    t.notify('scan:started');
+    t.notify('scan:aborted', 'facing');
+    expect(t.dropReason).toBe('facing');
+    expect(t.scanning).toBe(false);
+    expect(t.notify('scan:started')).toBe(false);
+    expect(t.dropReason).toBeNull();
   });
   it('events only count for the step waiting for them', () => {
     const t = new Tutorial();

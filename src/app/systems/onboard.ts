@@ -95,7 +95,7 @@ export function createOnboardSystem(): GameSystem {
           tutorial.scanProgress = progress;
         }),
       );
-      cleanup.add(bus.on('scan:aborted', () => tutorial.notify('scan:aborted')));
+      cleanup.add(bus.on('scan:aborted', ({ reason }) => tutorial.notify('scan:aborted', reason)));
       cleanup.add(
         bus.on('scan:complete', () => {
           // A completed opening target cannot be scanned again this dive.
@@ -153,6 +153,10 @@ export function createOnboardSystem(): GameSystem {
           ? ctx.discovery.scanner.getTargets().find((t) => t.id === f.nextScanObjective?.poiId)
           : undefined;
         const targetGapM = firstTarget ? Math.abs(f.sub.depth - firstTarget.position.y) : undefined;
+        const scanView = ctx.discovery.scanner.view;
+        // Touch teaches the depth slider once a target is in reach, not on the approach.
+        const depthReady =
+          device !== 'touch' || scanView.nearestInRange || scanView.objectiveInRange;
         if (tutorial.active && playing) {
           if (
             tutorial.update({
@@ -161,6 +165,7 @@ export function createOnboardSystem(): GameSystem {
               yaw: f.state.yaw,
               ballast: f.state.ballast,
               targetGapM,
+              depthReady,
             })
           )
             onAdvance();
@@ -169,7 +174,9 @@ export function createOnboardSystem(): GameSystem {
 
         const guidance = ctx.guidance;
         const step = tutorial.step;
-        const scanView = ctx.discovery.scanner.view;
+        // A dropped beam keeps its cue on the scan step, so the card does not fall back to STEP 3.
+        const dropped = step?.id === 'scan' && !tutorial.scanning && tutorial.dropReason !== null;
+        const waitingForDepth = step?.id === 'depth' && !depthReady;
         const scanDistance = scanView.objectiveId
           ? scanView.objectiveDistance
           : scanView.nearestDistance;
@@ -178,13 +185,15 @@ export function createOnboardSystem(): GameSystem {
         guidance.offer(
           'tutorial',
           'hint',
-          step && playing
+          step && playing && !waitingForDepth
             ? {
                 // Phones keep to one short line beside Skip.
                 kicker:
-                  device === 'touch'
-                    ? ''
-                    : `STEP ${tutorial.index + 1} OF ${TUTORIAL_STEPS.length}`,
+                  dropped && device !== 'touch'
+                    ? 'SCAN INTERRUPTED'
+                    : device === 'touch'
+                      ? ''
+                      : `STEP ${tutorial.index + 1} OF ${TUTORIAL_STEPS.length}`,
                 text: tutorialText(
                   step.id,
                   device,
@@ -195,6 +204,7 @@ export function createOnboardSystem(): GameSystem {
                     ? scanDistance
                     : undefined,
                   tutorial.stalled && Number.isFinite(scanDistance) ? scanDistance : undefined,
+                  tutorial.dropReason,
                 ),
                 tone: 'cyan',
                 step: step.id,

@@ -511,11 +511,12 @@ export class MissionRouter {
     const reason = m.endReason ?? 'surface';
     const primaries = m.primaryCounts();
     const { title, subtitle } = debriefText(reason, primaries, this.failedAt, this.abortCause);
+    const open = m.requiredPrimaries().filter((o) => !o.complete);
     const stats = discovery.stats.snapshot({
       title,
       subtitle,
       landmarkName: route.def.title,
-      objectives: primaries,
+      objectives: { ...primaries, remaining: open.length === 1 ? open[0]?.title : undefined },
     });
     if (!this.debrief) {
       this.debrief = new Debrief({ parent: this.opts.parent });
