@@ -588,16 +588,16 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
-        '#include <common>\nattribute float sedimentRoughness;\nattribute float bedLevel;\nvarying float vSedimentRoughness;\nvarying float vBedLevel;',
+        '#include <common>\nattribute float sedimentRoughness;\nattribute float bedLevel;\nvarying float vSedimentRoughness;\nvarying float vBedLevel;\nvarying vec2 vSilt;',
       )
       .replace(
         '#include <begin_vertex>',
-        '#include <begin_vertex>\nvSedimentRoughness = sedimentRoughness;\nvBedLevel = bedLevel;',
+        '#include <begin_vertex>\nvSedimentRoughness = sedimentRoughness;\nvBedLevel = bedLevel;\nvSilt = position.xy;',
       );
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        '#include <common>\nvarying float vSedimentRoughness;\nvarying float vBedLevel;',
+        '#include <common>\nvarying float vSedimentRoughness;\nvarying float vBedLevel;\nvarying vec2 vSilt;',
       )
       // Terraces are contours of height: shade each bed per pixel (lit lip, silted foot) so the
       // steps read at any triangle density, including Low's coarse grid.
@@ -606,7 +606,11 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
         `#include <color_fragment>
 float bedF = fract(vBedLevel);
 float bedRise = smoothstep(0.04, 0.3, bedF) * (1.0 - smoothstep(0.7, 0.96, bedF));
-diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sediment.lipLight.toFixed(3)} * smoothstep(0.86, 0.99, bedF);`,
+diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sediment.lipLight.toFixed(3)} * smoothstep(0.86, 0.99, bedF);
+// Silt: faint current ripples along the slope and a fine per-pixel grain.
+float siltRipple = sin(vSilt.x * 2.1 + 2.6 * sin(vSilt.y * 0.55 + vSilt.x * 0.17));
+float siltGrain = fract(sin(dot(floor(vSilt * 7.0), vec2(12.9898, 78.233))) * 43758.5453);
+diffuseColor.rgb *= 1.0 + 0.05 * siltRipple + 0.1 * (siltGrain - 0.5);`,
       )
       .replace(
         '#include <roughnessmap_fragment>',
