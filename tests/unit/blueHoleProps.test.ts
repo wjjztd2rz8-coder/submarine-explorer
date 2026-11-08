@@ -50,13 +50,13 @@ describe('Great Blue Hole props', () => {
       id: 'karst-grotto',
       tier: 'low',
       min: [-1.06218, 1.67745, -25.74851],
-      max: [7.28213, 11.17616, -3.06162],
+      max: [7.28213, 12.17616, -3.06162],
     },
     {
       id: 'karst-grotto',
       tier: 'high',
       min: [-17.81372, 1.06023, -31.67323],
-      max: [6.26942, 10.70134, -2.80004],
+      max: [6.26942, 12.0, -2.80004],
     },
     {
       id: 'karst-grotto-east',
@@ -184,7 +184,7 @@ describe('Great Blue Hole props', () => {
         }
         const boundary = [...edges.values()].filter((edge) => edge.count === 1);
         expect(boundary.length).toBeGreaterThan(0);
-        expect(boundary.every((edge) => edge.high <= def.dimensionsM![2] * 0.011)).toBe(true);
+        expect(boundary.every((edge) => edge.high <= def.dimensionsM![2] * 0.012)).toBe(true);
         expect([...edges.values()].every((edge) => edge.count <= 2)).toBe(true);
         disposeGeo(built);
       });

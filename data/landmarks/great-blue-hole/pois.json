@@ -8,7 +8,7 @@
       "lat": 17.3156,
       "lon": -87.53705,
       "snap_to_seabed": true,
-      "radius_m": 36,
+      "radius_m": 46,
       "min_depth_m": 10,
       "kind": "geology",
       "primary": false,
