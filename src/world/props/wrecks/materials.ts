@@ -74,42 +74,48 @@ float pNoise(vec2 p) {
       )
       .replace(
         '#include <map_fragment>',
-        `#include <map_fragment>
+        `#ifdef USE_MAP
+// Wander the plate map's seams so strakes bow and butt joints drift instead of
+// tiling as a ruler grid; the plate cells below follow the same warped coordinates.
+vec2 wuv = vMapUv + vec2(0.05 * (pNoise(vec2(vMapUv.y * 7.0, 2.0)) - 0.5),
+                         0.035 * (pNoise(vMapUv * vec2(4.0, 1.5) + 8.0) - 0.5));
+#endif
+${THREE.ShaderChunk.map_fragment.replace(/vMapUv/g, 'wuv')}
 #ifdef USE_MAP
 {
-  vec2 g = vec2(vMapUv.x * 2.0, vMapUv.y * 4.0);
+  vec2 g = vec2(wuv.x * 2.0, wuv.y * 4.0);
   vec2 cell = vec2(floor(g.x + floor(g.y) * 0.37), floor(g.y));
   float h1 = pHash(cell);
   float h2 = pHash(cell + 17.3);
   float lum = dot(diffuseColor.rgb, vec3(0.3, 0.59, 0.11));
-  // Lanes: bands of plates (rows a few strakes tall, columns a few plates wide) lean
-  // slightly cool or warm; kept gentle so the hull reads as one continuous plating.
-  float laneMix = 0.6 * pHash(vec2(floor(g.y * 0.5), 7.0)) + 0.4 * pHash(vec2(floor(g.x * 0.34), 1.0));
-  vec3 lane = mix(vec3(0.93, 0.98, 1.02), vec3(1.07, 0.99, 0.92), smoothstep(0.25, 0.75, laneMix));
-  // Per-plate brightness; some plates bleached grey-brown, a few sprung dark.
-  // Up close the plate-to-plate steps soften and a slow field that ignores the seams
-  // takes over, so the hull stops reading as a tile grid; far away the old look holds.
+  // Each plate is its own rust: orange-brown, dark brown or near-black stain, with its
+  // own brightness. A slow field that ignores the seams adds variation across plates.
   float near = 1.0 - smoothstep(20.0, 55.0, length(vViewPosition));
-  float tone = 0.7 + 0.5 * h1 - 0.25 * smoothstep(0.82, 0.97, h2);
-  float drift = pNoise(vMapUv * vec2(1.7, 2.6)) + 0.5 * pNoise(vMapUv * vec2(6.0, 9.0)) - 0.75;
-  tone = mix(tone, mix(tone, 0.95, 0.55) * (1.0 + 0.7 * drift), near);
-  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(lum), (0.12 + 0.28 * smoothstep(0.3, 0.9, h2))) * tone * lane;
+  float drift = pNoise(wuv * vec2(1.7, 2.6)) + 0.5 * pNoise(wuv * vec2(6.0, 9.0)) - 0.75;
+  float tone = 0.55 + 0.6 * h1 + 0.35 * drift * near;
+  vec3 plate = mix(vec3(0.4, 0.17, 0.07), vec3(0.22, 0.09, 0.04), smoothstep(0.3, 0.75, h2));
+  plate = mix(plate, vec3(0.07, 0.04, 0.025), smoothstep(0.8, 0.92, h2));
+  diffuseColor.rgb = mix(diffuseColor.rgb, plate * (0.3 + 0.9 * lum), 0.55 + 0.25 * near) * tone;
   // Stain band below the plate's upper seam, and long thin streaks running down.
   float down = 1.0 - fract(g.y);
   float band = smoothstep(0.0, 0.5, down) * (1.0 - smoothstep(0.5, 1.0, down));
-  float streak = pNoise(vec2(vMapUv.x * 50.0, vMapUv.y * 3.0 + h1 * 9.0));
+  float streak = pNoise(vec2(wuv.x * 50.0, wuv.y * 3.0 + h1 * 9.0));
   float stain = clamp(band * (0.35 + h2) * 0.5 + smoothstep(0.6, 0.95, streak) * 0.4, 0.0, 0.75);
   // Rust runs down from the rivet line under each seam in narrow runs of varied reach,
-  // and a few carry on across the next plate.
-  float run = pNoise(vec2(vMapUv.x * 70.0, cell.y * 5.3 + h1 * 7.0));
-  float reach = 0.25 + 1.3 * pHash(vec2(floor(vMapUv.x * 70.0), cell.y + 3.0));
-  float cluster = smoothstep(0.25, 0.7, pNoise(vMapUv * vec2(3.1, 2.3) + 4.0));
-  float bleed = smoothstep(0.5, 0.82, run) * (0.25 + 0.75 * cluster) * (1.0 - smoothstep(0.0, reach, down)) * (1.0 - 0.5 * smoothstep(0.85, 1.0, down));
-  stain = clamp(stain * (1.0 - 0.6 * near) + 0.45 * bleed * near, 0.0, 0.8);
-  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.42, 0.19, 0.07), 0.55 * bleed * near);
-  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.2, 0.09, 0.05), stain);
+  // and some carry on across the next plate; the runs are dark brown, not bright rust.
+  float run = pNoise(vec2(wuv.x * 70.0, cell.y * 5.3 + h1 * 7.0));
+  float reach = 0.3 + 1.6 * pHash(vec2(floor(wuv.x * 70.0), cell.y + 3.0));
+  float cluster = smoothstep(0.2, 0.65, pNoise(wuv * vec2(3.1, 2.3) + 4.0));
+  float bleed = smoothstep(0.45, 0.78, run) * (0.3 + 0.7 * cluster) * (1.0 - smoothstep(0.0, reach, down)) * (1.0 - 0.5 * smoothstep(0.85, 1.0, down));
+  stain = clamp(stain * (1.0 - 0.5 * near) + 0.5 * bleed * near, 0.0, 0.85);
+  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.3, 0.13, 0.05), 0.6 * bleed * near);
+  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.1, 0.05, 0.03), stain);
 }
 #endif`,
+      )
+      .replace(
+        '#include <normal_fragment_maps>',
+        THREE.ShaderChunk.normal_fragment_maps.replace(/vNormalMapUv/g, 'wuv'),
       )
       .replace(
         '#include <opaque_fragment>',
