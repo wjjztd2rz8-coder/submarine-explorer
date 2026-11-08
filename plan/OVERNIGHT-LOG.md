@@ -3447,3 +3447,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged Sonnet V-bluehole-gallery-2: karst-grotto 92x22x20 m, scan radius 46 m, apron silt grain/ripples; gallery ~18% to ~26% of opening frame. Reviewed before/after: modest but real; opening ~3.7 (agent said 4.0). Sub still touches gallery edge, stalactites small. Tests rebaselined (Low tri budget 21300 to 24000). gates smoke + project-base green on main; pushed. No tag.
 - Codex 149-152 queued (152 verifies the gallery); weekly 9% so pacing holds dispatch. Claude weekly ~37%: one package per run.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 12:32 CST headless run (Claude): red CI triage
+
+- Hosted CI on the gallery commit failed 3 shards, all f-bughunt-960 great-blue-hole realistic high: the larger karst-grotto collision box lifts the whole approach line above the 10 m scan depth rule, so the spec's teleport left the sub at -9.5 m (out of range). Spec fix only: fall back to a ring inside the scan radius that clears the depth rule. Passes locally (6/6); gates smoke + project-base green; pushed. No agents, no tag. Claude weekly 37% was just under the pace line, so no package this run.
+- Codex 149-152 queued (weekly 9%, pacing holds dispatch).
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?

@@ -206,6 +206,20 @@ for (const layout of [
                 pose.y = Math.min(pose.y, hoverY);
                 break;
               }
+              // A large prop's collision box can lift the whole approach line above the depth
+              // rule; then take the first spot on a ring inside the scan radius that clears it.
+              if (minDepth > 0 && pose.y > hoverY) {
+                const r = poi.radius * 0.8;
+                search: for (let a = 0; a < 24; a++) {
+                  const x = poi.position.x + Math.cos((a / 24) * Math.PI * 2) * r;
+                  const z = poi.position.z + Math.sin((a / 24) * Math.PI * 2) * r;
+                  if (hull.floorFor(hull.terrain.sampleHeight(x, z)) > hoverY) continue;
+                  pose.x = x;
+                  pose.z = z;
+                  pose.y = hoverY;
+                  break search;
+                }
+              }
               g.sub.reset(pose.x, pose.y, pose.z, pose.yaw);
               g.discovery.stats.markTeleport();
               return {
