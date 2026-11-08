@@ -3394,3 +3394,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged Haiku U-retest-walkthrough-5 (evidence; 6 unaided runs on Titanic and Blue Hole, note plan/progress/U-retest-walkthrough-5.md, 10 U-items; agent ~93 min). Top finding: on touch the seabed warning held the guidance slot for ~8 min while the reticle sat on the target. Merged Sonnet U-seabed-latch-hides-scan (net simpler: scanLive folded into nearScanTarget so a ready scan prompt outranks the latched warning; 3 unit tests; ~26 min). gates smoke + project-base green on branch and main; pushed. Hosted CI still unconfirmed, no tag.
 - DIRECTOR: 2a done, 2b U-copy-fixes-2 (Haiku) queued next; fish-vs-objective reticle lock (landscape Blue Hole) is a separate Sonnet item not yet added to the numbered list. Codex 146-150 queued (weekly pacing, 17% left).
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-07 21:32 CST headless run (Claude): U-copy-fixes-2
+
+- Merged Haiku U-copy-fixes-2 (agent ~93 min): touch opening card names the target, debrief "Next" names the one remaining primary, scan-drop keeps the "BEAM OFF TARGET" cue instead of STEP 3, touch slider card hidden until a target is in reach. Distance-hidden finding: the turn cue replaces distance by design, and a landscape CSS rule hides the ring that carries it (left for S-hud). gates smoke + project-base green on branch and main; pushed. Four journal-debrief "two-objective scan journey" e2e failures reproduce on the base commit (pre-existing, not triaged).
+- Hosted CI still unconfirmed (run on previous push in progress at start); no tag. Codex 146-150 queued (5 briefs, weekly pacing, 17% left). Claude weekly 44%: one package per run.
+- Next: triage the journal-debrief failures and hosted CI; U-scan-fish-lock-landscape (Sonnet).
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
