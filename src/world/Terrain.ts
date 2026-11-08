@@ -207,7 +207,8 @@ export class Terrain {
     this.stats.requestedSubdiv = requested;
 
     const rimTint = this.fidelity?.scour?.tint ?? 0;
-    if (this.biome.vertexTint || rimTint > 0) {
+    const moatShade = this.fidelity?.scour?.shade ?? 0;
+    if (this.biome.vertexTint || rimTint > 0 || moatShade > 0) {
       // Reuse every LOD's existing vertices and draw calls.
       built.material.vertexColors = true;
       if (this.biome.vertexTint)
@@ -223,7 +224,8 @@ export class Terrain {
             position.getZ(i),
             normal.getY(i),
           ) ?? [1, 1, 1];
-          const rim = 1 + rimTint * this.scourAt(position.getX(i), position.getZ(i)).rim;
+          const sc = this.scourAt(position.getX(i), position.getZ(i));
+          const rim = (1 + rimTint * sc.rim) * (1 - moatShade * sc.moat);
           colors.set([tint[0] * rim, tint[1] * rim, tint[2] * rim], i * 3);
         }
         chunk.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
@@ -345,10 +347,10 @@ export class Terrain {
    * Scour moat at a position: height offset (m) and rim weight 0..1. The moat is deepest against
    * the footprint and irregular along its length; the rim is a low silty berm just outside it.
    */
-  scourAt(x: number, z: number): { height: number; rim: number } {
+  scourAt(x: number, z: number): { height: number; rim: number; moat: number } {
     const s = this.scour;
     const p = this.fidelity?.scour;
-    if (!s || !p) return { height: 0, rim: 0 };
+    if (!s || !p) return { height: 0, rim: 0, moat: 0 };
     // Footprint frame: +z along the heading.
     const ox = x - s.x;
     const oz = z - s.z;
@@ -359,10 +361,11 @@ export class Terrain {
     const d = Math.hypot(Math.max(qx, 0), Math.max(qz, 0)) + Math.min(Math.max(qx, qz), 0);
     const ease = THREE.MathUtils.smoothstep;
     const irregular = 0.65 + 0.7 * valueNoise2(x / 17, z / 17, this.detail.seed ^ 0x3b);
-    const moat = p.depthM * irregular * (1 - ease(d, 0, p.widthM));
+    const hug = 1 - ease(d, 0, p.widthM);
+    const moat = p.depthM * irregular * hug;
     const rim =
       ease(d, p.widthM * 0.85, p.widthM * 1.1) * (1 - ease(d, p.widthM * 1.1, p.widthM * 1.9));
-    return { height: (rim * p.rimM - moat) * this.detail.strength, rim };
+    return { height: (rim * p.rimM - moat) * this.detail.strength, rim, moat: hug };
   }
 
   /**

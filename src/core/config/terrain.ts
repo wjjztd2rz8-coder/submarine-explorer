@@ -107,7 +107,8 @@ export interface TerrainFidelity {
   /**
    * Current scour around a large object lying on soft bed: a moat that dips toward the footprint
    * (a rectangle centred on `lat`/`lon`, `headingDeg` along its length) and a silty rim beyond it.
-   * Depths and widths in metres; `tint` lightens the rim in vertex colour.
+   * Depths and widths in metres; `tint` lightens the rim and `shade` darkens the moat floor
+   * against the footprint, both in vertex colour.
    */
   scour?: {
     lat: number;
@@ -119,6 +120,7 @@ export interface TerrainFidelity {
     widthM: number;
     rimM: number;
     tint: number;
+    shade?: number;
   };
   normalStrength: number;
   /** Reconstructed wall mesh limits; Low retains the original limits. */
@@ -199,7 +201,8 @@ export const DEFAULT_TERRAIN: TerrainConfig = {
         depthM: 4,
         widthM: 26,
         rimM: 1,
-        tint: 0.45,
+        tint: 0.15,
+        shade: 0.55,
       },
       normalStrength: 0,
       wallSegments: { low: [220, 150], medium: [230, 150], high: [220, 150] },
