@@ -3388,3 +3388,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Sonnet moved carve focus, ledge hero and POI ~170 m east as one coordinate: opening got worse (~3.3 vs 3.8; no pale face, heading changed), so product change reverted; findings note merged. Item 3 marked tried twice: remaining lever is an authored pale face prop at the marker, or park at 3.8. Agent ~27 min. Hosted CI on the Monterey catalog fix still unconfirmed; no tag. Codex 146-150 queued (weekly pacing, 17% left). Next: item 2 U-retest-walkthrough-5 (Haiku), then 4/5 plating.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-07 19:07 CST headless run (Claude): walkthrough-5 + seabed latch
+
+- Merged Haiku U-retest-walkthrough-5 (evidence; 6 unaided runs on Titanic and Blue Hole, note plan/progress/U-retest-walkthrough-5.md, 10 U-items; agent ~93 min). Top finding: on touch the seabed warning held the guidance slot for ~8 min while the reticle sat on the target. Merged Sonnet U-seabed-latch-hides-scan (net simpler: scanLive folded into nearScanTarget so a ready scan prompt outranks the latched warning; 3 unit tests; ~26 min). gates smoke + project-base green on branch and main; pushed. Hosted CI still unconfirmed, no tag.
+- DIRECTOR: 2a done, 2b U-copy-fixes-2 (Haiku) queued next; fish-vs-objective reticle lock (landscape Blue Hole) is a separate Sonnet item not yet added to the numbered list. Codex 146-150 queued (weekly pacing, 17% left).
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
