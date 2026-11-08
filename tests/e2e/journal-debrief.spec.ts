@@ -432,9 +432,7 @@ freshTest.describe('mission progression and Home Journal', () => {
       const debrief = page.locator('.mission-debrief');
       await expect(debrief.locator('.debrief-title')).toHaveText('Dive summary');
       await expect(debrief.locator('.debrief-highlight')).toHaveText('Scanned Bow section.');
-      await expect(debrief.locator('.debrief-next')).toHaveText(
-        'Next: Keep exploring to finish the primary objectives.',
-      );
+      await expect(debrief.locator('.debrief-next')).toHaveText('Next: Scan the stern.');
       // One filled primary; at most two quiet links visible, the rest under More.
       await expect(debrief.locator('.debrief-btn.is-primary')).toHaveCount(1);
       await expect(debrief.locator('.debrief-secondary > .debrief-btn')).toHaveCount(2);

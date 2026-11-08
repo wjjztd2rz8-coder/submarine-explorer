@@ -154,16 +154,11 @@ for (const layout of [
                 position: { x: layout.width / 2, y: layout.height - 80 },
               });
               await page.clock.runFor(34);
-              await expect(page.locator('.guidance-name')).toBeVisible();
-              await expect(page.locator('.guidance-name')).toHaveText(
+              // On the approach no target is in reach, so the touch slider card waits.
+              await expect(page.locator('.guidance-name')).not.toHaveText(
                 'Right slider: up to rise, down to sink.',
               );
-              await act(page.getByRole('button', { name: 'Skip', exact: true }));
-              await page.clock.runFor(34);
-              // The scan step names the distance while out of range; in range it reads Hold SCAN.
-              await expect(page.locator('.guidance-name')).toHaveText(
-                /^(Get closer to scan · \d+ m|Hold SCAN on a glowing target\.)$/,
-              );
+              await expect(page.getByRole('button', { name: 'Skip', exact: true })).toBeHidden();
             }
             await page.screenshot({ path: info.outputPath('opening.png') });
             await dismissTutorial(page, layout.touch, true);

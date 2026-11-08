@@ -458,9 +458,9 @@ test.describe('touch viewport', () => {
     }
     await shot(page, 'touch-step1');
     await page.getByRole('button', { name: 'Skip', exact: true }).tap();
-    await expect(card).toHaveAttribute('data-step', 'depth');
-    await expect(card).toContainText('slider');
-    await shot(page, 'touch-step2');
+    // On the approach no target is in reach, so the slider card waits for one.
+    await expect(page.locator(GUIDANCE.tutorial)).toBeHidden();
+    await shot(page, 'touch-approach');
     await dismissTutorial(page, true);
     await expect(page.locator(GUIDANCE.tutorial)).toBeHidden();
     await page.locator('.tc-btn-pause').tap();
