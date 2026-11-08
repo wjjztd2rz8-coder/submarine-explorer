@@ -448,7 +448,12 @@ describe('MissionRouter completion timing', () => {
         expect(router.endDive()).toBe(true);
         const debrief = router.debrief!;
         expect(control(debrief.root, 'debrief-title').textContent).toBe(heading);
-        expect(debrief.last?.objectives).toEqual({ completed: Number(completed), total: 1 });
+        // One open primary is named in the debrief's Next line; none left open names nothing.
+        expect(debrief.last?.objectives).toEqual({
+          completed: Number(completed),
+          total: 1,
+          remaining: completed ? undefined : 'Primary',
+        });
         expect(debrief.last?.subtitle).toBeUndefined();
         const metric = descendants(debrief.root).find((e) => e.dataset.field === 'objectives')!;
         expect(metric.children.map((e) => e.textContent).join('')).toBe(
