@@ -221,6 +221,19 @@ for (const layout of [
                 }
               }
               g.sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+              // Prop collision can still lift the sub after reset; probe the ring by the real pose.
+              if (minDepth > 0 && g.sub.position.y > -minDepth) {
+                const r = poi.radius * 0.8;
+                for (let a = 0; a < 24 && g.sub.position.y > -minDepth; a++) {
+                  const ang = (a / 24) * Math.PI * 2;
+                  g.sub.reset(
+                    poi.position.x + Math.cos(ang) * r,
+                    hoverY,
+                    poi.position.z + Math.sin(ang) * r,
+                    pose.yaw,
+                  );
+                }
+              }
               g.discovery.stats.markTeleport();
               return {
                 id: poi.id,

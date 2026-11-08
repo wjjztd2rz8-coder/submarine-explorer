@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-11-08 targeted review: red CI on main (3 runs)
+
+- Cause: the f-bughunt-960 great-blue-hole realistic-high spec. The earlier fix picked a ring spot using terrain height only, but the larger gallery prop's collision box still lifts the sub to about -9.5 m after `sub.reset`, below the 10 m scan-depth rule. It passed locally and failed on hosted CI (3 shards).
+- Fix (spec only): after reset, probe the ring using the real post-reset sub depth until it clears the depth rule. Local 12/12 pass; gates smoke + project-base green. Hosted CI on the push is the confirmation; if it is still red, triage by failing spec next run.
+- Process note: red CI came from a spec fix that was only checked locally in one layout; check by real pose, not terrain proxies.
+
 ## 2026-11-08 comprehensive review (trigger: new tag f76; Claude alone, Codex Sol skipped because the Codex week is at 9%)
 
 - **Stage:** about 86% to 1.0; 4-5 weeks (Sol's last range was 4-6; with no Sol pass this run I keep 4-5 and flag it as unchecked). Golden `2026-11-08-104909` vs `2026-11-07-180922`. f76 is tagged on green hosted CI (ee243d5c).
@@ -547,8 +553,6 @@ Two separate red specs, not one flaky shard. (1) Shard 20, `f-content-fix` "Hung
 - Cause: the resume.sh "no new work" skip (3 h) idled Claude at 76-79% with unblocked Sonnet items. Window cut to 90 min (PROCESS-LOG).
 - Work taken: V-challenger-ripples (Sonnet) merged: per-biome ripple reach, close/approach views clearly show ripples, opening view still none (~3.5). Gates green (smoke). Queued Codex 3570 (skip-rule audit), 3580 (verify ripples numerics) beside 3560.
 - No change to stage (~83-84%) or Needs owner.
-
-# Reviews
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 

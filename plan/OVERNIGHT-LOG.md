@@ -3458,3 +3458,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect (only the held 124/131 CI-speed worktrees). Hosted CI on 0dfde1ed (960 spec fix) was just started. Claude weekly 37% sits on the pace line (~35%) and the previous run ended minutes ago, so no package; Codex weekly 9%, briefs 149-152 still queued under pacing hold. No tag.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 14:02 CST headless run (Claude): targeted review, red CI
+
+- 960 great-blue-hole spec still failed on hosted CI: terrain-only ring spot ignored the prop collision lift. Spec now probes by real post-reset depth. Local 12/12, gates green; pushed. No agents, no tag.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
