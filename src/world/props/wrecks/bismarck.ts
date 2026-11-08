@@ -67,6 +67,9 @@ import {
 } from './ship.js';
 import { mulberry32, valueNoise3 } from './shared.js';
 
+/** Teak gone dark brown with tar and rust; paler wood reads as a green-grey slab at depth. */
+const DECK_BROWN = 0x5a3a24;
+
 /** Stations along the hull (m from the stem), from the ship's general arrangement. */
 const BISMARCK = {
   /** Where the hull ends: the stern broke away aft of turret Dora. */
@@ -104,11 +107,14 @@ export function buildBismarck(
   const endS = Math.min(K.tornAt, L - 1);
 
   // Sheer: the high "Atlantic bow", level amidships.
+  // Her back is half broken under the aft island: the deck sags there and the edge wanders.
   const top = (s: number): number =>
     hScale *
     (K.deckMid +
       (K.deckBow - K.deckMid) * Math.pow(1 - S(s, 0, 70), 1.6) -
-      (K.deckMid - K.deckAft) * S(s, 150, 230));
+      (K.deckMid - K.deckAft) * S(s, 150, 230) -
+      1.5 * S(s, 150, 185) * (1 - S(s, 195, 225)) +
+      0.6 * (valueNoise3(s * 0.08, 0.5, 1.5, seed ^ 0x33) - 0.5));
   const half = (s: number, y: number): number => {
     const yh = THREE.MathUtils.clamp(y / 10, 0, 1);
     // Fine entry, flared above; flat-sided amidships; slowly narrowing aft.
@@ -152,7 +158,7 @@ export function buildBismarck(
   hull.add(loftCap(spec, endS, 1), C.interior);
   deck.add(
     deckStrip(spec, 0, endS, (s) => top(s) - 0.03, 0.15, 6),
-    C.teak,
+    DECK_BROWN,
   );
   // Armour belt: a slight step down each side (the belt's top edge).
   for (const side of [-1, 1] as const) {
@@ -446,10 +452,12 @@ export function buildBismarck(
   paintWreck(deckGeom, {
     seed: seed ^ 0xd,
     rustiness: 0,
-    growth: 0.2,
-    silt: 0.55,
+    growth: 0.05,
+    silt: 0.3,
     mudBand: 0,
     wood: true,
+    // Dark, streaked planking: long stains run across the deck instead of one pale sheet.
+    shadeAt: (x, _y, z) => 0.38 + 0.4 * valueNoise3(x * 0.7, 1.5, z * 0.09, seed ^ 0x5d),
   });
   projectUVs(deckGeom, 6, true);
   const core = [
