@@ -372,16 +372,30 @@ export class Scanner {
     // Caller-owned live lists can drop the active object without a setter call.
     // Match the setters' silent clear instead of retaining progress on a removed contact.
     if (this.active && !activeGeo) this.clearActive();
-    // Keep an uninterrupted beam locked. After release, a newly eligible
-    // objective wins the next hold over an incidental contact's partial scan.
+    // The marked objective outranks incidental contacts (wildlife, samples): an
+    // eligible one takes the beam even mid-hold, otherwise a drifting school
+    // pins the reticle with a string of partial scans. A scan of a fixed POI
+    // keeps its lock, so retargeting guidance never swaps it away.
+    const activeIsObjective = this.active?.id === this.objectivePoiId;
+    const activeIsFixed = this.active !== null && this.targets.includes(this.active);
     if (
       this.active &&
       activeGeo?.inRange &&
       activeGeo.facing &&
-      (v.phase === 'scanning' || candidate?.id !== this.objectivePoiId) &&
+      (activeIsFixed || candidate?.id !== this.objectivePoiId) &&
       !this.isScanned(this.active.landmarkId, this.active.id)
     ) {
       candidate = this.active;
+    } else if (
+      activeIsObjective &&
+      v.progress > 0 &&
+      activeGeo?.inRange &&
+      candidate &&
+      candidate !== this.active
+    ) {
+      // A scan of the objective in progress is not handed to a contact that
+      // drifts into the cone while the beam is momentarily off it.
+      candidate = null;
     }
     // One shared selection: whatever Scan will scan is also what the card,
     // reticle and prompt name, even if a nearer off-axis contact exists.

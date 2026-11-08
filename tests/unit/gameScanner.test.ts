@@ -773,3 +773,49 @@ it('names exactly the contact Scan will scan when a nearer off-axis contact exis
     expect(log.find(([n]) => n === 'scan:started')?.[1]).toEqual({ poiId: 'ahead' });
   }
 });
+
+describe('Scanner objective priority over passing contacts', () => {
+  it('takes the beam from an in-progress wildlife scan once the objective is in reach and in the cone', () => {
+    const objective = target({ id: 'objective', position: new Vector3(100, -100, 0) });
+    const fish = target({ id: 'life:grunt', position: new Vector3(0, -100, -15) });
+    const { scanner } = setup([objective]);
+    scanner.setObjective(objective.id);
+    scanner.setExtraTargets([fish]);
+    scanner.update(0.1, AT, NORTH, true);
+    expect(scanner.view.activeId).toBe(fish.id);
+    objective.position.set(0, -100, -50);
+    scanner.update(DT, AT, NORTH, true);
+    expect(scanner.view.candidateId).toBe(objective.id);
+    expect(scanner.view.activeId).toBe(objective.id);
+  });
+
+  it('keeps wildlife locked while the objective is not in the cone', () => {
+    const objective = target({ id: 'objective', position: new Vector3(100, -100, 0) });
+    const fish = target({ id: 'life:grunt', position: new Vector3(0, -100, -15) });
+    const { scanner } = setup([objective]);
+    scanner.setObjective(objective.id);
+    scanner.setExtraTargets([fish]);
+    scanner.update(0.1, AT, NORTH, true);
+    scanner.update(0.1, AT, NORTH, true);
+    expect(scanner.view.activeId).toBe(fish.id);
+  });
+
+  it('does not hand an in-progress objective scan to a fish while the beam is briefly off it', () => {
+    const objective = target({ id: 'objective', position: new Vector3(0, -100, -50) });
+    const fish = target({ id: 'life:grunt', position: new Vector3(50, -100, 0) });
+    const { scanner } = setup([objective]);
+    scanner.setObjective(objective.id);
+    scanner.setExtraTargets([fish]);
+    scanner.update(0.5, AT, NORTH, true);
+    expect(scanner.view.activeId).toBe(objective.id);
+    // Turn east: the fish is in the cone, the objective is not.
+    scanner.update(DT, AT, EAST, true);
+    expect(scanner.view.phase).toBe('interrupted');
+    expect(scanner.view.activeId).toBe(objective.id);
+    expect(scanner.view.candidateId).toBeNull();
+    // Turning back resumes the objective's progress.
+    scanner.update(DT, AT, NORTH, true);
+    expect(scanner.view.phase).toBe('scanning');
+    expect(scanner.view.activeId).toBe(objective.id);
+  });
+});
