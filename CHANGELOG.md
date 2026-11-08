@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **V-bluehole-gallery-2:** the Blue Hole stalactite gallery (west) is larger (dimensions 70x22x18 to 105x30x27 m, per-site prop data), so it fills about 29% of the mission opening frame (was about 18%); its sediment apron gains faint current ripples and fine silt grain. The free-dive hero view of the same prop is larger and framed the same way. Mission range, depth and scan reach are unchanged. Nothing removed.
+
 - **U-seabed-latch-hides-scan:** the latched SEABED CLOSE warning now yields the guidance slot to a scan prompt or result card whenever a target is in range or a scan is under way (it returns only for imminent contact), so "Hold SCAN" is no longer hidden for minutes; the hold hysteresis is unchanged.
 
 - **U-scan-fish-vs-objective:** a completed scan of a non-objective contact while an objective is still pending now shows a "Side find" card (in place of "New Journal entry") whose detail line keeps the objective direction cue. Same card, no new element; the scan lock already preferred an in-range, facing objective. Nothing removed.
