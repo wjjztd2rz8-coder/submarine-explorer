@@ -3423,3 +3423,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Hosted failure was 11 shards (catalog tutorial for axial/endurance + mission.spec hint), not one. Cause: a second objective in the scan cone holds the guidance slot, so the touch depth card never shows; mission hint shows the turn cue by design. Fixed both specs; gates smoke + project-base green. No product change, no agents, no tag. Pushed; next hosted run decides.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 04:48 CST headless run (Claude): V-titanic-detail-plates
+
+- Merged Sonnet V-titanic-detail-plates (~21 min agent): shared steel shader inlines map/normal chunks with warped UVs (wandering seams), per-plate rust/dark/stain tones, darker streaks; rusticles 12 radial segments, slimmer. Reviewed before/after-titanic-3: clearly less pale and less gridded, still readable. I fixed the wreck shader unit test (inlined chunks) and rebaselined freeDiveComposition snapshots (sub-cm shifts). gates smoke + project-base green on branch and main; pushed. Bismarck is darker/browner via the shared shader (item 5 still open for its silhouette/scour).
+- Hosted CI on ee243d5c (catalog + mission spec fixes) still pending at start; no tag. Codex 146-150 queued (weekly 16%, pacing holds dispatch). Claude weekly 41%: one package per run.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
