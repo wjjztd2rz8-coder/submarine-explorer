@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **U-seabed-latch-hides-scan:** the latched SEABED CLOSE warning now yields the guidance slot to a scan prompt or result card whenever a target is in range or a scan is under way (it returns only for imminent contact), so "Hold SCAN" is no longer hidden for minutes; the hold hysteresis is unchanged.
+
 - **U-scan-fish-vs-objective:** a completed scan of a non-objective contact while an objective is still pending now shows a "Side find" card (in place of "New Journal entry") whose detail line keeps the objective direction cue. Same card, no new element; the scan lock already preferred an in-range, facing objective. Nothing removed.
 - **V-bluehole-pitchup:** Blue Hole free-dive opening now sits 50 m (was 58 m) from the gallery with the chase camera lowered and swung to the side (data only: freeDive chaseOffsetY 10 to -45, chaseOffsetX -30, chaseRadius 60), so the camera looks up at the hood and its stalactites instead of across open water. Nothing removed; no code change, and no hull-safe relaxation was needed (the 110 m route floor belongs to the mission opening, which is unchanged).
 - **V-blake-endurance-tint:** Blake Plateau and Endurance each gain one foreground prop on the opening approach (data only: a low coral-mound-f ahead-left of the Blake spawn; fallen-spars, a second endurance-rigging scatter, ahead-right of the Endurance spawn). Nothing removed; no code change.

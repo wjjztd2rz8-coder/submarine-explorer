@@ -52,10 +52,8 @@ const DEFAULT_WARN: HudWarnConfig = {
 
 /** Per-frame context the physics snapshot does not carry. */
 interface HudContext {
-  /** A scan target is within its scan radius: suppress the static proximity warning. */
+  /** A scan target is in range or a scan is under way: its card outranks the static proximity warning. */
   nearScanTarget?: boolean;
-  /** A scan is under way (or just interrupted): its card keeps the slot unless contact is imminent. */
-  scanLive?: boolean;
   /** Frame seconds, for the warning's minimum hold. */
   dt?: number;
   /** What the pilot does to rise, in the current input device's words (e.g. "RISE · SLIDER UP"). */
@@ -107,14 +105,8 @@ export class SeabedWarningLatch {
 
   constructor(private readonly warn: HudWarnConfig) {}
 
-  /** True when the warning should take the slot; a live scan keeps it unless contact is imminent. */
-  update(
-    altitude: number,
-    verticalSpeed: number,
-    nearScanTarget: boolean,
-    dt: number,
-    scanLive = false,
-  ): boolean {
+  /** True when the warning should take the slot; a ready scan keeps it unless contact is imminent. */
+  update(altitude: number, verticalSpeed: number, nearScanTarget: boolean, dt: number): boolean {
     if (seabedWarning(altitude, verticalSpeed, this.warn, nearScanTarget)) {
       this.on = true;
       this.quietS = 0;
@@ -123,7 +115,7 @@ export class SeabedWarningLatch {
       if (this.quietS >= this.warn.seabedHoldS && altitude >= this.warn.seabedClearAltitudeM)
         this.on = false;
     }
-    return this.on && (!scanLive || seabedWarning(altitude, verticalSpeed, this.warn, true));
+    return this.on && (!nearScanTarget || seabedWarning(altitude, verticalSpeed, this.warn, true));
   }
 }
 
@@ -305,13 +297,7 @@ export class HUD {
     } else if (this.powerState?.enabled && this.powerState.low.length) {
       this.showWarning(`${this.powerState.low.join(' & ').toUpperCase()} LOW — PLAN ASCENT`);
     } else if (
-      this.seabed.update(
-        s.altitude,
-        s.velocity.y,
-        ctx.nearScanTarget ?? false,
-        ctx.dt ?? 0,
-        ctx.scanLive,
-      )
+      this.seabed.update(s.altitude, s.velocity.y, ctx.nearScanTarget ?? false, ctx.dt ?? 0)
     ) {
       this.showWarning(ctx.riseCue ? `SEABED CLOSE · ${ctx.riseCue}` : 'SEABED CLOSE · RISE');
     } else {

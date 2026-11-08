@@ -132,11 +132,23 @@ describe('SeabedWarningLatch', () => {
 });
 
 describe('SeabedWarningLatch scan priority', () => {
-  it('a live scan keeps the slot unless hull contact is imminent', () => {
+  it('scan prompt wins over the seabed warning when a target is ready, unless contact is imminent', () => {
     const l = new SeabedWarningLatch(W);
     expect(l.update(13, 0, false, 0.1)).toBe(true);
-    expect(l.update(13, 0, true, 0.1, true)).toBe(false);
-    expect(l.update(40, -8, true, 0.1, true)).toBe(true);
+    expect(l.update(13, 0, true, 0.1)).toBe(false);
+    expect(l.update(40, -8, true, 0.1)).toBe(true);
+  });
+
+  it('a latched warning does not hold the slot for minutes over a ready target', () => {
+    const l = new SeabedWarningLatch(W);
+    l.update(13, 0, false, 0.1);
+    for (let i = 0; i < 600; i++) expect(l.update(18, 0, true, 0.1)).toBe(false);
+  });
+
+  it('does not flap while hovering at the threshold with no target', () => {
+    const l = new SeabedWarningLatch(W);
+    const out = [13, 16, 14, 17, 15.5, 14.5, 16].map((a) => l.update(a, 0, false, 0.2));
+    expect(out.every(Boolean)).toBe(true);
   });
 });
 

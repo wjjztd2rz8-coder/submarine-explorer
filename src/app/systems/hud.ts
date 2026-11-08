@@ -60,10 +60,10 @@ export const hudSystem: GameSystem = {
     'hud.draw': (f, ctx) => {
       const { hud, discovery, sub, guidance, missionRouter } = ctx;
       hud.update(f.sub, {
-        // Any contact in range (animals too): its result card must not lose the
-        // slot to the static altitude warning the moment the pose is read as shallow.
-        nearScanTarget: discovery.scanner.view.nearestInRange,
-        scanLive: discovery.scanner.view.phase !== 'idle',
+        // Any contact in range (animals too) or scan under way: its prompt or result
+        // card must not lose the slot to the static altitude warning.
+        nearScanTarget:
+          discovery.scanner.view.nearestInRange || discovery.scanner.view.phase !== 'idle',
         dt: f.dt,
         riseCue: riseCue(ctx),
         simSpeed: sub.simSpeed,
