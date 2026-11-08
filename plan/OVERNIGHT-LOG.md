@@ -3474,3 +3474,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - 960 great-blue-hole realistic high still red on hosted CI (sub resting at -9.5 m, 31.6 m from the POI but depth rule unmet). Passes locally at every viewport, so the cause is likely props finishing loading after the teleport. Spec now re-probes the ring by real pose after the first settle and re-aims. Unconfirmed until hosted CI runs; gates smoke + project-base green; pushed. If it stays red next run, wait for props ready before teleporting. No agents, no tag.
 - Claude weekly 36% on the pace line; Codex weekly 9%, briefs 149-152 queued under pacing hold.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 16:15 CST headless run (Claude): targeted review, red CI
+
+- All 3 red runs were the 960 great-blue-hole spec; third fix (re-probe after settle) is in hosted CI run 42529045680, verdict pending. Fallback plan in REVIEWS.md. No agents, no tag.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?

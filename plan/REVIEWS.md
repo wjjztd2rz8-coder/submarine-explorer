@@ -2,6 +2,12 @@
 
 ## 2026-11-08 targeted review: red CI on main (3 runs)
 
+- Cause: all failures are the f-bughunt-960 great-blue-hole realistic high spec (sub rests at -9.5 m, scan depth rule unmet after the larger karst-grotto box). Two spec fixes (ring spot, real-depth probe) did not clear it on hosted CI. A third (re-probe after the settle) is running as 42529045680; verdict pending.
+- If it fails again: the sub rests on the gallery collision box at -9.5 m, so wait for props ready before teleporting, or have the spec place the sub by a legal pose from the game's own scan check instead of a ring guess.
+- No scheduling problem found: runs are skipping only for pacing (Claude weekly 36%, Codex weekly 9%).
+
+## 2026-11-08 targeted review: red CI on main (3 runs)
+
 - Cause: the f-bughunt-960 great-blue-hole realistic-high spec. The earlier fix picked a ring spot using terrain height only, but the larger gallery prop's collision box still lifts the sub to about -9.5 m after `sub.reset`, below the 10 m scan-depth rule. It passed locally and failed on hosted CI (3 shards).
 - Fix (spec only): after reset, probe the ring using the real post-reset sub depth until it clears the depth rule. Local 12/12 pass; gates smoke + project-base green. Hosted CI on the push is the confirmation; if it is still red, triage by failing spec next run.
 - Process note: red CI came from a spec fix that was only checked locally in one layout; check by real pose, not terrain proxies.
