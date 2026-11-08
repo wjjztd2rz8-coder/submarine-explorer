@@ -3453,3 +3453,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Hosted CI on the gallery commit failed 3 shards, all f-bughunt-960 great-blue-hole realistic high: the larger karst-grotto collision box lifts the whole approach line above the 10 m scan depth rule, so the spec's teleport left the sub at -9.5 m (out of range). Spec fix only: fall back to a ring inside the scan radius that clears the depth rule. Passes locally (6/6); gates smoke + project-base green; pushed. No agents, no tag. Claude weekly 37% was just under the pace line, so no package this run.
 - Codex 149-152 queued (weekly 9%, pacing holds dispatch).
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 12:32 CST headless run (Claude): hold
+
+- Nothing to collect (only the held 124/131 CI-speed worktrees). Hosted CI on 0dfde1ed (960 spec fix) was just started. Claude weekly 37% sits on the pace line (~35%) and the previous run ended minutes ago, so no package; Codex weekly 9%, briefs 149-152 still queued under pacing hold. No tag.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
