@@ -2076,7 +2076,7 @@ freshTest.describe('Home to scan and return journey', () => {
                   () => (window.__game as unknown as Game).discovery.scanner.view.candidateId,
                 ),
               ).toBe(id);
-              await expect(page.locator('.guidance-slot')).toContainText(/HOLD .* TO SCAN/i);
+              await expect(page.locator('.guidance-slot')).toContainText(/HOLD (.* TO )?SCAN/i);
               await expect(page.locator('.guidance-slot')).not.toContainText(/OPTIONAL/i);
             });
           };

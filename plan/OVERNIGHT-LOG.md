@@ -3401,3 +3401,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Hosted CI still unconfirmed (run on previous push in progress at start); no tag. Codex 146-150 queued (5 briefs, weekly pacing, 17% left). Claude weekly 44%: one package per run.
 - Next: triage the journal-debrief failures and hosted CI; U-scan-fish-lock-landscape (Sonnet).
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-07 23:50 CST headless run (Claude): targeted review, red CI
+
+- Diagnosed hosted red on e903e970/2c2d1ee4: stale specs after U-copy-fixes and U-copy-fixes-2 (tutorial dismiss helper vs hidden touch depth card, hint turn cue vs range, "Hold SCAN" regex). Fixed specs/helper; verified locally on touch viewports, gates smoke + project-base green. Catalog tutorial hosted failure did not reproduce locally, so the next hosted run decides. No tag. Rule logged in PROCESS-LOG: copy/gating packages run affected e2e specs. No agents launched.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?

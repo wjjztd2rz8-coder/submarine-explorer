@@ -410,3 +410,7 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 
 - Claude weekly burn ~28%/day with 5 days to reset: limit each headless run to one package (Haiku first). Reason: efficiency.sh projects run-out in ~1.8 days.
 - Hosted-CI triage: `gh api repos/{owner}/{repo}/actions/jobs/<id>/logs | grep ✘` lists failing specs when `gh run view --log-failed` returns nothing. Spec-only fixes need a per-site, per-viewport cost check (`--repeat-each`), not just a local pass.
+
+## 2026-11-08
+
+- Red CI traced to stale specs after two Haiku UI-copy merges that ran only smoke + project-base. Rule: any package that changes player-facing text or HUD gating runs the affected e2e specs (hud-touch, phone-accept, journal-debrief, opening-framing) locally before merge. Triage tip: `gh run view --log` is empty here; use `gh api repos/:owner/:repo/actions/jobs/<id>/logs`.

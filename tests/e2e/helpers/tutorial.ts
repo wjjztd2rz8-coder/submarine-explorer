@@ -32,7 +32,11 @@ async function dismiss(page: Page, touch: boolean, pausedClock: boolean): Promis
     // The same real tutorial update that drives the game renders the next card.
     if (pausedClock) await page.clock.runFor(34);
     if (step === 'scan') await expect(card).toBeHidden();
-    else await expect(card).not.toHaveAttribute('data-step', step!);
+    // The next card may stay hidden (touch holds the slider card until a target is in reach).
+    else
+      await expect
+        .poll(async () => ((await card.isVisible()) ? await card.getAttribute('data-step') : null))
+        .not.toBe(step);
   }
   await expect(card).toBeHidden();
 }

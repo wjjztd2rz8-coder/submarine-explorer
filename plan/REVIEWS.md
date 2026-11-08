@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-11-08 targeted review (trigger: CI red 3 runs, on e903e970 and 2c2d1ee4)
+
+- **Root cause:** the Monterey catalog fix worked; the new reds come from the last two Haiku packages, which updated copy and gating without a full e2e. Hosted logs are empty through `gh run view --log`, but `gh api repos/:owner/:repo/actions/jobs/<id>/logs` works (use it for triage). Three stale expectations: (1) `helpers/tutorial.ts` dismiss asserted `not.toHaveAttribute` on a card that touch now hides at the depth step (phone-accept, Surface HUD, hud-touch catalog); (2) hud-touch one-target-surface expected the range in the hint, but the turn cue replaces it by design; (3) journal-debrief two-objective expected `HOLD .* TO SCAN`, touch now says "Hold SCAN".
+- **Fix:** specs and helper updated to the new behaviour (none loosened beyond accepting the turn cue or range, and the hidden depth card); the catalog case also moves the sub in reach when the depth card is hidden. Verified locally on 6 touch viewports for several sites; the catalog failure itself did not reproduce locally (passed before and after), so the hosted run decides. No tag until hosted CI is green.
+- **Process:** UI-copy packages given to Haiku must run `--full-e2e` for the affected specs (hud-touch, phone-accept, journal-debrief) before merge; added to the brief template note in PROCESS-LOG.
+
 ## 2026-11-07 late targeted review (trigger: CI red 3 runs)
 
 - All red runs (SHAs be6b14aa and earlier) fail only on the `hud-touch.spec.ts:1814` Monterey catalog case (240 s timeout). They predate the U-ci-monterey-catalog merge (spec is now at line 1819). Locally all 6 viewports of that case pass in 24 s on main. Hosted run 42409524890 (4582d7a7) is the first with the fix; confirm it next run. If it fails again, the next suspect is `away()` finding no offset with 40 m clearance (it then leaves the sub in range, so the chip never shows): fall back to teleporting to a fixed deep point. No tag until green.

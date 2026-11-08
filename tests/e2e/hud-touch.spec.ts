@@ -1609,7 +1609,10 @@ experiencedTest.describe('mission opening guidance', () => {
           await expect(
             page.locator('.d-scan-world-marker.is-current:visible, .d-scan-edge:visible'),
           ).toHaveCount(1);
-          await expect(page.locator('.guidance-hint')).toContainText(`${metrics.range} m`);
+          // The hint shows a turn cue while the target is off the bow, otherwise the range.
+          await expect(page.locator('.guidance-hint')).toHaveText(
+            new RegExp(`${metrics.range} m|TURN \\d+° (PORT|STARBOARD)`),
+          );
           await expect(
             page.locator('.obj-nav, .obj-hint, .d-scan-edge-name, .d-scan-edge-info'),
           ).toHaveCount(0);
@@ -1897,6 +1900,15 @@ freshTest.describe('catalog tutorial and reload', () => {
           await away(page);
           await expect(page.locator(GUIDANCE.discovery)).toBeHidden();
           for (const step of (await tutorialSteps(page)).filter((s) => s !== 'scan')) {
+            if (viewport.touch && step === 'depth' && !(await card.isVisible())) {
+              // Touch hides the slider card on the approach; it shows once a target is in reach.
+              await page.evaluate((poi) => {
+                const g = window.__game as unknown as Game;
+                g.sub.position.set(poi.from.x, poi.from.y, poi.from.z);
+                g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
+              }, poi);
+              await page.clock.runFor(500);
+            }
             await expect(card).toHaveAttribute('data-step', step);
             await expect(card).toBeVisible();
             await layout(page, `reward and tutorial ${step}`);
