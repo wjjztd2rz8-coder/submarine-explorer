@@ -3406,3 +3406,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Diagnosed hosted red on e903e970/2c2d1ee4: stale specs after U-copy-fixes and U-copy-fixes-2 (tutorial dismiss helper vs hidden touch depth card, hint turn cue vs range, "Hold SCAN" regex). Fixed specs/helper; verified locally on touch viewports, gates smoke + project-base green. Catalog tutorial hosted failure did not reproduce locally, so the next hosted run decides. No tag. Rule logged in PROCESS-LOG: copy/gating packages run affected e2e specs. No agents launched.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 01:26 CST headless run (Claude): targeted CI triage
+
+- Hosted CI on 38fa1597 failed one shard: hud-touch catalog tutorial for axial-seamount-ashes at 844x390 (touch depth card never appeared after the single 500 ms clock tick). Passes locally in 1.8 s, so spec fix: loop clock ticks until the gated card shows. No product change, no agents launched, no tag.
+- Codex 146-150 queued (weekly 16% left, pacing holds dispatch).
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?

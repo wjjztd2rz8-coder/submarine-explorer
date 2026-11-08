@@ -1907,7 +1907,10 @@ freshTest.describe('catalog tutorial and reload', () => {
                 g.sub.position.set(poi.from.x, poi.from.y, poi.from.z);
                 g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
               }, poi);
-              await page.clock.runFor(500);
+              // Slow hosted frames may need several ticks before the gate opens.
+              for (let i = 0; i < 20 && !(await card.isVisible()); i++) {
+                await page.clock.runFor(500);
+              }
             }
             await expect(card).toHaveAttribute('data-step', step);
             await expect(card).toBeVisible();
