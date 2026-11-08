@@ -40,8 +40,6 @@ interface TutorialSample {
   ballast: number;
   /** Metres between the sub and the first target's depth; absent when no target. */
   targetGapM?: number;
-  /** False while the sub is still on the approach (touch): the depth step waits. Default true. */
-  depthReady?: boolean;
 }
 
 export class Tutorial {
@@ -97,10 +95,6 @@ export class Tutorial {
       if (this.moveS >= MOVE_HOLD_S || this.turnS >= TURN_HOLD_S) return this.advance();
     } else if (step.id === 'depth') {
       if (s.targetGapM !== undefined && s.targetGapM <= DEPTH_SKIP_M) return this.advance();
-      if (s.depthReady === false) {
-        this.depthS = 0;
-        return false;
-      }
       this.depthS = Math.abs(s.ballast) >= AXIS_MIN ? this.depthS + s.dt : 0;
       if (this.depthS >= DEPTH_HOLD_S) return this.advance();
     }
@@ -177,6 +171,15 @@ export interface TutorialKeys {
   rise: string;
   sink: string;
   scan: string;
+}
+
+/**
+ * Touch hides the slider card while the sub is still on the approach: no target
+ * is in reach yet, so the card would name a control the player has no use for.
+ * Progress is unchanged; a slider hold made earlier still completes the step.
+ */
+export function depthCardWaits(device: InputDevice, targetInReach: boolean): boolean {
+  return device === 'touch' && !targetInReach;
 }
 
 /** Instruction text for a step on the given device. */

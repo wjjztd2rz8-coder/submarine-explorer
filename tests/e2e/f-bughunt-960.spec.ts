@@ -154,11 +154,29 @@ for (const layout of [
                 position: { x: layout.width / 2, y: layout.height - 80 },
               });
               await page.clock.runFor(34);
-              // On the approach no target is in reach, so the touch slider card waits.
-              await expect(page.locator('.guidance-name')).not.toHaveText(
-                'Right slider: up to rise, down to sink.',
-              );
-              await expect(page.getByRole('button', { name: 'Skip', exact: true })).toBeHidden();
+              // The touch slider card waits for a target in reach. The Blue Hole pose
+              // starts on the approach, so only a pose in reach shows the card here.
+              const inReach = await page.evaluate(() => {
+                const view = (window.__game as unknown as Game).discovery.scanner.view;
+                return view.nearestInRange || view.objectiveInRange;
+              });
+              if (inReach) {
+                await expect(page.locator('.guidance-name')).toBeVisible();
+                await expect(page.locator('.guidance-name')).toHaveText(
+                  'Right slider: up to rise, down to sink.',
+                );
+                await act(page.getByRole('button', { name: 'Skip', exact: true }));
+                await page.clock.runFor(34);
+                // The scan step names the distance while out of range; in range it reads Hold SCAN.
+                await expect(page.locator('.guidance-name')).toHaveText(
+                  /^(Get closer to scan · \d+ m|Hold SCAN on a glowing target\.)$/,
+                );
+              } else {
+                await expect(page.locator('.guidance-name')).not.toHaveText(
+                  'Right slider: up to rise, down to sink.',
+                );
+                await expect(page.getByRole('button', { name: 'Skip', exact: true })).toBeHidden();
+              }
             }
             await page.screenshot({ path: info.outputPath('opening.png') });
             await dismissTutorial(page, layout.touch, true);
@@ -206,6 +224,9 @@ for (const layout of [
               g.rig.snap(g.sub.position, aim.yaw, aim.pitch);
             }, aim);
             await page.clock.runFor(34);
+            // A touch pose on the approach hides the slider card (no target in reach yet),
+            // so the opening dismissal could not finish the tutorial. In reach it can.
+            await dismissTutorial(page, layout.touch, true);
             if (layout.touch) {
               await expect(page.locator('.d-scan-edge')).toBeHidden();
               await expect(page.locator('.objectives-panel .obj-list')).toBeHidden();

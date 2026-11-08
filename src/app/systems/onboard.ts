@@ -6,7 +6,7 @@
 import type { InputDevice } from '../../ui/ControlsCard.js';
 import { HINT_TEXT, HintEngine, creatureHintAllowed, hullHintAllowed } from '../../game/Hints.js';
 import type { HintLabels } from '../../game/Hints.js';
-import { TUTORIAL_STEPS, Tutorial, tutorialText } from '../../game/Tutorial.js';
+import { TUTORIAL_STEPS, Tutorial, depthCardWaits, tutorialText } from '../../game/Tutorial.js';
 import type { TutorialKeys } from '../../game/Tutorial.js';
 import { TutorialSave } from '../../game/TutorialSave.js';
 import type { GuidanceKind } from '../../game/Guidance.js';
@@ -154,9 +154,6 @@ export function createOnboardSystem(): GameSystem {
           : undefined;
         const targetGapM = firstTarget ? Math.abs(f.sub.depth - firstTarget.position.y) : undefined;
         const scanView = ctx.discovery.scanner.view;
-        // Touch teaches the depth slider once a target is in reach, not on the approach.
-        const depthReady =
-          device !== 'touch' || scanView.nearestInRange || scanView.objectiveInRange;
         if (tutorial.active && playing) {
           if (
             tutorial.update({
@@ -165,7 +162,6 @@ export function createOnboardSystem(): GameSystem {
               yaw: f.state.yaw,
               ballast: f.state.ballast,
               targetGapM,
-              depthReady,
             })
           )
             onAdvance();
@@ -176,7 +172,9 @@ export function createOnboardSystem(): GameSystem {
         const step = tutorial.step;
         // A dropped beam keeps its cue on the scan step, so the card does not fall back to STEP 3.
         const dropped = step?.id === 'scan' && !tutorial.scanning && tutorial.dropReason !== null;
-        const waitingForDepth = step?.id === 'depth' && !depthReady;
+        const waitingForDepth =
+          step?.id === 'depth' &&
+          depthCardWaits(device, scanView.nearestInRange || scanView.objectiveInRange);
         const scanDistance = scanView.objectiveId
           ? scanView.objectiveDistance
           : scanView.nearestDistance;
