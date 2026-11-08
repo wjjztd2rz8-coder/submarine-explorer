@@ -1027,9 +1027,21 @@ describe('tutorial copy', () => {
   it('is one short line on touch and names the destination elsewhere', () => {
     for (const step of TUTORIAL_STEPS)
       expect(tutorialText(step.id, 'touch', keys).length).toBeLessThanOrEqual(42);
+    // Touch names the target the same way desktop does, without the key hint.
     expect(tutorialText('move', 'touch', keys, null, 'Bow section')).toBe(
-      'Drag to follow the marker.',
+      'Follow the marker toward Bow section.',
     );
+    expect(tutorialText('move', 'touch', keys, null, undefined)).toBe('Drag to move and turn.');
+    // A dropped beam keeps its cue in the scan card's words, not the generic hold line.
+    expect(
+      tutorialText('scan', 'keyboard', keys, null, undefined, undefined, undefined, 'facing'),
+    ).toBe('BEAM OFF TARGET');
+    expect(
+      tutorialText('scan', 'touch', keys, null, undefined, undefined, undefined, 'released'),
+    ).toBe('HOLD SCAN TO RESUME');
+    expect(
+      tutorialText('scan', 'keyboard', keys, null, undefined, undefined, undefined, null),
+    ).toBe('Hold G on a glowing target.');
     expect(tutorialText('move', 'keyboard', keys, null, 'Bow section')).toContain('Bow section');
   });
   it('adds the marker distance on touch only after the move step sits idle', () => {

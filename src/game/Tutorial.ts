@@ -8,6 +8,8 @@ import type { InputDevice } from '../ui/ControlsCard.js';
 
 export type TutorialStepId = 'move' | 'depth' | 'scan';
 type TutorialEvent = 'scan:complete' | 'scan:started' | 'scan:aborted';
+/** Why a started scan stopped (the scanner's abort reason). */
+export type ScanDrop = 'range' | 'facing' | 'released';
 
 interface TutorialStep {
   id: TutorialStepId;
@@ -51,6 +53,8 @@ export class Tutorial {
   private idleS = 0;
   /** Events seen before their step came up; that step completes on arrival. */
   private early = new Set<TutorialEvent>();
+  /** Why the last scan was dropped; the scan step keeps that cue until the next scan starts. */
+  dropReason: ScanDrop | null = null;
 
   constructor(active = true) {
     this.active_ = active;
@@ -98,12 +102,14 @@ export class Tutorial {
   }
 
   /** An event only counts for the step that is waiting for it. */
-  notify(event: TutorialEvent): boolean {
+  notify(event: TutorialEvent, drop?: ScanDrop): boolean {
     if (event === 'scan:started') {
       this.scanning = true;
       this.scanProgress = 0;
+      this.dropReason = null;
       return false;
     }
+    if (event === 'scan:aborted') this.dropReason = drop ?? null;
     if (event === 'scan:aborted' || event === 'scan:complete') this.scanning = false;
     const step = this.step;
     if (!step) return false;
@@ -126,6 +132,7 @@ export class Tutorial {
     this.early.clear();
     this.scanning = false;
     this.scanProgress = 0;
+    this.dropReason = null;
   }
 
   /** Skip the step on screen. */
@@ -144,6 +151,7 @@ export class Tutorial {
 
   private advance(): boolean {
     this.index_ += 1;
+    this.dropReason = null;
     // Skip any following step whose event already happened.
     for (;;) {
       const next = TUTORIAL_STEPS[this.index_];
@@ -165,6 +173,15 @@ export interface TutorialKeys {
   scan: string;
 }
 
+/**
+ * Touch hides the slider card while the sub is still on the approach: no target
+ * is in reach yet, so the card would name a control the player has no use for.
+ * Progress is unchanged; a slider hold made earlier still completes the step.
+ */
+export function depthCardWaits(device: InputDevice, targetInReach: boolean): boolean {
+  return device === 'touch' && !targetInReach;
+}
+
 /** Instruction text for a step on the given device. */
 export function tutorialText(
   id: TutorialStepId,
@@ -174,13 +191,14 @@ export function tutorialText(
   destination?: string,
   scanDistanceM?: number,
   markerDistanceM?: number,
+  dropReason: ScanDrop | null = null,
 ): string {
   switch (id) {
     case 'move': {
       if (device === 'touch') {
         if (markerDistanceM !== undefined && destination)
           return `Marker ${Math.max(5, Math.round(markerDistanceM / 5) * 5)} m ahead`;
-        return destination ? 'Drag to follow the marker.' : 'Drag to move and turn.';
+        return destination ? `Follow the marker toward ${destination}.` : 'Drag to move and turn.';
       }
       const guidance = destination ? `Follow the marker toward ${destination}. ` : '';
       return (
@@ -199,6 +217,10 @@ export function tutorialText(
     case 'scan':
       if (scanProgress !== null)
         return `Scanning… ${Math.round(Math.max(0, Math.min(1, scanProgress)) * 100)}% · keep holding ${device === 'touch' ? 'SCAN' : k.scan}.`;
+      // A dropped beam says why, in the scan card's words, instead of the generic hold line.
+      if (dropReason === 'facing') return 'BEAM OFF TARGET';
+      if (dropReason === 'released')
+        return `HOLD ${device === 'touch' ? 'SCAN' : k.scan} TO RESUME`;
       if (scanDistanceM !== undefined) return `Get closer to scan · ${scanDistanceM.toFixed(0)} m`;
       return device === 'touch'
         ? 'Hold SCAN on a glowing target.'

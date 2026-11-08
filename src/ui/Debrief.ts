@@ -94,7 +94,9 @@ export function summarizeDive(
           : !scan && !entry
             ? 'Face a target and hold Scan.'
             : stats.objectives && stats.objectives.completed < stats.objectives.total
-              ? 'Keep exploring to finish the primary objectives.'
+              ? stats.objectives.remaining
+                ? `${stats.objectives.remaining}.`
+                : 'Keep exploring to finish the primary objectives.'
               : 'Open the Journal to read your finds.';
   return { highlight, next, kind };
 }

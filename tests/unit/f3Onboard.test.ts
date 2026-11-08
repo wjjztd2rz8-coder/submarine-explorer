@@ -7,7 +7,7 @@ import {
   hullHintAllowed,
   type HintContext,
 } from '../../src/game/Hints.js';
-import { TUTORIAL_STEPS, Tutorial, tutorialText } from '../../src/game/Tutorial.js';
+import { TUTORIAL_STEPS, Tutorial, depthCardWaits, tutorialText } from '../../src/game/Tutorial.js';
 import { ONBOARD_STORAGE_KEY, TutorialSave, migrateOnboard } from '../../src/game/TutorialSave.js';
 import { controlGroups } from '../../src/ui/ControlsCard.js';
 import type { SettingsStorage } from '../../src/core/Save.js';
@@ -210,6 +210,18 @@ describe('tutorial progression', () => {
     hold(t, { ballast: -1 }, 30);
     expect(t.step?.id).toBe('scan');
   });
+  it('keeps the drop cue on the scan step until the next scan starts', () => {
+    const t = new Tutorial();
+    t.skipStep();
+    t.skipStep();
+    expect(t.step?.id).toBe('scan');
+    t.notify('scan:started');
+    t.notify('scan:aborted', 'facing');
+    expect(t.dropReason).toBe('facing');
+    expect(t.scanning).toBe(false);
+    expect(t.notify('scan:started')).toBe(false);
+    expect(t.dropReason).toBeNull();
+  });
   it('events only count for the step waiting for them', () => {
     const t = new Tutorial();
     expect(t.notify('scan:complete')).toBe(false);
@@ -254,6 +266,16 @@ describe('tutorial progression', () => {
     for (const step of TUTORIAL_STEPS)
       for (const device of ['keyboard', 'gamepad', 'touch'] as const)
         expect(tutorialText(step.id, device, keys).length).toBeGreaterThan(10);
+  });
+});
+
+describe('depth card on approach', () => {
+  // Regression: the touch slider card showed while the sub was still on the approach.
+  it('waits on touch until a target is in reach, and never on other devices', () => {
+    expect(depthCardWaits('touch', false)).toBe(true);
+    expect(depthCardWaits('touch', true)).toBe(false);
+    expect(depthCardWaits('keyboard', false)).toBe(false);
+    expect(depthCardWaits('gamepad', false)).toBe(false);
   });
 });
 
