@@ -1909,6 +1909,15 @@ freshTest.describe('catalog tutorial and reload', () => {
               }, poi);
               // Slow hosted frames may need several ticks before the gate opens.
               for (let i = 0; i < 20 && !(await card.isVisible()); i++) {
+                // A second objective in the scan cone owns the one guidance slot
+                // (Hold SCAN); turn away so the target stays in reach but not in the beam.
+                if (await page.locator(GUIDANCE.scan).isVisible()) {
+                  await page.evaluate(() => {
+                    const g = window.__game as unknown as Game;
+                    g.sub.yaw += Math.PI;
+                    g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
+                  });
+                }
                 await page.clock.runFor(500);
               }
             }

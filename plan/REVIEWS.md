@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-11-08 targeted review: CI red on main (3 runs)
+
+- Hosted run 42459849494 (108c6f92) failed 11 shards, not one: `hud-touch.spec.ts:1822` catalog tutorial for axial-seamount-ashes and endurance across viewports, plus `mission.spec.ts:91`.
+- Root cause (from the failed shard's page snapshot): at the spawn pose a second objective sits in the scan cone, so the scan card owns the one guidance slot and the touch depth card never appears; the spec loop just burned the 4 min timeout. Fix: spec turns the sub away when the scan card is up. mission.spec expected the distance in the hint, but the turn cue replaces it by design; it now accepts either. No product change. Local runs pass (they passed before too), so the next hosted run decides.
+- Process: failed hosted specs hide the real cause behind timeouts; read `error-context.md` in the `e2e-artifacts-*` artifact first. No agents launched.
+
 ## 2026-11-08 targeted review (trigger: CI red 3 runs, on e903e970 and 2c2d1ee4)
 
 - **Root cause:** the Monterey catalog fix worked; the new reds come from the last two Haiku packages, which updated copy and gating without a full e2e. Hosted logs are empty through `gh run view --log`, but `gh api repos/:owner/:repo/actions/jobs/<id>/logs` works (use it for triage). Three stale expectations: (1) `helpers/tutorial.ts` dismiss asserted `not.toHaveAttribute` on a card that touch now hides at the depth step (phone-accept, Surface HUD, hud-touch catalog); (2) hud-touch one-target-surface expected the range in the hint, but the turn cue replaces it by design; (3) journal-debrief two-objective expected `HOLD .* TO SCAN`, touch now says "Hold SCAN".

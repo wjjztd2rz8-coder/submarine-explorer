@@ -3418,3 +3418,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged Sonnet U-scan-fish-lock-landscape (~27 min): root cause was the "keep the beam locked" step in Scanner.update, which let a fish scan pin the reticle (a school handed the lock fish to fish); the eligible marked objective now takes the beam mid-hold, and an in-progress objective scan is not handed to a fish that drifts into the cone. Three unit tests. gates smoke + project-base green on branch and main (e2e specs for scan/fish not run separately); pushed.
 - Hosted CI on 108c6f92 still red: only hud-touch catalog tutorial for axial-seamount-ashes (844x390 timeout, 390x844 data-step=move not found). Not reproducible locally; added DIRECTOR item 1b (U-ci-axial-catalog) as top. No tag. Codex briefs queued (9; weekly 16%, pacing holds dispatch). Claude weekly ~43%: one package per run.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 03:17 CST headless run (Claude): targeted review, red CI
+
+- Hosted failure was 11 shards (catalog tutorial for axial/endurance + mission.spec hint), not one. Cause: a second objective in the scan cone holds the guidance slot, so the touch depth card never shows; mission hint shows the turn cue by design. Fixed both specs; gates smoke + project-base green. No product change, no agents, no tag. Pushed; next hosted run decides.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?

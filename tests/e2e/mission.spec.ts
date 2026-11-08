@@ -180,7 +180,10 @@ test.describe('B3 mission flow', () => {
     ).toBeLessThan(2);
     expect(opening.range).toBeGreaterThanOrEqual(40);
     expect(opening.range).toBeLessThan(700);
-    await expect(page.locator('.guidance-hint')).toContainText(`${Math.round(opening.range)} m`);
+    // The turn cue replaces the distance while the target is off the bow (by design).
+    await expect(page.locator('.guidance-hint')).toContainText(
+      new RegExp(`TURN \\d+° (PORT|STARBOARD)|${Math.round(opening.range)} m`),
+    );
 
     // Now it simulates: flooding the tanks takes the boat down.
     const y0 = (await subPos(page)).y;
