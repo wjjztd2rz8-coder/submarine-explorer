@@ -1,7 +1,7 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { afterAll, describe, expect, it, vi } from 'vitest';
-import { Raycaster, Vector3 } from 'three';
+import { Box3, InstancedMesh, Matrix4, Mesh, Raycaster, Vector3, type Object3D } from 'three';
 import * as manifests from '../../src/core/SiteManifest.js';
 import { makeConfig } from '../../src/core/Config.js';
 import { defaultSettings } from '../../src/core/Save.js';
@@ -12,12 +12,35 @@ import { parseMission } from '../../src/game/Mission.js';
 import { parsePois, placePois } from '../../src/game/Pois.js';
 import { resolveScanRadius, Scanner } from '../../src/game/Scanner.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
+import { SubMesh } from '../../src/sub/SubMesh.js';
 import { Props } from '../../src/world/Props.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import type { TileMeta } from '../../src/util/types.js';
 
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 const audit: unknown[] = [];
+
+function projectedBounds(root: Object3D, rig: CameraRig): Box3 {
+  const bounds = new Box3();
+  const instance = new Matrix4();
+  const world = new Matrix4();
+  const point = new Vector3();
+  root.updateMatrixWorld(true);
+  root.traverseVisible((object) => {
+    if (!(object instanceof Mesh)) return;
+    const vertices = object.geometry.getAttribute('position');
+    for (let i = 0; i < (object instanceof InstancedMesh ? object.count : 1); i++) {
+      if (object instanceof InstancedMesh) object.getMatrixAt(i, instance);
+      else instance.identity();
+      world.multiplyMatrices(object.matrixWorld, instance);
+      for (let j = 0; j < vertices.count; j++)
+        bounds.expandByPoint(
+          point.fromBufferAttribute(vertices, j).applyMatrix4(world).project(rig.camera),
+        );
+    }
+  });
+  return bounds;
+}
 afterAll(() => {
   const env = (globalThis as { process?: { env?: Record<string, string> } }).process?.env;
   if (env?.OPENING_SAFETY_AUDIT)
@@ -25,7 +48,7 @@ afterAll(() => {
 });
 
 describe('closer mission opening safety', () => {
-  for (const site of ['lost-city', 'bismarck']) {
+  for (const site of ['lost-city', 'bismarck', 'endurance']) {
     for (const tier of ['low', 'medium', 'high'] as const) {
       it(`${site} ${tier}: effective scan radius, camera clearance and unchanged free dive in both modes`, async () => {
         const config = makeConfig();
@@ -138,6 +161,58 @@ describe('closer mission opening safety', () => {
               const ray = new Raycaster(position, arm.clone().normalize(), 0, arm.length());
               expect(ray.intersectObject(terrain.group, true)).toHaveLength(0);
               expect(ray.intersectObject(props.group, true)).toHaveLength(0);
+              // Regression guard: Endurance's lateral mission arm must frame both hulls and survive reset/recomposition on phones.
+              const hullFrames: Record<string, { min: number[]; max: number[] }> = {};
+              if (site === 'endurance') {
+                const mesh = new SubMesh({ length: 26, hullClass: mission.hull_class!, tier });
+                try {
+                  mesh.setPose(position, pose.yaw, 0, 0);
+                  const camera = rig.camera.position.clone();
+                  const orientation = rig.camera.quaternion.clone();
+                  rig.orbit(0.3, 0.1, -0.25);
+                  expect(rig.freeLook).toBe(true);
+                  rig.resetView();
+                  for (let frame = 0; frame < 120; frame++)
+                    rig.update(position, pose.yaw, 0, 1 / 60);
+                  expect(rig.freeLook).toBe(false);
+                  expect(rig.chaseRadius).toBe(pose.chaseRadius);
+                  expect(rig.camera.position.distanceTo(camera)).toBeLessThan(1e-6);
+                  expect(rig.camera.quaternion.angleTo(orientation)).toBeLessThan(1e-6);
+                  rig.camera.updateMatrixWorld(true);
+                  for (const [name, root] of [
+                    ['wreck', hero.full],
+                    ['submarine', mesh.group],
+                  ] as const) {
+                    const bounds = projectedBounds(root, rig);
+                    expect(bounds.isEmpty()).toBe(false);
+                    for (const axis of ['x', 'y', 'z'] as const) {
+                      expect(
+                        bounds.min[axis],
+                        `${name} ${width}x${height} ${axis} minimum`,
+                      ).toBeGreaterThan(-1);
+                      expect(
+                        bounds.max[axis],
+                        `${name} ${width}x${height} ${axis} maximum`,
+                      ).toBeLessThan(1);
+                    }
+                    hullFrames[name] = { min: bounds.min.toArray(), max: bounds.max.toArray() };
+                  }
+                  expect(
+                    composedMissionSpawn(
+                      site,
+                      primaries,
+                      meta,
+                      terrain,
+                      props,
+                      spawnSettings(config),
+                      safeDepth,
+                      effective.camera,
+                    ),
+                  ).toEqual(pose);
+                } finally {
+                  mesh.dispose();
+                }
+              }
               audit.push({
                 site,
                 tier,
@@ -149,6 +224,7 @@ describe('closer mission opening safety', () => {
                 eyeClearance: eye.y - terrain.sampleHeight(eye.x, eye.z),
                 nearClearance,
                 armClearance,
+                hullFrames,
               });
             }
             const free = () =>
@@ -164,7 +240,7 @@ describe('closer mission opening safety', () => {
               );
             const current = free();
             expect(current).not.toBeNull();
-            // Restore the pre-scale mission fields; free-dive data is identical.
+            // Mission-only tuning must not change the independent free-dive pose.
             const baseline = structuredClone(manifest);
             baseline.opening!.mission = {
               rangeM: site === 'lost-city' ? 220 : 110,
