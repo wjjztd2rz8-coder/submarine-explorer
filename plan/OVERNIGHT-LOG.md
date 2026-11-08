@@ -3429,3 +3429,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged Sonnet V-titanic-detail-plates (~21 min agent): shared steel shader inlines map/normal chunks with warped UVs (wandering seams), per-plate rust/dark/stain tones, darker streaks; rusticles 12 radial segments, slimmer. Reviewed before/after-titanic-3: clearly less pale and less gridded, still readable. I fixed the wreck shader unit test (inlined chunks) and rebaselined freeDiveComposition snapshots (sub-cm shifts). gates smoke + project-base green on branch and main; pushed. Bismarck is darker/browner via the shared shader (item 5 still open for its silhouette/scour).
 - Hosted CI on ee243d5c (catalog + mission spec fixes) still pending at start; no tag. Codex 146-150 queued (weekly 16%, pacing holds dispatch). Claude weekly 41%: one package per run.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 05:10 CST headless run (Claude): comprehensive review (f76)
+
+- Golden 2026-11-08-104909 captured; review written alone (Codex week 9%, Sol skipped, stated in REVIEWS.md). Stage ~86%, 4-5 weeks. Titanic 4.2, Bismarck still 3.2 (next: V-bismarck-hull-plates). DONE items archived, STATUS rewritten, Codex brief 151 queued (149-151 pending, pacing holds dispatch). No agents launched: Claude week 41%, one package per run kept for next run.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?

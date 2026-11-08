@@ -1,5 +1,16 @@
 # Reviews
 
+## 2026-11-08 comprehensive review (trigger: new tag f76; Claude alone, Codex Sol skipped because the Codex week is at 9%)
+
+- **Stage:** about 86% to 1.0; 4-5 weeks (Sol's last range was 4-6; with no Sol pass this run I keep 4-5 and flag it as unchecked). Golden `2026-11-08-104909` vs `2026-11-07-180922`. f76 is tagged on green hosted CI (ee243d5c).
+- **Changed since the last review:** CI red fixed in three spec rounds (catalog tutorial with a second objective in the cone, hint turn cue), U-scan-fish-lock-landscape (Scanner beam lock), V-titanic-detail-plates (wandering seams, per-plate tones, slimmer rusticles).
+- **Scores (openings, Claude):** Titanic 4.2 (up 0.1: darker, less gridded plating, still readable), Lost City 4.1, Beebe 4.0, Monterey 3.8 (wall strata now busy but coherent), Blue Hole 3.5 (gallery reads, apron flat), Bismarck 3.2 (unchanged: pale slab floating on a dome, hull not grounded). Whole-site scores stay Sol's 2026-11-07 numbers (none holds 4); not re-measured.
+- **Biggest gaps:** (1) Bismarck hull and grounding, (2) Blue Hole apron and gallery size, (3) Beebe separated stacks, (4) Lost City tube forms, (5) unaided journey evidence and Low-tier weaker-phone check, (6) Monterey wall face (two failed attempts; needs an authored face prop).
+- **Play flow:** not re-captured. The golden mission frames show a clean opening card with one target (Titanic "Hold G to scan", Bismarck "Get closer to scan", 110 m); no clutter seen. Last scripted journeys are walkthrough-5 (2026-11-07).
+- **Process:** efficiency shows Claude week 41% (about 20%/day, 2.0 days of runway, 4 days to reset) so Claude runs stay at one package; Codex week 9% (about 14%/day), so Sol review is skipped and dispatch is paced. 0 failed timer runs in 24 h. Golden takes about 15 min (detached runs only). Hosted CI on the newest main commits was still running at write time.
+- **New priorities:** V-bismarck-hull-plates first, then V-bluehole-gallery-2, V-beebe-chimney-stacks, V-lostcity-tower-forms, U-copy-fixes (Haiku, with affected e2e specs per the 2026-11-08 rule). Codex: 149, 150, 151 (S-verify-fish-lock-plates) queued. DONE items moved to `plan/archive/DIRECTOR-HISTORY-2026-11-08-backlog.md`.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
 ## 2026-11-08 targeted review: CI red on main (3 runs)
 
 - Hosted run 42459849494 (108c6f92) failed 11 shards, not one: `hud-touch.spec.ts:1822` catalog tutorial for axial-seamount-ashes and endurance across viewports, plus `mission.spec.ts:91`.
