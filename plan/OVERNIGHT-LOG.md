@@ -3479,3 +3479,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - All 3 red runs were the 960 great-blue-hole spec; third fix (re-probe after settle) is in hosted CI run 42529045680, verdict pending. Fallback plan in REVIEWS.md. No agents, no tag.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 16:45 CST headless run (Claude): hold
+
+- Nothing to collect (only held 124/131 worktrees and queued-but-unlaunched 149-151). Hosted CI runs 42529045680 (960 re-probe) and 42529370401 still running; no tag. Codex weekly 2%, dispatch held; Claude weekly 36% on the pace line and the previous run ended minutes ago, so no package.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
