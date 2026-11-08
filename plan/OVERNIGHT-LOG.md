@@ -3468,3 +3468,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect (only held 124/131 CI-speed worktrees). Hosted CI on 061e6765 (960 probe fix) still running; no tag. Claude weekly 36% sits on the pace line (~33%) and the previous run ended minutes ago, so no package. Codex weekly 9%; briefs 149-152 queued under pacing hold.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 16:12 CST headless run (Claude): red CI triage (960 third pass)
+
+- 960 great-blue-hole realistic high still red on hosted CI (sub resting at -9.5 m, 31.6 m from the POI but depth rule unmet). Passes locally at every viewport, so the cause is likely props finishing loading after the teleport. Spec now re-probes the ring by real pose after the first settle and re-aims. Unconfirmed until hosted CI runs; gates smoke + project-base green; pushed. If it stays red next run, wait for props ready before teleporting. No agents, no tag.
+- Claude weekly 36% on the pace line; Codex weekly 9%, briefs 149-152 queued under pacing hold.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?

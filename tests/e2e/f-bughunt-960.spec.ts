@@ -251,6 +251,36 @@ for (const layout of [
               g.rig.snap(g.sub.position, aim.yaw, aim.pitch);
             }, aim);
             await page.clock.runFor(34);
+            // Props that finish loading after the teleport can still lift the hull above the scan
+            // depth rule (hosted CI); re-probe the ring by the real pose and aim again.
+            const lifted = await page.evaluate(() => {
+              const g = window.__game as unknown as Game;
+              const poi = g.discovery.pois[0]!;
+              const minDepth = poi.minDepthM ?? 0;
+              if (minDepth <= 0 || g.sub.position.y <= -minDepth) return null;
+              const r = poi.radius * 0.8;
+              const yaw = g.sub.yaw;
+              for (let a = 0; a < 24 && g.sub.position.y > -minDepth; a++) {
+                const ang = (a / 24) * Math.PI * 2;
+                g.sub.reset(
+                  poi.position.x + Math.cos(ang) * r,
+                  -(minDepth + 2),
+                  poi.position.z + Math.sin(ang) * r,
+                  yaw,
+                );
+              }
+              return { from: g.sub.position.toArray(), to: poi.position.toArray() };
+            });
+            if (lifted) {
+              const re = scanAim(xyz(lifted.from), xyz(lifted.to), target.maxPitch);
+              await page.evaluate((aim) => {
+                const g = window.__game as unknown as Game;
+                g.sub.yaw = aim.yaw;
+                g.sub.pitch = aim.pitch;
+                g.rig.snap(g.sub.position, aim.yaw, aim.pitch);
+              }, re);
+              await page.clock.runFor(34);
+            }
             // A touch pose on the approach hides the slider card (no target in reach yet),
             // so the opening dismissal could not finish the tutorial. In reach it can.
             await dismissTutorial(page, layout.touch, true);
