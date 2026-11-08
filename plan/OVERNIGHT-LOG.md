@@ -3440,3 +3440,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged Sonnet V-bismarck-hull-plates (~29 min agent): the pale slab was the teak deck; now dark streaked brown (Bismarck-only constant), deck line sags under the aft island, scour gets an optional per-site `shade` in terrain data. Reviewed before/after opening: clearly better, readable. Not done: listing, far horizon dome. Bismarck ~3.5-3.8 (was 3.2). gates smoke + project-base green on branch and main; pushed. Titanic/Endurance untouched.
 - Hosted CI on main ab1f043c green (f76 tagged earlier); no new tag. Codex 149-151 queued, weekly 9% so pacing holds dispatch. Claude weekly ~39%: one package per run.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 10:32 CST headless run (Claude): V-bluehole-gallery-2 + Codex verification merges
+
+- Merged Codex S-verify-endurance-relief and T-verify-endurance-hull-pose (tests only; the 12-case opening-framing e2e matrix was left out because it never executed, web server timed out locally) and S-bughunt-scan-journal (no defect found). 131/124 CI-speed worktrees untouched (held).
+- Merged Sonnet V-bluehole-gallery-2: karst-grotto 92x22x20 m, scan radius 46 m, apron silt grain/ripples; gallery ~18% to ~26% of opening frame. Reviewed before/after: modest but real; opening ~3.7 (agent said 4.0). Sub still touches gallery edge, stalactites small. Tests rebaselined (Low tri budget 21300 to 24000). gates smoke + project-base green on main; pushed. No tag.
+- Codex 149-152 queued (152 verifies the gallery); weekly 9% so pacing holds dispatch. Claude weekly ~37%: one package per run.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
