@@ -253,6 +253,31 @@ describe('wreck site policy', () => {
 
 describe('Endurance opening atmosphere', () => {
   for (const tier of GRAPHICS_TIERS) {
+    it(`${tier}: keeps relief behind particles without adding geometry passes`, () => {
+      const { scene, preset } = setup(tier);
+      try {
+        const relief = scene.getObjectByName('enduranceRelief') as THREE.Mesh | undefined;
+        if (tier === 'low') {
+          expect(relief).toBeUndefined();
+          expect(scene.children.map((object) => object.name)).toEqual(['enduranceHorizon']);
+        } else {
+          expect(relief).toBeDefined();
+          expect(scene.children).toHaveLength(4);
+          expect(relief!.geometry.index!.count / 3).toBe(3360);
+          expect(Array.isArray(relief!.material)).toBe(false);
+          for (const name of ['wreckHaze', 'wreckMotes']) {
+            const particles = scene.getObjectByName(name) as THREE.Points;
+            expect(particles.renderOrder).toBeGreaterThan(relief!.renderOrder);
+            const material = particles.material as THREE.ShaderMaterial;
+            expect(material.depthTest).toBe(true);
+            expect(material.depthWrite).toBe(false);
+          }
+        }
+      } finally {
+        preset.exit();
+      }
+    });
+
     it(`${tier}: keeps flecks bounded across distance, lamp strength and viewport`, () => {
       const { scene, camera, atmo, preset, ctx } = setup(tier);
       const tuning = siteManifest('endurance')!.wreck!.atmosphere;
@@ -261,6 +286,11 @@ describe('Endurance opening atmosphere', () => {
       expect(snow.points!.geometry.getAttribute('position').count).toBe(
         config.water.tiers[tier].snowCount,
       );
+      const relief = scene.getObjectByName('enduranceRelief');
+      if (relief) expect(snow.points!.renderOrder).toBeGreaterThan(relief.renderOrder);
+      const snowMaterial = snow.points!.material as THREE.ShaderMaterial;
+      expect(snowMaterial.depthTest).toBe(true);
+      expect(snowMaterial.depthWrite).toBe(false);
       for (const height of [844, 900, 1800]) {
         for (const distance of [1, 6, 12, 20, 50, 100]) {
           for (const lamp of [0, 1, 50]) {
