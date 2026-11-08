@@ -3434,3 +3434,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Golden 2026-11-08-104909 captured; review written alone (Codex week 9%, Sol skipped, stated in REVIEWS.md). Stage ~86%, 4-5 weeks. Titanic 4.2, Bismarck still 3.2 (next: V-bismarck-hull-plates). DONE items archived, STATUS rewritten, Codex brief 151 queued (149-151 pending, pacing holds dispatch). No agents launched: Claude week 41%, one package per run kept for next run.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 07:29 CST headless run (Claude): V-bismarck-hull-plates
+
+- Merged Sonnet V-bismarck-hull-plates (~29 min agent): the pale slab was the teak deck; now dark streaked brown (Bismarck-only constant), deck line sags under the aft island, scour gets an optional per-site `shade` in terrain data. Reviewed before/after opening: clearly better, readable. Not done: listing, far horizon dome. Bismarck ~3.5-3.8 (was 3.2). gates smoke + project-base green on branch and main; pushed. Titanic/Endurance untouched.
+- Hosted CI on main ab1f043c green (f76 tagged earlier); no new tag. Codex 149-151 queued, weekly 9% so pacing holds dispatch. Claude weekly ~39%: one package per run.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
