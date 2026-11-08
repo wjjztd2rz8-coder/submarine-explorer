@@ -96,7 +96,7 @@ function cachedGeo(key: string, make: () => THREE.BufferGeometry): THREE.BufferG
  */
 export function rusticleGeometry(): THREE.BufferGeometry {
   return cachedGeo('rusticle', () => {
-    const g = new THREE.CylinderGeometry(0.5, 0.05, 1, 6, 8, false);
+    const g = new THREE.CylinderGeometry(0.5, 0.05, 1, 12, 8, true);
     g.translate(0, -0.5, 0);
     const pos = g.getAttribute('position');
     for (let i = 0; i < pos.count; i++) {
@@ -107,15 +107,15 @@ export function rusticleGeometry(): THREE.BufferGeometry {
       const t = -y;
       const bulge = 0.7 + 0.6 * valueNoise3(Math.cos(a) * 1.3, y * 5.3, Math.sin(a) * 1.3, 0x7a3);
       // Flared root, then a thin, slightly beaded stalk.
-      const flare = 1 + 1.4 * Math.pow(1 - Math.min(1, t * 6), 2);
+      const flare = 1 + 1.1 * Math.pow(1 - Math.min(1, t * 4), 2);
       const k = bulge * flare;
       // Droop: the tip swings sideways and the stalk wanders.
       const sway = 0.5 * t * t + 0.06 * Math.sin(t * 9);
       pos.setXYZ(i, x * k + sway, y, z * k);
     }
     g.computeVertexNormals();
-    const root = new THREE.Color(0x553821);
-    const tip = new THREE.Color(0x2e2012);
+    const root = new THREE.Color(0x3e2616);
+    const tip = new THREE.Color(0x22160c);
     const c = new THREE.Color();
     return colourise(normalise(g), (_x, y) => c.copy(root).lerp(tip, Math.pow(-y, 0.7)));
   });
