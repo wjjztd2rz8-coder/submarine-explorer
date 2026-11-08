@@ -86,15 +86,20 @@ it('textured steel shares plate tint and bounded rim light across tiers without 
       );
       // Tint and rim light retain standard normal, roughness, lighting, fog and
       // output chunks, with no additional texture fetches.
-      const chunks = (source: string) => source.match(/#include <[^>]+>/g);
+      // The map and normal-map chunks are inlined with warped UVs so seams wander;
+      // every other chunk stays an include.
+      const inlined = new Set(['<map_fragment>', '<normal_fragment_maps>']);
+      const chunks = (source: string) =>
+        (source.match(/#include <[^>]+>/g) ?? []).filter((c) => !inlined.has(c.slice(9)));
       expect(chunks(shader.fragmentShader)).toEqual(
         chunks(THREE.ShaderLib.standard.fragmentShader),
       );
       const samplers = (source: string) =>
         source.match(/\b(?:uniform\s+sampler\w*|texture\w*\s*\()/g);
-      expect(samplers(shader.fragmentShader)).toEqual(
-        samplers(THREE.ShaderLib.standard.fragmentShader),
-      );
+      const expanded = THREE.ShaderLib.standard.fragmentShader
+        .replace('#include <map_fragment>', THREE.ShaderChunk.map_fragment)
+        .replace('#include <normal_fragment_maps>', THREE.ShaderChunk.normal_fragment_maps);
+      expect(samplers(shader.fragmentShader)).toEqual(samplers(expanded));
       expect(shader.fragmentShader).toContain('diffuseColor.rgb = mix(');
       const source = shader.fragmentShader;
       const rim = source.match(/float rimFacing = ([^;]+);/)!;
