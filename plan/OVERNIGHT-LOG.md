@@ -3412,3 +3412,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Hosted CI on 38fa1597 failed one shard: hud-touch catalog tutorial for axial-seamount-ashes at 844x390 (touch depth card never appeared after the single 500 ms clock tick). Passes locally in 1.8 s, so spec fix: loop clock ticks until the gated card shows. No product change, no agents launched, no tag.
 - Codex 146-150 queued (weekly 16% left, pacing holds dispatch).
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 03:01 CST headless run (Claude): U-scan-fish-lock-landscape
+
+- Merged Sonnet U-scan-fish-lock-landscape (~27 min): root cause was the "keep the beam locked" step in Scanner.update, which let a fish scan pin the reticle (a school handed the lock fish to fish); the eligible marked objective now takes the beam mid-hold, and an in-progress objective scan is not handed to a fish that drifts into the cone. Three unit tests. gates smoke + project-base green on branch and main (e2e specs for scan/fish not run separately); pushed.
+- Hosted CI on 108c6f92 still red: only hud-touch catalog tutorial for axial-seamount-ashes (844x390 timeout, 390x844 data-step=move not found). Not reproducible locally; added DIRECTOR item 1b (U-ci-axial-catalog) as top. No tag. Codex briefs queued (9; weekly 16%, pacing holds dispatch). Claude weekly ~43%: one package per run.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: authored face prop for Monterey, or accept 3.8?
