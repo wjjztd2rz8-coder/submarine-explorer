@@ -104,7 +104,7 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 14. **S-verify-endurance-relief / T-verify-endurance-hull-pose / S-bughunt-scan-journal [Codex, briefs 146-148]:** verification and bug hunt over merged work; briefs 124/131 (R-ci-speed) stay held.
     **DONE 2026-11-09 (ff015277) S-verify-bluehole-gallery [Codex, brief 152]:** opening scan at 10 m depth and hero clearance pinned for all tiers/modes; tests only.
     **DONE 2026-11-08 (88525a69) S-verify-fish-lock-plates [Codex, brief 151]:** scan lock and plate normal tangent fixed; unit-tested, no browser acceptance.
-15. **R-ci-speed [Codex, held 124/131]:** hosted CI takes 25-30 min; target under 20 min without dropping coverage; 124 was not merged (unmeasured, may flake), 131 is a workflow_dispatch experiment.
+15. **R-ci-speed [Codex, measured 2026-11-09]:** latest green hosted runs take 42-43 min; owner target under 30 min without dropping coverage. Refreshed hosted weights for the existing 38 one-worker shards project about 3 min saved; the measured 636 runner-minutes at 20 slots prevent an under-30 claim from balancing alone. Hosted acceptance remains open; evidence: [progress/R-ci-speed.md](progress/R-ci-speed.md). Prior 124/131 attempts were read, not merged.
 
 16b. **R-ci-triage [Codex, brief 160, item 18]:** hosted CI is red often and takes 45-70 min; triage failing specs by run logs, fix root causes, propose a under-30-min change.
 16c. **T-verify-first-sixty [Codex, brief 161, item 19] DONE 2026-11-09 (merged; smoke gates green, browser spec unrun locally, hosted CI is the check):** first-60-s and debrief capability tests over all 13 sites on phone portrait/landscape/desktop; fix generic defects.
