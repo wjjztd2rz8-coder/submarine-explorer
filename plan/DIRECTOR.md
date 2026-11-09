@@ -112,6 +112,9 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 16d. **S-dead-code-audit [Codex, brief 162, item 20] DONE 2026-11-09 (51e8536f):** delete code made redundant by the ROV/boost/upgrade/HUD-offset cuts; net negative lines.
 16e. **V-challenger-lander-flag [Claude, optional, non-hero]:** the lander flag is a flat luminous triangle and the floats are faceted (`challenger-deep-3.png`); give the flag a cloth shape and round the floats.
 16f. **V-golden-capture-complete [Codex] DONE 2026-11-09 (working tree; gate review fixes verified in focused units):** Challenger was planned but Chromium closed during its screenshot. Golden manifests now verify every planned image and incomplete runs end with a named error and exit 1. The two helper regressions from the orchestrator's gate run are fixed without changing its unit assertions; full gate rerun pending. Tests/tools only; evidence in `plan/progress/V-golden-capture-complete.md`.
+16g. **S-bughunt-save-migration [Codex, brief 180]:** bug hunt on save/settings load paths (old saves, missing fields, corrupt JSON, private-mode storage); fix with unit tests.
+16h. **S-bughunt-touch-input [Codex, brief 181]:** bug hunt on touch controls/gestures (swipe-up list, joystick, multi-touch, orientation change) via unit tests and code reading; no key names on touch.
+16i. **S-verify-ci-first-sixty [Codex, brief 182]:** after hosted CI runs the new first-sixty spec, triage its failures by run logs and fix root causes in the spec or game.
 
 ### Release and owner
 
