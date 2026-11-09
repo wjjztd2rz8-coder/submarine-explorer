@@ -775,15 +775,98 @@ it('names exactly the contact Scan will scan when a nearer off-axis contact exis
 });
 
 describe('Scanner objective priority over passing contacts', () => {
+  it('selects a newly resolved objective on the first frame of a hold', () => {
+    const previous = target({ id: 'previous', position: new Vector3(0, -100, -40) });
+    const next = target({ id: 'next', position: new Vector3(0, -100, -80) });
+    const { scanner, log } = setup([previous, next]);
+    let marked = previous.id;
+    scanner.setObjective(() => marked);
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.candidateId).toBe(previous.id);
+
+    marked = next.id;
+    scanner.update(0.1, AT, NORTH, true);
+    expect(scanner.view.objectiveId).toBe(next.id);
+    expect(scanner.view.candidateId).toBe(next.id);
+    expect(scanner.view.nearestId).toBe(next.id);
+    expect(scanner.view.activeId).toBe(next.id);
+    expect(scanner.view.progress).toBeCloseTo(0.05);
+    expect(log.filter(([name]) => name === 'scan:started')).toEqual([
+      ['scan:started', { poiId: next.id }],
+    ]);
+  });
+
+  it.each(['fixed', 'wildlife', 'curiosity'] as const)(
+    'resolves guidance changes before retaining a held %s scan',
+    (pool) => {
+      const previous = target({ id: 'previous', position: new Vector3(400, -100, 0) });
+      const next = target({ id: 'next', position: new Vector3(100, -100, 0) });
+      const contact = target({ id: 'contact', position: new Vector3(0, -100, -40) });
+      const { scanner, store } = setup(
+        pool === 'fixed' ? [previous, next, contact] : [previous, next],
+      );
+      if (pool === 'wildlife') scanner.setExtraTargets([contact]);
+      if (pool === 'curiosity') scanner.setSupplementalTargets([contact]);
+      let marked = previous.id;
+      scanner.setObjective(() => marked);
+      scanner.update(0.4, AT, NORTH, true);
+      expect(scanner.view.activeId).toBe(contact.id);
+
+      marked = next.id;
+      next.position.set(0, -100, -80);
+      scanner.update(0.2, AT, NORTH, true);
+      const retained = pool === 'fixed' ? contact : next;
+      expect(scanner.view.objectiveId).toBe(next.id);
+      expect(scanner.view.candidateId).toBe(retained.id);
+      expect(scanner.view.nearestId).toBe(retained.id);
+      expect(scanner.view.activeId).toBe(retained.id);
+      expect(scanner.view.progress).toBeCloseTo(pool === 'fixed' ? 0.3 : 0.1);
+      scanner.update(2, AT, NORTH, true);
+      expect(scanner.view.lastCompleteSideFind).toBe(pool === 'fixed');
+      expect(scanner.view.objectiveId).toBe(pool === 'fixed' ? next.id : null);
+      expect(store.keys()).toEqual([`lm/${retained.id}`]);
+    },
+  );
+
+  it.each(['cleared', 'missing', 'logged'] as const)(
+    'drops a %s resolved objective before retaining wildlife and classifying its completion',
+    (reason) => {
+      const objective = target({ id: 'objective', position: new Vector3(100, -100, 0) });
+      const fish = target({ id: 'life:fish', position: new Vector3(0, -100, -40) });
+      const { scanner, store } = setup([objective]);
+      scanner.setExtraTargets([fish]);
+      let marked: string | null = objective.id;
+      scanner.setObjective(() => marked);
+      scanner.update(0.5, AT, NORTH, true);
+      expect(scanner.view.objectiveId).toBe(objective.id);
+      expect(scanner.view.activeId).toBe(fish.id);
+
+      marked = reason === 'cleared' ? null : reason === 'missing' ? 'missing' : objective.id;
+      if (reason === 'logged') scanner.scannedThisDive.add(`lm/${objective.id}`);
+      objective.position.set(0, -100, -80);
+      scanner.update(0.5, AT, NORTH, true);
+      expect(scanner.view.objectiveId).toBeNull();
+      expect(scanner.view.candidateId).toBe(fish.id);
+      expect(scanner.view.nearestId).toBe(fish.id);
+      expect(scanner.view.activeId).toBe(fish.id);
+      expect(scanner.view.progress).toBeCloseTo(0.5);
+      scanner.update(1, AT, NORTH, true);
+      expect(scanner.view.lastCompleteId).toBe(fish.id);
+      expect(scanner.view.lastCompleteSideFind).toBe(false);
+      expect(store.keys()).toEqual([`lm/${fish.id}`]);
+    },
+  );
+
   it.each([false, true])(
     'keeps a fixed scan through guidance changes, then selects the marked objective on a new hold (reversed=%s)',
     (reversed) => {
       const first = target({ id: 'first', position: new Vector3(0, -100, -50) });
       const second = target({ id: 'second', position: new Vector3(0, -100, -70) });
       const { scanner, log, store } = setup(reversed ? [second, first] : [first, second]);
-      scanner.setObjective(first.id);
+      let marked = first.id;
+      scanner.setObjective(() => marked);
       scanner.update(0.5, AT, NORTH, true);
-      scanner.setObjective(second.id);
+      marked = second.id;
       scanner.update(0.5, AT, NORTH, true);
       expect(scanner.view.activeId).toBe(first.id);
       expect(scanner.view.progress).toBeCloseTo(0.5);
@@ -880,20 +963,6 @@ describe('Scanner objective priority over passing contacts', () => {
       ['scan:started', { poiId: next.id }],
     ]);
     expect(store.keys()).toEqual(['lm/objective']);
-  });
-
-  it('takes the beam from an in-progress wildlife scan once the objective is in reach and in the cone', () => {
-    const objective = target({ id: 'objective', position: new Vector3(100, -100, 0) });
-    const fish = target({ id: 'life:grunt', position: new Vector3(0, -100, -15) });
-    const { scanner } = setup([objective]);
-    scanner.setObjective(objective.id);
-    scanner.setExtraTargets([fish]);
-    scanner.update(0.1, AT, NORTH, true);
-    expect(scanner.view.activeId).toBe(fish.id);
-    objective.position.set(0, -100, -50);
-    scanner.update(DT, AT, NORTH, true);
-    expect(scanner.view.candidateId).toBe(objective.id);
-    expect(scanner.view.activeId).toBe(objective.id);
   });
 
   it('keeps wildlife locked while the objective is not in the cone', () => {
