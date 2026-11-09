@@ -25,6 +25,7 @@ import {
   journalFirstOfKind,
   journalFront,
   journalIsSheet,
+  journalSiteRows,
   openJournalCategory,
   openJournalSite,
   setJournalSpoilers,
@@ -39,6 +40,63 @@ import spentKit from '../fixtures/legacy-save-spent-kit.json' with { type: 'json
 import secretSample from '../fixtures/legacy-save-secret-sample.json' with { type: 'json' };
 import heroStars from '../fixtures/legacy-save-hero-stars.json' with { type: 'json' };
 import type { Progress } from '../../src/game/Progress.js';
+
+for (const viewport of [
+  { width: 1280, height: 720 },
+  { width: 390, height: 844 },
+]) {
+  freshTest.describe(`cold Journal at ${viewport.width}px`, () => {
+    const touch = viewport.width === 390;
+    freshTest.use({ viewport, hasTouch: touch, serviceWorkers: 'block' });
+    freshTest(
+      `cold dive Journal shows cached entries before other sites load at ${viewport.width}px`,
+      async ({ page }) => {
+        // Regression guard: one slow unrelated site hid ready current-site entries
+        // behind "Loading the Journal…" and an "All dive sites" breadcrumb.
+        const act = (button: Locator) => (touch ? button.tap() : button.click());
+        await page.addInitScript(() => {
+          localStorage.setItem(
+            'subexplorer.discoveries.v1',
+            JSON.stringify({ version: 1, discovered: { 'titanic/titanic-bow': true } }),
+          );
+        });
+        let release!: () => void;
+        const pending = new Promise<void>((resolve) => (release = resolve));
+        await page.route('**/data/landmarks/beebe-vent-field/guide.json', async (route) => {
+          await pending;
+          await route.continue();
+        });
+        const journal = page.getByRole('dialog', { name: 'Journal', exact: true });
+        try {
+          await loadDive(page, `/?tile=titanic&tier=low&tutorial=0${touch ? '&touch=1' : ''}`);
+          if (touch) await page.locator('.tc-btn-pause').tap();
+          else await page.keyboard.press('Escape');
+          await act(
+            page.locator('.pause-menu').getByRole('button', { name: 'Journal', exact: true }),
+          );
+          await expect(journal).toBeVisible();
+          await expect(journal.locator('.jr-crumb')).toHaveText('RMS Titanic');
+          await expect(journal.locator('.jr-body .jr-title')).toHaveText('RMS Titanic');
+          await expect(journal.locator('.jr-body [data-row="titanic/poi/bow"]')).toContainText(
+            'The bow section',
+          );
+          await expect(journal).not.toContainText('Loading the Journal…');
+        } finally {
+          release();
+        }
+        await page.evaluate(() =>
+          (window.__game as unknown as { journal: Journal }).journal.load(),
+        );
+        await act(journal.getByRole('button', { name: 'Close Journal', exact: true }));
+        await act(
+          page.locator('.pause-menu').getByRole('button', { name: 'Journal', exact: true }),
+        );
+        await expect(journal.locator('.jr-body .jr-title')).toHaveText('RMS Titanic');
+        await expect(await journalSiteRows(page)).toHaveCount(catalog.landmarks.length);
+      },
+    );
+  });
+}
 
 freshTest(
   'Journal rotation releases focus from the hidden desktop spoilers switch',

@@ -474,10 +474,12 @@ const JOURNAL_CATALOGUE_URL = publicUrl('/data/landmarks.json');
 /**
  * Every site with a mission (index.json order), plus `extraIds` (the current
  * dive's content folder when it is not listed, e.g. the `_test` fixture).
+ * `onSite` receives each ready site without waiting for the others.
  */
 export async function loadJournalSites(
   extraIds: readonly string[] = [],
   fetchFn?: FetchJson,
+  onSite?: (site: JournalSite) => void,
 ): Promise<JournalSite[]> {
   const [catDoc, indexDoc] = await Promise.all([
     fetchContentJson(JOURNAL_CATALOGUE_URL, fetchFn),
@@ -486,5 +488,11 @@ export async function loadJournalSites(
   const catalogue = parseJournalCatalogue(catDoc);
   const ids = parseMissionIndex(indexDoc);
   for (const id of extraIds) if (isSafeLandmarkId(id) && !ids.includes(id)) ids.push(id);
-  return Promise.all(ids.map((id) => loadJournalSite(id, catalogue, fetchFn)));
+  return Promise.all(
+    ids.map(async (id) => {
+      const site = await loadJournalSite(id, catalogue, fetchFn);
+      onSite?.(site);
+      return site;
+    }),
+  );
 }

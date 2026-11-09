@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **U-journal-open-current:** a cold dive Journal publishes the current site's ready entries while other sites continue loading, keeps that site's breadcrumb during the wait, and delays the loading message by 200 ms. Cut: the full-catalogue barrier and promise-based focus repair; entry resolution now follows the active view as its data arrives. No new guidance, settings or layout rules.
+
 - **V-bluehole-gallery-2:** the Blue Hole stalactite gallery (west) is larger (dimensions 70x22x18 to 92x22x20 m and scan radius 36 to 46 m, per-site data), so it fills about 26% of the mission opening frame (was about 18%); its sediment apron gains faint current ripples and fine silt grain. The free-dive hero view of the same prop is larger and framed the same way. Mission range, depth and scan reach are unchanged. Nothing removed.
 
 - **U-seabed-latch-hides-scan:** the latched SEABED CLOSE warning now yields the guidance slot to a scan prompt or result card whenever a target is in range or a scan is under way (it returns only for imminent contact), so "Hold SCAN" is no longer hidden for minutes; the hold hysteresis is unchanged.
