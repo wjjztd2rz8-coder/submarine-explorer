@@ -204,7 +204,7 @@ it('refreshes photo key hints when the active viewfinder switches between keyboa
   const system = createPhotoSystem();
   const ctx = {
     photoMode: mode,
-    input: { primaryKeyLabel: () => 'K' },
+    input: { primaryKeyLabel: vi.fn(() => 'K') },
     rig: { camera: new PerspectiveCamera() },
     discovery: { pois: [] },
     journal: { siteName: () => 'Titanic' },
@@ -216,6 +216,7 @@ it('refreshes photo key hints when the active viewfinder switches between keyboa
   const tips = bottom.children[0];
   try {
     mode.setActive(true, 'K');
+    const setActive = vi.spyOn(mode, 'setActive');
     expect(capture.textContent).toBe('Capture (K / Space)');
     touch = true;
     system.frame!['camera.photo']!(frame, ctx);
@@ -225,6 +226,10 @@ it('refreshes photo key hints when the active viewfinder switches between keyboa
     system.frame!['camera.photo']!(frame, ctx);
     expect(capture.textContent).toBe('Capture (K / Space)');
     expect(tips.textContent).toBe('Esc: exit · drag: orbit · wheel: zoom');
+    vi.mocked(ctx.input.primaryKeyLabel).mockReturnValue('Space');
+    system.frame!['camera.photo']!(frame, ctx);
+    expect(capture.textContent).toBe('Capture (Space)');
+    expect(setActive).not.toHaveBeenCalled();
     expect(mode.active).toBe(true);
   } finally {
     mode.dispose();

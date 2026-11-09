@@ -119,6 +119,8 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 16k. **S-bughunt-audio-lifecycle [Codex, brief 184] DONE 2026-11-09 (b10bb0b5; audit/tests only):** two audit passes found no new defect; pending-unlock mix edits and overlapping stinger cleanup covered with existing mocks. Evidence and gate limits: [progress/S-bughunt-audio-lifecycle.md](progress/S-bughunt-audio-lifecycle.md).
 16l. **S-bughunt-site-data [Codex, brief 185, DONE 2026-11-09 (merged 2026-11-09; 4,722 units pass, browser acceptance blocked by sandbox)]:** audited all 13 sites and 49 objectives; MARS marker explicitly follows seabed. Raw ids/Journal/species and three-tier terrain regression coverage; evidence in `plan/progress/S-bughunt-site-data.md`.
 
+16m. **S-verify-save-touch-merges [Codex, DONE 2026-11-09 (working tree; 4,794 units pass; browser/tooling gate limits documented)]:** historical stars now survive retired or invalid current missions; 24 failing-first cases, save-format review and touch boundary/rebinding coverage. Evidence: [progress/S-verify-save-touch-merges.md](progress/S-verify-save-touch-merges.md).
+
 ### Release and owner
 
 16. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.

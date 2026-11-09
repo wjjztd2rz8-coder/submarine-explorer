@@ -75,12 +75,13 @@ export async function creditPreviousDives(
         absent = response.status === 404 || response.status === 410;
         return response;
       });
-      if (!def) return absent ? null : evidence;
-      const statuses = def.objectives.map((o) => ({
-        primary: o.primary,
-        complete: evidence.keys.includes(`${def.landmark}/${o.poi}`),
-      }));
-      def.objectives.forEach((o, i) => {
+      // Historical checklists remain usable when current content is retired or offline.
+      const statuses =
+        def?.objectives.map((o) => ({
+          primary: o.primary,
+          complete: evidence.keys.includes(`${def.landmark}/${o.poi}`),
+        })) ?? [];
+      def?.objectives.forEach((o, i) => {
         if (statuses[i].complete) progress.credit('objective', `${site}/${o.id}`);
       });
       const previous = Object.hasOwn(PREVIOUS_ROUTES, site) ? PREVIOUS_ROUTES[site] : [];
@@ -96,7 +97,7 @@ export async function creditPreviousDives(
         progress.bonus = evidence.bonus;
         progress.finish(site, route);
       }
-      return null;
+      return def || absent ? null : evidence;
     }),
   );
   progress.beginDive();

@@ -23,7 +23,16 @@ const legacyRoutes: [string, string[], number][] = [
 ];
 it.each(
   legacyRoutes.flatMap(([site, pois, stars]) =>
-    (['unchanged', 'renamed ids', 'removed objectives'] as const).map((change) => ({
+    (
+      [
+        'unchanged',
+        'renamed ids',
+        'removed objectives',
+        'empty mission',
+        'missing mission',
+        'unavailable mission',
+      ] as const
+    ).map((change) => ({
       site,
       pois,
       stars,
@@ -49,12 +58,14 @@ it.each(
     const discoveries = new DiscoveryStore(storage);
     const progress = new Progress(new ProgressSave(storage));
     const fetchJson: FetchJson = async () => ({
-      ok: true,
+      ok: change !== 'missing mission' && change !== 'unavailable mission',
+      status: change === 'missing mission' ? 410 : change === 'unavailable mission' ? 503 : 200,
       text: async () => {
         const doc = JSON.parse(readFileSync(`data/landmarks/${site}/mission.json`, 'utf8'));
         // Historical credit follows saved POIs even when current objective IDs disappear.
         if (change === 'renamed ids')
           for (const objective of doc.objectives) objective.id = `renamed-${objective.id}`;
+        if (change === 'empty mission') doc.objectives = [];
         if (change === 'removed objectives')
           doc.objectives = doc.objectives.filter((o: { poi: string }) => !pois.includes(o.poi));
         return JSON.stringify(doc);
@@ -62,6 +73,9 @@ it.each(
     });
     await creditPreviousDives(progress, discoveries, [], fetchJson);
     expect(progress.rating(site)).toBe(stars);
+    expect(progress.legacyCredited).toBe(
+      !['empty mission', 'unavailable mission'].includes(change),
+    );
     for (const poi of pois) {
       expect(discoveries.isDiscovered(site, poi)).toBe(true);
       expect(progress.snapshot().awarded).toContain(`poi:${site}/${poi}`);
@@ -87,7 +101,16 @@ it.each(
     ['hunga-tonga-caldera', 'hunga-tonga-caldera-floor', 'rim-wall'],
     ['hudson-canyon', 'hc-canyon-wall', 'coral-ledge'],
   ].flatMap(([site, poi, missing]) =>
-    (['unchanged', 'renamed id', 'removed objective'] as const).map((change) => ({
+    (
+      [
+        'unchanged',
+        'renamed id',
+        'removed objective',
+        'empty mission',
+        'missing mission',
+        'unavailable mission',
+      ] as const
+    ).map((change) => ({
       site,
       poi,
       missing,
@@ -101,9 +124,11 @@ it.each(
     discoveries.record(site, poi);
     const progress = new Progress(new ProgressSave(null));
     await creditPreviousDives(progress, discoveries, [], async () => ({
-      ok: true,
+      ok: change !== 'missing mission' && change !== 'unavailable mission',
+      status: change === 'missing mission' ? 404 : change === 'unavailable mission' ? 503 : 200,
       text: async () => {
         const doc = JSON.parse(readFileSync(`data/landmarks/${site}/mission.json`, 'utf8'));
+        if (change === 'empty mission') doc.objectives = [];
         if (change === 'renamed id')
           doc.objectives.find((o: { id: string }) => o.id === missing).id = `renamed-${missing}`;
         if (change === 'removed objective')

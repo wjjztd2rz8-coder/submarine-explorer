@@ -359,58 +359,71 @@ test('a fresh Realistic Challenger mission fits Class C without research', async
   expect(state.mission).toBe(true);
 });
 
-test('old discoveries are credited before fitting a deep-mission vehicle', async ({ page }) => {
-  // Regression guard: renamed current objective IDs must preserve historical route stars.
-  for (const site of ['great-blue-hole', 'hunga-tonga-caldera']) {
-    await page.route(`**/data/landmarks/${site}/mission.json`, async (route) => {
-      const response = await route.fetch();
-      const doc = await response.json();
-      for (const objective of doc.objectives) objective.id = `renamed-${objective.id}`;
-      await route.fulfill({ response, json: doc });
-    });
-  }
-  const discovered = Object.fromEntries(
-    [
-      'great-blue-hole/great-blue-hole-outer-dropoff',
-      'great-blue-hole/great-blue-hole-western-dropoff',
-      'hunga-tonga-caldera/hunga-tonga-caldera-floor',
-      'hunga-tonga-caldera/hunga-tonga-rim-wall',
-      'blake-plateau-corals/blake-mound-field-core',
-      'blake-plateau-corals/blake-coral-thicket',
-      'blake-plateau-corals/blake-second-mound',
-      'blake-plateau-corals/blake-inter-mound-channel',
-    ].map((key) => [key, { at: '2026-09-01T00:00:00Z', count: 1 }]),
+for (const retired of [false, true]) {
+  test(
+    retired
+      ? 'old route stars survive a retired mission before fitting a deep-mission vehicle'
+      : 'old discoveries are credited before fitting a deep-mission vehicle',
+    async ({ page }) => {
+      // Regression guard: renamed IDs and retired missions must preserve historical route stars.
+      for (const site of ['great-blue-hole', 'hunga-tonga-caldera']) {
+        await page.route(`**/data/landmarks/${site}/mission.json`, async (route) => {
+          if (retired && site === 'hunga-tonga-caldera') {
+            await route.fulfill({ status: 410, body: '' });
+            return;
+          }
+          const response = await route.fetch();
+          const doc = await response.json();
+          for (const objective of doc.objectives) objective.id = `renamed-${objective.id}`;
+          await route.fulfill({ response, json: doc });
+        });
+      }
+      const discovered = Object.fromEntries(
+        [
+          'great-blue-hole/great-blue-hole-outer-dropoff',
+          'great-blue-hole/great-blue-hole-western-dropoff',
+          'hunga-tonga-caldera/hunga-tonga-caldera-floor',
+          'hunga-tonga-caldera/hunga-tonga-rim-wall',
+          'blake-plateau-corals/blake-mound-field-core',
+          'blake-plateau-corals/blake-coral-thicket',
+          'blake-plateau-corals/blake-second-mound',
+          'blake-plateau-corals/blake-inter-mound-channel',
+        ].map((key) => [key, { at: '2026-09-01T00:00:00Z', count: 1 }]),
+      );
+      const old = JSON.stringify({ version: 1, discovered, stats: { scans: 8 } });
+      await page.addInitScript(
+        (value) => localStorage.setItem('subexplorer.discoveries.v1', value),
+        old,
+      );
+      await page.goto('/?mission=titanic&skipBriefing=1&tier=low');
+      await ready(page);
+      const result = await page.evaluate(() => {
+        const g = window.__game as {
+          progress: { lifetime: number; rating(site: string): number };
+          subMesh: { hullClass: string };
+          mission: { objectives: { complete: boolean }[] };
+        };
+        return {
+          lifetime: g.progress.lifetime,
+          blueHoleStars: g.progress.rating('great-blue-hole'),
+          hungaStars: g.progress.rating('hunga-tonga-caldera'),
+          vehicle: g.subMesh.hullClass,
+          completed: g.mission.objectives.filter((o) => o.complete).length,
+        };
+      });
+      expect(result).toEqual({
+        lifetime: 0,
+        blueHoleStars: 2,
+        hungaStars: 2,
+        vehicle: 'B',
+        completed: 0,
+      });
+      expect(await page.evaluate(() => localStorage.getItem('subexplorer.discoveries.v1'))).toBe(
+        old,
+      );
+    },
   );
-  const old = JSON.stringify({ version: 1, discovered, stats: { scans: 8 } });
-  await page.addInitScript(
-    (value) => localStorage.setItem('subexplorer.discoveries.v1', value),
-    old,
-  );
-  await page.goto('/?mission=titanic&skipBriefing=1&tier=low');
-  await ready(page);
-  const result = await page.evaluate(() => {
-    const g = window.__game as {
-      progress: { lifetime: number; rating(site: string): number };
-      subMesh: { hullClass: string };
-      mission: { objectives: { complete: boolean }[] };
-    };
-    return {
-      lifetime: g.progress.lifetime,
-      blueHoleStars: g.progress.rating('great-blue-hole'),
-      hungaStars: g.progress.rating('hunga-tonga-caldera'),
-      vehicle: g.subMesh.hullClass,
-      completed: g.mission.objectives.filter((o) => o.complete).length,
-    };
-  });
-  expect(result).toEqual({
-    lifetime: 0,
-    blueHoleStars: 2,
-    hungaStars: 2,
-    vehicle: 'B',
-    completed: 0,
-  });
-  expect(await page.evaluate(() => localStorage.getItem('subexplorer.discoveries.v1'))).toBe(old);
-});
+}
 
 test('species discovery credits once without research or full-depth access changes', async ({
   page,

@@ -493,6 +493,39 @@ describe('touch control interruptions', () => {
     },
   );
 
+  it.each([
+    { moveX: 60, upX: 73, upY: 60, reset: true },
+    { moveX: 60, upX: 74, upY: 60, reset: false },
+    { moveX: 60, upX: 60, upY: 74, reset: false },
+    { moveX: 68, upX: 73, upY: 60, reset: true },
+    { moveX: 68, upX: 60, upY: 60, reset: false },
+  ])(
+    'classifies final tap travel without adding release camera motion: $moveX/$upX/$upY',
+    ({ moveX, upX, upY, reset }) => {
+      const f = fixture();
+      vi.spyOn(performance, 'now').mockReturnValue(1000);
+      const send = (type: string, x = 60, y = 60) => {
+        const event = new Event(type);
+        Object.assign(event, { pointerId: 9, pointerType: 'touch', clientX: x, clientY: y });
+        Object.defineProperty(event, 'target', { value: f.canvas });
+        f.win.dispatchEvent(event);
+      };
+      try {
+        send('pointerdown');
+        send('pointerup');
+        send('pointerdown');
+        if (moveX !== 60) send('pointermove', moveX);
+        vi.mocked(f.input.touchLook).mockClear();
+        send('pointerup', upX, upY);
+        expect(f.input.touchLook).not.toHaveBeenCalled();
+        expect(f.input.touchEdge).toHaveBeenCalledTimes(reset ? 1 : 0);
+        if (reset) expect(f.input.touchEdge).toHaveBeenCalledWith('resetCamera');
+      } finally {
+        f.controls.dispose();
+      }
+    },
+  );
+
   it('restores the canvas touch-action preference on teardown', () => {
     const f = fixture('pan-y');
     expect(f.canvas.style.touchAction).toBe('none');
