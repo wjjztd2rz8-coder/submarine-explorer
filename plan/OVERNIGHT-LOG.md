@@ -3607,3 +3607,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Diagnosed CI: transient 'workflow file issue' pair plus one e2e shard-1 hang; queued Codex brief 189. No merges, no Claude package (weekly 29% below pace gate). See REVIEWS.md.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-09 14:16 CST headless run (Claude): collected Codex 183-185
+
+- Merged 183 (Dive again guarded against duplicate/stale replay), 184 (audio lifecycle audit, tests only), 185 (Monterey MARS marker follows seabed; all 49 objectives reachability test). gates.sh smoke + project-base green in worktrees and on main; pushed. Queued 190-191 (mission clock and photo mode bug hunts) behind 189. 186-188 running. No Claude package (weekly 28% below pace gate). No tag (hosted CI on main still pending/red-with-no-jobs history).
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
