@@ -3572,3 +3572,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged 165 (R-ci-speed: refreshed hosted shard timings for the 38 shards, about 3 min saved projected; under-30-min target still unmet, runner-minutes limit it). gates.sh smoke + project-base green in the worktree and on main; pushed. 170 and 171 still running; 124/131 held. No Claude package (weekly 30% below pace gate). Hosted CI for the 161 spec is its first real run, so watch for failures.
 - **Needs owner:** phone retest; Monterey 3.8 waiver; under-30-min CI probably needs more runner slots or fewer cases.
+
+## 2026-11-09 09:21 CST headless run (Claude): hold
+
+- Back-to-back with the 09:21 run; nothing new to collect. Codex 170 and 171 are running, 124/131 held, hosted CI on main pending (no tag). No Claude package (weekly 30% below the pace gate).
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
