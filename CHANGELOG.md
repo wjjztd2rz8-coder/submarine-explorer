@@ -112,6 +112,8 @@ without an entry here is not done.
 
 ### Fixed
 
+- **S-bughunt-touch-input (181):** rotation cancels captured globe drags, a camera drag's final release movement cannot count as a double-tap, and an open photo viewfinder removes keyboard hints when input switches to touch. Reuses existing gesture cancellation and photo labels; no visual/layout changes or gameplay cuts.
+
 - **S-bughunt:** preserve photos after non-quota write errors; scope photo cleanup to each system and release pending ZIP URLs/timers at Journal teardown. Clear held flight input when editable controls gain focus, order migrated discoveries by timestamp instant, and discard paused/hidden physics backlog and dive-clock catch-up on resume. Save keys and schemas are unchanged.
 
 ### Changed

@@ -450,7 +450,7 @@ describe('touch control interruptions', () => {
     }
   });
 
-  it.each(['cancel', 'drag', 'pinch'])(
+  it.each(['cancel', 'drag', 'release movement', 'pinch'])(
     'does not pair taps across a %s camera gesture',
     (gesture) => {
       const f = fixture();
@@ -474,7 +474,8 @@ describe('touch control interruptions', () => {
         else if (gesture === 'drag') {
           send('pointermove', 9, 100);
           send('pointerup', 9, 100);
-        } else {
+        } else if (gesture === 'release movement') send('pointerup', 9, 100);
+        else {
           send('pointerdown', 10, 80);
           send('pointerup', 10, 80);
           send('pointerup');
@@ -1247,41 +1248,48 @@ describe('phone home gestures', () => {
     }
   });
 
-  it.each(['pointercancel', 'lostpointercapture', 'blur', 'visibilitychange', 'close', 'modal'])(
-    'ends globe drag without a fling after %s and ignores stale motion',
-    (interruption) => {
-      const f = globeFixture();
-      try {
-        pointer(f.root, 'pointerdown', 1);
-        pointer(f.root, 'pointermove', 1, 80);
-        const lon = f.globe.orbit.lon;
-        if (interruption === 'modal') {
-          const modal = new FocusTrap(f.canvas as unknown as HTMLElement);
-          modal.show();
-          modal.dispose();
-        } else if (interruption === 'close') {
-          f.globe.close();
-          f.globe.open();
-        } else if (interruption === 'visibilitychange') {
-          f.doc.hidden = true;
-          f.doc.dispatchEvent(new Event(interruption));
-          f.doc.hidden = false;
-        } else if (interruption === 'blur') f.win.dispatchEvent(new Event(interruption));
-        else pointer(f.root, interruption, 1);
-        expect(f.root.classList.contains('is-dragging')).toBe(false);
-        expect(f.root.hasPointerCapture(1)).toBe(false);
-        pointer(f.root, 'pointermove', 1, 100);
-        f.globe.orbit.update(0.01);
-        expect(f.globe.orbit.lon).toBe(lon);
-        pointer(f.root, 'pointerdown', 2);
-        pointer(f.root, 'pointermove', 2, 80);
-        expect(f.globe.orbit.lon).toBeLessThan(lon);
-      } finally {
-        f.globe.dispose();
-        f.controls.dispose();
-      }
-    },
-  );
+  it.each([
+    'pointercancel',
+    'lostpointercapture',
+    'blur',
+    'resize',
+    'orientationchange',
+    'visibilitychange',
+    'close',
+    'modal',
+  ])('ends globe drag without a fling after %s and ignores stale motion', (interruption) => {
+    const f = globeFixture();
+    try {
+      pointer(f.root, 'pointerdown', 1);
+      pointer(f.root, 'pointermove', 1, 80);
+      const lon = f.globe.orbit.lon;
+      if (interruption === 'modal') {
+        const modal = new FocusTrap(f.canvas as unknown as HTMLElement);
+        modal.show();
+        modal.dispose();
+      } else if (interruption === 'close') {
+        f.globe.close();
+        f.globe.open();
+      } else if (interruption === 'visibilitychange') {
+        f.doc.hidden = true;
+        f.doc.dispatchEvent(new Event(interruption));
+        f.doc.hidden = false;
+      } else if (['blur', 'resize', 'orientationchange'].includes(interruption))
+        f.win.dispatchEvent(new Event(interruption));
+      else pointer(f.root, interruption, 1);
+      expect(f.root.classList.contains('is-dragging')).toBe(false);
+      expect(f.root.hasPointerCapture(1)).toBe(false);
+      pointer(f.root, 'pointermove', 1, 100);
+      f.globe.orbit.update(0.01);
+      expect(f.globe.orbit.lon).toBe(lon);
+      pointer(f.root, 'pointerdown', 2);
+      pointer(f.root, 'pointermove', 2, 80);
+      expect(f.globe.orbit.lon).toBeLessThan(lon);
+    } finally {
+      f.globe.dispose();
+      f.controls.dispose();
+    }
+  });
 });
 
 it.each(['paused canvas', 'lostpointercapture', 'photo closes'])(

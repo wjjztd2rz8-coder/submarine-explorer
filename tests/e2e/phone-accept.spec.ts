@@ -706,6 +706,17 @@ for (const viewport of [
       await expect(photo).not.toContainText(keyNames, { useInnerText: true });
       await expect(photo.locator('.photo-mode-tips')).toHaveText('Drag to orbit · pinch to zoom');
       await reachable(photo.locator('.photo-mode-capture'));
+      // Regression: switching back to touch left the open viewfinder's keyboard hints visible.
+      await page.keyboard.press('Tab');
+      await page.clock.fastForward(50);
+      await expect(photo.locator('.photo-mode-capture')).toContainText('Space');
+      await page.locator('#viewport').tap({
+        position: { x: viewport.width / 2, y: viewport.height / 2 },
+      });
+      await page.clock.fastForward(50);
+      await expect(photo).not.toContainText(keyNames, { useInnerText: true });
+      await expect(photo.locator('.photo-mode-capture')).toHaveText('Capture');
+      await expect(photo.locator('.photo-mode-tips')).toHaveText('Drag to orbit · pinch to zoom');
     });
 
     test('an optional event starts on arrival at its subject and clears touch controls', async ({

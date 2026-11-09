@@ -879,12 +879,14 @@ export class Globe {
     const onVisibility = (): void => {
       if (document.hidden) cancel();
     };
-    window.addEventListener('blur', cancel);
+    // Rotation moves the globe beneath a held finger; discard the old drag coordinates.
+    for (const event of ['blur', 'resize', 'orientationchange']) {
+      window.addEventListener(event, cancel);
+      this.disposers.push(() => window.removeEventListener(event, cancel));
+    }
     document.addEventListener('visibilitychange', onVisibility);
-    this.disposers.push(
-      observeOverlayOpen(cancel),
-      () => window.removeEventListener('blur', cancel),
-      () => document.removeEventListener('visibilitychange', onVisibility),
+    this.disposers.push(observeOverlayOpen(cancel), () =>
+      document.removeEventListener('visibilitychange', onVisibility),
     );
     this.root.addEventListener('wheel', onWheel, { passive: false });
   }
