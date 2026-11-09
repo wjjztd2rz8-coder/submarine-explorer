@@ -5,7 +5,7 @@ import { test as experiencedTest } from './helpers/unlocked.js';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { finishAnimations } from './helpers/hudTips.js';
 import { GUIDANCE } from './helpers/guidance.js';
-import { dismissTutorial, setScanCardSuppressed } from './helpers/tutorial.js';
+import { dismissTutorial, setScanCardSuppressed, tutorialStep } from './helpers/tutorial.js';
 import {
   expectCompactPhoneHud,
   expectObjectiveGuidance,
@@ -16,7 +16,6 @@ import { advanceScan, completeScan, scanWithKeyboard } from './helpers/scan.js';
 import { homeReady } from './helpers/home.js';
 import { diveReady, loadDive } from './helpers/dive.js';
 import { type Discovery } from '../../src/game/Discovery.js';
-import { DEPTH_SKIP_M, TUTORIAL_STEPS, type TutorialStepId } from '../../src/game/Tutorial.js';
 import { type Submarine } from '../../src/sub/Submarine.js';
 import { type CameraRig } from '../../src/sub/CameraRig.js';
 import { type HintEngine } from '../../src/game/Hints.js';
@@ -40,34 +39,6 @@ async function revealChecklist(page: Page): Promise<void> {
     ).missionRouter.panel.setVisible(true),
   );
   await expect(page.locator('.objectives-panel')).toBeVisible();
-}
-
-/**
- * The tutorial steps this pose will play. The depth step drops out when the next
- * scan target is already within DEPTH_SKIP_M of the sub, as the tutorial decides it.
- * Call it once the sub is where the step will be played: it reads the live pose.
- */
-async function tutorialSteps(page: Page): Promise<TutorialStepId[]> {
-  const skipDepth = await page.evaluate((skipM) => {
-    const g = window.__game as unknown as {
-      sub: Submarine;
-      discovery: Discovery;
-      missionRouter: {
-        mission: {
-          objectives: { resolved: boolean; complete: boolean; primary: boolean; poiId: string }[];
-        };
-      } | null;
-    };
-    const objectives = g.missionRouter?.mission.objectives ?? [];
-    // The first open objective, picked as nextScanObjective does (src/game/Mission.ts).
-    // That module cannot be imported here: it needs Vite's env, and specs run in Node.
-    const next =
-      objectives.find((o) => o.resolved && !o.complete && o.primary) ??
-      objectives.find((o) => o.resolved && !o.complete);
-    const target = g.discovery.scanner.getTargets().find((t) => t.id === next?.poiId);
-    return target !== undefined && Math.abs(g.sub.getState().depth - target.position.y) <= skipM;
-  }, DEPTH_SKIP_M);
-  return TUTORIAL_STEPS.map((s) => s.id).filter((id) => !(skipDepth && id === 'depth'));
 }
 
 experiencedTest.describe('guidance lifecycle', () => {
@@ -217,14 +188,15 @@ freshTest.describe('fixture and mission layout', () => {
         const skip = (await page.getByRole('button', { name: 'Skip', exact: true }).boundingBox())!;
         expect(skip.width).toBeGreaterThanOrEqual(44);
         expect(skip.height).toBeGreaterThanOrEqual(44);
-        const steps = await tutorialSteps(page);
-        for (let step = 1; step < steps.length; step++) {
+        for (let i = 0; i < 2 && (await tutorialStep(page)) !== 'scan'; i++) {
+          const previous = await tutorialStep(page);
           const button = page.locator('.guidance-skip');
           if (layout.touch) await button.tap();
           else await button.click();
+          await expect(page.locator(GUIDANCE.tutorial)).not.toHaveAttribute('data-step', previous!);
           await expect(page.locator('.guidance-slot[data-step]')).toHaveAttribute(
             'data-step',
-            steps[step]!,
+            (await tutorialStep(page))!,
           );
           await clearLayout(page, tutorialSelectors);
         }
@@ -488,7 +460,9 @@ freshTest.describe('large UI and menu reachability', () => {
             viewport.width > viewport.height ? 120 : 96,
           );
           // Check every instruction: the last step is longer than the first.
-          for (const step of await tutorialSteps(page)) {
+          for (let i = 0; i < 3; i++) {
+            const step = await tutorialStep(page);
+            if (!step) throw new Error('Tutorial finished before the scan step');
             await expect(page.locator('.guidance-slot[data-step]')).toHaveAttribute(
               'data-step',
               step,
@@ -500,7 +474,9 @@ freshTest.describe('large UI and menu reachability', () => {
             ).toBe(true);
             await separate(page, [...tutorialHud, '.guidance-slot[data-step]', ...controls]);
             await expectCompactPhoneHud(page);
-            if (step !== 'scan') await page.locator('.guidance-skip').tap();
+            if (step === 'scan') break;
+            await page.locator('.guidance-skip').tap();
+            await expect(page.locator(GUIDANCE.tutorial)).not.toHaveAttribute('data-step', step);
           }
           if (scale === 100)
             await reviewScreenshot(page, { path: testInfo.outputPath('tutorial-landscape.png') });
@@ -800,9 +776,12 @@ freshTest.describe('landscape guidance and completion', () => {
         await expect(page.locator(GUIDANCE.scan)).toBeVisible();
         await expect(card).toBeHidden();
         await setScanCardSuppressed(page, true);
-        for (const step of (await tutorialSteps(page)).filter((s) => s !== 'scan')) {
+        for (let i = 0; i < 2; i++) {
+          const step = await tutorialStep(page);
+          if (!step || step === 'scan') break;
           await expect(card).toHaveAttribute('data-step', step);
           await page.locator('.guidance-skip').tap();
+          await expect(card).not.toHaveAttribute('data-step', step);
         }
         await expect(card).toHaveAttribute('data-step', 'scan');
         await reviewScreenshot(page, { path: `${shots}/tutorial-scan-${tag}.png` });
@@ -1080,7 +1059,9 @@ freshTest.describe('hero guidance sequence', () => {
             await expect(page.locator('.guidance-slot[data-step]')).toBeHidden();
             await setScanCardSuppressed(page, true);
             await page.clock.runFor(34);
-            for (const step of await tutorialSteps(page)) {
+            for (let i = 0; i < 3; i++) {
+              const step = await tutorialStep(page);
+              if (!step) throw new Error('Tutorial finished before the scan step');
               await expect(page.locator('.guidance-slot[data-step]')).toHaveAttribute(
                 'data-step',
                 step,
@@ -1089,7 +1070,7 @@ freshTest.describe('hero guidance sequence', () => {
               if (step !== 'scan') {
                 await page.locator('.guidance-skip').tap();
                 await page.clock.runFor(34);
-              }
+              } else break;
             }
             {
               await reviewScreenshot(page, {
@@ -1896,10 +1877,13 @@ freshTest.describe('catalog tutorial and reload', () => {
           // The tutorial defers while the scan card is up, and the early scan is kept for its step.
           await expect(card).toBeHidden();
           await expect(page.locator(GUIDANCE.discovery)).toContainText('New Journal entry');
+          expect(await tutorialStep(page), 'an early scan must not complete movement').toBe('move');
           await layout(page, 'early scan reward');
           await away(page);
           await expect(page.locator(GUIDANCE.discovery)).toBeHidden();
-          for (const step of (await tutorialSteps(page)).filter((s) => s !== 'scan')) {
+          for (let i = 0; i < 2; i++) {
+            const step = await tutorialStep(page);
+            if (!step || step === 'scan') break;
             if (viewport.touch && step === 'depth' && !(await card.isVisible())) {
               // Touch hides the slider card on the approach; it shows once a target is in reach.
               await page.evaluate((poi) => {
@@ -1907,19 +1891,25 @@ freshTest.describe('catalog tutorial and reload', () => {
                 g.sub.position.set(poi.from.x, poi.from.y, poi.from.z);
                 g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
               }, poi);
-              // Slow hosted frames may need several ticks before the gate opens.
-              for (let i = 0; i < 20 && !(await card.isVisible()); i++) {
-                // A second objective in the scan cone owns the one guidance slot
-                // (Hold SCAN); turn away so the target stays in reach but not in the beam.
-                if (await page.locator(GUIDANCE.scan).isVisible()) {
-                  await page.evaluate(() => {
-                    const g = window.__game as unknown as Game;
-                    g.sub.yaw += Math.PI;
-                    g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
-                  });
-                }
-                await page.clock.runFor(500);
-              }
+              // Keep the target in reach but outside the beam so scan guidance yields.
+              await page.evaluate(() => {
+                const g = window.__game as unknown as Game;
+                g.sub.yaw += Math.PI;
+                g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
+              });
+              await clockFramesUntil(page, () => {
+                const tutorial = (
+                  window.__game as unknown as {
+                    onboard: { tutorial: { step: { id: string } | null } };
+                  }
+                ).onboard.tutorial;
+                return (
+                  tutorial.step?.id !== 'depth' ||
+                  !!document.querySelector('.guidance-slot[data-step="depth"]')
+                );
+              });
+              // Returning to the contact may auto-complete depth; the earlier scan then finishes.
+              if ((await tutorialStep(page)) !== step) break;
             }
             await expect(card).toHaveAttribute('data-step', step);
             await expect(card).toBeVisible();

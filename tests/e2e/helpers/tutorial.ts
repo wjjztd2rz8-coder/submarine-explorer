@@ -1,5 +1,15 @@
 import { expect, type Page } from '@playwright/test';
 import { GUIDANCE } from './guidance.js';
+import type { Tutorial, TutorialStepId } from '../../../src/game/Tutorial.js';
+
+/** Read the running tutorial; depth coaching can finish as the live target changes. */
+export async function tutorialStep(page: Page): Promise<TutorialStepId | null> {
+  return page.evaluate(
+    () =>
+      (window.__game as unknown as { onboard: { tutorial: Tutorial } }).onboard.tutorial.step?.id ??
+      null,
+  );
+}
 
 /** Press Skip until the tutorial is over: one press per step, on every device. */
 export async function dismissTutorial(

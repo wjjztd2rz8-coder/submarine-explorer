@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **R-ci-triage:** tutorial specs follow the running step instead of predicting depth coaching, Journal entry checks wait for catalogue publication instead of retrying clicks, and approach checks use the scan envelope instead of a fixed travel floor. Cut: the duplicate tutorial decision model and fixed frame-pumping loop. Coverage, safety assertions and hosted retries remain unchanged.
+
 - **Owner phone test 2026-11-08:**
   - **Scans are 40% shorter.** The data (POI `scan_seconds`, the 4 s default, life, secrets, samples) was cut rather than adding a multiplier.
   - **Depth coaching is skipped within 30 m** (was 15 m). Mission openings start 22 m above the first target to stay clear of the 20 m seabed warning, so the step always showed and taught nothing.
