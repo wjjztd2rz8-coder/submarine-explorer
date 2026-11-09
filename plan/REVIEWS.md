@@ -1,5 +1,9 @@
 # Reviews
 
+## 2026-11-09 targeted review (Codex starved)
+
+- **Trigger:** Codex starved 2 h with an empty queue. **Cause:** the queue ran dry after 152; no Claude run had refilled it. **Already fixed** by the comprehensive review minutes earlier: 160-162 launched at 01:08 and 3 tasks are running (Codex 5h 51%, week 92%). No further action; the next collecting run must refill the queue from DIRECTOR.md before 160-162 finish (about 2-3 h), or the trigger will refire.
+
 ## 2026-11-09 comprehensive review (joint: Claude + Codex 6.1 Sol; golden `2026-11-09-064047` vs `2026-11-08-104909`)
 
 - **Stage (agreed):** about 85% to 1.0 (Claude said 87, Sol 83); 4-5 weeks central, plan 4-6. Hosted CI, unaided onboarding on current main, phone Low performance, hero geometry (Beebe, Lost City, Blue Hole) and complete eight-site acceptance remain open.
