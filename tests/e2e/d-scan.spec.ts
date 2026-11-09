@@ -31,6 +31,32 @@ async function screenshot(page: Page, name: string): Promise<void> {
   await page.screenshot({ path: `${shots}/${name}.png` });
 }
 
+async function holdScan(page: Page, touch: boolean, work: () => Promise<void>): Promise<void> {
+  if (!touch) {
+    await page.keyboard.down('g');
+    try {
+      await work();
+    } finally {
+      await page.keyboard.up('g');
+    }
+    return;
+  }
+  const button = page.locator('.tc-btn-scan');
+  await expect(button).toBeVisible();
+  const box = (await button.boundingBox())!;
+  const session = await page.context().newCDPSession(page);
+  try {
+    await session.send('Input.dispatchTouchEvent', {
+      type: 'touchStart',
+      touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }],
+    });
+    await work();
+  } finally {
+    await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await session.detach();
+  }
+}
+
 for (const [dive, url] of [
   ['mission', '/?mission=titanic&skipBriefing=1&tutorial=0'],
   ['free dive', '/?tile=titanic&landmark=titanic&tutorial=0'],
@@ -236,6 +262,112 @@ for (const layout of [
       await expect(page.locator('.guidance-slot')).not.toContainText('French grunt');
     });
 
+    test('side finds keep objective guidance and yield the scan lock when it becomes eligible', async ({
+      page,
+    }) => {
+      // Guards fish rewards implying mission progress and incidental locks starving an eligible objective.
+      await pauseClockBeforeNavigation(page);
+      await page.goto('/?mission=great-blue-hole&skipBriefing=1&tier=low&tutorial=0', {
+        waitUntil: 'domcontentloaded',
+      });
+      await clockFramesUntil(page, () => {
+        const g = window.__game as unknown as MissionGame & { life?: unknown };
+        return window.__gameReady === true && g.discovery.loaded && g.props.loaded && !!g.life;
+      });
+      const objective = await page.evaluate(() => {
+        const g = window.__game as unknown as MissionGame;
+        const v = g.discovery.scanner.view;
+        // Keep incidental candidates deterministic while retaining the authored mission POIs.
+        g.discovery.scanner.setSupplementalTargets([]);
+        g.discovery.scanner.setExtraTargets([
+          {
+            id: 'life:french-grunt',
+            name: 'French grunt',
+            landmarkId: 'great-blue-hole',
+            position: g.sub.position.clone().addScaledVector(g.sub.getForward(), 5),
+            radius: 20,
+            scanSeconds: 2,
+          },
+        ]);
+        return { id: v.objectiveId!, name: v.objectiveName };
+      });
+      await holdScan(page, layout.touch, () => completeScan(page, 'life:french-grunt'));
+      await expect(page.locator('.guidance-kicker')).toHaveText('Side find');
+      await expect(page.locator('.guidance-name')).toHaveText('French grunt');
+      await expect(page.locator('.guidance-hint')).toContainText(`${objective.name} ·`);
+      const progress = await page.evaluate(() => {
+        const g = window.__game as unknown as MissionGame;
+        return {
+          primary: g.missionRouter.mission.objectives.filter((o) => o.primary && o.complete).length,
+          sideFind: g.discovery.scanner.view.lastCompleteSideFind,
+          objective: g.discovery.scanner.view.objectiveId,
+        };
+      });
+      expect(progress).toEqual({ primary: 0, sideFind: true, objective: objective.id });
+      await page.evaluate((id) => {
+        const g = window.__game as unknown as MissionGame;
+        const poi = g.discovery.pois.find((p) => p.id === id)!;
+        g.sub.reset(poi.position.x, poi.position.y, poi.position.z + 50, 0);
+        g.discovery.update(0, 0, g.sub.position, g.sub.getForward(), { scan: false });
+      }, objective.id);
+      await expect(page.locator('.guidance-kicker')).toHaveText('Side find');
+      await expect(page.locator('.guidance-hint')).toHaveText(
+        `${objective.name} · ${layout.touch ? 'Hold SCAN' : 'HOLD G TO SCAN'}`,
+      );
+      await page.evaluate(() => {
+        const g = window.__game as unknown as MissionGame;
+        // The objective remains in reach, outside the beam; start a second side scan.
+        const p = g.sub.position;
+        g.sub.reset(p.x, p.y, p.z, Math.PI / 2);
+        g.discovery.scanner.setExtraTargets([
+          {
+            id: 'life:comb-jelly',
+            name: 'Comb jelly',
+            landmarkId: 'great-blue-hole',
+            position: p.clone().addScaledVector(g.sub.getForward(), 15),
+            radius: 20,
+            scanSeconds: 2,
+          },
+        ]);
+      });
+      await holdScan(page, layout.touch, async () => {
+        await advanceScan(page, 0.2);
+        expect(
+          await page.evaluate(
+            () => (window.__game as unknown as MissionGame).discovery.scanner.view.activeId,
+          ),
+        ).toBe('life:comb-jelly');
+        await page.evaluate(() => {
+          const g = window.__game as unknown as MissionGame;
+          const p = g.sub.position;
+          g.sub.reset(p.x, p.y, p.z, 0);
+          // Keep both contacts eligible to prove priority, rather than loss of the fish.
+          g.discovery.scanner
+            .getExtraTargets()[0]
+            .position.copy(p)
+            .addScaledVector(g.sub.getForward(), 15);
+        });
+        await advanceScan(page, 0.1);
+        const lock = await page.evaluate(() => {
+          const v = (window.__game as unknown as MissionGame).discovery.scanner.view;
+          return { active: v.activeId, candidate: v.candidateId, name: v.nearestName };
+        });
+        expect(lock).toEqual({
+          active: objective.id,
+          candidate: objective.id,
+          name: objective.name,
+        });
+        await expect(page.locator('.guidance-name')).toHaveText(objective.name);
+        await completeScan(page, objective.id);
+      });
+      expect(
+        await page.evaluate(() => {
+          const g = window.__game as unknown as MissionGame;
+          return g.missionRouter.mission.objectives.filter((o) => o.primary && o.complete).length;
+        }),
+      ).toBe(1);
+    });
+
     for (const site of ['titanic', 'great-blue-hole']) {
       test(`completion advances navigation and direction in the same frame: ${site}`, async ({
         page,
@@ -258,22 +390,7 @@ for (const layout of [
           g.sub.reset(poi.position.x, poi.position.y, poi.position.z + 5, 0);
           return { id: poi.id, name: poi.name };
         });
-        if (layout.touch) {
-          const button = page.locator('.tc-btn-scan');
-          await expect(button).toBeVisible();
-          const box = (await button.boundingBox())!;
-          const session = await page.context().newCDPSession(page);
-          try {
-            await session.send('Input.dispatchTouchEvent', {
-              type: 'touchStart',
-              touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }],
-            });
-            await completeScan(page, scanned.id);
-          } finally {
-            await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-            await session.detach();
-          }
-        } else await scanWithKeyboard(page, scanned.id);
+        await holdScan(page, layout.touch, () => completeScan(page, scanned.id));
         // The clock is paused. Read synchronously before permitting any following frame.
         const completed = await page.evaluate(() => {
           const g = window.__game as unknown as MissionGame;

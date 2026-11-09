@@ -139,7 +139,7 @@ export class ScanOverlay {
     this.slot.tick(dt);
     if (this.suppressed) return;
     this.updateReticle(view, screen);
-    this.cue = this.objectiveCue(view);
+    this.cue = this.objectiveCue(view, keys);
     if (this.complete) {
       this.complete.left -= dt;
       if (this.complete.left <= 0) this.complete = null;
@@ -194,11 +194,14 @@ export class ScanOverlay {
     }
   }
 
-  /** "STERN · TURN 30° PORT": where the outstanding objective lies, unless ready to scan. */
-  private objectiveCue(view: ScanView): string | null {
+  /** Keep the outstanding objective on the result, including a side find's next scan. */
+  private objectiveCue(view: ScanView, keys: ScanOverlayKeys): string | null {
     if (view.objectiveId == null || !view.objectiveName || view.objectiveId === view.lastCompleteId)
       return null;
-    if (view.objectiveId === view.candidateId) return null;
+    if (view.objectiveId === view.candidateId)
+      return this.complete?.sideFind
+        ? `${view.objectiveName} · ${isTouch() ? 'Hold SCAN' : `HOLD ${keys.scan} TO SCAN`}`
+        : null;
     const turn = view.objectiveTurnDeg;
     const how =
       Math.abs(turn) >= 10
