@@ -122,6 +122,7 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 16n. **S-bughunt-photo-mode [Codex, brief 191]:** bug hunt on photo mode and gallery.
 
 16m. **S-verify-save-touch-merges [Codex, DONE 2026-11-09 (working tree; 4,794 units pass; browser/tooling gate limits documented)]:** historical stars now survive retired or invalid current missions; 24 failing-first cases, save-format review and touch boundary/rebinding coverage. Evidence: [progress/S-verify-save-touch-merges.md](progress/S-verify-save-touch-merges.md).
+16m. **S-bughunt-settings-quality [Codex, DONE 2026-11-09 (working tree; browser acceptance blocked by sandbox)]:** two audit passes; removed duplicate waypoint reduced-motion application at boot after four failing-first regressions. Tier pending/revert and persistence coverage extended. Evidence: `plan/progress/S-bughunt-settings-quality.md`.
 
 ### Release and owner
 

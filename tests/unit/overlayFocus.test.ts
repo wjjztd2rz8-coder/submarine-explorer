@@ -51,6 +51,7 @@ import { inputGateSystem, startLoop } from '../../src/app/loop.js';
 import { modesSystem } from '../../src/app/systems/modes.js';
 import { settingsSystem } from '../../src/app/systems/settings.js';
 import { waypointsSystem } from '../../src/app/systems/waypoints.js';
+import { Waypoints } from '../../src/ui/Waypoints.js';
 import { Progress, requiredHull } from '../../src/game/Progress.js';
 import { makeSyntheticTile } from './helpers.js';
 import { PROGRESS_STORAGE_KEY } from '../../src/core/Save.js';
@@ -1016,6 +1017,49 @@ it('Aa replaces the increase button, cycles saved steps and stays synced after r
   expect(save.get().uiScale).toBe(105);
 });
 
+it.each(['low', 'medium', 'high'] as const)(
+  'offers reload only while the saved tier differs from active %s',
+  (activeTier) => {
+    const records = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => records.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        records.set(key, value);
+      },
+      removeItem: (key: string) => {
+        records.delete(key);
+      },
+    };
+    const save = new Save({ config: DEFAULT_CONFIG, storage });
+    save.save({ graphicsTier: activeTier });
+    const bootSettings = save.get();
+    const input = new Input({ storage: null });
+    const screen = new SettingsScreen({
+      input,
+      save,
+      config: DEFAULT_CONFIG,
+      activeTier,
+      activeTierSetting: activeTier,
+      activeDetailStrength: bootSettings.detailStrength,
+    });
+    cleanup.push(() => {
+      screen.dispose();
+      input.dispose();
+    });
+    const tier = screen.root.querySelector<HTMLSelectElement>('[data-setting="graphicsTier"]')!;
+    const reload = screen.root.querySelector<HTMLButtonElement>('.settings-reload')!;
+    for (const next of ['low', 'medium', 'high', 'auto', activeTier] as const) {
+      tier.value = next;
+      tier.dispatchEvent(new Event('change'));
+      expect(reload.hidden).toBe(next === activeTier);
+      expect(tier.parentElement!.querySelector('.settings-note')!.textContent).toBe(
+        `This dive uses ${activeTier}. A change applies after a reload.`,
+      );
+      expect(new Save({ config: DEFAULT_CONFIG, storage }).get().graphicsTier).toBe(next);
+    }
+  },
+);
+
 it.each(
   [390, 844].flatMap((width) =>
     (['low', 'medium', 'high'] as const).flatMap((tier) =>
@@ -1558,6 +1602,44 @@ describe('overlay policies across the app', () => {
       expect(button.hidden).toBe(true);
     },
   );
+
+  it.each([
+    { saved: false, system: false },
+    { saved: true, system: false },
+    { saved: false, system: true },
+    { saved: true, system: true },
+  ])('applies effective waypoint motion once at boot: %j', (preference) => {
+    const motion = Object.assign(new EventTarget(), { matches: preference.system });
+    Object.assign(window, { matchMedia: () => motion });
+    const save = new Save({ config: DEFAULT_CONFIG, storage: null });
+    save.save({ reduceMotion: preference.saved });
+    const ctx = {
+      config: DEFAULT_CONFIG,
+      settings: save.get(),
+      save,
+      tier: 'low',
+      quality: { setting: 'low', urlForced: false, detected: { tier: 'low' } },
+      input: new Input({ storage: null }),
+      discovery: { ready: Promise.resolve(), pois: [], scanner: {} },
+      sonar: { setScanState: vi.fn(), setPois: vi.fn(), setPalette: vi.fn() },
+      effective: resolveEffective(save.get(), 'arcade', null),
+      globe: { isOpen: false },
+      expose: vi.fn(),
+      rig: {},
+    } as unknown as GameContext;
+    const apply = vi.spyOn(Waypoints.prototype, 'setReducedMotion');
+    cleanup.push(() => {
+      settingsSystem.dispose?.();
+      waypointsSystem.dispose?.();
+    });
+    // Use the actual system order: the first draw must see one resolved value.
+    waypointsSystem.init!(ctx);
+    settingsSystem.init!(ctx);
+    expect(apply).toHaveBeenCalledExactlyOnceWith(preference.saved || preference.system);
+    expect(ctx.waypoints.root.dataset.reduceMotion).toBe(String(ctx.rig.reduceMotion));
+    save.save({ captions: true, graphicsTier: 'high' });
+    expect(apply).toHaveBeenCalledTimes(1);
+  });
 
   it('applies reduced motion to waypoints once per edit and preserves the OS preference', () => {
     const motion = Object.assign(new EventTarget(), { matches: true });
