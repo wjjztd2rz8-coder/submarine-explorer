@@ -3628,3 +3628,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged 186 (historical stars survive retired/offline missions; touch/photo verification tests), 187 (waypoint reduced motion applied once at boot), 188 (Journal front page counts first wildlife/secret/sample scan). gates.sh smoke + project-base green in each worktree and on main; pushed. Worktrees removed. 189-191 queued; dispatch waiting on Codex 5h budget. 124/131 still held. No Claude package (weekly 28% near pace gate). No tag.
 - Process note: PW_PORT must be above 1023 (a 481 port wasted one gate round); pgrep-based waiters match themselves, wait on the log's gate line instead.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-09 17:51 CST headless run (Claude): hold
+
+- Nothing to collect: no Codex tasks running; 189-191 queued (dispatch waiting on Codex budget/pace); 124/131 held. Main clean and pushed; hosted CI on latest push pending (no tag). No Claude package (weekly 28%, at the pace gate).
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
