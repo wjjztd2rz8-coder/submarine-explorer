@@ -3500,3 +3500,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect (only held 124/131 worktrees; 152 queued). Hosted CI on the 150 merge (run 42545964908) was red on one shard only, e2e 7/38; GitHub returned no log for it. I re-ran the failed shard to tell flake from real. Next run: if it is still red, find the spec by running shard 7/38 locally; if green, tag. No agents, no tag. Claude weekly 35% sits on the pace line; Codex weekly 2%, dispatch held.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: 22 m opening depth gap vs the 15 m skip? Authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 23:15 CST headless run (Claude): CI triage (Journal re-render race)
+
+- Latest hosted CI failed on one f-bughunt-880 spec per shard (great-blue-hole, monterey-canyon, lost-city medium): `scrollIntoViewIfNeeded` hit a detached Journal row. Cause: the Journal now opens on the current site (150) and re-renders once after open. The spec now re-resolves and clicks the entry with retries while advancing the paused clock. Local spec passes; gates smoke + project-base green; pushed. Hosted CI verdict pending, so no tag. No agents.
+- Claude weekly ~34% on the pace line; Codex weekly 2%, dispatch held; 152 queued.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: 22 m opening depth gap vs the 15 m skip? Authored face prop for Monterey, or accept 3.8?
