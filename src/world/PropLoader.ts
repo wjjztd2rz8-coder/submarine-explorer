@@ -25,19 +25,14 @@ import type {
 import { isGeoFeature, type GeoFeatureId } from './props/geo/features.js';
 import { isWreckHull, isWreckScatter, type WreckId } from './props/wrecks/variants.js';
 
-export const PROCEDURAL_PREFIX = 'procedural:';
-export const PROCEDURAL_KINDS: readonly ProceduralPropKind[] = [
-  'hull-block',
-  'debris',
-  'chimney',
-  'geo',
-];
+const PROCEDURAL_PREFIX = 'procedural:';
+const PROCEDURAL_KINDS: readonly ProceduralPropKind[] = ['hull-block', 'debris', 'chimney', 'geo'];
 /** Allowed values in a hull-block's `ends: [forward, aft]`. */
-export const HULL_ENDS: readonly HullEnd[] = ['prow', 'cut', 'rounded'];
+const HULL_ENDS: readonly HullEnd[] = ['prow', 'cut', 'rounded'];
 /** Allowed values of `material_hint` (procedural:chimney rock type). */
-export const CHIMNEY_MATERIALS: readonly ChimneyMaterial[] = ['basalt', 'carbonate', 'sulfide'];
+const CHIMNEY_MATERIALS: readonly ChimneyMaterial[] = ['basalt', 'carbonate', 'sulfide'];
 /** GLB/glTF models must live here (served from `public/assets/models`). */
-export const MODEL_URL_PREFIX = '/assets/models/';
+const MODEL_URL_PREFIX = '/assets/models/';
 
 /** A validated, defaults-filled props.json entry. */
 export interface PropDef {

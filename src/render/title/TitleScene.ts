@@ -39,7 +39,7 @@ interface TitleSceneOptions {
   reducedMotion: boolean;
 }
 
-export interface TitleStats {
+interface TitleStats {
   /** GPU counts from the last draw; geometry estimates until first draw. */
   calls: number;
   triangles: number;

@@ -240,17 +240,6 @@ export class Discovery {
   }
 
   /**
-   * The POI the chase camera should keep clear of the hull: the
-   * nearest target while it is inside its scan radius, else null. The
-   * returned vector is the POI's own; do not mutate it.
-   */
-  focusPoint(): Vector3 | null {
-    const v = this.scanner.view;
-    if (!v.nearestId || !v.nearestInRange) return null;
-    return this.pois.find((p) => p.id === v.nearestId)?.position ?? null;
-  }
-
-  /**
    * Once per rendered frame.
    * @param simDt simulated seconds this frame (fixed steps x fixed delta)
    * @param realDt real frame delta, for UI animation

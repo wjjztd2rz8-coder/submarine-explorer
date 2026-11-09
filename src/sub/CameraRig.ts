@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import type { CameraConfig } from '../core/Config.js';
 import type { HeightField } from './Submarine.js';
 
-export type CameraMode = 'chase' | 'first-person' | 'orbit';
+type CameraMode = 'chase' | 'first-person' | 'orbit';
 
 /**
  * Photo-mode orbit radius limits (metres): close enough to fill the frame with

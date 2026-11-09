@@ -9,7 +9,7 @@ import type { InputDevice } from '../ui/ControlsCard.js';
 export type TutorialStepId = 'move' | 'depth' | 'scan';
 type TutorialEvent = 'scan:complete' | 'scan:started' | 'scan:aborted';
 /** Why a started scan stopped (the scanner's abort reason). */
-export type ScanDrop = 'range' | 'facing' | 'released';
+type ScanDrop = 'range' | 'facing' | 'released';
 
 interface TutorialStep {
   id: TutorialStepId;
@@ -23,8 +23,8 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
 ];
 
 /** Seconds of held input before a movement step counts as done. */
-export const MOVE_HOLD_S = 0.8;
-export const TURN_HOLD_S = 0.5;
+const MOVE_HOLD_S = 0.8;
+const TURN_HOLD_S = 0.5;
 const DEPTH_HOLD_S = 0.8;
 /**
  * A first target this close in depth (m) makes the depth step pointless: skip it.

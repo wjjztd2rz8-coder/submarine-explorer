@@ -168,7 +168,7 @@ export class Atmosphere {
   constructor(
     private readonly scene: THREE.Scene,
     private readonly config: WaterConfig,
-    private readonly tier: AtmosphereTier,
+    tier: AtmosphereTier,
     private readonly bus?: EventBus,
   ) {
     const first = config.bands[0]!;
@@ -254,11 +254,6 @@ export class Atmosphere {
     }
 
     return s;
-  }
-
-  /** Which tier this instance was built for (for the debug readout). */
-  get tierInfo(): AtmosphereTier {
-    return this.tier;
   }
 
   debugString(): string {

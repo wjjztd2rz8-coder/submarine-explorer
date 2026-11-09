@@ -15,7 +15,7 @@ import {
 import { buildWreck } from '../wrecks/index.js';
 import { makeRustTexture } from './wrecks.js';
 
-export interface DebrisPiece {
+interface DebrisPiece {
   kind: 'box' | 'cylinder';
   /** Characteristic size (m), in [debrisMinSizeM, debrisMaxSizeM]. */
   size: number;

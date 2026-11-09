@@ -72,7 +72,7 @@ export interface MissionDef {
   completion: CompletionRule;
 }
 
-export type Warn = (message: string) => void;
+type Warn = (message: string) => void;
 const defaultWarn: Warn = (m) => console.warn(`[mission] ${m}`);
 
 const isObj = (v: unknown): v is Record<string, unknown> =>
@@ -271,7 +271,7 @@ export async function loadMissionSummaries(
 type MissionState = 'briefing' | 'diving' | 'primaries-complete' | 'debrief' | 'aborted';
 
 /** Why a dive was aborted. Only crush depth for now (plan/DECISIONS.md failure model). */
-export type AbortReason = 'crush' | 'power';
+type AbortReason = 'crush' | 'power';
 
 /** Why the debrief opened: a voluntary surface, everything done, or an abort. */
 type EndReason = GameEvents['mission:ended']['reason'];

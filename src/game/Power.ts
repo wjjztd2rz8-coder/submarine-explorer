@@ -3,7 +3,7 @@ import { clamp01 } from '../util/math.js';
 
 import type { DescentProfile, PowerConfig } from '../core/Config.js';
 
-export type Supply = 'battery' | 'oxygen';
+type Supply = 'battery' | 'oxygen';
 export interface PowerState {
   enabled: boolean;
   battery: number;

@@ -17,7 +17,7 @@ import { bboxContains, latLonToWorld } from '../util/geo.js';
 import type { TileMeta } from '../util/types.js';
 import { contentUrl, fetchContentJson, type FetchJson } from './ContentPath.js';
 
-export const POI_KINDS = [
+const POI_KINDS = [
   'wreck',
   'debris',
   'vent',

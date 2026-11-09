@@ -56,7 +56,7 @@ import { mulberry32, valueNoise3 } from './shared.js';
 import { enduranceNameTexture } from './textures.js';
 
 /** Stations (m from the stem) and heights (m above the mud line), scaled to the hull length. */
-export const ENDURANCE = {
+const ENDURANCE = {
   forecastleEnd: 8,
   poopStart: 34,
   foremast: 9.5,

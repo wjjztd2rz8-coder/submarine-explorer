@@ -45,7 +45,7 @@ export interface ScatterSpec {
   kinds: readonly ScatterKind[];
 }
 
-export interface ScatterPlacement {
+interface ScatterPlacement {
   kind: string;
   x: number;
   /** Ground height at (x, z), before sinking. */
@@ -63,7 +63,7 @@ export interface ScatterPlacement {
   y: number;
 }
 
-export interface ScatterOptions {
+interface ScatterOptions {
   density: number;
   smallDebris: boolean;
   heightAt?: (x: number, z: number) => number;

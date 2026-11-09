@@ -154,14 +154,8 @@ from a debrief wins until it closes). Opening one blurs whatever was focused
 behind it but does not focus its own buttons: Space is ballast blow, and a
 focused "Dive again" would reload on a held Space. The first Tab lands inside.
 
-**Framing (QA-B #6).** `discovery.focusPoint()` is the nearest POI while it is
-inside its scan radius (else null). main.ts passes it to `CameraRig.update` as
-`focus`, and the chase camera slides sideways (to the target's side) and up and
-aims part-way at it (`Config.camera.focus*`), so the boat's own hull no longer
-sits on the sight line to the wreck. The HUD also drops the static SEABED
-PROXIMITY banner while it is non-null (QA-B #14): wreck inspection happens at
-12–25 m altitude on purpose. The closing-rate warning (under 60 m and < 4 s
-from contact) still fires.
+**Framing.** The chase camera follows the boat's pose and velocity; scan
+contacts do not steer it. The guidance slot owns scan prompts and seabed warnings.
 
 **DIVE TIME** counts real seconds of unfrozen play (`Discovery.update`'s
 `clockDt`), not capped physics time (QA-B #10).

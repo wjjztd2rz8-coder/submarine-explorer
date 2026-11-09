@@ -178,10 +178,6 @@ export class MissionSelect {
     if (this.options.presentation === 'shell') this.toggleEl.hidden = true;
   }
 
-  showFreeDive(show: boolean): void {
-    this.root.classList.toggle('is-free-dive', show);
-  }
-
   highlightSite(id: string): void {
     for (const item of this.root.querySelectorAll<HTMLElement>('[data-mission], [data-pending]')) {
       item.classList.toggle(

@@ -61,7 +61,7 @@ export function resolveScanRadius(
 }
 
 type ScanPhase = 'idle' | 'scanning' | 'interrupted';
-export type AbortReason = GameEvents['scan:aborted']['reason'];
+type AbortReason = GameEvents['scan:aborted']['reason'];
 
 /** Read-only snapshot for the overlay (and e2e). Updated in place every call. */
 export interface ScanView {

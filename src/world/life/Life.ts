@@ -70,11 +70,6 @@ export class Life {
     opts.scene.add(this.render.group);
   }
 
-  /** True when the site has anything to spawn (a table or a forced animal). */
-  get hasTable(): boolean {
-    return this.sim.rows.length > 0 || this.sim.rare !== null;
-  }
-
   /**
    * One frame. `dt` is 0 while the game is frozen (pause, photo mode): the
    * animals hold still but still draw, so a photo can orbit them.
