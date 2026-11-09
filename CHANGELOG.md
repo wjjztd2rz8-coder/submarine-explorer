@@ -12,6 +12,10 @@ without an entry here is not done.
 
 ## [Unreleased]
 
+### Fixed
+
+- **S-bughunt-debrief:** repeated Dive again activation now emits one restart and reload; retained replay actions cannot restart a disposed mission. Reuse the existing mission state to guard replay, with no new UI or lifecycle machinery.
+
 ### Changed
 
 - **S-bughunt-save-migration:** preserve historical dive stars through renamed or removed objective IDs, and prevent unfinished old routes from receiving completion credit. Historical routes now match saved Journal POI keys directly. Cut: the intersection with current objective IDs; save formats and gameplay settings stay unchanged.

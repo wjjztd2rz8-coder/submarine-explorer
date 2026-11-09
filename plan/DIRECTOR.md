@@ -115,7 +115,7 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 16g. **S-bughunt-save-migration [Codex, brief 180, DONE 2026-11-09]:** bug hunt on save/settings load paths (old saves, missing fields, corrupt JSON, private-mode storage); fix with unit tests.
 16h. **S-bughunt-touch-input [Codex, brief 181, DONE 2026-11-09]:** bug hunt on touch controls/gestures (swipe-up list, joystick, multi-touch, orientation change) via unit tests and code reading; no key names on touch. Three confirmed fixes in the working tree; browser acceptance blocked by sandbox localhost binding. Evidence: [progress/S-bughunt-touch-input.md](progress/S-bughunt-touch-input.md).
 16i. **S-verify-ci-first-sixty [Codex, brief 182]:** after hosted CI runs the new first-sixty spec, triage its failures by run logs and fix root causes in the spec or game.
-16j. **S-bughunt-debrief [Codex, brief 183]:** bug hunt on debrief/results and Journal unlock flow (end paths, ratings, persistence, double events).
+16j. **S-bughunt-debrief [Codex, brief 183] DONE 2026-11-09 (working tree):** duplicate/stale replay guarded by existing mission state; five failing-first regressions, 4,674 units pass. Python/browser gate limits documented in `plan/progress/S-bughunt-debrief.md`.
 16k. **S-bughunt-audio-lifecycle [Codex, brief 184]:** bug hunt on audio unlock, visibility, mute persistence, node leaks.
 16l. **S-bughunt-site-data [Codex, brief 185]:** loop-all-sites data test: objectives reachable, ids resolve, no duplicates.
 
