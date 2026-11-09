@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **S-bughunt-save-migration:** preserve historical dive stars through renamed or removed objective IDs, and prevent unfinished old routes from receiving completion credit. Historical routes now match saved Journal POI keys directly. Cut: the intersection with current objective IDs; save formats and gameplay settings stay unchanged.
+
 - **R-ci-speed:** rebalance the existing 38 single-worker browser shards using 985 case timings from two complete green hosted runs; cut 84 retired timing records. All 1,068 CI cases remain selected exactly once. Queue replay projects about 3 minutes saved; the hosted under-30-minute target remains unverified.
 - **S-verify-side-find-guidance:** verified live objective resolution before selection, fixed-POI lock retention, incidental handoff, and side-find classification after an objective clears or is already scanned. No runtime defect confirmed. Cut: consolidated the separate wildlife takeover unit test into shared fixed/wildlife/curiosity coverage; no gameplay or UI cuts.
 - **V-golden-capture-complete:** golden runs verify every planned image and end with an explicit `INCOMPLETE` error naming missing captures. Cut: separately supplied hero/mission manifest lists, manifest mode-based frame-count inference and the failure-array-only success decision; the manifest now reads the runner's explicit frame plan and controls its exit status. Mission-spawn metadata stays `mission`; a recorded output failure is reported once and cannot hide other missing frames. Partial evidence is retained. Tests/tools only; no art changes.

@@ -7,7 +7,7 @@ import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 
-it.each([
+const legacyRoutes: [string, string[], number][] = [
   ['great-blue-hole', ['great-blue-hole-outer-dropoff', 'great-blue-hole-western-dropoff'], 2],
   ['monterey-canyon', ['monterey-canyon-head', 'monterey-canyon-upper-channel'], 1],
   ['great-blue-hole', ['great-blue-hole-stalactites', 'great-blue-hole-outer-dropoff'], 1],
@@ -20,9 +20,19 @@ it.each([
   ],
   ['hunga-tonga-caldera', ['hunga-tonga-caldera-floor', 'hunga-tonga-rim-wall'], 2],
   ['hudson-canyon', ['hc-canyon-wall', 'hc-coral-ledge'], 2],
-] as const)(
-  'preserves legacy discoveries and earned route credit for %s: %j',
-  async (site, pois, stars) => {
+];
+it.each(
+  legacyRoutes.flatMap(([site, pois, stars]) =>
+    (['unchanged', 'renamed ids', 'removed objectives'] as const).map((change) => ({
+      site,
+      pois,
+      stars,
+      change,
+    })),
+  ),
+)(
+  'preserves legacy route credit for $site with $change: $pois',
+  async ({ site, pois, stars, change }) => {
     const values = new Map<string, string>();
     const storage = {
       getItem: (key: string) => values.get(key) ?? null,
@@ -40,7 +50,15 @@ it.each([
     const progress = new Progress(new ProgressSave(storage));
     const fetchJson: FetchJson = async () => ({
       ok: true,
-      text: async () => readFileSync(`data/landmarks/${site}/mission.json`, 'utf8'),
+      text: async () => {
+        const doc = JSON.parse(readFileSync(`data/landmarks/${site}/mission.json`, 'utf8'));
+        // Historical credit follows saved POIs even when current objective IDs disappear.
+        if (change === 'renamed ids')
+          for (const objective of doc.objectives) objective.id = `renamed-${objective.id}`;
+        if (change === 'removed objectives')
+          doc.objectives = doc.objectives.filter((o: { poi: string }) => !pois.includes(o.poi));
+        return JSON.stringify(doc);
+      },
     });
     await creditPreviousDives(progress, discoveries, [], fetchJson);
     expect(progress.rating(site)).toBe(stars);
@@ -48,10 +66,13 @@ it.each([
       expect(discoveries.isDiscovered(site, poi)).toBe(true);
       expect(progress.snapshot().awarded).toContain(`poi:${site}/${poi}`);
     }
+    const prefix = change === 'renamed ids' ? 'renamed-' : '';
     if (!new Set<string>(pois).has('great-blue-hole-stalactites'))
-      expect(progress.snapshot().awarded).not.toContain('objective:great-blue-hole/stalactites');
+      expect(progress.snapshot().awarded).not.toContain(
+        `objective:great-blue-hole/${prefix}stalactites`,
+      );
     for (const objective of ['eastern-floor', 'flank-transect', 'wall-transect'])
-      expect(progress.snapshot().awarded).not.toContain(`objective:${site}/${objective}`);
+      expect(progress.snapshot().awarded).not.toContain(`objective:${site}/${prefix}${objective}`);
     const earned = progress.snapshot();
     const reloaded = new Progress(new ProgressSave(storage));
     await creditPreviousDives(reloaded, new DiscoveryStore(storage), [], fetchJson);
@@ -60,22 +81,41 @@ it.each([
   },
 );
 
-it.each([
-  ['challenger-deep', 'cd-leggo-amphipod-site'],
-  ['hunga-tonga-caldera', 'hunga-tonga-caldera-floor'],
-  ['hudson-canyon', 'hc-canyon-wall'],
-])('does not credit an unfinished old route at %s', async (site, poi) => {
-  const discoveries = new DiscoveryStore(null);
-  discoveries.record(site, poi);
-  const progress = new Progress(new ProgressSave(null));
-  await creditPreviousDives(progress, discoveries, [], async () => ({
-    ok: true,
-    text: async () => readFileSync(`data/landmarks/${site}/mission.json`, 'utf8'),
-  }));
-  expect(progress.rating(site)).toBe(0);
-  expect(progress.snapshot().awarded).not.toContain(`primary:${site}`);
-  expect(progress.divePoints).toBe(0);
-});
+it.each(
+  [
+    ['challenger-deep', 'cd-leggo-amphipod-site', 'north-wall'],
+    ['hunga-tonga-caldera', 'hunga-tonga-caldera-floor', 'rim-wall'],
+    ['hudson-canyon', 'hc-canyon-wall', 'coral-ledge'],
+  ].flatMap(([site, poi, missing]) =>
+    (['unchanged', 'renamed id', 'removed objective'] as const).map((change) => ({
+      site,
+      poi,
+      missing,
+      change,
+    })),
+  ),
+)(
+  'does not credit an unfinished old route at $site with $change',
+  async ({ site, poi, missing, change }) => {
+    const discoveries = new DiscoveryStore(null);
+    discoveries.record(site, poi);
+    const progress = new Progress(new ProgressSave(null));
+    await creditPreviousDives(progress, discoveries, [], async () => ({
+      ok: true,
+      text: async () => {
+        const doc = JSON.parse(readFileSync(`data/landmarks/${site}/mission.json`, 'utf8'));
+        if (change === 'renamed id')
+          doc.objectives.find((o: { id: string }) => o.id === missing).id = `renamed-${missing}`;
+        if (change === 'removed objective')
+          doc.objectives = doc.objectives.filter((o: { id: string }) => o.id !== missing);
+        return JSON.stringify(doc);
+      },
+    }));
+    expect(progress.rating(site)).toBe(0);
+    expect(progress.snapshot().awarded).not.toContain(`primary:${site}`);
+    expect(progress.divePoints).toBe(0);
+  },
+);
 
 it.each(['animal', 'photo'])(
   'does not grant a legacy bonus for an empty %s subject',
