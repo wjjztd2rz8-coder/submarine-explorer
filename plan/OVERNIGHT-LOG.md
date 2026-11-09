@@ -3592,3 +3592,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: Codex 180, 181, 182 still running; 183-185 queued; 124/131 held. Hosted CI on main still queued (no tag). No Claude package (weekly 29%, little headroom).
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-09 12:13 CST headless run (Claude): collected Codex 180 and 181
+
+- Merged 180 (save migration keeps historical stars via Journal POI keys) and 181 (touch: globe drag cancels on rotate, photo controls follow device switch, tap distance). gates.sh smoke + project-base green in worktrees and on main; pushed. 182 finished with no changes (nothing to fix); removed. 183-185 running; queued 186-188. No Claude package (weekly 29% below pace gate); no tag (hosted CI on prior push still pending).
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
