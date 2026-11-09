@@ -107,7 +107,7 @@ it('covers every declared mission site', () => {
 });
 
 it.each(sites)(
-  '%s: every primary can be scanned at its reach and minimum depth with a safe hull',
+  '%s: every objective can be scanned at its reach and minimum depth with a safe hull',
   async (site) => {
     const config = makeConfig();
     const effective = resolveEffective(defaultSettings(config), 'arcade', null, config);
@@ -132,9 +132,10 @@ it.each(sites)(
         config.scan,
         site,
       );
-      for (const objective of mission.objectives.filter((o) => o.primary)) {
+      // Optional surveys must be reachable too; a complete mission must never strand a find.
+      for (const objective of mission.objectives) {
         const primary = pois.find((p) => p.id === objective.poi)!;
-        expect(primary).toBeDefined();
+        expect(primary, objective.id).toBeDefined();
         const baseReach = missionApproachScanRadius(site, primary.radius);
         for (const radius of [baseReach, baseReach * effective.sensor.scanRadiusMultiplier]) {
           const target = { ...primary, radius };
@@ -156,6 +157,11 @@ it.each(sites)(
                     Math.cos(angle) * radius * fraction,
                   ),
                 );
+              if (
+                Math.abs(p.x) > terrain.widthM / 2 - config.submarine.hullRadius ||
+                Math.abs(p.z) > terrain.depthM / 2 - config.submarine.hullRadius
+              )
+                continue;
               const floor = terrain.sampleHeight(p.x, p.z) + clearance;
               // Leave a metre for the boat's idle buoyancy after the real physics step.
               p.y = Math.min(
@@ -178,7 +184,7 @@ it.each(sites)(
           }
           expect(
             contact,
-            `${site}: navigable water within ${radius} m, min_depth_m=${primary.minDepthM}`,
+            `${site}/${objective.id}: navigable water within ${radius} m, min_depth_m=${primary.minDepthM}`,
           ).not.toBeNull();
           const p = contact!;
           const delta = primary.position.clone().sub(p);

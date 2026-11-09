@@ -117,7 +117,7 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 16i. **S-verify-ci-first-sixty [Codex, brief 182]:** after hosted CI runs the new first-sixty spec, triage its failures by run logs and fix root causes in the spec or game.
 16j. **S-bughunt-debrief [Codex, brief 183]:** bug hunt on debrief/results and Journal unlock flow (end paths, ratings, persistence, double events).
 16k. **S-bughunt-audio-lifecycle [Codex, brief 184]:** bug hunt on audio unlock, visibility, mute persistence, node leaks.
-16l. **S-bughunt-site-data [Codex, brief 185]:** loop-all-sites data test: objectives reachable, ids resolve, no duplicates.
+16l. **S-bughunt-site-data [Codex, brief 185, DONE 2026-11-09 (working tree; 4,722 units pass, browser acceptance blocked by sandbox)]:** audited all 13 sites and 49 objectives; MARS marker explicitly follows seabed. Raw ids/Journal/species and three-tier terrain regression coverage; evidence in `plan/progress/S-bughunt-site-data.md`.
 
 ### Release and owner
 
