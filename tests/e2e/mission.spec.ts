@@ -323,7 +323,11 @@ test.describe('B3 mission flow', () => {
     await debrief.locator('.debrief-more-toggle').click();
     await Promise.all([
       page.waitForEvent('load'),
-      debrief.locator('.debrief-btn', { hasText: 'Dive again' }).click(),
+      // Guards duplicate restart/reset events while the reload is still pending.
+      debrief.locator('.debrief-btn', { hasText: 'Dive again' }).evaluate((button) => {
+        (button as HTMLButtonElement).click();
+        (button as HTMLButtonElement).click();
+      }),
     ]);
     expect(page.url()).toContain('mission=titanic');
     expect(await page.evaluate(() => sessionStorage.getItem('b3-restart'))).toBe(
@@ -476,7 +480,11 @@ test.describe('fix S: mission failure, framing and modals', () => {
     await debrief.locator('.debrief-more-toggle').click();
     await Promise.all([
       page.waitForEvent('load'),
-      debrief.locator('.debrief-btn', { hasText: 'Dive again' }).click(),
+      // Guards duplicate restart/reset events after a hull-aborted dive too.
+      debrief.locator('.debrief-btn', { hasText: 'Dive again' }).evaluate((button) => {
+        (button as HTMLButtonElement).click();
+        (button as HTMLButtonElement).click();
+      }),
     ]);
     expect(page.url()).toContain('mission=titanic');
     expect(await page.evaluate(() => sessionStorage.getItem('fixs-restart'))).toBe(

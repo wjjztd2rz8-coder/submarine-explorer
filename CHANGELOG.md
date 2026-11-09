@@ -12,6 +12,10 @@ without an entry here is not done.
 
 ## [Unreleased]
 
+### Fixed
+
+- **S-bughunt-debrief:** repeated Dive again activation now emits one restart and reload; retained replay actions cannot restart a disposed mission. Reuse the existing mission state to guard replay, with no new UI or lifecycle machinery.
+
 ### Changed
 
 - **R-ci-speed:** rebalance the existing 38 single-worker browser shards using 985 case timings from two complete green hosted runs; cut 84 retired timing records. All 1,068 CI cases remain selected exactly once. Queue replay projects about 3 minutes saved; the hosted under-30-minute target remains unverified.

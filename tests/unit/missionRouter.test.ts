@@ -571,6 +571,45 @@ describe('MissionRouter completion timing', () => {
     }
   });
 
+  it.each([
+    { outcome: 'surface', completed: false },
+    { outcome: 'surface', completed: true },
+    { outcome: 'crush', completed: false },
+    { outcome: 'crush', completed: true },
+  ])(
+    'replays once after $outcome with all scans=$completed, even with duplicate clicks',
+    ({ outcome, completed }) => {
+      if (completed) {
+        scan('primary');
+        scan('optional');
+      }
+      if (outcome === 'crush') {
+        bus.emit('sub:emergencyBlow', { depth: 200, lockSeconds: 8 });
+        frame(router, { emergencyBlow: false });
+      } else expect(router.endDive()).toBe(true);
+      const replay = descendants(router.debrief!.root).find(
+        (e) => e.dataset.action === 'dive-again',
+      )!;
+      click(replay);
+      click(replay);
+      expect(events().filter((name) => name === 'mission:restart')).toHaveLength(1);
+      expect(options.navigate).toHaveBeenCalledExactlyOnceWith(null);
+      expect(router.mission.state).toBe('briefing');
+      expect(router.mission.counts()).toEqual({ completed: 0, total: 2 });
+    },
+  );
+
+  it('ignores a retained replay action after leaving the mission', () => {
+    expect(router.endDive()).toBe(true);
+    const replay = descendants(router.debrief!.root).find(
+      (e) => e.dataset.action === 'dive-again',
+    )!;
+    router.dispose();
+    click(replay);
+    expect(events()).not.toContain('mission:restart');
+    expect(options.navigate).not.toHaveBeenCalled();
+  });
+
   it('Dive again after abort reloads a fresh run whose logged objectives must be scanned again', async () => {
     scan('primary');
     scan('optional');

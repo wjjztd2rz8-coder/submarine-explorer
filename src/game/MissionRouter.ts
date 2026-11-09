@@ -551,6 +551,7 @@ export class MissionRouter {
 
   /** "Dive again": a fresh dive of the same mission (reload: briefing unless the URL skips it). */
   private diveAgain(): void {
+    if (this.disposed || this.mission.state !== 'debrief') return;
     this.mission.restart();
     this.navigate(null);
   }
