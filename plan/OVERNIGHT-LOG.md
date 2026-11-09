@@ -3506,3 +3506,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Latest hosted CI failed on one f-bughunt-880 spec per shard (great-blue-hole, monterey-canyon, lost-city medium): `scrollIntoViewIfNeeded` hit a detached Journal row. Cause: the Journal now opens on the current site (150) and re-renders once after open. The spec now re-resolves and clicks the entry with retries while advancing the paused clock. Local spec passes; gates smoke + project-base green; pushed. Hosted CI verdict pending, so no tag. No agents.
 - Claude weekly ~34% on the pace line; Codex weekly 2%, dispatch held; 152 queued.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: 22 m opening depth gap vs the 15 m skip? Authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 23:15 CST headless run (Claude): hold
+
+- Nothing to collect (124/131 held; 152 still running under Codex). Hosted CI on the 880 retry fix (run 42565938834) is queued, so no tag. Claude weekly 33% is at the pace gate, so no package. Codex queue has 152 launched and 3 tasks running.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: 22 m opening depth gap vs the 15 m skip? Authored face prop for Monterey, or accept 3.8?
