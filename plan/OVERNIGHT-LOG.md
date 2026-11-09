@@ -3602,3 +3602,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Golden captured (15 min), reviewed alone (Codex 5h 18%, Sol skipped). No art change since 01:00; scores stand. REVIEWS.md and STATUS.md updated and pushed. Last two hosted CI runs failed with zero jobs ("workflow file issue"; ci.yml unchanged), watch the next push. No Claude package (weekly 29% below pace gate). Codex 183-185 running, 186-188 queued.
 - **Needs owner:** phone retest; Monterey 3.8 waiver; check GitHub Actions notices if CI keeps failing with no jobs.
+
+## 2026-11-09 13:07 CST headless run (Claude): targeted review (CI red)
+
+- Diagnosed CI: transient 'workflow file issue' pair plus one e2e shard-1 hang; queued Codex brief 189. No merges, no Claude package (weekly 29% below pace gate). See REVIEWS.md.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.

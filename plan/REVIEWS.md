@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-11-09 targeted review (CI red on main for 3 runs)
+
+- **Diagnosis:** two of the three failures (55de9747, 72a73b85 pushes, 18:13) were "workflow file issue" runs with no jobs, ten seconds apart; `ci.yml` is unchanged and the next two pushes (18:56) started all jobs normally, so it looks like a transient GitHub-side failure on rapid back-to-back pushes. The third (run 42656342253) was real: e2e shard 1/38 stalled 11 min on its 24th test after `opening-framing.spec.ts:1903` and hit the 1500 s suite budget (21 passed, 4 did not run); every other shard passed. Queued Codex brief 189 (R-ci-triage) to find the unbounded wait and make a hang fail at the per-test timeout.
+- **Process:** avoid pushing twice within seconds; hold plan-only commits until the previous push's jobs have started. No merges this run; no tag.
+- **Needs owner:** unchanged (phone retest; Monterey 3.8 waiver).
+
 ## 2026-11-09 18:50 comprehensive review (Claude alone: Codex 5h 18%, below the review floor)
 
 - **No Sol second opinion:** `codex-review.sh` skipped for budget; scores below are Claude's only and carry that caveat. Golden `2026-11-09-183505` (47 images, 0/13 openings flagged by the readability check) vs `2026-11-09-064047`; the earlier set is incomplete so `golden-compare` refused it (that is the Challenger gap fixed by 170).
