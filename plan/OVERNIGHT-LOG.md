@@ -3527,3 +3527,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: Codex 160 (CI shard triage), 161 (first-60-s verification) and 162 (dead-code audit) are all still running with uncommitted worktree edits; 124/131 stay held. No Claude package: weekly 31% is right at the pace gate (~29.5%), so I saved it. Codex weekly 89%, 3 tasks running (the cap), queue empty; next run should queue follow-ups from DIRECTOR.md as 160-162 land. No tag (hosted CI unverified).
 - **Needs owner:** phone retest after the landscape HUD fix; confirm the Monterey 3.8 waiver for the 1.0 definition.
+
+## 2026-11-09 01:45 CST headless run (Claude): hold
+
+- Codex 160/161/162 are no longer running (Codex 5h hit 0%, resets 04:00; watchdog stopped them). Their worktrees hold uncommitted edits (160: e2e spec fixes; 161: phone-accept spec + progress note; 162: dead-code removals in src/game). Left untouched for relaunch after the reset; not finished by Claude because weekly 31% sits at the pace gate (~29.5%). Hosted CI on the latest push still queued; no tag.
+- **Needs owner:** phone retest after the landscape HUD fix; confirm the Monterey 3.8 waiver for the 1.0 definition.
