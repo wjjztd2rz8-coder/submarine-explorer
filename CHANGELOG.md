@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **R-ci-speed:** rebalance the existing 38 single-worker browser shards using 985 case timings from two complete green hosted runs; cut 84 retired timing records. All 1,068 CI cases remain selected exactly once. Queue replay projects about 3 minutes saved; the hosted under-30-minute target remains unverified.
+
 - **R-ci-triage:** tutorial specs follow the running step instead of predicting depth coaching, Journal entry checks wait for catalogue publication instead of retrying clicks, and approach checks use the scan envelope instead of a fixed travel floor. Cut: the duplicate tutorial decision model and fixed frame-pumping loop. Coverage, safety assertions and hosted retries remain unchanged.
 
 - **Owner phone test 2026-11-08:**
