@@ -196,10 +196,14 @@ for (const tier of ['low', 'medium']) {
       await page.clock.runFor(34);
       await expect(page.locator('.journal')).toBeVisible();
       // Guide-linked contacts have one stable content row after reload.
-      const entry = (await journalEntries(page, `${site}/poi/${opening.target.guide}`)).first();
-      await entry.scrollIntoViewIfNeeded();
-      if (hasTouch) await entry.tap();
-      else await entry.click();
+      // The Journal opens on the current site and may re-render once; click with retries.
+      await expect(async () => {
+        await page.clock.runFor(34);
+        const entry = (await journalEntries(page, `${site}/poi/${opening.target.guide}`)).first();
+        await entry.scrollIntoViewIfNeeded({ timeout: 2000 });
+        if (hasTouch) await entry.tap({ timeout: 2000 });
+        else await entry.click({ timeout: 2000 });
+      }).toPass({ timeout: 15000 });
       await expect(page.locator('.jr-locked')).toHaveCount(0);
       await expect(page.locator('.jr-body .jr-para').first()).toBeVisible();
       if (site === 'great-blue-hole')
