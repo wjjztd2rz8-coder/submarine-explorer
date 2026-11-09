@@ -1,14 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { execFile } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
 const run = promisify(execFile);
-import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, readFile, readdir, open, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { goldenBuild, readGoldenBuild } from '../golden-build.mjs';
-import { goldenOptions } from '../golden-options.mjs';
-import { goldenManifest, goldenContactSheet } from '../golden-manifest.mjs';
+import { goldenJobs, goldenOptions } from '../golden-options.mjs';
+import { goldenFilename, goldenManifest, goldenContactSheet } from '../golden-manifest.mjs';
 import { comparePixels, compareGoldenSets } from '../golden-compare.mjs';
 import { PNG } from 'playwright-core/lib/utilsBundle';
 
@@ -177,18 +178,21 @@ test('serialized pose manifests and contact sheets contain build, site, layout, 
   const provenance = { sha: 'a'.repeat(40), dirty: true, buildMode: 'production' };
   for (const mode of ['all', 'free-dive', 'mission']) {
     const options = goldenOptions({ GOLDEN_MODE: mode });
-    const captures = options.layouts.flatMap(({ name: layout }) =>
-      [0, 10].map((timeS) => ({
-        site: 'titanic',
-        layout,
-        mode,
-        ...provenance,
-        timeS,
-        missionId: mode === 'mission' ? 'titanic' : null,
-        missionElapsedS: mode === 'mission' ? timeS + 0.25 : null,
-        range: null,
-        filename: `titanic-${layout}-${timeS}.png`,
-      })),
+    const jobs = goldenJobs([['titanic']], ['titanic'], options);
+    const captures = jobs.flatMap(({ mode: captureMode, layout: { name: layout } }) =>
+      (captureMode === 'mission' ? (mode === 'mission' ? [0, 10] : [0]) : [null, null, null]).map(
+        (timeS, i) => ({
+          site: 'titanic',
+          layout,
+          mode: captureMode,
+          ...provenance,
+          timeS,
+          missionId: captureMode === 'mission' ? 'titanic' : null,
+          missionElapsedS: captureMode === 'mission' ? timeS + 0.25 : null,
+          range: null,
+          filename: goldenFilename('titanic', layout, i + 1, captureMode),
+        }),
+      ),
     );
     const manifest = JSON.parse(
       JSON.stringify(
@@ -197,7 +201,7 @@ test('serialized pose manifests and contact sheets contain build, site, layout, 
           stamp: 'fixture',
           provenance,
           options,
-          heroes: [['titanic']],
+          jobs,
           failures: [],
           captures,
         }),
@@ -211,7 +215,7 @@ test('serialized pose manifests and contact sheets contain build, site, layout, 
     }))
       assert.equal(manifest[key], expected);
     assert.deepEqual(manifest.layouts, options.layouts);
-    assert.deepEqual(manifest.plannedMissions, mode === 'mission' ? ['titanic'] : []);
+    assert.deepEqual(manifest.plannedMissions, mode === 'free-dive' ? [] : ['titanic']);
     assert.deepEqual(manifest.captures, captures);
     const sheet = goldenContactSheet(manifest);
     for (const { site, layout, mode, sha } of captures)
@@ -223,7 +227,7 @@ test('serialized pose manifests and contact sheets contain build, site, layout, 
       stamp: 'fixture',
       provenance,
       options,
-      heroes: [['titanic']],
+      jobs,
       failures: [{ stage: 'capture', message: 'fixture failure' }],
       captures: [],
     });
@@ -248,19 +252,168 @@ test('the combined contact sheet lists every mission opening with clean build pr
     range: null,
     timeS: 0,
   }));
+  for (const n of [1, 2, 3])
+    captures.push({
+      ...captures[0],
+      site: 'titanic',
+      mode: 'free-dive',
+      filename: `titanic-${n}.png`,
+      timeS: null,
+    });
   const manifest = goldenManifest({
     base: 'http://localhost/',
     stamp: 'fixture',
     provenance,
     options: goldenOptions({}),
-    heroes: [['titanic', 'bow-hull']],
-    missions,
+    jobs: goldenJobs([['titanic', 'bow-hull']], missions, goldenOptions({})),
     captures,
     failures: [],
   });
   assert.deepEqual(manifest.plannedMissions, missions);
   assert.deepEqual(manifest.plannedHeroes, [['titanic', 'bow-hull']]);
+  assert.equal(manifest.complete, true);
+  // Any catalogue site can fail, including the last job after all earlier jobs succeeded.
+  for (const shot of captures) {
+    const partial = goldenManifest({
+      options: goldenOptions({}),
+      jobs: goldenJobs([['titanic', 'bow-hull']], missions, goldenOptions({})),
+      captures: captures.filter((c) => c !== shot),
+      failures: [],
+    });
+    assert.equal(partial.complete, false, shot.filename);
+    assert.deepEqual(partial.failures, [
+      { stage: 'capture coverage', message: `Missing capture: ${shot.filename}` },
+    ]);
+    assert.ok(goldenContactSheet({ ...manifest, ...partial }).includes('INCOMPLETE'));
+  }
   const sheet = goldenContactSheet(manifest);
   assert.ok(sheet.includes('(clean tree)'));
   for (const shot of captures) assert.ok(sheet.includes(`href="${shot.filename}"`));
+});
+
+test('coverage requires both mission times in every layout and ignores duplicate successes', () => {
+  const options = goldenOptions({ GOLDEN_MODE: 'mission' });
+  const jobs = goldenJobs([], ['first-site', 'future-site'], options);
+  const captures = ['first-site', 'future-site'].flatMap((site) =>
+    ['', '-portrait', '-landscape'].flatMap((layout) =>
+      [1, 2].map((n) => ({ filename: `${site}${layout}-${n}-mission.png` })),
+    ),
+  );
+  assert.equal(goldenManifest({ options, jobs, captures, failures: [] }).complete, true);
+  assert.equal(
+    goldenManifest({
+      options,
+      jobs,
+      captures,
+      failures: [{ stage: 'close context', message: 'browser closed' }],
+    }).complete,
+    false,
+  );
+  for (const omitted of captures) {
+    const partial = goldenManifest({
+      options,
+      jobs,
+      captures: [...captures.filter((c) => c !== omitted), captures.find((c) => c !== omitted)],
+      failures: [{ stage: 'capture', message: 'browser closed' }],
+    });
+    assert.equal(partial.complete, false);
+    assert.deepEqual(partial.failures, [
+      { stage: 'capture', message: 'browser closed' },
+      { stage: 'capture coverage', message: `Missing capture: ${omitted.filename}` },
+    ]);
+  }
+});
+
+test('an aliased hero gallery only requires its approach and detail frames', () => {
+  const options = goldenOptions({ GOLDEN_MODE: 'free-dive' });
+  const jobs = goldenJobs([['site', 'hero', 'gallery']], ['site'], options);
+  const captures = [{ filename: 'gallery-2.png' }, { filename: 'gallery-3.png' }];
+  assert.equal(goldenManifest({ options, jobs, captures, failures: [] }).complete, true);
+  assert.equal(
+    goldenManifest({ options, jobs, captures: captures.slice(0, 1), failures: [] }).complete,
+    false,
+  );
+});
+
+test('a reported output failure stays singular and cannot hide another missing frame', () => {
+  const options = goldenOptions({ GOLDEN_MODE: 'mission', GOLDEN_LAYOUTS: 'portrait' });
+  const jobs = goldenJobs([], ['site'], options);
+  const failure = {
+    filename: 'site-portrait-1-mission.png',
+    stage: 'capture',
+    error: 'readback failed',
+  };
+  const result = goldenManifest({ options, jobs, captures: [], failures: [failure] });
+  assert.equal(result.complete, false);
+  assert.deepEqual(result.failures, [
+    failure,
+    {
+      stage: 'capture coverage',
+      message: 'Missing capture: site-portrait-2-mission.png',
+    },
+  ]);
+  const partial = goldenManifest({
+    options,
+    jobs,
+    captures: [{ filename: 'site-portrait-2-mission.png' }],
+    failures: [failure],
+  });
+  assert.equal(partial.complete, false);
+  assert.deepEqual(partial.failures, [failure]);
+});
+
+test('a failed browser launch persists the full missing-capture plan and exits loudly', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'golden-failure-'));
+  try {
+    const preload = join(root, 'fail-browser.mjs');
+    await writeFile(
+      preload,
+      `import { chromium } from ${JSON.stringify(pathToFileURL(resolve('node_modules/@playwright/test/index.mjs')).href)};
+chromium.launch = async () => { throw new Error('browser launch failed'); };`,
+    );
+    const log = join(root, 'stderr.log');
+    const stderrFile = await open(log, 'w');
+    let code;
+    try {
+      code = await new Promise((resolveExit, reject) => {
+        const child = spawn(
+          process.execPath,
+          ['--import', preload, resolve('tools/golden-shots.mjs')],
+          {
+            cwd: root,
+            stdio: ['ignore', 'ignore', stderrFile.fd],
+            env: {
+              ...process.env,
+              GOLDEN_MODE: 'mission',
+              GOLDEN_SITES: 'all',
+              GOLDEN_LAYOUTS: 'desktop,portrait,landscape',
+            },
+          },
+        );
+        child.on('error', reject);
+        child.on('close', resolveExit);
+      });
+    } finally {
+      await stderrFile.close();
+    }
+    assert.equal(code, 1);
+    const stderr = await readFile(log, 'utf8');
+    const [stamp] = await readdir(join(root, '.cache/golden'));
+    const output = join(root, '.cache/golden', stamp);
+    const manifest = JSON.parse(await readFile(join(output, 'poses.json'), 'utf8'));
+    const catalog = JSON.parse(
+      await readFile(new URL('../../data/landmarks/index.json', import.meta.url)),
+    ).landmarks;
+    assert.equal(manifest.complete, false);
+    assert.deepEqual(manifest.plannedMissions, catalog);
+    assert.deepEqual(manifest.captures, []);
+    assert.match(stderr, /Golden shots: INCOMPLETE:.*browser launch failed/);
+    for (const site of catalog)
+      for (const layout of ['', '-portrait', '-landscape'])
+        for (const n of [1, 2])
+          assert.ok(stderr.includes(`Missing capture: ${site}${layout}-${n}-mission.png`));
+    assert.ok((await readFile(join(output, 'index.html'), 'utf8')).includes('INCOMPLETE'));
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });

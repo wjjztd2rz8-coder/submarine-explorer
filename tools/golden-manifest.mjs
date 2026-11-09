@@ -1,15 +1,20 @@
 /** The manifest and contact sheet share exactly the same capture evidence. */
-export function goldenManifest({
-  base,
-  stamp,
-  provenance,
-  options,
-  heroes,
-  missions,
-  failures,
-  captures,
-}) {
+export function goldenFilename(site, layout, n, mode) {
+  return `${site}${layout === 'desktop' ? '' : `-${layout}`}-${n}${mode === 'mission' ? '-mission' : ''}.png`;
+}
+
+export function goldenManifest({ base, stamp, provenance, options, jobs, failures, captures }) {
   const { mode, tier, layouts } = options;
+  const saved = new Set(captures.map(({ filename }) => filename));
+  // A recorded failure for this exact output already explains why it is absent.
+  const reported = new Set(failures.map(({ filename }) => filename));
+  const missing = jobs.flatMap(({ hero: [id, , slug = id], layout, mode: jobMode, frames }) =>
+    frames
+      .map((n) => goldenFilename(slug, layout.name, n, jobMode))
+      .filter((filename) => !saved.has(filename) && !reported.has(filename))
+      .map((filename) => ({ stage: 'capture coverage', message: `Missing capture: ${filename}` })),
+  );
+  failures = [...failures, ...missing];
   return {
     base,
     stamp,
@@ -17,8 +22,10 @@ export function goldenManifest({
     mode,
     tier,
     layouts,
-    plannedHeroes: mode !== 'mission' ? heroes : [],
-    plannedMissions: missions ?? (mode === 'mission' ? heroes.map(([id]) => id) : []),
+    plannedHeroes: jobs
+      .filter((j) => j.mode === 'free-dive' && j.layout.name === layouts[0].name)
+      .map((j) => j.hero),
+    plannedMissions: [...new Set(jobs.filter((j) => j.mode === 'mission').map((j) => j.hero[0]))],
     complete: failures.length === 0,
     failures,
     captures,

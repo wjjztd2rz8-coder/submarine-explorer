@@ -58,8 +58,18 @@ export function goldenJobs(defaultHeroes, catalog, options) {
               : options.only,
         });
   return options.layouts.flatMap((layout) => [
-    ...heroes.map((hero) => ({ layout, hero, mode: 'free-dive' })),
-    ...missions.map((hero) => ({ layout, hero, mode: 'mission' })),
+    ...heroes.map((hero) => ({
+      layout,
+      hero,
+      mode: 'free-dive',
+      frames: (hero[2] ?? hero[0]) === hero[0] ? [1, 2, 3] : [2, 3],
+    })),
+    ...missions.map((hero) => ({
+      layout,
+      hero,
+      mode: 'mission',
+      frames: options.mode === 'mission' ? [1, 2] : [1],
+    })),
   ]);
 }
 
