@@ -1,5 +1,9 @@
 # Reviews
 
+## 2026-11-09 10:40 targeted review: Codex starved again
+
+- Cause: the trigger fired on the 07:50-era starvation; 180-182 were already launched at 10:34, so Codex is running 3 tasks. Underlying pattern: each run launches everything in the queue, leaving it empty, and the next idle gap re-fires the trigger. Fix: queued 183-185 (new bug-hunt briefs, items 16j-16l) behind the running three so dispatch has work as each finishes; Codex 5h 89%, week 73%. Rule: leave at least 3 briefs queued after launching, not just launched.
+
 ## 2026-11-09 07:50 targeted review: Codex starved 2 h
 
 - Cause: the 04:44 and 06:43 runs logged 161 as "re-queued", but only 162 was relaunched and no brief was left in the queue, so Codex sat at 86% with nothing running. Fix: 161 (resume in its existing worktree), 151 (released from hold) and a new R-ci-speed measure brief (165) are queued and dispatched. Rule for runs: after a Codex limit stop, confirm a file exists in `.cache/codex/queue/` named like the original brief, not just that a log says re-queued.
