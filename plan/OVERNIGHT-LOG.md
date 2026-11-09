@@ -3490,3 +3490,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged 149 (depth-coaching integration test; 22 m opening gap is the real cause, threshold unchanged), 150 (Journal publishes the current site early; Haiku fixed the focus regression the Codex version had broken), 151 (objective wins a new scan hold after interruption; wreck plate normal tangent follows the warp). Gates smoke + project-base green on main; pushed. No tag (hosted CI pending). Worktrees removed.
 - Codex weekly 2%, dispatch held; 152 queued. Held 124/131 untouched. Claude weekly 35%, no second package.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: 22 m opening depth gap vs the 15 m skip (raise the skip or spawn closer)? Authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-08 19:30 CST headless run (Claude): hold
+
+- Nothing to collect (held 124/131 worktrees only). Previous run ended seconds ago; hosted CI on the 149-151 merges is pending, so no tag. Claude weekly 35% sits just above the pace gate, so no package. Codex weekly 2%, dispatch held; 152 queued.
+- **Needs owner:** phone retest (4410-P2 checklist). Design call: 22 m opening depth gap vs the 15 m skip? Authored face prop for Monterey, or accept 3.8?
