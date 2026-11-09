@@ -27,7 +27,6 @@ export const waypointsSystem: GameSystem = {
     ctx.waypoints = waypoints;
     visualHints = ctx.effective.gameplay.visualHints;
     waypoints.setVisualHints(visualHints);
-    waypoints.setReducedMotion(settings.reduceMotion);
     waypoints.setPalette(settings.sonarPalette);
     // D-SONAR: scanned ticks and POIs on the sonar.
     sonar.setScanState((poi) => discovery.scanner.isScanned(poi.landmarkId, poi.id));
