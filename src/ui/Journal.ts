@@ -64,7 +64,7 @@ type View =
   | { kind: 'front' }
   | { kind: 'photos' }
   | { kind: 'site'; siteId: string }
-  | { kind: 'entry'; key: string };
+  | { kind: 'entry'; key: string; focus?: string };
 
 /** Site and POI entries come from the guide (and fire `guide:opened`); species and wildlife do not. */
 const isGuideEntry = (e: JournalEntry): boolean =>
@@ -135,6 +135,8 @@ export class Journal {
   private tileSources = new Map<string, string>();
   private loading: Promise<void> | null = null;
   private loaded = false;
+  private showLoading = false;
+  private loadingHint: ReturnType<typeof setTimeout> | undefined;
   private currentSiteId: string | null = null;
   private homeMode = false;
   private spoilers_ = false;
@@ -312,10 +314,16 @@ export class Journal {
     if (this.footer.textContent !== text) this.footer.textContent = text;
   }
 
-  /** Load every site's content once. Resolves when the Journal can render it. */
+  /** Load once, publishing the current site before the full catalogue settles. */
   load(): Promise<void> {
     this.loading ??= Promise.all([
-      loadJournalSites(this.currentSiteId ? [this.currentSiteId] : []),
+      loadJournalSites(this.currentSiteId ? [this.currentSiteId] : [], undefined, (site) => {
+        // A slow file at another site must not hide this dive's ready entries.
+        if (site.id === this.currentSiteId) {
+          this.sites = [site];
+          this.refresh();
+        }
+      }),
       loadTileSources(),
     ]).then(([sites, sources]) => {
       this.sites = sites;
@@ -335,14 +343,16 @@ export class Journal {
     this.pendingFocus = null;
     const site = this.currentSiteId;
     if (focus && site) {
-      this.view = { kind: 'entry', key: `${site}/poi/${focus}` };
-      this.fixEntryKey(site, focus);
+      this.view = { kind: 'entry', key: `${site}/poi/${focus}`, focus };
+      this.resolveFocus();
     } else if (this.homeMode || !site) {
       this.view = { kind: 'front' };
     } else if (!this.opened || this.view.kind === 'front') {
       this.view = { kind: 'site', siteId: site };
     }
     this.opened = true;
+    this.showLoading = false;
+    clearTimeout(this.loadingHint);
     this.revealView();
     // Reveal the scroll container before rendering/resetting its scroll position.
     if (!this.trap.active && typeof document !== 'undefined') document.exitPointerLock?.();
@@ -350,15 +360,20 @@ export class Journal {
     this.render();
     // A newly focused scan must start at its heading, not the previous entry's scroll.
     this.body.scrollTop = 0;
-    const openingView = this.view;
+    // Fast cached reads need no loading message. Slow reads keep the same page.
+    const hint = (this.loadingHint = setTimeout(() => {
+      this.showLoading = true;
+      this.refresh();
+    }, 200));
     void this.load().then(() => {
-      // A later click/show owns navigation, even when this load was already resolved.
-      if (focus && site && this.view === openingView) this.fixEntryKey(site, focus);
+      clearTimeout(hint);
+      this.resolveFocus();
       this.refresh();
     });
   }
 
   close(): void {
+    clearTimeout(this.loadingHint);
     this.trap.hide();
   }
 
@@ -397,6 +412,16 @@ export class Journal {
       this.view = { kind: 'entry', key: e.key };
       this.revealView();
     }
+  }
+
+  /**
+   * A focused scan resolves to its entry once that site's content is present.
+   * Any later show/back replaces the view, which drops the pending focus.
+   */
+  private resolveFocus(): void {
+    const v = this.view;
+    if (v.kind === 'entry' && v.focus && this.currentSiteId)
+      this.fixEntryKey(this.currentSiteId, v.focus);
   }
 
   /** Direct navigation (including a newly scanned entry) reveals its contents. */
@@ -473,6 +498,7 @@ export class Journal {
   }
 
   private renderContent(): void {
+    this.resolveFocus();
     this.phone = !!this.phoneMq?.matches;
     this.root.classList.toggle('is-phone', this.phone);
     this.root.classList.toggle('at-front', this.view.kind === 'front');
@@ -489,9 +515,16 @@ export class Journal {
 
     const v = this.view;
     const entry = v.kind === 'entry' ? this.entryByKey(v.key) : null;
-    const siteId = v.kind === 'site' ? v.siteId : (entry?.siteId ?? null);
+    const siteId =
+      v.kind === 'site'
+        ? v.siteId
+        : (entry?.siteId ?? (v.kind === 'entry' ? v.key.split('/')[0] : null));
     const site = sites.find((s) => s.id === siteId) ?? null;
-    this.crumbEl.textContent = site ? site.name : v.kind === 'photos' ? 'Photos' : 'All dive sites';
+    this.crumbEl.textContent = siteId
+      ? this.siteName(siteId)
+      : v.kind === 'photos'
+        ? 'Photos'
+        : 'All dive sites';
     // The sheet has no tree: its contents are the front page, its rows the site page.
     if (this.phone) this.navList.replaceChildren();
     else this.renderNav(sites, site, entry);
@@ -515,9 +548,10 @@ export class Journal {
     }
     // --- D-PHOTO end ---
     if (!this.sites.length) {
-      this.body.append(
-        el('p', 'jr-empty', this.loaded ? 'No Journal sites available.' : 'Loading the Journal…'),
-      );
+      if (this.loaded || this.showLoading)
+        this.body.append(
+          el('p', 'jr-empty', this.loaded ? 'No Journal sites available.' : 'Loading the Journal…'),
+        );
       return;
     }
     if (entry && site) this.renderEntry(site, entry);
@@ -1030,6 +1064,7 @@ export class Journal {
   }
 
   dispose(): void {
+    clearTimeout(this.loadingHint);
     this.photoGallery?.dispose();
     this.phoneMq?.removeEventListener?.('change', this.onPhoneChange);
     this.trap.dispose();

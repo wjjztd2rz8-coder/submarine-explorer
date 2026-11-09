@@ -164,6 +164,7 @@ beforeEach(() => {
 });
 afterEach(() => {
   journal.dispose();
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 
@@ -229,7 +230,10 @@ it.each(
     const opener = new Element('button');
     (document.body as unknown as Element).append(opener);
     opener.focus();
+    vi.useFakeTimers();
     journal.open();
+    expect(descendants(root).some((el) => el.textContent === 'Loading the Journal…')).toBe(false);
+    await vi.advanceTimersByTimeAsync(250);
     expect(find((el) => el.className === 'jr-empty').textContent).toBe('Loading the Journal…');
     finish();
     await journal.load();
@@ -245,6 +249,60 @@ it.each(
     expect(find((el) => el.className === 'jr-empty').textContent).toBe(
       'No Journal sites available.',
     );
+  },
+);
+
+it.each([false, true].flatMap((phone) => [false, true].map((focused) => ({ phone, focused }))))(
+  'shows the current site before unrelated Journal content finishes (phone=$phone, focused=$focused)',
+  async ({ phone, focused }) => {
+    journal.close();
+    phoneQuery.matches = phone;
+    Object.assign(journal, { sites: [] });
+    vi.mocked(journal.load).mockRestore();
+    let release!: () => void;
+    const pending = new Promise<void>((resolve) => (release = resolve));
+    let releaseCurrent!: () => void;
+    const currentPending = new Promise<void>((resolve) => (releaseCurrent = resolve));
+    const files: Record<string, unknown> = {
+      '/data/landmarks/index.json': { version: 1, landmarks: ['reef', 'wreck'] },
+      '/data/landmarks.json': { landmarks: [{ id: 'reef', name: 'Reef' }] },
+      '/data/landmarks/reef/guide.json': {
+        version: 1,
+        entries: [{ id: 'overview', title: 'Reef overview', paragraphs: ['A reef.'] }],
+      },
+      '/data/landmarks/reef/pois.json': {
+        version: 1,
+        pois: [{ id: 'target', name: 'Target', kind: 'wreck', lat: 0, lon: 0 }],
+      },
+    };
+    vi.stubGlobal('fetch', async (url: string) => {
+      if (url === '/data/landmarks/wreck/guide.json') await pending;
+      if (url === '/data/landmarks/reef/guide.json') await currentPending;
+      return { ok: url in files, text: async () => JSON.stringify(files[url]) };
+    });
+    journal.open(focused ? 'overview' : undefined);
+    try {
+      // Navigation is already on the current site even before its files arrive.
+      expect(find((el) => el.className === 'jr-crumb').textContent).toBe('Reef');
+      expect(descendants(root).some((el) => el.textContent === 'Loading the Journal…')).toBe(false);
+      await vi.waitFor(() =>
+        expect(find((el) => el.className === 'jr-empty').textContent).toBe('Loading the Journal…'),
+      );
+      releaseCurrent();
+      await vi.waitFor(() =>
+        expect(find((el) => el.className === 'jr-title').textContent).toBe(
+          focused ? 'Reef overview' : 'Reef',
+        ),
+      );
+      expect(descendants(root).some((el) => el.textContent === 'Loading the Journal…')).toBe(false);
+      journal.show(focused ? 'front' : 'reef/site/overview');
+    } finally {
+      releaseCurrent();
+      release();
+      await journal.load();
+    }
+    // Finishing the catalogue must not undo navigation after opening a scan.
+    expect(journal.viewKey).toBe(focused ? 'front' : 'reef/site/overview');
   },
 );
 
