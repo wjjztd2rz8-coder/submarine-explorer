@@ -17,6 +17,43 @@ import * as shared from '../../src/world/props/geo/shared.js';
 
 afterEach(() => vi.restoreAllMocks());
 
+it.each([
+  ['medium', 9, 103000],
+  ['high', 9, 156000],
+] as const)(
+  'great-blue-hole %s: enlarged galleries retain their draw and triangle budgets',
+  async (tier, draws, triangles) => {
+    const site = 'great-blue-hole';
+    const meta = validateMeta(
+      JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')),
+      site,
+    );
+    const props = new Props(
+      meta,
+      {
+        sampleHeight: () => -100,
+        getNormal: (_x, _z, out = new THREE.Vector3()) => out.set(0, 1, 0),
+      },
+      DEFAULT_CONFIG.props,
+      tier,
+    );
+    try {
+      await props.placeAll(
+        JSON.parse(readFileSync(`data/landmarks/${site}/props.json`, 'utf8')),
+        site,
+      );
+      expect(props.stats.failed).toBe(0);
+      expect(props.stats.skipped).toBe(0);
+      expect(props.placed).toHaveLength(2);
+      const counts = props.placed.map((placed) => shared.countGeo(placed.full));
+      expect(counts.reduce((sum, cost) => sum + cost.draws, 0)).toBe(draws);
+      expect(counts.reduce((sum, cost) => sum + cost.triangles, 0)).toBeLessThanOrEqual(triangles);
+    } finally {
+      props.dispose();
+    }
+  },
+);
+
 it('1140: Beebe angular rubble builds silently with finite flat normals on Low', () => {
   const warn = vi.spyOn(console, 'warn');
   const def = parsePropsDoc(beebeDoc, DEFAULT_CONFIG.props).props[0]!;
