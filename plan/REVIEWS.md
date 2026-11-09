@@ -1,5 +1,10 @@
 # Reviews
 
+## 2026-11-09 targeted review: CI red on main (3 runs)
+
+- **Diagnosis (Codex 160, merged):** four specs had stale expectations after the depth-skip change (15 → 30 m, scan holds cut 40%): f-bughunt-960 and hud-touch predicted a depth-coaching step that now auto-skips; f-verify-1000 assumed a 50 m travel floor; f-bughunt-880 raced the Journal load. Specs fixed in place (no retries, no timeout increases). Hosted CI has not yet confirmed; check the next run before tagging.
+- **Process:** Codex 5h hit 0% and the watchdog stopped 160-162 mid-work; nothing relaunches stopped tasks. I merged 160 by hand and re-queued 161/162 (they reuse their worktrees). Hosted CI queue wait (~25 min) and 20-slot concurrency are the main speed limit; 160 proposes 40 slots (Needs owner, GitHub plan).
+
 ## 2026-11-09 targeted review (Codex starved)
 
 - **Trigger:** Codex starved 2 h with an empty queue. **Cause:** the queue ran dry after 152; no Claude run had refilled it. **Already fixed** by the comprehensive review minutes earlier: 160-162 launched at 01:08 and 3 tasks are running (Codex 5h 51%, week 92%). No further action; the next collecting run must refill the queue from DIRECTOR.md before 160-162 finish (about 2-3 h), or the trigger will refire.

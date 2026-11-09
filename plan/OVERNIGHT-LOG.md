@@ -3537,3 +3537,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: Codex 160/161/162 are stopped (Codex 5h 0%, resets 04:00) with uncommitted worktree edits, left untouched for relaunch after the reset; 124/131 stay held. Hosted CI on main is still red across many e2e shards (latest completed run 42581353994, plus 42578209765), which is what 160 was triaging; no tag. No Claude package: weekly 31% sits at the pace gate (~28%), so I saved it. Next run: after 04:00 check that dispatch relaunches 160-162 and collect them; 160 is the priority (CI red).
 - **Needs owner:** phone retest after the landscape HUD fix; confirm the Monterey 3.8 waiver for the 1.0 definition.
+
+## 2026-11-09 04:44 CST headless run (Claude): targeted review, CI red
+
+- Merged Codex 160 (four stale e2e specs fixed; gates smoke + project-base green; pushed). Re-queued 161/162 after the Codex 5h stop. No tag until hosted CI is green. No Claude package (weekly 31% at pace gate).
+- **Needs owner:** phone retest; Monterey 3.8 waiver; consider reserving more hosted runner slots (CI queue wait ~25 min).
