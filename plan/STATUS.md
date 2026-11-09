@@ -1,17 +1,17 @@
-# Status (2026-11-09 comprehensive review, joint Claude + Sol)
+# Status (2026-11-09 evening review, Claude alone; Sol skipped for Codex budget)
 
 **Stage:** about 85% to 1.0; 4-5 weeks (plan 4-6). **f76** is the newest tag; current main is untagged until hosted CI is green.
 
 ## 1.0 table
 
-| Requirement                               | State                                                                                                                     |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Five heroes beautiful (4 of 5)            | Whole-site (Sol): Titanic 3.5, Lost City 3.5, Beebe 3-3.5, Blue Hole 3, Monterey 3 (owner-accepted 3.8). Openings 3.7-4.2 |
-| Other eight sites coherent                | Bismarck 3.3 (dark slab, hard to read); Challenger 3-3.5 (flat flag); Endurance, Axial about 4.0                          |
-| New player understands first five minutes | Not re-verified on current main; Codex brief 161 adds capability tests over all 13 sites                                  |
-| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great (older build); Auto resolution floor changed since, needs retest                                  |
-| Hosted CI green, releases tagged          | Red/slow: 45-70 min runs, many shards red on the 8f4852f merge. Brief 160 triages                                         |
-| Code simple enough                        | Sweeps merged; brief 162 audits dead code                                                                                 |
+| Requirement                               | State                                                                                                                            |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Five heroes beautiful (4 of 5)            | Whole-site (Sol): Titanic 3.5, Lost City 3.5, Beebe 3-3.5, Blue Hole 3, Monterey 3 (owner-accepted 3.8). Openings 3.7-4.2        |
+| Other eight sites coherent                | Bismarck 3.3 (dark slab, hard to read); Challenger 3-3.5 (flat flag); Endurance, Axial about 4.0                                 |
+| New player understands first five minutes | Not re-verified on current main; Codex brief 161 adds capability tests over all 13 sites                                         |
+| Acceptable Low-tier phone performance     | iPhone 17 Pro Low great (older build); Auto resolution floor changed since, needs retest                                         |
+| Hosted CI green, releases tagged          | Red/slow: 45-70 min runs; the last two runs failed with zero jobs ("workflow file issue"), cause unconfirmed, next push tests it |
+| Code simple enough                        | Sweeps merged; brief 162 audits dead code                                                                                        |
 
 ## Done recently
 

@@ -1,5 +1,16 @@
 # Reviews
 
+## 2026-11-09 18:50 comprehensive review (Claude alone: Codex 5h 18%, below the review floor)
+
+- **No Sol second opinion:** `codex-review.sh` skipped for budget; scores below are Claude's only and carry that caveat. Golden `2026-11-09-183505` (47 images, 0/13 openings flagged by the readability check) vs `2026-11-09-064047`; the earlier set is incomplete so `golden-compare` refused it (that is the Challenger gap fixed by 170).
+- **Changed since the 01:00 review:** only process and bug-hunt merges (165 shard timings, 170 golden capture, 171 scanner verification, 180 save migration, 181 touch input). No art changed, so site scores stand: Titanic opening 4.2 (clean wreck, readable), Beebe 4.0 opening but the stack in `beebe-vent-field-3.png` is still one broad folded cone with a stray vent ring (gap: item 6), Blue Hole 3.7 (gallery readable, large empty dark void below the sub; apron remains the gap), others as in the 01:00 entry.
+- **Biggest gaps:** hosted CI. The last two CI runs (55de9747, 72a73b85) ended "failure" with zero jobs ("workflow file issue") and e2e skipped; `ci.yml` is unchanged and valid, and the earlier runs executed e2e, so this looks GitHub-side or concurrency-related. Next push is the test; if it repeats, triage `ci.yml` before anything else. Before that, runs on 165/170 were red on 8 shards with no change in spec set; 182 found nothing to fix.
+- **Play/flow:** not re-captured; brief 161 spec is the first-60-s evidence and its hosted result is still pending.
+- **Process:** Claude weekly 29% (about 7%/day burn, gate blocks packages), so no Claude package since the 01:00 review; Codex week 62%, 5h 18%, burning 44%/day, so Codex is the binding lane now: 183-185 running, 186-188 queued. Watchdog trips 373 lifetime, mostly Codex 5h floor stops. Idle Claude time is by design (budget gate: 477 skips).
+- **Priorities:** unchanged (Claude: 6, 7, 11, 8, 10, 16e when budget allows; Codex: 183-188, then 124/131 when hosted CI is reliable).
+- **Stage:** about 85% to 1.0, 4-5 weeks (unchanged; no Sol view this time).
+- **Needs owner:** phone retest; Monterey 3.8 waiver; if CI keeps showing "workflow file issue", check the GitHub Actions settings/notices for the repo.
+
 ## 2026-11-09 10:40 targeted review: Codex starved again
 
 - Cause: the trigger fired on the 07:50-era starvation; 180-182 were already launched at 10:34, so Codex is running 3 tasks. Underlying pattern: each run launches everything in the queue, leaving it empty, and the next idle gap re-fires the trigger. Fix: queued 183-185 (new bug-hunt briefs, items 16j-16l) behind the running three so dispatch has work as each finishes; Codex 5h 89%, week 73%. Rule: leave at least 3 briefs queued after launching, not just launched.
