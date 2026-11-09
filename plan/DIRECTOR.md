@@ -97,7 +97,7 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 
 ### Codex lane (self-contained, not visual)
 
-- **U-scan-fish-vs-objective [Codex, IN FLIGHT 2026-11-09]:** objective-priority simplification and side-find guidance fix implemented; 204 focused unit tests pass. Browser acceptance blocked by sandbox localhost binding; gate details in `plan/progress/U-scan-fish-vs-objective.md`.
+- **U-scan-fish-vs-objective [Codex, DONE 2026-11-09 (merged; smoke gates green)]:** objective-priority simplification and side-find guidance fix implemented; 204 focused unit tests pass. Browser acceptance blocked by sandbox localhost binding; gate details in `plan/progress/U-scan-fish-vs-objective.md`.
 
 12. **DONE 2026-11-08 (458e001d) U-depth-step-skip [Codex, brief 149, rewritten 2026-11-07]:** the 15 m skip already exists (Tutorial.ts); reproduce why walkthrough-3 still saw the step for 3-7 min (targetGapM undefined?) and fix only that gap, or report not reproducible.
 13. **DONE 2026-11-08 (3b39f8c5) U-journal-open-current [Codex, brief 150, rewritten 2026-11-07]:** current-site opening already exists (Journal.ts); find the cold-load case that still shows 'Loading the Journal...' / All dive sites breadcrumb, fix that only.
