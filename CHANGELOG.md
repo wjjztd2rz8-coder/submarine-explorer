@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **T-verify-first-sixty:** consolidated the Titanic-only journey and idle all-site opening checks into one 13-site, three-viewport guidance/scan/debrief capability. Cut the CI-only 30-second shortcut; the idle tutorial regression stays in the existing large-scale phone HUD check, and every case now requires a full game minute and follows the real guidance through a first scan. No game, visual or art changes.
+
 - **Owner phone test 2026-11-08:**
   - **Scans are 40% shorter.** The data (POI `scan_seconds`, the 4 s default, life, secrets, samples) was cut rather than adding a multiplier.
   - **Depth coaching is skipped within 30 m** (was 15 m). Mission openings start 22 m above the first target to stay clear of the 20 m seabed warning, so the step always showed and taught nothing.
