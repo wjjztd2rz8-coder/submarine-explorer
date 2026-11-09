@@ -15,6 +15,7 @@ without an entry here is not done.
 ### Changed
 
 - **R-ci-speed:** rebalance the existing 38 single-worker browser shards using 985 case timings from two complete green hosted runs; cut 84 retired timing records. All 1,068 CI cases remain selected exactly once. Queue replay projects about 3 minutes saved; the hosted under-30-minute target remains unverified.
+- **S-verify-side-find-guidance:** verified live objective resolution before selection, fixed-POI lock retention, incidental handoff, and side-find classification after an objective clears or is already scanned. No runtime defect confirmed. Cut: consolidated the separate wildlife takeover unit test into shared fixed/wildlife/curiosity coverage; no gameplay or UI cuts.
 
 - **R-ci-triage:** tutorial specs follow the running step instead of predicting depth coaching, Journal entry checks wait for catalogue publication instead of retrying clicks, and approach checks use the scan envelope instead of a fixed travel floor. Cut: the duplicate tutorial decision model and fixed frame-pumping loop. Coverage, safety assertions and hosted retries remain unchanged.
 - **T-verify-first-sixty:** consolidated the Titanic-only journey and idle all-site opening checks into one 13-site, three-viewport guidance/scan/debrief capability. Cut the CI-only 30-second shortcut; the idle tutorial regression stays in the existing large-scale phone HUD check, and every case now requires a full game minute and follows the real guidance through a first scan. No game, visual or art changes.
