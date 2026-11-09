@@ -1,5 +1,15 @@
 # Reviews
 
+## 2026-11-09 comprehensive review (joint: Claude + Codex 6.1 Sol; golden `2026-11-09-064047` vs `2026-11-08-104909`)
+
+- **Stage (agreed):** about 85% to 1.0 (Claude said 87, Sol 83); 4-5 weeks central, plan 4-6. Hosted CI, unaided onboarding on current main, phone Low performance, hero geometry (Beebe, Lost City, Blue Hole) and complete eight-site acceptance remain open.
+- **Changed since 2026-11-08:** Bismarck darker plating, Blue Hole larger gallery (tests pinned, 152), Journal opens on the current site, scan lock and plate normal fixes, Auto resolution floor 1x (Sol: performance needs retesting, since the floor quadruples minimum pixels), landscape camera centred. Sol corrected my "tests only" wording: scans were shortened, coaching changed and camera/resolution behaviour changed.
+- **Scores:** opening appeal (Claude) / whole-site beauty (Sol, the release measure): Titanic 4.2 / 3.5, Lost City 4.1 / 3.5, Beebe 4.0 / 3-3.5, Blue Hole 3.7 / 3, Monterey 3.8 (owner-accepted, waived) / 3, Bismarck 3.3 (agreed), Challenger 3.8 / 3-3.5. Sol: opening and whole-site scores stay separate; Bismarck is a dark slab, but the capture does not prove it floats (my "grounding" word is withdrawn). Disputed: Challenger beauty (3.8 vs 3-3.5; non-hero, no work scheduled beyond optional 16e).
+- **Biggest gaps:** CI (45-70 min runs, 10+ shards red on the 8f4852f merge, no logs from GitHub; afa6f49a only fixed one spec, hosted verdict pending, Sol notes it cannot be proven it resolves the shard failures); Beebe stacks; Lost City tube forms; Blue Hole hero apron/void; Bismarck readability; no current phone or unaided onboarding evidence.
+- **Process:** Claude weekly 32% at the pace gate means about one package a day; Codex week fresh and under-used (24 h under-use 23-46 h) because the queue was empty. Fixed by queuing 160-162. The golden set disables tutorials and dynamic resolution (Sol), so it cannot judge onboarding or performance; the Challenger mission capture was missing.
+- **New priorities:** Codex: 160 R-ci-triage, 161 T-verify-first-sixty, 162 S-dead-code-audit. Claude: 11, 6, 7, 16e. Haiku: 16f.
+- **Needs owner:** phone retest (4410-P2 checklist) after the HUD fix lands. Confirm the Monterey waiver should be written into the 1.0 definition (Sol suggestion).
+
 ## 2026-11-08 targeted review: red CI on main (3 runs)
 
 - Cause: all failures are the f-bughunt-960 great-blue-hole realistic high spec (sub rests at -9.5 m, scan depth rule unmet after the larger karst-grotto box). Two spec fixes (ring spot, real-depth probe) did not clear it on hosted CI. A third (re-probe after the settle) is running as 42529045680; verdict pending.

@@ -62,7 +62,7 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
 | No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
-Stage (review 2026-11-08, Claude alone, Sol skipped: Codex weekly 9%): about 86% to 1.0, 4-5 weeks. Opening scores (Claude): Titanic 4.2, Lost City 4.1, Beebe 4.0, Monterey 3.8, Blue Hole 3.5, Bismarck 3.2. Whole-site scores (Sol, 2026-11-07, still the release measure): Titanic 3.5, Lost City 3.5, Beebe 3.5, Blue Hole 3, Monterey 3.
+Stage (joint review 2026-11-09, Claude + Sol): about 85% to 1.0, 4-5 weeks central (planning range 4-6). Opening appeal (Claude): Titanic 4.2, Lost City 4.1, Beebe 4.0, Monterey 3.8 (owner-accepted, parked), Blue Hole 3.7, Bismarck 3.3. Whole-site beauty (Sol, release measure): Titanic 3.5, Lost City 3.5, Beebe 3-3.5, Blue Hole 3, Monterey 3 (waived at 3.8), Bismarck 3.3, Challenger 3-3.5. Phone scores unverified.
 
 ## Needs owner
 
@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: none. V-bismarck-hull-plates DONE 2026-11-08 (e072e778). U-copy-fixes items 6-8 DONE 2026-11-07 (39830258); walkthrough-4 items 4-5 (scan-interrupt cue, side-find clarity) remain in item 9.
+- Claude: none (Claude weekly at the pace gate; review run 2026-11-09 only). Priority order for the next Claude packages: 11 (phone landscape HUD), 6 (Beebe stacks), 7 (Lost City tubes), then 16e. V-bismarck-hull-plates DONE 2026-11-08 (e072e778). U-copy-fixes items 6-8 DONE 2026-11-07 (39830258); walkthrough-4 items 4-5 (scan-interrupt cue, side-find clarity) remain in item 9.
 
 ## Backlog
 
@@ -103,6 +103,12 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
     **DONE 2026-11-09 (ff015277) S-verify-bluehole-gallery [Codex, brief 152]:** opening scan at 10 m depth and hero clearance pinned for all tiers/modes; tests only.
     **DONE 2026-11-08 (88525a69) S-verify-fish-lock-plates [Codex, brief 151]:** scan lock and plate normal tangent fixed; unit-tested, no browser acceptance.
 15. **R-ci-speed [Codex, held 124/131]:** hosted CI takes 25-30 min; target under 20 min without dropping coverage; 124 was not merged (unmeasured, may flake), 131 is a workflow_dispatch experiment.
+
+16b. **R-ci-triage [Codex, brief 160, item 18]:** hosted CI is red often and takes 45-70 min; triage failing specs by run logs, fix root causes, propose a under-30-min change.
+16c. **T-verify-first-sixty [Codex, brief 161, item 19]:** first-60-s and debrief capability tests over all 13 sites on phone portrait/landscape/desktop; fix generic defects.
+16d. **S-dead-code-audit [Codex, brief 162, item 20]:** delete code made redundant by the ROV/boost/upgrade/HUD-offset cuts; net negative lines.
+16e. **V-challenger-lander-flag [Claude, optional, non-hero]:** the lander flag is a flat luminous triangle and the floats are faceted (`challenger-deep-3.png`); give the flag a cloth shape and round the floats.
+16f. **V-golden-capture-complete [Haiku]:** the 2026-11-09 golden run lacked the Challenger mission capture; check why (`poses.json`) and fix the script.
 
 ### Release and owner
 

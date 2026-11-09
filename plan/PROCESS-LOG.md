@@ -414,3 +414,8 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 ## 2026-11-08
 
 - Red CI traced to stale specs after two Haiku UI-copy merges that ran only smoke + project-base. Rule: any package that changes player-facing text or HUD gating runs the affected e2e specs (hud-touch, phone-accept, journal-debrief, opening-framing) locally before merge. Triage tip: `gh run view --log` is empty here; use `gh api repos/:owner/:repo/actions/jobs/<id>/logs`.
+
+## 2026-11-09
+
+- Codex queue was empty with a fresh week (23-46 h under-used in 24 h). Queued 160-162 (CI triage, first-60-s verification, dead-code audit) so the review loop always leaves at least 3 briefs. Backlog had no unblocked Codex items left; the review now adds them as items 18-20.
+- Golden capture disables tutorials and dynamic resolution (Sol), and the Challenger mission capture was missing: added item 16f.
