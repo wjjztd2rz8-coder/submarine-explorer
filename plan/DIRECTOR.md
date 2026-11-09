@@ -123,6 +123,7 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 
 16m. **S-verify-save-touch-merges [Codex, DONE 2026-11-09 (working tree; 4,794 units pass; browser/tooling gate limits documented)]:** historical stars now survive retired or invalid current missions; 24 failing-first cases, save-format review and touch boundary/rebinding coverage. Evidence: [progress/S-verify-save-touch-merges.md](progress/S-verify-save-touch-merges.md).
 16m. **S-bughunt-settings-quality [Codex, DONE 2026-11-09 (working tree; browser acceptance blocked by sandbox)]:** two audit passes; removed duplicate waypoint reduced-motion application at boot after four failing-first regressions. Tier pending/revert and persistence coverage extended. Evidence: `plan/progress/S-bughunt-settings-quality.md`.
+16m. **S-bughunt-journal-ui [Codex, DONE 2026-11-09 (working tree; 4,762 units pass, browser acceptance blocked by sandbox)]:** two audit rounds; fixed the misleading empty hint after a first wildlife, secret or sample scan with six failing-first unit cases. Tags, filters, current-entry opening, narrow text and keyboard focus audited; evidence in `plan/progress/S-bughunt-journal-ui.md`.
 
 ### Release and owner
 

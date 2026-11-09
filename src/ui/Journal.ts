@@ -703,9 +703,12 @@ export class Journal {
     }
     const scanned = sites.filter((s) => isSiteUnlocked(s, this.store)).length;
     b.append(
-      logged
+      scanned
         ? this.chips(
-            [`${logged}/${total} points of interest`, `${scanned}/${sites.length} sites scanned`],
+            [
+              ...(logged ? [`${logged}/${total} points of interest`] : []),
+              `${scanned}/${sites.length} sites scanned`,
+            ],
             'jr-lead',
           )
         : el('p', 'jr-locked', 'Scan something on a dive to add it here.'),

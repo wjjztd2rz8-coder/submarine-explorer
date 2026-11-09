@@ -430,6 +430,51 @@ it('lists nothing but one hint before anything is earned', () => {
     'Scan something on a dive to add it here.',
   ]);
 });
+
+it.each(
+  [false, true].flatMap((phone) =>
+    ['life:life-entry', 'secret:arch', 'sample:mud'].map((discovery) => ({ phone, discovery })),
+  ),
+)(
+  'shows earned front-page progress for a first $discovery scan (phone=$phone)',
+  ({ phone, discovery }) => {
+    // A first wildlife or Find scan must replace the empty hint even without a POI scan.
+    phoneQuery.matches = phone;
+    const reef = site('reef');
+    reef.entries.push(
+      ...buildJournalSite({
+        id: 'reef',
+        guide: null,
+        pois: [],
+        species: null,
+        secrets: [{ id: 'arch', name: 'Arch', kind: 'rock', lat: 0, lon: 0, text: 'An arch.' }],
+        samples: [{ id: 'mud', name: 'Sediment core', lat: 0, lon: 0 }],
+      }).entries.filter((entry) => entry.kind === 'secret'),
+    );
+    Object.assign(journal, { sites: [reef, site('wreck')] });
+    const store = new DiscoveryStore(null);
+    store.record('reef', discovery);
+    journal.setStore(store);
+    for (let round = 0; round < 2; round++) {
+      journal.show('front');
+      expect(byClassAll('jr-locked')).toHaveLength(0);
+      expect(byClassAll('jr-lead')[0]?.children.map((el) => el.textContent)).toEqual([
+        '1/2 sites scanned',
+      ]);
+      journal.show('reef');
+      expect(byClassAll('jr-row').map((el) => el.dataset.row)).toContain(
+        discovery.startsWith('life:')
+          ? 'reef/life/entry'
+          : discovery === 'secret:arch'
+            ? 'reef/secret/arch'
+            : 'reef/sample/mud',
+      );
+      expect(byClassAll('jr-row').map((el) => el.dataset.row)).not.toContain('reef/poi/entry');
+      journal.close();
+      journal.open();
+    }
+  },
+);
 it('collapses a site without changing its article and restores focus on the rebuilt button', () => {
   const button = header('reef');
   button.focus();
