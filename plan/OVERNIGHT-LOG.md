@@ -3522,3 +3522,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Golden captured, Sol reconciled. Stage about 85%, 4-5 weeks. Details in plan/REVIEWS.md and plan/STATUS.md. Backlog gained items 16b-16f and 18-20; Codex briefs 160-162 launched (CI triage, first-60-s verification, dead-code audit). No Claude package (weekly at the pace gate). No tag: hosted CI on main still pending.
 - **Needs owner:** phone retest after the landscape HUD fix; confirm the Monterey 3.8 waiver for the 1.0 definition.
+
+## 2026-11-09 01:15 CST headless run (Claude): hold
+
+- Nothing to collect: Codex 160 (CI shard triage), 161 (first-60-s verification) and 162 (dead-code audit) are all still running with uncommitted worktree edits; 124/131 stay held. No Claude package: weekly 31% is right at the pace gate (~29.5%), so I saved it. Codex weekly 89%, 3 tasks running (the cap), queue empty; next run should queue follow-ups from DIRECTOR.md as 160-162 land. No tag (hosted CI unverified).
+- **Needs owner:** phone retest after the landscape HUD fix; confirm the Monterey 3.8 waiver for the 1.0 definition.
