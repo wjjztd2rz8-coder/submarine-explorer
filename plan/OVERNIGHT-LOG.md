@@ -3517,3 +3517,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged 152 (S-verify-bluehole-gallery: tests only; gallery opening scan and hero clearance verified on all tiers/modes, no defects). Main had dropped `setPhoneLandscape`, so I removed that call from the new spec. Gates smoke + project-base green on main; pushed. No tag (hosted CI on recent pushes still pending). Worktree removed.
 - Held 124/131 untouched. Claude weekly ~32% at the pace gate, so no Claude package. Codex weekly low, dispatch held.
 - **Needs owner:** phone retest (4410-P2 checklist). Design call: 22 m opening depth gap vs the 15 m skip? Authored face prop for Monterey, or accept 3.8?
+
+## 2026-11-09 01:09 CST headless run (Claude): comprehensive review (joint with Sol)
+
+- Golden captured, Sol reconciled. Stage about 85%, 4-5 weeks. Details in plan/REVIEWS.md and plan/STATUS.md. Backlog gained items 16b-16f and 18-20; Codex briefs 160-162 launched (CI triage, first-60-s verification, dead-code audit). No Claude package (weekly at the pace gate). No tag: hosted CI on main still pending.
+- **Needs owner:** phone retest after the landscape HUD fix; confirm the Monterey 3.8 waiver for the 1.0 definition.
