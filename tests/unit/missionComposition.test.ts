@@ -627,7 +627,6 @@ it.each(
             [844, 390],
           ]) {
             const rig = new CameraRig(effective.camera, width / height, terrain);
-            rig.setPhoneLandscape(width === 844);
             // The pilot view must see the contact from the opening; the authored
             // chase arm is checked separately and can place the hull over a small vent.
             rig.setMode('first-person');
@@ -660,7 +659,6 @@ it.each(
             [844, 390],
           ]) {
             const rig = new CameraRig(effective.camera, width / height, terrain);
-            rig.setPhoneLandscape(width === 844);
             rig.setChaseRadiusDefault(
               opening.chaseRadius,
               opening.chaseOffsetX,

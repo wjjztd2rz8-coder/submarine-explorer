@@ -148,14 +148,14 @@ describe('onboarding completion through the system', () => {
         frame.nextScanObjective = { poiId: 'bow' } as FrameState['nextScanObjective'];
         draw(); // A level side find must not stand in for the missing objective.
         expect(onboard.tutorial.step?.id).toBe('depth');
-        const objective = { id: 'bow', position: { y: -132 } };
+        const objective = { id: 'bow', position: { y: -150 } };
         targets.push(objective);
         draw(); // A known target outside the skip band still needs depth coaching.
         expect(onboard.tutorial.step?.id).toBe('depth');
-        frame.sub.depth = -116.5;
+        frame.sub.depth = -119.5;
         draw();
         expect(onboard.tutorial.step?.id).toBe('depth');
-        frame.sub.depth = -117;
+        frame.sub.depth = -120;
         draw();
         expect(onboard.tutorial.step?.id).toBe('scan');
         expect(lastTutorial()?.step).toBe('scan');

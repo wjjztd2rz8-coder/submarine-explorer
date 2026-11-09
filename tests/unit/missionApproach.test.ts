@@ -180,7 +180,6 @@ for (const site of sites.landmarks) {
         }
         for (const aspect of [1280 / 720, 390 / 844, 844 / 390]) {
           const rig = new CameraRig(effective.camera, aspect, terrain);
-          rig.setPhoneLandscape(aspect === 844 / 390);
           rig.setChaseRadiusDefault(
             pose!.chaseRadius,
             pose!.chaseOffsetX,

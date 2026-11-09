@@ -74,7 +74,8 @@ it.each(['resize', 'orientationchange'])(
       f.win.dispatchEvent(new Event(event));
       expect(f.renderer.setSize).toHaveBeenLastCalledWith(w, h, false);
       expect(f.rig.camera.aspect).toBeCloseTo(w / h);
-      expect(f.rig.camera.view?.enabled ?? false).toBe(w > h);
+      // Phone landscape keeps the sub centred: no projection offset (owner 2026-11-08).
+      expect(f.rig.camera.view?.enabled ?? false).toBe(false);
       expect(f.rig.camera.fov).toBeCloseTo(w > h ? DEFAULT_CONFIG.camera.fovDeg : portraitFov);
       expect(ctx.post.target.width).toBe(w * 2);
       expect(ctx.post.target.height).toBe(h * 2);
@@ -84,27 +85,19 @@ it.each(['resize', 'orientationchange'])(
     renderSystem.dispose?.();
     f.win.dispatchEvent(new Event(event));
     expect(f.renderer.setSize).toHaveBeenCalledTimes(calls);
-    expect(f.disconnect).toHaveBeenCalledExactlyOnceWith();
   },
 );
 
-it('keeps the landscape projection aligned when touch mode changes without a resize', () => {
+it('dynamic resolution resizes the post target through the same callback', () => {
   const f = fixture();
   f.win.innerWidth = 844;
   f.win.innerHeight = 390;
   f.win.dispatchEvent(new Event('resize'));
-  expect(f.rig.camera.view?.enabled).toBe(true);
-  f.setTouch(false);
-  expect(f.rig.camera.view?.enabled).toBe(false);
-  f.setTouch(true);
-  expect(f.rig.camera.view?.enabled).toBe(true);
-  // Dynamic resolution reuses the same resize callback.
   f.renderer.getPixelRatio = () => 0.75;
   ctx.resize();
   expect(ctx.post.target.width).toBe(633);
   expect(ctx.post.target.height).toBe(293);
   expect(f.rig.camera.aspect).toBeCloseTo(844 / 390);
-  expect(f.rig.camera.view?.enabled).toBe(true);
 });
 
 // The render system owns this pass even on Low, where the draw path skips it.

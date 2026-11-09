@@ -64,10 +64,13 @@ export const DEFAULT_QUALITY: QualityConfig = {
     budgetMs: 1000 / 55,
     overBudgetFactor: 1.15,
     downHoldS: 1.5,
-    headroomFactor: 0.7,
+    // Under budget at a vsync-capped 60 fps (16.7 ms), so a phone can climb back
+    // after a load hitch. 0.7 needed 12.7 ms, which a 60 Hz phone never reports.
+    headroomFactor: 0.95,
     upHoldS: 5,
     step: 0.25,
-    minPixelRatio: 0.5,
+    // Never below one pixel per CSS pixel: 0.5 on a 3x phone is 1/6 resolution.
+    minPixelRatio: 1,
     cooldownS: 1,
     smoothingS: 0.5,
   },

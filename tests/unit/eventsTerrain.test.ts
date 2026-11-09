@@ -142,7 +142,6 @@ for (const site of [
           expect(Math.abs(contact.position.x)).toBeLessThan((meta.cols * meta.cellsize_m_x) / 2);
           expect(Math.abs(contact.position.z)).toBeLessThan((meta.rows * meta.cellsize_m_y) / 2);
           const rig = new CameraRig(config.camera, aspect, terrain);
-          rig.setPhoneLandscape(aspect === 844 / 390);
           rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
           rig.snap(pilot, 0, 0);
 

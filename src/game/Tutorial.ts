@@ -26,8 +26,13 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
 export const MOVE_HOLD_S = 0.8;
 export const TURN_HOLD_S = 0.5;
 const DEPTH_HOLD_S = 0.8;
-/** A first target this close in depth (m) makes the depth step pointless: skip it. */
-export const DEPTH_SKIP_M = 15;
+/**
+ * A first target this close in depth (m) makes the depth step pointless: skip it.
+ * Mission openings sit about 22 m above their first target (hull radius, seabed
+ * clearance and spawn clearance), which keeps them clear of the 20 m seabed warning.
+ * The skip needs to cover that gap.
+ */
+export const DEPTH_SKIP_M = 30;
 /** Seconds on the move step with no input before the text adds the marker distance. */
 export const MOVE_IDLE_S = 20;
 const AXIS_MIN = 0.25;

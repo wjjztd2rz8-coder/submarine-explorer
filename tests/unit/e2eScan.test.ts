@@ -90,8 +90,9 @@ it('completes a real wildlife target after a low-fps held scan falls short', asy
     const time = new Time();
     const camera = new PerspectiveCamera();
     time.tick(0);
-    // Ten frames over the original 20-second wait: control/geometry remain valid.
-    for (let frame = 1; frame <= 10; frame++) {
+    // Six long frames, each capped by the fixed-step limit: control/geometry
+    // remain valid and the scan falls short of the jelly's hold time.
+    for (let frame = 1; frame <= 6; frame++) {
       const steps = time.tick(frame * 2000);
       life.update(time.frameDelta, sub, camera, 800, 0);
       scanner.update(steps * time.fixedDelta, game.sub.position, game.sub.getForward(), true);

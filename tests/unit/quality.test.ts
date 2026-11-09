@@ -337,9 +337,28 @@ describe('DynamicResolution', () => {
     expect(dr.pixelRatio).toBe(2);
   });
 
+  it('climbs back to full resolution at a vsync-capped 60 fps after a load hitch', () => {
+    // Regression guard (owner phone 2026-11-08): a 60 Hz phone never reported
+    // the old 12.7 ms headroom, so one hitch left it blurry for the whole dive.
+    const dr = new DynamicResolution(cfg, 2);
+    run(dr, 35, 4);
+    expect(dr.pixelRatio).toBeLessThan(2);
+    run(dr, 1000 / 60, 60);
+    expect(dr.pixelRatio).toBe(2);
+  });
+
+  it('never drops below one pixel per CSS pixel', () => {
+    const dr = new DynamicResolution(cfg, 3);
+    run(dr, 60, 60);
+    expect(dr.pixelRatio).toBe(1);
+  });
+
+  // The hysteresis cases below need room under a ratio of 1, so they use a lower floor.
+  const lowFloor = { ...cfg, minPixelRatio: 0.5 };
+
   it('settles on a stable ratio-dependent workload instead of cycling', () => {
     // 25 ms at ratio 1, 8.5 ms at 0.75: a stable, ratio-dependent workload.
-    const dr = new DynamicResolution(cfg, 1);
+    const dr = new DynamicResolution(lowFloor, 1);
     const cost = (r: number): number => 25 * (r > 0.9 ? 1 : 0.34);
     const changes: number[] = [];
     for (let t = 0; t < 3600 * 1000;) {
@@ -353,7 +372,7 @@ describe('DynamicResolution', () => {
   });
 
   it('retries a rejected ratio once the workload gets lighter', () => {
-    const dr = new DynamicResolution(cfg, 1);
+    const dr = new DynamicResolution(lowFloor, 1);
     let load = 1;
     const cost = (r: number): number => 25 * load * (r > 0.9 ? 1 : 0.34);
     const step = (seconds: number): void => {

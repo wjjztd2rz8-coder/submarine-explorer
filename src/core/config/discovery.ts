@@ -82,7 +82,9 @@ export const DEFAULT_LANDMARKS: LandmarksConfig = {
 
 // Scan & discovery. See docs/discovery.md.
 export const DEFAULT_SCAN: ScanConfig = {
-  defaultSeconds: 4, // the master plan's "hold the beam 3-5 s"
+  // Owner phone test 2026-11-08: holds felt long, so every scan time (this,
+  // POI scan_seconds, life, secrets, samples) was cut 40% from the original 3-5 s.
+  defaultSeconds: 2.4,
   defaultRadiusM: 150,
   coneHalfAngleDeg: 35,
   closeRangeM: 25,

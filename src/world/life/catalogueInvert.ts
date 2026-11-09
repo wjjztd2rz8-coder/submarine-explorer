@@ -401,7 +401,7 @@ export const INVERTEBRATES: SpeciesDef[] = [
     maxCount: 1,
     rare: true,
     scanRadius: 38,
-    scanSeconds: 3.4,
+    scanSeconds: 2.04,
     look: { cD: 0x93403b, cB: 0xcf9e90, cFin: 0xa84d48, cEye: 0x0b0d10 },
   }),
 ];

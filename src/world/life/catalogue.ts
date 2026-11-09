@@ -611,7 +611,7 @@ const VERTEBRATES: SpeciesDef[] = [
     amp: 0.05,
     freq: 2.2,
     scanRadius: 42,
-    scanSeconds: 3.6,
+    scanSeconds: 2.16,
     look: {
       H: 0.21,
       W: 0.17,
@@ -650,7 +650,7 @@ const VERTEBRATES: SpeciesDef[] = [
     amp: 0.05,
     freq: 2.0,
     scanRadius: 42,
-    scanSeconds: 3.6,
+    scanSeconds: 2.16,
     look: {
       H: 0.2,
       W: 0.18,
@@ -687,7 +687,7 @@ const VERTEBRATES: SpeciesDef[] = [
     maxCount: 1,
     rare: true,
     scanRadius: 40,
-    scanSeconds: 3.4,
+    scanSeconds: 2.04,
     amp: 0.06,
     freq: 2.6,
     look: {
@@ -731,7 +731,7 @@ const VERTEBRATES: SpeciesDef[] = [
     maxCount: 2,
     rare: true,
     scanRadius: 26,
-    scanSeconds: 2.8,
+    scanSeconds: 1.68,
     vertical: true,
     amp: 0.05,
     freq: 4.5,
@@ -771,7 +771,7 @@ const VERTEBRATES: SpeciesDef[] = [
     attract: 0.85,
     maxCount: 3,
     scanRadius: 24,
-    scanSeconds: 2.6,
+    scanSeconds: 1.56,
     amp: 0.05,
     freq: 5,
     look: {

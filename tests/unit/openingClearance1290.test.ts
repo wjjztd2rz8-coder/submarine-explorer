@@ -52,7 +52,6 @@ describe('1290 merged opening camera clearance', () => {
             [844, 390],
           ]) {
             const rig = new CameraRig(config.camera, width / height, terrain);
-            rig.setPhoneLandscape(width === 844);
             rig.setChaseRadiusDefault(
               pose.chaseRadius,
               pose.chaseOffsetX,

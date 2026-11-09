@@ -83,7 +83,7 @@ One list, ordered by player impact and dependencies; lane in brackets. Evidence:
 
 Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIEWS.md`. Partial art items (all marked "partial" earlier) are re-listed here with their remaining gap so nothing is lost when DONE items go to the archive.
 
-3. **V-monterey-wall-face [attempted TWICE 2026-11-07, nothing shipped; 2nd pass (plan/progress/V-monterey-wall-face-2.md) moving carve+hero+POI 170 m east rated 3.3, worse than 3.8 baseline. Moving the trio does not reproduce try2. Only remaining lever: an authored pale face prop at the marker (owner design call); otherwise park at 3.8]. Earlier note: [ see plan/progress/V-monterey-wall-face.md. Next: move carve focus, canyon-wall-ledge hero and scan target together ~180 m east, then rebaseline habitat/carve tests (allowed: rules-can-bend)]:** opening is striped rock with no clear wall face (Sol 3, me 3.8 by opening). Target: one wall face centre-right with the marker on it. Site data (scan target onto the pale face, pose) plus a generic scarp distance fade of displacement.
+3. **V-monterey-wall-face: PARKED 2026-11-08 (owner): accepted at 3.8, moved to [Later](#later).**
 4. **V-bismarck-hull-plates [DONE 2026-11-08 (e072e778): dark streaked deck, scour shade, deck sag; ~3.5-3.8. Left: listing, far horizon dome]:** hull reads as a pale green-grey flat slab on a dome (opening 3-3.5; no demonstrated regression, plating was already pale). Target: darker streaked plating with broken seams (shared shader with 4), scour visible as a darker rim, far horizon not a perfect dome. Do not flatten the seamount flank (`data/landmarks/bismarck/guide.json`).
 5. **V-bluehole-gallery-2 [DONE 2026-11-08 (35d20fa6): gallery 92 m, ~26% of opening frame, opening ~3.7-4.0; sub still touches gallery edge, stalactites small]:** gallery is ~18% of frame width in the opening (3.5). Next lever: a larger gallery prop or an apron-clearing approach (moves the free-dive hero pose too); apron still lacks fine silt grain and ripples. Re-check scan reach (the closer opening changed it).
 6. **V-beebe-chimney-stacks:** still a broad folded cone (`beebe-vent-field-3.png`); a vent bore alone will not fix the silhouette. Target: separated slim stacks with a vent orifice, via shelf/stack placement in site data plus the shared builder.
@@ -91,6 +91,9 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 8. **U-copy-fixes [Haiku]:** U-depth-card-level-approach (extends 12), U-scan-interrupt-cue, U-side-find-clarity, U-ctrl-tip-timing, U-objective-two-cues, U-scan-prompt-copy (from walkthrough-4, `plan/progress/U-retest-walkthrough-4.md`).
 9. **V-golden-refresh [Haiku]:** `GOLDEN_MODE=mission tools/golden.sh` detached after items 3-8 land; feeds the next review.
 10. **V-axial-sky-band [optional]:** Axial upper third is empty dark water; enable `horizonRidge` in its preset data (generic option already exists).
+
+11. **U-phone-landscape-hud [Sonnet, owner phone 2026-11-08]:** in phone landscape the objective banner, Pause and Journal sit left of centre (grid `'sonar bar hud' / 'sonar guide hud'`, with a 250 px depth box on the right). Target: the banner centred on screen, with the readouts and buttons pushed to the edges. Fix it in the HUD grid (rule 3), not with per-element offsets. The camera's 14% left shift was removed on 2026-11-08 at the owner's request, so the sub now sits in the centre; check that it stays clear of the SCAN cluster.
+    11b. **P2-phone-blur [owner + Claude, owner phone 2026-11-08]:** "horribly compressed video at every setting". Fixed on 2026-11-08: dynamic resolution (Auto tier only) could drop and never come back on a 60 fps-capped phone, with a floor of 0.5x (1/6 resolution on a 3x screen). The floor is now 1x and the rule for climbing back up is reachable at 60 fps. Fixed tiers already render at 2x, so if the owner still sees blur on Low/Medium/High after this ships, the cause is elsewhere. Next suspects: the fog and grade look, terrain texture resolution, iOS Low Power Mode. Owner to retest.
 
 ### Codex lane (self-contained, not visual)
 
@@ -104,6 +107,13 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 
 16. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.
 17. **R-release [Haiku]:** tag the newest green-CI main after each review (f76 newest, 2026-11-08); next tag once hosted CI on main is green.
+
+### Later
+
+Parked ideas worth keeping that aren't on the path to 1.0. Promote one into the backlog above when there's room; until then nothing here starts.
+
+- **Monterey authored wall-face prop** (from V-monterey-wall-face, owner 2026-11-08): a pale authored face at the marker. Two generic passes failed (3.3 vs the 3.8 baseline).
+- **Refresh-aware dynamic resolution:** detect a 30 Hz (Low Power Mode) or 60 Hz frame cap and stop lowering resolution when that won't help.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16), per-plate blockiness, Hunga silhouette (4.0, parked), V-bismarck-hull-scale (superseded by 3).
 

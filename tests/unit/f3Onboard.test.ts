@@ -153,16 +153,16 @@ describe('tutorial progression', () => {
     hold(t, { yaw: -1 }, 10); // past 0.5 s
     expect(t.step?.id).toBe('depth');
   });
-  it('skips depth step when target is within 15 m of the sub', () => {
+  it('skips depth step when target is within 30 m of the sub (mission openings start 22 m above)', () => {
     const near = new Tutorial();
     hold(near, { throttle: 1 }, 30);
     expect(near.step?.id).toBe('depth');
-    near.update({ dt: 1 / 30, throttle: 0, yaw: 0, ballast: 0, targetGapM: 15 });
+    near.update({ dt: 1 / 30, throttle: 0, yaw: 0, ballast: 0, targetGapM: 30 });
     expect(near.step?.id).toBe('scan');
 
     const far = new Tutorial();
     hold(far, { throttle: 1 }, 30);
-    far.update({ dt: 1 / 30, throttle: 0, yaw: 0, ballast: 0, targetGapM: 15.5 });
+    far.update({ dt: 1 / 30, throttle: 0, yaw: 0, ballast: 0, targetGapM: 30.5 });
     expect(far.step?.id).toBe('depth');
     hold(far, { ballast: -1 }, 30);
     expect(far.step?.id).toBe('scan');

@@ -203,7 +203,6 @@ for (const tier of ['low', 'medium', 'high'] as const) {
             [844, 390],
           ]) {
             const rig = new CameraRig(config.camera, width / height, terrain);
-            rig.setPhoneLandscape(width === 844);
             rig.setChaseRadiusDefault(
               pose!.chaseRadius,
               pose!.chaseOffsetX,

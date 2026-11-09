@@ -126,7 +126,6 @@ describe('closer mission opening safety', () => {
               [844, 390],
             ]) {
               const rig = new CameraRig(effective.camera, width / height, terrain);
-              rig.setPhoneLandscape(width === 844);
               rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
               rig.snap(position, pose.yaw, 0);
               rig.camera.updateMatrixWorld(true);
