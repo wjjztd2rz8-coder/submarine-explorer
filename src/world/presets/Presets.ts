@@ -115,7 +115,7 @@ interface PresetSelection {
   overrides: Record<string, unknown>;
 }
 
-export type Warn = (message: string) => void;
+type Warn = (message: string) => void;
 const defaultWarn: Warn = (m) => console.warn(`[presets] ${m}`);
 
 /** Pick the preset for this dive. Never throws; bad inputs are warned and skipped. */

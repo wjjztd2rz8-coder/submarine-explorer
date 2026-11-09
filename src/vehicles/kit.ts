@@ -73,7 +73,7 @@ export function alongY(pos: THREE.Vector3Like, dir: THREE.Vector3Like, scale = 1
 }
 
 /** Force a geometry into the kit's attribute layout (non-indexed, pos/normal/uv/color). */
-export function normalise(geo: THREE.BufferGeometry, color?: Rgb | Painter): THREE.BufferGeometry {
+function normalise(geo: THREE.BufferGeometry, color?: Rgb | Painter): THREE.BufferGeometry {
   const g = geo.index ? geo.toNonIndexed() : geo;
   if (g !== geo) geo.dispose();
   if (!g.getAttribute('normal')) g.computeVertexNormals();

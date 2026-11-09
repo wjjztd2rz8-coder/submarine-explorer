@@ -132,11 +132,6 @@ export class Briefing {
     return this.choice;
   }
 
-  /** True while "Advanced" is expanded. */
-  get advancedOpen(): boolean {
-    return this.modeSelector ? !this.modeSelector.advancedPanel.hidden : false;
-  }
-
   /**
    * Connect the Dive settings panel to the saved settings. The
    * mode, start position and Advanced then read and write `settings`;

@@ -36,7 +36,7 @@ import type {
 } from './types.js';
 
 /** Props whose surroundings get rust motes: hull sections and debris fields. */
-export function hullProps(props: readonly PresetProp[], max: number): PresetProp[] {
+function hullProps(props: readonly PresetProp[], max: number): PresetProp[] {
   return props
     .filter((p) => p.model === 'procedural:hull-block' || p.model === 'procedural:debris')
     .sort((a, b) => b.radius - a.radius)
