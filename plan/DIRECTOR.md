@@ -116,7 +116,7 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 16h. **S-bughunt-touch-input [Codex, brief 181]:** bug hunt on touch controls/gestures (swipe-up list, joystick, multi-touch, orientation change) via unit tests and code reading; no key names on touch.
 16i. **S-verify-ci-first-sixty [Codex, brief 182]:** after hosted CI runs the new first-sixty spec, triage its failures by run logs and fix root causes in the spec or game.
 16j. **S-bughunt-debrief [Codex, brief 183]:** bug hunt on debrief/results and Journal unlock flow (end paths, ratings, persistence, double events).
-16k. **S-bughunt-audio-lifecycle [Codex, brief 184]:** bug hunt on audio unlock, visibility, mute persistence, node leaks.
+16k. **S-bughunt-audio-lifecycle [Codex, brief 184] DONE 2026-11-09 (working tree; audit/tests only):** two audit passes found no new defect; pending-unlock mix edits and overlapping stinger cleanup covered with existing mocks. Evidence and gate limits: [progress/S-bughunt-audio-lifecycle.md](progress/S-bughunt-audio-lifecycle.md).
 16l. **S-bughunt-site-data [Codex, brief 185]:** loop-all-sites data test: objectives reachable, ids resolve, no duplicates.
 
 ### Release and owner
