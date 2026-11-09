@@ -3577,3 +3577,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Back-to-back with the 09:21 run; nothing new to collect. Codex 170 and 171 are running, 124/131 held, hosted CI on main pending (no tag). No Claude package (weekly 30% below the pace gate).
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-09 10:34 CST headless run (Claude): collected Codex 170 and 171
+
+- Merged 171 (scanner side-find verification, no defect found) and 170 (golden capture no longer drops Challenger). gates.sh smoke + project-base green in worktrees and on main; pushed. Queued and launched 180 (save-migration bug hunt), 181 (touch-input bug hunt), 182 (CI triage for first-sixty spec). 124/131 held. No Claude package (weekly 30% below pace gate); no tag (hosted CI pending).
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
