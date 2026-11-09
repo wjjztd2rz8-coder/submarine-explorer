@@ -360,6 +360,15 @@ test('a fresh Realistic Challenger mission fits Class C without research', async
 });
 
 test('old discoveries are credited before fitting a deep-mission vehicle', async ({ page }) => {
+  // Regression guard: renamed current objective IDs must preserve historical route stars.
+  for (const site of ['great-blue-hole', 'hunga-tonga-caldera']) {
+    await page.route(`**/data/landmarks/${site}/mission.json`, async (route) => {
+      const response = await route.fetch();
+      const doc = await response.json();
+      for (const objective of doc.objectives) objective.id = `renamed-${objective.id}`;
+      await route.fulfill({ response, json: doc });
+    });
+  }
   const discovered = Object.fromEntries(
     [
       'great-blue-hole/great-blue-hole-outer-dropoff',
@@ -381,17 +390,25 @@ test('old discoveries are credited before fitting a deep-mission vehicle', async
   await ready(page);
   const result = await page.evaluate(() => {
     const g = window.__game as {
-      progress: { lifetime: number };
+      progress: { lifetime: number; rating(site: string): number };
       subMesh: { hullClass: string };
       mission: { objectives: { complete: boolean }[] };
     };
     return {
       lifetime: g.progress.lifetime,
+      blueHoleStars: g.progress.rating('great-blue-hole'),
+      hungaStars: g.progress.rating('hunga-tonga-caldera'),
       vehicle: g.subMesh.hullClass,
       completed: g.mission.objectives.filter((o) => o.complete).length,
     };
   });
-  expect(result).toEqual({ lifetime: 0, vehicle: 'B', completed: 0 });
+  expect(result).toEqual({
+    lifetime: 0,
+    blueHoleStars: 2,
+    hungaStars: 2,
+    vehicle: 'B',
+    completed: 0,
+  });
   expect(await page.evaluate(() => localStorage.getItem('subexplorer.discoveries.v1'))).toBe(old);
 });
 

@@ -5,25 +5,40 @@ import type { FetchJson } from './ContentPath.js';
 import type { Progress } from './Progress.js';
 import type { LegacyEvidence } from '../core/Save.js';
 
-// Earlier content changed these routes. A discoveries-only save can already have earned
-// completion on the old primaries; retain that credit without marking a new
-// mission run complete or requiring a newly added or promoted terrain scan.
-// f-mission-pacing moved the second required target close to the first; the
-// 940-era route stays credited too.
-const PREVIOUS_OBJECTIVES: Record<string, Record<string, boolean>[]> = {
+// Historical routes use the POI keys stored in the Journal. Current objective IDs
+// can change or disappear without erasing earned stars or shrinking an old route.
+const PREVIOUS_ROUTES: Record<string, Record<string, boolean>[]> = {
   'great-blue-hole': [
-    { 'outer-dropoff': true, 'western-dropoff': true },
-    { stalactites: true, 'outer-dropoff': true, 'stalactites-east': false },
+    { 'great-blue-hole-outer-dropoff': true, 'great-blue-hole-western-dropoff': true },
+    {
+      'great-blue-hole-stalactites': true,
+      'great-blue-hole-outer-dropoff': true,
+      'great-blue-hole-stalactites-east': false,
+    },
   ],
   'monterey-canyon': [
-    { 'canyon-head': true, 'upper-channel': true, 'canyon-wall': false, 'mars-node': false },
-    { 'canyon-wall': true, 'upper-channel': true, 'canyon-axis': false },
+    {
+      'monterey-canyon-head': true,
+      'monterey-canyon-upper-channel': true,
+      'monterey-canyon-wall': false,
+      'mbari-mars-node': false,
+    },
+    {
+      'monterey-canyon-wall': true,
+      'monterey-canyon-upper-channel': true,
+      'monterey-canyon-axis': false,
+    },
   ],
   'challenger-deep': [
-    { 'leggo-site': true, 'north-wall': true, 'central-basin': false, 'axis-sill': false },
+    {
+      'cd-leggo-amphipod-site': true,
+      'cd-north-wall': true,
+      'cd-central-basin': false,
+      'cd-axis-sill': false,
+    },
   ],
-  'hunga-tonga-caldera': [{ 'caldera-floor': true, 'rim-wall': true }],
-  'hudson-canyon': [{ wall: true, 'coral-ledge': true }],
+  'hunga-tonga-caldera': [{ 'hunga-tonga-caldera-floor': true, 'hunga-tonga-rim-wall': true }],
+  'hudson-canyon': [{ 'hc-canyon-wall': true, 'hc-coral-ledge': true }],
 };
 
 /** Finish legacy credit before hull gating; a returning pilot never loses access during migration. */
@@ -68,13 +83,12 @@ export async function creditPreviousDives(
       def.objectives.forEach((o, i) => {
         if (statuses[i].complete) progress.credit('objective', `${site}/${o.id}`);
       });
-      const previous = Object.hasOwn(PREVIOUS_OBJECTIVES, site) ? PREVIOUS_OBJECTIVES[site] : [];
+      const previous = Object.hasOwn(PREVIOUS_ROUTES, site) ? PREVIOUS_ROUTES[site] : [];
       const oldRoutes = previous.map((roles) =>
-        def.objectives.flatMap((o, i) =>
-          Object.hasOwn(roles, o.id)
-            ? [{ primary: roles[o.id], complete: statuses[i].complete }]
-            : [],
-        ),
+        Object.entries(roles).map(([poi, primary]) => ({
+          primary,
+          complete: evidence.keys.includes(`${site}/${poi}`),
+        })),
       );
       for (const route of [...oldRoutes, statuses]) {
         const primary = route.filter((o) => o.primary);
