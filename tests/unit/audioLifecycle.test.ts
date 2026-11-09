@@ -289,6 +289,54 @@ describe('audio lifecycle', () => {
     },
   );
 
+  it.each([false, true])(
+    'keeps edits made during the first gesture resume through visibility with mute=%s',
+    async (muted) => {
+      let finish!: () => void;
+      Context.resumeResult = () =>
+        new Promise<void>((resolve) => {
+          finish = () => {
+            context().state = 'running';
+            resolve();
+          };
+        });
+      const audio = system();
+      try {
+        audio.unlock();
+        const ctx = context();
+        const nodes = [...ctx.nodes];
+        // The gesture's async completion must use the latest mix, including zero.
+        audio.setSettings({ masterVolume: 0, sfxVolume: 0, musicVolume: 0, muted });
+        visibility(true);
+        Context.resumeResult = null;
+        finish();
+        await vi.waitFor(() => expect(ctx.suspend).toHaveBeenCalledTimes(2));
+        expect(audio.diagnostics).toMatchObject({
+          state: 'suspended',
+          masterGain: 0,
+          sfxGain: 0,
+          musicGain: 0,
+          muted,
+        });
+        visibility(false);
+        await flush();
+        expect(audio.diagnostics).toMatchObject({
+          state: 'running',
+          masterGain: 0,
+          sfxGain: 0,
+          musicGain: 0,
+          muted,
+        });
+        audio.setSettings({ masterVolume: 0.43 });
+        expect(audio.diagnostics.masterGain).toBe(muted ? 0 : 0.43);
+        expect(ctx.nodes).toEqual(nodes);
+      } finally {
+        audio.dispose();
+      }
+      for (const node of context().nodes) expect(node.connections).toEqual([]);
+    },
+  );
+
   it('stays locked when context construction throws and retries with the latest saved gains', async () => {
     const construct = vi.fn(function () {
       throw new Error('Audio device unavailable');
@@ -1259,6 +1307,44 @@ describe('audio graph ownership and peaks', () => {
     for (const node of nodes) expect(node.disconnect).toHaveBeenCalledTimes(1);
     engine.dispose();
     for (const node of nodes) expect(node.disconnect).toHaveBeenCalledTimes(1);
+  });
+
+  it('releases overlapping stingers independently when voices end out of order or the site closes', () => {
+    const engine = new AudioEngine(config);
+    const ctx = context();
+    const initial = ctx.nodes.length;
+    cues.playDiscoveryChime(engine, config);
+    const first = ctx.nodes.slice(initial);
+    cues.playDiscoveryChime(engine, config);
+    const second = ctx.nodes.slice(initial + first.length);
+    cues.playCollisionThud(engine, config, 20);
+    const collision = ctx.nodes.slice(initial + first.length + second.length);
+    const firstVoices = first.filter((node) => node.start.mock.calls.length);
+    const secondVoices = second.filter((node) => node.start.mock.calls.length);
+    const collisionVoices = collision.filter((node) => node.start.mock.calls.length);
+    expect(firstVoices).toHaveLength(3);
+    expect(secondVoices).toHaveLength(3);
+    expect(collisionVoices).toHaveLength(2);
+    // A later stinger can finish first; shared buses and earlier voices stay live.
+    for (const voice of [...secondVoices].reverse()) voice.end();
+    for (const node of second) expect(node.disconnect).toHaveBeenCalledOnce();
+    for (const node of [...first, ...collision]) expect(node.disconnect).not.toHaveBeenCalled();
+    firstVoices[2].end();
+    collisionVoices[1].end();
+    for (const node of collision) expect(node.disconnect).not.toHaveBeenCalled();
+    expect(firstVoices[0].connections).toHaveLength(1);
+    expect(firstVoices[1].connections).toHaveLength(1);
+    expect((engine.bus('ui') as unknown as Node).connections).toEqual([engine.effects]);
+    // Suspended teardown must release unfinished notes without waiting for onended.
+    expect(ctx.state).toBe('suspended');
+    engine.dispose();
+    for (const voice of [...firstVoices, ...secondVoices, ...collisionVoices]) voice.end();
+    engine.dispose();
+    for (const node of ctx.nodes) {
+      expect(node.connections).toEqual([]);
+      expect(node.disconnect).toHaveBeenCalledOnce();
+    }
+    expect(ctx.close).toHaveBeenCalledOnce();
   });
 
   it('stops and disconnects loops idempotently and releases suspended one-shots on teardown', () => {
