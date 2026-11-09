@@ -183,7 +183,6 @@ export class Scanner {
   /** Public per-dive state for sonar, objectives and other presentation layers. */
   readonly scannedThisDive = new Set<string>();
   private active: ScanTarget | null = null;
-  private objectivePoiId: string | null = null;
   private objectiveSource: string | null | (() => string | null) = null;
 
   /** Mission callers supply a live resolver so completion advances guidance immediately. */
@@ -307,10 +306,7 @@ export class Scanner {
       if (
         g.inRange &&
         g.facing &&
-        (candidate === null ||
-        (t.id === this.objectivePoiId) !== (candidate.id === this.objectivePoiId)
-          ? t.id === this.objectivePoiId || candidate === null
-          : g.distance < candidateDist)
+        (t.id === v.objectiveId || (candidate?.id !== v.objectiveId && g.distance < candidateDist))
       ) {
         candidate = t;
         candidateDist = g.distance;
@@ -338,7 +334,7 @@ export class Scanner {
       if (
         t.arrivalRadiusM === undefined &&
         g.facing &&
-        candidate?.id !== this.objectivePoiId &&
+        candidate?.id !== v.objectiveId &&
         g.distance < candidateDist
       ) {
         candidate = t;
@@ -377,13 +373,13 @@ export class Scanner {
     // pins the reticle with a string of partial scans. A scan of a fixed POI
     // keeps its lock while scanning, so retargeting guidance never swaps it
     // away mid-hold. After interruption, the marked objective wins a new hold.
-    const activeIsObjective = this.active?.id === this.objectivePoiId;
+    const activeIsObjective = this.active?.id === v.objectiveId;
     const activeIsFixed = this.active !== null && this.targets.includes(this.active);
     if (
       this.active &&
       activeGeo?.inRange &&
       activeGeo.facing &&
-      ((activeIsFixed && v.phase === 'scanning') || candidate?.id !== this.objectivePoiId) &&
+      ((activeIsFixed && v.phase === 'scanning') || candidate?.id !== v.objectiveId) &&
       !this.isScanned(this.active.landmarkId, this.active.id)
     ) {
       candidate = this.active;
@@ -472,12 +468,10 @@ export class Scanner {
   }
 
   private updateObjective(position: Vector3, forward: Vector3): void {
-    this.objectivePoiId =
+    const poiId =
       typeof this.objectiveSource === 'function' ? this.objectiveSource() : this.objectiveSource;
     const v = this.view;
-    const t = this.objectivePoiId
-      ? (this.targets.find((x) => x.id === this.objectivePoiId) ?? null)
-      : null;
+    const t = this.targets.find((x) => x.id === poiId);
     if (!t || this.isScanned(t.landmarkId, t.id)) {
       v.objectiveId = null;
       v.objectiveName = '';
