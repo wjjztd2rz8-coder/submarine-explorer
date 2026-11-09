@@ -123,6 +123,50 @@ function setup(seenHints: HintId[] = ['creature']) {
 
 describe('onboarding completion through the system', () => {
   it.each(['keyboard', 'touch', 'gamepad'] as const)(
+    'rechecks the live objective depth after late target loading on %s',
+    (device) => {
+      // Regression guard: an unavailable objective at step entry must not
+      // strand depth coaching once the target arrives or the sub gets level.
+      const { ctx, system, tick, onboard } = setup();
+      ctx.input.touchActive = device === 'touch';
+      ctx.input.gamepadActive = device === 'gamepad';
+      const targets = [{ id: 'side-find', position: { y: -110 } }];
+      Object.assign(ctx.discovery.scanner, { getTargets: () => targets });
+      const frame = {
+        state: { throttle: 0, yaw: 0, ballast: 0 },
+        dt: 0.1,
+        elapsed: 1,
+        frozen: false,
+        sub: { ratedRatio: 0.01, depth: -110, ratedDepth: -11000 },
+      } as FrameState;
+      const draw = () => system.frame!['hud.draw']!(frame, ctx);
+      try {
+        tick({ throttle: 1, yaw: 0, ballast: 0 }, 1);
+        expect(onboard.tutorial.step?.id).toBe('depth');
+        draw(); // No resolved objective yet.
+        expect(onboard.tutorial.step?.id).toBe('depth');
+        frame.nextScanObjective = { poiId: 'bow' } as FrameState['nextScanObjective'];
+        draw(); // A level side find must not stand in for the missing objective.
+        expect(onboard.tutorial.step?.id).toBe('depth');
+        const objective = { id: 'bow', position: { y: -132 } };
+        targets.push(objective);
+        draw(); // A known target outside the skip band still needs depth coaching.
+        expect(onboard.tutorial.step?.id).toBe('depth');
+        frame.sub.depth = -116.5;
+        draw();
+        expect(onboard.tutorial.step?.id).toBe('depth');
+        frame.sub.depth = -117;
+        draw();
+        expect(onboard.tutorial.step?.id).toBe('scan');
+        expect(lastTutorial()?.step).toBe('scan');
+        expect(onboard.store.get().tutorialDone).toBe(false);
+      } finally {
+        system.dispose?.();
+      }
+    },
+  );
+
+  it.each(['keyboard', 'touch', 'gamepad'] as const)(
     'only asks for a scan once in range on %s',
     (device) => {
       const { ctx, system, tick, onboard } = setup();
