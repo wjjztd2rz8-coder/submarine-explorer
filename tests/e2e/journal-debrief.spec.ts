@@ -128,6 +128,133 @@ freshTest(
   },
 );
 
+freshTest.describe('Journal reading', () => {
+  freshTest.use({ serviceWorkers: 'block' });
+  for (const width of [1280, 360]) {
+    for (const discovery of ['life:comb-jelly', 'secret:find-1', 'sample:material-1']) {
+      freshTest(
+        `first ${discovery} replaces the empty Journal hint at ${width}px`,
+        async ({ page }) => {
+          // Regression guard: non-POI discoveries left the front page asking for a first scan.
+          await page.setViewportSize({ width, height: 800 });
+          await page.addInitScript((id) => {
+            const key = 'subexplorer.discoveries.v1';
+            if (!localStorage.getItem(key))
+              localStorage.setItem(
+                key,
+                JSON.stringify({ version: 1, discovered: { [`titanic/${id}`]: true } }),
+              );
+          }, discovery);
+          await page.goto('/?tier=low', { waitUntil: 'domcontentloaded' });
+          const journal = page.getByRole('dialog', { name: 'Journal', exact: true });
+          for (let round = 0; round < 2; round++) {
+            await homeReady(page);
+            const opener = page
+              .locator('.home-menu')
+              .getByRole('button', { name: 'Journal', exact: true });
+            await opener.click();
+            await expect(journal.locator('.jr-site-card')).toHaveCount(catalog.landmarks.length);
+            await expect(journal.locator('.jr-lead')).toHaveText(
+              `1/${catalog.landmarks.length} sites scanned`,
+            );
+            await expect(journal.locator('.jr-locked')).toHaveCount(0);
+            await expect(journal.locator('.jr-spoilers input')).not.toBeChecked();
+            await journal.locator('.jr-site-card[data-target="titanic"]').click();
+            await expect(await journalEntries(page, 'titanic/poi/')).toHaveCount(0);
+            if (!(await journalIsSheet(page)))
+              await openJournalCategory(
+                page,
+                'titanic',
+                discovery.startsWith('life:') ? 'life' : 'secret',
+              );
+            const key = discovery.replace(':', '/');
+            const entry = await journalEntries(page, `titanic/${key}`);
+            await expect(entry).toBeVisible();
+            await entry.click();
+            await expect(journal.locator('.jr-title-row .jr-tag')).toHaveText('Game addition');
+            await expect(journal.locator('.jr-body .jr-locked')).toHaveCount(0);
+            await page.keyboard.press('Escape');
+            await expect(opener).toBeFocused();
+            if (round === 0) await page.reload({ waitUntil: 'domcontentloaded' });
+          }
+        },
+      );
+    }
+  }
+  freshTest(
+    '360px Journal contains long text and keeps keyboard navigation in reading order',
+    async ({ page }) => {
+      // Regression guard: long content must wrap without pushing controls off a narrow phone.
+      await page.setViewportSize({ width: 360, height: 800 });
+      const long = 'UnbrokenJournalText'.repeat(24);
+      await page.route('**/data/landmarks/titanic/guide.json', (route) =>
+        route.fulfill({
+          json: {
+            ...fixtureGuide,
+            entries: fixtureGuide.entries.map((entry) =>
+              entry.id === 'bow'
+                ? {
+                    ...entry,
+                    title: long,
+                    paragraphs: [long],
+                    facts: [{ label: long, value: long }],
+                    sources: [{ title: long, url: 'https://example.org/journal' }],
+                  }
+                : entry,
+            ),
+          },
+        }),
+      );
+      await page.addInitScript(() => {
+        localStorage.setItem(
+          'subexplorer.discoveries.v1',
+          JSON.stringify({ version: 1, discovered: { 'titanic/titanic-bow': true } }),
+        );
+      });
+      await page.goto('/?tier=low', { waitUntil: 'domcontentloaded' });
+      await homeReady(page);
+      const opener = page
+        .locator('.home-menu')
+        .getByRole('button', { name: 'Journal', exact: true });
+      await opener.focus();
+      await page.keyboard.press('Enter');
+      const journal = page.getByRole('dialog', { name: 'Journal', exact: true });
+      await expect(journal.locator('.jr-site-card')).toHaveCount(catalog.landmarks.length);
+      await page.keyboard.press('Tab');
+      await expect(journal.locator('.jr-close')).toBeFocused();
+      await page.keyboard.press('Tab');
+      await expect(journal.locator('.jr-site-card').first()).toBeFocused();
+      await journal.locator('.jr-site-card[data-target="titanic"]').focus();
+      await page.keyboard.press('Enter');
+      await expect(journal.locator('.jr-body')).toBeFocused();
+      const row = journal.locator('[data-row="titanic/poi/bow"]');
+      await expect(row).toHaveText(`${long}›`);
+      await row.focus();
+      await page.keyboard.press('Enter');
+      await expect(journal.locator('.jr-title-row .jr-title')).toHaveText(long);
+      for (const selector of [
+        '.jr-panel',
+        '.jr-body',
+        '.jr-title-row',
+        '.jr-facts',
+        '.jr-sources',
+      ]) {
+        expect(
+          await journal.locator(selector).evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+          selector,
+        ).toBe(true);
+      }
+      await page.keyboard.press('Tab');
+      await expect(journal.locator('.jr-back')).toBeFocused();
+      await page.keyboard.press('Enter');
+      await expect(row).toBeVisible();
+      await expect(journal.locator('.jr-body')).toBeFocused();
+      await page.keyboard.press('Escape');
+      await expect(opener).toBeFocused();
+    },
+  );
+});
+
 freshTest.describe('legacy save persistence', () => {
   for (const [name, fixture] of [
     ['spent kit', spentKit],
