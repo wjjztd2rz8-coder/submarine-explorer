@@ -80,7 +80,7 @@
       "name": "MARS cabled observatory node",
       "lat": 36.712468,
       "lon": -122.186898,
-      "depth_m": 888,
+      "snap_to_seabed": true,
       "radius_m": 100,
       "kind": "other",
       "primary": false,
@@ -89,7 +89,7 @@
       "confidence": "high",
       "reconstruction": true,
       "sources": ["https://www.mbari.org/technology/monterey-accelerated-research-system-mars/"],
-      "note": "Published position 36 deg 42.7481'N, 122 deg 11.2139'W, depth 891 m (MBARI). GMRT seabed here is 888 m, within 3 m of the published depth. The real trawl-resistant frame (about 3.7 x 4.6 m at the base, 1.2 m tall) is not modelled in detail; the placed prop is a simplified marker."
+      "note": "Published position 36 deg 42.7481'N, 122 deg 11.2139'W, depth 891 m (MBARI). GMRT seabed here is about 888 m, within 3 m of the published depth. The scan marker follows the detailed seabed rather than a rounded depth that sits slightly below it. The real trawl-resistant frame (about 3.7 x 4.6 m at the base, 1.2 m tall) is not modelled in detail; the placed prop is a simplified marker."
     }
   ]
 }
