@@ -121,6 +121,8 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 16m. **S-bughunt-mission-clock [Codex, brief 190]:** bug hunt on mission/free-dive lifecycle and clock.
 16n. **S-bughunt-photo-mode [Codex, brief 191]:** bug hunt on photo mode and gallery.
 
+16m. **S-verify-save-touch-merges [Codex, DONE 2026-11-09 (working tree; 4,794 units pass; browser/tooling gate limits documented)]:** historical stars now survive retired or invalid current missions; 24 failing-first cases, save-format review and touch boundary/rebinding coverage. Evidence: [progress/S-verify-save-touch-merges.md](progress/S-verify-save-touch-merges.md).
+
 ### Release and owner
 
 16. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.

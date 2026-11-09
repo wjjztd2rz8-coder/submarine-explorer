@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Fixed
 
+- **S-verify-save-touch-merges:** historical route stars survive missing, retired or invalid current missions; transient content failures retain frozen retry evidence. Cut: the valid-current-mission prerequisite for historical checklist credit. Save formats stay unchanged. Verified merged touch cancellation, photo-device hints and final tap travel with additional capability tests.
+
 - **S-bughunt-debrief:** repeated Dive again activation now emits one restart and reload; retained replay actions cannot restart a disposed mission. Reuse the existing mission state to guard replay, with no new UI or lifecycle machinery.
 
 ### Changed
