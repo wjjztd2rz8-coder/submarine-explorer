@@ -3562,3 +3562,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Codex starved (empty queue): queued and dispatched 161 resume, 151, 165 (R-ci-speed). Tagged f77 (CI green). No Claude package (weekly at pace gate).
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-09 08:44 CST headless run (Claude): collected Codex 151 and 161
+
+- Merged 151 (scan side-find keeps objective detail; Scanner simplified) and 161 (first-minute capability spec over 13 sites x 3 viewports). Codex sandbox could not run browsers, so I ran gates.sh in both worktrees and on main (smoke + project-base green); pushed. The 161 browser spec has not run anywhere yet: hosted CI is its first real check, so watch for failures there. Queued 170 (golden capture) and 171 (scanner bug hunt); 165 (CI speed measure) still running. No tag: f77 was tagged earlier, new CI pending. No Claude package (weekly 30% below the pace gate).
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
