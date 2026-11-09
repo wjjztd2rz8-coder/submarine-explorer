@@ -192,6 +192,45 @@ it('offers visible Capture, Done and Pause actions while the viewfinder is activ
   mode.dispose();
 });
 
+it('refreshes photo key hints when the active viewfinder switches between keyboard and touch', () => {
+  const body = new Element();
+  vi.stubGlobal('document', { body, documentElement, createElement: () => new Element() });
+  vi.stubGlobal('window', {
+    clearTimeout: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  });
+  const mode = new PhotoMode(vi.fn(), vi.fn(), vi.fn());
+  const system = createPhotoSystem();
+  const ctx = {
+    photoMode: mode,
+    input: { primaryKeyLabel: () => 'K' },
+    rig: { camera: new PerspectiveCamera() },
+    discovery: { pois: [] },
+    journal: { siteName: () => 'Titanic' },
+    contentLandmark: 'titanic',
+  } as unknown as GameContext;
+  const frame = { pilotPosition: new Vector3(), sampled: {} } as FrameState;
+  const bottom = (mode.root as unknown as Element).children.at(-1)!;
+  const capture = bottom.children[1].children[0];
+  const tips = bottom.children[0];
+  try {
+    mode.setActive(true, 'K');
+    expect(capture.textContent).toBe('Capture (K / Space)');
+    touch = true;
+    system.frame!['camera.photo']!(frame, ctx);
+    expect(capture.textContent).toBe('Capture');
+    expect(tips.textContent).toBe('Drag to orbit · pinch to zoom');
+    touch = false;
+    system.frame!['camera.photo']!(frame, ctx);
+    expect(capture.textContent).toBe('Capture (K / Space)');
+    expect(tips.textContent).toBe('Esc: exit · drag: orbit · wheel: zoom');
+    expect(mode.active).toBe(true);
+  } finally {
+    mode.dispose();
+  }
+});
+
 it('restores the opener only after the dive controls become visible again, over two rounds', () => {
   const body = new Element();
   let photoActive = false;
@@ -408,7 +447,11 @@ function automaticStillFixture() {
       audio: { playShutter: vi.fn() },
       expose: vi.fn(),
       rig: { exitPhotoMode: vi.fn(), camera: new PerspectiveCamera() },
-      input: { state: { lookDx: 0, lookDy: 0 }, wheelDelta: 0 },
+      input: {
+        state: { lookDx: 0, lookDy: 0 },
+        wheelDelta: 0,
+        primaryKeyLabel: () => 'Enter',
+      },
       setAppState: (state: 'dive' | 'pause' | 'home') => bus.emit('app:state', { state }),
     } as unknown as GameContext;
     const f = {

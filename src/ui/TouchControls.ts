@@ -474,7 +474,10 @@ export class TouchControls {
         p.tap &&
         this.looks.size === 0 &&
         e.target === canvas &&
-        isTap(performance.now() - p.t0, p.moved);
+        isTap(
+          performance.now() - p.t0,
+          p.moved + Math.abs(e.clientX - p.x) + Math.abs(e.clientY - p.y),
+        );
       if (!tap) this.doubleTap = new DoubleTap();
       else if (this.doubleTap.tap(performance.now(), e.clientX, e.clientY)) {
         this.input.touchEdge('resetCamera');

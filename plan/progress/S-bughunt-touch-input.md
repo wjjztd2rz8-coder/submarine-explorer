@@ -1,5 +1,88 @@
 # S-bughunt-touch-input
 
+## Brief 181 follow-up — 2026-11-09
+
+Audited HEAD `7534c9a57eb97e9d09e10b5e3e1e5327052409be`, initially clean,
+against Director item 16h. The earlier audit below is historical evidence.
+Read `plan/DIRECTOR.md` first and followed its simplicity rules; no visual,
+CSS, site data, settings or input-policy changes.
+
+### Round 1: confirm defects
+
+Reviewed Touch, TouchControls, Input, Home, Globe, FocusTrap, PhotoMode and
+the photo/touch frame systems. Extended existing capability unit cases and
+ran them against unchanged production code: **4 failed / 6 passed / 80 skipped**
+(`.cache/touch-input-181/reproduction.log`). Confirmed:
+
+- Globe kept its drag/capture across both resize and orientationchange,
+  accepting stale pre-rotation coordinates. Its existing cancellation handler
+  now handles both events and removes the listeners on disposal.
+- Camera tap detection counted pointermove distance but omitted movement
+  reported at pointerup. A quick drag could reset the camera as a second tap.
+  Tap classification now includes the final displacement without generating
+  an extra camera delta.
+- Photo labels were chosen only when opening the viewfinder. Switching from
+  keyboard to touch while it stayed open left key names visible. The existing
+  photo frame updates the same labels for the current device, preserving
+  custom capture bindings on return to keyboard. Text writes occur only when
+  labels change; the focus trap is not reopened.
+
+### Round 2: capability review
+
+Existing tests cover joystick dead zone/clamping, independent stick/slider
+owners, simultaneous scan holds, unrelated pointer IDs, pointercancel/lost
+capture, blur/hidden/rotation cleanup, modal interruption between frames,
+fresh input after interruption, site-list swipe ownership/trailing clicks and
+camera pinch routing. No further defect was confirmed. Added one photo-system
+unit case and extended the existing camera/globe interruption tables; no new
+spec files or weakened assertions. Updated the existing phone acceptance case
+to switch an open photo viewfinder from touch to keyboard and back.
+
+Simplicity: extended the existing globe cancellation loop and tap classifier;
+extracted existing photo label updates for reuse instead of adding device
+observers, state or another guidance surface. No new on-screen elements or
+cuts. No rendering or real-device acceptance is claimed.
+
+### Current validation
+
+- Focused units: **6 files / 370 tests passed**:
+  `npm test -- --configLoader runner --cache=false tests/unit/touchControlsAudit.test.ts tests/unit/photoMode.test.ts tests/unit/touchControls.test.ts tests/unit/touch.test.ts tests/unit/subInput.test.ts tests/unit/overlayFocus.test.ts`.
+  Log: `.cache/touch-input-181/focused-unit.log`.
+- Searched `tests/e2e` for touch, drag, rotation, double-tap and photo gestures;
+  results: `.cache/touch-input-181/e2e-discovery.txt`.
+- Build/typecheck passed through
+  `GATES_CONFIG_MODE=writable PW_PORT=4196 PW_OUTDIR=dist-touch-input-181 bash tools/gates.sh`.
+  Gate run: `.cache/runs/20261109-103743-3-JoQpkg/`; overall log:
+  `.cache/touch-input-181/gates.log`.
+- Full gate finished, exit **1**. **195 unit files / 4,673 tests passed** in
+  **918.98 seconds**. Config, content, root build/typecheck, project-base
+  build/typecheck, attribution and repository-wide Prettier passed. Python:
+  **169 tests / 5 failures**, matching the previously recorded sandbox tooling
+  failures: four build-manifest tests report `spawnSync git EPERM`, and the
+  golden comparison test receives empty JSON. Root smoke and project-base
+  browser gates both fail before executing tests because preview cannot start.
+  No assertions, timeouts or gate configuration were weakened. Full gate pass
+  and browser acceptance remain outstanding in an unrestricted environment.
+- Required named Playwright runs were attempted against that isolated build:
+
+  ```sh
+  GATES_CONFIG_MODE=writable PW_PORT=4197 PW_OUTDIR=dist-touch-input-181 npx playwright test tests/e2e/f1-touch.spec.ts -g 'simultaneous flight and scan release on cancellation, blur, hiding and rotation|stick moves the sub, scan holds, pause opens by touch'
+  GATES_CONFIG_MODE=writable PW_PORT=4198 PW_OUTDIR=dist-touch-input-181 npx playwright test tests/e2e/globe-pins.spec.ts -g 'rotation discards a held site-list swipe and a fresh swipe works|pins sit on their location'
+  GATES_CONFIG_MODE=writable PW_PORT=4199 PW_OUTDIR=dist-touch-input-181 npx playwright test tests/e2e/phone-accept.spec.ts -g 'touch help and photo gestures name no keyboard keys or boost'
+  ```
+
+  All exited **1 before test execution**: the configured preview could not
+  start. A direct preview confirms `listen EPERM 127.0.0.1:4199` in this
+  sandbox. Logs: `.cache/touch-input-181/{controls-e2e,globe-e2e,photo-e2e,preview}.log`.
+  Playwright discovery finds both updated photo cases (portrait/landscape).
+  No browser pass or screenshot evidence is available; native-device testing
+  and these browser cases remain outstanding outside this sandbox.
+
+- Final changed-file formatting and `git diff --check` passed. Removed the
+  isolated browser build after validation; retained the logs.
+
+---
+
 Audited HEAD `17fd4b6d417bb1bf86cb424ca45024cea323b9a3`. Initial checkout
 clean. Two rounds cover virtual stick, site-list swipe, scan hold, rotation,
 blur/visibility release, multiple fingers and pointer cancellation. Browser

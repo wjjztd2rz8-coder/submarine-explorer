@@ -183,6 +183,7 @@ export function createPhotoSystem(): GameSystem {
       },
       'camera.photo': (f, ctx) => {
         if (!ctx.photoMode.active) return;
+        ctx.photoMode.updateControls(ctx.input.primaryKeyLabel('capturePhoto'));
         photoPoi = poiInPhoto(ctx.rig.camera, ctx.discovery.pois, f.pilotPosition);
         const animal = photoPoi ? null : (ctx.life?.animalInView(ctx.rig.camera) ?? null);
         photoAnimal = animal ? { id: `${LIFE_ID_PREFIX}${animal.id}`, name: animal.common } : null;
