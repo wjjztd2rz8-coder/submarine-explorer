@@ -3597,3 +3597,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged 180 (save migration keeps historical stars via Journal POI keys) and 181 (touch: globe drag cancels on rotate, photo controls follow device switch, tap distance). gates.sh smoke + project-base green in worktrees and on main; pushed. 182 finished with no changes (nothing to fix); removed. 183-185 running; queued 186-188. No Claude package (weekly 29% below pace gate); no tag (hosted CI on prior push still pending).
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-09 12:56 CST headless run (Claude): comprehensive review
+
+- Golden captured (15 min), reviewed alone (Codex 5h 18%, Sol skipped). No art change since 01:00; scores stand. REVIEWS.md and STATUS.md updated and pushed. Last two hosted CI runs failed with zero jobs ("workflow file issue"; ci.yml unchanged), watch the next push. No Claude package (weekly 29% below pace gate). Codex 183-185 running, 186-188 queued.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; check GitHub Actions notices if CI keeps failing with no jobs.
