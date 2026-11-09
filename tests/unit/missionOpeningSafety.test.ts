@@ -47,6 +47,214 @@ afterAll(() => {
     writeFileSync(env.OPENING_SAFETY_AUDIT, JSON.stringify(audit, null, 2) + '\n');
 });
 
+describe('Blue Hole enlarged gallery opening safety', () => {
+  for (const tier of ['low', 'medium', 'high'] as const)
+    for (const mode of ['arcade', 'realistic'] as const)
+      it(`${tier} ${mode}: completes the opening scan at minimum depth and clears the free-dive hero`, async () => {
+        const site = 'great-blue-hole';
+        const config = makeConfig();
+        const effective = resolveEffective(defaultSettings(config), mode, null, config);
+        const settings = spawnSettings(config);
+        const meta = json(`data/tiles/${site}/meta.json`) as TileMeta;
+        const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
+        const terrain = new Terrain(
+          {
+            meta,
+            heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows),
+          },
+          config.terrain,
+          tier,
+        );
+        const props = new Props(meta, terrain, config.props, tier);
+        try {
+          await props.placeAll(json(`data/landmarks/${site}/props.json`), site);
+          expect(props.stats.failed).toBe(0);
+          const mission = parseMission(json(`data/landmarks/${site}/mission.json`), site)!;
+          const pois = placePois(
+            parsePois(json(`data/landmarks/${site}/pois.json`)),
+            meta,
+            terrain,
+            config.scan,
+            site,
+          );
+          const primary = mission.objectives
+            .filter((o) => o.primary)
+            .map((o) => pois.find((p) => p.id === o.poi)!);
+          const target = primary[0];
+          expect(target.id).toBe('great-blue-hole-stalactites');
+          expect(target.radius).toBe(46);
+          expect(target.minDepthM).toBe(10);
+          const targets = primary.map((poi) => ({
+            ...poi,
+            radius: resolveScanRadius(
+              missionApproachScanRadius(site, poi.radius) * effective.sensor.scanRadiusMultiplier,
+              effective.scan,
+            ),
+          }));
+          const radius = targets[0].radius;
+          expect(radius).toBe(mode === 'arcade' ? 100 : 39);
+          const safeDepth = config.submarine.hullClasses[mission.hull_class!].ratedDepth;
+          const opening = composedMissionSpawn(
+            site,
+            primary,
+            meta,
+            terrain,
+            props,
+            settings,
+            safeDepth,
+            effective.camera,
+          )!;
+          expect(opening).not.toBeNull();
+          const start = new Vector3(opening.x, opening.y, opening.z);
+          expect(start.distanceTo(target.position)).toBeCloseTo(125, 6);
+          expect(start.distanceTo(target.position)).toBeGreaterThan(radius);
+
+          // Search the shallowest legal plane using the actual mission radius, not
+          // the larger authored radius. Sample every metre of a straight approach.
+          let station: Vector3 | undefined;
+          let forward: Vector3 | undefined;
+          let routeClearance = Infinity;
+          const y = -target.minDepthM!;
+          const horizontal = Math.sqrt(radius ** 2 - (target.position.y - y) ** 2);
+          expect(horizontal).toBeGreaterThan(0);
+          for (const fraction of [0.98, 0.9, 0.75, 0.5, 0]) {
+            for (let bearing = 0; bearing < 360 && !station; bearing += 5) {
+              const angle = (bearing * Math.PI) / 180;
+              const end = new Vector3(
+                target.position.x + Math.sin(angle) * horizontal * fraction,
+                y,
+                target.position.z + Math.cos(angle) * horizontal * fraction,
+              );
+              let clearance = Infinity;
+              let clear = true;
+              const steps = Math.ceil(start.distanceTo(end));
+              for (let step = 0; step <= steps; step++) {
+                const p = start.clone().lerp(end, step / steps);
+                clearance = Math.min(clearance, p.y - terrain.sampleHeight(p.x, p.z));
+                if (
+                  clearance < settings.hullRadius + settings.seabedClearance ||
+                  props.collide(p.clone(), settings.hullRadius, new Vector3())
+                ) {
+                  clear = false;
+                  break;
+                }
+              }
+              if (!clear) continue;
+              const delta = target.position.clone().sub(end);
+              const yaw = Math.atan2(delta.x, -delta.z);
+              const pitch = Math.max(
+                -config.submarine.maxPitch,
+                Math.min(
+                  config.submarine.maxPitch,
+                  Math.atan2(delta.y, Math.hypot(delta.x, delta.z)),
+                ),
+              );
+              const direction = new Vector3(
+                Math.sin(yaw) * Math.cos(pitch),
+                Math.sin(pitch),
+                -Math.cos(yaw) * Math.cos(pitch),
+              );
+              const scanner = new Scanner(effective.scan, { emit: () => {} });
+              scanner.setTargets(targets);
+              scanner.setObjective(target.id);
+              scanner.update(0, end, direction, false);
+              if (scanner.view.candidateId !== target.id) continue;
+              // Prove the depth boundary, then complete at exactly that boundary.
+              scanner.update(0, end.clone().setY(y + 0.001), direction, true);
+              expect(scanner.view.objectiveInRange).toBe(false);
+              for (let frame = 0; frame <= Math.ceil(target.scanSeconds * 60); frame++)
+                scanner.update(1 / 60, end, direction, true);
+              expect(scanner.isScanned(site, target.id)).toBe(true);
+              station = end;
+              forward = direction;
+              routeClearance = clearance;
+            }
+            if (station) break;
+          }
+          expect(
+            station,
+            'a collision-free minimum-depth opening scan station must exist',
+          ).toBeDefined();
+          expect(station!.y).toBe(-10);
+          expect(station!.distanceTo(target.position)).toBeLessThanOrEqual(radius);
+
+          const free = composedFreeDiveSpawn(
+            site,
+            meta,
+            terrain,
+            props,
+            settings,
+            safeDepth,
+            effective.camera,
+            mode,
+          )!;
+          expect(free).not.toBeNull();
+          const position = new Vector3(free.x, free.y, free.z);
+          expect(props.collide(position.clone(), settings.hullRadius, new Vector3())).toBe(false);
+          expect(position.y - terrain.sampleHeight(position.x, position.z)).toBeGreaterThanOrEqual(
+            settings.hullRadius + settings.seabedClearance,
+          );
+          let freeArmClearance = Infinity;
+          for (const [width, height] of [
+            [1600, 900],
+            [390, 844],
+            [844, 390],
+          ]) {
+            const rig = new CameraRig(effective.camera, width / height, terrain);
+            rig.setPhoneLandscape(width === 844);
+            rig.setChaseRadiusDefault(
+              free.chaseRadius,
+              free.chaseOffsetX,
+              free.chaseOffsetY,
+              free.portraitChaseOffset,
+            );
+            rig.snap(position, free.yaw, 0);
+            expect(props.collide(rig.camera.position.clone(), 1, new Vector3())).toBe(false);
+            for (let step = 0; step <= 100; step++) {
+              const p = position.clone().lerp(rig.camera.position, step / 100);
+              freeArmClearance = Math.min(freeArmClearance, p.y - terrain.sampleHeight(p.x, p.z));
+              expect(props.collide(p.clone(), 1, new Vector3())).toBe(false);
+            }
+          }
+          expect(freeArmClearance).toBeGreaterThan(0);
+          const hull = new SubMesh({ length: 26, hullClass: mission.hull_class!, tier });
+          try {
+            hull.setPose(position, free.yaw, 0, 0);
+            hull.group.updateMatrixWorld(true);
+            hull.group.traverseVisible((object) => {
+              if (!(object instanceof Mesh)) return;
+              const vertices = object.geometry.getAttribute('position');
+              for (let i = 0; i < vertices.count; i++) {
+                const p = new Vector3()
+                  .fromBufferAttribute(vertices, i)
+                  .applyMatrix4(object.matrixWorld);
+                expect(props.collide(p.clone(), 0.01, new Vector3()), object.name).toBe(false);
+              }
+            });
+          } finally {
+            hull.dispose();
+          }
+          audit.push({
+            site,
+            tier,
+            mode,
+            radius,
+            target: target.position.toArray(),
+            opening: start.toArray(),
+            station: station!.toArray(),
+            forward: forward!.toArray(),
+            routeClearance,
+            free: position.toArray(),
+            freeCollision: false,
+            freeArmClearance,
+          });
+        } finally {
+          props.dispose();
+          terrain.dispose();
+        }
+      });
+});
+
 describe('closer mission opening safety', () => {
   for (const site of ['lost-city', 'bismarck', 'endurance']) {
     for (const tier of ['low', 'medium', 'high'] as const) {

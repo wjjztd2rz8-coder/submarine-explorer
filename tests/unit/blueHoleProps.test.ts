@@ -43,6 +43,10 @@ describe('Great Blue Hole props', () => {
     expect(geo.length).toBeGreaterThan(0);
   });
 
+  it('retains the enlarged 92 by 22 by 20 metre main gallery', () => {
+    expect(geo.find((p) => p.id === 'karst-grotto')!.dimensionsM).toEqual([92, 22, 20]);
+  });
+
   // Reference geometry uses level seating. Bound the pendant
   // envelope independently of terrain refinements and the roof's reduced crest.
   const originalGallery = [
