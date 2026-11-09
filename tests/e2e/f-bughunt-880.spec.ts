@@ -195,15 +195,13 @@ for (const tier of ['low', 'medium']) {
       // J queues an input edge; the paused game must sample it in a real frame.
       await page.clock.runFor(34);
       await expect(page.locator('.journal')).toBeVisible();
-      // Guide-linked contacts have one stable content row after reload.
-      // The Journal opens on the current site and may re-render once; click with retries.
-      await expect(async () => {
-        await page.clock.runFor(34);
-        const entry = (await journalEntries(page, `${site}/poi/${opening.target.guide}`)).first();
-        await entry.scrollIntoViewIfNeeded({ timeout: 2000 });
-        if (hasTouch) await entry.tap({ timeout: 2000 });
-        else await entry.click({ timeout: 2000 });
-      }).toPass({ timeout: 15000 });
+      // Await catalogue publication before interacting with rows replaced by its refresh.
+      await page.evaluate(() =>
+        (window.__game as unknown as { journal: { load(): Promise<void> } }).journal.load(),
+      );
+      const entry = (await journalEntries(page, `${site}/poi/${opening.target.guide}`)).first();
+      if (hasTouch) await entry.tap();
+      else await entry.click();
       await expect(page.locator('.jr-locked')).toHaveCount(0);
       await expect(page.locator('.jr-body .jr-para').first()).toBeVisible();
       if (site === 'great-blue-hole')

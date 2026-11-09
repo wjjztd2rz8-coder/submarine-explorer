@@ -6,7 +6,7 @@ import type { CameraRig } from '../../src/sub/CameraRig.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { completeScan, scanWithKeyboard } from './helpers/scan.js';
 import { scanAim } from './helpers/scanAim.js';
-import { dismissTutorial, setScanCardSuppressed } from './helpers/tutorial.js';
+import { dismissTutorial, setScanCardSuppressed, tutorialStep } from './helpers/tutorial.js';
 import { expectCompactPhoneHud } from './helpers/phoneHud.js';
 
 type Game = {
@@ -144,8 +144,13 @@ for (const layout of [
               await expectCompactPhoneHud(page);
               await page.keyboard.press('F9');
               await page.clock.runFor(34);
+              const step = await tutorialStep(page);
+              expect(['depth', 'scan']).toContain(step);
+              await expect(page.locator('.guidance-slot')).toHaveAttribute('data-step', step!);
               await expect(page.locator('.guidance-name')).toHaveText(
-                'Hold Space to rise or Ctrl to sink.',
+                step === 'depth'
+                  ? 'Hold Space to rise or Ctrl to sink.'
+                  : /^(Get closer to scan · \d+ m|Hold G on a glowing target\.)$/,
               );
               await expect(page.getByRole('button', { name: 'Skip', exact: true })).toBeVisible();
               // Keys switch the entire HUD to keyboard mode. A real touch on
@@ -160,7 +165,12 @@ for (const layout of [
                 const view = (window.__game as unknown as Game).discovery.scanner.view;
                 return view.nearestInRange || view.objectiveInRange;
               });
-              if (inReach) {
+              if (step === 'scan') {
+                await expect(page.locator('.guidance-name')).toHaveText(
+                  /^(Get closer to scan · \d+ m|Hold SCAN on a glowing target\.)$/,
+                );
+                await expect(page.getByRole('button', { name: 'Skip', exact: true })).toBeVisible();
+              } else if (inReach) {
                 await expect(page.locator('.guidance-name')).toBeVisible();
                 await expect(page.locator('.guidance-name')).toHaveText(
                   'Right slider: up to rise, down to sink.',

@@ -156,10 +156,15 @@ for (const viewport of [
               const g = window.__game as unknown as Game;
               return {
                 position: g.sub.position.toArray(),
+                range: g.scanner.view.objectiveDistance,
+                radius: g.scanner.view.objectiveRadius,
                 first: g.mission!.requiredPrimaries()[0].id,
               };
             });
             expect(start.first).toBe(objective);
+            expect(start.range, 'opening requires an approach before scanning').toBeGreaterThan(
+              start.radius,
+            );
             // Preserve the real scan/vehicle frame path and every safety check;
             // reduce only raster fill work during the held-input interval.
             const pixelRatio = await page.evaluate(() => {
@@ -213,7 +218,8 @@ for (const viewport of [
               (window.__game as unknown as Game).sub.position.toArray(),
             );
             const transit = Math.hypot(...end.map((p, i) => p - start.position[i]));
-            expect(transit).toBeGreaterThan(50);
+            // Reach the actual scan envelope; scan duration no longer implies a fixed travel distance.
+            expect(transit).toBeGreaterThanOrEqual(start.range - start.radius);
             expect(transit).toBeLessThan(300);
             await info.attach('first-scan', {
               body: JSON.stringify({
