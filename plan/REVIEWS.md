@@ -1,5 +1,10 @@
 # Reviews
 
+## 2026-11-09 07:50 targeted review: Codex starved 2 h
+
+- Cause: the 04:44 and 06:43 runs logged 161 as "re-queued", but only 162 was relaunched and no brief was left in the queue, so Codex sat at 86% with nothing running. Fix: 161 (resume in its existing worktree), 151 (released from hold) and a new R-ci-speed measure brief (165) are queued and dispatched. Rule for runs: after a Codex limit stop, confirm a file exists in `.cache/codex/queue/` named like the original brief, not just that a log says re-queued.
+- Hosted CI on b828c2fb is green, so tag f77 pushed.
+
 ## 2026-11-09 targeted review: CI red on main (3 runs)
 
 - **Diagnosis (Codex 160, merged):** four specs had stale expectations after the depth-skip change (15 → 30 m, scan holds cut 40%): f-bughunt-960 and hud-touch predicted a depth-coaching step that now auto-skips; f-verify-1000 assumed a 50 m travel floor; f-bughunt-880 raced the Journal load. Specs fixed in place (no retries, no timeout increases). Hosted CI has not yet confirmed; check the next run before tagging.
