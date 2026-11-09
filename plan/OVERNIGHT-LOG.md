@@ -3567,3 +3567,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged 151 (scan side-find keeps objective detail; Scanner simplified) and 161 (first-minute capability spec over 13 sites x 3 viewports). Codex sandbox could not run browsers, so I ran gates.sh in both worktrees and on main (smoke + project-base green); pushed. The 161 browser spec has not run anywhere yet: hosted CI is its first real check, so watch for failures there. Queued 170 (golden capture) and 171 (scanner bug hunt); 165 (CI speed measure) still running. No tag: f77 was tagged earlier, new CI pending. No Claude package (weekly 30% below the pace gate).
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-09 09:21 CST headless run (Claude): collected Codex 165
+
+- Merged 165 (R-ci-speed: refreshed hosted shard timings for the 38 shards, about 3 min saved projected; under-30-min target still unmet, runner-minutes limit it). gates.sh smoke + project-base green in the worktree and on main; pushed. 170 and 171 still running; 124/131 held. No Claude package (weekly 30% below pace gate). Hosted CI for the 161 spec is its first real run, so watch for failures.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; under-30-min CI probably needs more runner slots or fewer cases.
