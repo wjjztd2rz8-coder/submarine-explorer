@@ -201,7 +201,6 @@ describe('Blue Hole enlarged gallery opening safety', () => {
             [844, 390],
           ]) {
             const rig = new CameraRig(effective.camera, width / height, terrain);
-            rig.setPhoneLandscape(width === 844);
             rig.setChaseRadiusDefault(
               free.chaseRadius,
               free.chaseOffsetX,
