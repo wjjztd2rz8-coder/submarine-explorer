@@ -106,7 +106,7 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 
 16b. **R-ci-triage [Codex, brief 160, item 18]:** hosted CI is red often and takes 45-70 min; triage failing specs by run logs, fix root causes, propose a under-30-min change.
 16c. **T-verify-first-sixty [Codex, brief 161, item 19]:** first-60-s and debrief capability tests over all 13 sites on phone portrait/landscape/desktop; fix generic defects.
-16d. **S-dead-code-audit [Codex, brief 162, item 20]:** delete code made redundant by the ROV/boost/upgrade/HUD-offset cuts; net negative lines.
+16d. **S-dead-code-audit [Codex, brief 162, item 20] DONE 2026-11-09 (51e8536f):** delete code made redundant by the ROV/boost/upgrade/HUD-offset cuts; net negative lines.
 16e. **V-challenger-lander-flag [Claude, optional, non-hero]:** the lander flag is a flat luminous triangle and the floats are faceted (`challenger-deep-3.png`); give the flag a cloth shape and round the floats.
 16f. **V-golden-capture-complete [Haiku]:** the 2026-11-09 golden run lacked the Challenger mission capture; check why (`poses.json`) and fix the script.
 

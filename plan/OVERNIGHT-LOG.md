@@ -3547,3 +3547,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Back-to-back with the 04:44 run; nothing new to collect. Codex 162 is running, 161 re-queued, 124/131 held. Hosted CI on the 160 merge is still pending, so no tag. No Claude package: weekly 31% at the pace gate.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-09 06:43 CST headless run (Claude): collected Codex 162
+
+- Merged 162 (S-dead-code-audit, net -59 source lines). Codex's own gates were sandbox-blocked, so I ran gates.sh in the worktree and on main (smoke + project-base, green); pushed. Re-queued 161 (stopped by the 5h limit at 01:30). 124/131 stay held. No tag: hosted CI on main is still pending. No Claude package (weekly 31% at the pace gate).
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
