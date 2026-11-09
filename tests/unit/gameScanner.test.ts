@@ -775,6 +775,113 @@ it('names exactly the contact Scan will scan when a nearer off-axis contact exis
 });
 
 describe('Scanner objective priority over passing contacts', () => {
+  it.each([false, true])(
+    'keeps a fixed scan through guidance changes, then selects the marked objective on a new hold (reversed=%s)',
+    (reversed) => {
+      const first = target({ id: 'first', position: new Vector3(0, -100, -50) });
+      const second = target({ id: 'second', position: new Vector3(0, -100, -70) });
+      const { scanner, log, store } = setup(reversed ? [second, first] : [first, second]);
+      scanner.setObjective(first.id);
+      scanner.update(0.5, AT, NORTH, true);
+      scanner.setObjective(second.id);
+      scanner.update(0.5, AT, NORTH, true);
+      expect(scanner.view.activeId).toBe(first.id);
+      expect(scanner.view.progress).toBeCloseTo(0.5);
+      scanner.update(0.1, AT, NORTH, false);
+      expect(scanner.view.phase).toBe('interrupted');
+      scanner.update(0.1, AT, NORTH, true);
+      expect(scanner.view.activeId).toBe(second.id);
+      expect(scanner.view.candidateId).toBe(second.id);
+      expect(scanner.view.nearestId).toBe(second.id);
+      expect(scanner.view.progress).toBeCloseTo(0.05);
+      scanner.update(1.9, AT, NORTH, true);
+      expect(log.filter(([name]) => name === 'scan:complete')).toEqual([
+        ['scan:complete', { poiId: second.id, landmarkId: 'lm', firstTime: true }],
+      ]);
+      expect(store.keys()).toEqual(['lm/second']);
+    },
+  );
+
+  it('resumes an off-cone objective at its decayed progress without starting a passing fish', () => {
+    const objective = target({ id: 'objective' });
+    const fish = target({ id: 'life:grunt', position: new Vector3(50, -100, 0) });
+    const { scanner, log, store } = setup([objective]);
+    scanner.setObjective(objective.id);
+    scanner.setExtraTargets([fish]);
+    scanner.update(1, AT, NORTH, true);
+    scanner.update(0.2, AT, EAST, true);
+    scanner.update(0.2, AT, EAST, true);
+    expect(scanner.view.candidateId).toBeNull();
+    expect(scanner.view.progress).toBeCloseTo(0.3);
+    expect(log.filter(([name]) => name === 'scan:aborted')).toEqual([
+      ['scan:aborted', { poiId: objective.id, reason: 'facing' }],
+    ]);
+    scanner.update(0.2, AT, NORTH, true);
+    expect(scanner.view.activeId).toBe(objective.id);
+    expect(scanner.view.progress).toBeCloseTo(0.4);
+    scanner.update(1.2, AT, NORTH, true);
+    expect(store.keys()).toEqual(['lm/objective']);
+    expect(log.filter(([name]) => name === 'scan:started')).toEqual([
+      ['scan:started', { poiId: objective.id }],
+      ['scan:started', { poiId: objective.id }],
+    ]);
+  });
+
+  it.each(['range', 'decay'] as const)(
+    'allows a fish scan after the objective loses its lock through %s',
+    (reason) => {
+      const objective = target({ id: 'objective', radius: 110 });
+      const fish = target({ id: 'life:grunt', position: new Vector3(50, -100, 0) });
+      const { scanner, log, store } = setup([objective]);
+      scanner.setObjective(objective.id);
+      scanner.setExtraTargets([fish]);
+      scanner.update(1, AT, NORTH, true);
+      const position = reason === 'range' ? new Vector3(50, -100, 0) : AT;
+      if (reason === 'decay') {
+        scanner.update(1, position, EAST, true);
+        expect(scanner.view.phase).toBe('idle');
+        expect(scanner.view.progress).toBe(0);
+      }
+      scanner.update(0.2, position, EAST, true);
+      expect(scanner.view.activeId).toBe(fish.id);
+      expect(scanner.view.progress).toBeCloseTo(0.1);
+      expect(log.filter(([name]) => name === 'scan:aborted')).toEqual([
+        ['scan:aborted', { poiId: objective.id, reason: reason === 'range' ? 'range' : 'facing' }],
+      ]);
+      scanner.update(1.8, position, EAST, true);
+      expect(store.keys()).toEqual(['lm/life:grunt']);
+    },
+  );
+
+  it('finishes the objective when a school enters on the completion frame and starts the next objective fresh', () => {
+    const objective = target({ id: 'objective' });
+    const next = target({ id: 'next', position: new Vector3(0, -100, -80) });
+    const { scanner, bus, log, store } = setup([next, objective]);
+    let marked = objective.id;
+    scanner.setObjective(() => marked);
+    bus.on('scan:complete', ({ poiId }) => {
+      if (poiId === objective.id) marked = next.id;
+    });
+    scanner.update(1.99, AT, NORTH, true);
+    scanner.setExtraTargets(
+      [15, 20, 25].map((distance, i) =>
+        target({ id: `life:fish-${i}`, position: new Vector3(0, -100, -distance) }),
+      ),
+    );
+    scanner.update(0.01, AT, NORTH, true);
+    expect(scanner.view.objectiveId).toBe(next.id);
+    expect(scanner.view.lastCompleteId).toBe(objective.id);
+    expect(scanner.view.progress).toBe(0);
+    scanner.update(0.1, AT, NORTH, true);
+    expect(scanner.view.activeId).toBe(next.id);
+    expect(scanner.view.progress).toBeCloseTo(0.05);
+    expect(log.filter(([name]) => name === 'scan:started')).toEqual([
+      ['scan:started', { poiId: objective.id }],
+      ['scan:started', { poiId: next.id }],
+    ]);
+    expect(store.keys()).toEqual(['lm/objective']);
+  });
+
   it('takes the beam from an in-progress wildlife scan once the objective is in reach and in the cone', () => {
     const objective = target({ id: 'objective', position: new Vector3(100, -100, 0) });
     const fish = target({ id: 'life:grunt', position: new Vector3(0, -100, -15) });

@@ -375,14 +375,15 @@ export class Scanner {
     // The marked objective outranks incidental contacts (wildlife, samples): an
     // eligible one takes the beam even mid-hold, otherwise a drifting school
     // pins the reticle with a string of partial scans. A scan of a fixed POI
-    // keeps its lock, so retargeting guidance never swaps it away.
+    // keeps its lock while scanning, so retargeting guidance never swaps it
+    // away mid-hold. After interruption, the marked objective wins a new hold.
     const activeIsObjective = this.active?.id === this.objectivePoiId;
     const activeIsFixed = this.active !== null && this.targets.includes(this.active);
     if (
       this.active &&
       activeGeo?.inRange &&
       activeGeo.facing &&
-      (activeIsFixed || candidate?.id !== this.objectivePoiId) &&
+      ((activeIsFixed && v.phase === 'scanning') || candidate?.id !== this.objectivePoiId) &&
       !this.isScanned(this.active.landmarkId, this.active.id)
     ) {
       candidate = this.active;

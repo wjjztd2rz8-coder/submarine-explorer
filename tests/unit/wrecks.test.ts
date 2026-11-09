@@ -88,7 +88,11 @@ it('textured steel shares plate tint and bounded rim light across tiers without 
       // output chunks, with no additional texture fetches.
       // The map and normal-map chunks are inlined with warped UVs so seams wander;
       // every other chunk stays an include.
-      const inlined = new Set(['<map_fragment>', '<normal_fragment_maps>']);
+      const inlined = new Set([
+        '<map_fragment>',
+        '<normal_fragment_begin>',
+        '<normal_fragment_maps>',
+      ]);
       const chunks = (source: string) =>
         (source.match(/#include <[^>]+>/g) ?? []).filter((c) => !inlined.has(c.slice(9)));
       expect(chunks(shader.fragmentShader)).toEqual(
@@ -98,8 +102,24 @@ it('textured steel shares plate tint and bounded rim light across tiers without 
         source.match(/\b(?:uniform\s+sampler\w*|texture\w*\s*\()/g);
       const expanded = THREE.ShaderLib.standard.fragmentShader
         .replace('#include <map_fragment>', THREE.ShaderChunk.map_fragment)
+        .replace('#include <normal_fragment_begin>', THREE.ShaderChunk.normal_fragment_begin)
         .replace('#include <normal_fragment_maps>', THREE.ShaderChunk.normal_fragment_maps);
       expect(samplers(shader.fragmentShader)).toEqual(samplers(expanded));
+      // Low and Medium compile without a normal map. Keep Three's guards intact
+      // so the derivative tangent-frame path is disabled for those tiers.
+      expect(shader.fragmentShader).toContain(
+        THREE.ShaderChunk.normal_fragment_begin.replace(/vNormalMapUv/g, 'wuv'),
+      );
+      expect(shader.fragmentShader).toContain(
+        THREE.ShaderChunk.normal_fragment_maps.replace(/vNormalMapUv/g, 'wuv'),
+      );
+      const derivatives = (source: string) => source.match(/\b(?:dFdx|dFdy|fwidth)\s*\(/g);
+      expect(derivatives(shader.fragmentShader)).toEqual(derivatives(expanded));
+      // Three builds a derivative TBN from this UV when geometry has no tangents.
+      // Sampling the normal map at warped UVs requires the same UV for that frame.
+      const tbn = shader.fragmentShader.match(/mat3 tbn = getTangentFrame\([\s\S]*?\);/)?.[0];
+      expect(tbn).toContain('wuv');
+      expect(tbn).not.toContain('vNormalMapUv');
       expect(shader.fragmentShader).toContain('diffuseColor.rgb = mix(');
       const source = shader.fragmentShader;
       const rim = source.match(/float rimFacing = ([^;]+);/)!;
@@ -152,8 +172,9 @@ it('textured steel shares plate tint and bounded rim light across tiers without 
       const multiplier = source.match(/outgoingLight\s*\*=\s*([^;]+);/)!;
       expect(up).not.toBeNull();
       expect(multiplier).not.toBeNull();
+      expect(source.indexOf('normal = normalize( tbn * mapN );')).toBeGreaterThan(-1);
       expect(source.indexOf(up[0])).toBeGreaterThan(
-        source.indexOf('#include <normal_fragment_maps>'),
+        source.indexOf('normal = normalize( tbn * mapN );'),
       );
       expect(source.indexOf(up[0])).toBeGreaterThan(source.indexOf(weight[0]));
       expect(source.indexOf(multiplier[0])).toBeLessThan(

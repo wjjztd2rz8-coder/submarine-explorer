@@ -113,6 +113,11 @@ ${THREE.ShaderChunk.map_fragment.replace(/vMapUv/g, 'wuv')}
 }
 #endif`,
       )
+      // The derivative tangent frame must follow the same warp as the normal map.
+      .replace(
+        '#include <normal_fragment_begin>',
+        THREE.ShaderChunk.normal_fragment_begin.replace(/vNormalMapUv/g, 'wuv'),
+      )
       .replace(
         '#include <normal_fragment_maps>',
         THREE.ShaderChunk.normal_fragment_maps.replace(/vNormalMapUv/g, 'wuv'),
