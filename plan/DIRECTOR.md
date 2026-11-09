@@ -110,7 +110,7 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 16c. **T-verify-first-sixty [Codex, brief 161, item 19] DONE 2026-11-09 (merged; smoke gates green, browser spec unrun locally, hosted CI is the check):** first-60-s and debrief capability tests over all 13 sites on phone portrait/landscape/desktop; fix generic defects.
 16d. **S-dead-code-audit [Codex, brief 162, item 20] DONE 2026-11-09 (51e8536f):** delete code made redundant by the ROV/boost/upgrade/HUD-offset cuts; net negative lines.
 16e. **V-challenger-lander-flag [Claude, optional, non-hero]:** the lander flag is a flat luminous triangle and the floats are faceted (`challenger-deep-3.png`); give the flag a cloth shape and round the floats.
-16f. **V-golden-capture-complete [Haiku]:** the 2026-11-09 golden run lacked the Challenger mission capture; check why (`poses.json`) and fix the script.
+16f. **V-golden-capture-complete [Codex] DONE 2026-11-09 (working tree; gate review fixes verified in focused units):** Challenger was planned but Chromium closed during its screenshot. Golden manifests now verify every planned image and incomplete runs end with a named error and exit 1. The two helper regressions from the orchestrator's gate run are fixed without changing its unit assertions; full gate rerun pending. Tests/tools only; evidence in `plan/progress/V-golden-capture-complete.md`.
 
 ### Release and owner
 

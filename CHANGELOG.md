@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **V-golden-capture-complete:** golden runs verify every planned image and end with an explicit `INCOMPLETE` error naming missing captures. Cut: separately supplied hero/mission manifest lists, manifest mode-based frame-count inference and the failure-array-only success decision; the manifest now reads the runner's explicit frame plan and controls its exit status. Mission-spawn metadata stays `mission`; a recorded output failure is reported once and cannot hide other missing frames. Partial evidence is retained. Tests/tools only; no art changes.
+
 - **R-ci-triage:** tutorial specs follow the running step instead of predicting depth coaching, Journal entry checks wait for catalogue publication instead of retrying clicks, and approach checks use the scan envelope instead of a fixed travel floor. Cut: the duplicate tutorial decision model and fixed frame-pumping loop. Coverage, safety assertions and hosted retries remain unchanged.
 - **T-verify-first-sixty:** consolidated the Titanic-only journey and idle all-site opening checks into one 13-site, three-viewport guidance/scan/debrief capability. Cut the CI-only 30-second shortcut; the idle tutorial regression stays in the existing large-scale phone HUD check, and every case now requires a full game minute and follows the real guidance through a first scan. No game, visual or art changes.
 

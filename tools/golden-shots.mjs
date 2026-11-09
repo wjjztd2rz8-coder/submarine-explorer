@@ -36,7 +36,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { goldenOptions, goldenUrl, goldenJobs } from './golden-options.mjs';
 import { readGoldenBuild } from './golden-build.mjs';
-import { goldenManifest, goldenContactSheet } from './golden-manifest.mjs';
+import { goldenFilename, goldenManifest, goldenContactSheet } from './golden-manifest.mjs';
 import { installGoldenFrames } from './golden-frames.mjs';
 import { readGoldenReadability, readableSummary } from './golden-readable.mjs';
 import blueHolePoses from './blue-hole-poses.json' with { type: 'json' };
@@ -137,6 +137,7 @@ async function main() {
       layout: { name: layout, width, height },
       hero: [siteId, heroId, slug, fixed],
       mode,
+      frames,
     } of jobs) {
       const site = slug ?? siteId;
       stage = `${site}: create context`;
@@ -237,7 +238,7 @@ async function main() {
               const frameTimes =
                 mode === 'mission' ? null : await evaluate(() => window.__goldenFrames.settle());
               if (errors.length) throw new Error(`${site}: ${errors.join('; ')}`);
-              const filename = `${site}${layout === 'desktop' ? '' : `-${layout}`}-${n}${mode === 'mission' ? '-mission' : ''}.png`;
+              const filename = goldenFilename(site, layout, n, mode);
               const pose = await evaluate(() => {
                 const g = window.__game;
                 return {
@@ -367,7 +368,7 @@ async function main() {
             };
             if (mode === 'mission') {
               await capture(1, null, 0);
-              if (options.mode !== 'mission') return;
+              if (!frames.includes(2)) return;
               stage = `${site}: advance mission by 10 seconds`;
               await evaluate(() => window.__goldenFrames.advance(10));
               await page.waitForFunction(() => window.__goldenFrames.paused, null, {
@@ -376,7 +377,7 @@ async function main() {
               await capture(2, null, 10);
               return;
             }
-            if (site === siteId) await capture(1, null);
+            if (frames.includes(1)) await capture(1, null);
             stage = `${site}: choose approach`;
             const approach = await evaluate(
               ({ propId, fixed }) => {
@@ -576,10 +577,7 @@ async function main() {
       stamp,
       provenance,
       options,
-      heroes: jobs
-        .filter((j) => j.mode === 'free-dive' && j.layout === options.layouts[0])
-        .map((j) => j.hero),
-      missions: [...new Set(jobs.filter((j) => j.mode === 'mission').map((j) => j.hero[0]))],
+      jobs,
       failures,
       captures,
     });
@@ -592,7 +590,10 @@ async function main() {
     } catch (error) {
       console.warn(`Golden readability (advisory): unavailable (${error.message})`);
     }
-    if (failures.length) process.exitCode = 1;
+    if (!manifest.complete)
+      throw new Error(
+        `INCOMPLETE: ${manifest.failures.map(({ stage, message }) => `${stage}: ${message.split('\n')[0]}`).join('; ')} (see ${resolve(output, 'poses.json')})`,
+      );
   }
 }
 

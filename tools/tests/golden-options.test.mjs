@@ -138,6 +138,7 @@ test('mission defaults capture each real catalog mission once across all three l
     await readFile(new URL('../../data/landmarks/index.json', import.meta.url)),
   ).landmarks;
   const options = goldenOptions({ GOLDEN_MODE: 'mission' });
+  for (const job of goldenJobs([], catalog, options)) assert.deepEqual(job.frames, [1, 2]);
   assert.deepEqual(
     options.layouts.map(({ name }) => name),
     ['desktop', 'portrait', 'landscape'],
@@ -212,6 +213,7 @@ test('the nightly plan appends all 13 mission openings without hero poses or gal
     catalog.map((id) => [id]),
   );
   for (const job of jobs.filter((j) => j.mode === 'mission')) {
+    assert.deepEqual(job.frames, [1]);
     const url = goldenUrl(
       'http://localhost/',
       job.hero[0],
@@ -237,5 +239,9 @@ test('the nightly plan appends all 13 mission openings without hero poses or gal
       ['free-dive', 'great-blue-hole'],
       ['mission', 'great-blue-hole'],
     ],
+  );
+  assert.deepEqual(
+    gallery.map((j) => j.frames),
+    [[2, 3], [1]],
   );
 });

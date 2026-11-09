@@ -3,7 +3,7 @@ import { type Page, test } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { readGoldenBuild } from '../../../tools/golden-build.mjs';
 // @ts-expect-error The existing golden manifest builder is JavaScript.
-import { goldenManifest, goldenContactSheet } from '../../../tools/golden-manifest.mjs';
+import * as golden from '../../../tools/golden-manifest.mjs';
 import type { Submarine } from '../../../src/sub/Submarine.js';
 import type { CameraRig } from '../../../src/sub/CameraRig.js';
 import type { Mission } from '../../../src/game/Mission.js';
@@ -31,9 +31,10 @@ export async function reviewScreenshot(
 /** Mission acceptance needs evidence on ordinary runs, independently of review flags. */
 export async function missionSpawnShot(page: Page, site: string, directory: string): Promise<void> {
   const provenance = readGoldenBuild(await page.content());
-  const filename = `${site}-portrait-1-mission.png`;
+  const layout = { name: 'portrait', width: 390, height: 844 };
+  const filename = golden.goldenFilename(site, layout.name, 1, 'mission');
   const captures = [];
-  const failures: { stage: string; error: string }[] = [];
+  const failures: { stage: string; error: string; filename: string }[] = [];
   await mkdir(directory, { recursive: true });
   try {
     const pose = await page.evaluate(() => {
@@ -86,23 +87,23 @@ export async function missionSpawnShot(page: Page, site: string, directory: stri
       ...pose,
     });
   } catch (error) {
-    failures.push({ stage: `${site}: mission spawn capture`, error: String(error) });
+    failures.push({ stage: `${site}: mission spawn capture`, error: String(error), filename });
     throw error;
   } finally {
-    const manifest = goldenManifest({
+    const manifest = golden.goldenManifest({
       base: new URL('.', page.url()).href,
       stamp: new Date().toISOString(),
       provenance,
       options: {
         mode: 'mission',
         tier: 'low',
-        layouts: [{ name: 'portrait', width: 390, height: 844 }],
+        layouts: [layout],
       },
-      heroes: [[site]],
+      jobs: [{ hero: [site], layout, mode: 'mission', frames: [1] }],
       failures,
       captures,
     });
     await writeFile(`${directory}/poses.json`, JSON.stringify(manifest, null, 2));
-    await writeFile(`${directory}/index.html`, goldenContactSheet(manifest));
+    await writeFile(`${directory}/index.html`, golden.goldenContactSheet(manifest));
   }
 }
