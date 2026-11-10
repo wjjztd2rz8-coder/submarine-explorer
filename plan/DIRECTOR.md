@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: none (Claude weekly at the pace gate; review run 2026-11-10). Priority order for the next Claude packages (Sol: first-session usability before art): 11 (phone landscape HUD), 22 (Hunga slab), 6 (Beebe stacks), 7 (Lost City tubes), then 16e. V-bismarck-hull-plates DONE 2026-11-08 (e072e778). U-copy-fixes items 6-8 DONE 2026-11-07 (39830258); walkthrough-4 items 4-5 (scan-interrupt cue, side-find clarity) remain in item 9.
+- Claude: none. Item 11 U-phone-landscape-hud DONE 2026-11-10 (68b5931f); needs phone retest for safe-area insets. Priority order for the next Claude packages (Sol: first-session usability before art): 11 (phone landscape HUD), 22 (Hunga slab), 6 (Beebe stacks), 7 (Lost City tubes), then 16e. V-bismarck-hull-plates DONE 2026-11-08 (e072e778). U-copy-fixes items 6-8 DONE 2026-11-07 (39830258); walkthrough-4 items 4-5 (scan-interrupt cue, side-find clarity) remain in item 9.
 
 ## Backlog
 
@@ -92,7 +92,7 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 9. **V-golden-refresh [Haiku]:** `GOLDEN_MODE=mission tools/golden.sh` detached after items 3-8 land; feeds the next review.
 10. **V-axial-sky-band [optional]:** Axial upper third is empty dark water; enable `horizonRidge` in its preset data (generic option already exists).
 
-11. **U-phone-landscape-hud [Sonnet, owner phone 2026-11-08]:** in phone landscape the objective banner, Pause and Journal sit left of centre (grid `'sonar bar hud' / 'sonar guide hud'`, with a 250 px depth box on the right). Target: the banner centred on screen, with the readouts and buttons pushed to the edges. Fix it in the HUD grid (rule 3), not with per-element offsets. The camera's 14% left shift was removed on 2026-11-08 at the owner's request, so the sub now sits in the centre; check that it stays clear of the SCAN cluster.
+11. **DONE 2026-11-10 (68b5931f) U-phone-landscape-hud [Sonnet, owner phone 2026-11-08]:** in phone landscape the objective banner, Pause and Journal sit left of centre (grid `'sonar bar hud' / 'sonar guide hud'`, with a 250 px depth box on the right). Target: the banner centred on screen, with the readouts and buttons pushed to the edges. Fix it in the HUD grid (rule 3), not with per-element offsets. The camera's 14% left shift was removed on 2026-11-08 at the owner's request, so the sub now sits in the centre; check that it stays clear of the SCAN cluster.
     11b. **P2-phone-blur [owner + Claude, owner phone 2026-11-08]:** "horribly compressed video at every setting". Fixed on 2026-11-08: dynamic resolution (Auto tier only) could drop and never come back on a 60 fps-capped phone, with a floor of 0.5x (1/6 resolution on a 3x screen). The floor is now 1x and the rule for climbing back up is reachable at 60 fps. Fixed tiers already render at 2x, so if the owner still sees blur on Low/Medium/High after this ships, the cause is elsewhere. Next suspects: the fog and grade look, terrain texture resolution, iOS Low Power Mode. Owner to retest.
 
 ### Codex lane (self-contained, not visual)
