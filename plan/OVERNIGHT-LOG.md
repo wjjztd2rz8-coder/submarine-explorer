@@ -3714,3 +3714,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Sonnet: stack radius/gap now per-site profile fields (no site branch); Beebe stacks slimmer and visibly separate from the mound. Remaining: ragged tops, faint vent bores, pale close frame. gates.sh smoke + project-base green on worktree and main (no --full-e2e). Pushed. Codex dispatch declines legitimately (week 43% vs pace line ~49%); 6 briefs queued. 124/131 held. Claude weekly 20%: no second package.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-10 15:59 CST headless run (Claude): hold
+
+- Nothing to collect (only held worktrees 124/131). Claude weekly 20%, below pace gate; no package started. Codex week 43% vs pace line ~49%, so dispatch declining is expected; 6 briefs queued (180, 192-196). Main clean and pushed; no tag.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
