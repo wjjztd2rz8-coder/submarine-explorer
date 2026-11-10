@@ -3658,3 +3658,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect (only held worktrees 124/131). 189-191 queued; dispatch waits on the Codex week pace. Main clean and pushed; the hosted CI run on the latest push is still in progress after 1.5 h (shard hang, covered by 189); no tag. No Claude package started (weekly 27%).
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-10 02:22 CST headless run (Claude): collected Codex 189-191
+
+- Merged 189 (shard-1 first-minute journey keeps its configured timeout; teardown screenshot bounded), 190 (mission/free-dive lifecycle + clock fixes), 191 (photo mode/gallery fixes + specs). gates.sh smoke + project-base green per worktree and on main; pushed. Worktrees removed. Hosted CI result pending (no tag); 124/131 still held. No Claude package (weekly 27%, below pace gate).
+- Queue empty of new Codex briefs from this run except leftovers; next run should queue fresh bug-hunt/verify briefs over 189-191.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
