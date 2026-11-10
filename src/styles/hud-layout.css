@@ -173,20 +173,22 @@ html.is-touch body:has(.guidance-slot[data-kind='scan']:not([hidden])) .d-scan-e
 }
 
 @media (orientation: landscape) {
+  /* Equal side tracks keep the guidance card on the screen's centre line: sonar on the
+     left edge, readouts and the bar on the right edge. */
   html.is-touch .hud-regions {
+    --hud-side: 176px;
+    grid-template-columns: var(--hud-side) minmax(0, 1fr) var(--hud-side);
     grid-template-areas:
-      'sonar bar   hud'
-      'sonar guide hud';
+      'sonar guide hud'
+      'sonar .     bar';
     grid-template-rows: auto minmax(0, 1fr);
-  }
-  html.is-touch .hud-bar {
-    justify-self: start;
-  }
-  html.is-touch .hud-regions {
     --sheet-right: 270px;
   }
+  html.is-touch .hud-bar {
+    justify-self: end;
+  }
   html.is-touch .hud {
-    width: 250px;
+    width: auto;
   }
   /* The narrow card's text names the distance ("Get closer to scan · 1116 m"); the ring's
      copy of it, and wide tracking, would wrap that line. */
