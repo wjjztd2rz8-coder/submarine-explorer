@@ -3689,3 +3689,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect (only held worktrees 124/131); item 11 merged by the run just before. 192-197 queued; dispatch declined (Codex budget low per its gate). Claude weekly 24%, kept in reserve; no package started. Main clean and pushed; hosted CI on latest push in progress, last full run red (197 covers triage); no tag.
 - **Needs owner:** phone retest (landscape HUD); Monterey 3.8 waiver.
+
+## 2026-11-10 08:47 CST targeted review (Claude): red CI
+
+- All hosted reds are one spec (phone-accept first minute, hung renderer at 240 s, 1-2 per shard); brief 180 queued (replaces 197). Dispatch waits on Codex gate. No package started. No tag.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.

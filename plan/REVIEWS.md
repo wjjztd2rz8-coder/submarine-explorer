@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-11-10 targeted review: red CI on main (3+ runs)
+
+- **Diagnosis (from job logs, not guesses):** all failures across runs 42827804490 and 42801871242 are one spec, `phone-accept.spec.ts` "guidance reaches first scan within sixty seconds and debrief exits", spread over every viewport and site, 1-2 tests per shard (all 38 shards red). Each failing test runs to the 240 s CI timeout, the retry does too, and the log ends with `Protocol error ... session closed` while waiting on `.guidance-name` (`helpers/phoneHud.ts:56`). Passing tests in the same shard average ~38 s, so it is hung or crashed renderers, not uniform slowness. The reds predate 189 (red since at least 2026-11-09 18:13 UTC); 189's removal of the 900 s per-test budget did not cause them.
+- **Action:** replaced the vague brief 197 with `180-R-ci-phone-accept-hosted` (item 16b): root-cause from the failed shard artifacts, then fix by capability (rotate one viewport per site on CI) rather than timeouts. Dispatch declined this run (Codex budget gate), so it launches when the gate opens. No tag until hosted CI is green.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
+
 ## 2026-11-10 comprehensive review (joint: Claude + Codex 6.1 Sol; golden `2026-11-10-082252` vs `2026-11-09-183505`)
 
 - **Stage (agreed):** about 85% to 1.0, 4-5 weeks central, plan 4-6. Nothing in the art changed since 2026-11-09 (merges were bug hunts 183-185, 189-191 and CI spec fixes), so whole-site scores stand: Titanic 3.5, Lost City 3-3.5 (Sol; I said 3.5, accepted), Beebe 3-3.5, Blue Hole 3, Monterey 3 (waived), Bismarck about 3.3, Challenger 3-3.5. Openings: Titanic 4.2, Lost City 4.1, Beebe 4.0, Blue Hole 3.7.
