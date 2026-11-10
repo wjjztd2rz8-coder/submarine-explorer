@@ -1031,7 +1031,7 @@ freshTest.describe('scan persistence and fixture debrief', () => {
       );
       const before = await probe(page);
       expect(before.discovered).toBe(false);
-      await expect(page.locator('.guidance-slot .guidance-hint')).toHaveText(/HOLD G TO SCAN/);
+      await expect(page.locator('.guidance-slot .guidance-hint')).toHaveText(/Hold G/);
 
       // Record bus events from inside the page.
       await page.evaluate(() => {

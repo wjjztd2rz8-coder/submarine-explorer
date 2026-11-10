@@ -330,7 +330,7 @@ async function firstMinute(
           await reachable(skip);
           if (touch) await skip.tap();
           else await skip.click();
-        } else if (/^Hold SCAN$|HOLD G TO SCAN|SCANNING/im.test(text)) {
+        } else if (/^Hold SCAN$|^Hold G$|SCANNING/im.test(text)) {
           expect(
             view.candidateId ?? view.activeId,
             'the game scan check accepts the first objective',

@@ -181,18 +181,18 @@ describe('guidance slot', () => {
       const { scanner, targets, overlay, keys, step } = contactGuidance(touch);
       step(0.1, true);
       expect(step(1, true)).toMatchObject({
-        kicker: 'Side find',
+        kicker: 'Side find - not the objective',
         name: 'Memorial',
-        detail: 'Stern · TURN 90° PORT',
+        detail: 'Objective still open · Stern',
       });
       expect(scanner.view.lastCompleteId).toBe('memorial');
       // A repeat side find uses the same guidance, even as the objective becomes ready.
       overlay.showComplete('Memorial', false, keys, true);
       targets[1].position.set(0, 0, -15);
       expect(step()).toMatchObject({
-        kicker: 'Side find',
+        kicker: 'Side find - not the objective',
         name: 'Memorial',
-        detail: `Stern · ${touch ? 'Hold SCAN' : 'HOLD G TO SCAN'}`,
+        detail: `Stern · ${touch ? 'Hold SCAN' : 'Hold G'}`,
       });
       expect(scanner.view.candidateId).toBe('stern');
       expect(step(0.1, true)).toMatchObject({ kicker: 'SCANNING', name: 'Stern' });
@@ -260,7 +260,7 @@ describe('guidance slot', () => {
       expect(texts(overlay.slot)).toMatchObject({
         name: 'Bow',
         kind: 'scan',
-        detail: touch ? 'Hold SCAN' : 'HOLD G TO SCAN',
+        detail: touch ? 'Hold SCAN' : 'Hold G',
       });
       scanner.update(0.2, position, forward, true);
       position.z = 0;
@@ -463,7 +463,7 @@ describe('guidance slot', () => {
       expect(f.step()).toMatchObject({
         name: 'Memorial',
         kicker: 'SCAN TARGET',
-        detail: touch ? 'Hold SCAN' : 'HOLD G TO SCAN',
+        detail: touch ? 'Hold SCAN' : 'Hold G',
       });
       f.scanner.setObjective(null);
       expect(f.step().kicker).toBe('SCAN TARGET');
@@ -475,7 +475,7 @@ describe('guidance slot', () => {
       expect(f.step()).toMatchObject({
         name: 'Stern',
         kicker: 'SCAN TARGET',
-        detail: touch ? 'Hold SCAN' : 'HOLD X TO SCAN',
+        detail: touch ? 'Hold SCAN' : 'Hold X',
       });
       f.targets[1].position.set(-300, 0, 0);
       f.position.set(0, 0, 1000);
