@@ -3,7 +3,7 @@
  *
  * - A thin corner-bracket reticle over the nearest POI's screen position.
  * - The scan, discovery and objective messages for the guidance slot: target
- *   name and "HOLD F TO SCAN", a progress ring while the beam is on, the
+ *   name and "Hold F", a progress ring while the beam is on, the
  *   "New Journal entry" confirmation, and the "where next" objective line. Amber marks
  *   states that need the pilot's attention (interrupted, turn to face).
  *
@@ -46,6 +46,8 @@ export class ScanOverlay {
   } | null = null;
   /** The standing objective's direction line, kept for a result card to carry. */
   private cue: string | null = null;
+  /** The outstanding objective, so a side-find result can say it is still open. */
+  private openObjective: { name: string; ready: boolean } | null = null;
 
   constructor(
     private readonly config: Pick<
@@ -85,6 +87,7 @@ export class ScanOverlay {
     this.reticle.hidden = true;
     this.complete = null;
     this.cue = null;
+    this.openObjective = null;
     this.slot.clear();
   }
 
@@ -116,19 +119,35 @@ export class ScanOverlay {
     keys: ScanOverlayKeys,
   ): GuidanceMessage {
     return {
-      kicker: sideFind ? 'Side find' : firstTime ? 'New Journal entry' : 'SCAN COMPLETE',
+      kicker: sideFind
+        ? 'Side find - not the objective'
+        : firstTime
+          ? 'New Journal entry'
+          : 'SCAN COMPLETE',
       text: title,
       detail:
-        this.cue && (sideFind || isTouch())
-          ? this.cue
-          : firstTime
-            ? isTouch()
-              ? 'OPEN JOURNAL'
-              : `PRESS ${keys.guide} · JOURNAL`
-            : 'LOGGED · JOURNAL',
+        sideFind && this.openObjective
+          ? this.sideFindDetail(keys)
+          : this.cue && (sideFind || isTouch())
+            ? this.cue
+            : firstTime
+              ? isTouch()
+                ? 'OPEN JOURNAL'
+                : `PRESS ${keys.guide} · JOURNAL`
+              : 'LOGGED · JOURNAL',
       tone: firstTime ? 'cyan' : 'dim',
       ring: { progress: 1, label: 'OK' },
     };
+  }
+
+  /**
+   * A side find did not count. Say so, and name the objective still open rather
+   * than a turn toward it, which would read as progress.
+   */
+  private sideFindDetail(keys: ScanOverlayKeys): string {
+    const open = this.openObjective!;
+    if (open.ready) return `${open.name} · ${isTouch() ? 'Hold SCAN' : `Hold ${keys.scan}`}`;
+    return `Objective still open · ${open.name}`;
   }
 
   /**
@@ -140,6 +159,10 @@ export class ScanOverlay {
     if (this.suppressed) return;
     this.updateReticle(view, screen);
     this.cue = this.objectiveCue(view, keys);
+    this.openObjective =
+      view.objectiveId != null && view.objectiveName && view.objectiveId !== view.lastCompleteId
+        ? { name: view.objectiveName, ready: view.objectiveId === view.candidateId }
+        : null;
     if (this.complete) {
       this.complete.left -= dt;
       if (this.complete.left <= 0) this.complete = null;
@@ -200,7 +223,7 @@ export class ScanOverlay {
       return null;
     if (view.objectiveId === view.candidateId)
       return this.complete?.sideFind
-        ? `${view.objectiveName} · ${isTouch() ? 'Hold SCAN' : `HOLD ${keys.scan} TO SCAN`}`
+        ? `${view.objectiveName} · ${isTouch() ? 'Hold SCAN' : `Hold ${keys.scan}`}`
         : null;
     const turn = view.objectiveTurnDeg;
     const how =
@@ -341,7 +364,7 @@ export class ScanOverlay {
           kicker: 'SCAN TARGET',
           text: view.nearestName,
           ready: true,
-          detail: touch ? 'Hold SCAN' : `HOLD ${keys.scan} TO SCAN`,
+          detail: touch ? 'Hold SCAN' : `Hold ${keys.scan}`,
           tone: 'cyan',
           ring: { progress: 0, label: dist },
         },

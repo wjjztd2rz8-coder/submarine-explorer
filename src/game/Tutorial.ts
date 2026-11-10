@@ -112,14 +112,28 @@ export class Tutorial {
       this.scanning = true;
       this.scanProgress = 0;
       this.dropReason = null;
-      return false;
+      return this.leaveDepth();
     }
-    if (event === 'scan:aborted') this.dropReason = drop ?? null;
-    if (event === 'scan:aborted' || event === 'scan:complete') this.scanning = false;
+    if (event === 'scan:aborted') {
+      this.scanning = false;
+      // Advance first: advancing clears the drop cue, which is recorded after it.
+      const moved = this.leaveDepth();
+      this.dropReason = drop ?? null;
+      return moved;
+    }
+    if (event === 'scan:complete') this.scanning = false;
     const step = this.step;
     if (!step) return false;
     if (step.id === 'scan' && event === 'scan:complete') return this.advance();
     return false;
+  }
+
+  /**
+   * A scan that starts or drops during the depth step shows the player is
+   * already on target: the depth card is moot and must not return after it.
+   */
+  private leaveDepth(): boolean {
+    return this.step?.id === 'depth' ? this.advance() : false;
   }
 
   /**

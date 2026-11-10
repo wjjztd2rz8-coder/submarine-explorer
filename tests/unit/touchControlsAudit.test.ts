@@ -207,9 +207,7 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
       f.controls.setTouchMode(device === 'touch');
       tick(0);
       expect(card.children[1].textContent).toBe('Objective');
-      expect(card.children[2].textContent).toBe(
-        device === 'touch' ? 'Hold SCAN' : 'HOLD G TO SCAN',
-      );
+      expect(card.children[2].textContent).toBe(device === 'touch' ? 'Hold SCAN' : 'Hold G');
       expect(overlay.slot.kind).toBe('scan');
       held(true);
       tick(0.5);
@@ -710,7 +708,7 @@ it('scan instructions use on-screen controls on touch and key bindings on keyboa
   try {
     f.controls.setTouchMode(false);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
-    expect(hint.textContent).toBe('HOLD G TO SCAN');
+    expect(hint.textContent).toBe('Hold G');
     f.controls.setTouchMode(true);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(hint.textContent).toBe('Hold SCAN');

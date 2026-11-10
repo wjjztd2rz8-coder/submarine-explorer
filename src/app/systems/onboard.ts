@@ -89,13 +89,21 @@ export function createOnboardSystem(): GameSystem {
       });
       cleanup.add(() => ctx.guidance.setSkipHandler(null));
 
-      cleanup.add(bus.on('scan:started', () => tutorial.notify('scan:started')));
+      cleanup.add(
+        bus.on('scan:started', () => {
+          if (tutorial.notify('scan:started')) onAdvance();
+        }),
+      );
       cleanup.add(
         bus.on('scan:progress', ({ progress }) => {
           tutorial.scanProgress = progress;
         }),
       );
-      cleanup.add(bus.on('scan:aborted', ({ reason }) => tutorial.notify('scan:aborted', reason)));
+      cleanup.add(
+        bus.on('scan:aborted', ({ reason }) => {
+          if (tutorial.notify('scan:aborted', reason)) onAdvance();
+        }),
+      );
       cleanup.add(
         bus.on('scan:complete', () => {
           // A completed opening target cannot be scanned again this dive.

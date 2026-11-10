@@ -222,6 +222,23 @@ describe('tutorial progression', () => {
     expect(t.notify('scan:started')).toBe(false);
     expect(t.dropReason).toBeNull();
   });
+  it('a scan that starts or drops on the depth step ends that step for good', () => {
+    const started = new Tutorial();
+    started.skipStep(); // move done; depth is on screen
+    expect(started.step?.id).toBe('depth');
+    expect(started.notify('scan:started')).toBe(true);
+    expect(started.step?.id).toBe('scan');
+
+    const dropped = new Tutorial();
+    dropped.skipStep();
+    expect(dropped.notify('scan:aborted', 'facing')).toBe(true);
+    // The drop cue is kept on the scan step, never the depth card.
+    expect(dropped.step?.id).toBe('scan');
+    expect(dropped.dropReason).toBe('facing');
+    // A later depth hold cannot bring the depth card back.
+    hold(dropped, { ballast: -1 }, 60);
+    expect(dropped.step?.id).toBe('scan');
+  });
   it('events only count for the step waiting for them', () => {
     const t = new Tutorial();
     expect(t.notify('scan:complete')).toBe(false);

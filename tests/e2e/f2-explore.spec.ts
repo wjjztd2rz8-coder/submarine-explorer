@@ -179,7 +179,7 @@ test('samples collect per dive, appear in mission debrief, and reset on restart'
   // Free-dive coaching names a ready sample; mission coaching retains its primary.
   await boot(page);
   await park(page, 0, true);
-  await expect(page.locator('.guidance-hint')).toContainText('TO SCAN');
+  await expect(page.locator('.guidance-hint')).toContainText(/Hold (G|SCAN)/);
   await boot(page, 'monterey-canyon', true);
   const id = await park(page, 0, true);
   const primary = await page.evaluate(() => {

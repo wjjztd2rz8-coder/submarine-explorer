@@ -98,7 +98,7 @@ for (const [dive, url] of [
 
 test('scanned contacts stay marked and cannot be rescanned until a new dive', async ({ page }) => {
   await boot(page, scanUrl);
-  await expect(page.locator('.guidance-slot .guidance-hint')).toHaveText(/HOLD G TO SCAN/);
+  await expect(page.locator('.guidance-slot .guidance-hint')).toHaveText(/Hold G/);
   await scanWithKeyboard(page, 'test-bow');
   await expect
     .poll(() =>
@@ -147,7 +147,7 @@ test('scanned contacts stay marked and cannot be rescanned until a new dive', as
       (window.__game as { discovery?: { spawnedAt: string | null } }).discovery?.spawnedAt ===
       'test-bow',
   );
-  await expect(page.locator('.guidance-slot .guidance-hint')).toHaveText(/HOLD G TO SCAN/);
+  await expect(page.locator('.guidance-slot .guidance-hint')).toHaveText(/Hold G/);
   await scanWithKeyboard(page, 'test-bow');
   expect(
     await page.evaluate(() => {
@@ -296,9 +296,11 @@ for (const layout of [
         return { id: v.objectiveId!, name: v.objectiveName };
       });
       await holdScan(page, layout.touch, () => completeScan(page, 'life:french-grunt'));
-      await expect(page.locator('.guidance-kicker')).toHaveText('Side find');
+      await expect(page.locator('.guidance-kicker')).toHaveText('Side find - not the objective');
       await expect(page.locator('.guidance-name')).toHaveText('French grunt');
-      await expect(page.locator('.guidance-hint')).toContainText(`${objective.name} ·`);
+      await expect(page.locator('.guidance-hint')).toContainText(
+        `Objective still open · ${objective.name}`,
+      );
       const progress = await page.evaluate(() => {
         const g = window.__game as unknown as MissionGame;
         return {
@@ -314,9 +316,9 @@ for (const layout of [
         g.sub.reset(poi.position.x, poi.position.y, poi.position.z + 50, 0);
         g.discovery.update(0, 0, g.sub.position, g.sub.getForward(), { scan: false });
       }, objective.id);
-      await expect(page.locator('.guidance-kicker')).toHaveText('Side find');
+      await expect(page.locator('.guidance-kicker')).toHaveText('Side find - not the objective');
       await expect(page.locator('.guidance-hint')).toHaveText(
-        `${objective.name} · ${layout.touch ? 'Hold SCAN' : 'HOLD G TO SCAN'}`,
+        `${objective.name} · ${layout.touch ? 'Hold SCAN' : 'Hold G'}`,
       );
       await page.evaluate(() => {
         const g = window.__game as unknown as MissionGame;
