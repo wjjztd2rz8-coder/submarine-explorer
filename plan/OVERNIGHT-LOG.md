@@ -3633,3 +3633,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect: no Codex tasks running; 189-191 queued (dispatch waiting on Codex budget/pace); 124/131 held. Main clean and pushed; hosted CI on latest push pending (no tag). No Claude package (weekly 28%, at the pace gate).
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-09 19:46 CST headless run (Claude): hold
+
+- Nothing to collect (only held worktrees 124/131). Dispatch still says "Codex budget low; queue waits" although ai-limits shows Codex 5h 100% (status was 30 min old); 189-191 queued. Hosted CI on main still failing (e2e runs 1h+ red; 189 covers the shard hang). No Claude package (weekly 28% at pace gate), no tag.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
