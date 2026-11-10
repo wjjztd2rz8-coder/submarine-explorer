@@ -3643,3 +3643,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect (only held worktrees 124/131). 189-191 queued; dispatch waits because the Codex week (56% left, reset Nov 15) is behind its pace line, not the 5h window. Main clean and pushed; hosted CI on main still red (189 covers the shard hang). No Claude package (weekly 28% at pace gate), no tag.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-09 22:42 CST targeted review (Claude): CI red diagnosed
+- Fixed d-scan 265 (objective race) and f2-progress 363 (route.fetch disposed) specs; gates smoke+project-base green; pushed. Hosted CI result pending, no tag. 189-191 still queued.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
