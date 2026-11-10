@@ -3664,3 +3664,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged 189 (shard-1 first-minute journey keeps its configured timeout; teardown screenshot bounded), 190 (mission/free-dive lifecycle + clock fixes), 191 (photo mode/gallery fixes + specs). gates.sh smoke + project-base green per worktree and on main; pushed. Worktrees removed. Hosted CI result pending (no tag); 124/131 still held. No Claude package (weekly 27%, below pace gate).
 - Queue empty of new Codex briefs from this run except leftovers; next run should queue fresh bug-hunt/verify briefs over 189-191.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-10 03:02 CST comprehensive review (Claude + Sol)
+
+- Joint review done and pushed (REVIEWS.md, STATUS.md, DIRECTOR.md re-plan). Stage about 85%, 4-5 weeks. New: Hunga opening heading regression (brief 195), 720p unaided check (196), CI triage follow-up (197) queued behind 192-194. Prettier pre-commit hook installed (third prettier-CI recurrence). No packages merged; no tag.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
