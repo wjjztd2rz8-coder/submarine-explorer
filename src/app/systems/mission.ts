@@ -34,8 +34,6 @@ export const missionSystem: GameSystem = {
     approachOpening = false;
     const { route, params, discovery, meta, terrain, config, sub, rig, headlights, bus } = ctx;
     const { save } = ctx;
-    let lastStart: typeof sub.position | null = null;
-    let lastChoice: MissionStartPosition = ctx.effective.gameplay.startPosition;
     const originalScanRadii = new Map<string, number>();
     // Also used to preview the start behind the briefing, so Begin
     // resolves the same pose and the dive starts without a teleport.
@@ -95,8 +93,6 @@ export const missionSystem: GameSystem = {
       }
       sub.reset(pose.x, pose.y, pose.z, pose.yaw);
       ctx.reanchorFirstMove?.();
-      lastStart = sub.position.clone();
-      lastChoice = choice;
       rig.setChaseRadiusDefault(
         opening?.chaseRadius,
         opening?.chaseOffsetX,
@@ -170,11 +166,13 @@ export const missionSystem: GameSystem = {
         }),
       );
     }
-    // Optional models may finish after discovery. Reframe a waiting pilot once,
-    // while preserving surface choices, URL probes and anyone already moving.
+    // Optional models may finish after discovery. Reframe only the briefing
+    // preview: resetting a live dive also clears velocity and emergency ascent.
     cleanup.add(
       bus.on('props:loaded', () => {
-        if (lastStart && sub.position.distanceTo(lastStart) < 2) applyMissionStart(lastChoice);
+        const briefing = missionRouter?.briefing;
+        if (missionRouter?.mission.state === 'briefing' && briefing?.isOpen)
+          applyMissionStart(briefing.startChoice);
       }),
     );
 

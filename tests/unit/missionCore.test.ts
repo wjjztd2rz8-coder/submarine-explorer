@@ -665,3 +665,70 @@ describe('Titanic content (B2) against the mission loader', () => {
     );
   });
 });
+
+const missionDocs = import.meta.glob('../../data/landmarks/*/mission.json', {
+  eager: true,
+  import: 'default',
+});
+const poiDocs = import.meta.glob('../../data/landmarks/*/pois.json', {
+  eager: true,
+  import: 'default',
+});
+
+it.each(
+  landmarkIndex.landmarks.flatMap((site) =>
+    (['surface', 'crush', 'power'] as const).map((ending) => ({ site, ending })),
+  ),
+)('$site: objective counts and clock survive resume, then $ending', ({ site, ending }) => {
+  const warnings: string[] = [];
+  const warn = (message: string) => warnings.push(message);
+  const doc = missionDocs[`../../data/landmarks/${site}/mission.json`] as typeof MINIMAL;
+  const parsed = parseMission(doc, site, warn)!;
+  const pois = parsePois(poiDocs[`../../data/landmarks/${site}/pois.json`], warn);
+  const bus = new EventBus();
+  const mission = new Mission({ def: parsed, bus, warn });
+  mission.resolve(pois.map((poi) => poi.id));
+  expect(warnings).toEqual([]);
+  const total = doc.objectives.length;
+  expect(mission.counts()).toEqual({ completed: 0, total });
+  expect(mission.primaryCounts()).toEqual({ completed: 0, total: 2 });
+  mission.update(60);
+  expect(mission.elapsedS).toBe(0);
+  mission.start(parsed.tile);
+  // Optional-first/reversed order must count only this run, once per objective.
+  const order = [...doc.objectives].reverse().sort((a, b) => Number(a.primary) - Number(b.primary));
+  let primaries = 0;
+  for (const [index, objective] of order.entries()) {
+    mission.update(0.5);
+    for (let duplicate = 0; duplicate < 2; duplicate++)
+      bus.emit('scan:complete', { poiId: objective.poi, landmarkId: site, firstTime: false });
+    primaries += Number(objective.primary);
+    expect(mission.counts()).toEqual({ completed: index + 1, total });
+    expect(mission.primaryCounts()).toEqual({ completed: primaries, total: 2 });
+    if (index === 0) {
+      mission.end();
+      mission.update(60);
+      expect(mission.durationS).toBe(0.5);
+      expect(mission.resume()).toBe(true);
+      // Reload starts a fresh mission rather than restoring a partial objective tally.
+      const reloaded = new Mission({ def: parsed, bus: new EventBus(), warn });
+      reloaded.resolve(pois.map((poi) => poi.id));
+      expect(reloaded.state).toBe('briefing');
+      expect(reloaded.elapsedS).toBe(0);
+      expect(reloaded.counts()).toEqual({ completed: 0, total });
+      reloaded.dispose();
+    }
+  }
+  if (ending !== 'surface') mission.abort(ending);
+  mission.end();
+  expect(mission.endReason).toBe(ending === 'surface' ? 'all' : 'abort');
+  expect(mission.canResume).toBe(ending === 'surface');
+  expect(mission.emitted.filter((event) => event.name === 'mission:complete')).toHaveLength(
+    ending === 'surface' ? 1 : 0,
+  );
+  expect(mission.durationS).toBe(total * 0.5);
+  mission.update(60);
+  expect(mission.elapsedS).toBe(total * 0.5);
+  expect(mission.emitted.at(-1)?.payload).toMatchObject({ completed: total, total });
+  mission.dispose();
+});
