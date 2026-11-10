@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: none. Item 11 U-phone-landscape-hud DONE 2026-11-10 (68b5931f); needs phone retest for safe-area insets. Priority order for the next Claude packages (Sol: first-session usability before art): 11 (phone landscape HUD), 22 (Hunga slab), 6 (Beebe stacks), 7 (Lost City tubes), then 16e. V-bismarck-hull-plates DONE 2026-11-08 (e072e778). U-copy-fixes items 6-8 DONE 2026-11-07 (39830258); walkthrough-4 items 4-5 (scan-interrupt cue, side-find clarity) remain in item 9.
+- Claude: item 6 V-beebe-chimney-stacks IN FLIGHT (Sonnet, 2026-11-10). Item 11 U-phone-landscape-hud DONE 2026-11-10 (68b5931f); needs phone retest for safe-area insets. Priority order for the next Claude packages (Sol: first-session usability before art): 11 (phone landscape HUD), 22 (Hunga slab), 6 (Beebe stacks), 7 (Lost City tubes), then 16e. V-bismarck-hull-plates DONE 2026-11-08 (e072e778). U-copy-fixes items 6-8 DONE 2026-11-07 (39830258); walkthrough-4 items 4-5 (scan-interrupt cue, side-find clarity) remain in item 9.
 
 ## Backlog
 
@@ -86,7 +86,7 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 3. **V-monterey-wall-face: PARKED 2026-11-08 (owner): accepted at 3.8, moved to [Later](#later).**
 4. **V-bismarck-hull-plates [DONE 2026-11-08 (e072e778): dark streaked deck, scour shade, deck sag; ~3.5-3.8. Left: listing, far horizon dome]:** hull reads as a pale green-grey flat slab on a dome (opening 3-3.5; no demonstrated regression, plating was already pale). Target: darker streaked plating with broken seams (shared shader with 4), scour visible as a darker rim, far horizon not a perfect dome. Do not flatten the seamount flank (`data/landmarks/bismarck/guide.json`).
 5. **V-bluehole-gallery-2 [DONE 2026-11-08 (35d20fa6): gallery 92 m, ~26% of opening frame, opening ~3.7-4.0; sub still touches gallery edge, stalactites small]:** gallery is ~18% of frame width in the opening (3.5). Next lever: a larger gallery prop or an apron-clearing approach (moves the free-dive hero pose too); apron still lacks fine silt grain and ripples. Re-check scan reach (the closer opening changed it).
-6. **V-beebe-chimney-stacks:** still a broad folded cone (`beebe-vent-field-3.png`); a vent bore alone will not fix the silhouette. Target: separated slim stacks with a vent orifice, via shelf/stack placement in site data plus the shared builder.
+6. **V-beebe-chimney-stacks [IN FLIGHT (Sonnet, 2026-11-10)]:** still a broad folded cone (`beebe-vent-field-3.png`); a vent bore alone will not fix the silhouette. Target: separated slim stacks with a vent orifice, via shelf/stack placement in site data plus the shared builder.
 7. **V-lostcity-tower-forms:** readable cluster, but smooth forms and faceted hollow tubes in `lost-city-3.png`. Target: irregular tower profiles and rounded tubes.
 8. **DONE 2026-11-10 (b142fd30) U-copy-fixes [Haiku]:** U-depth-card-level-approach (extends 12), U-scan-interrupt-cue, U-side-find-clarity, U-ctrl-tip-timing, U-objective-two-cues, U-scan-prompt-copy (from walkthrough-4, `plan/progress/U-retest-walkthrough-4.md`). Depth, Ctrl+W and one-cue fixes were already on the branch; this pass ends the depth step on scan start or drop, says the objective is still open on side-find results, and drops "TO SCAN". "Target changed" cue skipped. Evidence: `plan/progress/U-copy-fixes.md`.
 9. **V-golden-refresh [Haiku]:** `GOLDEN_MODE=mission tools/golden.sh` detached after items 3-8 land; feeds the next review.
