@@ -397,3 +397,62 @@ test('a full phone gallery keeps photo order, exports and recovers from failed d
   await journal.getByRole('button', { name: 'Download all' }).click();
   expect((await archive).suggestedFilename()).toBe('journal-photos.zip');
 });
+
+// Regression: a refused 2D context escaped the thumbnail error boundary and stopped capture.
+test('a denied photo canvas context reports failure and a later capture succeeds', async ({
+  page,
+}) => {
+  await pauseClockBeforeNavigation(page);
+  await page.goto(DIVE);
+  await ready(page, true);
+  await page.keyboard.press('p');
+  await page.clock.runFor(34);
+  await page.evaluate(() => {
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, ...args) {
+      if (args[0] === '2d') {
+        HTMLCanvasElement.prototype.getContext = getContext;
+        throw new DOMException('Canvas access denied', 'SecurityError');
+      }
+      return getContext.apply(this, args);
+    } as typeof getContext;
+  });
+  const capture = page.locator('.photo-mode-capture');
+  await capture.click();
+  await page.clock.runFor(34);
+  await expect(page.locator('.photo-mode-toast')).toHaveText(
+    'This browser could not create the photo.',
+  );
+  expect((await storedPhotos(page))?.photos ?? []).toHaveLength(0);
+  await page.clock.runFor(500);
+  await capture.click();
+  await page.clock.runFor(34);
+  await expect(page.locator('.photo-mode-toast')).toHaveText('Saved to Journal');
+  expect((await storedPhotos(page))?.photos).toHaveLength(1);
+});
+
+test.describe('touch photo gallery', () => {
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
+
+  // Regression: the empty gallery prescribed P and Enter on phones, including after rotation.
+  test('empty gallery guidance names actions across phone orientations', async ({ page }) => {
+    await pauseClockBeforeNavigation(page);
+    await page.goto(DIVE);
+    await ready(page, true);
+    await page.locator('.hud-journal').tap();
+    for (const size of [
+      { width: 390, height: 844 },
+      { width: 844, height: 390 },
+    ]) {
+      await page.setViewportSize(size);
+      await page.clock.runFor(50);
+      await page.evaluate(() =>
+        (window.__game as { journal: { show(key: string): void } }).journal.show('photos'),
+      );
+      const hint = page.locator('.journal .jr-empty');
+      await expect(hint).toBeVisible();
+      await expect(hint).toContainText('choose Capture');
+      await expect(hint).not.toContainText(/press|Enter|Space|Esc|\bP\b/);
+    }
+  });
+});

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PerspectiveCamera, Vector3 } from 'three';
 import { createPhotoSystem } from '../../src/app/systems/photo.js';
+import { shellSystem } from '../../src/app/systems/shell.js';
 import { createProgressSystem } from '../../src/app/systems/progress.js';
 import type { GameContext } from '../../src/app/context.js';
 import { SystemRunner, type FrameState } from '../../src/app/System.js';
@@ -57,6 +58,21 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 const documentElement = { classList: { contains: (name: string) => touch && name === 'is-touch' } };
+
+it.each([false, true])(
+  'empty gallery guidance works without keyboard keys (touch=%s)',
+  (onTouch) => {
+    touch = onTouch;
+    vi.stubGlobal('document', { documentElement, createElement: () => new Element() });
+    const container = new Element();
+    const gallery = new PhotoGallery(new PhotoStore(null));
+    gallery.render(container as unknown as HTMLElement, []);
+    const hint = container.children[1].textContent;
+    expect(hint).toContain('photo mode');
+    expect(hint).toContain('Capture');
+    expect(hint).not.toMatch(/press|Enter|Space|Esc|\bP\b/);
+  },
+);
 
 it('releases photo ZIP URLs and timers on gallery teardown without affecting another gallery', () => {
   vi.useFakeTimers();
@@ -518,6 +534,42 @@ function automaticStillFixture() {
 }
 
 describe('automatic scan still handoff', () => {
+  it.each(['pause', 'debrief'] as const)(
+    'cancels queued captures and refuses photo entry during %s',
+    (overlay) => {
+      const fixture = automaticStillFixture();
+      const { ctx, runner, f } = fixture.createDive();
+      Object.assign(ctx, {
+        app: { state: overlay === 'pause' ? 'pause' : 'dive' },
+        globe: { isOpen: false },
+        settingsScreen: { isOpen: false },
+      });
+      Object.assign(ctx.discovery, {
+        guide: { isOpen: false },
+        debrief: { isOpen: overlay === 'debrief' },
+      });
+      try {
+        for (let round = 0; round < 2; round++) {
+          ctx.photoMode.setActive(true);
+          const root = ctx.photoMode.root as unknown as Element;
+          root.children.at(-1)!.children.at(-1)!.children[0].click();
+          f.sampled = { togglePhotoMode: true, capturePhoto: true } as FrameState['sampled'];
+          shellSystem.frame!['gate.shell']!(f, ctx);
+          expect(f.blocked).toBe(true);
+          runner.frame(f);
+          runner.frame(f); // The held request cannot reopen behind the overlay.
+          expect(ctx.photoMode.active).toBe(false);
+          expect(fixture.thumbnail).not.toHaveBeenCalled();
+          expect(ctx.photos.photos).toEqual([]);
+          expect(ctx.audio.playShutter).not.toHaveBeenCalled();
+        }
+        expect(ctx.rig.exitPhotoMode).toHaveBeenCalledTimes(2);
+      } finally {
+        fixture.dispose();
+      }
+    },
+  );
+
   // Regression: render.capture saved the photo after the reward poll, so ending
   // before the next frame lost the third star despite a successful capture.
   it.each(['automatic', 'manual'] as const)(

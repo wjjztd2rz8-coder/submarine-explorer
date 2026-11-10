@@ -107,8 +107,8 @@ export class PhotoGallery {
         el(
           'p',
           'jr-empty',
-          'No photos yet. During a dive press P for photo mode, frame a wreck or feature, ' +
-            'then press Enter to save it here.',
+          'No photos yet. During a dive open photo mode, frame a wreck or feature, ' +
+            'then choose Capture to save it here.',
         ),
       );
       return;

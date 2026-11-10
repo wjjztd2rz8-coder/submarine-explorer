@@ -37,9 +37,9 @@ export function canvasThumbnail(
   const out = document.createElement('canvas');
   out.width = w;
   out.height = h;
-  const ctx = out.getContext('2d');
-  if (!ctx || w < 1) return null;
   try {
+    const ctx = out.getContext('2d');
+    if (!ctx || w < 1) return null;
     ctx.drawImage(source, 0, sy, source.width, band, 0, 0, w, h);
     const color = PHOTO_FRAMES.find((def) => def.id === frame)?.color;
     if (color) {

@@ -379,12 +379,13 @@ it.each(['context', 'encoder', 'empty canvas', 'empty height'])(
   },
 );
 
-it.each(['draw', 'encode'] as const)(
+it.each(['context', 'draw', 'encode'] as const)(
   'returns a missing capture after a browser %s exception and allows the next capture',
   (failure) => {
     const drawImage = vi.fn();
     const toDataURL = vi.fn(() => 'data:image/jpeg;base64,YQ==');
-    const output = { width: 0, height: 0, getContext: () => ({ drawImage }), toDataURL };
+    const getContext = vi.fn(() => ({ drawImage }));
+    const output = { width: 0, height: 0, getContext, toDataURL };
     vi.stubGlobal('document', { createElement: () => output });
     try {
       const source = { width: 400, height: 800 } as HTMLCanvasElement;
@@ -394,7 +395,8 @@ it.each(['draw', 'encode'] as const)(
           failure === 'draw' ? 'InvalidStateError' : 'SecurityError',
         );
       };
-      if (failure === 'draw') drawImage.mockImplementationOnce(fail);
+      if (failure === 'context') getContext.mockImplementationOnce(fail);
+      else if (failure === 'draw') drawImage.mockImplementationOnce(fail);
       else toDataURL.mockImplementationOnce(fail);
       expect(canvasThumbnail(source, undefined, undefined, 'stock', 0.99)).toBeNull();
       expect(canvasThumbnail(source, undefined, undefined, 'stock', 0.99)).toBe(
