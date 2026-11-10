@@ -300,7 +300,12 @@ describe('smoker profile capability', () => {
         // The first merged triangle has two rim vertices followed by the disc centre.
         expect(
           Math.hypot(positions.getX(0) - positions.getX(2), positions.getZ(0) - positions.getZ(2)),
-        ).toBeCloseTo((9 * 1.5 * 0.15 + 0.6) * 0.6 * authored.topMouthRadiusFraction, 5);
+        ).toBeCloseTo(
+          (9 * 1.5 * authored.stackRadiusPerM + authored.stackRadiusBaseM) *
+            0.6 *
+            authored.topMouthRadiusFraction,
+          5,
+        );
         profiled.full.traverse((object) => {
           if (!(object instanceof THREE.Mesh)) return;
           for (const name of ['position', 'normal', 'color']) {
