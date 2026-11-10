@@ -3684,3 +3684,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged item 11 (Sonnet): landscape touch HUD now symmetric, objective card centred, banner stacked to avoid PHOTO; new phone-landscape-hud spec. gates.sh smoke green on main (no --full-e2e). Pushed. Hosted CI on main still red from earlier (197 covers triage); no tag. Codex 192-197 still queued behind week pace; 124/131 held.
 - **Needs owner:** phone retest (landscape HUD incl. safe-area insets); Monterey 3.8 waiver.
+
+## 2026-11-10 07:48 CST headless run (Claude): hold
+
+- Nothing to collect (only held worktrees 124/131); item 11 merged by the run just before. 192-197 queued; dispatch declined (Codex budget low per its gate). Claude weekly 24%, kept in reserve; no package started. Main clean and pushed; hosted CI on latest push in progress, last full run red (197 covers triage); no tag.
+- **Needs owner:** phone retest (landscape HUD); Monterey 3.8 waiver.
