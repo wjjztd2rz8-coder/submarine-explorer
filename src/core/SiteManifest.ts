@@ -115,6 +115,11 @@ export type SmokerProfile = ChimneyShape &
   Record<(typeof smokerDetailKeys)[number], number> & {
     /** Top/base radius ratio in (0, 1]; omitted data defaults to the original 0.45 taper. */
     topFraction: number;
+    /** Stack base radius = stackRadiusBaseM + height * stackRadiusPerM; defaults 0.6 and 0.15. */
+    stackRadiusPerM: number;
+    stackRadiusBaseM: number;
+    /** Extra clear gap (m) between the hero column and the side stacks; default 0. */
+    stackGapM: number;
     mouthColor: number;
     /** Mouth-disc emissive RGB (0x000000–0xffffff); defaults to unlit black (0). */
     throatColor: number;
@@ -505,6 +510,9 @@ const propCheck = fields(
       },
       {
         topFraction: positiveFraction,
+        stackRadiusPerM: aboveZero,
+        stackRadiusBaseM: aboveZero,
+        stackGapM: aboveZero,
         throatColor: color,
         bodyShade: positiveFraction,
         bodyGlow: positiveFraction,
@@ -650,6 +658,9 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
               smoker: {
                 ...prop.smoker,
                 topFraction: prop.smoker.topFraction ?? 0.45,
+                stackRadiusPerM: prop.smoker.stackRadiusPerM ?? 0.15,
+                stackRadiusBaseM: prop.smoker.stackRadiusBaseM ?? 0.6,
+                stackGapM: prop.smoker.stackGapM ?? 0,
                 throatColor: prop.smoker.throatColor ?? 0,
                 bodyShade: prop.smoker.bodyShade ?? 0.95,
                 bodyGlow: prop.smoker.bodyGlow ?? 0.16,
