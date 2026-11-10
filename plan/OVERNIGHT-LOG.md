@@ -3699,3 +3699,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Haiku agent: depth step ends when a scan starts or drops (card can't return), side-find result reads "Side find - not the objective / Objective still open", "Hold G" copy. Other sub-items (Ctrl+W tip, one cue per objective, Hold SCAN) were already merged on Nov 7; "target changed" cue skipped (switch is same-frame). gates.sh smoke + project-base green on main; pushed (b142fd30). Hosted CI still red from earlier (brief 180 covers); no tag. 6 Codex briefs queued, dispatch waits on its gate. 124/131 held. Claude weekly 23%, no second package.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-10 10:19 CST headless run (Claude): hold
+
+- Nothing to collect (only held worktrees 124/131). 6 Codex briefs queued (180, 192-196); dispatch declined (its gate says Codex budget low, though ai-limits shows 5h 100% / week 43%). Claude weekly 23%, below pace gate; no package started. Main clean and pushed; hosted CI on latest pushes pending; no tag.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
