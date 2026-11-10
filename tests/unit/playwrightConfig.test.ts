@@ -1,6 +1,7 @@
 import { afterEach, expect, test, vi } from 'vitest';
 
 afterEach(() => {
+  vi.doUnmock('@playwright/test');
   vi.unstubAllEnvs();
   vi.resetModules();
 });
@@ -38,3 +39,51 @@ test.each([
     if (excluded) expect(config.grepInvert).toEqual(/@render/);
   },
 );
+
+test('first-minute journeys preserve local, hosted and diagnostic test deadlines', async () => {
+  const playwright = await vi.importActual<typeof import('@playwright/test')>('@playwright/test');
+  type Journey = (
+    fixtures: { page: { on(): void; goto(): Promise<never> } },
+    info: object,
+  ) => Promise<void>;
+  const journeys: Journey[] = [];
+  let firstMinute = false;
+  let budget = 0;
+  // Collect the real journey bodies without starting a browser in the static gate.
+  const register = Object.assign(
+    (name: string, body: Journey) => {
+      if (firstMinute && name.startsWith('kamaehuakanaloa:')) journeys.push(body);
+    },
+    {
+      describe: (name: string, body: () => void) => {
+        firstMinute = name.startsWith('first minute acceptance');
+        body();
+        firstMinute = false;
+      },
+      use() {},
+      beforeEach() {},
+      afterEach() {},
+      setTimeout: (timeout: number) => {
+        budget = timeout;
+      },
+    },
+  );
+  vi.doMock('@playwright/test', () => ({ ...playwright, test: register }));
+  await import('../e2e/phone-accept.spec.js');
+  expect(journeys).toHaveLength(3);
+  const navigation = new Error('navigation reached');
+  const page = {
+    on() {},
+    goto: async (): Promise<never> => {
+      throw navigation;
+    },
+  };
+  for (const timeout of [90_000, 240_000, 1_500]) {
+    for (const journey of journeys) {
+      budget = timeout;
+      await expect(journey({ page }, {})).rejects.toBe(navigation);
+      // A body-level timeout override otherwise makes a hung goto outlive the configured deadline.
+      expect(budget).toBe(timeout);
+    }
+  }
+});

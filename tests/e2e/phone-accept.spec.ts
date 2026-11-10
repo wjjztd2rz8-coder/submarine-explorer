@@ -77,7 +77,9 @@ for (const viewport of [
       });
     });
     test.afterEach(async ({ page }, info) => {
-      await page.screenshot({ path: info.outputPath('last-state.png') });
+      // Teardown has a fresh test budget; a stalled renderer must not spend it on evidence.
+      if (info.status === 'timedOut') return;
+      await page.screenshot({ path: info.outputPath('last-state.png'), timeout: 5_000 });
     });
     for (const site of catalog.landmarks) {
       test(`${site}: guidance reaches first scan within sixty seconds and debrief exits`, async ({
@@ -85,7 +87,7 @@ for (const viewport of [
       }, info) => {
         // Regression guard: idle or pose-assisted checks miss unreachable first targets,
         // covered guidance, frozen input and debrief exits that strand the player.
-        test.setTimeout(900_000); // A full game minute needs 600 frames on slow software GPUs.
+        // Keep the configured per-test budget, including shorter diagnostic CLI timeouts.
         const act = (target: Locator): Promise<void> => (touch ? target.tap() : target.click());
         const errors: string[] = [];
         page.on('pageerror', (error) => errors.push(error.message));
