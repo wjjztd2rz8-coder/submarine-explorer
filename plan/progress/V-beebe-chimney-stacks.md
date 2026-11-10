@@ -16,4 +16,4 @@
 
 ## Gates
 
-See the final report for the gate mode that passed.
+Gate mode: `PW_PORT=4881 tools/gates.sh` (smoke + project-base e2e). The run passed python, content, build, unit, e2e, e2e-base and attribution; prettier initially flagged two files, fixed afterwards and verified with `prettier --check`. Geometry snapshots for Beebe were regenerated on purpose. No --full-e2e run.
