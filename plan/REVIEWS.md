@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-11-10 targeted review (Claude): CI red on main for 3 runs
+
+- Diagnosis (run 42910184458, 30 of 38 e2e shards red): every failure is one spec, `phone-accept.spec.ts` "guidance reaches first scan within sixty seconds and debrief exits" (4.0 m timeout, then `clock.fastForward: Target page, context or browser has been closed`); other specs in the failing shards pass (26/27). Same cause as this morning's review; no new regression from the Beebe chimney merge.
+- Fix path: Codex brief 180 (item 16b) is first in the queue; dispatch declines only on the weekly pace line (Codex week 43% vs ~49%), so it launches when the line passes. No new scheduling fault found (the earlier "budget low" message was the pace gate). Claude weekly 20% is below the pace gate, so no Claude package.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
+
 ## 2026-11-10 targeted review: red CI on main (3+ runs)
 
 - **Diagnosis (from job logs, not guesses):** all failures across runs 42827804490 and 42801871242 are one spec, `phone-accept.spec.ts` "guidance reaches first scan within sixty seconds and debrief exits", spread over every viewport and site, 1-2 tests per shard (all 38 shards red). Each failing test runs to the 240 s CI timeout, the retry does too, and the log ends with `Protocol error ... session closed` while waiting on `.guidance-name` (`helpers/phoneHud.ts:56`). Passing tests in the same shard average ~38 s, so it is hung or crashed renderers, not uniform slowness. The reds predate 189 (red since at least 2026-11-09 18:13 UTC); 189's removal of the 900 s per-test budget did not cause them.

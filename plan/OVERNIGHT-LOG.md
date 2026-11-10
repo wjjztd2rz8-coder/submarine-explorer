@@ -3719,3 +3719,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect (only held worktrees 124/131). Claude weekly 20%, below pace gate; no package started. Codex week 43% vs pace line ~49%, so dispatch declining is expected; 6 briefs queued (180, 192-196). Main clean and pushed; no tag.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-10 16:46 CST targeted review (Claude): red CI
+
+- Diagnosed: 30/38 shards fail on the single phone-accept first-minute spec (hung renderer). Brief 180 first in queue, waits on Codex pace line. Entry in plan/REVIEWS.md. No package started, no tag.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
