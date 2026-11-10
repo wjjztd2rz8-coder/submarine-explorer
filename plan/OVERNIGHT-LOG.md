@@ -3652,3 +3652,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect (only held worktrees 124/131). 189-191 queued; dispatch waits on the Codex week pace. Main clean and pushed; hosted CI on the latest push still pending (no tag). No Claude package (weekly 27%, below the pace gate).
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-10 00:15 CST headless run (Claude): hold
+
+- Nothing to collect (only held worktrees 124/131). 189-191 queued; dispatch waits on the Codex week pace. Main clean and pushed; the hosted CI run on the latest push is still in progress after 1.5 h (shard hang, covered by 189); no tag. No Claude package started (weekly 27%).
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
