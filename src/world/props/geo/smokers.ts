@@ -74,12 +74,13 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   }
   const n = THREE.MathUtils.clamp(Math.round(2 + H / 2.6), 3, 6);
   const stacks: Stack[] = [];
-  const radius = (h: number): number => h * 0.15 + 0.6;
+  const radius = (h: number): number =>
+    h * (profile?.stackRadiusPerM ?? 0.15) + (profile?.stackRadiusBaseM ?? 0.6);
   for (let i = 0; i < n; i++) {
     const h = i === 0 ? H : H * (0.34 + rnd() * 0.4);
     const r0 = radius(h);
     // Side stacks stand clear of the main column, on a loose ring.
-    const ring = i === 0 ? 0 : radius(H) + r0 + 0.4 + rnd() * 0.12 * Math.min(L, W);
+    const ring = i === 0 ? 0 : radius(H) + r0 + 0.4 + (profile?.stackGapM ?? 0) + rnd() * 0.12 * Math.min(L, W);
     const a = i * 2.4 + rnd() * 0.8;
     const x = Math.cos(a) * ring;
     const z = Math.sin(a) * ring;
