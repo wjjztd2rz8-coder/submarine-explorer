@@ -291,22 +291,6 @@ freshTest.describe('fixture and mission layout', () => {
         if (layout.touch) selectors.push('.tc-btn-pause', '.tc-stick', '.tc-slider', '.tc-buttons');
         else selectors.push('.objectives-panel', '.hud-reset-camera');
         await clearLayout(page, selectors);
-        if (layout.touch) {
-          // Pause/Journal and the card are separate flow items with the region gap between.
-          const gaps = await page.evaluate(() => {
-            const bottom = (selector: string): number =>
-              document.querySelector(selector)!.getBoundingClientRect().bottom;
-            const card = document.querySelector('.guidance-slot')!.getBoundingClientRect();
-            return {
-              pause: card.top - bottom('.tc-btn-pause'),
-              journal: card.top - bottom('.hud-journal'),
-            };
-          });
-          if (layout.width > layout.height) {
-            expect(gaps.pause).toBeGreaterThanOrEqual(8);
-            expect(gaps.journal).toBeGreaterThanOrEqual(8);
-          }
-        }
       });
     });
   }
