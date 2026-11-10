@@ -627,6 +627,9 @@ it.each(placements)(
         }
         const learned = ctx.cameraTips.moved;
         const calls = reset.mock.calls.length;
+        const pilotedPose = pose(ctx);
+        const pilotedVelocity = ctx.sub.velocity.clone();
+        const pilotedHull = ctx.sub.getState();
         if (order === 'skip-delayed-ready') await settleReady();
         else if (!order.endsWith('props-first')) {
           propsIO.resolve();
@@ -641,8 +644,15 @@ it.each(placements)(
         expect(ctx.props.stats.failed).toBe(0);
         expect(ctx.props.stats.skipped).toBe(0);
         expect(resetCalls).toBe(
-          ['free-no-reset', 'mission-props-first', 'free-props-first'].includes(order) ? 0 : 1,
+          ['free-late-props', 'free-learned', 'skip-delayed-ready'].includes(order) ? 1 : 0,
         );
+        // Late mission props cannot replace an already piloted opening. Keep
+        // the real movement and hull state, including its onboarding progress.
+        if (!free && order !== 'skip-delayed-ready') {
+          expect(pose(ctx)).toEqual(pilotedPose);
+          expect(ctx.sub.velocity).toEqual(pilotedVelocity);
+          expect(ctx.sub.getState()).toEqual(pilotedHull);
+        }
         expect(ctx.cameraTips.moved).toBe(learned);
         frame(); // Authored replacement cannot complete the earlier partial command.
         expect(ctx.cameraTips.moved).toBe(learned);
@@ -659,7 +669,7 @@ it.each(placements)(
             FIRST_MINUTE_GUIDANCE.moveDistanceM,
           );
         }
-        if (resetCalls === 0) {
+        if (resetCalls === 0 && !learned) {
           const pausedPose = pose(ctx);
           ctx.app.state = 'pause';
           expect(frame(1).steps).toBe(0);

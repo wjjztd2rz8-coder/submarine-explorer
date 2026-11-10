@@ -3956,3 +3956,46 @@ it.each(['home', 'pause'] as const)(
     expect(remove.mock.calls).toHaveLength(add.mock.calls.length);
   },
 );
+
+it('mission Begin discards briefing preview depth and travel before starting dive statistics', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, text: async () => '[]' }));
+  vi.spyOn(Journal.prototype, 'load').mockResolvedValue();
+  const bus = new EventBus();
+  const ctx = {
+    bus,
+    config: DEFAULT_CONFIG,
+    effective: resolveEffective(defaultSettings(DEFAULT_CONFIG), 'arcade', null),
+    meta: { id: 'reef' },
+    terrain: { sampleHeight: () => -5000 },
+    contentLandmark: 'reef',
+    params: new URLSearchParams(),
+    input: { primaryKeyLabel: () => 'G' },
+    expose: vi.fn(),
+  } as unknown as GameContext;
+  discoverySystem.init?.(ctx);
+  cleanup.push(() => discoverySystem.dispose?.());
+  await ctx.discovery.ready;
+  const update = (dt: number, x: number, depth: number) =>
+    ctx.discovery.update(
+      0,
+      0,
+      new THREE.Vector3(x, -depth, 0),
+      new THREE.Vector3(0, 0, -1),
+      { scan: false },
+      undefined,
+      dt,
+      true,
+    );
+  // A near-site preview and changing its pose happen while the clock is frozen.
+  update(0, 0, 3800);
+  update(0, 10, 3800);
+  bus.emit('mission:started', { missionId: 'reef', tileId: 'reef' });
+  // The pilot chose a surface start; preview depth/travel must not enter the debrief.
+  update(0.5, 0, 5);
+  update(0.5, 3, 9);
+  expect(ctx.discovery.stats.snapshot()).toMatchObject({
+    elapsedS: 1,
+    distanceM: 5,
+    maxDepthM: 9,
+  });
+});

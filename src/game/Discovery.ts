@@ -97,6 +97,7 @@ export class Discovery {
 
     this.disposers.push(
       bus.on('scan:complete', (e) => this.onComplete(e.landmarkId, e.poiId)),
+      bus.on('mission:started', () => this.stats.reset()),
       bus.on('mission:restart', () => this.resetDive()),
       bus.on('landmarks:loaded', ({ landmarks }) => {
         const l = landmarks.find((x) => x.id === landmarkId);

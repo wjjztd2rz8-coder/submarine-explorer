@@ -3645,6 +3645,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
 
 ## 2026-11-09 22:42 CST targeted review (Claude): CI red diagnosed
+
 - Fixed d-scan 265 (objective race) and f2-progress 363 (route.fetch disposed) specs; gates smoke+project-base green; pushed. Hosted CI result pending, no tag. 189-191 still queued.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
 
