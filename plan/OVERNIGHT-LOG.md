@@ -3694,3 +3694,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - All hosted reds are one spec (phone-accept first minute, hung renderer at 240 s, 1-2 per shard); brief 180 queued (replaces 197). Dispatch waits on Codex gate. No package started. No tag.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-10 10:19 CST headless run (Claude): merged U-copy-fixes (item 8)
+
+- Haiku agent: depth step ends when a scan starts or drops (card can't return), side-find result reads "Side find - not the objective / Objective still open", "Hold G" copy. Other sub-items (Ctrl+W tip, one cue per objective, Hold SCAN) were already merged on Nov 7; "target changed" cue skipped (switch is same-frame). gates.sh smoke + project-base green on main; pushed (b142fd30). Hosted CI still red from earlier (brief 180 covers); no tag. 6 Codex briefs queued, dispatch waits on its gate. 124/131 held. Claude weekly 23%, no second package.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
