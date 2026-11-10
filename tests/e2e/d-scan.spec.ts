@@ -274,6 +274,10 @@ for (const layout of [
         const g = window.__game as unknown as MissionGame & { life?: unknown };
         return window.__gameReady === true && g.discovery.loaded && g.props.loaded && !!g.life;
       });
+      await clockFramesUntil(page, () => {
+        const g = window.__game as unknown as MissionGame;
+        return !!g.discovery.scanner.view.objectiveId;
+      });
       const objective = await page.evaluate(() => {
         const g = window.__game as unknown as MissionGame;
         const v = g.discovery.scanner.view;

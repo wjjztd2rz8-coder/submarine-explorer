@@ -419,3 +419,7 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 
 - Codex queue was empty with a fresh week (23-46 h under-used in 24 h). Queued 160-162 (CI triage, first-60-s verification, dead-code audit) so the review loop always leaves at least 3 briefs. Backlog had no unblocked Codex items left; the review now adds them as items 18-20.
 - Golden capture disables tutorials and dynamic resolution (Sol), and the Challenger mission capture was missing: added item 16f.
+
+## 2026-11-10 stale dist masks spec results
+
+Single-spec playwright runs serve `dist/`; a build older than the source hid the 186 migration change and sent diagnosis down a false trail. Rebuild before running single specs. Codex briefs that touch `src` should run `npm run build` first (gates.sh already does).

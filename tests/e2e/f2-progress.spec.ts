@@ -3,7 +3,7 @@ import { homeReady } from './helpers/home.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { scanWithKeyboard } from './helpers/scan.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
 import { scanAim } from './helpers/scanAim.js';
 
@@ -372,10 +372,11 @@ for (const retired of [false, true]) {
             await route.fulfill({ status: 410, body: '' });
             return;
           }
-          const response = await route.fetch();
-          const doc = await response.json();
+          const doc = JSON.parse(
+            await readFile(`public/data/landmarks/${site}/mission.json`, 'utf8'),
+          );
           for (const objective of doc.objectives) objective.id = `renamed-${objective.id}`;
-          await route.fulfill({ response, json: doc });
+          await route.fulfill({ json: doc });
         });
       }
       const discovered = Object.fromEntries(

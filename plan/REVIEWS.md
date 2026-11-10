@@ -1,5 +1,12 @@
 # Reviews
 
+## 2026-11-10 targeted review (CI red on main for 3 runs)
+
+- **Diagnosis (evidence: hosted run 42748266090, jobs' logs):** these were real e2e failures, not the hang. Three specs broke after the 186-188 merges: `d-scan.spec.ts:265` (read `scanner.view.objectiveId` before the first frame had set it, so it was null at all 3 viewports; test race, not a product bug), `f2-progress.spec.ts:363` (both variants; `route.fetch()` then `response.json()` threw "Response has been disposed", so hunga's mission fetch failed and the star was never credited), and a flaky `terrain-render` titanic high (passes alone). Each failing shard then reports "N did not run", which inflates the red.
+- **Fix:** d-scan waits for the objective before capturing it; f2-progress reads the mission JSON from disk instead of `route.fetch`. Gates on main; pushed.
+- **Process:** local playwright runs use `dist/`, and a stale dist (built Nov 9 12:35) masked source changes; rebuild (`npm run build`) before running single specs. 189 still covers the shard-1 hang.
+- **Needs owner:** unchanged (phone retest; Monterey 3.8 waiver).
+
 ## 2026-11-09 targeted review (CI red on main for 3 runs)
 
 - **Diagnosis:** two of the three failures (55de9747, 72a73b85 pushes, 18:13) were "workflow file issue" runs with no jobs, ten seconds apart; `ci.yml` is unchanged and the next two pushes (18:56) started all jobs normally, so it looks like a transient GitHub-side failure on rapid back-to-back pushes. The third (run 42656342253) was real: e2e shard 1/38 stalled 11 min on its 24th test after `opening-framing.spec.ts:1903` and hit the 1500 s suite budget (21 passed, 4 did not run); every other shard passed. Queued Codex brief 189 (R-ci-triage) to find the unbounded wait and make a hang fail at the per-test timeout.
