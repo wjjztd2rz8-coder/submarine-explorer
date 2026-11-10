@@ -168,7 +168,7 @@ html.is-touch body:has(.guidance-slot[data-kind='scan']:not([hidden])) .d-scan-e
   /* Equal side tracks keep the guidance card on the screen's centre line: sonar on the
      left edge, readouts and the bar on the right edge. */
   html.is-touch .hud-regions {
-    --hud-side: 176px;
+    --hud-side: clamp(176px, 24vw, 250px);
     grid-template-columns: var(--hud-side) minmax(0, 1fr) var(--hud-side);
     grid-template-areas:
       'sonar guide hud'
