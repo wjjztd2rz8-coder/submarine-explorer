@@ -423,3 +423,7 @@ Sol's round 1 plus the reconcile round used ~485k tokens and hit the Codex 5h li
 ## 2026-11-10 stale dist masks spec results
 
 Single-spec playwright runs serve `dist/`; a build older than the source hid the 186 migration change and sent diagnosis down a false trail. Rebuild before running single specs. Codex briefs that touch `src` should run `npm run build` first (gates.sh already does).
+
+## 2026-11-10: prettier on plan docs, third recurrence
+
+- Hosted run 42757881498 failed three static shards on `prettier --check` (unformatted OVERNIGHT-LOG hold entries); the rule in REVIEW-PROMPT only covered review runs. Fix: a local pre-commit hook formats staged `*.md` and fails loudly, so any run's plan commits are formatted. Untracked (in `.git/hooks`); reinstall after a fresh clone.

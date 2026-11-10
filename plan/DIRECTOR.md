@@ -62,7 +62,7 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
 | No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
-Stage (joint review 2026-11-09, Claude + Sol): about 85% to 1.0, 4-5 weeks central (planning range 4-6). Opening appeal (Claude): Titanic 4.2, Lost City 4.1, Beebe 4.0, Monterey 3.8 (owner-accepted, parked), Blue Hole 3.7, Bismarck 3.3. Whole-site beauty (Sol, release measure): Titanic 3.5, Lost City 3.5, Beebe 3-3.5, Blue Hole 3, Monterey 3 (waived at 3.8), Bismarck 3.3, Challenger 3-3.5. Phone scores unverified.
+Stage (joint review 2026-11-10, Claude + Sol; scores unchanged, no art merged since 2026-11-09): about 85% to 1.0, 4-5 weeks central (planning range 4-6). Opening appeal (Claude): Titanic 4.2, Lost City 4.1, Beebe 4.0, Monterey 3.8 (owner-accepted, parked), Blue Hole 3.7, Bismarck 3.3. Whole-site beauty (Sol, release measure): Titanic 3.5, Lost City 3.5, Beebe 3-3.5, Blue Hole 3, Monterey 3 (waived at 3.8), Bismarck 3.3, Challenger 3-3.5. Phone scores unverified.
 
 ## Needs owner
 
@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: none (Claude weekly at the pace gate; review run 2026-11-09 only). Priority order for the next Claude packages: 11 (phone landscape HUD), 6 (Beebe stacks), 7 (Lost City tubes), then 16e. V-bismarck-hull-plates DONE 2026-11-08 (e072e778). U-copy-fixes items 6-8 DONE 2026-11-07 (39830258); walkthrough-4 items 4-5 (scan-interrupt cue, side-find clarity) remain in item 9.
+- Claude: none (Claude weekly at the pace gate; review run 2026-11-10). Priority order for the next Claude packages (Sol: first-session usability before art): 11 (phone landscape HUD), 22 (Hunga slab), 6 (Beebe stacks), 7 (Lost City tubes), then 16e. V-bismarck-hull-plates DONE 2026-11-08 (e072e778). U-copy-fixes items 6-8 DONE 2026-11-07 (39830258); walkthrough-4 items 4-5 (scan-interrupt cue, side-find clarity) remain in item 9.
 
 ## Backlog
 
@@ -107,7 +107,7 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
     **DONE 2026-11-08 (88525a69) S-verify-fish-lock-plates [Codex, brief 151]:** scan lock and plate normal tangent fixed; unit-tested, no browser acceptance.
 15. **DONE 2026-11-09 (db6de37b) R-ci-speed timings refresh; hosted acceptance open [Codex, measured 2026-11-09]:** latest green hosted runs take 42-43 min; owner target under 30 min without dropping coverage. Refreshed hosted weights for the existing 38 one-worker shards project about 3 min saved; the measured 636 runner-minutes at 20 slots prevent an under-30 claim from balancing alone. Hosted acceptance remains open; evidence: [progress/R-ci-speed.md](progress/R-ci-speed.md). Prior 124/131 attempts were read, not merged.
 
-16b. **R-ci-triage [Codex, brief 160, item 18]:** hosted CI is red often and takes 45-70 min; triage failing specs by run logs, fix root causes, propose a under-30-min change.
+16b. **R-ci-triage [Codex, briefs 160 and 197, item 18]:** hosted CI is red often and takes 45-70 min; triage failing specs by run logs, fix root causes, propose a under-30-min change.
 **Brief 189, 2026-11-10:** shard 1's first-minute journey replaced its four-minute hosted timeout with 15 minutes; restore the configured deadline and bound teardown evidence. Local validation and hosted/workflow evidence: [progress/R-ci-shard1-hang.md](progress/R-ci-shard1-hang.md). Hosted acceptance and the under-30-minute goal remain open.
 16c. **T-verify-first-sixty [Codex, brief 161, item 19] DONE 2026-11-09 (merged; smoke gates green, browser spec unrun locally, hosted CI is the check):** first-60-s and debrief capability tests over all 13 sites on phone portrait/landscape/desktop; fix generic defects.
 16d. **S-dead-code-audit [Codex, brief 162, item 20] DONE 2026-11-09 (51e8536f):** delete code made redundant by the ROV/boost/upgrade/HUD-offset cuts; net negative lines.
@@ -125,6 +125,10 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 16m. **S-verify-save-touch-merges [Codex, DONE 2026-11-09 (working tree; 4,794 units pass; browser/tooling gate limits documented)]:** historical stars now survive retired or invalid current missions; 24 failing-first cases, save-format review and touch boundary/rebinding coverage. Evidence: [progress/S-verify-save-touch-merges.md](progress/S-verify-save-touch-merges.md).
 16m. **S-bughunt-settings-quality [Codex, DONE 2026-11-09 (working tree; browser acceptance blocked by sandbox)]:** two audit passes; removed duplicate waypoint reduced-motion application at boot after four failing-first regressions. Tier pending/revert and persistence coverage extended. Evidence: `plan/progress/S-bughunt-settings-quality.md`.
 16m. **S-bughunt-journal-ui [Codex, DONE 2026-11-09 (working tree; 4,762 units pass, browser acceptance blocked by sandbox)]:** two audit rounds; fixed the misleading empty hint after a first wildlife, secret or sample scan with six failing-first unit cases. Tags, filters, current-entry opening, narrow text and keyboard focus audited; evidence in `plan/progress/S-bughunt-journal-ui.md`.
+
+20. **T-hunga-opening-heading [Codex, brief 195, joint review 2026-11-10]:** Hunga mission opening heading changed 98° to 345° between golden sets, so the rim slab shows its narrow end. Find cause, restore the broad-face framing with a capability test; check rapid Begin before props load.
+21. **T-verify-desktop-720 [Codex, brief 196, Sol 2026-11-10]:** unaided 1280x720 first five minutes, extending existing specs; fix generic defects in the HUD grid.
+22. **V-hunga-rim-slab [Claude, Sonnet, after 11]:** the Hunga opening objective reads as a flat slab or thin tower from every heading (`hunga-tonga-caldera-1-mission.png`); target a rim with irregular broken top and talus, not a wall. Eight-site coherence item.
 
 ### Release and owner
 

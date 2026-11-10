@@ -1,5 +1,16 @@
 # Reviews
 
+## 2026-11-10 comprehensive review (joint: Claude + Codex 6.1 Sol; golden `2026-11-10-082252` vs `2026-11-09-183505`)
+
+- **Stage (agreed):** about 85% to 1.0, 4-5 weeks central, plan 4-6. Nothing in the art changed since 2026-11-09 (merges were bug hunts 183-185, 189-191 and CI spec fixes), so whole-site scores stand: Titanic 3.5, Lost City 3-3.5 (Sol; I said 3.5, accepted), Beebe 3-3.5, Blue Hole 3, Monterey 3 (waived), Bismarck about 3.3, Challenger 3-3.5. Openings: Titanic 4.2, Lost City 4.1, Beebe 4.0, Blue Hole 3.7.
+- **New finding (Sol, verified by me):** Hunga's mission opening heading changed from 98° to 345° between the sets (`hunga-tonga-caldera-1-mission.png`), so the rim slab now shows its narrow end as a thin tower. Brief 195 finds the cause; item 22 reworks the slab itself.
+- **Corrections accepted:** I mis-numbered the merges (debrief/audio/site-data were 183-185); "CI red every run" was too strong (the last complete green runs took 42-43 min), and the three most recent failures I could read were (a) static prettier on unformatted OVERNIGHT-LOG entries and (b) e2e shards in a run predating 189's fix; Blue Hole "floating" is not proven by the image (withdrawn); the golden set is desktop High only, so it says nothing about phone or unaided onboarding.
+- **Sol's additions:** ordinary rapid Begin before props load may bypass the late-prop reframing (source reading, unreproduced; folded into brief 195); automated desktop coverage is 1280x800 with scripted scanner state, not unaided 1280x720 (brief 196). Deploy only runs after green CI for the exact SHA.
+- **Disputed:** Sol thinks usability ranks above art in the Claude queue; I accept that and put 11 (phone HUD) first, then Hunga, Beebe, Lost City. Sol disputes my one-package-a-day inference from the budget gate; the gate's actual output is the evidence and stays the rule.
+- **Process:** the prettier-on-plan-docs failure has now recurred three times (2026-10-30, 2026-11-03, 2026-11-10 05:34, three static shards). Fix: a local `.git/hooks/pre-commit` formats staged markdown and fails loudly (not tracked by git; reinstall on a fresh clone). Codex week 48% burning about 36%/day: three briefs queued (195-197) behind 192-194. Claude idle time is the budget gate by design.
+- **New priorities:** Codex 195, 196, 197, then 192-194; Claude 11, 22, 6, 7, 16e.
+- **Needs owner:** phone retest; Monterey 3.8 waiver in the 1.0 definition (still open).
+
 ## 2026-11-10 targeted review (CI red on main for 3 runs)
 
 - **Diagnosis (evidence: hosted run 42748266090, jobs' logs):** these were real e2e failures, not the hang. Three specs broke after the 186-188 merges: `d-scan.spec.ts:265` (read `scanner.view.objectiveId` before the first frame had set it, so it was null at all 3 viewports; test race, not a product bug), `f2-progress.spec.ts:363` (both variants; `route.fetch()` then `response.json()` threw "Response has been disposed", so hunga's mission fetch failed and the star was never credited), and a flaky `terrain-render` titanic high (passes alone). Each failing shard then reports "N did not run", which inflates the red.
