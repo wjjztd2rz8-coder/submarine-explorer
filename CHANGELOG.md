@@ -14,6 +14,7 @@ without an entry here is not done.
 
 ### Fixed
 
+- **S-bughunt-photo-mode:** empty photo galleries describe the Capture action without keyboard keys, including on touch screens. A refused thumbnail canvas context now uses the existing capture-error message and permits a later retry. Cut: the hard-coded P/Enter gallery instructions; reuse the existing canvas error boundary, with no new state or UI.
 - **S-verify-save-touch-merges:** historical route stars survive missing, retired or invalid current missions; transient content failures retain frozen retry evidence. Cut: the valid-current-mission prerequisite for historical checklist credit. Save formats stay unchanged. Verified merged touch cancellation, photo-device hints and final tap travel with additional capability tests.
 - **S-bughunt-settings-quality:** apply reduced motion to waypoints once at boot through the existing Settings path, combining saved and system preferences. Cut the earlier saved-only application. Two audit passes also checked pending Low/Medium/High/Auto edits, reload persistence and audio mute; no further defect confirmed.
 
