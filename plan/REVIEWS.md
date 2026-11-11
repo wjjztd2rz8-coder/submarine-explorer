@@ -1,5 +1,10 @@
 # Reviews
 
+## 2026-11-11 targeted review (red CI on main, 3 runs)
+
+- **Diagnosis:** brief 180 cleared the phone-accept first-minute hangs; the same 7 shards now fail identically on each of the last 3 runs: d-scan same-frame titanic/GBH (touch, `.tc-btn-scan` hidden), journal-debrief two-objective 1280, hud-touch desktop regions, opening-framing portrait matrix, phone-accept touch-help `tap` timeout. All pass locally, even with `CI=1`, so the cause is hosted SwiftShader timing or paused-clock stepping, not a game regression. Not diagnosed further here.
+- **Action:** queued Codex brief 190 (item 16o, root cause by capability, no timeout bumps). No tag until hosted CI is green.
+
 ## 2026-11-11 comprehensive review (Claude alone; Sol skipped, Codex budget low; golden `2026-11-11-044544` vs `2026-11-10-082252`)
 
 - **Second opinion:** `tools/codex-review.sh start` exited 75 (Codex 5h 18%, week 30%, brief 180 running), so this is a single-reviewer view; no Sol disagreements to report. Next review should re-run the joint pass.

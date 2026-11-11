@@ -3794,3 +3794,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect (124/131 held, no running tasks). Claude weekly 12% (resets Nov 12 06:00), kept to the floor, no agent started. Codex 5h 100% but dispatch declines (weekly pace, 27% left); 194-196 queued. Main clean and pushed; no tag.
 - **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
+## 2026-11-11 06:47 CST targeted review (red CI)
+
+- Hosted CI: same 7 shards fail on 3 runs, all pass locally (hosted timing). Queued brief 190 (item 16o). No agent started (Claude weekly 12%).
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
