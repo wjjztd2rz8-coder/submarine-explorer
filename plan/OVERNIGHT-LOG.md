@@ -3804,3 +3804,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect (124/131 held, no running tasks). Claude weekly 12% (resets Nov 12 05:59), below pace gate, no agent started. Codex dispatch declines (weekly pace, 27% left); 4 briefs queued (190, 194-196). Main clean and pushed; no tag.
 - **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
+## 2026-11-11 08:45 CST headless run (Claude): hold
+
+- Nothing to collect (124/131 held, no running tasks). Claude weekly 12% (resets Nov 12 05:59), below pace gate, no agent started. Codex 5h 100%, weekly 27% left, dispatch paced; briefs stay queued. Main clean and pushed; no tag.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
