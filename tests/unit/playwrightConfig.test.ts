@@ -1,4 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest';
+import catalog from '../../data/landmarks/index.json' with { type: 'json' };
 
 afterEach(() => {
   vi.doUnmock('@playwright/test');
@@ -41,6 +42,7 @@ test.each([
 );
 
 test('phone acceptance preserves test deadlines and bounds every teardown screenshot', async () => {
+  vi.stubEnv('PW_RENDER_REVIEW', '1');
   const playwright = await vi.importActual<typeof import('@playwright/test')>('@playwright/test');
   type Journey = (
     fixtures: { page: { on(): void; goto(): Promise<never> } },
@@ -114,3 +116,45 @@ test('phone acceptance preserves test deadlines and bounds every teardown screen
     }
   }
 });
+
+test.each([
+  ['', undefined, 3],
+  ['1', undefined, 1],
+  ['1', '1', 3],
+] as const)(
+  'first-minute matrix covers every site and every layout (%s, %s)',
+  async (ci, review, copies) => {
+    vi.stubEnv('CI', ci);
+    vi.stubEnv('PW_RENDER_REVIEW', review);
+    const playwright = await vi.importActual<typeof import('@playwright/test')>('@playwright/test');
+    const sites: string[] = [];
+    const layouts = new Set<string>();
+    let layout = '';
+    const register = Object.assign(
+      (name: string) => {
+        if (!layout) return;
+        sites.push(name.split(':')[0]);
+        layouts.add(layout);
+      },
+      {
+        describe: (name: string, body: () => void) => {
+          layout = name.startsWith('first minute acceptance') ? name : '';
+          body();
+          layout = '';
+        },
+        use() {},
+        beforeEach() {},
+        afterEach() {},
+      },
+    );
+    vi.doMock('@playwright/test', () => ({ ...playwright, test: register }));
+    await import('../e2e/phone-accept.spec.js');
+    expect(layouts.size).toBe(3);
+    expect(sites).toHaveLength(catalog.landmarks.length * copies);
+    for (const site of catalog.landmarks)
+      expect(
+        sites.filter((found) => found === site),
+        site,
+      ).toHaveLength(copies);
+  },
+);
