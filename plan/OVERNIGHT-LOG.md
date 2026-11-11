@@ -3739,3 +3739,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Finished the previous run's uncommitted worktree myself (no new agent): `horizonRidge` plus a `horizon` block in Axial data, one unit-test list updated. Axial portrait golden shows a soft ridge/haze band in the upper third, readable, not dark. gates.sh smoke + project-base green on main (no --full-e2e). Pushed. Claude weekly ~18%, no second package. 124/131 held; 6 Codex briefs queued, dispatch pacing unchanged. Note: unit suite now takes ~14 min, so gates runs need a long timeout.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-10 22:32 CST headless run (Claude): merged V-challenger-lander-flag (item 16e)
+
+- Sonnet: lander flag is now a rippled matt cloth strip (lander.ts only, 3 draw calls, within triangle budgets). Reads as folded cloth, still a bit peach-lit; ~7. gates.sh smoke + project-base green on main (no --full-e2e). Pushed. Claude weekly ~15%: no second package. Codex dispatch still waiting on its pace line; 6 briefs queued (180, 192-196). 124/131 held. Hosted CI still red (brief 180).
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
