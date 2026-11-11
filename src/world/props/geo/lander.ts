@@ -2,11 +2,11 @@
  * `feature: "benthic-lander"` (Challenger Deep, the "Leggo" bait station): a free-vehicle lander
  * seen as a readable hero object. Three-legged frame with a ring and cross braces, amber foam
  * flotation, a ballast plate with an acoustic release and a coil of cable on the seabed, a camera
- * housing, an arm carrying a wire bait cage with mackerel, and a tall mast with an orange recovery
+ * housing, an arm carrying a wire bait cage with mackerel, and a tall mast with an orange cloth recovery
  * flag and a white strobe. The frame is aged: sediment darkens its lower sections and rust stains
  * patch the legs. dims = [footprint width, footprint depth, overall height incl. mast]. Parts are
  * merged with vertex colours into one frame mesh together with a disturbed-sediment halo and a few
- * half-buried clasts on the seabed around the footprint (outside the reported bounds); the flag (emissive) and strobe (unlit) are two
+ * half-buried clasts on the seabed around the footprint (outside the reported bounds); the flag (matt cloth) and strobe (unlit) are two
  * small extra meshes, so the whole lander is three draw calls at every tier. Real lander dimensions
  * are unpublished: the shape is generic, only the position is the real one.
  */
@@ -36,6 +36,7 @@ const STRAP = new THREE.Color(0x2f3234);
 const WHITE = new THREE.Color(0x535b5d);
 const FISH = new THREE.Color(0x8fa6b4);
 const FLAG = new THREE.Color(0xff5a16);
+const CLOTH = new THREE.Color(0x6e2e12);
 const STROBE = new THREE.Color(0xd6f4ff);
 const GLASS = new THREE.Color(0x1f3a48);
 const SEDIMENT = new THREE.Color(0x2a251d);
@@ -517,48 +518,31 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
   );
   frame.name = 'lander-frame';
 
-  // Recovery flag: a swallow-tailed pennant, double-sided and self-lit so it reads at depth.
-  // Hung part-way down the mast and kept compact, so it stays in the open sky clear of the objective card.
+  // Recovery flag: a rippled cloth quad strip hung from the mast, matt and unlit by itself so it
+  // reads as dull fabric. Hung part-way down the mast and kept compact, clear of the objective card.
   const fl = 0.8 * k;
   const fh = 0.45 * k;
-  const flagGeom = new THREE.BufferGeometry();
+  const cols = 8;
   const top = ringY * k + (mastTop - ringY * k) * 0.62;
-  flagGeom.setAttribute(
-    'position',
-    new THREE.BufferAttribute(
-      new Float32Array([
-        0,
-        top,
-        0,
-        0,
-        top - fh,
-        0,
-        fl,
-        top - fh * 0.5,
-        0.12 * k,
-        0,
-        top,
-        0,
-        fl * 0.5,
-        top - fh * 0.15,
-        0.1 * k,
-        fl,
-        top - fh * 0.5,
-        0.12 * k,
-      ]),
-      3,
-    ),
-  );
+  const pos: number[] = [];
+  const idx: number[] = [];
+  for (let i = 0; i <= cols; i++) {
+    const u = i / cols;
+    // Ripples grow away from the mast; the free end sags a little.
+    const z = Math.sin(u * 9) * 0.12 * k * u;
+    for (const drop of [0, 1]) pos.push(u * fl, top - drop * fh * (1 - 0.15 * u), z);
+    if (i < cols) {
+      const c = i * 2;
+      idx.push(c, c + 1, c + 2, c + 1, c + 3, c + 2);
+    }
+  }
+  const flagGeom = new THREE.BufferGeometry();
+  flagGeom.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  flagGeom.setIndex(idx);
   flagGeom.computeVertexNormals();
   const flag = new THREE.Mesh(
     flagGeom,
-    new THREE.MeshStandardMaterial({
-      color: FLAG,
-      emissive: FLAG,
-      emissiveIntensity: 0.5,
-      roughness: 0.8,
-      side: THREE.DoubleSide,
-    }),
+    new THREE.MeshStandardMaterial({ color: CLOTH, roughness: 1, side: THREE.DoubleSide }),
   );
   flag.name = 'lander-flag';
   const strobe = new THREE.Mesh(
