@@ -3759,3 +3759,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect (only held worktrees 124/131). Claude weekly 17%, below pace gate; no agent started. Golden refresh (subexp-golden-2245) still running. Codex week 43%, dispatch waiting on pace; 6 briefs queued (180, 192-196). Main clean and pushed; no tag; hosted CI red (brief 180).
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-11 00:45 CST headless run (Claude): hold
+
+- Codex dispatch launched briefs 180 (CI phone-accept), 192, 193 at 00:30; all three running in their worktrees, nothing to collect yet. Claude weekly 17% (resets Nov 12 05:59), so no agent started. 3 briefs still queued (194-196). Main clean, no tag; hosted CI red until brief 180 lands.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
