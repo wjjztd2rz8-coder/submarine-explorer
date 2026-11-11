@@ -16,4 +16,4 @@
 
 ## Gates
 
-`PW_PORT=4893 tools/gates.sh` (smoke + project-base e2e), `GATES_CONFIG_MODE=writable`. No --full-e2e run.
+`PW_PORT=4893 tools/gates.sh` (smoke + project-base e2e), `GATES_CONFIG_MODE=writable`: all PASS (python, content, build, unit, e2e, e2e-base, attribution, prettier). `perf-budget` Lost City sprite-fill pins re-pinned to the new trunk surface. No --full-e2e run.
