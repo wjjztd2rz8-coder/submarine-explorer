@@ -62,5 +62,13 @@
     "virgin-chimney": {
       "bodyGlow": 0.6
     }
+  },
+  "horizon": {
+    "upperColor": 661024,
+    "hazeColor": 2773606,
+    "hazePeakElevation": 0.4,
+    "fogLift": 1.6,
+    "fadeStartM": 400,
+    "fadeEndM": 600
   }
 }

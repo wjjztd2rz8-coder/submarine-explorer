@@ -910,7 +910,7 @@ describe('site manifest graded backdrop', () => {
       allSiteManifests()
         .filter((m) => m.horizon)
         .map((m) => m.id),
-    ).toEqual(['beebe-vent-field', 'blake-plateau-corals', 'lost-city']);
+    ).toEqual(['axial-seamount-ashes', 'beebe-vent-field', 'blake-plateau-corals', 'lost-city']);
   });
 });
 
