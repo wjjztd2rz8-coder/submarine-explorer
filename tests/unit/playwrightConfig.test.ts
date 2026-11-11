@@ -40,13 +40,20 @@ test.each([
   },
 );
 
-test('first-minute journeys preserve local, hosted and diagnostic test deadlines', async () => {
+test('phone acceptance preserves test deadlines and bounds every teardown screenshot', async () => {
   const playwright = await vi.importActual<typeof import('@playwright/test')>('@playwright/test');
   type Journey = (
     fixtures: { page: { on(): void; goto(): Promise<never> } },
     info: object,
   ) => Promise<void>;
   const journeys: Journey[] = [];
+  type Teardown = (
+    fixtures: { page: { screenshot: ReturnType<typeof vi.fn> } },
+    info: { status: string; outputPath(name: string): string },
+  ) => Promise<void>;
+  const rootTeardowns: Teardown[] = [];
+  const suites: Array<{ name: string; teardowns: Teardown[] }> = [];
+  let suite: (typeof suites)[number] | undefined;
   let firstMinute = false;
   let budget = 0;
   // Collect the real journey bodies without starting a browser in the static gate.
@@ -56,13 +63,17 @@ test('first-minute journeys preserve local, hosted and diagnostic test deadlines
     },
     {
       describe: (name: string, body: () => void) => {
+        const parent = suite;
+        suite = { name, teardowns: [...(parent?.teardowns ?? rootTeardowns)] };
+        suites.push(suite);
         firstMinute = name.startsWith('first minute acceptance');
         body();
+        suite = parent;
         firstMinute = false;
       },
       use() {},
       beforeEach() {},
-      afterEach() {},
+      afterEach: (body: Teardown) => (suite?.teardowns ?? rootTeardowns).push(body),
       setTimeout: (timeout: number) => {
         budget = timeout;
       },
@@ -84,6 +95,22 @@ test('first-minute journeys preserve local, hosted and diagnostic test deadlines
       await expect(journey({ page }, {})).rejects.toBe(navigation);
       // A body-level timeout override otherwise makes a hung goto outlive the configured deadline.
       expect(budget).toBe(timeout);
+    }
+  }
+  expect(suites).toHaveLength(5);
+  for (const { name, teardowns } of suites) {
+    expect(teardowns, name).toHaveLength(1);
+    for (const status of ['passed', 'failed', 'interrupted', 'timedOut']) {
+      const screenshot = vi.fn().mockResolvedValue(undefined);
+      for (const teardown of teardowns)
+        await teardown({ page: { screenshot } }, { status, outputPath: (file) => file });
+      if (status === 'timedOut') expect(screenshot, name).not.toHaveBeenCalled();
+      else {
+        expect(screenshot, name).toHaveBeenCalledExactlyOnceWith({
+          path: expect.stringMatching(/\.png$/),
+          timeout: 5_000,
+        });
+      }
     }
   }
 });

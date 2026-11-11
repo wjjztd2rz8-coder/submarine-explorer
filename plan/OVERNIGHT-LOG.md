@@ -3764,3 +3764,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Codex dispatch launched briefs 180 (CI phone-accept), 192, 193 at 00:30; all three running in their worktrees, nothing to collect yet. Claude weekly 17% (resets Nov 12 05:59), so no agent started. 3 briefs still queued (194-196). Main clean, no tag; hosted CI red until brief 180 lands.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-11 02:14 CST headless run (Claude): merged briefs 193 and 192
+
+- 193 (pause/reload: skipBriefing reuses begin(), waits for content/pose; net simpler) and 192 (phone-accept teardown screenshot bounded by one file-level hook; test-only) merged, gates.sh smoke + project-base green on worktree (192 on its own worktree; 193 also on main), pushed. No Claude agent (weekly 16%, below pace gate). Brief 180 (CI phone-accept) still running; 194-196 queued. 124/131 held. Golden refresh (item 9) failed INCOMPLETE (monterey capture timeout, endurance context create); rerun when budget allows. Hosted CI red until 180 lands; no tag.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.

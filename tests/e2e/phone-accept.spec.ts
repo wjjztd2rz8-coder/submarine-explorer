@@ -37,6 +37,12 @@ const touchControls = [
   '.hud-journal',
 ];
 
+test.afterEach(async ({ page }, info) => {
+  // Teardown has a fresh test budget; a stalled renderer must not spend it on evidence.
+  if (info.status === 'timedOut') return;
+  await page.screenshot({ path: info.outputPath('last-state.png'), timeout: 5_000 });
+});
+
 for (const viewport of [
   { width: 390, height: 844, touch: true },
   { width: 844, height: 390, touch: true },
@@ -75,11 +81,6 @@ for (const viewport of [
           }),
         );
       });
-    });
-    test.afterEach(async ({ page }, info) => {
-      // Teardown has a fresh test budget; a stalled renderer must not spend it on evidence.
-      if (info.status === 'timedOut') return;
-      await page.screenshot({ path: info.outputPath('last-state.png'), timeout: 5_000 });
     });
     for (const site of catalog.landmarks) {
       test(`${site}: guidance reaches first scan within sixty seconds and debrief exits`, async ({
@@ -458,11 +459,6 @@ for (const viewport of [
           );
       });
     });
-    test.afterEach(async ({ page }, info) => {
-      // Keep evidence in ordinary runs, including immediately after an assertion failure.
-      await page.screenshot({ path: info.outputPath('phone.png') });
-    });
-
     test('Home names the next site and launches that destination', async ({ page }) => {
       await page.goto('/?tier=low&touch=1');
       await homeReady(page, true);
