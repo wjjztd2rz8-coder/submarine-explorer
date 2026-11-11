@@ -23,6 +23,7 @@ without an entry here is not done.
 
 ### Changed
 
+- **S-bughunt-pause-resume-reload:** a reload with `skipBriefing=1` waits for content and the starting pose before starting the mission clock or allowing piloting. Cut the separate early-start path; reuse Begin, retaining the live default start setting while content loads. Pause, visibility, input cancellation and saved Journal boundaries were audited in two rounds.
 - **S-bughunt-journal-ui:** the Journal front page recognizes a first wildlife, secret or sample scan as earned progress. Cut: the misleading first-scan hint after these discoveries and the zero POI chip. Tags, spoiler filtering and saved discoveries keep their existing behavior.
 
 - **S-bughunt-save-migration:** preserve historical dive stars through renamed or removed objective IDs, and prevent unfinished old routes from receiving completion credit. Historical routes now match saved Journal POI keys directly. Cut: the intersection with current objective IDs; save formats and gameplay settings stay unchanged.

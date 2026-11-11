@@ -87,6 +87,72 @@ async function holdScanUntil(page: Page, objectiveId: string): Promise<void> {
   );
 }
 
+for (const touch of [false, true]) {
+  test.describe(touch ? 'phone mission clock' : 'desktop mission clock', () => {
+    test.use({
+      hasTouch: touch,
+      viewport: touch ? { width: 390, height: 844 } : { width: 1280, height: 800 },
+    });
+
+    test('pause and visibility stay frozen; slow reload excludes content loading time', async ({
+      page,
+    }) => {
+      // Guards a skipped briefing starting the clock and piloting before its late start pose.
+      await boot(page, `/?mission=titanic&skipBriefing=1&tier=low${touch ? '&touch=1' : ''}`);
+      await page.waitForFunction(
+        () => (window.__game as { mission: { state: string } }).mission.state === 'diving',
+      );
+      const elapsed = () =>
+        page.evaluate(() => (window.__game as { mission: { elapsedS: number } }).mission.elapsedS);
+      if (touch) await page.locator('.tc-btn-pause').tap();
+      else await page.keyboard.press('Escape');
+      await expect(page.locator('.pause-menu')).toBeVisible();
+      const paused = await elapsed();
+      await page.evaluate(() => {
+        for (const hidden of [true, false]) {
+          Object.defineProperty(document, 'hidden', { configurable: true, value: hidden });
+          document.dispatchEvent(new Event('visibilitychange'));
+        }
+      });
+      await waitForFrames(page, 3);
+      expect(await elapsed()).toBe(paused);
+      await expect(page.locator('.pause-menu')).toBeVisible();
+      const resume = page
+        .locator('.pause-menu')
+        .getByRole('button', { name: 'Resume', exact: true });
+      if (touch) await resume.tap();
+      else await resume.click();
+      await expect.poll(elapsed).toBeGreaterThan(paused);
+
+      let release!: () => void;
+      const content = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      await page.route('**/data/landmarks/titanic/pois.json', async (route) => {
+        await content;
+        await route.continue();
+      });
+      try {
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.waitForFunction(() => window.__gameReady === true);
+        await waitForFrames(page, 3);
+        expect((await missionProbe(page)).state).toBe('briefing');
+        expect(await elapsed()).toBe(0);
+        expect((await missionProbe(page)).emitted).not.toContain('mission:started');
+        if (touch) await expect(page.locator('.tc-btn-scan')).toBeHidden();
+      } finally {
+        release();
+      }
+      await page.waitForFunction(
+        () => (window.__game as { mission: { state: string } }).mission.state === 'diving',
+      );
+      const fresh = await missionProbe(page);
+      expect(fresh.emitted).toEqual(['mission:started']);
+      expect(fresh.objectives.every((objective) => !objective.complete)).toBe(true);
+    });
+  });
+}
+
 test.describe('B3 mission flow', () => {
   test('briefing freezes the game; Enter starts near the site with objectives', async ({
     page,

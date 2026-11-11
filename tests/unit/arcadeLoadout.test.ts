@@ -830,7 +830,7 @@ it.each([false, true])(
       expect(ctx.rig.snap).not.toHaveBeenCalled();
       expect(
         ctx.missionRouter!.mission.emitted.filter((e) => e.name === 'mission:started'),
-      ).toHaveLength(skipBriefing ? 1 : 0);
+      ).toHaveLength(0);
     } finally {
       missionSystem.dispose?.();
       submarine.dispose!();

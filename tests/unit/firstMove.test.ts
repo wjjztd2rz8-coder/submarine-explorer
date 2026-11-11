@@ -111,7 +111,7 @@ describe('first move through camera controls', () => {
       briefing.frozen = entry === 'briefing';
       const start = () =>
         ctx.bus.emit('mission:started', { missionId: 'titanic', tileId: 'titanic' });
-      // Begin applies the opening before the event; skipBriefing starts before ready.
+      // Also tolerate a late placement after an early start event.
       if (entry === 'skipBriefing') start();
       ctx.sub.position.set(120, -300, -80);
       ctx.sub.yaw = Math.PI / 2;
@@ -602,6 +602,18 @@ it.each(placements)(
           cameraControlsSystem.frame!['controls.camera']!(f, ctx);
           return f;
         };
+        if (order === 'skip-delayed-ready') {
+          const waitingPose = pose(ctx);
+          const before = reset.mock.calls.length;
+          for (let i = 0; i < 120; i++)
+            expect(frame(1)).toMatchObject({ frozen: true, steps: 0, clockDt: 0 });
+          expect(pose(ctx)).toEqual(waitingPose);
+          expect(ctx.cameraTips.moved).toBe(false);
+          expect(ctx.missionRouter!.mission.elapsedS).toBe(0);
+          await settleReady();
+          expect(reset.mock.calls.length - before).toBe(1);
+          expect(ctx.missionRouter!.mission.state).toBe('diving');
+        }
         frame(0, true);
         expect(ctx.cameraTips.moved).toBe(false);
         const anchor = ctx.sub.position.clone();
@@ -630,25 +642,18 @@ it.each(placements)(
         const pilotedPose = pose(ctx);
         const pilotedVelocity = ctx.sub.velocity.clone();
         const pilotedHull = ctx.sub.getState();
-        if (order === 'skip-delayed-ready') await settleReady();
-        else if (!order.endsWith('props-first')) {
+        if (!order.endsWith('props-first')) {
           propsIO.resolve();
           await loaded;
         }
         const resetCalls = reset.mock.calls.length - calls;
-        expect(ctx.props.stats.count).toBe(
-          order === 'skip-delayed-ready'
-            ? 0
-            : json(`data/landmarks/${site}/props.json`).props.length,
-        );
+        expect(ctx.props.stats.count).toBe(json(`data/landmarks/${site}/props.json`).props.length);
         expect(ctx.props.stats.failed).toBe(0);
         expect(ctx.props.stats.skipped).toBe(0);
-        expect(resetCalls).toBe(
-          ['free-late-props', 'free-learned', 'skip-delayed-ready'].includes(order) ? 1 : 0,
-        );
+        expect(resetCalls).toBe(['free-late-props', 'free-learned'].includes(order) ? 1 : 0);
         // Late mission props cannot replace an already piloted opening. Keep
         // the real movement and hull state, including its onboarding progress.
-        if (!free && order !== 'skip-delayed-ready') {
+        if (!free) {
           expect(pose(ctx)).toEqual(pilotedPose);
           expect(ctx.sub.velocity).toEqual(pilotedVelocity);
           expect(ctx.sub.getState()).toEqual(pilotedHull);
