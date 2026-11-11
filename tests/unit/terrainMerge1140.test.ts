@@ -138,7 +138,7 @@ it.each([false, true])(
 );
 
 it.each([
-  ['tuff', 'b52d30fd1e8b8025ecc07450c165ab3a5b96b7acf14376207a6715b413bb4ed1'],
+  ['tuff', '276b0570281b2dcb004f30d2a20e45c0bedefd691f2eefae312569798400cb7b'],
   ['hadal', '4a0ba159854bd492d2f580d5b156fe70a1f43dfa879a0579d62611b2ea060fed'],
 ] as const)('1140: Monterey strata preserves f43 %s scarp buffers', (id, baseline) => {
   const built = buildScarp(id, {

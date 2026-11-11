@@ -176,10 +176,10 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     bands: 8,
     dip: 0.1,
     ledge: 0.4,
-    gully: 2.2,
+    gully: 1.5,
     gullyFreq: 0.14,
     joints: 7,
-    jointStep: 2.2,
+    jointStep: 1.4,
     benchVar: 0.03,
     base: new THREE.Color(0x8d7d63), // tan tuff
     band: new THREE.Color(0x56554a), // darker ash bands, greenish
@@ -344,9 +344,9 @@ export function wallEnvelope(
   const skyline =
     edgeStart < 0.6
       ? 0.72 + 0.5 * fbm3(x * 0.06, 1, width, Math.round(width * 31), 4)
-      : 0.5 +
-        0.55 * fbm3(x * 0.05, 3, width, Math.round(width * 17), 3) -
-        0.2 * smooth(0.62, 0.8, fbm3(x * 0.12, 6, width, 41, 2));
+      : 0.62 +
+        0.5 * fbm3(x * 0.05, 3, width, Math.round(width * 17), 3) -
+        0.16 * smooth(0.62, 0.8, fbm3(x * 0.12, 6, width, 41, 2));
   return { edge, skyline };
 }
 
