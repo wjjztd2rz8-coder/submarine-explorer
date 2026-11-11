@@ -136,6 +136,8 @@ interface Preset {
   tile: [number, number];
   /** Bed-by-bed tone contrast, thin lamination and grain strength (1 = the original look). */
   bedContrast: number;
+  /** Share of the bed tone taken from patchy noise instead of the regular bands (0 = banded). */
+  mottle: number;
 }
 
 const REAR: [number, number][] = [
@@ -145,20 +147,12 @@ const REAR: [number, number][] = [
   [-0.12, 1.8],
 ];
 
-/** Rear of a flat-topped escarpment: the crest runs back as a level shelf before it falls away. */
-const PLATEAU_REAR: [number, number][] = [
-  [1.01, 0.5],
-  [1, 1.2],
-  [0.3, 1.5],
-  [-0.12, 1.8],
-];
-
 const PRESETS: Record<ScarpPresetId, Preset> = {
   tuff: {
     bedding: 'regular',
     glow: { wall: [0.19, 0xb4b09a, 0.25], rubble: [0.35, 0xb4b09a, 0.45] },
     decoration: 'seeps',
-    cliff: { talusShade: 0.6, crestLit: 0.5 },
+    cliff: { talusShade: 0.3, crestLit: 0.6 },
     tex: 'strata',
     profile: [
       [0.14, -0.2],
@@ -171,7 +165,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
       [0.86, 0],
       [0.93, -0.05],
       [1, 0.02],
-      ...PLATEAU_REAR,
+      ...REAR,
     ],
     join: 0.14,
     reach: 0.9,
@@ -181,24 +175,25 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     passage: 0,
     bands: 8,
     dip: 0.1,
-    ledge: 0.7,
-    gully: 1.5,
+    ledge: 0.4,
+    gully: 2.2,
     gullyFreq: 0.14,
     joints: 7,
-    jointStep: 1.4,
+    jointStep: 2.2,
     benchVar: 0.03,
     base: new THREE.Color(0x8d7d63), // tan tuff
     band: new THREE.Color(0x56554a), // darker ash bands, greenish
     crest: new THREE.Color(0xa89679),
     drape: new THREE.Color(0xa89878),
     boulder: new THREE.Color(0x7f7461),
-    boulders: 220,
-    rockSize: 0.75,
-    blocks: 0.05,
+    boulders: 320,
+    rockSize: 0.9,
+    blocks: 0.14,
     rough: 0.95,
     edgeStart: 0.75,
     tile: [14, 14],
     bedContrast: 1,
+    mottle: 0.75,
   },
   canyon: {
     bedding: 'eroded',
@@ -252,6 +247,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     edgeStart: 0.3,
     tile: [12, 5],
     bedContrast: 2.8,
+    mottle: 0,
   },
   hadal: {
     bedding: 'regular',
@@ -293,6 +289,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     edgeStart: 0.3,
     tile: [7, 7],
     bedContrast: 1,
+    mottle: 0,
   },
 };
 
@@ -342,11 +339,14 @@ export function wallEnvelope(
 ): { edge: number; skyline: number } {
   const edge = smooth(edgeStart, 1, endRatio(x, width));
   // A ragged skyline: the crest varies along the wall and slopes away at both ends.
-  // Late-pinching walls (edgeStart >= 0.6) are escarpments: a level crest in a few terraces.
+  // Late-pinching walls (edgeStart >= 0.6) are caldera rims: a broken crest of spurs and deep
+  // notches rather than a level top.
   const skyline =
     edgeStart < 0.6
       ? 0.72 + 0.5 * fbm3(x * 0.06, 1, width, Math.round(width * 31), 4)
-      : 1 - 0.09 * Math.abs(Math.round(((x / width) * 2.4) % 2));
+      : 0.5 +
+        0.55 * fbm3(x * 0.05, 3, width, Math.round(width * 17), 3) -
+        0.2 * smooth(0.62, 0.8, fbm3(x * 0.12, 6, width, 41, 2));
   return { edge, skyline };
 }
 
@@ -737,7 +737,10 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     // light and the undercut beneath it is in shadow.
     const bed = fbm3(Math.floor(s) * 3.1 + 0.5, 2.5, seed + 77, seed + 3, 1);
     const bc = fidelity ? 1.5 : P.bedContrast;
-    out.copy(P.band).lerp(P.base, Math.min(1.1, 0.25 + 0.85 * ((bed - 0.5) * bc + 0.5)));
+    // Mottled rock takes its tone from slow patchy noise so no band runs unbroken across the face.
+    const patch = fbm3(x * 0.07, y * 0.09, seed + 23, seed + 4, 3);
+    const toneBed = THREE.MathUtils.lerp(bed, patch, P.mottle);
+    out.copy(P.band).lerp(P.base, Math.min(1.1, 0.25 + 0.85 * ((toneBed - 0.5) * bc + 0.5)));
     if (erodedBeds) {
       // Each bed keeps its own muted albedo; resistant beds are paler than weak ones.
       const k = Math.min(P.bands - 1, Math.max(0, Math.floor(s)));
@@ -750,7 +753,9 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       if (fidelity) out.lerp(P.drape, MONTEREY_STRATA.faintBedAmount * smooth(0.55, 0.8, drift));
     }
     out.multiplyScalar(
-      (0.82 + 0.4 * tone) * (1 + 0.14 * smooth(0.8, 1, saw) - 0.28 * (1 - smooth(0, 0.14, saw))),
+      (0.82 + 0.4 * tone) *
+        (1 +
+          (1 - 0.7 * P.mottle) * (0.14 * smooth(0.8, 1, saw) - 0.28 * (1 - smooth(0, 0.14, saw)))),
     );
     if (bc > 1) {
       // Thin laminae inside each bed, a sharp shadow line under every ledge, and fine grain.

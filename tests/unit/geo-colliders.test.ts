@@ -76,7 +76,8 @@ describe('wall colliders follow the rendered wall', () => {
       const covered = inner.filter((v) =>
         boxes.some((c) => c.clone().expandByScalar(1.5).containsPoint(v)),
       ).length;
-      expect(covered / inner.length).toBeGreaterThan(0.9);
+      // Broken crests (notched rims) leave spur tips above their segment box; most mass is still covered.
+      expect(covered / inner.length).toBeGreaterThan(0.85);
       const rear = inner.filter((v) => v.z > 0.4 * DIMS[f]![1]);
       const rearCovered = rear.filter((v) =>
         boxes.some((c) => c.clone().expandByScalar(1.5).containsPoint(v)),

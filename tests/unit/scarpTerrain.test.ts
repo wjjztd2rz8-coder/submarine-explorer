@@ -218,22 +218,22 @@ const slope = (x: number, z: number) => 0.045 * x + 0.025 * z;
 // clipped depth extents. Placement and material contracts remain independent.
 const scarpBaseline: Record<string, string[]> = {
   'tuff-low': [
-    '043499bafa3eada94c6c979a4d74acd59958354f0465303c484d5f1825a82a4c',
-    '35d1d8379c8e2e838127d4afe3f3c6515f1f4a7157cb3b299862e1f415e358a0',
+    '3674ccd7c61109c535a31dcdc44882ce51d54e956a7eb60838815076b90417fd',
+    '5e8ef391e014be1fd3e44cb590c0a9bdd8cbd7fdfcae1d2e85911c77f843fa7e',
     '3f6bb4a68be59d5c46fe234f9d9612a2e0a0f6a0f43a1d21a9df30be91a2707b',
-    '8f9deed2ba0979770c623965f7f3ca923f7a8dfe20ca9c56c999607f9fd92dc9',
+    'f6117fc3dd51e2b68d2200d93a1db62cdb231195dec54b50bef53a9e7bdb2238',
   ],
   'tuff-medium': [
-    '0802d829afad759db2037108e82eeaa35317b9fb08b1db2b7df17e05b2a390f8',
-    '4ee62fb8f8331b46f1820b2be89868152088d8e85e5d5c47f9ec9f0c02413b2e',
+    '244ec56aa21c86479e557c20ab2edc35978b57ae6b880f4f989d635954881bfb',
+    '1dc2bdaebdf1a376804a5384628c5d06a97bc2d692cdda3c0c039feeaa79f00e',
     '1d0915c2f47a3f04de07b880ec408425b50992d2d08a75d649044988af5bd62e',
-    'b8a241a2024ab47df60d542da7bc2802ad074587b724df9b49aa85588ae20426',
+    'fea822932f6dd72b62849dea23ca29012b917349366713ab21db97a10614d60d',
   ],
   'tuff-high': [
-    '76efa284b9bf70cb8c5fdd7ab8375f11b8a5565b743251362243d4b2e1f04048',
-    'f342f4bb8571f2accc156aaef6a28173c17585ac93ad261a3a86b43083771cc4',
+    '3464070e21acf774c29b68e60af603aa3388ddf5c6d9845de503989002421d32',
+    'd4b14042f1f8e7301d8ae39dcacab30c5a060b7c4a2ccac25ae870dc042386ea',
     '1d0915c2f47a3f04de07b880ec408425b50992d2d08a75d649044988af5bd62e',
-    '71ba2f4676e68e7c38277384e7d93f6df21bc59eb09cfaa1b7aaac5ab126cf25',
+    '1218c3e9c7b8e7455673a70b358bdc4cf17a4243ce105324f27fd65e8601377a',
   ],
   'canyon-low': [
     'a59694039df1257d8887a9756e06df631427481bdea775a10030526e7d40fe68',
@@ -297,7 +297,7 @@ describe('scarp output equivalence', () => {
             Object.entries(instances)
               .filter(([name]) => name.startsWith(prefix))
               .reduce((sum, [, n]) => sum + n, 0);
-          const rubble = { tuff: 220, canyon: 160, hadal: 190 }[kind];
+          const rubble = { tuff: 320, canyon: 160, hadal: 190 }[kind];
           expect(count('boulders-')).toBe(
             tier === 'low' ? 0 : Math.round(rubble * geoDetail(tier).growth),
           );
@@ -393,15 +393,18 @@ it('rejects offscreen steep terrain boxes in the elevated wall view without chan
   }
 });
 
-describe('escarpment crest', () => {
-  // Walls that pinch late are flat-topped escarpments: a level, stepped crest across the
-  // middle, not the ragged skyline of a slumped wall.
-  it('keeps the crest level across the middle and within a few terrace steps', () => {
-    const heights = [-0.35, -0.2, -0.05, 0.05, 0.2, 0.35].map(
-      (f) => wallEnvelope(f * 150, 150, 0.75).skyline,
-    );
-    for (const h of heights) expect(h).toBeGreaterThan(0.85);
-    expect(new Set(heights.map((h) => h.toFixed(3))).size).toBeLessThanOrEqual(3);
+describe('caldera rim crest', () => {
+  // Walls that pinch late are caldera rims: a broken crest of spurs and notches across the
+  // middle, never a level top, yet never so low that the wall reads as a mound.
+  it('breaks the crest into spurs and notches across the middle', () => {
+    const heights: number[] = [];
+    for (let x = -50; x <= 50; x += 2.5) heights.push(wallEnvelope(x, 150, 0.75).skyline);
+    for (const h of heights) {
+      expect(h).toBeGreaterThan(0.3);
+      expect(h).toBeLessThan(1.25);
+    }
+    expect(Math.max(...heights) - Math.min(...heights)).toBeGreaterThan(0.25);
+    expect(new Set(heights.map((h) => h.toFixed(2))).size).toBeGreaterThan(12);
     expect(wallEnvelope(0, 150, 0.75).edge).toBe(0);
   });
 });
