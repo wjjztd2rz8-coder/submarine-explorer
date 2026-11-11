@@ -1,5 +1,10 @@
 # Reviews
 
+## 2026-11-11 targeted review (red CI, no change, latest)
+
+- Rechecked run 43085531714: still hosted-timing shard failures, none new. Brief 190 (item 16o) queued behind Codex weekly pace; Claude weekly 11% (resets Nov 12 05:59). No change; docs-only pushes keep re-running the suite, so this is the last entry until something differs.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
 ## 2026-11-11 09:20 targeted review (red CI, 3 runs)
 
 - **Diagnosis:** unchanged from the 06:47 review. The latest hosted run (43027519092, docs-only commit) fails 8 e2e shards of 38 (7 earlier); the failing specs pass locally, so it is hosted timing, not a regression. Nothing new to diagnose.
