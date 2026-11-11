@@ -427,3 +427,10 @@ Single-spec playwright runs serve `dist/`; a build older than the source hid the
 ## 2026-11-10: prettier on plan docs, third recurrence
 
 - Hosted run 42757881498 failed three static shards on `prettier --check` (unformatted OVERNIGHT-LOG hold entries); the rule in REVIEW-PROMPT only covered review runs. Fix: a local pre-commit hook formats staged `*.md` and fails loudly, so any run's plan commits are formatted. Untracked (in `.git/hooks`); reinstall after a fresh clone.
+
+## 2026-11-11 (comprehensive review, Claude)
+
+- Sol second opinion skipped: `tools/codex-review.sh start` exited 75 (Codex 5h 18%, week 30%, brief 180 running). Review done alone; recorded in REVIEWS.md.
+- Golden `2026-11-11-044544` finished with 75 shots and Endurance/Monterey-2 missing (capture timeouts). Acceptable for the review; the named-error exit from 16f worked as designed. Rerun only if a later review needs those two.
+- Claude lanes had only one unblocked item (22) after 6/7/11/16e merged; refilled with items 23-26 from the new golden set.
+- Claude weekly 16% (resets 11-12 05:59): the budget gate, not scheduling, limits packages.

@@ -1,6 +1,6 @@
-# Status (2026-11-10 comprehensive review, joint Claude + Sol)
+# Status (2026-11-11 comprehensive review, Claude alone; Sol skipped for budget)
 
-**Stage:** about 85% to 1.0; 4-5 weeks (plan 4-6); no art changed since 11-09, only bug hunts and CI spec fixes. **f76** is the newest tag; current main is untagged until hosted CI is green.
+**Stage:** about 86% to 1.0; 4-5 weeks (plan 4-6). Beebe and Lost City improved; Hunga (3.0) is now the worst opening; hosted CI still red (brief 180). **f76** is the newest tag; current main is untagged until hosted CI is green.
 
 ## 1.0 table
 
@@ -19,7 +19,7 @@ Bismarck darker plates, Blue Hole larger gallery with pinned opening scan, Journ
 
 ## Left
 
-New: Hunga opening heading regressed (brief 195); unaided 1280x720 evidence (196); CI triage after 189 (197).
+Claude queue: Hunga slab, Challenger lander presence, deep upper frame, Axial floor, Beebe bores/Lost City crown. New: Hunga opening heading regressed (brief 195); unaided 1280x720 evidence (196); CI triage after 189 (197).
 
 CI green, Beebe stacks, Lost City tube forms, Blue Hole hero apron, Bismarck readability, phone landscape HUD, phone and unaided onboarding evidence. Claude weekly budget (about 1 package a day) is the pacing limit; Codex has three briefs queued.
 

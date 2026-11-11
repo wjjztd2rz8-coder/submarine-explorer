@@ -1,5 +1,17 @@
 # Reviews
 
+## 2026-11-11 comprehensive review (Claude alone; Sol skipped, Codex budget low; golden `2026-11-11-044544` vs `2026-11-10-082252`)
+
+- **Second opinion:** `tools/codex-review.sh start` exited 75 (Codex 5h 18%, week 30%, brief 180 running), so this is a single-reviewer view; no Sol disagreements to report. Next review should re-run the joint pass.
+- **Changed since 2026-11-10:** merges 6 (Beebe slimmer stacks), 7 (Lost City irregular towers, round tubes), 10 (Axial sky band), 11 (centred landscape HUD), 16e (Challenger flag), copy fixes, and Codex bug hunts 192 and 193. Hosted CI still red (phone-accept hang; brief 180 running); no tag since f76.
+- **Per-site (desktop mission openings, from the new set):** Titanic 3.5 (wreck reads at once; upper half is a flat dark band); Lost City 3.7 (up from 3.5: towers are irregular and the cluster reads); Beebe 3.5 (up: separated stacks and smoke read at 150 m; bores faint); Axial 3.8 (smokers strong, floor near black); Challenger 3.3 (lander tiny on an empty plain); **Hunga 3.0** (still a smooth striped wall from the opening, worst of the set); Blue Hole, Monterey, Bismarck, Endurance not re-viewed this pass (scores stand: 3, 3 waived, 3.3-3.5, 4.0). Monterey-2 and Endurance captures were missing from the set.
+- **Biggest gaps:** Hunga slab; featureless upper frame on deep sites; Challenger objective presence; CI red blocks any tag.
+- **Play check:** no new onboarding evidence this pass (no e2e shots newer than the set); phone retest and unaided 720p (brief 196) remain the open evidence.
+- **Process:** Claude lanes were down to one item, refilled (23-26). Claude weekly 16% (resets 11-12 05:59) limits packages by design. Codex queue holds 195, 196 and the gallery-share bug hunt. Details in PROCESS-LOG.md.
+- **New priorities:** Claude 22, 23, 24, 25, 26; Codex 180 (CI), 195, 196.
+- **Needs owner:** phone retest on the newest build; Monterey 3.8 waiver in the 1.0 definition.
+- **Stage:** about 86% to 1.0, 4-5 weeks central (unchanged; Claude alone, so lower confidence).
+
 ## 2026-11-10 22:35 targeted review (Claude): CI red on main for 3 runs
 
 - Same cause as the two earlier reviews today: run 42953882678 (and 42945628767) fail on the phone-accept first-minute spec across 33 shards; nothing new. Brief 180 (item 16b) is still first in the queue; dispatch logs "codex low" only because Codex week (43%) is under its pace line, so it launches when the line passes. No scheduling fault; I did not bend the pace gate. Claude weekly 17% is below the pace gate, so no package. No tag until hosted CI is green.
