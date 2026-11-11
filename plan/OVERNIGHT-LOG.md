@@ -3829,3 +3829,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Rechecked: same 7-8 shards red on hosted CI (hosted timing, all pass locally). Brief 190 (item 16o) still queued; Codex dispatch paced (weekly 27% left), Claude weekly 11% (resets Nov 12 05:59), no agent started. Nothing new to diagnose; no change.
 - **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
+## 2026-11-11 13:15 CST headless run (Claude): hold
+
+- Nothing to collect (124/131 held, no running tasks). Claude weekly 11% (resets Nov 12 05:59), below pace gate, no agent started. Codex dispatch paced (weekly 27% left); briefs 190, 194-196 queued. Main clean and pushed; no tag.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
