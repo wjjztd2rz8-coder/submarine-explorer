@@ -10,7 +10,7 @@ import type { Discovery } from '../../src/game/Discovery.js';
 import type { MissionRouter } from '../../src/game/MissionRouter.js';
 import type { Save } from '../../src/core/Save.js';
 import type { AnchoredEvents, EventContact } from '../../src/game/Events.js';
-import type { Scene } from 'three';
+import type { Scene, WebGLRenderer } from 'three';
 import catalog from '../../data/landmarks/index.json' with { type: 'json' };
 
 type Game = {
@@ -22,6 +22,7 @@ type Game = {
   props: { loaded: boolean };
   perf: { tier: string };
   scene: Scene;
+  renderer: WebGLRenderer;
   explore: { ready: boolean; events: AnchoredEvents; eventContacts: EventContact[] };
 };
 
@@ -36,12 +37,15 @@ const touchControls = [
   '.tc-btn-pause',
   '.hud-journal',
 ];
+const env =
+  (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
+const fullJourneyMatrix = !env.CI || env.PW_RENDER_REVIEW === '1';
 
-for (const viewport of [
+for (const [viewportIndex, viewport] of [
   { width: 390, height: 844, touch: true },
   { width: 844, height: 390, touch: true },
   { width: 1280, height: 800, touch: false },
-]) {
+].entries()) {
   test.describe(`first minute acceptance ${viewport.width}x${viewport.height}`, () => {
     const touch = viewport.touch;
     test.use({
@@ -81,7 +85,9 @@ for (const viewport of [
       if (info.status === 'timedOut') return;
       await page.screenshot({ path: info.outputPath('last-state.png'), timeout: 5_000 });
     });
-    for (const site of catalog.landmarks) {
+    for (const [siteIndex, site] of catalog.landmarks.entries()) {
+      // Push CI covers every site and all three layouts; local/render review keeps the cross product.
+      if (!fullJourneyMatrix && siteIndex % 3 !== viewportIndex) continue;
       test(`${site}: guidance reaches first scan within sixty seconds and debrief exits`, async ({
         page,
       }, info) => {
@@ -307,6 +313,28 @@ async function firstMinute(
   if (touch) await reachableTouchControls(page);
   let completedAt: number | null = null;
   const trace: unknown[] = [];
+  // This checks piloting/HUD behavior through 600 real game frames. Software
+  // WebGL draws dominate their wall time. Draw the world once per half-second,
+  // but update its matrices and the DOM HUD on every frame for projection/clearance.
+  // The CSS viewport and physics steps stay intact; evidence uses normal rendering.
+  const restoreRendering = await page.evaluateHandle(() => {
+    const g = window.__game as unknown as Game;
+    const ratio = g.renderer.getPixelRatio();
+    const render = g.renderer.render;
+    let frame = 0;
+    g.renderer.render = function (scene, camera) {
+      scene.updateMatrixWorld();
+      camera.updateMatrixWorld();
+      if (frame++ % 5 === 0) render.call(this, scene, camera);
+    };
+    g.renderer.setPixelRatio(ratio * 0.25);
+    window.dispatchEvent(new Event('resize'));
+    return () => {
+      g.renderer.render = render;
+      g.renderer.setPixelRatio(ratio);
+      window.dispatchEvent(new Event('resize'));
+    };
+  });
   try {
     for (let tick = 0; tick <= 120; tick++) {
       const { elapsed, view } = await state();
@@ -385,6 +413,12 @@ async function firstMinute(
       body: JSON.stringify({ first, completedAt, trace }, null, 2),
       contentType: 'application/json',
     });
+    if (info.status !== 'timedOut' && !page.isClosed()) {
+      await restoreRendering.evaluate((restore) => restore());
+      await restoreRendering.dispose();
+      // Resizing clears the drawing buffer; present a native-resolution frame before screenshots.
+      await page.clock.fastForward(50);
+    }
   }
 }
 
