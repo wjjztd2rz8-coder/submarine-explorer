@@ -110,8 +110,8 @@ export function rimDrop(o: SpireOpts, ang: number): number {
   // One smooth broad scoop plus soft teeth: quantised steps and narrow bites cut the rim into
   // planar sheets at the ring spacing, so the trunk crown keeps a rounded, eroded outline.
   const drop =
-    Math.pow(smooth(0.35, 0.7, broad), 1.5) * (o.trunk ? 0.3 : 1.6) +
-    smooth(0.5, 0.8, teeth) * (o.trunk ? 0.05 : 0.5);
+    Math.pow(smooth(0.35, 0.7, broad), 1.5) * (o.trunk ? 0.55 : 1.6) +
+    smooth(0.5, 0.8, teeth) * (o.trunk ? 0.1 : 0.5);
   return o.r0 * o.topFrac * drop;
 }
 
@@ -165,6 +165,14 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
         // Slow swells and waists along the whole trunk.
         f *=
           1 + irr * 0.12 * Math.sin(t * TAU * 1.35 + o.seed * 0.7 + Math.cos(ang - o.seed) * 0.6);
+        // Uneven taper: a seeded bulge or two (centre, width and swell vary per column) that
+        // stay clear of the foot and the crown, so the profile is not a clean cone.
+        for (let b = 0; b < 2; b++) {
+          const c = 0.25 + 0.5 * hash1(o.seed + b * 7.1);
+          const wd = 0.1 + 0.08 * hash1(o.seed + b * 3.3);
+          const k = (t - c) / wd;
+          f *= 1 + irr * (0.16 * hash1(o.seed + b * 5.9) - 0.05) * Math.exp(-k * k);
+        }
       } else {
         const u = t * (o.tiers ?? 0);
         const m = fbm3(
