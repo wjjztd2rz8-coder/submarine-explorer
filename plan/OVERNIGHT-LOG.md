@@ -3729,3 +3729,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect (only held worktrees 124/131). Claude weekly 20%, below pace gate; no package started. Codex week 43% (below its pace line), 6 briefs queued (180, 192-196). Main clean and pushed; hosted CI pending/red (brief 180 covers); no tag.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-10 20:22 CST headless run (Claude): merged V-lostcity-tower-forms (item 7)
+
+- Sonnet: uneven taper bulges, deeper torn rims, buttress fingers, round tubes (spire.ts, towers.ts; no site branches). Rated ~7 (was ~5.5); crown still one fluted sheet. gates.sh smoke + project-base green on worktree and main (no --full-e2e). Pushed. Codex dispatch pacing unchanged; 6 briefs queued. 124/131 held. Claude weekly ~18%: no second package. Item 22 (Hunga slab) waits on brief 195.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
