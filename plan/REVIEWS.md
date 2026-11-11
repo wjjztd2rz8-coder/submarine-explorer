@@ -1,5 +1,12 @@
 # Reviews
 
+## 2026-11-11 09:20 targeted review (red CI, 3 runs)
+
+- **Diagnosis:** unchanged from the 06:47 review. The latest hosted run (43027519092, docs-only commit) fails 8 e2e shards of 38 (7 earlier); the failing specs pass locally, so it is hosted timing, not a regression. Nothing new to diagnose.
+- **Scheduling:** not a fault. Brief 190 (item 16o) waits only on the Codex weekly pace line (27% left, resets Nov 15 23:00); Claude weekly is 11% (resets Nov 12 05:59), below the agent gate. Both unblock on their own. I did not bend the pace gate: a docs-only push keeps re-running the 40-60 min suite, which is the only cost.
+- **Action:** none beyond this entry. No tag until hosted CI is green.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
 ## 2026-11-11 targeted review (red CI on main, 3 runs)
 
 - **Diagnosis:** brief 180 cleared the phone-accept first-minute hangs; the same 7 shards now fail identically on each of the last 3 runs: d-scan same-frame titanic/GBH (touch, `.tc-btn-scan` hidden), journal-debrief two-objective 1280, hud-touch desktop regions, opening-framing portrait matrix, phone-accept touch-help `tap` timeout. All pass locally, even with `CI=1`, so the cause is hosted SwiftShader timing or paused-clock stepping, not a game regression. Not diagnosed further here.
