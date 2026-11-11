@@ -588,9 +588,9 @@ describe('Lost City transparent effect fill budget', () => {
           // the previous continuous-field workload as an upper resource bound. The pins follow
           // the trunk surface the sprites are grounded on; draws and points are unchanged.
           for (const [range, expectedPixels, ceiling] of [
-            [70, 10_661.430496, 10_670],
-            [32, 44_211.162883, 44_320],
-            [10, 67_265.486637, 67_300],
+            [70, 10_660.530067, 10_670],
+            [32, 43_755.46254, 44_320],
+            [10, 66_767.598682, 67_300],
           ]) {
             const pixels = Math.max(
               ...measurements[1].filter((s) => s.range === range).map((s) => s.pixels),

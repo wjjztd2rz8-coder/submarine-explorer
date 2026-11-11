@@ -136,7 +136,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       r0,
       topFrac: main ? 0.3 : 0.28,
       seed: seed + spires.length * 11,
-      segs: 40 * dens + 4,
+      segs: 44 * dens + 4,
       rings: (h / 0.9) * dens + 8,
       tiers: Math.max(2, Math.round(h / (main ? 6.5 : 5))),
       ledge: 0.09,
@@ -222,7 +222,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     tips.push({ x: s.x, y: s.y + s.h, z: s.z });
     // Drooping flanges on the column: wide shelves on the main tower, one or two elsewhere.
     // Saucer flanges read as plates, so only an occasional small one remains on lesser spires.
-    const nf = lone ? 0 : i === 0 ? 2 : 0;
+    const nf = lone ? 0 : i === 0 ? 3 : 0;
     for (let f = 0; f < nf; f++) {
       const t =
         i === 0 ? 0.12 + (f / nf) * 0.6 + rnd() * 0.06 : 0.1 + (f / nf) * 0.6 + rnd() * 0.08;
@@ -247,7 +247,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   // and side chimneys; they break the single-cone silhouette.
   const fingerRnd = mulberry32(seed ^ 0xf1f1);
   for (const [i, s] of spires.entries()) {
-    const nFing = lone ? 2 : i === 0 ? 3 : 1;
+    const nFing = lone ? 2 : i === 0 ? 4 : 1;
     for (let k = 0; k < nFing; k++) {
       const t = 0.1 + (k / nFing) * 0.55 + fingerRnd() * 0.1;
       const a = fingerRnd() * 6.283;
@@ -260,7 +260,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
         r0: fr,
         topFrac: 0.08,
         seed: seed + 900 + k + i * 13,
-        segs: 10 * dens + 4,
+        segs: 14 * dens + 6,
         rings: (fh / 1.2) * dens + 5,
         tiers: Math.max(1, Math.round(fh / 4)),
         ledge: 0.18,
