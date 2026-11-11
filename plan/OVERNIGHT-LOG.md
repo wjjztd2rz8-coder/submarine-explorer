@@ -3789,3 +3789,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Sonnet agent reworked the tuff rim: notched crest, sloping rear, mottled strata, more talus (shared scarp builder driven by preset data, no site branch). Worktree gates smoke+project-base green; Hunga site specs 16/16. Approach views clearly better; the 120 m opening is still an end-on tower (my read ~3.8, from 3.0). Collider floor lowered 0.9 to 0.85 (spur tips), logged in the progress note. Items 23-26 next. Codex queue: 194-196 waiting for dispatch. Claude weekly ~13% (resets Nov 12 06:00).
 - **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
+## 2026-11-11 05:39 CST headless run (Claude): hold
+
+- Nothing to collect (124/131 held, no running tasks). Claude weekly 12% (resets Nov 12 06:00), kept to the floor, no agent started. Codex 5h 100% but dispatch declines (weekly pace, 27% left); 194-196 queued. Main clean and pushed; no tag.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
