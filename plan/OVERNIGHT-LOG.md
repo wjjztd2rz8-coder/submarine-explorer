@@ -3779,3 +3779,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Nothing to collect (worktrees 124/131 held; 180 still running). Claude weekly 16% (below pace gate, resets Nov 12 06:00), no agent started. 3 briefs queued (194-196). Main clean, no tag, hosted CI red until 180 lands.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-11 03:15 CST headless run (Claude): merged brief 180 (item 16b)
+
+- Brief 180 (CI phone-accept): push CI now runs 13 first-minute journeys (each site once, rotating portrait/landscape/desktop), world draws throttled; local and render review keep all 39. Worktree gates.sh smoke+project-base green; merge conflicted with 192/193 test edits, resolved by hand (11 playwrightConfig unit tests pass). Gates on merged main: smoke + project-base green; pushed. Hosted green and under-30 min still open: progress note proposes 24 slots/48 shards (needs owner OK for runner capacity). 124/131 held. 194-196 queued; Codex 0% 5h until 03:30. No Claude agent (weekly 16%).
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
