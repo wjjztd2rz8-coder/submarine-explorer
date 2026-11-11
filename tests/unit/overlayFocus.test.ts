@@ -3763,6 +3763,7 @@ it.each(
       if (timing === 'after the reserve microtask is queued') {
         resolveReady();
         await ready;
+        await Promise.resolve();
         expect(setLevels).not.toHaveBeenCalled();
       }
       press('Escape');
@@ -3778,6 +3779,7 @@ it.each(
       resolveReady();
       await ready;
       await Promise.resolve();
+      await Promise.resolve();
       if (action === 'pause') {
         const reserve = startingReserves(3800, ctx.effective.submarine, ctx.effective.power);
         expect(setLevels).toHaveBeenCalledExactlyOnceWith(reserve.battery, reserve.oxygen);
@@ -3790,6 +3792,11 @@ it.each(
         expect(ctx.power.state).toMatchObject({ battery: 1, oxygen: 1 });
         if (timing === 'before readiness') expect(resolveObjectives).not.toHaveBeenCalled();
       }
+      // Starting now follows readiness; teardown must remove that live listener.
+      expect(reset).toHaveBeenCalledTimes(
+        action === 'pause' || timing === 'after the reserve microtask is queued' ? 1 : 0,
+      );
+      reset.mockClear();
       runner.dispose();
       runner.dispose();
       bus.emit('mission:started', { missionId: 'titanic', tileId: 'titanic' });

@@ -410,6 +410,37 @@ describe('MissionRouter completion timing', () => {
     vi.unstubAllGlobals();
   });
 
+  it('a reload that skips the briefing freezes until content and the start pose are ready', async () => {
+    router.dispose();
+    let loaded!: () => void;
+    const ready = new Promise<void>((resolve) => {
+      loaded = resolve;
+    });
+    const applyStart = vi.fn(() => {
+      expect(router.mission.state).toBe('briefing');
+      expect(events()).not.toContain('mission:started');
+    });
+    router = new MissionRouter({
+      ...options,
+      discovery: { ...options.discovery, ready },
+      applyStart,
+    });
+    // Slow reloads must not count loading as diving or allow a live pose reset.
+    expect(router.frozen).toBe(true);
+    advance(router, 60);
+    expect(router.mission.elapsedS).toBe(0);
+    expect(router.canEndDive).toBe(false);
+    expect(applyStart).not.toHaveBeenCalled();
+    loaded();
+    await ready;
+    expect(applyStart).toHaveBeenCalledExactlyOnceWith('near-site');
+    expect(router.frozen).toBe(false);
+    expect(events()).toEqual(['mission:started']);
+    pauseAndResume(router);
+    advance(router, 1);
+    expect(router.mission.elapsedS).toBe(1);
+  });
+
   it('advances the checklist with objective completion before another frame', () => {
     const current = () => control(router.panel.root, 'is-current').dataset.objective;
     frame(router);

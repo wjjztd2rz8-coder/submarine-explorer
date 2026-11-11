@@ -302,7 +302,7 @@ export class MissionRouter {
   private disposed = false;
 
   constructor(private readonly opts: MissionRouterOptions) {
-    const { route, bus, meta } = opts;
+    const { route, bus } = opts;
     this.mission = new Mission({ def: route.def, bus });
     this.panel = new ObjectivesPanel(opts.parent);
     this.panel.setTitle(route.def.title);
@@ -322,10 +322,7 @@ export class MissionRouter {
 
     if (route.skipBriefing) {
       this.briefing = null;
-      this.mission.start(meta.id);
-      void opts.discovery.ready.then(() =>
-        this.disposed ? undefined : opts.applyStart?.(opts.defaultStartPosition ?? 'near-site'),
-      );
+      this.begin();
     } else {
       this.briefing = new Briefing({
         parent: opts.parent,
@@ -360,10 +357,10 @@ export class MissionRouter {
   }
 
   /** Close the briefing and start the mission clock. */
-  begin(choice: MissionStartPosition = this.opts.defaultStartPosition ?? 'near-site'): void {
+  begin(choice?: MissionStartPosition): void {
     void this.opts.discovery.ready.then(() => {
       if (this.disposed) return;
-      this.opts.applyStart?.(choice);
+      this.opts.applyStart?.(choice ?? this.opts.defaultStartPosition ?? 'near-site');
       this.briefing?.hide();
       this.showPanel();
       this.mission.start(this.opts.meta.id);
