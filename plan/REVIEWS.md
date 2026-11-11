@@ -1,5 +1,10 @@
 # Reviews
 
+## 2026-11-10 22:35 targeted review (Claude): CI red on main for 3 runs
+
+- Same cause as the two earlier reviews today: run 42953882678 (and 42945628767) fail on the phone-accept first-minute spec across 33 shards; nothing new. Brief 180 (item 16b) is still first in the queue; dispatch logs "codex low" only because Codex week (43%) is under its pace line, so it launches when the line passes. No scheduling fault; I did not bend the pace gate. Claude weekly 17% is below the pace gate, so no package. No tag until hosted CI is green.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
+
 ## 2026-11-10 targeted review (Claude): CI red on main for 3 runs
 
 - Diagnosis (run 42910184458, 30 of 38 e2e shards red): every failure is one spec, `phone-accept.spec.ts` "guidance reaches first scan within sixty seconds and debrief exits" (4.0 m timeout, then `clock.fastForward: Target page, context or browser has been closed`); other specs in the failing shards pass (26/27). Same cause as this morning's review; no new regression from the Beebe chimney merge.

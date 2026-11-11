@@ -3744,3 +3744,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Sonnet: lander flag is now a rippled matt cloth strip (lander.ts only, 3 draw calls, within triangle budgets). Reads as folded cloth, still a bit peach-lit; ~7. gates.sh smoke + project-base green on main (no --full-e2e). Pushed. Claude weekly ~15%: no second package. Codex dispatch still waiting on its pace line; 6 briefs queued (180, 192-196). 124/131 held. Hosted CI still red (brief 180).
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-10 22:35 CST targeted review (Claude): red CI
+
+- Same phone-accept hang as earlier reviews (33 shards); brief 180 waits on Codex pace line. Nothing merged, no package (Claude weekly 17%). Entry in plan/REVIEWS.md.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
