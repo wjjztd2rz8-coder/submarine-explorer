@@ -3734,3 +3734,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Sonnet: uneven taper bulges, deeper torn rims, buttress fingers, round tubes (spire.ts, towers.ts; no site branches). Rated ~7 (was ~5.5); crown still one fluted sheet. gates.sh smoke + project-base green on worktree and main (no --full-e2e). Pushed. Codex dispatch pacing unchanged; 6 briefs queued. 124/131 held. Claude weekly ~18%: no second package. Item 22 (Hunga slab) waits on brief 195.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-10 21:36 CST headless run (Claude): merged V-axial-sky-band (item 10)
+
+- Finished the previous run's uncommitted worktree myself (no new agent): `horizonRidge` plus a `horizon` block in Axial data, one unit-test list updated. Axial portrait golden shows a soft ridge/haze band in the upper third, readable, not dark. gates.sh smoke + project-base green on main (no --full-e2e). Pushed. Claude weekly ~18%, no second package. 124/131 held; 6 Codex briefs queued, dispatch pacing unchanged. Note: unit suite now takes ~14 min, so gates runs need a long timeout.
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
