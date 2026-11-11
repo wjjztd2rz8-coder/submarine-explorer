@@ -3749,3 +3749,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Same phone-accept hang as earlier reviews (33 shards); brief 180 waits on Codex pace line. Nothing merged, no package (Claude weekly 17%). Entry in plan/REVIEWS.md.
 - **Needs owner:** phone retest; Monterey 3.8 waiver.
+
+## 2026-11-10 22:45 CST headless run (Claude): golden refresh launched (item 9)
+
+- Nothing to collect (only held worktrees 124/131). Claude weekly ~17%, no agent started. Launched `GOLDEN_MODE=mission tools/golden.sh` detached (unit subexp-golden-2245); feeds the next review. Codex dispatch still declines (budget pace); 6 briefs queued (180, 192-196). Main clean, no tag, hosted CI red (brief 180).
+- **Needs owner:** phone retest; Monterey 3.8 waiver.
