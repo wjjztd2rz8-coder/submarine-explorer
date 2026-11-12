@@ -86,7 +86,7 @@ exports[`1130: Beebe rocks darken and fracture in the same draws with identical 
 exports[`1130: other sites retain byte-identical scatter geometry, placement, colors and draw counts 1`] = `
 {
   "axial-seamount-ashes": {
-    "meshes": "a93a09f0c35869d402d10c257d21b8aedfec7e1f98b2ddec68332f8677d44b02",
+    "meshes": "74a527ee4175b298f5add5a6894af57c066ac6aeb726792d28ca24258ab93075",
     "stats": {
       "cells": 21,
       "drawCalls": 3,

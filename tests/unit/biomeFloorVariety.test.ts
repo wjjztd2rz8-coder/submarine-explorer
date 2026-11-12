@@ -29,9 +29,9 @@ describe('open sediment floor variety', () => {
         tier,
         biome: biomeFor(id),
         exaggeration: 1,
-      }).material.userData.uniforms.uFlow.value;
+      }).material.userData.uniforms.uFlow?.value;
     expect(mat('axial-seamount-ashes', 'high')).toBe(biomeFor('axial-seamount-ashes').flow);
-    expect(mat('titanic', 'high')).toBe(0);
+    expect(mat('titanic', 'high')).toBeUndefined();
   });
 
   it('optional scatter tint multiplies rock colours once without changing soft life or placement', () => {

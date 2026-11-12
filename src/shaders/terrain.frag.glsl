@@ -49,7 +49,9 @@ uniform float uRippleLen;
 uniform float uRippleReach;
 uniform vec2 uRippleDir;
 uniform float uBurrow;
-uniform float uFlow;            // fresh lava lobes, 0 = off
+//~flow
+uniform float uFlow;            // fresh lava lobes
+//~endflow
 uniform float uRockBias;
 uniform float uTexScale;        // metres per albedo repeat
 uniform float uMacroScale;      // metres, largest colour variation
@@ -281,6 +283,7 @@ float terrRough = 0.92;
     slope += g1 * 0.16 * bm;
     burrowShade = t1 * 0.12 * bm;
   }
+//~flow
   float flowShade = 0.0;
 #ifdef TERRAIN_FLOW
   // Fresh lava: broad overlapping pillow lobes (low-frequency value noise), dark creases where the
@@ -298,6 +301,7 @@ float terrRough = 0.92;
     terrRough = mix(terrRough, 0.5, 0.55 * fMask * (1.0 - crease));
   }
 #endif
+//~endflow
   nAcc.xz += slope;
 #ifdef TERRAIN_ROCK_DETAIL
   // Fine dipping lamination and grain; analytical gradients cost no extra texture fetches.
@@ -315,7 +319,10 @@ float terrRough = 0.92;
   terrWorldN = normalize(nAcc);
 
   // --- shading modulations ----------------------------------------------
-  alb *= 1.0 + burrowShade + rip * 0.09 + flowShade;
+  alb *= 1.0 + burrowShade + rip * 0.09;
+//~flow
+  alb *= 1.0 + flowShade;
+//~endflow
   alb *= 1.0 - 0.38 * max(cav, 0.0) + 0.08 * max(-cav, 0.0);
   alb *= mix(1.0, mix(0.74, 1.26, m1.x) * mix(0.9, 1.1, m2), uMottle);
   alb *= mix(vec3(1.0), mix(vec3(1.04, 1.0, 0.95), vec3(0.96, 1.0, 1.05), m2), uMottle);
