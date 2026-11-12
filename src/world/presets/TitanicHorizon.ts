@@ -1,5 +1,10 @@
-/** Titanic's abyssal water backdrop. No lighting, grade or shared shader changes. */
+/**
+ * The deep-water backdrop dome: graded horizon haze, a down-welling crown that is
+ * never darker than the haze-lit water, and sparse distant marine snow. No
+ * lighting, grade or shared shader changes.
+ */
 import * as THREE from 'three';
+import { lcg32 } from '../../util/rng.js';
 import type { AtmosphereSample } from '../../render/Atmosphere.js';
 import { ABYSS_HORIZON } from '../../core/config/atmosphere.js';
 
@@ -22,6 +27,8 @@ interface HorizonLook {
 
 export class TitanicHorizon {
   readonly dome: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>;
+  private readonly snow: THREE.Points<THREE.BufferGeometry, THREE.PointsMaterial> | null;
+  private readonly crown = new THREE.Color();
   private readonly upper = new THREE.Color();
   private readonly haze = new THREE.Color();
   private readonly color = new THREE.Color();
@@ -40,6 +47,8 @@ export class TitanicHorizon {
     private readonly scene: THREE.Scene,
     look: HorizonLook = {},
     ridge = 0,
+    /** Marine-snow share of the full budget (0 on Low, where the dome is colour only). */
+    snowScale = 0,
   ) {
     this.fadeStartM = look.fadeStartM ?? ABYSS_HORIZON.fadeStartM;
     this.fadeEndM = look.fadeEndM ?? ABYSS_HORIZON.fadeEndM;
@@ -64,7 +73,8 @@ export class TitanicHorizon {
       const glow =
         1 - ABYSS_HORIZON.glowVariation * (0.5 + 0.5 * Math.cos(azimuth * ABYSS_HORIZON.glowLobes));
       this.weights[i] =
-        glow * THREE.MathUtils.smoothstep(elevation, ABYSS_HORIZON.fogMatchElevation, peak);
+        glow *
+        Math.sqrt(THREE.MathUtils.smoothstep(elevation, ABYSS_HORIZON.fogMatchElevation, peak));
       // Far ridge: a lighter haze bank below a wavy skyline, drawn only when asked for.
       const top =
         ABYSS_HORIZON.ridgeBase +
@@ -107,13 +117,52 @@ export class TitanicHorizon {
     this.dome.frustumCulled = false;
     this.dome.visible = false;
     scene.add(this.dome);
+    this.snow =
+      snowScale > 0 ? this.makeSnow(Math.round(ABYSS_HORIZON.snow.count * snowScale)) : null;
   }
 
-  update(camera: THREE.PerspectiveCamera, atmo: AtmosphereSample): void {
+  /** Fixed motes on the upper dome; the dome follows the camera, so they read as far away. */
+  private makeSnow(count: number): THREE.Points<THREE.BufferGeometry, THREE.PointsMaterial> {
+    const cfg = ABYSS_HORIZON.snow;
+    const rand = lcg32(0x5eed);
+    const xyz = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const elevation = cfg.minElevation + (cfg.maxElevation - cfg.minElevation) * rand();
+      const azimuth = rand() * Math.PI * 2;
+      const ring = Math.sqrt(1 - elevation * elevation);
+      xyz.set([Math.cos(azimuth) * ring, elevation, Math.sin(azimuth) * ring], i * 3);
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(xyz, 3));
+    const points = new THREE.Points(
+      geometry,
+      new THREE.PointsMaterial({
+        size: cfg.sizePx,
+        sizeAttenuation: false,
+        color: 0xbfe0ea,
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+        fog: false,
+        toneMapped: false,
+        depthTest: false,
+        depthWrite: false,
+      }),
+    );
+    points.name = 'horizonSnow';
+    points.renderOrder = -999;
+    points.frustumCulled = false;
+    points.visible = false;
+    this.scene.add(points);
+    return points;
+  }
+
+  update(camera: THREE.PerspectiveCamera, atmo: AtmosphereSample, elapsed = 0): void {
     // Preserve surface starts and the shallower depth bands. Full effect only
     // below 1,200 m, comfortably above the Titanic inspection depth.
     const abyss = THREE.MathUtils.smoothstep(-camera.position.y, this.fadeStartM, this.fadeEndM);
     this.dome.visible = abyss > 0;
+    if (this.snow) this.snow.visible = abyss > 0;
     if (abyss <= 0) return;
     // Preserve the fog hue: the shared post pass derives its foreground
     // readability floor from normalized fog RGB. A tint lerp would recolour
@@ -127,6 +176,11 @@ export class TitanicHorizon {
     this.dome.position.copy(camera.position);
     this.dome.scale.setScalar(camera.far * 0.9);
     this.upper.copy(atmo.fogColor).lerp(this.upperWater, abyss);
+    // Brighten only: per-channel max against the down-welling floor.
+    this.crown.copy(atmo.fogColor).lerp(this.hazeWater, ABYSS_HORIZON.downwell * abyss);
+    this.upper.r = Math.max(this.upper.r, this.crown.r);
+    this.upper.g = Math.max(this.upper.g, this.crown.g);
+    this.upper.b = Math.max(this.upper.b, this.crown.b);
     this.haze.copy(atmo.fogColor).lerp(this.hazeWater, abyss);
     const colors = this.dome.geometry.getAttribute('color');
     for (let i = 0; i < this.weights.length; i++) {
@@ -136,11 +190,22 @@ export class TitanicHorizon {
       colors.setXYZ(i, this.color.r, this.color.g, this.color.b);
     }
     colors.needsUpdate = true;
+    if (this.snow) {
+      this.snow.position.copy(camera.position);
+      this.snow.scale.setScalar(camera.far * 0.9);
+      this.snow.rotation.y = elapsed * ABYSS_HORIZON.snow.driftRadPerS;
+      this.snow.material.opacity = ABYSS_HORIZON.snow.opacity * abyss;
+    }
   }
 
   dispose(): void {
     this.scene.remove(this.dome);
     this.dome.geometry.dispose();
     this.dome.material.dispose();
+    if (this.snow) {
+      this.scene.remove(this.snow);
+      this.snow.geometry.dispose();
+      this.snow.material.dispose();
+    }
   }
 }

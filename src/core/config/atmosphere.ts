@@ -17,9 +17,21 @@ export const ABYSS_HORIZON = {
   fadeEndM: 1200,
   // Elevations are unit-sphere Y. Match fog through the first ring above level
   // to avoid outlining far seabed in pitched and portrait views.
-  fogMatchElevation: 0.2,
+  fogMatchElevation: 0.08,
   hazePeakElevation: 0.5,
   upperElevation: 1,
+  // Down-welling light: the crown is never darker than this share of the way from
+  // the fog colour to the haze colour, so the upper frame reads as lit water.
+  downwell: 0.85,
+  // Sparse distant marine snow on the dome, drawn only above the Low tier.
+  snow: {
+    count: 160,
+    minElevation: 0.04,
+    maxElevation: 0.75,
+    sizePx: 2.6,
+    opacity: 0.6,
+    driftRadPerS: 0.004,
+  },
   // Broad, faint suspended-sediment variation, baked into existing vertices.
   glowVariation: 0.08,
   glowLobes: 3,
