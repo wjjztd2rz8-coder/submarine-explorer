@@ -172,6 +172,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   }
 
   const crownTubes = lone ? 0 : 3;
+  const crownFirst = spires.length;
   const crownRnd = mulberry32(seed ^ 0xc70a);
   const crownA = crownRnd() * 6.283;
   for (let i = 0; i < crownTubes; i++) {
@@ -509,6 +510,8 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   const full = new THREE.Group();
   full.name = 'carbonate-tower';
   full.add(new THREE.Mesh(geom, material));
+  // The trunk's vent, haze and fringe belong to its highest crown tube.
+  if (crownTubes) tips[0] = tips[crownFirst]!;
   full.userData.ventTop = tips[0]!.y;
 
   // Poseidon's inactive apron: three small thickets, clear of the active columns.
@@ -582,9 +585,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       );
   }
 
-  // Faint clear-fluid haze at the tips of the tallest spires; the trunk's haze rises from the
-  // highest crown tube.
-  if (crownTubes) tips[0] = tips[1]!;
+  // Faint clear-fluid haze at the tips of the tallest spires.
   const hazeFor = [...spires.keys()]
     .sort((a, b) => spires[b]!.h - spires[a]!.h)
     .slice(0, lone ? 1 : 3);

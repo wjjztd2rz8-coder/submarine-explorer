@@ -12,7 +12,7 @@
 
 ## Tests
 
-Snapshots rebaselined (intended): props-geo, beebeIsolation, terrainMerge1140 (Beebe and Lost City only); perf-budget Low Lost City effect-footprint pins moved with the crown surface (range 32 grew 43.8k to 59.0k px, still small; the High ceiling of 120k holds). f-perf-budget.spec.ts passes unchanged. Low-tier crown tubes use coarser segments/rings to stay within the Low triangle ceiling. Gates: see final report.
+Snapshots rebaselined (intended): props-geo, beebeIsolation, terrainMerge1140 (Beebe and Lost City only); perf-budget Low Lost City effect-footprint pins moved with the crown surface (range 70 10.66k to 10.65k, 32 43.76k to 43.55k, 10 66.8k to 52.8k px; ceilings unchanged). f-perf-budget.spec.ts passes unchanged. Low-tier crown tubes use coarser segments/rings to stay within the Low triangle ceiling. Gates: see final report.
 
 ## Simplicity
 

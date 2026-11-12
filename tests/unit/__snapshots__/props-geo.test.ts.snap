@@ -470,12 +470,12 @@ exports[`authored prop geometry golden > lost-city high: retains buffers, materi
   {
     "budget": {
       "draws": 3,
-      "triangles": 94680,
+      "triangles": 90280,
     },
-    "buffers": "745115f9b11573760d1d54bdf4dad8aae49fbc7674e7298d9df4e33ac3a4a1be",
+    "buffers": "d1bbb023518e80e3729767d3d2042c6991be543932c61e36902c94d83e16704b",
     "id": "poseidon-tower",
-    "placement": "155f5fc3ba567fef47c0ed33212da02eb0a36cb4d01f16c7968ef5a0a44cf958",
-    "ventTop": 51.6,
+    "placement": "88d20415644ce67e83cdb5c1d68d0334e06ee2b429a369c3caa97a5366fb5a3e",
+    "ventTop": 60,
   },
   {
     "budget": {
@@ -595,12 +595,12 @@ exports[`authored prop geometry golden > lost-city low: retains buffers, materia
   {
     "budget": {
       "draws": 3,
-      "triangles": 19008,
+      "triangles": 18576,
     },
-    "buffers": "eb80e46df3bedcc27f9852a0f1285c4dda777f08bc9e1fd580137240a94657ad",
+    "buffers": "6a08d926c7fcabc4ec471b392dc6a686bce7bc012a18e370d758d497ec0d567f",
     "id": "poseidon-tower",
-    "placement": "c7f664f38e2904f43770e4a7d4be50e7f0974b1550a8b42b79470fcaf7c3a727",
-    "ventTop": 51.6,
+    "placement": "9b4c052b0c62065219dee09d47e60bb503edf50e26fb2fb09ee57d34e22ff398",
+    "ventTop": 60,
   },
   {
     "budget": {
@@ -720,12 +720,12 @@ exports[`authored prop geometry golden > lost-city medium: retains buffers, mate
   {
     "budget": {
       "draws": 3,
-      "triangles": 63890,
+      "triangles": 64090,
     },
-    "buffers": "5e4925283f83550987267b6bcd753188670d9a9fe88608e307719e1fbb4ef8f3",
+    "buffers": "77c6742bae88ed06652895adac69e116337dc648aa2191cbb60f1c4e94a89014",
     "id": "poseidon-tower",
-    "placement": "f268e86f594a195b7e74ebfaefb1ff418bc0098390199abc3ef7ae37be50fc2a",
-    "ventTop": 51.6,
+    "placement": "6e6c74e3f1d8d5f69a222df5e813eec2d89d7904264324b7f32f29bb89096c26",
+    "ventTop": 60,
   },
   {
     "budget": {
