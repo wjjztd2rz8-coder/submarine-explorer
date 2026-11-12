@@ -3942,3 +3942,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged item 29 U-backlog-id-cleanup (docs only; repeated 16m/16n/16o IDs renumbered 16p-16t; done inline, no agent). No visual Claude items left in the backlog. Codex weekly 21% left, dispatch paced; briefs 190, 194-198 queued; 124/131 still held. Hosted CI still red (hosted-timing shards); no tag.
 - **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
+## 2026-11-12 16:46 CST headless run (Claude)
+
+- No merge. Codex 190, 194, 195 just launched and running in their worktrees (not collectable yet); 124/131 held; briefs 196-198 queued. No visual Claude items left in the backlog, so no agent started. Main clean; hosted CI still red (hosted-timing shards), no tag.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
