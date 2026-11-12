@@ -142,7 +142,13 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
   }
 
   const vert = splitSections(vertGlsl, ['@body']);
-  const frag = splitSections(fragGlsl, ['@albedo', '@rough', '@normal']);
+  // Shader blocks between //~flow and //~endflow stay out of the source entirely unless the biome asks for them.
+  const flowRe = /^\/\/~flow\n([\s\S]*?)^\/\/~endflow\n/gm;
+  const frag = splitSections(fragGlsl.replace(flowRe, biome.flow ? '$1' : ''), [
+    '@albedo',
+    '@rough',
+    '@normal',
+  ]);
   const defines: string[] = [];
   if (tierCfg.pbrNormals) defines.push('#define TERRAIN_PBR_NORMALS');
   if (tierCfg.textureBreakup) defines.push('#define TERRAIN_BREAKUP');
@@ -152,6 +158,8 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
   if (biome.horizonFadeM) {
     uniforms.uHorizonFadeM = { value: new THREE.Vector2(...biome.horizonFadeM) };
   }
+  if (biome.flow) uniforms.uFlow = { value: biome.flow };
+  if (tierCfg.pbrNormals && biome.flow) defines.push('#define TERRAIN_FLOW');
   if (opts.rockDetailStrength) defines.push('#define TERRAIN_ROCK_DETAIL');
 
   const material = new THREE.MeshStandardMaterial({
