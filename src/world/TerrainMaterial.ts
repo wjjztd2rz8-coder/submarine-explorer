@@ -78,6 +78,7 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
     uRippleLen: { value: biome.rippleLenM },
     uRippleDir: { value: new THREE.Vector2(Math.cos(biome.rippleDir), Math.sin(biome.rippleDir)) },
     uBurrow: { value: biome.burrow },
+    uFlow: { value: biome.flow ?? 0 },
     uRockBias: { value: biome.rockBias },
     uTexScale: { value: config.materialTextureScaleM },
     uMacroScale: { value: config.materialMacroScaleM },
@@ -152,6 +153,7 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
   if (biome.horizonFadeM) {
     uniforms.uHorizonFadeM = { value: new THREE.Vector2(...biome.horizonFadeM) };
   }
+  if (tierCfg.pbrNormals && biome.flow) defines.push('#define TERRAIN_FLOW');
   if (opts.rockDetailStrength) defines.push('#define TERRAIN_ROCK_DETAIL');
 
   const material = new THREE.MeshStandardMaterial({

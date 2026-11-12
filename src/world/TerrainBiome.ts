@@ -92,6 +92,8 @@ export interface Biome {
   rippleFadeM?: [number, number];
   /** Bioturbation mounds/tracks strength, 0..1. */
   burrow: number;
+  /** Fresh lava-flow lobes (ropey, glossy pillows) on gentle ground, 0..1; PBR tiers only. */
+  flow?: number;
   /** Slot C coverage bias: + shows hard substrate on gentler slopes. */
   rockBias: number;
   /** Multiplier on the texture pattern contrast and normal-map strength (default 1). */
@@ -292,6 +294,9 @@ export const BIOMES: Record<string, Biome> = {
     colorB: 0x4a4743,
     stain: 0x5a4a3c,
     mottle: 0.3,
+    // Young flows: lobed, glossy basalt that the lamps and vent glow pick out of the dark.
+    flow: 0.8,
+    colorA: 0x4c4947,
     // The caldera wall ends at the tile edge; dissolve it into the water rather than a hard line.
     horizonFadeM: [200, 700],
   },
