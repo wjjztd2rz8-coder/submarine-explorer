@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import type { EnvPresetName } from '../../core/Config.js';
 import { HADAL_TOP_M, smoothstep, trenchInterval } from './maths.js';
 import { num } from './shared.js';
+import { TitanicHorizon } from './TitanicHorizon.js';
 import type { EnvPreset, PresetEnterContext, PresetFrameContext, PresetParams } from './types.js';
 
 const BLACK = new THREE.Color(0, 0, 0);
@@ -22,6 +23,7 @@ export class TrenchPreset implements EnvPreset {
   private params: PresetParams = {};
   private visuals = false;
   private clock = 0;
+  private horizon: TitanicHorizon | null = null;
   /** Number of `env:trench` ticks emitted (tests read it). */
   ticks = 0;
 
@@ -29,6 +31,14 @@ export class TrenchPreset implements EnvPreset {
     this.params = ctx.params;
     this.visuals = ctx.visuals;
     this.clock = 0;
+    // Hadal water has no authored backdrop; the default dome gives it a lit upper column.
+    this.horizon = new TitanicHorizon(
+      ctx.scene,
+      ctx.site?.horizon,
+      0,
+      ctx.visuals ? ctx.particleScale : 0,
+    );
+    this.stats.draws = 1;
   }
 
   update(dt: number, ctx: PresetFrameContext): void {
@@ -43,6 +53,7 @@ export class TrenchPreset implements EnvPreset {
       a.snowDensity *= 1 + (num(p.snowScale, 0.4) - 1) * k;
       a.vignette += num(p.vignetteAdd, 0.1) * k;
     }
+    this.horizon?.update(ctx.camera, ctx.atmo, ctx.elapsed);
     if (depth < HADAL_TOP_M) {
       this.clock = 0;
       return;
@@ -65,5 +76,8 @@ export class TrenchPreset implements EnvPreset {
     return `ticks=${this.ticks}`;
   }
 
-  exit(): void {}
+  exit(): void {
+    this.horizon?.dispose();
+    this.horizon = null;
+  }
 }

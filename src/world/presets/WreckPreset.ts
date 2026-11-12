@@ -101,7 +101,12 @@ export class WreckPreset implements EnvPreset {
     this.scene = ctx.scene;
     this.visuals = ctx.visuals;
     if (ctx.params.titanicHorizon === true || wreck) {
-      this.horizon = new TitanicHorizon(ctx.scene, wreck?.horizon, num(ctx.params.horizonRidge, 0));
+      this.horizon = new TitanicHorizon(
+        ctx.scene,
+        wreck?.horizon,
+        num(ctx.params.horizonRidge, 0),
+        ctx.visuals ? ctx.particleScale : 0,
+      );
       if (wreck) this.horizon.dome.name = wreck.horizon.name;
       this.stats.draws = 1;
     }
@@ -229,7 +234,7 @@ export class WreckPreset implements EnvPreset {
   }
 
   update(_dt: number, ctx: PresetFrameContext): void {
-    this.horizon?.update(ctx.camera, ctx.atmo);
+    this.horizon?.update(ctx.camera, ctx.atmo, ctx.elapsed);
     const fill = num(this.params.ambientFill, 0);
     if (fill > 0) {
       ctx.atmo.ambientIntensity += fill;

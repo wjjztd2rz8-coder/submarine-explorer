@@ -1,4 +1,8 @@
-/** Titanic's abyssal water backdrop. No lighting, grade or shared shader changes. */
+/**
+ * The deep-water backdrop dome: graded horizon haze, a down-welling crown that is
+ * never darker than the haze-lit water, and sparse distant marine snow. No
+ * lighting, grade or shared shader changes.
+ */
 import * as THREE from 'three';
 import type { AtmosphereSample } from '../../render/Atmosphere.js';
 import { ABYSS_HORIZON } from '../../core/config/atmosphere.js';
@@ -22,6 +26,8 @@ interface HorizonLook {
 
 export class TitanicHorizon {
   readonly dome: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>;
+  private readonly snowUniforms = { uSnow: { value: 0 }, uTime: { value: 0 } };
+  private readonly crown = new THREE.Color();
   private readonly upper = new THREE.Color();
   private readonly haze = new THREE.Color();
   private readonly color = new THREE.Color();
@@ -40,6 +46,8 @@ export class TitanicHorizon {
     private readonly scene: THREE.Scene,
     look: HorizonLook = {},
     ridge = 0,
+    /** Marine-snow density multiplier (0 on Low, where the dome stays plain vertex colour). */
+    snowScale = 0,
   ) {
     this.fadeStartM = look.fadeStartM ?? ABYSS_HORIZON.fadeStartM;
     this.fadeEndM = look.fadeEndM ?? ABYSS_HORIZON.fadeEndM;
@@ -107,9 +115,43 @@ export class TitanicHorizon {
     this.dome.frustumCulled = false;
     this.dome.visible = false;
     scene.add(this.dome);
+    if (snowScale > 0) this.addSnow(snowScale);
   }
 
-  update(camera: THREE.PerspectiveCamera, atmo: AtmosphereSample): void {
+  /**
+   * Sparse distant marine snow painted by the dome's own fragment shader (a hashed
+   * dot grid over view direction): no extra draw, object or particle buffer.
+   */
+  private addSnow(scale: number): void {
+    const cfg = ABYSS_HORIZON.snow;
+    const f = (n: number): string => n.toFixed(4);
+    this.dome.material.onBeforeCompile = (shader) => {
+      Object.assign(shader.uniforms, this.snowUniforms);
+      shader.vertexShader = shader.vertexShader
+        .replace('void main() {', 'varying vec3 vDir;\nvoid main() {')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\nvDir = position;');
+      shader.fragmentShader = shader.fragmentShader
+        .replace(
+          'void main() {',
+          'varying vec3 vDir;\nuniform float uSnow;\nuniform float uTime;\nvoid main() {',
+        )
+        .replace(
+          '#include <color_fragment>',
+          `#include <color_fragment>
+          vec3 d = normalize(vDir);
+          vec2 g = vec2(atan(d.z, d.x) + uTime, d.y) * ${f(cfg.cells / (2 * Math.PI))};
+          vec2 cell = floor(g);
+          vec2 h = fract(sin(vec2(dot(cell, vec2(127.1, 311.7)), dot(cell, vec2(269.5, 183.3)))) * 43758.5453);
+          float flake = step(1.0 - ${f(cfg.density * scale)}, h.x) *
+            (1.0 - smoothstep(${f(cfg.radius / 2)}, ${f(cfg.radius)}, length(fract(g) - (0.2 + 0.6 * h.yx)))) *
+            smoothstep(${f(cfg.minElevation)}, ${f(cfg.minElevation + 0.1)}, d.y) *
+            (1.0 - smoothstep(${f(cfg.maxElevation - 0.2)}, ${f(cfg.maxElevation)}, d.y));
+          diffuseColor.rgb += vec3(0.75, 0.88, 0.92) * flake * uSnow;`,
+        );
+    };
+  }
+
+  update(camera: THREE.PerspectiveCamera, atmo: AtmosphereSample, elapsed = 0): void {
     // Preserve surface starts and the shallower depth bands. Full effect only
     // below 1,200 m, comfortably above the Titanic inspection depth.
     const abyss = THREE.MathUtils.smoothstep(-camera.position.y, this.fadeStartM, this.fadeEndM);
@@ -127,6 +169,11 @@ export class TitanicHorizon {
     this.dome.position.copy(camera.position);
     this.dome.scale.setScalar(camera.far * 0.9);
     this.upper.copy(atmo.fogColor).lerp(this.upperWater, abyss);
+    // Brighten only: per-channel max against the down-welling floor.
+    this.crown.copy(atmo.fogColor).lerp(this.hazeWater, ABYSS_HORIZON.downwell * abyss);
+    this.upper.r = Math.max(this.upper.r, this.crown.r);
+    this.upper.g = Math.max(this.upper.g, this.crown.g);
+    this.upper.b = Math.max(this.upper.b, this.crown.b);
     this.haze.copy(atmo.fogColor).lerp(this.hazeWater, abyss);
     const colors = this.dome.geometry.getAttribute('color');
     for (let i = 0; i < this.weights.length; i++) {
@@ -136,6 +183,8 @@ export class TitanicHorizon {
       colors.setXYZ(i, this.color.r, this.color.g, this.color.b);
     }
     colors.needsUpdate = true;
+    this.snowUniforms.uSnow.value = ABYSS_HORIZON.snow.opacity * abyss;
+    this.snowUniforms.uTime.value = elapsed * ABYSS_HORIZON.snow.driftRadPerS;
   }
 
   dispose(): void {

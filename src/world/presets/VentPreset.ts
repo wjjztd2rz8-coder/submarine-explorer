@@ -112,7 +112,12 @@ export class VentPreset implements EnvPreset {
     this.scene = ctx.scene;
     // Opt-in graded water backdrop (site data): gives the far water a horizon, even on Low.
     if (ctx.site?.horizon) {
-      this.horizon = new TitanicHorizon(ctx.scene, ctx.site.horizon, num(p.horizonRidge, 0));
+      this.horizon = new TitanicHorizon(
+        ctx.scene,
+        ctx.site.horizon,
+        num(p.horizonRidge, 0),
+        ctx.visuals ? ctx.particleScale : 0,
+      );
       this.stats.draws += 1;
     }
     this.sources = ventSources(ctx, num(p.maxSources, 12));
@@ -344,7 +349,7 @@ export class VentPreset implements EnvPreset {
     if (haze !== 1) ctx.atmo.fogDensity *= haze;
     const lift = num(this.params.hazeLift, 0);
     if (lift > 0) ctx.atmo.fogColor.lerp(HAZE_TINT, lift);
-    this.horizon?.update(ctx.camera, ctx.atmo);
+    this.horizon?.update(ctx.camera, ctx.atmo, ctx.elapsed);
     if (this.smoke) {
       updateCommonUniforms(this.smoke, ctx, this.look);
       // Bend the column downstream: half the drift a particle would make over its life,
