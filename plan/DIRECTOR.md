@@ -138,6 +138,10 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 25. **V-axial-floor-readability [Claude, Sonnet, review 2026-11-11]:** Axial smokers are strong but the surrounding basalt is nearly black (`axial-seamount-ashes-1-mission.png`). Target: lit lava-flow texture within the sub light radius and glow bleed from the chimneys onto the floor.
 26. **V-beebe-bores-lostcity-crown [Claude, Sonnet, review 2026-11-11]:** two leftovers from items 6 and 7: Beebe bores are faint and chimney tops ragged; the Lost City crown is still one fluted sheet. Pair them as one pass over the shared tower/chimney builder; keep the gains from 6 and 7.
 
+27. **R-ci-trace-diagnostics [Codex, brief 197, Sol 2026-11-12]:** traces only record on retry but hosted CI has zero retries, so failures leave no evidence. Retain failure traces as artifacts for failing shards only, then root-cause the remaining red shards (extends 16o).
+28. **T-verify-first-session-current [Codex, brief 198, Sol 2026-11-12]:** re-verify Home to debrief unaided at phone portrait/landscape and desktop 1280x720 on current main (last complete flow evidence 2026-11-07); fix generic stalls.
+29. **U-backlog-id-cleanup [Haiku]:** IDs 16m/16n/16o repeat in the Codex lane; renumber to unique stable IDs and update brief names that cite them.
+
 ### Release and owner
 
 16. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.

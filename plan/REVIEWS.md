@@ -1,5 +1,16 @@
 # Reviews
 
+## 2026-11-12 comprehensive review (joint: Claude draft + Codex Sol)
+
+- **Method note:** Claude weekly was 10% (kill floor 7%, resets 06:00), so Claude viewed only two golden frames (Hunga, Blue Hole) and leaned on Sol's full image review (golden `2026-11-12-084527`, 45 captures, 0 failures, desktop High only). Sol could not open a browser or reach GitHub.
+- **Changed since 2026-11-11:** Hunga rim slab merged (09448867): opening now a broad broken crest and talus, ~3.5-4 (Claude 3.9, Sol 3.5-4). No other visual merges; Codex bug hunts merged. CI still red.
+- **Stage (agreed):** about 85% to 1.0; 4-5 weeks, planning range 4-6, conditional on Claude visual capacity.
+- **Scores, whole-site (agreed, Sol's standard of opening + approach + detail):** Titanic 3.5, Lost City 3.5, Beebe 3-3.5, Blue Hole 3 (opening alone ~3.8), Monterey ~3 independent (owner-accepted waiver stands). Non-hero openings: Hunga 3.5-4, Axial 3.5, Endurance 3.5, Bismarck 3-3.5, Challenger 3-3.5, Blake/Hudson/Kama'ehuakanaloa ~3. Corrections accepted from Sol: Claude's Axial/Endurance 4.0 carry-over was too high; opening score is not a whole-site score.
+- **Disputed, settled on evidence:** Claude said Hunga heading is 120 (read from `hunga-tonga-caldera-1.png`, a different pose); Sol cites 98 deg for the mission image; one capture does not prove brief 195's heading fix, so it stays queued. Budget is a constraint, not a blocker; first-session and phone acceptance outrank dark-water polish (Sol, accepted).
+- **Biggest gaps:** (1) hosted CI red, no failure traces because zero retries (new item 27); (2) first-session flow unverified since 11-07 (item 28); (3) phone Low-tier retest not done; (4) hero surface realism (regular plates, folded crown, soft walls); (5) Challenger and Bismarck visibility, Blake mound bases.
+- **Process:** Claude idle time is budget-gated, not scheduling. Codex 22-26% weekly with 4 briefs waiting on pace; added 197, 198. Backlog ID duplicates (16m/16n/16o) queued as item 29. No Claude agents started (weekly below gate); next Claude visual run after the 06:00 reset takes items 23-26.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
 ## 2026-11-11 21:45 CST targeted review (red CI, no change)
 
 - Red CI unchanged: same hosted-timing shard failures, newest run still in progress. Claude weekly 10% (resets Nov 12 05:59), below pace gate and near kill floor, so no agent started. Briefs 190, 194-196 queued; Codex paced. Re-plan after the Claude reset.

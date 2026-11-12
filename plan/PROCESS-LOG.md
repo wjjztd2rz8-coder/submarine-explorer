@@ -434,3 +434,7 @@ Single-spec playwright runs serve `dist/`; a build older than the source hid the
 - Golden `2026-11-11-044544` finished with 75 shots and Endurance/Monterey-2 missing (capture timeouts). Acceptable for the review; the named-error exit from 16f worked as designed. Rerun only if a later review needs those two.
 - Claude lanes had only one unblocked item (22) after 6/7/11/16e merged; refilled with items 23-26 from the new golden set.
 - Claude weekly 16% (resets 11-12 05:59): the budget gate, not scheduling, limits packages.
+
+## 2026-11-12: review finding, CI shards leave no evidence
+
+Playwright traces record on first retry; hosted CI uses zero retries, so red shards were triaged as "hosted timing" for days. Queued brief 197 (item 27) to retain failure traces. Reason: diagnose red CI by evidence, not guesses.
