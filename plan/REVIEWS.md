@@ -1,5 +1,9 @@
 # Reviews
 
+## 2026-11-11 21:45 CST targeted review (red CI, no change)
+
+- Red CI unchanged: same hosted-timing shard failures, newest run still in progress. Claude weekly 10% (resets Nov 12 05:59), below pace gate and near kill floor, so no agent started. Briefs 190, 194-196 queued; Codex paced. Re-plan after the Claude reset.
+
 ## 2026-11-11 19:15 CST targeted review (red CI, no change)
 
 - CI still red on the same hosted-timing shards (run 43125981022); another run queued. Claude weekly 11% (resets Nov 12 05:59), no agent started. Briefs 190, 194-196 queued, Codex paced. Re-check after the reset.
