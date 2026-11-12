@@ -3908,3 +3908,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Same hosted-timing shard failures; fix is item 27 + briefs 190/197 (queued, Codex paced). Claude weekly 10%, no agent started. Main clean.
 - **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
+## 2026-11-12 07:49 CST headless run (Claude)
+
+- Merged item 23 V-challenger-lander-presence (lander ~1.7x, bait glow + amphipod swarm; known gap: hard lower edge on glow pool). Main gates (smoke + project-base) green; pushed. Claude weekly refreshed (98%); only one package run this time (about 54 min). Codex briefs 190, 194-198 queued; 124/131 still held. No tag (hosted CI red).
+- Next Claude items: 24 V-deep-upper-frame, 25 V-axial-floor-readability, 26.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
