@@ -244,8 +244,9 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     // They are visual only: smoke origins, colliders and impostor retain their existing anchors.
     const mouthMaterial = new THREE.MeshStandardMaterial({
       color: profile.mouthColor,
-      // Hot fluid glows in the throat; the dark rim and bowl around it stay black.
+      // The throat is a dark bore with only an ember glow; the lip ring carries the brightness.
       emissive: profile.throatColor,
+      emissiveIntensity: 0.3,
       roughness: 1,
       side: THREE.DoubleSide,
       polygonOffset: true,
@@ -276,6 +277,21 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
         if (hit) pos.setY(i, hit.point.y + profile.mouthClearanceM);
       }
       mouths.push(disc);
+      // A pale lip round the bore (merged with the collars): the dark opening reads as a ring.
+      const lip = place(new THREE.RingGeometry(radius * 0.92, radius * 1.4, 20, 1), {
+        x: s.x,
+        y: s.y + s.h,
+        z: s.z,
+        rx: -Math.PI / 2,
+      });
+      const lipPos = lip.getAttribute('position');
+      for (let i = 0; i < lipPos.count; i++) {
+        probe.set(lipPos.getX(i), s.y + s.h + 2, lipPos.getZ(i));
+        ray.set(probe, down);
+        const hit = ray.intersectObject(body)[0];
+        if (hit) lipPos.setY(i, hit.point.y + profile.mouthClearanceM * 2);
+      }
+      collars.push(lip);
     }
     // The opening view sees the main stack from below its summit. Broken side vents
     // give that view a readable aperture even when the top rim is outside the frame.

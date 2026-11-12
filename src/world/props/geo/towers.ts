@@ -126,18 +126,18 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   }
   const spires: Spire[] = [];
   const dens = d.meshDensity;
-  const mk = (x: number, z: number, h: number, main: boolean): void => {
-    const r0 = h * (main ? 0.26 : 0.17) + 0.5;
+  const mk = (x: number, z: number, h: number, main: boolean, y?: number, r?: number): void => {
+    const r0 = r ?? h * (main ? 0.26 : 0.17) + 0.5;
     spires.push({
       x,
       z,
-      y: Math.max(skirtShape(x, z), 0) + gnd(x, z) - 0.6,
+      y: y ?? Math.max(skirtShape(x, z), 0) + gnd(x, z) - 0.6,
       h,
       r0,
       topFrac: main ? 0.3 : 0.28,
       seed: seed + spires.length * 11,
-      segs: 44 * dens + 4,
-      rings: (h / 0.9) * dens + 8,
+      segs: (y === undefined ? 44 : 20) * dens + 4,
+      rings: (h / (y === undefined ? 0.9 : 1.4)) * dens + 6,
       tiers: Math.max(2, Math.round(h / (main ? 6.5 : 5))),
       ledge: 0.09,
       wobble: 0.1,
@@ -155,7 +155,12 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   };
   // H is the edifice's total local relief: the column rises from the top of its talus
   // skirt, so it is shortened by the skirt's height under it.
-  mk(0, 0, H - (Math.max(skirtShape(0, 0), 0) - 0.6), true);
+  // The crown: the trunk stops short of the full height and a few slim tubes of different
+  // height rise from its rim, each with its own bore, so the top is a cluster, not one sheet.
+  const crownRise = lone ? 0 : H * 0.14;
+  const trunkH = H - (Math.max(skirtShape(0, 0), 0) - 0.6);
+  // The trunk keeps the girth of the full-height column.
+  mk(0, 0, trunkH - crownRise, true, undefined, trunkH * 0.26 + 0.5);
   const main = spires[0]!;
   const n = lone ? 0 : 4 + Math.floor(rnd() * 2);
   for (let i = 0; i < n; i++) {
@@ -164,6 +169,25 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     const sr0 = h * 0.17 + 0.5;
     const r = main.r0 * 0.9 + sr0 * 0.9 + 1 + rnd() * 0.1 * Math.min(W, D);
     mk(Math.cos(a) * r, Math.sin(a) * r, h, false);
+  }
+
+  const crownTubes = lone ? 0 : 3;
+  const crownFirst = spires.length;
+  const crownRnd = mulberry32(seed ^ 0xc70a);
+  const crownA = crownRnd() * 6.283;
+  for (let i = 0; i < crownTubes; i++) {
+    const a = crownA + (i / crownTubes) * 6.283 + (crownRnd() - 0.5) * 0.5;
+    const rise = crownRise * [1, 0.62, 0.34][i]!;
+    const foot = main.h * 0.97;
+    const ring = i === 0 ? 0 : main.r0 * main.topFrac * 0.62;
+    mk(
+      Math.cos(a) * ring,
+      Math.sin(a) * ring,
+      rise + (main.h - foot),
+      false,
+      main.y + foot,
+      1.2 + rise * 0.14,
+    );
   }
 
   // The build plane is wider than the nominal footprint so the ragged outline fits inside it.
@@ -486,6 +510,8 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   const full = new THREE.Group();
   full.name = 'carbonate-tower';
   full.add(new THREE.Mesh(geom, material));
+  // The trunk's vent, haze and fringe belong to its highest crown tube.
+  if (crownTubes) tips[0] = tips[crownFirst]!;
   full.userData.ventTop = tips[0]!.y;
 
   // Poseidon's inactive apron: three small thickets, clear of the active columns.

@@ -112,7 +112,8 @@ export function rimDrop(o: SpireOpts, ang: number): number {
   const drop =
     Math.pow(smooth(0.35, 0.7, broad), 1.5) * (o.trunk ? 0.55 : 1.6) +
     smooth(0.5, 0.8, teeth) * (o.trunk ? 0.1 : 0.5);
-  return o.r0 * o.topFrac * drop;
+  // Crusted sulfide rims tear less: a tidier, lower-contrast edge around the bore.
+  return o.r0 * o.topFrac * drop * (o.crust ? 0.55 : 1);
 }
 
 /** A tiered, fluted column standing on y = 0. */

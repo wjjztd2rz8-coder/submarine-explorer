@@ -2,9 +2,9 @@
 
 exports[`1140: beebe-vent-field Low buffers are finite and draw counts stay within f43 1`] = `
 {
-  "buffers": "11042ac9216ac710e464f92bc7670198719d9ee6e9740f891ddd3ded08178fc4",
+  "buffers": "ece72708de2c373476f7abdd4480e3b8a0834f748d2a1c6984e6121136068118",
   "draws": 13,
-  "triangles": 20338,
+  "triangles": 20578,
 }
 `;
 
@@ -18,9 +18,9 @@ exports[`1140: great-blue-hole Low buffers are finite and draw counts stay withi
 
 exports[`1140: lost-city Low buffers are finite and draw counts stay within f43 1`] = `
 {
-  "buffers": "44a20216a8d910aeb1d4c32e941330cfbdcf7964505b3062373e4aaea06137dd",
+  "buffers": "2b48a9c75a6f35b42d9733ec481e2024ee2abf65db67c29e67637ee381448496",
   "draws": 14,
-  "triangles": 54352,
+  "triangles": 53856,
 }
 `;
 
