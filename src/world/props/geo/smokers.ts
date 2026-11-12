@@ -253,7 +253,6 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
       polygonOffsetFactor: -2,
     });
     const mouths: THREE.BufferGeometry[] = [];
-    const lips: THREE.BufferGeometry[] = [];
     const collars: THREE.BufferGeometry[] = [];
     const sideMouths: Array<{ centre: number[]; normal: number[] }> = [];
     const ray = new THREE.Raycaster();
@@ -278,8 +277,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
         if (hit) pos.setY(i, hit.point.y + profile.mouthClearanceM);
       }
       mouths.push(disc);
-      // A bright lip round the bore: the crater rim catches the throat's glow, so the dark
-      // opening reads as a ring of light from a distance.
+      // A pale lip round the bore (merged with the collars): the dark opening reads as a ring.
       const lip = place(new THREE.RingGeometry(radius * 0.92, radius * 1.4, 20, 1), {
         x: s.x,
         y: s.y + s.h,
@@ -293,7 +291,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
         const hit = ray.intersectObject(body)[0];
         if (hit) lipPos.setY(i, hit.point.y + profile.mouthClearanceM * 2);
       }
-      lips.push(lip);
+      collars.push(lip);
     }
     // The opening view sees the main stack from below its summit. Broken side vents
     // give that view a readable aperture even when the top rim is outside the frame.
@@ -361,18 +359,6 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     orifices.name = 'beebe-orifices';
     orifices.userData.sideMouths = sideMouths;
     full.add(orifices);
-    const lipMaterial = new THREE.MeshStandardMaterial({
-      color: profile.collarColor,
-      roughness: 1,
-      emissive: profile.throatColor,
-      emissiveIntensity: 0.9,
-      side: THREE.DoubleSide,
-      polygonOffset: true,
-      polygonOffsetFactor: -1,
-    });
-    const bores = new THREE.Mesh(mergeAll(lips), lipMaterial);
-    bores.name = 'beebe-bore-lips';
-    full.add(bores);
     const mineralCollars = new THREE.Mesh(mergeAll(collars), crustMaterial);
     mineralCollars.name = 'beebe-side-collars';
     full.add(mineralCollars);

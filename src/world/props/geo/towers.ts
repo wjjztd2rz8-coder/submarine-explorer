@@ -136,8 +136,8 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       r0,
       topFrac: main ? 0.3 : 0.28,
       seed: seed + spires.length * 11,
-      segs: 44 * dens + 4,
-      rings: (h / 0.9) * dens + 8,
+      segs: (y === undefined ? 44 : 20) * dens + 4,
+      rings: (h / (y === undefined ? 0.9 : 1.4)) * dens + 6,
       tiers: Math.max(2, Math.round(h / (main ? 6.5 : 5))),
       ledge: 0.09,
       wobble: 0.1,
@@ -158,7 +158,9 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   // The crown: the trunk stops short of the full height and a few slim tubes of different
   // height rise from its rim, each with its own bore, so the top is a cluster, not one sheet.
   const crownRise = lone ? 0 : H * 0.14;
-  mk(0, 0, H - (Math.max(skirtShape(0, 0), 0) - 0.6) - crownRise, true);
+  const trunkH = H - (Math.max(skirtShape(0, 0), 0) - 0.6);
+  // The trunk keeps the girth of the full-height column.
+  mk(0, 0, trunkH - crownRise, true, undefined, trunkH * 0.26 + 0.5);
   const main = spires[0]!;
   const n = lone ? 0 : 4 + Math.floor(rnd() * 2);
   for (let i = 0; i < n; i++) {
@@ -176,7 +178,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     const a = crownA + (i / crownTubes) * 6.283 + (crownRnd() - 0.5) * 0.5;
     const rise = crownRise * [1, 0.62, 0.34][i]!;
     const foot = main.h * 0.97;
-    const ring = main.r0 * main.topFrac * 0.62;
+    const ring = i === 0 ? 0 : main.r0 * main.topFrac * 0.62;
     mk(
       Math.cos(a) * ring,
       Math.sin(a) * ring,
@@ -580,7 +582,9 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       );
   }
 
-  // Faint clear-fluid haze at the tips of the tallest spires.
+  // Faint clear-fluid haze at the tips of the tallest spires; the trunk's haze rises from the
+  // highest crown tube.
+  if (crownTubes) tips[0] = tips[1]!;
   const hazeFor = [...spires.keys()]
     .sort((a, b) => spires[b]!.h - spires[a]!.h)
     .slice(0, lone ? 1 : 3);

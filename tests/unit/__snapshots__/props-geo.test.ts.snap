@@ -290,9 +290,9 @@ exports[`authored prop geometry golden > beebe-vent-field high: retains buffers,
   {
     "budget": {
       "draws": 9,
-      "triangles": 148058,
+      "triangles": 148298,
     },
-    "buffers": "134783ad682d5d67204ed5ad48ac0760a917db971cf3045876e793f1803cda93",
+    "buffers": "9752c20952b2fb903d601ea02b7f283ed449ca076edd4ddd93c559938678a7a0",
     "id": "beebe-chimney-1",
     "placement": "94f4a973d597de7176fbbcfc17ca7fe350906ab3c94f618400fe0d180ac08f5d",
     "ventTop": 27.84017557996292,
@@ -302,9 +302,9 @@ exports[`authored prop geometry golden > beebe-vent-field high: retains buffers,
       "draws": 2,
       "triangles": 16304,
     },
-    "buffers": "f9f45e7a6ee63b47a50e919b05b66ccf57602d576c9f61258d0c813d02758235",
+    "buffers": "f1b0c05d48163c789b4cdac1f0721f54f57df7bc77d2e29283f0d82f6dc5d7e2",
     "id": "beebe-chimney-2",
-    "placement": "54b5d8a02466a47a8027385c6cf3ba802112a3e00345005da435a44de06e6993",
+    "placement": "c8af43c679ca139f8a36dc7eed874288923d511212ed0c6fb37b0dbde26b8b52",
     "ventTop": undefined,
   },
   {
@@ -312,7 +312,7 @@ exports[`authored prop geometry golden > beebe-vent-field high: retains buffers,
       "draws": 2,
       "triangles": 15472,
     },
-    "buffers": "a477005bc87262914d0e1b18e6c6115e025a0ba65dc278ddb835438e81a423f6",
+    "buffers": "e4be8bcfc8b5bf7f1f935628b24b6635ebeb35f31bf33bdc6ff82f9b4cbfc881",
     "id": "beebe-chimney-3",
     "placement": "a829f2fd0288b6c18d21e89a2dd8322bf0f6e512185bc19719de064b4d88a9f6",
     "ventTop": undefined,
@@ -325,9 +325,9 @@ exports[`authored prop geometry golden > beebe-vent-field low: retains buffers, 
   {
     "budget": {
       "draws": 9,
-      "triangles": 18010,
+      "triangles": 18250,
     },
-    "buffers": "cdc466d8f4c43c7b269b0b24c99baab24ff4a4b97ff7e48958f12b37740ca055",
+    "buffers": "5e0f24c6a5d01719d7e046b079ba42c256be691626a92c80dbead91a8a3b86ff",
     "id": "beebe-chimney-1",
     "placement": "c86044a22e19cb3b43b575f7542582c5a0a5afc4da19e5623b8134d11788c4a3",
     "ventTop": 27.84017557996292,
@@ -337,9 +337,9 @@ exports[`authored prop geometry golden > beebe-vent-field low: retains buffers, 
       "draws": 2,
       "triangles": 1214,
     },
-    "buffers": "ec0f80b42f7071d62dd658fdeee1fc738f27bca75f1ad236413a67927520274f",
+    "buffers": "ec6e55eb075b0d6e74a3aea72fc33ceef7b882157e3b7eeccbe4b0a4a58c606e",
     "id": "beebe-chimney-2",
-    "placement": "5e70b13516220028c71f8092233f31c650270f8442991bae251eccacbef24ca3",
+    "placement": "e8151d33860fab268d7faa49fd4fe97e7cbc710a67bb38d518a099b0d5682488",
     "ventTop": undefined,
   },
   {
@@ -347,7 +347,7 @@ exports[`authored prop geometry golden > beebe-vent-field low: retains buffers, 
       "draws": 2,
       "triangles": 1114,
     },
-    "buffers": "566cda0bd70970258a1f8594afe115388300330b55cc0685c567e0e6f8ad49fa",
+    "buffers": "bbf4de7da0accf2b1dba69144585369d298329cbff8c6cff095bc3d1227f1930",
     "id": "beebe-chimney-3",
     "placement": "e7d988b805690792d17d82c328415cf55b492eba30eefd6db532eec0f05d6ae7",
     "ventTop": undefined,
@@ -360,9 +360,9 @@ exports[`authored prop geometry golden > beebe-vent-field medium: retains buffer
   {
     "budget": {
       "draws": 9,
-      "triangles": 88022,
+      "triangles": 88262,
     },
-    "buffers": "b1845affd93a767cd7dcd573b880e87909b61d9ce6dcba5a4bba90b23a4cea41",
+    "buffers": "f7f663a2fcf0b78ade4dfd6e7fc270c81cc19abfbff7c70c11fdb6209b1b49a4",
     "id": "beebe-chimney-1",
     "placement": "c86044a22e19cb3b43b575f7542582c5a0a5afc4da19e5623b8134d11788c4a3",
     "ventTop": 27.84017557996292,
@@ -372,9 +372,9 @@ exports[`authored prop geometry golden > beebe-vent-field medium: retains buffer
       "draws": 2,
       "triangles": 8420,
     },
-    "buffers": "a77b14c335b03c7445b7bae23d4a45efcc27c65e9df5cca098f85d7f31c0bc36",
+    "buffers": "253fe54cd0d74eee42726d58d9bb1fbe8f2a65b6fc4921b870211cf85777e57a",
     "id": "beebe-chimney-2",
-    "placement": "a282335832478bdd82413e788e3a438d7ce576ba95c48053c4fea3d86751a3e7",
+    "placement": "5fca8368186f985aecaebcfe9b327d3464e1287542eca7a04fb09a5928271035",
     "ventTop": undefined,
   },
   {
@@ -382,7 +382,7 @@ exports[`authored prop geometry golden > beebe-vent-field medium: retains buffer
       "draws": 2,
       "triangles": 7864,
     },
-    "buffers": "01816e509d9f987392bc24622be0664ac29a308bc42eee4ed2f808906832d042",
+    "buffers": "c1a1173a1568fab41e6344ebe68f2c5eea9e7004d90867b1a819d558b843d09d",
     "id": "beebe-chimney-3",
     "placement": "ae5a48ef49044644609293ef9d17da2093f479a65d415fd29410653d77b169b7",
     "ventTop": undefined,
@@ -470,19 +470,19 @@ exports[`authored prop geometry golden > lost-city high: retains buffers, materi
   {
     "budget": {
       "draws": 3,
-      "triangles": 89408,
+      "triangles": 94680,
     },
-    "buffers": "0a77af7105f1ad2189d52bb955ec594b4a0a8d83bd8273cf81344b7e5987943e",
+    "buffers": "745115f9b11573760d1d54bdf4dad8aae49fbc7674e7298d9df4e33ac3a4a1be",
     "id": "poseidon-tower",
-    "placement": "d23779cf8c9256b8b7168f172e2032fa94764d01a6889320c4da7c95c422946a",
-    "ventTop": 60,
+    "placement": "155f5fc3ba567fef47c0ed33212da02eb0a36cb4d01f16c7968ef5a0a44cf958",
+    "ventTop": 51.6,
   },
   {
     "budget": {
       "draws": 1,
-      "triangles": 6880,
+      "triangles": 6688,
     },
-    "buffers": "fcdced07fbdee20cceb3b39f1e1e86ad147c943ed2dee5ae0275c7fa4d16480a",
+    "buffers": "08bb47a9933ff93ee563707b544c9cca8acd6139ba71f72e5b47daa53d62dc00",
     "id": "beehive-chimney",
     "placement": "8d7c2f02d89324c3685dcfc1478ecda08fb4516ab46f96d1dd4e787937d41be7",
     "ventTop": 0.9999999999999999,
@@ -490,9 +490,9 @@ exports[`authored prop geometry golden > lost-city high: retains buffers, materi
   {
     "budget": {
       "draws": 1,
-      "triangles": 8392,
+      "triangles": 8200,
     },
-    "buffers": "8d84d693b58e46b7e9cc39deba8bc70dfd2d21eaa8ebb23f0fa3d6408a58fd70",
+    "buffers": "e10895316f37eb4bcef5e48f7e9f160bb47b6a9c2ddff0cb7d19cd0c9d052cb5",
     "id": "imax-tower",
     "placement": "e5a1224c3f51b402788afbcbdfaf2e78b86dd11e34b2e2b5599b859c411d090b",
     "ventTop": 8,
@@ -500,9 +500,9 @@ exports[`authored prop geometry golden > lost-city high: retains buffers, materi
   {
     "budget": {
       "draws": 1,
-      "triangles": 10872,
+      "triangles": 10680,
     },
-    "buffers": "41e7e8149261e8d4370597352c1fc2d0a991afc61c8386429182f0562532a683",
+    "buffers": "281edd8b50eca1fba012dd92e99c242baea6790dcb0fc7c7714107f1d3e0960e",
     "id": "unnamed-chimney-1",
     "placement": "fe27e2336421d66b155f3b771f74b6167817250040590549a336dba6d5046425",
     "ventTop": 18,
@@ -510,9 +510,9 @@ exports[`authored prop geometry golden > lost-city high: retains buffers, materi
   {
     "budget": {
       "draws": 1,
-      "triangles": 12008,
+      "triangles": 11816,
     },
-    "buffers": "10f214655e1a7e12b420d78401d73b17957877b201c2930afd89e593d1a170a8",
+    "buffers": "d111d1f561e96a87bff3ad9102711019183e5aa36454263ca66f2ecbd5c3457a",
     "id": "unnamed-chimney-2",
     "placement": "0a8e6999dab47e68130b670495ccd23f0cbc15509a3dbd3c3040038a1bc13aea",
     "ventTop": 24,
@@ -520,9 +520,9 @@ exports[`authored prop geometry golden > lost-city high: retains buffers, materi
   {
     "budget": {
       "draws": 1,
-      "triangles": 13592,
+      "triangles": 13400,
     },
-    "buffers": "e6e1bd67889b50ea52053fda2cf00fba1f76128a70d19a0baba06313063947d6",
+    "buffers": "336a070389db4f8ed4c0db613957fdd4a1255d82334e8886a65c7fc6137389b5",
     "id": "far-spire-1",
     "placement": "bf7466734c1a1dde56acfca193f4b8bb99f509dcda81949b3911358b156bff10",
     "ventTop": 38,
@@ -530,9 +530,9 @@ exports[`authored prop geometry golden > lost-city high: retains buffers, materi
   {
     "budget": {
       "draws": 1,
-      "triangles": 14584,
+      "triangles": 14392,
     },
-    "buffers": "82f1509eaf13764b5d4111e85852caf801902900532867ee5801e86fe54673b9",
+    "buffers": "13565e76b5454ad1802880c91c0b8a0ad5d4f3d6197d3d1dcc3bfdec31828620",
     "id": "far-spire-2",
     "placement": "ee888bef76e98f2c48e60f3dc2c577b446a351789723a4ce413b1b24599ddb35",
     "ventTop": 46,
@@ -540,9 +540,9 @@ exports[`authored prop geometry golden > lost-city high: retains buffers, materi
   {
     "budget": {
       "draws": 1,
-      "triangles": 12296,
+      "triangles": 12104,
     },
-    "buffers": "0eb5390f578c20326a4d88d67d1b4387500b331b7af961b57d78976a6fde9533",
+    "buffers": "d1e403129b0e9bf57858eeaec244628479ecc9fbda2f9ee383ebe1a9f9118f26",
     "id": "far-spire-3",
     "placement": "9b870408ad3fb831d3f44c307e8f91978ca8cc8b1d40912a7e61dae12179ce7b",
     "ventTop": 28,
@@ -550,9 +550,9 @@ exports[`authored prop geometry golden > lost-city high: retains buffers, materi
   {
     "budget": {
       "draws": 1,
-      "triangles": 14784,
+      "triangles": 14592,
     },
-    "buffers": "2eea7670819f4db0f3f5be3e9cd6e590a56ae2b7a7ec8b9a9ecbb8d15074b81e",
+    "buffers": "12651a1ab44a7e09048f179f87d5938fe64892146fcfb718bae42e0a4dba0fb8",
     "id": "far-spire-4",
     "placement": "aabc507dd66c4134c610666271b5239fe3eab2411472b75f14b42e7e5382a557",
     "ventTop": 52,
@@ -560,9 +560,9 @@ exports[`authored prop geometry golden > lost-city high: retains buffers, materi
   {
     "budget": {
       "draws": 1,
-      "triangles": 13368,
+      "triangles": 13176,
     },
-    "buffers": "00236b40f2f449e25c3229492913b25786c6d87c63088634cb99e813bd6c824d",
+    "buffers": "39171aa290123fcbeee8269fd59d558a0b6374b80d75bad7c67b6c6a3384510e",
     "id": "far-spire-5",
     "placement": "51b9c42d04c3e8ee32e99a841e1a2320070436e85f32053ddd0c02e4ee0b91f8",
     "ventTop": 34,
@@ -570,9 +570,9 @@ exports[`authored prop geometry golden > lost-city high: retains buffers, materi
   {
     "budget": {
       "draws": 1,
-      "triangles": 11928,
+      "triangles": 11736,
     },
-    "buffers": "c240afb9b6f8449263354499fc3fa164d1b1ae71805cc21d82a40f122aed9ae9",
+    "buffers": "2702e1a9f4d6fdfb396bdfe48cc3a9dfd1046c69b04bef3dfb8d564899b73a75",
     "id": "far-spire-6",
     "placement": "f3bb75a2c76ac66709e1f145144288e32e798d8b0bd1e5626d9c000f08bf871a",
     "ventTop": 24,
@@ -580,9 +580,9 @@ exports[`authored prop geometry golden > lost-city high: retains buffers, materi
   {
     "budget": {
       "draws": 1,
-      "triangles": 14200,
+      "triangles": 14008,
     },
-    "buffers": "07f380d66e3e731949ddc909593b7578cae0a11ff9405ef41c504162614e405b",
+    "buffers": "bcb107e0d3a31b8e8c7ec09a94021a48b8cf89d8fd97e622629bb1114567d2de",
     "id": "far-spire-7",
     "placement": "2b11ffcd9a1502c0411368836ab77801e1576295dee6fe5ed7d878a5430f44a1",
     "ventTop": 42,
@@ -595,19 +595,19 @@ exports[`authored prop geometry golden > lost-city low: retains buffers, materia
   {
     "budget": {
       "draws": 3,
-      "triangles": 17840,
+      "triangles": 19008,
     },
-    "buffers": "02e25b5e4dd583cfc6ac7149b9eac08da6c8890f935395200cdc9febede7735b",
+    "buffers": "eb80e46df3bedcc27f9852a0f1285c4dda777f08bc9e1fd580137240a94657ad",
     "id": "poseidon-tower",
-    "placement": "1ac992f5fabc4ce701edaff442b9f7d13af2adf3e3a07011e7520b214cc8bba8",
-    "ventTop": 60,
+    "placement": "c7f664f38e2904f43770e4a7d4be50e7f0974b1550a8b42b79470fcaf7c3a727",
+    "ventTop": 51.6,
   },
   {
     "budget": {
       "draws": 1,
-      "triangles": 2296,
+      "triangles": 2184,
     },
-    "buffers": "4f6f281fbbf1352839121ab4e5a507366a37774aacfaf16cc1f0b822f6b98c53",
+    "buffers": "ab233726e6fb655822b76ea7192f94ca776866bc508b9e243df8e30ddf425309",
     "id": "beehive-chimney",
     "placement": "b38d9fe6aedddf901f1d18cdc2af55af5c14d352227e047d0d3623e9eefd4e73",
     "ventTop": 0.9999999999999999,
@@ -615,9 +615,9 @@ exports[`authored prop geometry golden > lost-city low: retains buffers, materia
   {
     "budget": {
       "draws": 1,
-      "triangles": 2576,
+      "triangles": 2464,
     },
-    "buffers": "a5a936b338d496eec1b521e50ebc8f76a0a0d774bc3e5f4c8ad4775620c27532",
+    "buffers": "22a0e877e73cd232421d3211d8273f44573ec1acdeea9157b95f5f9c9e858b55",
     "id": "imax-tower",
     "placement": "ab77d7c74e031afd9aa19e04e5e6d68cc7b2db9663f9ae3dc1cec0c642e10601",
     "ventTop": 8,
@@ -625,9 +625,9 @@ exports[`authored prop geometry golden > lost-city low: retains buffers, materia
   {
     "budget": {
       "draws": 1,
-      "triangles": 2912,
+      "triangles": 2800,
     },
-    "buffers": "70d577511099c9557873bae49ef02995bc343b8948075b38fc1ff2d55c2364af",
+    "buffers": "3ab6cb46427cc309f914c4fc5d1f1839ee6c2e35b231f303d1201e403c9d5338",
     "id": "unnamed-chimney-1",
     "placement": "47c5256a68ab74875e8cfe239049fd1406ccf9670ca907c565875a39d3554855",
     "ventTop": 18,
@@ -635,9 +635,9 @@ exports[`authored prop geometry golden > lost-city low: retains buffers, materia
   {
     "budget": {
       "draws": 1,
-      "triangles": 3192,
+      "triangles": 3080,
     },
-    "buffers": "06a644d5c27c9c2d87e5c2fb5d75158889624ee99731d302c8f1686b48732a90",
+    "buffers": "7b37557e2854c505ccdf2d24ecb5a79cd5b71e89963be0fb34cb96381d880421",
     "id": "unnamed-chimney-2",
     "placement": "0a8e6999dab47e68130b670495ccd23f0cbc15509a3dbd3c3040038a1bc13aea",
     "ventTop": 24,
@@ -645,9 +645,9 @@ exports[`authored prop geometry golden > lost-city low: retains buffers, materia
   {
     "budget": {
       "draws": 1,
-      "triangles": 3612,
+      "triangles": 3500,
     },
-    "buffers": "031b84eb28669efd8243005b9b99f75ee82df6d8c8e11abe442c8bda4f2d1da6",
+    "buffers": "08f7cd4bfef173ee1c65c7a671a4ab6a577e4aee887b3039533e6527e3b1c3f0",
     "id": "far-spire-1",
     "placement": "825c452078a55bcda3d0efe336966798a344fc3fb5cca8fc0008b5d20496a168",
     "ventTop": 38,
@@ -655,9 +655,9 @@ exports[`authored prop geometry golden > lost-city low: retains buffers, materia
   {
     "budget": {
       "draws": 1,
-      "triangles": 3948,
+      "triangles": 3836,
     },
-    "buffers": "cc741a39282f229816a7d70a3e82a3a7f10fd122e9cb5ce540bb88ffafc88c64",
+    "buffers": "0e981ac97ea11a6721c62b7cbc013e0770243e181422a4e7ff32b024098f5f49",
     "id": "far-spire-2",
     "placement": "a87287132ed536385c398423022ffc1038b73308044d8c054387d364e7010b10",
     "ventTop": 46,
@@ -665,9 +665,9 @@ exports[`authored prop geometry golden > lost-city low: retains buffers, materia
   {
     "budget": {
       "draws": 1,
-      "triangles": 3304,
+      "triangles": 3192,
     },
-    "buffers": "e15c28cb80c8dab44197b9ceefa44453587a22049abc8eeb11f7367907094e13",
+    "buffers": "e46e9d5d31e48b60750f7b0c3392cf9d61f3c09ea6439c5332a23c90c0533ad3",
     "id": "far-spire-3",
     "placement": "6bb7086772e32d0f338eab0502c97337f9988799db561baf9784593b6ed10371",
     "ventTop": 28,
@@ -675,9 +675,9 @@ exports[`authored prop geometry golden > lost-city low: retains buffers, materia
   {
     "budget": {
       "draws": 1,
-      "triangles": 4144,
+      "triangles": 4032,
     },
-    "buffers": "0de2504ce4b02ccc27f9b7ae92941ac48c4667dc7b50a24308abc9682638df5c",
+    "buffers": "cc42622f5acc6dd95454910258a82f7a82055e353c992c1dbfcf0dbb46a09dbf",
     "id": "far-spire-4",
     "placement": "da26871fcc7071bdd045f32ffed9e6fd6b8e3c6dd5d645c6127fae987b1124ad",
     "ventTop": 52,
@@ -685,9 +685,9 @@ exports[`authored prop geometry golden > lost-city low: retains buffers, materia
   {
     "budget": {
       "draws": 1,
-      "triangles": 3528,
+      "triangles": 3416,
     },
-    "buffers": "1b48e7348c7ec171ef2e5c874ec47c1d56322b9d0eac2b14c2323bb45e55b9ae",
+    "buffers": "57c4f0ee7c62a78c0098a12d637d76214521a30aa68101a287117d85fbc03cfd",
     "id": "far-spire-5",
     "placement": "b2fbbf11d62f686edbb3b72ef7bca52bdca1ccd01f0fa9f2254317892af77d14",
     "ventTop": 34,
@@ -695,9 +695,9 @@ exports[`authored prop geometry golden > lost-city low: retains buffers, materia
   {
     "budget": {
       "draws": 1,
-      "triangles": 3164,
+      "triangles": 3052,
     },
-    "buffers": "1baf95251027b8a7cc4abaa32606b76fa257ab3381456e17c19c0aa2b718eea8",
+    "buffers": "f41da10feecbdfc181c74db395b2bb9d10852081d0df97b804bcf6b02ae2d6ce",
     "id": "far-spire-6",
     "placement": "f3bb75a2c76ac66709e1f145144288e32e798d8b0bd1e5626d9c000f08bf871a",
     "ventTop": 24,
@@ -705,9 +705,9 @@ exports[`authored prop geometry golden > lost-city low: retains buffers, materia
   {
     "budget": {
       "draws": 1,
-      "triangles": 3836,
+      "triangles": 3724,
     },
-    "buffers": "09341ff5e0c894489b4fad06346a3c2f4505a54b061aec7b44032569a1016b3a",
+    "buffers": "e94ca77c9bd5be4105e2609c67505861474e57cfba7bb5944a48b323b13e6a62",
     "id": "far-spire-7",
     "placement": "2b11ffcd9a1502c0411368836ab77801e1576295dee6fe5ed7d878a5430f44a1",
     "ventTop": 42,
@@ -720,19 +720,19 @@ exports[`authored prop geometry golden > lost-city medium: retains buffers, mate
   {
     "budget": {
       "draws": 3,
-      "triangles": 63336,
+      "triangles": 63890,
     },
-    "buffers": "82c868b2ad7ad30a17e90259d9803e76002d54bd8c692a100bfacc8172eddd47",
+    "buffers": "5e4925283f83550987267b6bcd753188670d9a9fe88608e307719e1fbb4ef8f3",
     "id": "poseidon-tower",
-    "placement": "e5cdd2b11baca216f3fe7976b10f248e4366a762909721b863f9ef155742e0df",
-    "ventTop": 60,
+    "placement": "f268e86f594a195b7e74ebfaefb1ff418bc0098390199abc3ef7ae37be50fc2a",
+    "ventTop": 51.6,
   },
   {
     "budget": {
       "draws": 1,
-      "triangles": 4708,
+      "triangles": 4552,
     },
-    "buffers": "ccabe71a25e5df817335b42ade94541b06cdde5de5f4a0f8350793340e84402a",
+    "buffers": "54076a5fe151e4abd37085f4b49164d479a92f7a15bb737206ea110356ad8d52",
     "id": "beehive-chimney",
     "placement": "8d7c2f02d89324c3685dcfc1478ecda08fb4516ab46f96d1dd4e787937d41be7",
     "ventTop": 0.9999999999999999,
@@ -740,9 +740,9 @@ exports[`authored prop geometry golden > lost-city medium: retains buffers, mate
   {
     "budget": {
       "draws": 1,
-      "triangles": 5644,
+      "triangles": 5488,
     },
-    "buffers": "d2d553c489c38f0ea4eb38d88b1ceda826329d408c5bf96497b9280ec86ea856",
+    "buffers": "b9d7589d370641250d21c4f2f9ae6b9aa8f26a2f2afa22e3ff4a760c73c46b21",
     "id": "imax-tower",
     "placement": "bf44a475655c9e8c7c26ce5c5ea457cd07e64fd82307b9766fa198a44236744f",
     "ventTop": 8,
@@ -750,9 +750,9 @@ exports[`authored prop geometry golden > lost-city medium: retains buffers, mate
   {
     "budget": {
       "draws": 1,
-      "triangles": 6884,
+      "triangles": 6728,
     },
-    "buffers": "65fc7143559614a8a7555a9c68142ff86dde51d63f44395eb612fcfa43608765",
+    "buffers": "232f2c135f48512a9f1ee6f3ba85ccdd0e4a9a347e5184492e97e6d470412d7e",
     "id": "unnamed-chimney-1",
     "placement": "012f40c19deaf18f6636cb5d2e72913b5a0ebaf64799e9d3f849a34444e8bdac",
     "ventTop": 18,
@@ -760,9 +760,9 @@ exports[`authored prop geometry golden > lost-city medium: retains buffers, mate
   {
     "budget": {
       "draws": 1,
-      "triangles": 8462,
+      "triangles": 8306,
     },
-    "buffers": "db1304f0ba587b34e9b1c36a334fc658e98e2890ec5385636a480e8b7974be00",
+    "buffers": "779137345ada9912182fb0ca5da18950339e4e2ea24cc357d2efc770ad45fae6",
     "id": "unnamed-chimney-2",
     "placement": "0a8e6999dab47e68130b670495ccd23f0cbc15509a3dbd3c3040038a1bc13aea",
     "ventTop": 24,
@@ -770,9 +770,9 @@ exports[`authored prop geometry golden > lost-city medium: retains buffers, mate
   {
     "budget": {
       "draws": 1,
-      "triangles": 9994,
+      "triangles": 9838,
     },
-    "buffers": "65fd98b5b68e09f1b7a067c39e59e85b9b1ee712a07c016926093d662ce92338",
+    "buffers": "55766644a5d11313a7e29376ca9ee317e4817828fb75a88e1fa897a1abea2320",
     "id": "far-spire-1",
     "placement": "40d9cd5d4c5001eed1789577dc863722db76144d4fce0224913dda35e5f5a1a0",
     "ventTop": 38,
@@ -780,9 +780,9 @@ exports[`authored prop geometry golden > lost-city medium: retains buffers, mate
   {
     "budget": {
       "draws": 1,
-      "triangles": 10780,
+      "triangles": 10624,
     },
-    "buffers": "8b818dc2e281aa2cb43c6574ae59fff74dbd3cbfcca7e672ee1c046bee5609d5",
+    "buffers": "b84006a66ceb465c9fef589185e9b2170e0e3d678ef74d05594375bd73d54358",
     "id": "far-spire-2",
     "placement": "a5e2059f55961e36374c21cbef0c4828d8e2f7ecb03991f1cbfbcd99be6c5237",
     "ventTop": 46,
@@ -790,9 +790,9 @@ exports[`authored prop geometry golden > lost-city medium: retains buffers, mate
   {
     "budget": {
       "draws": 1,
-      "triangles": 9130,
+      "triangles": 8974,
     },
-    "buffers": "6f16f2b4d28bc8bbea52ac73a0fabf90ae9ae6ec070b76920ba6e63757bfb9c2",
+    "buffers": "848cc93312cfb4d6a3b957f30d11daf4bbd1c8d41a2c93c07d205eef32befc2b",
     "id": "far-spire-3",
     "placement": "dbcb7663ef06d94db32887c3fd7f918298c9ab11934b982ebeb4822485c163b7",
     "ventTop": 28,
@@ -800,9 +800,9 @@ exports[`authored prop geometry golden > lost-city medium: retains buffers, mate
   {
     "budget": {
       "draws": 1,
-      "triangles": 10760,
+      "triangles": 10604,
     },
-    "buffers": "92b207567ff7da668f46500f78e8247cdc535c74cdbf587981e7c4d30cddf453",
+    "buffers": "e4367d6ee90db6e5f631141abdda4e96f2a32be6fa740ece03cefa7b77810331",
     "id": "far-spire-4",
     "placement": "e067044401f908acdb9d84d073aabed7884bd0219d1975e40beeaf4726a62ee1",
     "ventTop": 52,
@@ -810,9 +810,9 @@ exports[`authored prop geometry golden > lost-city medium: retains buffers, mate
   {
     "budget": {
       "draws": 1,
-      "triangles": 9954,
+      "triangles": 9798,
     },
-    "buffers": "a5349c82fbbaab38e56d3479ed7cc5c94b585b29ac832b371ac3d3b0386f13a6",
+    "buffers": "980c994f56e615048d9472e1a0f809b30babda3f5262c52af16f7d3570558858",
     "id": "far-spire-5",
     "placement": "51b9c42d04c3e8ee32e99a841e1a2320070436e85f32053ddd0c02e4ee0b91f8",
     "ventTop": 34,
@@ -820,9 +820,9 @@ exports[`authored prop geometry golden > lost-city medium: retains buffers, mate
   {
     "budget": {
       "draws": 1,
-      "triangles": 8302,
+      "triangles": 8146,
     },
-    "buffers": "790991ba1002a1a9ebed03372801bfc4850765025cc309846dd47e183631249a",
+    "buffers": "33902c88f92eca3715263e939fcb8cb873e79f6415ff1c21e4cf5cf2b0a7bd77",
     "id": "far-spire-6",
     "placement": "f3bb75a2c76ac66709e1f145144288e32e798d8b0bd1e5626d9c000f08bf871a",
     "ventTop": 24,
@@ -830,9 +830,9 @@ exports[`authored prop geometry golden > lost-city medium: retains buffers, mate
   {
     "budget": {
       "draws": 1,
-      "triangles": 10512,
+      "triangles": 10356,
     },
-    "buffers": "e9e399eee4c621435270c08df2bfc0d2b4f94abc9c1c988b14a59e0079007db6",
+    "buffers": "da89931e03558b4a089ed11bae8eaa15e8d579b3e8228357ec77e90b340ceebf",
     "id": "far-spire-7",
     "placement": "6be408fecc3104a5a22101c277dd088a8a5a6af4163cb319039ec5036dd9ab22",
     "ventTop": 42,

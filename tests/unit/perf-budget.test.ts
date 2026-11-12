@@ -586,11 +586,11 @@ describe('Lost City transparent effect fill budget', () => {
           expect(measurements[1]).toEqual(measurements[0]);
           // Pin triangle-grounded placements as well as paired equality, retaining
           // the previous continuous-field workload as an upper resource bound. The pins follow
-          // the trunk surface the sprites are grounded on; draws and points are unchanged.
+          // the crown surface the sprites are grounded on; draws and points are unchanged.
           for (const [range, expectedPixels, ceiling] of [
-            [70, 10_660.530067, 10_670],
-            [32, 43_755.46254, 44_320],
-            [10, 66_767.598682, 67_300],
+            [70, 12_698.784526, 12_710],
+            [32, 59_017.757387, 59_100],
+            [10, 26_670.554578, 26_700],
           ]) {
             const pixels = Math.max(
               ...measurements[1].filter((s) => s.range === range).map((s) => s.pixels),
