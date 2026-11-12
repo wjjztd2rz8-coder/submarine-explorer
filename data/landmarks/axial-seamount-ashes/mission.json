@@ -13,7 +13,6 @@
       "hazeGlow": 0.35,
       "glowIntensity": 1400,
       "glowDistanceM": 55,
-      "glowLights": 3,
       "ambientFill": 3,
       "hullLight": 0.95,
       "glowDropM": 0.5,

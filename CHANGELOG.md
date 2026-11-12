@@ -24,6 +24,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **V-axial-floor-readability:** Axial's seabed no longer drops to near-black outside the sub light. The vent glow lights now reach 55 m (was 28 m), run at twice the intensity, and a small ambient fill lifts the basalt; its base colour is slightly lighter. New optional biome field `flow` (terrain shader, PBR tiers only) adds overlapping pillow lobes, dark creases, ropey wrinkles and a glossier skin near the camera; Low keeps the plain material. Only Axial sets it.
+
 - **S-bughunt-pause-resume-reload:** a reload with `skipBriefing=1` waits for content and the starting pose before starting the mission clock or allowing piloting. Cut the separate early-start path; reuse Begin, retaining the live default start setting while content loads. Pause, visibility, input cancellation and saved Journal boundaries were audited in two rounds.
 - **S-bughunt-journal-ui:** the Journal front page recognizes a first wildlife, secret or sample scan as earned progress. Cut: the misleading first-scan hint after these discoveries and the zero POI chip. Tags, spoiler filtering and saved discoveries keep their existing behavior.
 

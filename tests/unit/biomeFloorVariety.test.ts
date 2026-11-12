@@ -20,6 +20,20 @@ const flatGround = {
 const cell = { cellSizeM: 64, density: 1, rockLo: 0.05, rockHi: 0.3, seed: 7 };
 
 describe('open sediment floor variety', () => {
+  it('lava-flow lobes are opt-in per biome and compile only on PBR tiers', () => {
+    expect(biomeFor('axial-seamount-ashes').flow).toBeGreaterThan(0);
+    expect(biomeFor('titanic').flow).toBeUndefined();
+    const mat = (id: string, tier: 'low' | 'high') =>
+      createTerrainMaterial({
+        config: DEFAULT_CONFIG.terrain,
+        tier,
+        biome: biomeFor(id),
+        exaggeration: 1,
+      }).material.userData.uniforms.uFlow.value;
+    expect(mat('axial-seamount-ashes', 'high')).toBe(biomeFor('axial-seamount-ashes').flow);
+    expect(mat('titanic', 'high')).toBe(0);
+  });
+
   it('optional scatter tint multiplies rock colours once without changing soft life or placement', () => {
     const biome = biomeFor('lost-city');
     expect(biome.scatterTint).toEqual([0.62, 0.9, 0.9]);
