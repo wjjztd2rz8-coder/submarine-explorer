@@ -3920,3 +3920,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged item 24 V-deep-upper-frame (generic down-welling crown plus dome marine snow via the existing backdrop dome; trench preset now gets the dome; Titanic horizon strip still dark, a known gap). First merge attempt failed ~20 unit tests (seam guard, Endurance, presets), so it was reset and sent back; the second pass kept the fog seam and rebaselined only the Endurance dome colour. Main gates (smoke + project-base) green; pushed. No tag (hosted CI red). Codex briefs 190, 194-198 still queued (paced).
 - Next Claude items: 25 V-axial-floor-readability, 26.
 - **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
+## 2026-11-12 10:55 CST targeted review (red CI, no change)
+
+- Same hosted-timing shard failures (9/38 e2e red); fix is item 27 + briefs 190/197, paced by Codex weekly. No agent started. Main clean.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
