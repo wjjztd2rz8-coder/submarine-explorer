@@ -510,7 +510,13 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
   // Footprint and impostor describe the lander itself, not its seabed dressing.
   bodyGeom.computeBoundingBox();
   const bodyBox = bodyGeom.boundingBox!.clone();
-  const dressing = seabedDressing(k, d.meshDensity < 0.7, input.groundHeight() ?? (() => 0));
+  // The dressing is solid seabed clutter that must stay inside the scan sphere, so its scale is capped
+  // while the lander itself grows.
+  const dressing = seabedDressing(
+    Math.min(k, 6.5),
+    d.meshDensity < 0.7,
+    input.groundHeight() ?? (() => 0),
+  );
   const frameGeom = mergeGeometries([bodyGeom, dressing], false)!;
   bodyGeom.dispose();
   dressing.dispose();
@@ -591,6 +597,8 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
   pool.position.set(cage.x, 0.12 * k, cage.z);
   pool.scale.setScalar(7 * k);
   pool.raycast = () => undefined;
+  // Light only, no solid: scan-boundary audits skip it.
+  pool.userData.lightOnly = true;
   full.add(halo, pool);
 
   // Amphipod swarm milling round the cage: pale pink-orange flecks, count scaled by the tier.
