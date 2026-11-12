@@ -3931,3 +3931,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged item 25 V-axial-floor-readability (data-gated lava-lobe floor shader, wider vent glow and fill; Axial-only; floor now readable with glow pools, lobes visible only close up; first pass leaked into other sites' snapshots, fixed by gating). Main gates (smoke + project-base) green; pushed. No tag (hosted CI red). Codex briefs 190, 194-198 still queued (paced).
 - Next Claude item: 26 V-beebe-bores-lostcity-crown.
 - **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
+## 2026-11-12 16:02 CST headless run (Claude)
+
+- Merged item 26 V-beebe-bores-lostcity-crown (Lost City crown now three spires of different height; Beebe stacks get a lip ring and darker bore; ~7 and ~6). Main gates (smoke + project-base) green. No tag (hosted CI red). Codex briefs 190, 194-198 still queued (paced).
+- Known gaps: spiky tube tips, white speckles on the old trunk rim; Beebe bore lips read only from above. Next Claude items: none visual left in backlog; 29 (Haiku) remains.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
