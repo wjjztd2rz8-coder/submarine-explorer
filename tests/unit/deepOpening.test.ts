@@ -245,7 +245,7 @@ describe('Challenger / Endurance opening', () => {
             const closest = new Vector3();
             let extent = 0;
             hero.full.traverse((object) => {
-              if (!(object instanceof Mesh)) return;
+              if (!(object instanceof Mesh) || object.userData.lightOnly) return;
               const vertices = object.geometry.getAttribute('position');
               const indices = object.geometry.index;
               const count = indices?.count ?? vertices.count;
