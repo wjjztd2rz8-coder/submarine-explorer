@@ -3937,3 +3937,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged item 26 V-beebe-bores-lostcity-crown (Lost City crown now three spires of different height; Beebe stacks get a lip ring and darker bore; ~7 and ~6). Main gates (smoke + project-base) green. No tag (hosted CI red). Codex briefs 190, 194-198 still queued (paced).
 - Known gaps: spiky tube tips, white speckles on the old trunk rim; Beebe bore lips read only from above. Next Claude items: none visual left in backlog; 29 (Haiku) remains.
 - **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
+## 2026-11-12 16:15 CST headless run (Claude)
+
+- Merged item 29 U-backlog-id-cleanup (docs only; repeated 16m/16n/16o IDs renumbered 16p-16t; done inline, no agent). No visual Claude items left in the backlog. Codex weekly 21% left, dispatch paced; briefs 190, 194-198 queued; 124/131 still held. Hosted CI still red (hosted-timing shards); no tag.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
