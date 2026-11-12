@@ -310,6 +310,20 @@ test('a full photo store reports the dropped oldest; quota failure is explained'
   expect(stored?.photos).toHaveLength(24);
   expect(stored?.photos.some((p) => p.id === 'old-23')).toBe(false);
 
+  // Regression: quota eviction can keep fewer photos than the count limit reports.
+  await page.evaluate((key) => {
+    const write = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (name: string, value: string) {
+      if (name === key && JSON.parse(value).photos.length > 2)
+        throw new DOMException('full', 'QuotaExceededError');
+      write.call(this, name, value);
+    };
+  }, PHOTOS_KEY);
+  await page.waitForTimeout(500);
+  await page.keyboard.press('Enter');
+  await expect(toast).toHaveText('Saved to Journal · oldest 23 photos removed (keeps 2)');
+  expect((await storedPhotos(page))?.photos).toHaveLength(2);
+
   // Storage that refuses every write: a clear, nonfatal message.
   await page.evaluate(() => {
     Storage.prototype.setItem = () => {
