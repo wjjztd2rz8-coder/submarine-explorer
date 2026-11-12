@@ -1,5 +1,10 @@
 # Reviews
 
+## 2026-11-12 22:05 CST targeted review (red CI, no change)
+
+- Same 9/38 hosted-timing e2e shard failures; fix is item 27 plus briefs 190/197, still queued and held by Codex weekly pacing (21% left until Nov 15). Nothing new to schedule; no agent started. Main clean.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
 ## 2026-11-12 targeted review (red CI x3, no change)
 
 - Latest completed run: the same 9/38 e2e shards fail (hosted-timing). The fix is item 27 plus briefs 190/197, queued; Codex weekly is 21% and dispatch is paced. Claude 5h 64%, weekly 93%. No agent started this run.
