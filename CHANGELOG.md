@@ -24,6 +24,7 @@ without an entry here is not done.
 
 ### Changed
 
+- **S-bughunt-gallery-share:** photo capture reports the actual retained count after quota eviction instead of always saying 24. Cut the duplicate successful-capture branch; shutter, sound and status use one path. JPEG/ZIP exports, deletion and storage limits passed two audit rounds without another confirmed defect.
 - **V-axial-floor-readability:** Axial's seabed no longer drops to near-black outside the sub light. The vent glow lights now reach 55 m (was 28 m), run at twice the intensity, and a small ambient fill lifts the basalt; its base colour is slightly lighter. New optional biome field `flow` (terrain shader, PBR tiers only) adds overlapping pillow lobes, dark creases, ropey wrinkles and a glossier skin near the camera; Low keeps the plain material. Only Axial sets it.
 
 - **S-bughunt-pause-resume-reload:** a reload with `skipBriefing=1` waits for content and the starting pose before starting the mission clock or allowing piloting. Cut the separate early-start path; reuse Begin, retaining the live default start setting while content loads. Pause, visibility, input cancellation and saved Journal boundaries were audited in two rounds.

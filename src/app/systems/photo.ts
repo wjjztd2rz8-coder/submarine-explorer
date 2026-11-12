@@ -8,7 +8,7 @@
  */
 
 import * as THREE from 'three';
-import { PHOTO_LIMIT, PhotoStore, poiInPhoto } from '../../game/PhotoStore.js';
+import { PhotoStore, poiInPhoto } from '../../game/PhotoStore.js';
 import type { PlacedPoi } from '../../game/Pois.js';
 import { PhotoGallery } from '../../ui/PhotoGallery.js';
 import { PhotoMode, canvasThumbnail } from '../../ui/PhotoMode.js';
@@ -67,16 +67,14 @@ export function createPhotoSystem(): GameSystem {
     // Surface can open the debrief before another frame runs.
     if (result.saved && poiId) ctx.progress.award('photo', `${contentLandmark}/${poiId}`);
     if (!result.saved) photoMode.toast(result.error, true);
-    else if (result.dropped) {
+    else {
       photoMode.shutter();
       ctx.audio.playShutter();
       photoMode.toast(
-        `Saved to Journal · oldest ${result.dropped === 1 ? 'photo' : `${result.dropped} photos`} removed (keeps ${PHOTO_LIMIT})`,
+        result.dropped
+          ? `Saved to Journal · oldest ${result.dropped === 1 ? 'photo' : `${result.dropped} photos`} removed (keeps ${photos.photos.length})`
+          : 'Saved to Journal',
       );
-    } else {
-      photoMode.shutter();
-      ctx.audio.playShutter();
-      photoMode.toast('Saved to Journal');
     }
     journal.refresh();
   };

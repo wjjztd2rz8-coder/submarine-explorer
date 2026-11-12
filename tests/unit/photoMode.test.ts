@@ -534,6 +534,50 @@ function automaticStillFixture() {
 }
 
 describe('automatic scan still handoff', () => {
+  it.each([1, 3, 24])(
+    'reports the actual %i retained photos after capture eviction',
+    (retained) => {
+      const fixture = automaticStillFixture();
+      const { ctx, runner, f, storage, toast } = fixture.createDive();
+      try {
+        for (let i = 0; i < 24; i++) {
+          expect(
+            ctx.photos.save({
+              id: `old-${i}`,
+              image: fixture.image,
+              siteId: 'titanic',
+              siteName: 'RMS Titanic',
+              poiId: null,
+              poiName: null,
+              at: '2026-09-24T10:00:00Z',
+              depthM: 3790,
+            }).saved,
+          ).toBe(true);
+        }
+        const write = storage.setItem.getMockImplementation()!;
+        storage.setItem.mockImplementation((key, value) => {
+          if (key === PHOTO_STORAGE_KEY && JSON.parse(value).photos.length > retained)
+            throw new DOMException('Full', 'QuotaExceededError');
+          return write(key, value);
+        });
+        ctx.photoMode.setActive(true);
+        f.sampled.capturePhoto = true;
+        runner.frame(f);
+        const dropped = 25 - retained;
+        expect(ctx.photos.photos).toHaveLength(retained);
+        expect(new PhotoStore(storage).photos).toEqual(ctx.photos.photos);
+        expect(toast).toHaveBeenCalledExactlyOnceWith(
+          `Saved to Journal · oldest ${dropped === 1 ? 'photo' : `${dropped} photos`} removed (keeps ${retained})`,
+        );
+        expect(ctx.photos.photos.slice(1).map((photo) => photo.id)).toEqual(
+          Array.from({ length: retained - 1 }, (_, i) => `old-${23 - i}`),
+        );
+      } finally {
+        fixture.dispose();
+      }
+    },
+  );
+
   it.each(['pause', 'debrief'] as const)(
     'cancels queued captures and refuses photo entry during %s',
     (overlay) => {
