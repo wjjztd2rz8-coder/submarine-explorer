@@ -3925,3 +3925,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Same hosted-timing shard failures (9/38 e2e red); fix is item 27 + briefs 190/197, paced by Codex weekly. No agent started. Main clean.
 - **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
+## 2026-11-12 13:29 CST headless run (Claude)
+
+- Merged item 25 V-axial-floor-readability (data-gated lava-lobe floor shader, wider vent glow and fill; Axial-only; floor now readable with glow pools, lobes visible only close up; first pass leaked into other sites' snapshots, fixed by gating). Main gates (smoke + project-base) green; pushed. No tag (hosted CI red). Codex briefs 190, 194-198 still queued (paced).
+- Next Claude item: 26 V-beebe-bores-lostcity-crown.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
