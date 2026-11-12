@@ -3893,3 +3893,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Stage ~85%, 4-5 weeks. Entry in plan/REVIEWS.md; STATUS rewritten; DIRECTOR items 27-29 added; briefs 197, 198 queued (190, 194-196 still waiting on pace). No Claude agent started (weekly 10%, resets 06:00). Main clean, no tag.
 - **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
+## 2026-11-12 03:17 CST targeted review (red CI, no change)
+
+- Same hosted-timing e2e shard failures (runs 43163516237, 43166860941); diagnosis unchanged, fix is item 27 (retries/traces) plus brief 190, already in the backlog from the 03:17 comprehensive review. Claude weekly 10% (resets 06:00), no agent started. Briefs queued, Codex paced.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
