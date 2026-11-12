@@ -1,5 +1,10 @@
 # Reviews
 
+## 2026-11-12 05:45 CST targeted review (red CI, 3 runs, no change)
+
+- Same hosted-timing e2e shard failures as the 03:17 review; root cause unchanged. Fix path is already in the backlog: item 27 (retries/traces) plus queued Codex briefs 190 and 197, waiting on Codex weekly pacing (21% left). Claude weekly 10%, below pace gate, so no agent started. Nothing further to schedule.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
 ## 2026-11-12 comprehensive review (joint: Claude draft + Codex Sol)
 
 - **Method note:** Claude weekly was 10% (kill floor 7%, resets 06:00), so Claude viewed only two golden frames (Hunga, Blue Hole) and leaned on Sol's full image review (golden `2026-11-12-084527`, 45 captures, 0 failures, desktop High only). Sol could not open a browser or reach GitHub.
