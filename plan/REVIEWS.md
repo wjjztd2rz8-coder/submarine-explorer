@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-11-12 targeted review (red CI, 3 runs, premise corrected)
+
+- Run 43211943393: 9 of 38 e2e shards fail after their retry; e.g. shard 10 fails `journal-debrief.spec.ts:1959` (two-objective scan journey 1280x720, great-blue-hole) with a 60 s `toContainText` timeout. Correction to the 03:17 review and item 27/brief 197: `playwright.config.ts` already sets `retries: 1` on CI and `ci.yml` already uploads `e2e-artifacts-*` (report, traces, screenshots) for failing shards, so evidence exists; brief 197 should start from those artifacts and the debrief-journey timeout, not add retention.
+- Scheduling: Claude is now 83% 5h / 98% weekly (reset done), so the next headless run can take items 24-26; Codex weekly 21%, briefs 190, 194-198 still paced.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
 ## 2026-11-12 05:45 CST targeted review (red CI, 3 runs, no change)
 
 - Same hosted-timing e2e shard failures as the 03:17 review; root cause unchanged. Fix path is already in the backlog: item 27 (retries/traces) plus queued Codex briefs 190 and 197, waiting on Codex weekly pacing (21% left). Claude weekly 10%, below pace gate, so no agent started. Nothing further to schedule.
