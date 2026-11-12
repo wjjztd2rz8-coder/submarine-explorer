@@ -1,5 +1,10 @@
 # Reviews
 
+## 2026-11-11 19:15 CST targeted review (red CI, no change)
+
+- CI still red on the same hosted-timing shards (run 43125981022); another run queued. Claude weekly 11% (resets Nov 12 05:59), no agent started. Briefs 190, 194-196 queued, Codex paced. Re-check after the reset.
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
 ## 2026-11-11 targeted review (red CI, no change, latest)
 
 - Rechecked run 43085531714: still hosted-timing shard failures, none new. Brief 190 (item 16o) queued behind Codex weekly pace; Claude weekly 11% (resets Nov 12 05:59). No change; docs-only pushes keep re-running the suite, so this is the last entry until something differs.
