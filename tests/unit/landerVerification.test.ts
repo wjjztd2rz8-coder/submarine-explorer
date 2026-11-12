@@ -29,6 +29,17 @@ function meshes(built: ReturnType<typeof build>): THREE.Mesh[] {
   return result;
 }
 
+/** Draws and triangles of the opaque body (frame, flag, strobe); the additive glow and swarm are budgeted separately. */
+function bodyCost(built: ReturnType<typeof build>): { draws: number; triangles: number } {
+  const sum = { draws: 0, triangles: 0 };
+  for (const name of ['lander-frame', 'lander-flag', 'lander-strobe']) {
+    const c = countGeo(built.full.getObjectByName(name)!);
+    sum.draws += c.draws;
+    sum.triangles += c.triangles;
+  }
+  return sum;
+}
+
 function release(built: ReturnType<typeof build>): void {
   for (const mesh of meshes(built)) {
     mesh.geometry.dispose();
@@ -39,10 +50,10 @@ function release(built: ReturnType<typeof build>): void {
 
 describe('merged Challenger lander', () => {
   for (const tier of ['low', 'medium', 'high', 'ultra']) {
-    it(`${tier}: three opaque draw calls, bounded triangles and finite vertex tint`, () => {
+    it(`${tier}: three opaque body draw calls, bounded triangles and finite vertex tint`, () => {
       const built = build(tier);
       try {
-        const cost = countGeo(built.full);
+        const cost = bodyCost(built);
         console.log(`LANDER ${tier}: ${JSON.stringify(cost)}`);
         expect(cost.draws).toBe(3);
         expect(cost.triangles).toBeGreaterThan(500);
@@ -52,11 +63,20 @@ describe('merged Challenger lander', () => {
           'lander-frame',
           'lander-flag',
           'lander-strobe',
+          'lander-bait-glow',
+          'lander-bait-pool',
+          'lander-amphipod-swarm',
         ]);
+        // Glow and swarm are additive extras; the body stays opaque.
+        const swarm = built.full.getObjectByName('lander-amphipod-swarm') as THREE.Points;
+        expect(swarm.geometry.getAttribute('aSeed').count).toBe(
+          tier === 'low' ? 80 : tier === 'medium' ? 136 : 200,
+        );
         for (const mesh of meshes(built)) {
           expect(mesh).not.toBeInstanceOf(THREE.InstancedMesh);
           expect(Array.isArray(mesh.material)).toBe(false);
-          expect((mesh.material as THREE.Material).transparent).toBe(false);
+          if (mesh.name !== 'lander-bait-pool')
+            expect((mesh.material as THREE.Material).transparent).toBe(false);
           for (const value of mesh.geometry.getAttribute('position').array)
             expect(Number.isFinite(value)).toBe(true);
         }
@@ -75,7 +95,7 @@ describe('merged Challenger lander', () => {
     it(`${tier}: dimensions, seed and ground relief cannot exceed the geometry budget`, () => {
       const baseline = build(tier);
       try {
-        const cost = countGeo(baseline.full);
+        const cost = bodyCost(baseline);
         for (const options of [
           { dims: [3.4, 3.4, 4.6], seed: 0, groundHeight: () => () => 0 },
           {
@@ -86,10 +106,8 @@ describe('merged Challenger lander', () => {
         ] satisfies Partial<GeoBuildInput>[]) {
           const built = build(tier, options);
           try {
-            expect(countGeo(built.full)).toEqual(cost);
-            expect(countGeo(built.full).triangles).toBeLessThanOrEqual(
-              tier === 'low' ? 2000 : 3000,
-            );
+            expect(bodyCost(built)).toEqual(cost);
+            expect(bodyCost(built).triangles).toBeLessThanOrEqual(tier === 'low' ? 2000 : 3000);
           } finally {
             release(built);
           }
@@ -134,12 +152,12 @@ describe('merged Challenger lander', () => {
     const a = build('low');
     const b = build('low');
     try {
-      expect(meshes(a)).toHaveLength(4);
-      expect(meshes(b)).toHaveLength(4);
+      expect(meshes(a)).toHaveLength(5);
+      expect(meshes(b)).toHaveLength(5);
       const geometries = new Set(meshes(a).map((mesh) => mesh.geometry));
       const materials = new Set(meshes(a).map((mesh) => mesh.material));
-      expect(geometries.size).toBe(4);
-      expect(materials.size).toBe(4);
+      expect(geometries.size).toBe(5);
+      expect(materials.size).toBe(5);
       for (const mesh of meshes(b)) {
         expect(geometries.has(mesh.geometry)).toBe(false);
         expect(materials.has(mesh.material)).toBe(false);

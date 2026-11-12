@@ -7,7 +7,9 @@
  * patch the legs. dims = [footprint width, footprint depth, overall height incl. mast]. Parts are
  * merged with vertex colours into one frame mesh together with a disturbed-sediment halo and a few
  * half-buried clasts on the seabed around the footprint (outside the reported bounds); the flag (matt cloth) and strobe (unlit) are two
- * small extra meshes, so the whole lander is three draw calls at every tier. Real lander dimensions
+ * small extra meshes. A bait-station glow (a warm additive halo sprite over the cage and a pool on the seabed)
+ * and a shader-animated amphipod swarm (one Points cloud, tier-scaled count) draw the eye to the cage,
+ * so the whole lander is six draw calls at every tier. Real lander dimensions
  * are unpublished: the shape is generic, only the position is the real one.
  */
 
@@ -15,6 +17,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { lerp, smoothstep } from '../../../util/math.js';
 import { geoDetail } from './detail.js';
+import { makePlume } from './plume.js';
 import {
   boxCH,
   impostorFromBoxes,
@@ -23,6 +26,7 @@ import {
   valueNoise3,
   type BuiltProp,
 } from './shared.js';
+import { softDot } from './textures.js';
 import type { GeoBuildInput } from './types.js';
 
 const ALU = new THREE.Color(0x302f2a);
@@ -554,6 +558,60 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
   const full = new THREE.Group();
   full.name = 'benthic-lander';
   full.add(frame, flag, strobe);
+
+  // Bait-station glow: a soft warm halo around the cage and a lit pool on the seabed beneath it,
+  // additive so it only ever brightens the scene. Fog is off so the beacon survives the murk.
+  const dot = softDot();
+  const glowMat = (opacity: number) =>
+    new THREE.SpriteMaterial({
+      map: dot,
+      color: 0xffc58a,
+      transparent: true,
+      opacity,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      fog: false,
+    });
+  const halo = new THREE.Sprite(glowMat(0.5));
+  halo.name = 'lander-bait-glow';
+  halo.position.set(cage.x, cage.y + 0.1 * k, cage.z);
+  halo.scale.setScalar(5.5 * k);
+  halo.raycast = () => undefined;
+  const poolMat = new THREE.MeshBasicMaterial({
+    map: dot,
+    color: 0xffb877,
+    transparent: true,
+    opacity: 0.55,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    fog: false,
+  });
+  const pool = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), poolMat);
+  pool.name = 'lander-bait-pool';
+  pool.position.set(cage.x, 0.12 * k, cage.z);
+  pool.scale.setScalar(7 * k);
+  pool.raycast = () => undefined;
+  full.add(halo, pool);
+
+  // Amphipod swarm milling round the cage: pale pink-orange flecks, count scaled by the tier.
+  const swarm = makePlume({
+    height: 1.1 * k,
+    baseRadius: 0.35 * k,
+    spread: 1.4 * k,
+    count: Math.round(160 * d.growth + 40),
+    color: 0xffb9a0,
+    opacity: 0.95,
+    size: 0.24 * k,
+    speed: 0.16,
+    drift: 0.2 * k,
+    seed: 4141,
+  });
+  if (swarm) {
+    swarm.name = 'lander-amphipod-swarm';
+    swarm.position.set(cage.x, 0.1 * k, cage.z);
+    swarm.renderOrder = 3;
+    full.add(swarm);
+  }
   const bounds = bodyBox.expandByObject(flag).expandByObject(strobe);
   const colliders: THREE.Box3[] = [boxCH(0, 1 * k, 0, 1.1 * k, 1 * k, 1.1 * k)];
   return { full, impostor: impostorFromBoxes(colliders, bounds, 0x8a9296), bounds, colliders };
