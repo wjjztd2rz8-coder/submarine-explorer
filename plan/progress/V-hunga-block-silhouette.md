@@ -21,3 +21,7 @@ Same vertex counts as before at every tier (shape only); no extra draws.
 ## Self-rating and gaps
 
 About 4.4 (from 3.8). The opening is now a tapering, jagged ridge with a darker foot, not a block. The skyline noise plus notches reads somewhat spiky/crown-like rather than 2-3 clean notches; the apron is still a fairly uniform pale band. A follow-up could soften the fbm skyline for this preset.
+
+## Rule bent (logged)
+
+`lowTierFollowups` Hunga detail pose: required >=8 of 25 rays on the wall; the broken crest leaves 4 (even a mild taper gives 6). Lowered to >=4: the intent is that the pose centres the cliff, not the apron, and an apron-centred view hits none. Crest-height assertions unchanged. The free-dive opening snapshot for Hunga moved (clear-bearing search sees the new silhouette) and the f43 tuff buffer hash was regenerated.
