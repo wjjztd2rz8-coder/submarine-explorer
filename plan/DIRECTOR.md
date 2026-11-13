@@ -142,6 +142,16 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 28. **T-verify-first-session-current [Codex, brief 198, Sol 2026-11-12]:** re-verify Home to debrief unaided at phone portrait/landscape and desktop 1280x720 on current main (last complete flow evidence 2026-11-07); fix generic stalls.
 29. **U-backlog-id-cleanup:** DONE 2026-11-12: Codex-lane IDs 16m/16n/16o were repeated; the repeats are now 16p-16t.
 
+30. **R-ci-three-flakes [Codex, brief 199, review 2026-11-13]:** hosted run 43336555553 failed `props-geo` smoker unit (30 s timeout), `presets` trench draw count (stale expectation: preset sets 1, table says 0) and `f2-progress` cosmetics reload; fix root causes in tests or game.
+31. **V-bluehole-lower-frame [Sonnet, review 2026-11-13]:** Blue Hole opening (`great-blue-hole-1.png`) has an empty dark-blue lower half under the sub. Target: one generic water-column/seabed-fall-off treatment (faint scattered life or a lit wall base within light radius) so the lower 40% reads as depth, not void. No site branches.
+32. **V-hunga-block-silhouette [Sonnet, review 2026-11-13]:** Hunga mission opening (`hunga-tonga-caldera-1-mission.png`, ~3.8) is still a rectangular brown block with a talus apron. Target: a tapering broken crest with 2-3 notches and a darker base fade, via per-site profile data.
+33. **V-challenger-floor [Sonnet, review 2026-11-13]:** Challenger opening (~3.5) lander reads but the plain is flat ripple, dark. Target: sparse boulders/amphipod trails and a lit pool gradient, generic seabed options only.
+34. **V-lostcity-slope-colour [Sonnet, review 2026-11-13]:** Lost City opening slope is flat mud-green; add a generic carbonate-pale talus tint near chimneys.
+35. **U-play-flow-recheck [Haiku]:** screenshot Home -> site -> first 60 s -> Journal -> debrief via existing e2e captures on the newest build and list confusions (feeds item 28).
+
+36. **V-blake-pad-coherence [Sonnet, Sol 2026-11-13]:** Blake coral pads look disconnected from the seabed (`blake-plateau-corals-1-mission.png`); blend bases generically before declaring eight sites coherent.
+37. **T-low-axial-floor [Codex, Sol 2026-11-13]:** Low lacks Axial's new flow shader; verify Low-tier floor readability by unit/shot evidence.
+
 ### Release and owner
 
 16. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.

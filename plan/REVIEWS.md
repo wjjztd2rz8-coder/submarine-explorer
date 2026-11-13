@@ -1,5 +1,16 @@
 # Reviews
 
+## 2026-11-13 comprehensive review (joint: Claude draft + Codex Sol reconcile)
+
+- **Changed since 2026-11-12:** no new merges; golden `2026-11-13-094524` (45 PNGs, desktop High, complete) shows items 23-26 landing: Titanic upper band has depth, Axial floor lit, Challenger lander readable. Hosted CI still red: `props-geo` smoker unit timeout, `presets` trench (deterministic: preset sets draws 1, test expects 0; Sol's catch), `f2-progress` cosmetics reload (undiagnosed). Brief 199 queued.
+- **Stage (agreed):** about 85% to 1.0; 5 weeks central, 4-6 planning range, conditional on capacity. Phone and unaided first-session still unverified on current main.
+- **Scores:** openings (Claude): Titanic 4.3, Lost City 4.1, Beebe 4.1, Blue Hole 3.8, Monterey 3.8 (owner waiver); non-hero openings Axial 3.8, Hunga 3.8, Challenger 3.5. Whole-site beauty used for release reporting (Sol, accepted): Titanic 3.5, Lost City 3.5, Blue Hole 3, Beebe 3-3.5, Monterey 3 (waived). Blake coral pads flagged by Sol.
+- **Biggest gaps (agreed order):** unaided first-session acceptance; Low-tier phone check; hero detail beauty; CI green/traces/latency; eight-site coherence (Blake).
+- **Disputes settled:** Claude's "47 images/partial" was wrong (45, complete). Claude's "all three CI failures flaky" was wrong for trench. Sol's point that art items are not top blockers is accepted: they stay queued for Claude capacity but onboarding/phone evidence leads. Sol: Pages deploy only follows successful main CI; "48-shard OK" is not a real decision, dropped from Needs owner.
+- **Process:** Claude idle was lane starvation (no visual items); refilled items 31-34, 36. Codex weekly 10% to Nov 15; briefs 196-199 waiting on pace. Golden takes 15 min.
+- **New priorities:** 28 (first-session recheck), 30, 27, then Claude art 31, 32, 36, 33, 34.
+- **Needs owner:** phone retest on newest build; confirm Monterey waiver goes into the 1.0 definition.
+
 ## 2026-11-12 22:05 CST targeted review (red CI, no change)
 
 - Same 9/38 hosted-timing e2e shard failures; fix is item 27 plus briefs 190/197, still queued and held by Codex weekly pacing (21% left until Nov 15). Nothing new to schedule; no agent started. Main clean.
