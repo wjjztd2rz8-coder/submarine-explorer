@@ -122,6 +122,11 @@ export interface TerrainFidelity {
     tint: number;
     shade?: number;
   };
+  /**
+   * Carbonate-pale talus: vertex colour lightens toward the focus point (chimney field), by up to
+   * `amount` (1 = doubled albedo) within `radiusM`, in broken drifts rather than a disc.
+   */
+  paleTalus?: { radiusM: number; amount: number };
   normalStrength: number;
   /** Reconstructed wall mesh limits; Low retains the original limits. */
   wallSegments: Record<GraphicsTier, [number, number]>;
@@ -152,6 +157,7 @@ export const LOST_CITY_FIDELITY: TerrainFidelity = {
   reliefBed: 0,
   rillStretch: 1,
   normalStrength: 0.2,
+  paleTalus: { radiusM: 240, amount: 1.3 },
 };
 
 export const DEFAULT_TERRAIN: TerrainConfig = {
