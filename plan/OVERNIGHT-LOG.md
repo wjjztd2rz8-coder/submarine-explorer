@@ -4027,3 +4027,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Item 35 U-play-flow-recheck (Haiku, read-only): 16 findings in plan/progress/U-play-flow-recheck.md (Home jargon, unexplained hull ratings, unlabelled scan/dive controls, text-wall journal, unexplained debrief stars; possible translucent box overlapping journal art/text; settings text bleeding through panel). Feeds item 28; no code changed. Codex weekly 4%, 196-199 stay queued (paced). Claude visual backlog now empty. No tag (CI not confirmed green).
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-13 14:45 CST headless run (Claude)
+
+- No merge, no agent: Claude visual backlog is empty (items 31-36 done), Codex weekly 4% so briefs 196-199 stay queued (paced; resets Sun Nov 15 23:00). Old codex worktrees 124-r-ci-speed and 131-s-verify-ci-speed still hold uncommitted changes and no running task; left untouched for a later review. Main clean. No tag (CI not confirmed green).
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
