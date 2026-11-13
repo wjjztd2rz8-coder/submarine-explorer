@@ -208,7 +208,8 @@ export class Terrain {
 
     const rimTint = this.fidelity?.scour?.tint ?? 0;
     const moatShade = this.fidelity?.scour?.shade ?? 0;
-    if (this.biome.vertexTint || rimTint > 0 || moatShade > 0) {
+    const pale = this.fidelity?.paleTalus;
+    if (this.biome.vertexTint || rimTint > 0 || moatShade > 0 || pale) {
       // Reuse every LOD's existing vertices and draw calls.
       built.material.vertexColors = true;
       if (this.biome.vertexTint)
@@ -225,8 +226,30 @@ export class Terrain {
             normal.getY(i),
           ) ?? [1, 1, 1];
           const sc = this.scourAt(position.getX(i), position.getZ(i));
-          const rim = (1 + rimTint * sc.rim) * (1 - moatShade * sc.moat);
-          colors.set([tint[0] * rim, tint[1] * rim, tint[2] * rim], i * 3);
+          let cool = [1, 1, 1];
+          let rim = (1 + rimTint * sc.rim) * (1 - moatShade * sc.moat);
+          if (pale && this.focus) {
+            const near =
+              1 -
+              THREE.MathUtils.smoothstep(
+                Math.hypot(position.getX(i) - this.focus.x, position.getZ(i) - this.focus.z),
+                pale.radiusM * 0.25,
+                pale.radiusM,
+              );
+            const drift = valueNoise2(
+              position.getX(i) / 22,
+              position.getZ(i) / 22,
+              this.detail.seed ^ 0x7a,
+            );
+            const lift = pale.amount * near * (0.55 + 0.45 * drift);
+            rim *= 1 + lift;
+            // Carbonate flour is cooler than the olive silt it drapes.
+            cool = [1 - 0.12 * near, 1, 1 + 0.1 * near];
+          }
+          colors.set(
+            [tint[0] * rim * cool[0], tint[1] * rim * cool[1], tint[2] * rim * cool[2]],
+            i * 3,
+          );
         }
         chunk.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
       }
