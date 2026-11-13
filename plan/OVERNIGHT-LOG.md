@@ -4002,3 +4002,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged item 31 V-bluehole-lower-frame (Sonnet): lifted the wall-base depth tint, horizon fade and reef ambient so the lower frame shows wall and floor ring instead of black (~4.0; no life group added, still a dark quiet band). Smoke + project-base gates green on main; pushed. Agent reported 4 touch-viewport failures (pause menu not opening in journal-debrief and phone-accept specs), which look pre-existing and are unconfirmed on main; hosted CI is the check. Codex weekly 4% so 196-199 stay queued (paced). Items 33, 34, 36 (Sonnet) still open; Claude 5h under 45% so no second agent. No tag (CI red from item 30).
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-13 11:39 CST targeted review (red CI) (Claude)
+
+- Read the failing shard logs: three separate causes (stale trench draws spec, f2-progress props-load race, blue-hole 240 s timeout on a slow shard). Fixed the first two in tests (specs 20/20 locally), pushed; the timeout is left to item 27 shard weights. No agent, no Codex change. See plan/REVIEWS.md.
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.

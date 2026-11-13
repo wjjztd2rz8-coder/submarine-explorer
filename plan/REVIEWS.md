@@ -1,5 +1,15 @@
 # Reviews
 
+## 2026-11-13 targeted review (red CI x3, fixed on main)
+
+- Hosted CI has been red for days, and earlier targeted reviews logged "no change". This time I read the failures. Shards 20 and 32 failed on all three runs; shard 8 failed only on the latest. They are three separate causes, not hosted-timing flake.
+  - **presets trench:** the Challenger trench preset now draws a marine-snow dome, so the spec's `draws: 0` was stale. Fixed to 1.
+  - **f2-progress (shard 32):** reproduced locally. Props load asynchronously, and when the sub is still at its opening pose they re-place it. The test teleported to the first scan target, which equals that pose, then props loaded and moved the sub 200 m away. A race in the test, not the game. `ready()` now waits for `props.loaded`.
+  - **f-fidelity-rollout blue-hole karst-grotto-3 (shard 8):** 240 s test timeout on a slow shard (that shard ran 17.8 min); the same test passes locally in 5 s. Not fixed. Shard weights are item 27's job.
+- Local runs: f2-progress and presets specs 20/20 green.
+- **Process:** rule for later targeted reviews: read `gh api repos/{owner}/{repo}/actions/jobs/<id>/logs` for each failing shard before logging "no change".
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
 ## 2026-11-13 comprehensive review (joint: Claude draft + Codex Sol reconcile)
 
 - **Changed since 2026-11-12:** no new merges; golden `2026-11-13-094524` (45 PNGs, desktop High, complete) shows items 23-26 landing: Titanic upper band has depth, Axial floor lit, Challenger lander readable. Hosted CI still red: `props-geo` smoker unit timeout, `presets` trench (deterministic: preset sets draws 1, test expects 0; Sol's catch), `f2-progress` cosmetics reload (undiagnosed). Brief 199 queued.

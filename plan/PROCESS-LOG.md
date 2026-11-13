@@ -438,3 +438,5 @@ Single-spec playwright runs serve `dist/`; a build older than the source hid the
 ## 2026-11-12: review finding, CI shards leave no evidence
 
 Playwright traces record on first retry; hosted CI uses zero retries, so red shards were triaged as "hosted timing" for days. Queued brief 197 (item 27) to retain failure traces. Reason: diagnose red CI by evidence, not guesses.
+
+- 2026-11-13: targeted reviews logged 'no change' on red CI for days without reading job logs; two of three failures were stale/racy specs, fixed. Rule: read each failing shard's log (`gh api repos/{owner}/{repo}/actions/jobs/<id>/logs`) first.

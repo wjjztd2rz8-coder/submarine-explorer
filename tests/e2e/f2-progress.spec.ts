@@ -19,7 +19,10 @@ async function ready(page: Page): Promise<void> {
     page,
     () =>
       window.__gameReady === true &&
-      (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
+      (window.__game as { discovery: { loaded: boolean }; props: { loaded: boolean } }).discovery
+        .loaded &&
+      // Loaded props may re-place a sub still at its opening pose; teleports must wait for that.
+      (window.__game as { props: { loaded: boolean } }).props.loaded,
   );
 }
 async function realistic(page: Page): Promise<void> {

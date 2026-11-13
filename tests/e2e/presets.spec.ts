@@ -63,7 +63,7 @@ for (const { name, url, draws, source } of [
   {
     name: 'trench',
     url: '/?tile=challenger-deep&preset=trench&depth=10000',
-    draws: 0,
+    draws: 1, // marine-snow dome
     source: 'param',
   },
   {
