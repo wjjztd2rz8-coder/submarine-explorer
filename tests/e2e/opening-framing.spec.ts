@@ -634,8 +634,20 @@ freshTest.describe('live portrait opening', () => {
         page,
       }, testInfo) => {
         const errors: string[] = [];
+        const driverWarnings: string[] = [];
         page.on('pageerror', (error) => errors.push(error.message));
         page.on('console', (message) => {
+          // Chromium reports software-GPU readback costs as warnings. Keep them
+          // as diagnostics without confusing them with application/spawn warnings.
+          if (
+            message.type() === 'warning' &&
+            /^\[\.WebGL-0x[\da-f]+\]GL Driver Message \(OpenGL, Performance, GL_CLOSE_PATH_NV, High\): GPU stall due to ReadPixels(?: \(this message will no longer repeat\))?$/.test(
+              message.text(),
+            )
+          ) {
+            driverWarnings.push(message.text());
+            return;
+          }
           if (message.type() === 'error' || message.type() === 'warning')
             errors.push(message.text());
         });
@@ -782,7 +794,7 @@ freshTest.describe('live portrait opening', () => {
         const diagnostics = `${shots}/${name}.json`;
         await writeFile(
           diagnostics,
-          JSON.stringify({ site, settleMs: 3000, ...opening, errors }, null, 2),
+          JSON.stringify({ site, settleMs: 3000, ...opening, errors, driverWarnings }, null, 2),
         );
         if (renderReview)
           await testInfo.attach(name, { path: screenshot, contentType: 'image/png' });

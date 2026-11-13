@@ -711,6 +711,14 @@ for (const viewport of [
 
     test('touch help and photo gestures name no keyboard keys or boost', async ({ page }) => {
       await boot(page, 'mission=titanic&skipBriefing=1&tutorial=0');
+      // Content readiness can follow the last frozen frame. A paused-clock tap
+      // cannot render the newly live controls, including after Resume below.
+      const flightControls = () =>
+        clockFramesUntil(
+          page,
+          () => document.querySelector<HTMLElement>('.tc-btn-pause')?.checkVisibility() === true,
+        );
+      await flightControls();
       await page.locator('.tc-btn-pause').tap();
       const pause = page.getByRole('dialog', { name: 'Pause menu' });
       await expect(pause).not.toContainText(keyNames, { useInnerText: true });
@@ -732,6 +740,7 @@ for (const viewport of [
       }
       await help.getByRole('button', { name: 'Close', exact: true }).tap();
       await pause.getByRole('button', { name: 'Resume', exact: true }).tap();
+      await flightControls();
       await page.locator('.tc-btn-photo').tap();
       await page.clock.fastForward(50);
       const photo = page.locator('.photo-mode');

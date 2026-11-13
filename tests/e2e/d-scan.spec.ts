@@ -199,6 +199,7 @@ type MissionGame = {
   missionRouter: MissionRouter;
   sub: Submarine;
   props: { loaded: boolean };
+  touch: { active: boolean };
 };
 
 for (const layout of [
@@ -383,9 +384,18 @@ for (const layout of [
         await page.goto(`/?mission=${site}&skipBriefing=1&tier=low&tutorial=0`, {
           waitUntil: 'domcontentloaded',
         });
+        // Content can finish after the last frozen frame. Render live controls
+        // before teleporting; the close scan pose need not be safe for physics.
         await clockFramesUntil(page, () => {
           const g = window.__game as unknown as MissionGame;
-          return window.__gameReady === true && g.discovery.loaded && g.props.loaded;
+          return (
+            window.__gameReady === true &&
+            g.discovery.loaded &&
+            g.props.loaded &&
+            !g.missionRouter.frozen &&
+            (!g.touch.active ||
+              document.querySelector<HTMLElement>('.tc-btn-scan')?.checkVisibility() === true)
+          );
         });
         const scanned = await page.evaluate(() => {
           const g = window.__game as unknown as MissionGame;

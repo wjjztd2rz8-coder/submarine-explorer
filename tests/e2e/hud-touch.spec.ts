@@ -33,6 +33,13 @@ import sites from '../../data/landmarks/index.json' with { type: 'json' };
 
 /** The checklist opens after the first completed objective; layout checks open it directly. */
 async function revealChecklist(page: Page): Promise<void> {
+  // Begin hides the empty checklist. Wait for that transition before revealing
+  // it for measurement, rather than racing asynchronously loaded mission content.
+  await page.waitForFunction(
+    () =>
+      (window.__game as unknown as { missionRouter: { mission: { diving: boolean } } })
+        .missionRouter.mission.diving,
+  );
   await page.evaluate(() =>
     (
       window.__game as unknown as { missionRouter: { panel: { setVisible(v: boolean): void } } }
