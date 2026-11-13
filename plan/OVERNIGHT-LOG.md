@@ -4012,3 +4012,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged item 33 V-challenger-floor (Sonnet): calmer ripple, softer wider lander light pool, larger sparse boulders (~4.0 from ~3.5; amphipod trails still not visible at opening distance). Fast-forward of the worktree commit that passed full smoke + project-base gates (unit, e2e, prettier); main not re-gated as the tree is identical. Pinned Challenger test values/snapshots/keepout fixture updated, clearance assertions intact. Codex weekly 4%, 196-199 stay queued (paced). Items 34, 36 (Sonnet) still open. No tag (hosted CI not confirmed green).
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-13 13:39 CST headless run (Claude)
+
+- Merged item 34 V-lostcity-slope-colour (Sonnet): per-site `paleTalus` terrain data lightens/cools the slope near the chimney focus (agent self-rated 7/10 from 5/10; I could not view a fresh screenshot, so the look is unverified by me). Smoke + project-base gates green on main; pushed. site-specs lost-city: one pre-existing 844x390 journal-debrief pause-menu failure. Codex weekly 4%, 196-199 stay queued (paced). Item 36 (Sonnet) still open. No tag (CI not confirmed green).
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
