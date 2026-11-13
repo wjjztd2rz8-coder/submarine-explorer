@@ -218,22 +218,22 @@ const slope = (x: number, z: number) => 0.045 * x + 0.025 * z;
 // clipped depth extents. Placement and material contracts remain independent.
 const scarpBaseline: Record<string, string[]> = {
   'tuff-low': [
-    '21530678d6cb1f157861dd8984e32079ea7508ad28039cace4ed0557f646a9c6',
-    '5a5457221ffe66415c9ce679ddb3cde3071301e3c6c251c7250dbc20503a1d04',
+    '5bff1401e10fcaf1d1ecd6c729636111fa1d8b5de110b1e39c35986aee18d96b',
+    'b1b875f9d8eeb3d532dde52b20be3fe0c0d4553b3439771a60b24a0eafb25c1d',
     '3f6bb4a68be59d5c46fe234f9d9612a2e0a0f6a0f43a1d21a9df30be91a2707b',
-    'b8ed110a73b9582a8fb08c0ddd216c36ab7c3aefb917c319be585d00ca821535',
+    'bac49806dbc90e82fdae654d663a78f1c0be53d46de53734dcf4825d49ffbfd0',
   ],
   'tuff-medium': [
-    '83575fc4a9b494f38a2e03cbaab64b640abc79204e7996b88768f446ce4b29a6',
-    '372f9448d6fd70598a8198fe66b5736e29f56f9384a063e4a89f7c2c97e8ee7c',
+    '8a565b17749f68ea5740b5e7ce2b222c9ab517917a8355ee39d80af4619fe9ee',
+    'e2bb1728433b1b7e54ab3ca6e11551bd93fa2f71b0a90ff71f8b90937a527895',
     '1d0915c2f47a3f04de07b880ec408425b50992d2d08a75d649044988af5bd62e',
-    'fca5c83eed1da081292c58df70c4f548bc14f1567721db258cee3255ac812abc',
+    '0de00d470ae228c9a298b40206d0446aaff9cd7c6b895af756caac5de3f1649c',
   ],
   'tuff-high': [
-    '12090814a5207b1de6c98c219ca70acd7bd2869a7beb1f1e24e7a44cb7779ebb',
-    '44086a8795d06fbcd7ac3e3004939da0bf6caa026e4f722e97e3d2843251632d',
+    'a0baceda3bc1a307c1c5a2c5e68a71fa159e6e41a78beedad2080d1d93656665',
+    '664c8626cd8fe27f68dca2164625f98c3a527fc4edec119986fe61bc8ce9a8d1',
     '1d0915c2f47a3f04de07b880ec408425b50992d2d08a75d649044988af5bd62e',
-    'ff75ffeedef9fbec71519f30134e2fc15b89f1a15521c1dbfda50d61e268035f',
+    'af37da26d4683f80b61042194bd320ae4b5f77f7744d17546f0314c9aab74e18',
   ],
   'canyon-low': [
     'a59694039df1257d8887a9756e06df631427481bdea775a10030526e7d40fe68',
@@ -409,6 +409,29 @@ describe('caldera rim crest', () => {
   });
 });
 
+describe('broken crest profile', () => {
+  // A preset can ask for a crest that tapers along the wall and is cut by notches, so a rim
+  // reads as a broken ridge rather than a level-topped block.
+  const crest = { taper: 0.4, notches: 3, notchDepth: 0.4, notchWidth: 0.035 };
+  const sample = (c?: typeof crest): number[] => {
+    const out: number[] = [];
+    for (let x = -50; x <= 50; x += 1) out.push(wallEnvelope(x, 150, 0.75, c).skyline);
+    return out;
+  };
+  it('leans the crest down toward one end and keeps it above the ground', () => {
+    const h = sample(crest);
+    const mean = (a: number[]): number => a.reduce((s, v) => s + v, 0) / a.length;
+    expect(mean(h.slice(0, 30))).toBeGreaterThan(mean(h.slice(-30)));
+    for (const v of h) expect(v).toBeGreaterThan(0.1);
+  });
+  it('cuts notches that the plain rim crest lacks', () => {
+    const plain = sample();
+    const cut = sample(crest);
+    const deep = cut.filter((v, i) => v < plain[i]! * 0.75).length;
+    expect(deep).toBeGreaterThan(3);
+  });
+});
+
 describe('cliff read', () => {
   // A preset with a cliff profile shades the apron at the wall base and lights the crest lip.
   it('darkens the talus at the wall and lights the crest edge', () => {
@@ -444,8 +467,12 @@ describe('cliff read', () => {
     const near = mean(apron!, (_y, z) => z > zMax - 0.15 * (zMax - zMin));
     const far = mean(apron!, (_y, z) => z < zMin + 0.15 * (zMax - zMin));
     expect(near).toBeLessThan(far);
-    expect(mean(wall!, (y) => y > 31 && y < 35.5)).toBeGreaterThan(
-      mean(wall!, (y) => y > 20 && y < 24),
+    // The broken crest lowers the top, so compare bands relative to the highest rock.
+    const top = Math.max(
+      ...Array.from(wall!.geometry.attributes.position!.array).filter((_, i) => i % 3 === 1),
+    );
+    expect(mean(wall!, (y) => y > 0.85 * top && y < 0.98 * top)).toBeGreaterThan(
+      mean(wall!, (y) => y > 0.5 * top && y < 0.6 * top),
     );
   });
 });

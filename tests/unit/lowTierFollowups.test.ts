@@ -292,8 +292,9 @@ test('Hunga Tonga Low: the detail pose centres the cliff rather than the sedimen
     }
     console.log('HUNGA cliffHits', cliffHits);
     // Seen from the open (west) side the wall is a narrower silhouette than from behind.
-    // The notched crest opens gaps in the skyline, so fewer of the 25 rays hit rock than on a slab.
-    expect(cliffHits).toBeGreaterThanOrEqual(8);
+    // The tapering, notched crest leaves gaps in the skyline, so only a few of the 25 rays hit rock;
+    // an apron-centred view would hit none (the apron is excluded), so a handful still proves it.
+    expect(cliffHits).toBeGreaterThanOrEqual(4);
     const crest = new Vector3().fromArray(fixed.target);
     crest.y = hero.def.dimensionsM![2];
     hero.root.localToWorld(crest).project(rig.camera);
