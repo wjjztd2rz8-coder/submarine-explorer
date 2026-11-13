@@ -4017,3 +4017,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged item 34 V-lostcity-slope-colour (Sonnet): per-site `paleTalus` terrain data lightens/cools the slope near the chimney focus (agent self-rated 7/10 from 5/10; I could not view a fresh screenshot, so the look is unverified by me). Smoke + project-base gates green on main; pushed. site-specs lost-city: one pre-existing 844x390 journal-debrief pause-menu failure. Codex weekly 4%, 196-199 stay queued (paced). Item 36 (Sonnet) still open. No tag (CI not confirmed green).
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-13 14:15 CST headless run (Claude)
+
+- Merged item 36 V-blake-pad-coherence (Sonnet): coral mounds' rim sinks under the terrain and base colour fades to seabed tint (~3.5-4; looked at the fresh Blake shot, reads as a mound grading into the floor; Hudson Canyon not re-shot). Smoke + project-base gates green on main; pushed. Codex weekly 4%, 196-199 stay queued (paced). Claude backlog visual items now empty except 35 (Haiku). No tag (CI not confirmed green).
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.

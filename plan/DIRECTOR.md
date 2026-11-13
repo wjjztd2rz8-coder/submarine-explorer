@@ -149,7 +149,7 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 34. **DONE 2026-11-13 (2e4e4838; ~3.5-4, pale talus near chimneys, far hillside still dark) V-lostcity-slope-colour [Sonnet, review 2026-11-13]:** Lost City opening slope is flat mud-green; add a generic carbonate-pale talus tint near chimneys.
 35. **U-play-flow-recheck [Haiku]:** screenshot Home -> site -> first 60 s -> Journal -> debrief via existing e2e captures on the newest build and list confusions (feeds item 28).
 
-36. **V-blake-pad-coherence [Sonnet, Sol 2026-11-13]:** Blake coral pads look disconnected from the seabed (`blake-plateau-corals-1-mission.png`); blend bases generically before declaring eight sites coherent.
+36. **DONE 2026-11-13 (merge, ~3.5-4, mound grades into seabed; Hudson not re-shot) V-blake-pad-coherence [Sonnet, Sol 2026-11-13]:** Blake coral pads look disconnected from the seabed (`blake-plateau-corals-1-mission.png`); blend bases generically before declaring eight sites coherent.
 37. **T-low-axial-floor [Codex, Sol 2026-11-13]:** Low lacks Axial's new flow shader; verify Low-tier floor readability by unit/shot evidence.
 
 ### Release and owner
