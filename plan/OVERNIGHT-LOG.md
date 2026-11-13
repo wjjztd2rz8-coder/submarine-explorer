@@ -3997,3 +3997,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged item 32 V-hunga-block-silhouette (Sonnet): tapering notched crest via tuff preset data, darker wall foot; ~4.2 (spiky, apron still uniform). Smoke + project-base gates green on main; pushed. One assertion loosened (lowTierFollowups wall rays 8 to 4; crest assertions intact); Hunga free-dive yaw moved 120 to 75 deg (clearance tests pass). Codex weekly 4%, so 196-199 stay queued (paced). Items 31, 33, 34, 36 (Sonnet) still open. Hosted CI red from before (item 30); no tag.
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-13 09:38 CST headless run (Claude)
+
+- Merged item 31 V-bluehole-lower-frame (Sonnet): lifted the wall-base depth tint, horizon fade and reef ambient so the lower frame shows wall and floor ring instead of black (~4.0; no life group added, still a dark quiet band). Smoke + project-base gates green on main; pushed. Agent reported 4 touch-viewport failures (pause menu not opening in journal-debrief and phone-accept specs), which look pre-existing and are unconfirmed on main; hosted CI is the check. Codex weekly 4% so 196-199 stay queued (paced). Items 33, 34, 36 (Sonnet) still open; Claude 5h under 45% so no second agent. No tag (CI red from item 30).
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
