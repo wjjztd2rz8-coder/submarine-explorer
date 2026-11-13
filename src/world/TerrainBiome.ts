@@ -403,13 +403,13 @@ export const BIOMES: Record<string, Biome> = {
     rippleDir: 0.2,
     burrow: 0,
     rockBias: 0.3,
-    // Lower walls fall away to deep blue-grey (the real hole is dark below the ledge) but stay readable.
-    depthShade: { startM: 30, endM: 105, tint: 0x3f6a82 },
+    // Lower walls fall away to deep blue-grey (the real hole is dark below the ledge) but the wall and floor ring stay readable under the sub.
+    depthShade: { startM: 30, endM: 105, tint: 0x9cc0d0 },
     // Beds are baked into vertex colour (blueHoleTint), with riser ambient occlusion; no fragment striping.
     vertexTint: blueHoleTint,
     smoothRock: true,
-    // Across the 320 m bowl the reef should already dissolve into water haze.
-    horizonFadeM: [80, 260],
+    // Across the 320 m bowl the far wall dissolves into haze past the near ledges.
+    horizonFadeM: [140, 360],
     scatter: [
       // Dense, enlarged clumps on the ledges and treads so they read at gallery range.
       { kind: 'sponge', density: 2.6, slopeMaxDeg: 40, on: 'rock', sizeMul: 2.2 },
