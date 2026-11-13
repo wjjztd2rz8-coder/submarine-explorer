@@ -3952,3 +3952,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged item 194 S-bughunt-gallery-share (Codex; photo quota toast reports actual retained count, duplicate branch cut). Main gates (smoke + project-base) green; pushed. Codex 190 and 195 still running in worktrees; 196-198 queued, 124/131 held. No Claude visual items left; no agent started. No tag (hosted CI red).
 - **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
+## 2026-11-12 18:22 CST headless run (Claude)
+
+- Merged Codex 190 R-ci-e2e-residual (test-only readiness/copy/warning fixes) and 195 T-hunga-opening-heading (Begin/skipBriefing await prop placement; Hunga 97.5° framing restored). Main gates (smoke + project-base) green; pushed. Briefs 196-198 queued (paced); 124/131 held. No Claude visual items left; no agent started. No tag (hosted CI red until 190 runs on CI).
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
