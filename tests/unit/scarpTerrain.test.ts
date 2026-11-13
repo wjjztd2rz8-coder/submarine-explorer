@@ -409,6 +409,29 @@ describe('caldera rim crest', () => {
   });
 });
 
+describe('broken crest profile', () => {
+  // A preset can ask for a crest that tapers along the wall and is cut by notches, so a rim
+  // reads as a broken ridge rather than a level-topped block.
+  const crest = { taper: 0.4, notches: 3, notchDepth: 0.4, notchWidth: 0.035 };
+  const sample = (c?: typeof crest): number[] => {
+    const out: number[] = [];
+    for (let x = -50; x <= 50; x += 1) out.push(wallEnvelope(x, 150, 0.75, c).skyline);
+    return out;
+  };
+  it('leans the crest down toward one end and keeps it above the ground', () => {
+    const h = sample(crest);
+    const mean = (a: number[]): number => a.reduce((s, v) => s + v, 0) / a.length;
+    expect(mean(h.slice(0, 30))).toBeGreaterThan(mean(h.slice(-30)));
+    for (const v of h) expect(v).toBeGreaterThan(0.1);
+  });
+  it('cuts notches that the plain rim crest lacks', () => {
+    const plain = sample();
+    const cut = sample(crest);
+    const deep = cut.filter((v, i) => v < plain[i]! * 0.75).length;
+    expect(deep).toBeGreaterThan(3);
+  });
+});
+
 describe('cliff read', () => {
   // A preset with a cliff profile shades the apron at the wall base and lights the crest lip.
   it('darkens the talus at the wall and lights the crest edge', () => {

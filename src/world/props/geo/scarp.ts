@@ -132,6 +132,8 @@ interface Preset {
   rough: number;
   /** Where the ends start to pinch (fraction of the half width). */
   edgeStart: number;
+  /** Optional broken crest: a lean along the wall and a few notches. */
+  broken?: Crest;
   /** Metres per texture tile along the wall and up the face (anisotropic: bedding runs along x). */
   tile: [number, number];
   /** Bed-by-bed tone contrast, thin lamination and grain strength (1 = the original look). */
@@ -191,6 +193,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     blocks: 0.14,
     rough: 0.95,
     edgeStart: 0.75,
+    broken: { taper: 0.4, notches: 3, notchDepth: 0.4, notchWidth: 0.035 },
     tile: [14, 14],
     bedContrast: 1,
     mottle: 0.75,
@@ -328,6 +331,16 @@ export function pinchScale(edge: number): number {
   return 1 - 0.88 * Math.pow(edge, 1.5);
 }
 
+/** A broken crest: the top leans away along the wall and is cut by narrow notches. */
+export interface Crest {
+  /** Fraction of the crest height lost from one end to the other. */
+  taper: number;
+  /** Number of notches, their depth (fraction of height) and half width (fraction of the wall). */
+  notches: number;
+  notchDepth: number;
+  notchWidth: number;
+}
+
 /**
  * How the wall ends pinch: `edge` (0 mid-wall, 1 at the ends) and the ragged
  * `skyline` multiplier on positive heights. Shared by the mesh and colliders.
@@ -336,17 +349,27 @@ export function wallEnvelope(
   x: number,
   width: number,
   edgeStart: number,
+  crest?: Crest,
 ): { edge: number; skyline: number } {
   const edge = smooth(edgeStart, 1, endRatio(x, width));
   // A ragged skyline: the crest varies along the wall and slopes away at both ends.
   // Late-pinching walls (edgeStart >= 0.6) are caldera rims: a broken crest of spurs and deep
   // notches rather than a level top.
-  const skyline =
+  let skyline =
     edgeStart < 0.6
       ? 0.72 + 0.5 * fbm3(x * 0.06, 1, width, Math.round(width * 31), 4)
       : 0.62 +
         0.5 * fbm3(x * 0.05, 3, width, Math.round(width * 17), 3) -
         0.16 * smooth(0.62, 0.8, fbm3(x * 0.12, 6, width, 41, 2));
+  if (crest) {
+    const u = x / width + 0.5;
+    skyline *= 1 - crest.taper * u;
+    for (let i = 0; i < crest.notches; i++) {
+      const jitter = fbm3(i * 7.1, 3, width, 11, 1) - 0.5;
+      const centre = 0.1 + (0.8 * (i + 0.5 + jitter * 0.6)) / crest.notches;
+      skyline *= 1 - crest.notchDepth * (1 - smooth(0, crest.notchWidth, Math.abs(u - centre)));
+    }
+  }
   return { edge, skyline };
 }
 
@@ -370,6 +393,8 @@ interface ExtrudeOpts {
   rise?: (x: number, y: number, z: number) => number;
   /** Metres per texture tile: writes `uv` as (x, arc length along the profile). A pair is (along, up). */
   uvTile?: number | [number, number];
+  /** Broken-crest shape of the skyline. */
+  crest?: Crest;
 }
 
 /**
@@ -401,7 +426,7 @@ export function extrudeProfile(
   const idx: number[] = [];
   for (let i = 0; i <= nx; i++) {
     const x = (i / nx - 0.5) * width;
-    const { edge, skyline } = wallEnvelope(x, width, edgeStart);
+    const { edge, skyline } = wallEnvelope(x, width, edgeStart, opts.crest);
     const plan = opts.plan ? opts.plan(x) : 0;
     const sink = opts.sink ? opts.sink(x) : 0;
     for (let j = 0; j <= ny; j++) {
@@ -575,11 +600,11 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   const gnd = ground ?? ((): number => 0);
   const plan = (x: number): number => planOffset(P, x, W, D, seed);
   const footAt = (x: number): number => {
-    const { edge } = wallEnvelope(x, W, P.edgeStart);
+    const { edge } = wallEnvelope(x, W, P.edgeStart, P.broken);
     return footZ * (1 - edge * 0.55) + plan(x);
   };
   const scaleAt = (x: number): number => {
-    const { edge, skyline } = wallEnvelope(x, W, P.edgeStart);
+    const { edge, skyline } = wallEnvelope(x, W, P.edgeStart, P.broken);
     return pinchScale(edge) * skyline;
   };
   const sinkAt = (x: number): number => endSink(x, W, H);
@@ -726,6 +751,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     plan,
     sink: sinkAt,
     uvTile: P.tile,
+    crest: P.broken,
   });
   paint(wall, (x, yAbs, z, ny_, out) => {
     const y = yAbs - liftAt(x);
@@ -792,6 +818,8 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     out.lerp(P.crest, smooth(0.75, 1, y / H) * 0.6);
     // A lit lip along the top edge separates the wall from the bank behind it.
     if (P.cliff) out.multiplyScalar(1 + P.cliff.crestLit * smooth(0.9, 0.99, y / H));
+    // The wall foot darkens into the apron's shadow rather than ending in a colour step.
+    if (P.cliff) out.multiplyScalar(1 - P.cliff.talusShade * (1 - smooth(0.05, 0.5, y / H)));
     if (P.joints > 0) {
       const { crack } = jointOffset(x, P.joints, P.jointStep, seed);
       out.multiplyScalar(1 - 0.35 * crack);
@@ -1026,6 +1054,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   const colliders = wallColliders(profile, W, D, H, 9, gnd, {
     disp,
     edgeStart: P.edgeStart,
+    crest: P.broken,
     plan,
     liftAt: (x, y) => (y === undefined ? liftAt(x) : lift(x, y)),
     sinkAt,
@@ -1124,6 +1153,8 @@ interface WallShape {
   disp: (x: number, y: number, z: number) => number;
   /** Pinch start passed to `extrudeProfile` (default 0.4). */
   edgeStart?: number;
+  /** Crest shape passed to `extrudeProfile`. */
+  crest?: Crest;
   /** Plan offset given to `extrudeProfile`. */
   plan?: (x: number) => number;
   /** Ground lift of the whole wall at x (replaces `wallLift`). */
@@ -1184,14 +1215,14 @@ export function wallColliders(
     for (let n = 0; n < SAMPLES; n++) {
       const x = x0 + (n / (SAMPLES - 1)) * segW;
       xs.push(x);
-      const { edge, skyline } = wallEnvelope(x, W, edgeStart);
+      const { edge, skyline } = wallEnvelope(x, W, edgeStart, shape?.crest);
       hScale = Math.min(hScale, pinchScale(edge) * skyline);
       sink = Math.min(sink, shape?.sinkAt ? shape.sinkAt(x) : 0);
     }
     // The boxes overlap their neighbours a little: the height limit must hold there too.
     for (const x of [x0 - segW * 0.1, x0 + segW * 1.1]) {
       const xe = Math.max(-W / 2, Math.min(W / 2, x));
-      const { edge, skyline } = wallEnvelope(xe, W, edgeStart);
+      const { edge, skyline } = wallEnvelope(xe, W, edgeStart, shape?.crest);
       hScale = Math.min(hScale, pinchScale(edge) * skyline);
     }
     // The highest the rendered wall actually reaches in this segment (crest, after pinch and sink).
@@ -1199,7 +1230,7 @@ export function wallColliders(
     for (let n = 0; n <= 8; n++) {
       const x = x0 - segW * 0.08 + (n / 8) * segW * 1.16;
       const xe = Math.max(-W / 2, Math.min(W / 2, x));
-      const { edge, skyline } = wallEnvelope(xe, W, edgeStart);
+      const { edge, skyline } = wallEnvelope(xe, W, edgeStart, shape?.crest);
       crest = Math.max(
         crest,
         topY * pinchScale(edge) * skyline - (shape?.sinkAt ? shape.sinkAt(xe) : 0),
@@ -1221,7 +1252,7 @@ export function wallColliders(
       let front = 0;
       let back = 0;
       for (const x of xs) {
-        const { edge } = wallEnvelope(x, W, edgeStart);
+        const { edge } = wallEnvelope(x, W, edgeStart, shape?.crest);
         let lo = Infinity;
         let hi = -Infinity;
         for (const z0 of zs) {
