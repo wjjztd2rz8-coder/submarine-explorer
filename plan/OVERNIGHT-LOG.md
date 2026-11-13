@@ -3947,3 +3947,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - No merge. Codex 190, 194, 195 just launched and running in their worktrees (not collectable yet); 124/131 held; briefs 196-198 queued. No visual Claude items left in the backlog, so no agent started. Main clean; hosted CI still red (hosted-timing shards), no tag.
 - **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
+
+## 2026-11-12 18:00 CST headless run (Claude)
+
+- Merged item 194 S-bughunt-gallery-share (Codex; photo quota toast reports actual retained count, duplicate branch cut). Main gates (smoke + project-base) green; pushed. Codex 190 and 195 still running in worktrees; 196-198 queued, 124/131 held. No Claude visual items left; no agent started. No tag (hosted CI red).
+- **Needs owner:** phone retest; Monterey 3.8 waiver; OK for 48-shard CI change.
