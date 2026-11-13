@@ -24,6 +24,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Coral mounds (Blake Plateau, Hudson Canyon) now grade into the seabed: the rim sinks gradually below the ground and the pale framework fades to seabed sediment near the base, so the mound no longer reads as a disc sitting on the floor.
+
 - Lost City: the seabed near the chimney field takes a carbonate-pale, cooler talus tint (per-site `paleTalus` terrain data) so the opening slope reads pale rather than flat mud-green.
 
 - **S-bughunt-gallery-share:** photo capture reports the actual retained count after quota eviction instead of always saying 24. Cut the duplicate successful-capture branch; shutter, sound and status use one path. JPEG/ZIP exports, deletion and storage limits passed two audit rounds without another confirmed defect.
