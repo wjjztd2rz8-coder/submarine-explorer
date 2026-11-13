@@ -4022,3 +4022,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Merged item 36 V-blake-pad-coherence (Sonnet): coral mounds' rim sinks under the terrain and base colour fades to seabed tint (~3.5-4; looked at the fresh Blake shot, reads as a mound grading into the floor; Hudson Canyon not re-shot). Smoke + project-base gates green on main; pushed. Codex weekly 4%, 196-199 stay queued (paced). Claude backlog visual items now empty except 35 (Haiku). No tag (CI not confirmed green).
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-13 14:21 CST headless run (Claude)
+
+- Item 35 U-play-flow-recheck (Haiku, read-only): 16 findings in plan/progress/U-play-flow-recheck.md (Home jargon, unexplained hull ratings, unlabelled scan/dive controls, text-wall journal, unexplained debrief stars; possible translucent box overlapping journal art/text; settings text bleeding through panel). Feeds item 28; no code changed. Codex weekly 4%, 196-199 stay queued (paced). Claude visual backlog now empty. No tag (CI not confirmed green).
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
