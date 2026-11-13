@@ -28,6 +28,8 @@ import {
 import type { GeoBuildInput } from './types.js';
 
 const SEDIMENT = new THREE.Color(0x77705f);
+/** Matches the plain seabed the skirt grades into, slightly darker than the mound sediment. */
+const SEABED = new THREE.Color(0x5f5a4b);
 const FRAMEWORK = new THREE.Color(0xb8b09b); // dead coral framework
 const COVER = new THREE.Color(0xd8ccb2);
 const IVORY = new THREE.Color(0xf0e8d8);
@@ -77,11 +79,12 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
   const rnd = mulberry32(seed);
   const shape = (x: number, z: number): number => {
     const r = Math.hypot(x / (L / 2), z / (W / 2));
-    if (r >= 1) return -3;
+    if (r >= 1.25) return -3;
     const ridge = 0.65 + 0.35 * fbm3(x * 0.09, 1, z * 0.09, seed + 3, 3) * 2;
-    const base = H * Math.pow(1 - r * r, 0.9) * ridge;
+    const base = H * Math.pow(Math.max(0, 1 - r * r), 0.9) * ridge;
     const n = (fbm3(x * 0.4, 9, z * 0.4, seed, 3) - 0.5) * H * 0.18;
-    return Math.max(-3, base + n * clamp01(base / H) - smooth(0.85, 1, r) * 0.6);
+    // The skirt keeps sinking past the rim so the mound grades into the seabed, no lip.
+    return Math.max(-3, base + n * clamp01(base / H) - smooth(0.75, 1.25, r) * 1.8);
   };
   /** Mound surface: the shape lifted onto the terrain. */
   const mound = (x: number, z: number): number => shape(x, z) + gnd(x, z);
@@ -116,6 +119,8 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
       .multiplyScalar(0.82 + 0.4 * n);
     // Live thickets tint the ground where colonies are dense.
     out.lerp(COVER, smooth(0.42, 0.62, fbm3(x * 0.16, 2, z * 0.16, seed + 9, 3)) * 0.55);
+    // Near the ground the pale framework fades into plain sediment, so the base has no seam.
+    out.lerp(SEABED, 1 - smooth(0, 4, y - gnd(x, z)));
   });
   projectUVs(body, 2.5);
   body.computeBoundingBox();
