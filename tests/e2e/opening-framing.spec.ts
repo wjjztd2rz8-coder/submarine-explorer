@@ -495,6 +495,63 @@ freshTest.describe('mission preview and approach', () => {
     });
   }
 
+  for (const skipBriefing of [false, true]) {
+    // Regression guard: Begin/skipBriefing raced props and retained the narrow
+    // 345° rim view instead of the loaded broad-face opening at 97.5°.
+    test(`Hunga rapid ${skipBriefing ? 'skipBriefing' : 'Begin'} waits for props and restores the broad-face heading`, async ({
+      page,
+    }) => {
+      let releaseProps!: () => void;
+      const delayed = new Promise<void>((resolve) => {
+        releaseProps = resolve;
+      });
+      await page.route('**/data/landmarks/hunga-tonga-caldera/props.json', async (route) => {
+        await delayed;
+        await route.continue();
+      });
+      try {
+        await pauseClockBeforeNavigation(page);
+        await page.goto(
+          `/?mission=hunga-tonga-caldera&tier=high&tutorial=0&dynres=0${skipBriefing ? '&skipBriefing=1' : ''}`,
+          { waitUntil: 'domcontentloaded' },
+        );
+        await clockFramesUntil(page, () => {
+          const g = window.__game as unknown as Game;
+          return !!(window.__gameReady && g.discovery.loaded && g.mission);
+        });
+        await page.evaluate(() => {
+          (window.__game as unknown as Game).sub.step = () => {};
+        });
+        if (!skipBriefing) await page.locator('.briefing-begin').click();
+        await page.clock.runFor(100);
+        expect(
+          await page.evaluate(() => {
+            const g = window.__game as unknown as Game;
+            return {
+              loaded: g.props.loaded,
+              state: g.mission!.state,
+              elapsed: g.mission!.elapsedS,
+            };
+          }),
+        ).toEqual({ loaded: false, state: 'briefing', elapsed: 0 });
+        releaseProps();
+        await ready(page);
+        await clockFramesUntil(
+          page,
+          () => (window.__game as unknown as Game).mission!.state === 'diving',
+        );
+        const opening = await pose(page);
+        expect((opening.yaw * 180) / Math.PI).toBeCloseTo(97.5, 4);
+        expect(opening.range).toBeCloseTo(MISSION_APPROACH_M['hunga-tonga-caldera'], 2);
+        expect(opening.range!).toBeGreaterThan(opening.scanRadius!);
+        expect(opening.failedProps).toBe(0);
+      } finally {
+        releaseProps();
+        await page.unrouteAll({ behavior: 'wait' });
+      }
+    });
+  }
+
   for (const [site, first] of [
     ['titanic', 'find-bow'],
     ['great-blue-hole', 'stalactites'],

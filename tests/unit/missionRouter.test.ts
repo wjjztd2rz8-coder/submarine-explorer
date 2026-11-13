@@ -441,6 +441,42 @@ describe('MissionRouter completion timing', () => {
     expect(router.mission.elapsedS).toBe(1);
   });
 
+  it.each(['near-site', 'surface'] as const)(
+    'Begin preserves the %s choice while props load and cannot start after disposal',
+    async (choice) => {
+      for (const leave of [false, true]) {
+        router.dispose();
+        let loaded!: () => void;
+        const startReady = new Promise<void>((resolve) => {
+          loaded = resolve;
+        });
+        const applyStart = vi.fn();
+        router = new MissionRouter({
+          ...options,
+          startReady,
+          applyStart,
+          defaultStartPosition: choice,
+        });
+        await Promise.resolve();
+        advance(router, 60);
+        expect(router.frozen).toBe(true);
+        expect(router.mission.elapsedS).toBe(0);
+        expect(applyStart).not.toHaveBeenCalled();
+        if (leave) router.dispose();
+        loaded();
+        for (let i = 0; i < 3; i++) await Promise.resolve();
+        if (leave) {
+          expect(applyStart).not.toHaveBeenCalled();
+          expect(events()).not.toContain('mission:started');
+        } else {
+          expect(applyStart).toHaveBeenCalledExactlyOnceWith(choice);
+          expect(router.frozen).toBe(false);
+          expect(events()).toEqual(['mission:started']);
+        }
+      }
+    },
+  );
+
   it('advances the checklist with objective completion before another frame', () => {
     const current = () => control(router.panel.root, 'is-current').dataset.objective;
     frame(router);

@@ -38,57 +38,59 @@ export const propsSystem: GameSystem = {
     if (propsDebug) cleanup.add(() => propsDebug.dispose());
     const propsLandmark = route ? contentLandmark : landmarkIdFor(params, meta.id);
     const initialPosition = sub.position.clone();
-    void props.load(contentUrl(propsLandmark, 'props.json'), propsLandmark).then((st) => {
-      if (disposed) return;
-      if (props.placed.some((p) => p.def.clearsGround))
-        terrain.scatter.setGroundKeepout((x, z) => props.coversGround(x, z));
-      const manifest = siteManifest(propsLandmark);
-      const hero = manifest?.scatter?.keepoutHero
-        ? props.placed.find((p) => p.def.id === manifest.opening?.freeDive?.hero)
-        : undefined;
-      if (hero) {
-        hero.root.updateMatrixWorld(true);
-        terrain.scatter.setBoulderKeepout(
-          hero.localBounds.clone().applyMatrix4(hero.root.matrixWorld),
-        );
-      }
-      // Explicit probes and missions keep their poses; don't teleport a pilot
-      // who has already moved while optional models were downloading.
-      if (
-        ctx.app?.state !== 'home' &&
-        !route &&
-        !['at', 'poi', 'depth'].some((key) => params.has(key)) &&
-        sub.position.distanceTo(initialPosition) < 2
-      ) {
-        const pose = composedFreeDiveSpawn(
-          propsLandmark,
-          meta,
-          terrain,
-          props,
-          spawnSettings(config),
-          sub.getState().ratedDepth,
-          ctx.effective.camera,
-          ctx.save.get().gameplayMode,
-        );
-        if (pose) {
-          sub.reset(pose.x, pose.y, pose.z, pose.yaw);
-          ctx.reanchorFirstMove?.();
-          if (manifest?.opening?.camera?.applyDefaults || pose.chaseOffsetY !== undefined)
-            rig.setChaseRadiusDefault(
-              pose.chaseRadius,
-              pose.chaseOffsetX,
-              pose.chaseOffsetY,
-              pose.portraitChaseOffset,
-            );
-          else if (pose.chaseRadius) rig.chaseRadius = pose.chaseRadius;
-          rig.snap(sub.position, sub.yaw, sub.pitch);
+    ctx.propsReady = props
+      .load(contentUrl(propsLandmark, 'props.json'), propsLandmark)
+      .then((st) => {
+        if (disposed) return;
+        if (props.placed.some((p) => p.def.clearsGround))
+          terrain.scatter.setGroundKeepout((x, z) => props.coversGround(x, z));
+        const manifest = siteManifest(propsLandmark);
+        const hero = manifest?.scatter?.keepoutHero
+          ? props.placed.find((p) => p.def.id === manifest.opening?.freeDive?.hero)
+          : undefined;
+        if (hero) {
+          hero.root.updateMatrixWorld(true);
+          terrain.scatter.setBoulderKeepout(
+            hero.localBounds.clone().applyMatrix4(hero.root.matrixWorld),
+          );
         }
-      }
-      const { landmarkId, count, models, procedural } = st;
-      bus.emit('props:loaded', { landmarkId, count, models, procedural });
-      if (count || st.skipped) console.info(`[props] ${landmarkId}: ${props.debugString()}`);
-      propsDebug?.refresh();
-    });
+        // Explicit probes and missions keep their poses; don't teleport a pilot
+        // who has already moved while optional models were downloading.
+        if (
+          ctx.app?.state !== 'home' &&
+          !route &&
+          !['at', 'poi', 'depth'].some((key) => params.has(key)) &&
+          sub.position.distanceTo(initialPosition) < 2
+        ) {
+          const pose = composedFreeDiveSpawn(
+            propsLandmark,
+            meta,
+            terrain,
+            props,
+            spawnSettings(config),
+            sub.getState().ratedDepth,
+            ctx.effective.camera,
+            ctx.save.get().gameplayMode,
+          );
+          if (pose) {
+            sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+            ctx.reanchorFirstMove?.();
+            if (manifest?.opening?.camera?.applyDefaults || pose.chaseOffsetY !== undefined)
+              rig.setChaseRadiusDefault(
+                pose.chaseRadius,
+                pose.chaseOffsetX,
+                pose.chaseOffsetY,
+                pose.portraitChaseOffset,
+              );
+            else if (pose.chaseRadius) rig.chaseRadius = pose.chaseRadius;
+            rig.snap(sub.position, sub.yaw, sub.pitch);
+          }
+        }
+        const { landmarkId, count, models, procedural } = st;
+        bus.emit('props:loaded', { landmarkId, count, models, procedural });
+        if (count || st.skipped) console.info(`[props] ${landmarkId}: ${props.debugString()}`);
+        propsDebug?.refresh();
+      });
     const at = parseAtParam(params.get('at'));
     if (at) {
       const c = config.props.atSpawnClearanceM;

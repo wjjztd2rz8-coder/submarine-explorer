@@ -611,7 +611,22 @@ it.each(placements)(
           expect(ctx.cameraTips.moved).toBe(false);
           expect(ctx.missionRouter!.mission.elapsedS).toBe(0);
           await settleReady();
-          expect(reset.mock.calls.length - before).toBe(1);
+          expect(reset.mock.calls.length - before).toBe(0);
+          expect(ctx.missionRouter!.mission.state).toBe('briefing');
+        }
+        if (!free && !order.endsWith('props-first')) {
+          // Begin now waits for both content pipelines. Piloting and its move
+          // anchor cannot start against a temporary pose without subject props.
+          const waitingPose = pose(ctx);
+          const elapsed = ctx.missionRouter!.mission.elapsedS;
+          for (let i = 0; i < 120; i++)
+            expect(frame(1)).toMatchObject({ frozen: true, steps: 0, clockDt: 0 });
+          expect(pose(ctx)).toEqual(waitingPose);
+          expect(ctx.cameraTips.moved).toBe(false);
+          expect(ctx.missionRouter!.mission.elapsedS).toBe(elapsed);
+          propsIO.resolve();
+          await ctx.propsReady;
+          await flush();
           expect(ctx.missionRouter!.mission.state).toBe('diving');
         }
         frame(0, true);
@@ -642,9 +657,14 @@ it.each(placements)(
         const pilotedPose = pose(ctx);
         const pilotedVelocity = ctx.sub.velocity.clone();
         const pilotedHull = ctx.sub.getState();
-        if (!order.endsWith('props-first')) {
+        if (free && !order.endsWith('props-first')) {
           propsIO.resolve();
           await loaded;
+        }
+        if (!free) {
+          // A subsequent placement notification must still preserve a live
+          // pilot's real movement, hull state and unlearned move anchor.
+          ctx.bus.emit('props:loaded', { ...ctx.props.stats });
         }
         const resetCalls = reset.mock.calls.length - calls;
         expect(ctx.props.stats.count).toBe(json(`data/landmarks/${site}/props.json`).props.length);
