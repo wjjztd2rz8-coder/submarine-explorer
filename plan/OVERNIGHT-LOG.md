@@ -4007,3 +4007,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Read the failing shard logs: three separate causes (stale trench draws spec, f2-progress props-load race, blue-hole 240 s timeout on a slow shard). Fixed the first two in tests (specs 20/20 locally), pushed; the timeout is left to item 27 shard weights. No agent, no Codex change. See plan/REVIEWS.md.
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-13 12:49 CST headless run (Claude)
+
+- Merged item 33 V-challenger-floor (Sonnet): calmer ripple, softer wider lander light pool, larger sparse boulders (~4.0 from ~3.5; amphipod trails still not visible at opening distance). Fast-forward of the worktree commit that passed full smoke + project-base gates (unit, e2e, prettier); main not re-gated as the tree is identical. Pinned Challenger test values/snapshots/keepout fixture updated, clearance assertions intact. Codex weekly 4%, 196-199 stay queued (paced). Items 34, 36 (Sonnet) still open. No tag (hosted CI not confirmed green).
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
