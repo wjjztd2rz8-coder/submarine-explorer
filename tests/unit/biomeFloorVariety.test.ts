@@ -546,3 +546,16 @@ describe('site floor material bindings', () => {
     },
   );
 });
+
+describe('depth-shaded walls stay readable', () => {
+  it('never tints a deep wall below a quarter of its albedo in any channel', () => {
+    const shaded = Object.entries(BIOMES).filter(([, biome]) => biome.depthShade);
+    expect(shaded.length).toBeGreaterThan(0);
+    for (const [, biome] of shaded) {
+      const { startM, endM, tint } = biome.depthShade!;
+      expect(endM).toBeGreaterThan(startM);
+      const c = new THREE.Color(tint);
+      expect(Math.min(c.r, c.g, c.b)).toBeGreaterThan(0.25);
+    }
+  });
+});
