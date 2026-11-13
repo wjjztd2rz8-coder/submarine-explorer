@@ -4,7 +4,7 @@
 
 The Blue Hole opening's lower frame was a black void because the wall below the ledge was multiplied to near black by the biome `depthShade` tint, and the reef ambient was too low to reveal it. Data-only retune, no code branches:
 
-- `TerrainBiome.ts` great-blue-hole: `depthShade` tint 0x3f6a82 -> 0x9cc0d0, full shade at 120 m (was 105); `horizonFadeM` [80,260] -> [140,360] so the far wall is not fogged away.
+- `TerrainBiome.ts` great-blue-hole: `depthShade` tint 0x3f6a82 -> 0x9cc0d0, depth window unchanged; `horizonFadeM` [80,260] -> [140,360] so the far wall is not fogged away.
 - `data/landmarks/great-blue-hole/mission.json`: reef preset `ambientScale` 1.5 -> 3.2 (fades out by 200 m as before).
 - Unit test: every depth-shaded biome keeps its deep tint above a quarter of albedo (walls never go black).
 

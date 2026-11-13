@@ -404,7 +404,7 @@ export const BIOMES: Record<string, Biome> = {
     burrow: 0,
     rockBias: 0.3,
     // Lower walls fall away to deep blue-grey (the real hole is dark below the ledge) but the wall and floor ring stay readable under the sub.
-    depthShade: { startM: 30, endM: 120, tint: 0x9cc0d0 },
+    depthShade: { startM: 30, endM: 105, tint: 0x9cc0d0 },
     // Beds are baked into vertex colour (blueHoleTint), with riser ambient occlusion; no fragment striping.
     vertexTint: blueHoleTint,
     smoothRock: true,
