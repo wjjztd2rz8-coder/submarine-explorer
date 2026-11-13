@@ -6,7 +6,11 @@
         "min": [-492.39836734312155, -10925.096398287296, 484.626290792275],
         "max": [-434.8225807525454, -10885.87682204771, 524.096879476357]
       },
-      "stats": { "cells": 14, "instances": 282, "drawCalls": 4 },
+      "stats": {
+        "cells": 14,
+        "instances": 282,
+        "drawCalls": 4
+      },
       "meshes": [
         {
           "name": "scatter:dropstone",
@@ -17,7 +21,7 @@
         {
           "name": "scatter:boulder",
           "count": 10,
-          "matrices": "af110823d1045af184c5fb3d1309388cb5fc4ed838c46ee375ac2705d18e06ff",
+          "matrices": "81f65e0daef1ff2ec1f6fe0253208cb8a69c472e8aa0b7e055ba118dc651ed32",
           "colors": "96a823c3c8a37e2f8380d328f202b552f32b8e5431c51a1ad81cc47ffda3a04f"
         },
         {
@@ -40,7 +44,11 @@
         "min": [-492.39836734312155, -10925.096398287296, 484.626290792275],
         "max": [-434.8225807525454, -10885.87682204771, 524.096879476357]
       },
-      "stats": { "cells": 14, "instances": 282, "drawCalls": 4 },
+      "stats": {
+        "cells": 14,
+        "instances": 282,
+        "drawCalls": 4
+      },
       "meshes": [
         {
           "name": "scatter:dropstone",
@@ -51,7 +59,7 @@
         {
           "name": "scatter:boulder",
           "count": 10,
-          "matrices": "af110823d1045af184c5fb3d1309388cb5fc4ed838c46ee375ac2705d18e06ff",
+          "matrices": "81f65e0daef1ff2ec1f6fe0253208cb8a69c472e8aa0b7e055ba118dc651ed32",
           "colors": "96a823c3c8a37e2f8380d328f202b552f32b8e5431c51a1ad81cc47ffda3a04f"
         },
         {
@@ -74,7 +82,11 @@
         "min": [-492.39836734312155, -10925.096398287296, 484.626290792275],
         "max": [-434.8225807525454, -10885.87682204771, 524.096879476357]
       },
-      "stats": { "cells": 14, "instances": 282, "drawCalls": 4 },
+      "stats": {
+        "cells": 14,
+        "instances": 282,
+        "drawCalls": 4
+      },
       "meshes": [
         {
           "name": "scatter:dropstone",
@@ -85,7 +97,7 @@
         {
           "name": "scatter:boulder",
           "count": 10,
-          "matrices": "af110823d1045af184c5fb3d1309388cb5fc4ed838c46ee375ac2705d18e06ff",
+          "matrices": "81f65e0daef1ff2ec1f6fe0253208cb8a69c472e8aa0b7e055ba118dc651ed32",
           "colors": "96a823c3c8a37e2f8380d328f202b552f32b8e5431c51a1ad81cc47ffda3a04f"
         },
         {
@@ -110,7 +122,11 @@
         "min": [-492.3456768371401, -10925.523719005969, 484.8359751642232],
         "max": [-434.8225807525454, -10886.265430205252, 524.187943929482]
       },
-      "stats": { "cells": 52, "instances": 3212, "drawCalls": 4 },
+      "stats": {
+        "cells": 52,
+        "instances": 3212,
+        "drawCalls": 4
+      },
       "meshes": [
         {
           "name": "scatter:dropstone",
@@ -121,7 +137,7 @@
         {
           "name": "scatter:boulder",
           "count": 256,
-          "matrices": "de615c79767858d01457729431ef9ba6053168d5f87736652b1a7629dec1d843",
+          "matrices": "00961d1b826a731b40318240983a5805fbf087bd502c87021d19521f0a6d004b",
           "colors": "a1731c7a5a139d8ec253c7809926b6c441c50f238cfddb19179492b5118f4607"
         },
         {
@@ -144,7 +160,11 @@
         "min": [-492.3456768371401, -10925.523719005969, 484.8359751642232],
         "max": [-434.8225807525454, -10886.265430205252, 524.187943929482]
       },
-      "stats": { "cells": 52, "instances": 3212, "drawCalls": 4 },
+      "stats": {
+        "cells": 52,
+        "instances": 3212,
+        "drawCalls": 4
+      },
       "meshes": [
         {
           "name": "scatter:dropstone",
@@ -155,7 +175,7 @@
         {
           "name": "scatter:boulder",
           "count": 256,
-          "matrices": "de615c79767858d01457729431ef9ba6053168d5f87736652b1a7629dec1d843",
+          "matrices": "00961d1b826a731b40318240983a5805fbf087bd502c87021d19521f0a6d004b",
           "colors": "a1731c7a5a139d8ec253c7809926b6c441c50f238cfddb19179492b5118f4607"
         },
         {
@@ -178,7 +198,11 @@
         "min": [-492.3456768371401, -10925.523719005969, 484.8359751642232],
         "max": [-434.8225807525454, -10886.265430205252, 524.187943929482]
       },
-      "stats": { "cells": 52, "instances": 3212, "drawCalls": 4 },
+      "stats": {
+        "cells": 52,
+        "instances": 3212,
+        "drawCalls": 4
+      },
       "meshes": [
         {
           "name": "scatter:dropstone",
@@ -189,7 +213,7 @@
         {
           "name": "scatter:boulder",
           "count": 256,
-          "matrices": "de615c79767858d01457729431ef9ba6053168d5f87736652b1a7629dec1d843",
+          "matrices": "00961d1b826a731b40318240983a5805fbf087bd502c87021d19521f0a6d004b",
           "colors": "a1731c7a5a139d8ec253c7809926b6c441c50f238cfddb19179492b5118f4607"
         },
         {

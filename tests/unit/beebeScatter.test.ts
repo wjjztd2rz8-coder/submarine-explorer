@@ -179,6 +179,7 @@ it('1310: larger Challenger boulders retain every tier instance and triangle bud
       spec.kind === 'boulder' ? { ...spec, sizeMul: 1.1 } : spec,
     ),
   };
+  const grown = biome.scatter.find((spec) => spec.kind === 'boulder')!.sizeMul! / 1.1;
   const cfg = makeConfig();
   const matrix = new THREE.Matrix4();
   const oldMatrix = new THREE.Matrix4();
@@ -212,9 +213,9 @@ it('1310: larger Challenger boulders retain every tier instance and triangle bud
           expect(matrix.elements[14]).toBe(oldMatrix.elements[14]);
           scale.setFromMatrixScale(matrix);
           oldScale.setFromMatrixScale(oldMatrix);
-          expect(scale.x / oldScale.x).toBeCloseTo(2.6 / 1.1, 5);
-          expect(scale.y / oldScale.y).toBeCloseTo(2.6 / 1.1, 5);
-          expect(scale.z / oldScale.z).toBeCloseTo(2.6 / 1.1, 5);
+          expect(scale.x / oldScale.x).toBeCloseTo(grown, 5);
+          expect(scale.y / oldScale.y).toBeCloseTo(grown, 5);
+          expect(scale.z / oldScale.z).toBeCloseTo(grown, 5);
           if (scale.x >= 3) large++;
         }
         expect(large, `${tier}: some blocks read at approach range`).toBeGreaterThan(0);

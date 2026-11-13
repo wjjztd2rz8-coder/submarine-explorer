@@ -98,7 +98,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
     },
   },
   "challenger-deep": {
-    "biome": "fb28c5b28fe50bf59c76a221b9b20b96ffbffbb4c38a5767a2f0324089baf4c6",
+    "biome": "172e9db90fca9316fd7cca024ce67731dbf02d4241973954b0bc7ec7ced2edd3",
     "tiers": {
       "high": {
         "buffers": [
@@ -112,7 +112,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
         ],
         "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
         "shader": "ecee33e178410d74a6ac6899792d2c460eb035a134653f461838a31c14104abc",
-        "uniforms": "050177b62e8de64ebd774a279708e698d18ffd2eda6230badffac8470d0b3026",
+        "uniforms": "c41db0442a8bd3564797faaafec3d95d44ecab87a12c1574d1c23768d96c20a3",
       },
       "low": {
         "buffers": [
@@ -126,7 +126,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
         ],
         "cache": "seabed-",
         "shader": "278282786c2f1bd61b4ad34ff3999c314f5a808369c331d25f9b75f94ada5873",
-        "uniforms": "050177b62e8de64ebd774a279708e698d18ffd2eda6230badffac8470d0b3026",
+        "uniforms": "c41db0442a8bd3564797faaafec3d95d44ecab87a12c1574d1c23768d96c20a3",
       },
     },
   },

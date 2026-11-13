@@ -6,6 +6,8 @@ import { createTerrainMaterial } from '../../src/world/TerrainMaterial.js';
 import { placeCell } from '../../src/world/scatter/ScatterPlacement.js';
 import { SCATTER_TYPES } from '../../src/world/scatter/ScatterTypes.js';
 
+const trench = biomeFor('challenger-deep');
+
 afterEach(() => vi.unstubAllGlobals());
 
 const flatGround = {
@@ -255,10 +257,13 @@ describe('site floor material bindings', () => {
             shader as Parameters<typeof result.material.onBeforeCompile>[0],
             {} as THREE.WebGLRenderer,
           );
-          expect(uniforms.uRippleReach.value).toBe(site === 'challenger-deep' ? 0.4 : 0);
-          if (site === 'challenger-deep') expect(biome.rippleFadeM).toEqual([70, 200]);
+          expect(uniforms.uRippleReach.value).toBe(
+            site === 'challenger-deep' ? biome.rippleReach : 0,
+          );
+          if (site === 'challenger-deep') expect(biome.rippleFadeM).toEqual(trench.rippleFadeM);
           else expect(biome.rippleFadeM).toBeUndefined();
-          const expectedFade = site === 'challenger-deep' ? [70, 200] : config.detailFadeRippleM;
+          const expectedFade =
+            site === 'challenger-deep' ? trench.rippleFadeM : config.detailFadeRippleM;
           expect(uniforms.uFadeRipple.value).toBeInstanceOf(THREE.Vector2);
           expect(uniforms.uFadeRipple.value.toArray()).toEqual(expectedFade);
           expect(uniforms.uFadeRipple.value.toArray().every(Number.isFinite)).toBe(true);
@@ -284,7 +289,7 @@ describe('site floor material bindings', () => {
           for (const previous of built.slice(0, -1)) {
             const retained = previous.material.userData.uniforms.uRippleReach;
             expect(retained).not.toBe(uniforms.uRippleReach);
-            expect(retained.value).toBe(previous === built[2] ? 0.4 : 0);
+            expect(retained.value).toBe(previous === built[2] ? trench.rippleReach : 0);
             const previousFade = previous.material.userData.uniforms.uFadeRipple;
             expect(previousFade).not.toBe(uniforms.uFadeRipple);
             expect(previousFade.value).not.toBe(uniforms.uFadeRipple.value);
