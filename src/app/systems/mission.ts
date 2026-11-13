@@ -143,6 +143,7 @@ export const missionSystem: GameSystem = {
             return ctx.effective.gameplay.startPosition;
           },
           applyStart: applyMissionStart,
+          startReady: ctx.propsReady,
           // D-FLOW: debrief "Dive sites" / "Home" go to the shell without launching a dive.
           onDiveSites: () => {
             history.pushState({}, '', ctx.shellBaseHref());

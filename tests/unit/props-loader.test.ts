@@ -476,6 +476,14 @@ describe('loaded prop scatter policy', () => {
         propsSystem.init?.(ctx);
         expect(load).toHaveBeenCalledWith(`/data/landmarks/${content}/props.json`, content);
         expect(order).toEqual([]);
+        // Mission Begin must wait for the real placement/event pipeline,
+        // including a missing optional props document.
+        let openingReady = false;
+        void ctx.propsReady.then(() => {
+          openingReady = true;
+        });
+        await Promise.resolve();
+        expect(openingReady).toBe(false);
         finish(
           row.missingContent
             ? null
@@ -494,6 +502,8 @@ describe('loaded prop scatter policy', () => {
                 ],
               },
         );
+        await ctx.propsReady;
+        expect(openingReady).toBe(true);
         await ready;
         const enabled =
           (content === 'challenger-deep' || row.customHero) &&

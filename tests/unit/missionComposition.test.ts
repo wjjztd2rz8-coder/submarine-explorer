@@ -46,9 +46,37 @@ import { SubMesh } from '../../src/sub/SubMesh.js';
 import { hullClearance } from './helpers/hullClearance.js';
 import { siteManifest } from '../../src/core/SiteManifest.js';
 import { requiredHull } from '../../src/game/Progress.js';
+import { missionSystem } from '../../src/app/systems/mission.js';
+import type { GameContext } from '../../src/app/context.js';
+import goldenOpenings from '../fixtures/mission-opening-poses.json';
 import { solidMeshes, subjectVisibility } from './helpers/subjectVisibility.js';
 // @ts-expect-error Diagnostics share their fixed capture sizes with Node tools.
 import { diagnosticViewports } from '../../tools/diagnostic-tiers.mjs';
+
+// Keep the real mission lifecycle and placement; Node replaces only DOM views.
+vi.mock('../../src/ui/Briefing.js', () => ({
+  Briefing: class {
+    root = { querySelector: () => null };
+    isOpen = false;
+    startChoice = 'near-site';
+    show() {
+      this.isOpen = true;
+    }
+    hide() {
+      this.isOpen = false;
+    }
+    attachDiveSettings() {}
+    dispose() {}
+  },
+}));
+vi.mock('../../src/ui/ObjectivesPanel.js', () => ({
+  ObjectivesPanel: class {
+    setTitle() {}
+    setObjectives() {}
+    setVisible() {}
+    dispose() {}
+  },
+}));
 
 const sites: string[] = readdirSync('data/landmarks').filter(
   (site: string) => !site.startsWith('_') && !site.endsWith('.json'),
@@ -357,6 +385,144 @@ function targetFrame(subject: Object3D, rig: CameraRig) {
     heightDeg: (Math.atan(bounds.max.y * tanY) - Math.atan(bounds.min.y * tanY)) * degrees,
   };
 }
+
+it.each(sites)(
+  '%s: rapid Begin waits for the broad objective face and preserves golden frame width',
+  async (site) => {
+    const config = makeConfig();
+    const effective = resolveEffective(defaultSettings(config), 'arcade', null, config);
+    const meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;
+    const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
+    const terrain = new Terrain(
+      { meta, heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows) },
+      config.terrain,
+      'high',
+    );
+    const props = new Props(meta, terrain, config.props, 'high');
+    const def = parseMission(
+      JSON.parse(readFileSync(`data/landmarks/${site}/mission.json`, 'utf8')),
+      site,
+    )!;
+    const pois = placePois(
+      parsePois(JSON.parse(readFileSync(`data/landmarks/${site}/pois.json`, 'utf8'))),
+      meta,
+      terrain,
+      config.scan,
+      site,
+    );
+    const sub = new Submarine(effective.submarine, terrain);
+    sub.setHullClass(requiredHull(def.briefing.depth_m ?? Math.abs(meta.min_m)).id);
+    const rig = new CameraRig(effective.camera, 16 / 9, terrain);
+    let finishProps!: () => void;
+    const propsReady = new Promise<void>((resolve) => {
+      finishProps = resolve;
+    });
+    const ctx = {
+      app: { state: 'dive' },
+      route: { landmarkId: site, missionId: site, tileId: site, def, skipBriefing: false },
+      params: new URLSearchParams(),
+      config,
+      effective,
+      meta,
+      terrain,
+      props,
+      propsReady,
+      sub,
+      rig,
+      discovery: { ready: Promise.resolve(), pois },
+      bus: new EventBus(),
+      save: { onChange: () => () => {} },
+      baseScanRadii: new Map(),
+      headlights: { setEnabled: () => {} },
+      expose: () => {},
+      shellBaseHref: () => 'http://localhost/',
+    } as unknown as GameContext;
+    vi.stubGlobal('document', { createElement: () => ({ getContext: () => null }) });
+    try {
+      missionSystem.init!(ctx);
+      // The real Begin button hides the card before invoking the router.
+      ctx.missionRouter!.briefing!.hide();
+      ctx.missionRouter!.begin('near-site');
+      await Promise.resolve();
+      const frozenBeforeProps = ctx.missionRouter!.frozen;
+      await placeProps(props, site);
+      props.loaded = true;
+      ctx.bus.emit('props:loaded', { ...props.stats });
+      finishProps();
+      for (let i = 0; i < 5; i++) await Promise.resolve();
+      const hero = props.placed.find(
+        (p) => p.def.id === siteManifest(site)!.opening!.freeDive!.hero,
+      )!;
+      rig.camera.updateMatrixWorld(true);
+      props.update(rig.camera);
+      const frame = targetFrame(hero.root, rig);
+      // Compare the same shipped geometry at the recorded golden pose, so art
+      // changes cannot masquerade as a heading or camera regression.
+      const previous = goldenOpenings.poses[site as keyof typeof goldenOpenings.poses];
+      const reference = new CameraRig(effective.camera, 16 / 9, terrain);
+      reference.camera.position.fromArray(previous.camera);
+      reference.camera.lookAt(
+        new Vector3(...previous.position).add(
+          new Vector3(
+            Math.sin(previous.yaw) * effective.camera.chaseLookAhead,
+            effective.camera.chaseLookRise,
+            -Math.cos(previous.yaw) * effective.camera.chaseLookAhead,
+          ),
+        ),
+      );
+      reference.camera.updateMatrixWorld(true);
+      const goldenFrame = targetFrame(hero.root, reference);
+      // Horizontal projection onto camera-right measures whether the wide side
+      // of a slab/hull is presented instead of its narrow end.
+      const centre = hero.root.localToWorld(hero.localBounds.getCenter(new Vector3()));
+      const size = hero.localBounds.getSize(new Vector3());
+      const faceWidth = (camera: CameraRig) => {
+        const right = hero.root
+          .worldToLocal(
+            centre.clone().add(new Vector3(1, 0, 0).applyQuaternion(camera.camera.quaternion)),
+          )
+          .sub(hero.root.worldToLocal(centre.clone()))
+          .normalize();
+        return Math.abs(right.x) * size.x + Math.abs(right.z) * size.z;
+      };
+      console.log(
+        'OPENING-HEADING',
+        JSON.stringify({
+          site,
+          frozenBeforeProps,
+          yaw: (sub.yaw * 180) / Math.PI,
+          frame: frame.widthFraction,
+          golden: goldenFrame.widthFraction,
+          face: faceWidth(rig),
+          goldenFace: faceWidth(reference),
+        }),
+      );
+      expect(frozenBeforeProps, 'Begin stays frozen until the objective geometry arrives').toBe(
+        true,
+      );
+      expect(ctx.missionRouter!.mission.state).toBe('diving');
+      expect(
+        frame.widthFraction + 0.001,
+        'objective width retains the previous golden',
+      ).toBeGreaterThanOrEqual(goldenFrame.widthFraction);
+      expect(
+        faceWidth(rig) + 1e-6,
+        'opening retains the reviewed broad face',
+      ).toBeGreaterThanOrEqual(faceWidth(reference));
+      const position = sub.position.clone();
+      sub.velocity.set(1, 2, 3);
+      ctx.bus.emit('props:loaded', { ...props.stats });
+      expect(sub.position).toEqual(position);
+      expect(sub.velocity.toArray()).toEqual([1, 2, 3]);
+    } finally {
+      finishProps();
+      missionSystem.dispose?.();
+      props.dispose();
+      terrain.dispose();
+      vi.unstubAllGlobals();
+    }
+  },
+);
 
 /** Geometry-only water above the world-horizontal horizon, sampled at cell centres. */
 function emptyAboveHorizon(

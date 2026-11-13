@@ -136,6 +136,8 @@ export interface GameContext extends BootContext {
   /** POI scan radii before the sensor preset multiplier. */
   baseScanRadii: Map<string, number>;
   props: Props;
+  /** Placement completes even when optional props are missing or fail to build. */
+  propsReady: Promise<void>;
   propsDebug: PlacementDebug | null;
   propContact: PropContact;
   currents: Currents;

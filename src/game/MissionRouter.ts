@@ -234,6 +234,8 @@ export interface MissionRouterOptions {
   stars?: () => number;
   defaultStartPosition?: MissionStartPosition;
   applyStart?: (choice: MissionStartPosition) => void;
+  /** Final subject transforms/collision must be available before the dive unfreezes. */
+  startReady?: Promise<void>;
   /** Unused since D-FLOW (the HUD shows a non-1× sim speed); kept for callers. */
   simSpeed?: number;
   /** Navigate: a URL, or null to reload the current one. */
@@ -358,7 +360,10 @@ export class MissionRouter {
 
   /** Close the briefing and start the mission clock. */
   begin(choice?: MissionStartPosition): void {
-    void this.opts.discovery.ready.then(() => {
+    const ready = this.opts.startReady
+      ? Promise.all([this.opts.discovery.ready, this.opts.startReady])
+      : this.opts.discovery.ready;
+    void ready.then(() => {
       if (this.disposed) return;
       this.opts.applyStart?.(choice ?? this.opts.defaultStartPosition ?? 'near-site');
       this.briefing?.hide();
