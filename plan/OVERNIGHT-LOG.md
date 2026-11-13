@@ -3992,3 +3992,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Joint review with Sol done; see plan/REVIEWS.md. No merge, no agent. Backlog refilled (30-37), brief 199 queued. CI red (3 test failures).
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-13 06:52 CST headless run (Claude)
+
+- Merged item 32 V-hunga-block-silhouette (Sonnet): tapering notched crest via tuff preset data, darker wall foot; ~4.2 (spiky, apron still uniform). Smoke + project-base gates green on main; pushed. One assertion loosened (lowTierFollowups wall rays 8 to 4; crest assertions intact); Hunga free-dive yaw moved 120 to 75 deg (clearance tests pass). Codex weekly 4%, so 196-199 stay queued (paced). Items 31, 33, 34, 36 (Sonnet) still open. Hosted CI red from before (item 30); no tag.
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
