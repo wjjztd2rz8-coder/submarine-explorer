@@ -239,10 +239,10 @@ export const BIOMES: Record<string, Biome> = {
     stainAmount: 0.07,
     patch: 0.45,
     burrow: 0.9,
-    ripple: 2.5,
-    // Ripples reach the whole lander light pool instead of isolated patches.
-    rippleReach: 0.4,
-    rippleFadeM: [70, 200],
+    ripple: 1.8,
+    // Ripples soften within the lander light pool and fade out, leaving a pale plain with isolated rocks and trails.
+    rippleReach: 0.2,
+    rippleFadeM: [30, 110],
     // Separate the crests from the fine silt texture in the approach view.
     rippleLenM: 1.6,
     rippleDir: 0.5,
@@ -253,7 +253,7 @@ export const BIOMES: Record<string, Biome> = {
       // Scattered dropstones and cobbles, a few larger half-buried rocks, and burrow mounds: relief near the lander.
       { kind: 'dropstone', density: 14, slopeMaxDeg: 24, on: 'any', sizeMul: 2.4 },
       // Larger sparse blocks read at the 45 m approach; retain the same instance budget.
-      { kind: 'boulder', density: 1.6, slopeMaxDeg: 25, on: 'any', sizeMul: 2.6 },
+      { kind: 'boulder', density: 2.4, slopeMaxDeg: 25, on: 'any', sizeMul: 3.4 },
       { kind: 'rubble', density: 24, slopeMaxDeg: 30, on: 'any', sizeMul: 2 },
       { kind: 'mound', density: 14, slopeMaxDeg: 12, on: 'flat' },
     ],

@@ -575,6 +575,8 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
       transparent: true,
       opacity,
       blending: THREE.AdditiveBlending,
+      // Depth-tested glow would be sliced flat where the sprite dips into the seabed.
+      depthTest: false,
       depthWrite: false,
       fog: false,
     });
@@ -594,8 +596,8 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
   });
   const pool = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), poolMat);
   pool.name = 'lander-bait-pool';
-  pool.position.set(cage.x, 0.12 * k, cage.z);
-  pool.scale.setScalar(7 * k);
+  pool.position.set(cage.x, 0.3 * k, cage.z);
+  pool.scale.setScalar(12 * k);
   pool.raycast = () => undefined;
   // Light only, no solid: scan-boundary audits skip it.
   pool.userData.lightOnly = true;
