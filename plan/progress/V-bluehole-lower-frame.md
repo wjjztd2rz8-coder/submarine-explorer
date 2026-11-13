@@ -23,3 +23,7 @@ No new draw calls, triangles, or shader work; values only. Low stays as cheap as
 ## Self-rating
 
 6/10. The lower 40% now has structure instead of a void, but at 57 m it is still a dark, quiet area; no extra life or particles were added (snow scaling and fog haze were tried and were invisible or muddied the grotto, so reverted). A later pass could stage a faint group of fish below the sub via `life.opening`.
+
+## Gates
+
+`PW_PORT=5731 tools/gates.sh` passes (e2e=smoke + project-base). `tools/site-specs.sh great-blue-hole`: 88 pass; 4 touch-viewport failures (journal-debrief journey 844x390 / 390x844 and phone-accept first-minute 390x844 / 844x390, pause menu never opens) also fail for titanic, so they are not caused by this change. Five other initial failures were a stale dist (served SHA mismatch) and passed after a rebuild.
