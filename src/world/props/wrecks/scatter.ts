@@ -549,7 +549,7 @@ const KITS: Record<WreckScatterId, Kit> = {
           geom: 'plate',
           mat: 'steel',
           big: true,
-          count: 26,
+          count: 36,
           size: [
             [2, 7],
             [1, 1.5],
@@ -558,7 +558,7 @@ const KITS: Record<WreckScatterId, Kit> = {
           pose: 'lie',
           sink: 0.1,
           align: 1.4,
-          cluster: 0.3,
+          cluster: 0.6,
           tints: TRAIL_TINTS,
           gain: 1.7,
         },

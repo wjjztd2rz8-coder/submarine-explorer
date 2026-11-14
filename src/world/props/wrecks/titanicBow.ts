@@ -89,7 +89,9 @@ const TITANIC_BOW = {
   forecastleY: 11,
   wellY: 8.3,
   boatDeckY: 13.7,
-  pitchM: 1.6,
+  pitchM: -1,
+  rake: 0.32,
+  rakeEnd: 30,
 } as const;
 
 /** Build the Titanic bow; dims = [length, beam, height] from props.json. */
@@ -104,7 +106,7 @@ export function buildTitanicBow(
   const rnd = mulberry32(seed);
   const halfB = B / 2;
   const pitch = (s: number): number => (T.pitchM * s) / L;
-  const sheer = (s: number): number => 0.9 * Math.pow(Math.max(0, 1 - s / 42), 2);
+  const sheer = (s: number): number => 1.9 * Math.pow(Math.max(0, 1 - s / 42), 2);
   const tornT = (s: number): number =>
     THREE.MathUtils.clamp((s - T.tornStart) / (L - T.tornStart), 0, 1);
 
@@ -121,6 +123,8 @@ export function buildTitanicBow(
   };
   // The torn end: upper decks sag, plating splays, the break is ragged.
   const deform = (p: THREE.Vector3, s: number, y: number, side: -1 | 1): void => {
+    // Raked stem: the prow leans forward with height, so the bow reads as a rising profile.
+    if (s < T.rakeEnd) p.z -= T.rake * Math.max(0, y) * Math.pow(1 - s / T.rakeEnd, 2);
     const t = tornT(s);
     if (t <= 0) return;
     const n = valueNoise3(s * 0.12, y * 0.18, side * 3.3, seed);
@@ -375,10 +379,17 @@ export function buildTitanicBow(
     }
   }
 
-  // ---- anchors (port visible above the mud; starboard in its pocket)
+  // ---- anchor wells: dark recesses in the flare below the forecastle, an anchor resting in each
   for (const side of [-1, 1] as const) {
-    const { p, n } = hullFrame(spec, 5, 2.4, side);
-    p.addScaledVector(n, 0.25);
+    const well = hullFrame(spec, 9.5, 7.2, side);
+    dark.add(
+      new THREE.PlaneGeometry(3.8, 4.6).applyMatrix4(
+        facingMatrix(well.p.addScaledVector(well.n, 0.12), well.n, 1, 1),
+      ),
+      0,
+    );
+    const { p, n } = hullFrame(spec, 9.5, 5.4, side);
+    p.addScaledVector(n, 0.3);
     stocklessAnchor(hull, p, n, 1.25, C.rustDark);
     const hawse = hullFrame(spec, 4.2, 6.2, side);
     dark.add(
@@ -388,6 +399,24 @@ export function buildTitanicBow(
       0,
     );
   }
+
+  // ---- bow rail: solid top rail, mid rail and posts in the hull mesh, so it reads at every distance
+  const bowRail = (side: -1 | 1): void => {
+    const pts = edgePath(spec, 0.4, T.forecastleEnd, 1.5, fcY, side, 0.3);
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i]!;
+      hull.add(beam(a, a.clone().add(v3(0, 1.1, 0)), 0.09, 0.09, 4), C.whitePaint);
+      const b = pts[i + 1];
+      if (!b) continue;
+      for (const h of [1.1, 0.55])
+        hull.add(
+          beam(a.clone().add(v3(0, h, 0)), b.clone().add(v3(0, h, 0)), 0.08, 0.08, 4),
+          C.whitePaint,
+        );
+    }
+  };
+  bowRail(-1);
+  bowRail(1);
 
   // ---- the torn end: deck slabs sagging out of the break, plates peeled outward
   const tornDecks = [4.2, 6.9, 9.6, 12.3];
@@ -573,10 +602,6 @@ export function buildTitanicBow(
   const rails = new InstanceList();
   const outward = (p: THREE.Vector3): THREE.Vector3 => v3(Math.sign(p.x) || 1, 0, 0);
   if (detail.railings) {
-    // The bow railing: both forecastle edges meeting at the stem.
-    const port = edgePath(spec, 0.6, T.forecastleEnd, 1.4, fcY, -1, 0.3);
-    const star = edgePath(spec, 0.6, T.forecastleEnd, 1.4, fcY, 1, 0.3);
-    railing(rails, [...port.reverse(), ...star], rnd, { outward, bend: 0.5, missing: 0.06 });
     // Forecastle break rail and superstructure-front rail.
     for (const [s, y] of [
       [T.forecastleEnd - 0.3, fcY(T.forecastleEnd - 0.3)],
@@ -702,8 +727,8 @@ export function buildTitanicBow(
       v3(-halfB, -2.5, zOf(T.forecastleEnd)),
       v3(halfB, T.wellY + 0.5, zOf(T.wellEnd)),
     ),
-    new THREE.Box3(v3(-halfB, -2.5, zOf(T.wellEnd)), v3(halfB, T.boatDeckY + T.pitchM, L / 2 - 4)),
-    new THREE.Box3(v3(-9, T.boatDeckY, zOf(62)), v3(12.6, T.boatDeckY + T.pitchM + 2.6, zOf(122))),
+    new THREE.Box3(v3(-halfB, -2.5, zOf(T.wellEnd)), v3(halfB, T.boatDeckY, L / 2 - 4)),
+    new THREE.Box3(v3(-9, T.boatDeckY, zOf(62)), v3(12.6, T.boatDeckY + 2.6, zOf(122))),
   ];
 
   const parts: WreckParts = {

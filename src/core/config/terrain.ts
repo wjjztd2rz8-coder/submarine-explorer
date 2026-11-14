@@ -179,7 +179,7 @@ export const DEFAULT_TERRAIN: TerrainConfig = {
         headingDeg: 0,
         halfLengthM: 71.5,
         halfWidthM: 14,
-        depthM: 5.5,
+        depthM: 7.5,
         widthM: 18,
         rimM: 1.5,
         tint: 0.45,
