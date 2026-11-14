@@ -155,11 +155,12 @@ export function createPhotoSystem(): GameSystem {
         ctx.bus.on('scan:complete', ({ poiId, firstTime }) => {
           if (!firstTime) return;
           const poi = ctx.discovery.pois.find((p) => p.id === poiId);
+          if (poi) return; // Fixed POI stills are captured by the reveal camera.
           const animal = poiId.startsWith(LIFE_ID_PREFIX)
             ? SPECIES_BY_ID.get(poiId.slice(LIFE_ID_PREFIX.length))
             : undefined;
-          const name = poi?.name ?? animal?.common;
-          const at = poi?.position ?? ctx.life?.targets.find((t) => t.id === poiId)?.position;
+          const name = animal?.common;
+          const at = ctx.life?.targets.find((t) => t.id === poiId)?.position;
           if (name) scanStill = { id: poiId, name, at: at?.clone() ?? null };
         }),
       );

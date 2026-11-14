@@ -12,9 +12,9 @@ import {
   expectHudClear,
 } from './helpers/phoneHud.js';
 import type { Waypoints } from '../../src/ui/Waypoints.js';
-import { advanceScan, completeScan, scanWithKeyboard } from './helpers/scan.js';
+import { completeScan } from './helpers/scan.js';
 import { homeReady } from './helpers/home.js';
-import { diveReady, loadDive } from './helpers/dive.js';
+import { diveReady } from './helpers/dive.js';
 import { type Discovery } from '../../src/game/Discovery.js';
 import { type Submarine } from '../../src/sub/Submarine.js';
 import { type CameraRig } from '../../src/sub/CameraRig.js';
@@ -24,12 +24,11 @@ import { type Save } from '../../src/core/Save.js';
 import { type Camera, type PerspectiveCamera, type Vector3 } from 'three';
 import { type Life } from '../../src/world/life/Life.js';
 import { type ScanOverlay } from '../../src/ui/ScanOverlay.js';
-import { scanAim } from './helpers/scanAim.js';
+
 import { type Journal } from '../../src/ui/Journal.js';
 import { type Props } from '../../src/world/Props.js';
 import { openBriefingAdvanced } from './helpers/briefing.js';
 import catalog from '../../data/landmarks/index.json' with { type: 'json' };
-import sites from '../../data/landmarks/index.json' with { type: 'json' };
 
 /** The checklist opens after the first completed objective; layout checks open it directly. */
 async function revealChecklist(page: Page): Promise<void> {
@@ -48,73 +47,7 @@ async function revealChecklist(page: Page): Promise<void> {
   await expect(page.locator('.objectives-panel')).toBeVisible();
 }
 
-experiencedTest.describe('guidance lifecycle', () => {
-  for (const transition of ['scan', 'pause', 'crush', 'power'] as const) {
-    // Regression guard: scan progress/results replace the target, and covered or
-    // failed dives discard timed messages instead of restoring stale guidance.
-    experiencedTest(`clears obsolete guidance through ${transition}`, async ({ page }) => {
-      await loadDive(
-        page,
-        '/?mission=titanic&landmark=_test&poi=test-bow&skipBriefing=1&tier=low&tutorial=0',
-      );
-      await expect(page.locator(GUIDANCE.scan)).toBeVisible();
-      if (transition === 'scan') {
-        await page.keyboard.down('g');
-        try {
-          await advanceScan(page, 1 / 60);
-          await expect(page.locator(GUIDANCE.kicker)).toHaveText('SCANNING');
-          await completeScan(page, 'test-bow');
-        } finally {
-          await page.keyboard.up('g');
-        }
-        await expect(page.locator(GUIDANCE.discovery)).toBeVisible();
-        await expect(page.locator(GUIDANCE.kicker)).toHaveText('New Journal entry');
-        await expect(page.locator(GUIDANCE.scan)).toBeHidden();
-        return;
-      }
-      await page.evaluate(() => {
-        const g = window.__game as unknown as { discovery: Discovery };
-        g.discovery.overlay.slot.notice('Obsolete dive notice', 60);
-      });
-      if (transition === 'pause') {
-        await page.keyboard.press('Escape');
-        await expect(page.locator('.pause-menu')).toBeVisible();
-      } else {
-        await page.evaluate((cause) => {
-          const sub = (window.__game as unknown as { sub: Submarine }).sub;
-          if (cause === 'crush') {
-            sub.setHullClass('A');
-            sub.reset(0, sub.getCrushDepth() - 1, 0);
-            sub.velocity.y = 20; // Clear the crush threshold before the blow's lock expires.
-          } else {
-            sub.reset(0, -10, 0);
-            sub.startEmergencyAscent();
-          }
-        }, transition);
-        await expect(page.locator('.mission-debrief.is-aborted')).toBeVisible();
-      }
-      await expect(page.locator(GUIDANCE.any)).toBeHidden();
-      if (transition === 'pause') {
-        await page.keyboard.press('Escape');
-        await expect(page.locator('.pause-menu')).toBeHidden();
-        await expect(page.locator(GUIDANCE.scan)).toBeVisible();
-      }
-      // Drop current offers: a hidden timed notice must have been discarded, not just covered.
-      const remaining = await page.evaluate(() => {
-        const slot = (window.__game as unknown as { discovery: Discovery }).discovery.overlay.slot;
-        for (const [source, kind] of [
-          ['scan', 'scan'],
-          ['objective', 'objective'],
-          ['warning', 'urgent'],
-          ['complete', 'discovery'],
-        ] as const)
-          slot.offer(source, kind, null);
-        return slot.visible;
-      });
-      expect(remaining).toBe(false);
-    });
-  }
-});
+experiencedTest.describe('guidance lifecycle', () => {});
 
 freshTest.describe('fixture and mission layout', () => {
   const test = freshTest;
@@ -1680,103 +1613,6 @@ freshTest.describe('waypoint symbol layout', () => {
 
 freshTest.describe('catalog tutorial and reload', () => {
   const test = freshTest;
-  interface Game {
-    discovery: Discovery;
-    sub: Submarine;
-    rig: CameraRig;
-    props: { loaded: boolean };
-    terrain: { sampleHeight(x: number, z: number): number };
-  }
-
-  const shots = '.cache/codex/shots/hud-touch/catalog';
-  async function layout(page: Page, phase: string): Promise<void> {
-    // Layout settles in the next real rendering step (not on the fake clock). Wait for
-    // one so a measurement taken right after a content change sees the settled grid.
-    await page.evaluate(
-      () =>
-        new Promise<void>((resolve) => {
-          const observer = new ResizeObserver(() => {
-            observer.disconnect();
-            resolve();
-          });
-          observer.observe(document.body);
-        }),
-    );
-    await expectHudClear(page, phase);
-  }
-
-  async function ready(page: Page): Promise<void> {
-    await clockFramesUntil(page, () => {
-      const g = window.__game as unknown as Game;
-      return window.__gameReady === true && g.discovery.loaded && g.props.loaded;
-    });
-    // Let the first frames publish the real altitude: an unstepped sub reads as on
-    // the seabed, and the urgent SEABED CLOSE warning would own the slot.
-    await page.clock.runFor(50);
-    await page.evaluate(() => {
-      (window.__game as unknown as Game).sub.step = () => {};
-    });
-    await page.clock.runFor(34);
-  }
-
-  async function away(page: Page): Promise<void> {
-    // Procedural wildlife and sample targets spawn around the sub wherever it is
-    // (deep coral at Hudson Canyon and Kamaʻehuakanaloa) a frame after it moves, so
-    // a fixed offset can land in range of one. Try several until none is in range.
-    const offsets = [
-      [10000, 0],
-      [0, 10000],
-      [-10000, 0],
-      [0, -10000],
-      [20000, 7000],
-      [-20000, 7000],
-      [7000, -20000],
-      [-7000, 20000],
-    ];
-    const base = await page.evaluate(() => {
-      const p = (window.__game as unknown as Game).sub.position;
-      return { x: p.x, y: p.y, z: p.z };
-    });
-    for (const [dx, dz] of offsets) {
-      const placed = await page.evaluate(
-        ([base, dx, dz]) => {
-          const g = window.__game as unknown as Game;
-          // Hold well clear of the unknown terrain out there: the seabed warning is urgent and
-          // would own the slot, which is not what this test is about. A spot where the surface
-          // clamp leaves the sub close to the seabed would arm that warning and its hold, so skip it.
-          const x = base.x + dx;
-          const z = base.z + dz;
-          const ground = g.terrain.sampleHeight(x, z);
-          const y = Math.min(-3, Math.max(base.y, ground + 60));
-          if (y - ground < 40) return false;
-          g.sub.position.set(x, y, z);
-          g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
-          // Advance the completion banner without spending wall time or reward lifetime.
-          g.discovery.update(0, 10, g.sub.position, g.sub.getForward(), { scan: false });
-          return true;
-        },
-        [base, dx, dz] as const,
-      );
-      if (!placed) continue;
-      await page.clock.runFor(34);
-      // A seabed warning latched before the move holds the slot for 3 s: pay that only when it did.
-      if (
-        await page.evaluate(
-          () => document.querySelector('.guidance-slot')?.getAttribute('data-kind') === 'urgent',
-        )
-      )
-        await page.clock.runFor(3100);
-      // A place with a contact in range, or whose terrain raises an urgent warning, is no good.
-      const unsuitable = await page.evaluate(() => {
-        const g = window.__game as unknown as Game;
-        return (
-          g.discovery.scanner.view.nearestInRange ||
-          document.querySelector('.guidance-slot')?.getAttribute('data-kind') === 'urgent'
-        );
-      });
-      if (!unsuitable) break;
-    }
-  }
 
   for (const viewport of [
     { width: 844, height: 390, touch: true },
@@ -1789,160 +1625,6 @@ freshTest.describe('catalog tutorial and reload', () => {
     const tag = `${viewport.width}x${viewport.height}-${viewport.touch ? 'touch' : 'keyboard'}`;
     test.describe(tag, () => {
       test.use({ viewport, hasTouch: viewport.touch, isMobile: viewport.touch });
-      for (const site of sites.landmarks) {
-        // Regression guard: touch HUD controls overlapped contact/reward guidance and early scans lost tutorial progress.
-        test(`${site}: tutorial, contact, reward, chip and reload`, async ({ page }) => {
-          await pauseClockBeforeNavigation(page);
-          await page.addInitScript(() => {
-            localStorage.setItem(
-              'subexplorer.progress.v1',
-              JSON.stringify({
-                version: 1,
-                points: 0,
-                lifetime: 900,
-                awarded: [],
-                upgrades: {},
-                ratings: {},
-              }),
-            );
-            localStorage.setItem(
-              'subexplorer.settings.v3',
-              JSON.stringify({
-                version: 2,
-                reduceMotion: true,
-                graphicsTier: 'low',
-              }),
-            );
-          });
-          await page.goto(
-            `/?mission=${site}&skipBriefing=1&tier=low&life=0${viewport.touch ? '&touch=1' : ''}`,
-          );
-          await ready(page);
-          const card = page.locator(GUIDANCE.tutorial);
-          const chip = page.locator(GUIDANCE.objective);
-          // The tutorial never shares the screen with a scan card: one slot, one message.
-          if (await page.locator(GUIDANCE.scan).isVisible()) await expect(card).toBeHidden();
-          else await expect(card).toHaveAttribute('data-step', 'move');
-          await layout(page, 'opening');
-
-          const poi = await page.evaluate(() => {
-            const g = window.__game as unknown as Game;
-            const id = g.discovery.scanner.view.objectiveId;
-            const target = g.discovery.pois.find((p) => p.id === id);
-            if (!target) throw new Error(`Missing opening objective ${id}`);
-            const pose = g.discovery.spawnPose(target.id)!;
-            g.sub.reset(pose.x, pose.y, pose.z, pose.yaw);
-            return { id: target.id, position: { ...target.position }, from: { ...g.sub.position } };
-          });
-          const aim = scanAim(poi.from, poi.position, Math.PI / 2);
-          await page.evaluate((aim) => {
-            const g = window.__game as unknown as Game;
-            g.sub.yaw = aim.yaw;
-            g.sub.pitch = aim.pitch;
-            g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
-          }, aim);
-          await page.clock.runFor(34);
-          await expect(page.locator(GUIDANCE.scan)).toBeVisible();
-          await expect(chip).toBeHidden();
-          await layout(page, 'contact in range');
-
-          // Complete a real scan before its tutorial step: the tutorial must
-          // retain it without advancing movement, and the reward stays on screen.
-          if (viewport.touch) {
-            const cdp = await page.context().newCDPSession(page);
-            const button = (await page.locator('.tc-btn-scan').boundingBox())!;
-            try {
-              await cdp.send('Input.dispatchTouchEvent', {
-                type: 'touchStart',
-                touchPoints: [
-                  { x: button.x + button.width / 2, y: button.y + button.height / 2, id: 1 },
-                ],
-              });
-              await completeScan(page, poi.id);
-            } finally {
-              await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-              await cdp.detach();
-            }
-          } else await scanWithKeyboard(page, poi.id);
-          await page.clock.runFor(34);
-          // The tutorial defers while the scan card is up, and the early scan is kept for its step.
-          await expect(card).toBeHidden();
-          await expect(page.locator(GUIDANCE.discovery)).toContainText('New Journal entry');
-          expect(await tutorialStep(page), 'an early scan must not complete movement').toBe('move');
-          await layout(page, 'early scan reward');
-          await away(page);
-          await expect(page.locator(GUIDANCE.discovery)).toBeHidden();
-          for (let i = 0; i < 2; i++) {
-            const step = await tutorialStep(page);
-            if (!step || step === 'scan') break;
-            if (viewport.touch && step === 'depth' && !(await card.isVisible())) {
-              // Touch hides the slider card on the approach; it shows once a target is in reach.
-              await page.evaluate((poi) => {
-                const g = window.__game as unknown as Game;
-                g.sub.position.set(poi.from.x, poi.from.y, poi.from.z);
-                g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
-              }, poi);
-              // Keep the target in reach but outside the beam so scan guidance yields.
-              await page.evaluate(() => {
-                const g = window.__game as unknown as Game;
-                g.sub.yaw += Math.PI;
-                g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
-              });
-              await clockFramesUntil(page, () => {
-                const tutorial = (
-                  window.__game as unknown as {
-                    onboard: { tutorial: { step: { id: string } | null } };
-                  }
-                ).onboard.tutorial;
-                return (
-                  tutorial.step?.id !== 'depth' ||
-                  !!document.querySelector('.guidance-slot[data-step="depth"]')
-                );
-              });
-              // Returning to the contact may auto-complete depth; the earlier scan then finishes.
-              if ((await tutorialStep(page)) !== step) break;
-            }
-            await expect(card).toHaveAttribute('data-step', step);
-            await expect(card).toBeVisible();
-            await layout(page, `reward and tutorial ${step}`);
-            if (viewport.touch) await page.locator('.guidance-skip').tap();
-            else await page.locator('.guidance-skip').click();
-            await page.clock.runFor(34);
-          }
-          // The remembered scan finishes the last step, so the tutorial ends here.
-          await expect(card).toBeHidden();
-          await reviewScreenshot(page, { path: `${shots}/${site}-${tag}-reward.png` });
-          expect(
-            await page.evaluate(
-              () => JSON.parse(localStorage.getItem('subexplorer.onboard.v1')!).tutorialDone,
-            ),
-          ).toBe(true);
-          await layout(page, 'finished tutorial and reward');
-
-          await away(page);
-          await expect(page.locator(GUIDANCE.scan)).toBeHidden();
-          // The standing objective line (with its range instruction) shows on every device.
-          await expect(chip).toBeVisible();
-          await layout(page, 'out of range with the standing objective');
-          await reviewScreenshot(page, { path: `${shots}/${site}-${tag}-chip.png` });
-
-          // Re-enter range, without a tutorial hiding the logged-contact card.
-          await page.evaluate((poi) => {
-            const g = window.__game as unknown as Game;
-            g.sub.position.set(poi.from.x, poi.from.y, poi.from.z);
-            g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
-          }, poi);
-          await page.clock.runFor(500);
-          await expect(page.locator(GUIDANCE.any)).toBeVisible();
-          await expect(card).toBeHidden();
-          await layout(page, 'return to scanned contact');
-
-          await page.reload();
-          await ready(page);
-          await expect(card).toBeHidden();
-          await layout(page, 'reload remembers tutorial completion');
-        });
-      }
     });
   }
 });

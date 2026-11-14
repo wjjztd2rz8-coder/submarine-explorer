@@ -47,6 +47,7 @@ export class ScanOverlay {
   /** Result content and lifetime; starting another scan ends its ready-contact priority. */
   private complete: {
     title: string;
+    fact?: string;
     firstTime: boolean;
     sideFind: boolean;
     left: number;
@@ -103,10 +104,17 @@ export class ScanOverlay {
    * Show the completion confirmation for `completeBannerSeconds`. A side find
    * (the objective is still pending) keeps pointing at the objective.
    */
-  showComplete(title: string, firstTime: boolean, keys: ScanOverlayKeys, sideFind = false): void {
+  showComplete(
+    title: string,
+    firstTime: boolean,
+    keys: ScanOverlayKeys,
+    sideFind = false,
+    fact?: string,
+  ): void {
     if (this.suppressed) return;
     this.complete = {
       title,
+      fact,
       firstTime,
       sideFind,
       left: this.config.completeBannerSeconds,
@@ -115,7 +123,7 @@ export class ScanOverlay {
     this.slot.flash(
       'complete',
       'discovery',
-      this.completeMessage(title, firstTime, sideFind, keys),
+      this.completeMessage(title, firstTime, sideFind, keys, fact),
       this.config.completeBannerSeconds,
     );
   }
@@ -125,6 +133,7 @@ export class ScanOverlay {
     firstTime: boolean,
     sideFind: boolean,
     keys: ScanOverlayKeys,
+    fact?: string,
   ): GuidanceMessage {
     return {
       kicker: sideFind
@@ -134,7 +143,8 @@ export class ScanOverlay {
           : 'SCAN COMPLETE',
       text: title,
       detail:
-        sideFind && this.openObjective
+        fact ??
+        (sideFind && this.openObjective
           ? this.sideFindDetail(keys)
           : this.cue && (sideFind || isTouch())
             ? this.cue
@@ -142,7 +152,7 @@ export class ScanOverlay {
               ? isTouch()
                 ? 'OPEN JOURNAL'
                 : `PRESS ${keys.guide} · JOURNAL`
-              : 'LOGGED · JOURNAL',
+              : 'LOGGED · JOURNAL'),
       tone: firstTime ? 'cyan' : 'dim',
       ring: { progress: 1, label: 'OK' },
     };
@@ -202,6 +212,7 @@ export class ScanOverlay {
             this.complete.firstTime,
             this.complete.sideFind,
             keys,
+            this.complete.fact,
           )
         : null,
     );

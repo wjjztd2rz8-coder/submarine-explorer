@@ -32,6 +32,9 @@ import {
   type SeabedSampler,
   type SpawnPose,
 } from './Pois.js';
+import type { RevealController } from './Reveal.js';
+import { revealExcerpt } from './Reveal.js';
+import { loadLifeDoc } from '../world/life/tables.js';
 import { Scanner } from './Scanner.js';
 
 interface DiscoveryOptions {
@@ -67,6 +70,8 @@ export class Discovery {
   /** Resolves once POIs and the guide have loaded (or turned out to be missing). */
   readonly ready: Promise<void>;
 
+  reveal?: RevealController;
+  private lifeFacts: Record<string, { text: string }> = {};
   pois: PlacedPoi[] = [];
   guideDoc: GuideDoc | null = null;
   entries: GuideEntry[] = [];
@@ -74,6 +79,7 @@ export class Discovery {
   /** Set once a `?poi=` spawn has been applied. */
   spawnedAt: string | null = null;
 
+  private pendingDebrief: (() => void) | null = null;
   private disposed = false;
   private landmarkName: string;
   private unlocked = new Set<string>();
@@ -109,6 +115,9 @@ export class Discovery {
       }),
     );
     this.ready = this.load();
+    void loadLifeDoc().then((doc) => {
+      if (!this.disposed) this.lifeFacts = doc.species;
+    });
 
     const params = opts.params;
     if (params?.get('debrief') === '1') {
@@ -175,6 +184,7 @@ export class Discovery {
 
   /** Clear dive-local scan and session state while retaining Journal unlocks. */
   resetDive(): void {
+    this.pendingDebrief = null;
     this.overlay.clear();
     this.scanner.resetDive();
     this.stats.reset();
@@ -201,14 +211,6 @@ export class Discovery {
     }
     this.guide.focus(entryId);
     this.guide.refresh();
-    // The card names the target the objective panel showed; the Journal
-    // entry (guide title) can differ in wording.
-    this.overlay.showComplete(
-      poi.name,
-      !before.has(entryId),
-      this.keys(),
-      this.scanner.view.lastCompleteSideFind,
-    );
   }
 
   /**
@@ -225,6 +227,11 @@ export class Discovery {
       firstTime,
       this.keys(),
       this.scanner.view.lastCompleteSideFind,
+      revealExcerpt(
+        this.lifeFacts[entryId.replace(/^life\//, '')]?.text ?? 'Logged in the Journal.',
+        220,
+        1,
+      ),
     );
   }
 
@@ -258,8 +265,14 @@ export class Discovery {
     clockDt: number = simDt,
     blocked = false,
   ): void {
-    if (input.toggleGuide) this.guide.toggle();
-    const overlayOpen = blocked || this.guide.isOpen || this.debrief.isOpen;
+    if (!this.reveal?.active && this.pendingDebrief) {
+      const show = this.pendingDebrief;
+      this.pendingDebrief = null;
+      show();
+    }
+    if (input.toggleGuide && !this.reveal?.active) this.guide.toggle();
+    const overlayOpen =
+      !!this.reveal?.active || blocked || this.guide.isOpen || this.debrief.isOpen;
     this.overlay.setSuppressed(overlayOpen);
     this.scanner.enabled = !overlayOpen;
     this.scanner.update(simDt, position, forward, input.scan);
@@ -291,7 +304,9 @@ export class Discovery {
   showDebrief(extra: Partial<DebriefStats> = {}, onEscape?: (() => void) | null): DebriefStats {
     const stats = this.stats.snapshot({ landmarkName: this.siteName, ...extra });
     this.overlay.setSuppressed(true);
-    this.debrief.show(stats, undefined, undefined, onEscape);
+    if (this.reveal?.active)
+      this.pendingDebrief = () => this.debrief.show(stats, undefined, undefined, onEscape);
+    else this.debrief.show(stats, undefined, undefined, onEscape);
     return stats;
   }
 

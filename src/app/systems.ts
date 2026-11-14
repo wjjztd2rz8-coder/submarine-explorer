@@ -8,6 +8,7 @@
  * earlier only when another system reads its `ctx` field during `init`.
  */
 
+import { createRevealSystem } from './systems/reveal.js';
 import { createControlsSystem } from './systems/controls.js';
 import { createDailySystem } from './systems/daily.js';
 import { createExploreSystem } from './systems/explore.js';
@@ -89,6 +90,7 @@ export function createSystems(): GameSystem[] {
     renderSystem,
     createQualitySystem(),
     createExploreSystem(),
+    createRevealSystem(),
     // Frame-only: `gate.input`.
     inputGateSystem,
   ];

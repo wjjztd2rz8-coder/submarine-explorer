@@ -59,6 +59,50 @@ export class CameraRig {
   /** Mode the camera returns to when photo mode is switched off. */
   private modeBeforeOrbit: CameraMode = 'chase';
 
+  private revealShot: {
+    target: THREE.Vector3;
+    distance: number;
+    elevation: number;
+    azimuth: number;
+    sweep: number;
+    elapsed: number;
+    duration: number;
+    returning: boolean;
+    from: THREE.Vector3;
+    rotation: THREE.Quaternion;
+  } | null = null;
+
+  beginReveal(shot: {
+    target: THREE.Vector3;
+    distance: number;
+    elevation: number;
+    azimuth: number;
+    sweep: number;
+  }): void {
+    this.revealShot = {
+      ...shot,
+      elapsed: 0,
+      duration: 6,
+      returning: false,
+      from: this.camera.position.clone(),
+      rotation: this.camera.quaternion.clone(),
+    };
+  }
+
+  endReveal(): void {
+    const shot = this.revealShot;
+    if (!shot) return;
+    shot.returning = true;
+    shot.elapsed = 0;
+    shot.from.copy(this.camera.position);
+    shot.rotation.copy(this.camera.quaternion);
+    if (this.reduceMotion) this.revealShot = null;
+  }
+
+  get revealReturning(): boolean {
+    return this.revealShot?.returning ?? false;
+  }
+
   setConfig(config: CameraConfig): void {
     this.config = config;
   }
@@ -222,6 +266,12 @@ export class CameraRig {
     dt: number,
     opts: CameraUpdateOptions = {},
   ): void {
+    if (this.revealShot && !this.revealShot.returning) {
+      this.updateReveal(dt);
+      return;
+    }
+    const revealDt = dt;
+    if (this.revealShot) dt = 0;
     const c = this.config;
     this.lastSubPos.copy(subPos);
 
@@ -322,6 +372,51 @@ export class CameraRig {
     }
     this.camera.lookAt(this.currentTarget);
     this.applyBank(opts.roll ?? 0, dt);
+    this.updateReveal(revealDt);
+  }
+
+  private updateReveal(dt: number): void {
+    const shot = this.revealShot;
+    if (shot) {
+      shot.elapsed += Math.max(0, dt);
+      const t = Math.min(1, shot.elapsed / 0.6);
+      const eased = this.reduceMotion ? 1 : t * t * (3 - 2 * t);
+      if (shot.returning) {
+        this.camera.position.lerpVectors(shot.from, this.camera.position.clone(), eased);
+        this.camera.quaternion.slerpQuaternions(
+          shot.rotation,
+          this.camera.quaternion.clone(),
+          eased,
+        );
+        if (t >= 1) this.revealShot = null;
+      } else {
+        const angle =
+          shot.azimuth +
+          (this.reduceMotion ? 0 : shot.sweep * Math.min(1, shot.elapsed / shot.duration));
+        this.camera.position
+          .set(
+            Math.sin(angle) * Math.cos(shot.elevation),
+            Math.sin(shot.elevation),
+            Math.cos(angle) * Math.cos(shot.elevation),
+          )
+          .multiplyScalar(shot.distance)
+          .add(shot.target);
+        if (this.terrain)
+          this.camera.position.y = Math.max(
+            this.camera.position.y,
+            this.terrain.sampleHeight(this.camera.position.x, this.camera.position.z) + 4,
+          );
+        this.camera.lookAt(shot.target);
+        const rotation = this.camera.quaternion.clone();
+        this.camera.position.lerpVectors(shot.from, this.camera.position.clone(), eased);
+        this.camera.quaternion.slerpQuaternions(shot.rotation, rotation, eased);
+      }
+      if (this.terrain)
+        this.camera.position.y = Math.max(
+          this.camera.position.y,
+          this.terrain.sampleHeight(this.camera.position.x, this.camera.position.z) + 4,
+        );
+    }
   }
 
   /** Portrait can keep a close authored view while sharing desktop's zoom/reset state. */
