@@ -59,6 +59,24 @@ slope at 246 s).
 Not in this sprint: opening-frame art passes, bug-hunt and verify briefs, CI shard tuning,
 Realistic mode, cosmetics, new plan documents.
 
+## Start of the next thread: use the Cursor Models pool first (owner, 2026-11-14 15:55)
+
+The owner looked at the usage panel and said the spending "seemed off": Claude's session was
+at 4% while Cursor's "Cursor Models" pool (Composer, Grok) sat at 100%, unused all day, and
+"Other Models" at 35%. The first two threads sent every code task to GPT-5.6 Sol or Opus.
+
+- **Default code delegate is now Cursor Composer 2.5** (Grok as the alternative), for every
+  task where it fits: script work, config, test updates after data changes, small and
+  medium game-code changes with a clear spec. Backlog items 1, 3, 4 and 6 fit; try item 2
+  there first too.
+- Step up to GPT-5.6 Sol, Codex or Opus (medium effort) only when Composer has failed at a
+  task or the task is a cross-cutting design problem. Say why in the brief.
+- Sonnet stays for item 5 (facts); Gemini for anything judged from screenshots.
+- The orchestrator itself is the largest Claude cost. Keep the thread short, do not read
+  images or logs that a delegate can summarise, and check `ai-limits` before each launch.
+- This thread paused at 15:55 until the Claude session reset at about 17:50 (18:30 by
+  `ai-limits`). Nothing is running.
+
 ## How to work (lessons from the first 80 minutes)
 
 The first orchestrator thread spent 63 points of the Claude 5-hour window in 80 minutes.
