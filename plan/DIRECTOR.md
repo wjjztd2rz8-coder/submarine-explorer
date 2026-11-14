@@ -21,7 +21,7 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   targets, scan, **discovery reveal** (close camera shot plus a card with the name and one
   fact), unnamed "?" sonar contacts for everything that is not a primary objective, and a
   debrief that opens by itself when everything is found and offers "Next dive: <site>".
-- Unit suite: green in CI (4,783 tests). Both test-fix branches are merged; the only source
+- Unit suite: green in CI. Both test-fix branches are merged; the only source
   changes were three guards in `camera.ts`, `mission.ts` and `MissionRouter.ts`.
 - Push CI is static checks, unit tests, builds and one base-path browser check; the 38-shard
   e2e matrix is in `e2e-full.yml` (manual only). Deploy follows a green CI run on main.
