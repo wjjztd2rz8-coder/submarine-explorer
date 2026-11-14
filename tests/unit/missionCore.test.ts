@@ -690,8 +690,9 @@ it.each(
   mission.resolve(pois.map((poi) => poi.id));
   expect(warnings).toEqual([]);
   const total = doc.objectives.length;
+  const primaryTotal = doc.objectives.filter((objective) => objective.primary).length;
   expect(mission.counts()).toEqual({ completed: 0, total });
-  expect(mission.primaryCounts()).toEqual({ completed: 0, total: 2 });
+  expect(mission.primaryCounts()).toEqual({ completed: 0, total: primaryTotal });
   mission.update(60);
   expect(mission.elapsedS).toBe(0);
   mission.start(parsed.tile);
@@ -704,7 +705,7 @@ it.each(
       bus.emit('scan:complete', { poiId: objective.poi, landmarkId: site, firstTime: false });
     primaries += Number(objective.primary);
     expect(mission.counts()).toEqual({ completed: index + 1, total });
-    expect(mission.primaryCounts()).toEqual({ completed: primaries, total: 2 });
+    expect(mission.primaryCounts()).toEqual({ completed: primaries, total: primaryTotal });
     if (index === 0) {
       mission.end();
       mission.update(60);
