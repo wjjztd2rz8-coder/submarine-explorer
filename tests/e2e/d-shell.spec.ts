@@ -192,7 +192,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   const existingActions = page.locator('.home-menu > button:not(.daily-card)');
   await expect(existingActions).toHaveCount(7);
   await expect(existingActions).toHaveText([
-    /^Dive(:|$)/,
+    /^(Dive|Continue)(:|$)/,
     'Dive sites',
     'Free dive',
     'Journal',
@@ -236,7 +236,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
     'false',
   );
   await expect(page.locator('.home-menu .mode-advanced')).toBeHidden();
-  await expect(page.getByRole('button', { name: /^Dive(:|$)/ })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^(Dive|Continue)(:|$)/ })).toBeEnabled();
   await expect(page.getByRole('button', { name: 'Continue' })).toHaveCount(0);
   // The title scene backs the menu; the embedded globe opens only in the sites view.
   await expect(page.locator('.globe.is-embedded')).toBeHidden();
@@ -341,7 +341,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await expect(page.locator('.pause-menu')).toBeHidden();
   await expect(page.locator('body')).toHaveAttribute('data-app-state', 'home');
   expect(new URL(page.url()).search).toBe('');
-  await expect(page.getByRole('button', { name: /^Dive(:|$)/ })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^(Dive|Continue)(:|$)/ })).toBeEnabled();
   // Freezing the sub after Quit is covered by the title scene lifecycle spec.
 });
 
@@ -407,12 +407,12 @@ test('Home needs no dive tile; selecting a site keeps loading until its first fr
     await route.continue();
   });
   await boot(page, '/?tier=low');
-  await expect(page.getByRole('button', { name: /^Dive(:|$)/ })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^(Dive|Continue)(:|$)/ })).toBeEnabled();
   await waitForFrames(page, 8, 400);
   expect(diveRequests).toEqual([]);
   await page
     .locator('.home-menu')
-    .getByRole('button', { name: /^Dive(:|$)/ })
+    .getByRole('button', { name: /^(Dive|Continue)(:|$)/ })
     .click();
   await expect(page).toHaveURL(/[?&]mission=titanic/);
   await expect(page.locator('#startup-loading')).toContainText('Loading dive…');

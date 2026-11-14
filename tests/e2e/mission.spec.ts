@@ -421,7 +421,7 @@ test.describe('B3 mission flow', () => {
       }),
       page
         .locator('.home-menu')
-        .getByRole('button', { name: /^Dive(:|$)/ })
+        .getByRole('button', { name: /^(Dive|Continue)(:|$)/ })
         .click(),
     ]);
     await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });

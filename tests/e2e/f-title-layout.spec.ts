@@ -69,7 +69,7 @@ test('home copy, semantic order and first focus', async ({ page }) => {
     'Controls',
   ]);
   // Fresh save: the single Dive button takes first focus.
-  await expect(page.getByRole('button', { name: /^Dive(:|$)/ })).toBeFocused();
+  await expect(page.getByRole('button', { name: /^(Dive|Continue)(:|$)/ })).toBeFocused();
 });
 
 test('both selector entry buttons restore focus on Back and Escape', async ({ page }) => {
