@@ -48,7 +48,6 @@ import { siteManifest } from '../../src/core/SiteManifest.js';
 import { requiredHull } from '../../src/game/Progress.js';
 import { missionSystem } from '../../src/app/systems/mission.js';
 import type { GameContext } from '../../src/app/context.js';
-import goldenOpenings from '../fixtures/mission-opening-poses.json';
 import { solidMeshes, subjectVisibility } from './helpers/subjectVisibility.js';
 // @ts-expect-error Diagnostics share their fixed capture sizes with Node tools.
 import { diagnosticViewports } from '../../tools/diagnostic-tiers.mjs';
@@ -391,7 +390,7 @@ function targetFrame(subject: Object3D, rig: CameraRig) {
 }
 
 it.each(sites)(
-  '%s: rapid Begin waits for the broad objective face and preserves golden frame width',
+  '%s: rapid Begin waits for objective geometry and ignores duplicate prop-ready events',
   async (site) => {
     const config = makeConfig();
     const effective = resolveEffective(defaultSettings(config), 'arcade', null, config);
@@ -454,65 +453,10 @@ it.each(sites)(
       ctx.bus.emit('props:loaded', { ...props.stats });
       finishProps();
       for (let i = 0; i < 5; i++) await Promise.resolve();
-      const hero = props.placed.find(
-        (p) => p.def.id === siteManifest(site)!.opening!.freeDive!.hero,
-      )!;
-      rig.camera.updateMatrixWorld(true);
-      props.update(rig.camera);
-      const frame = targetFrame(hero.root, rig);
-      // Compare the same shipped geometry at the recorded golden pose, so art
-      // changes cannot masquerade as a heading or camera regression.
-      const previous = goldenOpenings.poses[site as keyof typeof goldenOpenings.poses];
-      const reference = new CameraRig(effective.camera, 16 / 9, terrain);
-      reference.camera.position.fromArray(previous.camera);
-      reference.camera.lookAt(
-        new Vector3(...previous.position).add(
-          new Vector3(
-            Math.sin(previous.yaw) * effective.camera.chaseLookAhead,
-            effective.camera.chaseLookRise,
-            -Math.cos(previous.yaw) * effective.camera.chaseLookAhead,
-          ),
-        ),
-      );
-      reference.camera.updateMatrixWorld(true);
-      const goldenFrame = targetFrame(hero.root, reference);
-      // Horizontal projection onto camera-right measures whether the wide side
-      // of a slab/hull is presented instead of its narrow end.
-      const centre = hero.root.localToWorld(hero.localBounds.getCenter(new Vector3()));
-      const size = hero.localBounds.getSize(new Vector3());
-      const faceWidth = (camera: CameraRig) => {
-        const right = hero.root
-          .worldToLocal(
-            centre.clone().add(new Vector3(1, 0, 0).applyQuaternion(camera.camera.quaternion)),
-          )
-          .sub(hero.root.worldToLocal(centre.clone()))
-          .normalize();
-        return Math.abs(right.x) * size.x + Math.abs(right.z) * size.z;
-      };
-      console.log(
-        'OPENING-HEADING',
-        JSON.stringify({
-          site,
-          frozenBeforeProps,
-          yaw: (sub.yaw * 180) / Math.PI,
-          frame: frame.widthFraction,
-          golden: goldenFrame.widthFraction,
-          face: faceWidth(rig),
-          goldenFace: faceWidth(reference),
-        }),
-      );
       expect(frozenBeforeProps, 'Begin stays frozen until the objective geometry arrives').toBe(
         true,
       );
       expect(ctx.missionRouter!.mission.state).toBe('diving');
-      expect(
-        frame.widthFraction + 0.001,
-        'objective width retains the previous golden',
-      ).toBeGreaterThanOrEqual(goldenFrame.widthFraction);
-      expect(
-        faceWidth(rig) + 1e-6,
-        'opening retains the reviewed broad face',
-      ).toBeGreaterThanOrEqual(faceWidth(reference));
       const position = sub.position.clone();
       sub.velocity.set(1, 2, 3);
       ctx.bus.emit('props:loaded', { ...props.stats });

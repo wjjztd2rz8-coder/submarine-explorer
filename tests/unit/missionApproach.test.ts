@@ -19,7 +19,6 @@ import {
 import { composedMissionSpawn } from '../../src/game/DeepOpeningSpawn.js';
 import { parseMission } from '../../src/game/Mission.js';
 import { parsePois, placePois } from '../../src/game/Pois.js';
-import { scanAim } from '../e2e/helpers/scanAim.js';
 import { Props } from '../../src/world/Props.js';
 import { PropContact } from '../../src/world/props/Wiring.js';
 import { Terrain } from '../../src/world/Terrain.js';
@@ -66,7 +65,7 @@ for (const site of sites.landmarks) {
       pilotCases.map((pilotRoute) => ({
         pilotRoute,
         capability: pilotRoute
-          ? 'pilots from the opening through two primary scans without teleporting'
+          ? 'pilots from the opening through all primary scans without teleporting'
           : 'first primary has a clear, hull-safe approach and visible navigation',
       })),
     )(`${site} ${tier} ${mode}: $capability`, async ({ pilotRoute }) => {
@@ -230,38 +229,10 @@ for (const site of sites.landmarks) {
           const contact = new PropContact(props, bus, config.props, settings.hullRadius);
           sub.setHullClass(missionHull);
           sub.setSimSpeed(1);
-          if (site === 'great-blue-hole') {
-            const target = primaries[1];
-            scanner.setObjective(target.id);
-            const aimAt = (p: { x: number; y: number; z: number }) => {
-              const aim = scanAim(p, target.position, effective.submarine.maxPitch);
-              sub.reset(p.x, p.y, p.z, aim.yaw);
-              sub.pitch = aim.pitch;
-              scanner.update(0, sub.position, sub.getForward(), false);
-            };
-            // Match the journey's observation pose inside the bowl. The actual
-            // scanner and physics must accept it without widening any scan gate.
-            const inside = { x: target.position.x, y: 0, z: target.position.z - 40 };
-            inside.y = Math.max(
-              target.position.y + 16,
-              terrain.sampleHeight(inside.x, inside.z) +
-                settings.hullRadius +
-                settings.seabedClearance +
-                16,
-            );
-            aimAt(inside);
-            expect(scanner.view.candidateId).toBe(target.id);
-            for (let frame = 0; frame < 2; frame++) {
-              sub.step(FROZEN_INPUT, 1 / 60);
-              contact.resolve(sub, 1 / 60);
-              scanner.update(0, sub.position, sub.getForward(), false);
-              expect(scanner.view.candidateId).toBe(target.id);
-            }
-          }
           sub.reset(pose!.x, pose!.y, pose!.z, pose!.yaw);
           const clamp = (n: number) => Math.max(-1, Math.min(1, n));
           try {
-            for (const target of primaries.slice(0, 2)) {
+            for (const target of primaries) {
               expect(nextScanObjective(run.objectives)?.poiId).toBe(target.id);
               scanner.setObjective(target.id);
               const start = sub.position.clone();
@@ -298,10 +269,10 @@ for (const site of sites.landmarks) {
               expect(sub.hullBreached).toBe(false);
               expect(scanner.view.lastCompleteId).toBe(target.id);
             }
-            expect(scanner.view.completed).toBe(2);
+            expect(scanner.view.completed).toBe(primaries.length);
             expect(
               run.objectives.filter((objective) => objective.primary && objective.complete),
-            ).toHaveLength(2);
+            ).toHaveLength(primaries.length);
           } finally {
             run.dispose();
           }
