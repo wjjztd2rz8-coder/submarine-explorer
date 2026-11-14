@@ -6,7 +6,7 @@ import { unknownContactsForSite } from '../../game/Contacts.js';
 
 import type { Vector3 } from 'three';
 import type { GameContext } from '../context.js';
-import { nextScanObjective as selectScanObjective } from '../../game/Mission.js';
+import { scanObjectiveFrom as selectScanObjective } from '../../game/Mission.js';
 import { Waypoints } from '../../ui/Waypoints.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
@@ -85,10 +85,10 @@ export const waypointsSystem: GameSystem = {
   },
   frame: {
     'guide.waypoints': (f, ctx) => {
-      f.nextScanObjective = selectScanObjective(ctx.missionRouter?.mission.objectives, (id) =>
-        ctx.sub.position.distanceTo(
-          ctx.discovery.pois.find((p) => p.id === id)?.position ?? ctx.sub.position,
-        ),
+      f.nextScanObjective = selectScanObjective(
+        ctx.missionRouter?.mission.objectives,
+        () => ctx.sub.position,
+        () => ctx.discovery.pois,
       );
     },
     'render.prepare': (f, ctx) => {
@@ -100,8 +100,10 @@ export const waypointsSystem: GameSystem = {
 
 function updateWaypoints(ctx: GameContext, position: Vector3) {
   const { missionRouter } = ctx;
-  const nextScanObjective = selectScanObjective(missionRouter?.mission.objectives, (id) =>
-    position.distanceTo(ctx.discovery.pois.find((p) => p.id === id)?.position ?? position),
+  const nextScanObjective = selectScanObjective(
+    missionRouter?.mission.objectives,
+    () => position,
+    () => ctx.discovery.pois,
   );
   // Near-site approaches retain their navigation marker in Realistic too.
   // Once in scan range, resume the pilot's normal visual-waypoint preference.

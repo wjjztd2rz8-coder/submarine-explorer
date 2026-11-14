@@ -77,8 +77,8 @@
     {
       "id": "axial-caldera-wall",
       "name": "Base of the western caldera wall",
-      "lat": 45.9337,
-      "lon": -130.0179,
+      "lat": 45.93368,
+      "lon": -130.01563,
       "snap_to_seabed": true,
       "radius_m": 150,
       "kind": "geology",
@@ -91,13 +91,23 @@
         "https://oceanobservatories.org/site/rs03ashs/",
         "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"
       ],
-      "note": "Real GMRT terrain, about 288 m west of Mushroom: the seabed rises here from ~1,540 m to ~1,416 m, a slope consistent with the caldera's western boundary fault -- OOI states ASHES sits 'near the base of the western caldera wall' and 'about 130 m east of the caldera boundary fault' (the exact fault trace itself is not resolved at this tile's ~43-61 m cell size, so this POI marks the rising wall terrain rather than a specific scarp line).",
-      "reveal": {
-        "distance_m": 44,
-        "elevation_deg": 12,
-        "azimuth_deg": 35,
-        "target_offset": [-8, 5, 0]
-      }
+      "note": "Real GMRT terrain, about 1,508 m deep and about 130 m west of Mushroom, on the lower part of the rise from ~1,540 m at the vents to ~1,416 m some 300 m west, a slope consistent with the caldera's western boundary fault -- OOI states ASHES sits 'near the base of the western caldera wall' and 'about 130 m east of the caldera boundary fault'. Moved 2026-11 from the top of the rise (the +300 m point, 1,416 m) so the dive does not have to climb 125 m. The exact fault trace itself is not resolved at this tile's ~43-61 m cell size, so this POI marks the rising wall terrain rather than a specific scarp line."
+    },
+    {
+      "id": "axial-ashes-vent-life",
+      "name": "Vent animal community",
+      "lat": 45.93332,
+      "lon": -130.01305,
+      "snap_to_seabed": true,
+      "radius_m": 100,
+      "kind": "biology",
+      "primary": false,
+      "scan_seconds": 2.4,
+      "guide_entry": "vent-life",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": ["https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"],
+      "note": "GMRT terrain at about 1,540 m, about 80 m east-southeast of Mushroom, inside the area about 60-80 m across where UW describes most ASHES activity. Added 2026-11 as a route stop for the guide's vent-life entry; the marker stands for the field's animal communities, not one surveyed colony."
     }
   ]
 }

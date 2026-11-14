@@ -78,7 +78,8 @@ export function debriefModel(
   const fact = factFind?.text;
   // Authored facts are shown whole; older paragraph text is cut to its first sentence.
   const sentence = factFind?.whole ? fact : fact?.match(/^.*?[.!?](?=\s|$)|^.+$/s)?.[0];
-  const counts = site && store ? siteFinds(site, store) : null;
+  // A mission counts its own route; a free dive counts the site's Journal finds.
+  const counts = stats.finds ?? (site && store ? siteFinds(site, store) : null);
   return {
     title:
       stats.objectives &&
@@ -93,7 +94,7 @@ export function debriefModel(
         : sentence
       : null,
     progress: counts
-      ? `Found ${counts.found} of ${counts.total} at ${stats.landmarkName ?? site?.name}`
+      ? `Found ${counts.found} of ${counts.total} at ${stats.landmarkName ?? site?.name ?? 'this site'}`
       : null,
   };
 }

@@ -32,6 +32,7 @@ import type { InputState } from '../core/Input.js';
 import { Briefing, type BriefingContent } from '../ui/Briefing.js';
 import { Debrief, type DebriefAction } from '../ui/Debrief.js';
 import { ObjectivesPanel } from '../ui/ObjectivesPanel.js';
+import { hudBar } from '../ui/hudRegions.js';
 import { latLonToWorld, normalizeHeadingDeg } from '../util/geo.js';
 import type { TileMeta } from '../util/types.js';
 import { shellUrl } from '../util/navigation.js';
@@ -297,6 +298,8 @@ export class MissionRouter {
   readonly mission: Mission;
   readonly briefing: Briefing | null;
   readonly panel: ObjectivesPanel;
+  /** "Finish dive": always on screen once the primaries are done (desktop and touch). */
+  readonly finishButton: HTMLButtonElement;
   debrief: Debrief | null = null;
   exploration: Debrief['exploration'] = null;
 
@@ -320,6 +323,15 @@ export class MissionRouter {
     this.panel = new ObjectivesPanel(opts.parent);
     this.panel.setTitle(route.def.title);
     this.panel.setObjectives(this.mission.objectives);
+    this.finishButton = document.createElement('button');
+    this.finishButton.type = 'button';
+    this.finishButton.className = 'hud-finish';
+    this.finishButton.textContent = 'Finish dive';
+    this.finishButton.title = 'Surface and debrief';
+    this.finishButton.hidden = true;
+    // Pointer activation keeps flight focus, like the completion banner's buttons.
+    this.finishButton.onmousedown = (e) => e.preventDefault();
+    this.finishButton.onclick = () => this.endDive();
 
     this.disposers.push(
       this.mission.onChange((m) => this.onMissionChange(m)),
@@ -428,7 +440,21 @@ export class MissionRouter {
     this.mission.update(dt);
     if (this.blow && hull && !hull.emergencyBlow) this.onBlowComplete();
     this.updateBanner(dt);
+    this.updateFinish();
   }
+
+  /** The banner offers the same choice while it is open; otherwise the bar keeps it. */
+  private updateFinish(): void {
+    const show =
+      this.mission.state === 'primaries-complete' && this.canEndDive && !this.panel.bannerOpen;
+    if (this.finishButton.hidden === show) this.finishButton.hidden = !show;
+    // Attached on first use, beside Journal and Pause in the HUD bar.
+    if (show && !this.finishAttached) {
+      this.finishAttached = true;
+      (this.opts.parent ?? hudBar()).append(this.finishButton);
+    }
+  }
+  private finishAttached = false;
 
   /**
    * The checklist repeats the step banner's goal, so it stays hidden until the
@@ -535,11 +561,13 @@ export class MissionRouter {
     const primaries = m.primaryCounts();
     const { title, subtitle } = debriefText(reason, primaries, this.failedAt, this.abortCause);
     const open = m.requiredPrimaries().filter((o) => !o.complete);
+    const { completed, total } = m.counts();
     const stats = discovery.stats.snapshot({
       title,
       subtitle,
       landmarkName: discovery.siteName,
       objectives: { ...primaries, remaining: open.length === 1 ? open[0]?.title : undefined },
+      finds: { found: completed, total },
     });
     if (!this.debrief) {
       this.debrief = new Debrief({
@@ -590,6 +618,7 @@ export class MissionRouter {
     this.debrief.exploration = this.exploration;
     this.debrief.show(stats, actions, rating, m.canResume ? () => this.keepExploring() : null);
     this.panel.setVisible(false);
+    this.finishButton.hidden = true;
   }
 
   /** "Dive again": a fresh dive of the same mission (reload: briefing unless the URL skips it). */
@@ -649,6 +678,7 @@ export class MissionRouter {
     this.mission.dispose();
     this.briefing?.dispose();
     this.panel.dispose();
+    if (this.finishAttached) this.finishButton.remove();
     this.debrief?.dispose();
   }
 }

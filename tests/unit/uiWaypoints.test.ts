@@ -224,7 +224,7 @@ describe('waypoint objective state', () => {
     };
   }
 
-  it('conceals nearby contacts, hides remote world markers, and restores persistent names', () => {
+  it('conceals nearby contacts, marks only the current remote one, and restores persistent names', () => {
     const f = fixture();
     let found = false;
     f.view.setContactState(() => ({ primary: false, found }));
@@ -232,8 +232,11 @@ describe('waypoint objective state', () => {
     expect(f.marker('a').textContent).toMatch(/^\? · \d+ m$/);
     expect(f.marker('a').title).toBe('Unknown contact');
     f.pois[0]!.position.z = -800;
-    f.draw();
+    // A remote unknown contact is hidden unless it is the current target.
+    f.draw(null);
     expect(f.marker('a').hidden).toBe(true);
+    f.draw();
+    expect(f.marker('a').hidden).toBe(false);
     found = true;
     f.draw();
     expect(f.marker('a').textContent).toBe('✓ First contact');

@@ -159,3 +159,7 @@ tile's bounding box within the depth window, not at any specific chimney.
 - The InterRidge Vents Database entry for this field (an independent source used for other vent
   fields in `data/landmarks.json`) could not be reached (expired TLS certificate, same failure noted
   in Lost City's `sources.md`); a retry later might add a second citation for named-chimney facts.
+
+## Route (2026-11)
+
+`axial-caldera-wall` moved from the +300 m point (1,416.4 m) to about 130 m west of Mushroom (45.93368, -130.01563, about 1,508 m), where OOI places the caldera boundary fault, so the dive does not have to climb 125 m. `axial-ashes-vent-life` (45.93332, -130.01305, about 1,540 m) was added inside the field for the guide's vent-life entry.

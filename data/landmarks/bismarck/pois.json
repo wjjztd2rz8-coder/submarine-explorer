@@ -33,9 +33,9 @@
     {
       "id": "bismarck-turret-debris",
       "name": "Detached main gun turrets",
-      "lat": 48.15114,
-      "lon": -16.10497,
-      "depth_m": 4124,
+      "lat": 48.15076,
+      "lon": -16.109,
+      "depth_m": 4164,
       "radius_m": 60,
       "kind": "debris",
       "primary": true,
@@ -47,13 +47,7 @@
         "https://www.kbismarck.org/forum/viewtopic.php?t=1470",
         "https://www.magellan.gg/vrov-pilot-bismarck/"
       ],
-      "note": "The four main turrets fell out during capsizing. This authored marker and matching prop sit about 900 m east-northeast and upslope of the hull. Public individual turret coordinates are not available; the layout follows the general slope setting rather than surveyed turret positions.",
-      "reveal": {
-        "distance_m": 32,
-        "elevation_deg": 22,
-        "azimuth_deg": 335,
-        "target_offset": [0, -2, 0]
-      }
+      "note": "The four main turrets fell out during capsizing. This authored marker and matching prop sit about 600 m east-northeast and upslope of the hull (moved 2026-11 from about 900 m so the dive is a short route; the 2001 expedition identified one turret near the hull). Public individual turret coordinates are not available; the layout follows the general slope setting rather than surveyed turret positions."
     },
     {
       "id": "bismarck-damage",
@@ -80,6 +74,38 @@
         "azimuth_deg": 345,
         "target_offset": [-20, -3, 45]
       }
+    },
+    {
+      "id": "bismarck-memorial",
+      "name": "Memorial marker",
+      "lat": 48.15028,
+      "lon": -16.11672,
+      "depth_m": 4212,
+      "radius_m": 40,
+      "kind": "memorial",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "memorial",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": ["https://en.wikipedia.org/wiki/German_battleship_Bismarck"],
+      "note": "Restored 2026-11. A respectful marker near the hull, not a surveyed structure or a prop. Of Bismarck's crew of 2,221, only around 114 were rescued; roughly 2,100 died. This game has no salvage, collection or loot of any kind at any site."
+    },
+    {
+      "id": "bismarck-skid-trail",
+      "name": "The seamount flank",
+      "lat": 48.15089,
+      "lon": -16.11317,
+      "snap_to_seabed": true,
+      "radius_m": 150,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "seamount-flank",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": ["https://www.gmrt.org/", "https://www.magellan.gg/vrov-pilot-bismarck/"],
+      "note": "Real survey data. Restored 2026-11 about 300 m up-slope (north-east) of the hull so the dive's route reaches it: this tile's terrain shoals from 4,218.5 m at the hull to about 4,207 m here, and on to about 4,182 m some 500 m up-slope, toward the seamount summit (~4,024 m about 3 km further along the same line). Published accounts describe the real debris trail as about 1 km long down a much steeper (~14.5 degree) slope, formed when the turrets hit the seamount first and triggered a landslide that carried the hull further down -- so this point sits between the turret-debris marker (further up-slope) and the hull (down-slope), on the same real slope. This tile's grid, built from GMRT's coarser global (GEBCO-derived) fill rather than a dedicated survey of the wreck site, is far too coarse to resolve the true trail or slope angle -- what you scan here is real but smoothed terrain, not the skid mark itself."
     }
   ]
 }

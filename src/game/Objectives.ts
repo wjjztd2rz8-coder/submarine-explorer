@@ -101,6 +101,8 @@ export interface DebriefStats {
    * `remaining` is the title of the one primary still open, when exactly one is.
    */
   objectives?: { completed: number; total: number; remaining?: string };
+  /** A mission's counted discoveries (primaries and route contacts); absent in a free dive. */
+  finds?: { found: number; total: number };
   /** Distinct targets scanned this dive, in discovery order, including previously logged finds. */
   discoveries: Array<{ poiId: string; name: string }>;
   /** Journal entries first unlocked this session. */

@@ -67,6 +67,25 @@
         "azimuth_deg": 135,
         "target_offset": [0, 2, 0]
       }
+    },
+    {
+      "id": "hunga-tonga-outer-flank",
+      "name": "Outer submarine flank",
+      "lat": -20.56892,
+      "lon": -175.41675,
+      "snap_to_seabed": true,
+      "radius_m": 120,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "outer-flank",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": [
+        "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024GC011685",
+        "https://www.gmrt.org/"
+      ],
+      "note": "Real survey terrain, about 382 m deep here, partway down the outer flank of the roughly 2-km-high volcanic edifice whose summit forms the islands and caldera, between the flank-transect point and the rim slope. Restored 2026-11 as a route stop (the D3 marker was about 1,029 m deep, several kilometres away). This part of the tile is unaffected by the eruption's caldera collapse, which was confined to the summit area."
     }
   ]
 }

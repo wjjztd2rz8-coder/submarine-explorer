@@ -127,14 +127,19 @@ export function createRevealSystem(): GameSystem {
               const entry = ctx.discovery.entries.find(
                 (e) => e.id === entryIdForPoi(poi, ctx.discovery.entries),
               );
+              // A mission's tally is its counted route, the same "N of N" as its debrief.
+              const counted = ctx.missionRouter?.mission.objectives
+                .filter((o) => o.resolved)
+                .map((o) => o.poiId);
+              const tally = counted
+                ? ctx.discovery.pois.filter((p) => counted.includes(p.id))
+                : ctx.discovery.pois;
               card.show(
                 poi.id,
                 poi.name,
                 entry?.fact ?? revealExcerpt(entry?.paragraphs.join(' ') ?? ''),
-                ctx.discovery.pois.filter((p) =>
-                  ctx.discovery.store.isDiscovered(p.landmarkId, p.id),
-                ).length,
-                ctx.discovery.pois.length,
+                tally.filter((p) => ctx.discovery.store.isDiscovered(p.landmarkId, p.id)).length,
+                tally.length,
                 ctx.discovery.siteName,
               );
             }
