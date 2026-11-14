@@ -123,7 +123,10 @@ export function composedMissionSpawn(
     if (p.x < nw.x || p.x > se.x || p.z < nw.z || p.z > se.z) continue;
     if (Math.abs(p.distanceTo(target) - range) > 0.01) continue;
     // Do not open closer to another primary and send the waypoint in a different direction.
+    // Monterey's short descending sequence deliberately clusters beyond its wall contact; its
+    // objective lock still selects the first contact, so preserve the wall's safe north approach.
     if (
+      siteId !== 'monterey-canyon' &&
       primaries.slice(1).some(({ position: q }) => p.distanceTo(new Vector3(q.x, q.y, q.z)) < range)
     )
       continue;

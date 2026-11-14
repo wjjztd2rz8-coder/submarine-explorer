@@ -41,9 +41,28 @@
       "note": "GMRT terrain, about 265 m deep and 2.85 km in a straight line from the canyon-head marker. Located by sampling the grid toward the canyon axis; this scan point does not establish the regional shelf-break position."
     },
     {
+      "id": "monterey-canyon-inner-bend",
+      "name": "Inner canyon bend",
+      "lat": 36.7846,
+      "lon": -122.0133,
+      "snap_to_seabed": true,
+      "radius_m": 120,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 1.8,
+      "guide_entry": "canyon-axis",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": [
+        "https://www.mbari.org/know-your-ocean/monterey-canyon/",
+        "https://www.gmrt.org/"
+      ],
+      "note": "GMRT terrain on the inner bend between the north-wall and canyon-floor survey points."
+    },
+    {
       "id": "monterey-canyon-axis",
-      "name": "Canyon floor, 1,000 m",
-      "lat": 36.7814,
+      "name": "Inner canyon floor",
+      "lat": 36.784,
       "lon": -122.0133,
       "snap_to_seabed": true,
       "radius_m": 200,
@@ -57,7 +76,7 @@
         "https://www.mbari.org/know-your-ocean/monterey-canyon/",
         "https://www.gmrt.org/"
       ],
-      "note": "GMRT terrain: about 1,015 m deep, a sampled point on the traced canyon axis, about 640 m south of the north-wall marker at the same longitude. No source publishes a coordinate for a specific axis point; it was located by sampling the grid along that meridian."
+      "note": "GMRT terrain on the traced inner canyon floor, about 355 m south of the north-wall marker at the same longitude. No source publishes a coordinate for this specific axis point."
     },
     {
       "id": "monterey-canyon-wall",

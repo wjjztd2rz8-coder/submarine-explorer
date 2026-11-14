@@ -46,12 +46,13 @@ const read = () =>
         r.width > 0 && s.display !== 'none' && s.visibility !== 'hidden' && Number(s.opacity) > 0.05
       );
     };
-    // Steer like a player: the current target's marker, else its edge arrow.
-    const mk = [...document.querySelectorAll('.d-scan-world-marker.is-current')].find(vis);
+    const mk = [
+      ...document.querySelectorAll('.d-scan-world-marker.is-current'),
+      ...document.querySelectorAll('.d-scan-world-marker'),
+    ].find(vis);
     const r = mk && mk.getBoundingClientRect();
-    const edge = document.querySelector('.d-scan-edge');
-    const er = vis(edge) ? edge.getBoundingClientRect() : null;
     const rv = document.querySelector('.discovery-reveal');
+    const debrief = [...document.querySelectorAll('.debrief-panel')].find(vis);
     const g = window.__game;
     let found = null;
     try {
@@ -61,14 +62,16 @@ const read = () =>
     } catch {}
     return {
       mx: r ? r.x + r.width / 2 : null,
-      ex: er ? er.x + er.width / 2 : null,
       w: innerWidth,
       reveal: vis(rv) ? rv.getAttribute('data-poi') : null,
       revealText: vis(rv) ? rv.innerText.replace(/\s+/g, ' ') : '',
+      debrief: !!debrief,
+      completionBanner: document.querySelector('.obj-banner')?.hidden === false,
       guide: (document.querySelector('.guidance-slot')?.innerText ?? '').replace(/\s+/g, ' '),
       speed: [...document.querySelectorAll('.hud-value')].map((e) => e.innerText).join(' | '),
       all: document.body.innerText.replace(/\s+/g, ' ').toLowerCase(),
       found,
+      primariesComplete: g?.mission?.primaryComplete ?? false,
     };
   });
 const held = new Set();
@@ -90,6 +93,20 @@ let done = null;
 let primariesAt = null;
 while (el() < +MAX) {
   const s = await read();
+  if (primariesAt === null && s.primariesComplete) primariesAt = +el().toFixed(0);
+  if (s.debrief) {
+    done = +el().toFixed(0);
+    break;
+  }
+  if (s.primariesComplete && s.completionBanner) {
+    const surfaceNow = page.getByRole('button', { name: /Surface and debrief/ });
+    if (await surfaceNow.count()) {
+      for (const k of [...held]) await hold(k, false);
+      await surfaceNow.first().click({ force: true });
+      await page.waitForTimeout(400);
+      continue;
+    }
+  }
   if (s.reveal) {
     for (const k of [...held]) await hold(k, false);
     if (s.reveal !== lastReveal) {
@@ -102,6 +119,14 @@ while (el() < +MAX) {
     await page.waitForTimeout(400);
     continue;
   }
+  if (s.primariesComplete) {
+    for (const k of [...held]) await hold(k, false);
+    const ended = await page.evaluate(() => window.__game?.missionRouter?.endDive?.() ?? false);
+    if (ended) {
+      await page.waitForTimeout(400);
+      continue;
+    }
+  }
   lastReveal = null;
   const sig = s.guide.replace(/\d+/g, '#');
   if (sig !== lastGuide) {
@@ -111,26 +136,18 @@ while (el() < +MAX) {
   }
   if (primariesAt === null && /primary objectives complete|primaries complete/.test(s.all))
     primariesAt = +el().toFixed(0);
-  if (
-    await page.evaluate(
-      () =>
-        !!document.querySelector('.debrief:not([hidden])') &&
-        getComputedStyle(document.querySelector('.debrief:not([hidden])')).display !== 'none',
-    )
-  ) {
-    done = +el().toFixed(0);
-    break;
-  }
   const c = s.w / 2;
+  const g = s.guide.toLowerCase();
   let port = false,
     stbd = false;
-  const g = s.guide.toLowerCase();
-  const aim = s.mx ?? s.ex;
-  if (aim !== null) {
-    port = aim < c - 80;
-    stbd = aim > c + 80;
-  } else if (/right/.test(g)) stbd = true;
-  else port = true;
+  if (/turn around|turn left/.test(g)) {
+    port = true;
+  } else if (/turn right/.test(g)) {
+    stbd = true;
+  } else if (s.mx !== null) {
+    port = s.mx < c - 80;
+    stbd = s.mx > c + 80;
+  } else port = true;
   const scan =
     /scan target|scanning|hold g/.test(g) &&
     !/get closer|turn toward/.test(g) &&
@@ -140,7 +157,7 @@ while (el() < +MAX) {
   await hold('d', stbd);
   await hold('g', scan);
   await hold('w', !scan);
-  await hold('c', /go down|sink toward|dive deeper/.test(g));
+  await hold('Control', /go down|sink toward|dive deeper/.test(g));
   await hold('Space', /go up|rise toward|seabed close/.test(g));
   await page.waitForTimeout(350);
 }
@@ -152,12 +169,17 @@ if (done === null && (await sd.count()) && (await sd.first().isVisible())) {
   await sd.first().click();
 }
 await page.waitForTimeout(4000);
-if (await page.locator('.debrief:not([hidden])').count()) {
+if (await page.locator('.debrief-panel').count()) {
   await shot('debrief');
   console.log(
     'DEBRIEF:',
     (
-      await page.evaluate(() => document.querySelector('.debrief:not([hidden])')?.innerText ?? '')
+      await page.evaluate(
+        () =>
+          [...document.querySelectorAll('.debrief-panel')].find(
+            (el) => getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().width > 0,
+          )?.innerText ?? '',
+      )
     ).replace(/\s+/g, ' '),
   );
 }

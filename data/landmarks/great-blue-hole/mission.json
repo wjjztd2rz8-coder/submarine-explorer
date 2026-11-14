@@ -25,7 +25,7 @@
     "heading_deg": 270
   },
   "briefing": {
-    "summary": "Scan the two stalactite galleries inside the Great Blue Hole. Optional surveys of the reef's eastern and western edges lie several kilometres away across the shallow Lighthouse Reef platform.",
+    "summary": "Scan a stalactite gallery, descend through the lower chamber, then survey the eastern gallery. Optional surveys of the reef's outer edges lie several kilometres away.",
     "depth_m": 125,
     "facts": [
       "The Great Blue Hole is about 320 m across and 125 m deep, inside the shallow Lighthouse Reef lagoon.",
@@ -48,6 +48,14 @@
       "primary": true,
       "title": "Scan the stalactite gallery",
       "hint": "Face the nearby limestone alcove inside the hole."
+    },
+    {
+      "id": "lower-chamber",
+      "type": "scan",
+      "poi": "great-blue-hole-lower-chamber",
+      "primary": true,
+      "title": "Survey the lower chamber",
+      "hint": "Descend into the open centre of the hole."
     },
     {
       "id": "stalactites-east",

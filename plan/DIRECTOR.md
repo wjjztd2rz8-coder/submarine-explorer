@@ -28,19 +28,29 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
 - The old automation is off: systemd timers `subexp-resume` and `subexp-tick` are disabled,
   and old Codex briefs 196-200 are in `.cache/codex/hold/`. Leave them off.
 
-### Played results so far (scripted player, desktop 1280x720)
+### Played results (scripted player, desktop 1280x720, build `2762130c`, 240 s per site)
 
-| Site        | First reveal | Outcome                                                                        |
-| ----------- | ------------ | ------------------------------------------------------------------------------ |
-| Titanic     | 12 s         | 6 finds by 190 s; good reveal framing on the bow                               |
-| Lost City   | 6 s          | 4 of 4 by 95 s, debrief opens; reveal framing poor on slope                    |
-| Beebe       | 12 s         | 3 of 3 by 59 s; two finds show the same fact                                   |
-| Blue Hole   | 9 s          | **stalls**: sub stuck against the wall at 27 m, view confusing                 |
-| Monterey    | 16 s         | **stalls**: next target is 300 m deeper; sub stops near 919 m                  |
-| Other eight | not played   | Bismarck, Endurance, Challenger, Axial, Hunga, Hudson, Blake, Kama'ehuakanaloa |
+| Site                | Found  | Outcome                                              |
+| ------------------- | ------ | ---------------------------------------------------- |
+| Lost City           | 4 of 4 | debrief at 97 s                                      |
+| Beebe               | 3 of 3 | debrief at 87 s                                      |
+| Endurance           | 4 of 4 | debrief at 127 s                                     |
+| Challenger Deep     | 2 of 5 | debrief at 91 s, "Dive complete" over "Found 2 of 5" |
+| Titanic             | 5 of 7 | never ends; contact 591 m away at 213 s              |
+| Bismarck            | 2 of 3 | landmarks by 33 s, then circles a contact 900 m away |
+| Kama'ehuakanaloa    | 2 of 3 | same, contact 692 m away                             |
+| Blake Plateau       | 3 of 4 | same, contact 409 m away                             |
+| Axial               | 3 of 4 | stuck from 53 s on "Go up 95 m"                      |
+| Hunga               | 1 of 3 | stuck from 22 s; next target 155 m up a slope        |
+| Hudson Canyon       | 1 of 3 | stuck from 32 s; next target stays 600 m away        |
+| Blue Hole, Monterey | n/a    | stall (earlier runs); F-vertical is on them          |
 
-Touch: `tools/playtest/touch-drive.mjs` completed two scans in both phone orientations on the
-pre-merge build (first scan about 13 s). Not re-run on the new build.
+`tour.mjs` never detects the debrief (`allDoneAt` always null): read endings from the last
+log line (HUD fields blank means the debrief is open) until a delegate's fix lands.
+
+Touch (`touch-drive.mjs`, Lost City, 390x844 and 844x390, same build): **0 scans in 150 s in
+both orientations**. The sub stops 85 m from the objective under "Hold SCAN" and no scan
+starts. Game bug or stale script is not yet known; F-touch is finding out.
 
 ## In flight
 
@@ -52,8 +62,14 @@ A branch is finished when it has a commit ahead of the commit it started from.
    `data/landmarks/*/pois.json`. Contact sheets go to `.cache/sprint/reveals-final/index.html`.
 2. **F-vertical** (Cursor, GPT-5.6 Sol): backlog item 3, reports to the second thread. Owns
    the Blue Hole and Monterey site data and `tools/playtest/tour.mjs`.
-3. **Tour table**: `.cache/sprint/tour-all.sh <sites...>` plays sites two at a time on the
-   build in `.cache/sprint/play-dist` and writes `.cache/sprint/tour/table.txt`.
+3. **F-endings** (Claude Opus 5.5): backlog item 4's fix. Nine sites must end on the debrief
+   in 2 to 5 minutes with 4 to 6 reachable discoveries, an honest N of N count, an obvious
+   finish control after both landmarks, and homing that closes on far contacts.
+4. **F-touch** (Cursor, GPT-5.6 Sol): backlog item 5. Why touch scanning fails, the fix, and
+   a SCAN button that shows when a scan is possible.
+
+`.cache/sprint/tour-all.sh <sites...>` replays sites two at a time on the build in
+`.cache/sprint/play-dist` and writes `.cache/sprint/tour/table.txt`.
 
 ## Backlog, in order
 

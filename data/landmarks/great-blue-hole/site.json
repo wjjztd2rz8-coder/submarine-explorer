@@ -11,12 +11,12 @@
     "mission": {
       "rangeM": 125,
       "chaseRadius": 54,
-      "chaseOffsetX": 36,
+      "chaseOffsetX": 24,
       "openingDepthM": 44,
-      "chaseOffsetY": -66,
+      "chaseOffsetY": 0,
       "localAltitudeWeight": -0.1,
       "destinationLabel": "the stalactite gallery",
-      "yawOffset": -20
+      "yawOffset": 0
     },
     "freeDive": {
       "hero": "karst-grotto",
