@@ -11,7 +11,7 @@ import type { GameContext } from '../../src/app/context.js';
 import { dailyDive } from '../../src/game/Daily.js';
 import { DiscoveryStore, DISCOVERY_STORAGE_KEY } from '../../src/game/DiscoveryStore.js';
 import { Progress } from '../../src/game/Progress.js';
-import { Scanner } from '../../src/game/Scanner.js';
+import { resolveScanRadius, Scanner } from '../../src/game/Scanner.js';
 import * as Secrets from '../../src/game/Secrets.js';
 import type { ExplorationSummary } from '../../src/ui/Debrief.js';
 import type { Samples } from '../../src/game/Samples.js';
@@ -363,6 +363,7 @@ it.each([false, true])(
           guide: 'J',
         },
         false,
+        'Logged in the Journal.',
       );
       expect(secretFound).toHaveBeenCalledTimes(1);
       expect(scanner.view.completed).toBe(3);
@@ -425,6 +426,7 @@ it.each([false, true])(
           guide: 'J',
         },
         false,
+        'Logged in the Journal.',
       );
       expect(summary()).toEqual({
         found: 1,
@@ -540,7 +542,9 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
         expect(sub.position.equals(before)).toBe(true);
         expect(sub.getState().hullClass).toBe(hull);
         expect(ctx.effective.speedName).toBe(mode === 'arcade' ? 'fast' : 'research');
-        expect(poi.radius).toBe(100 * ctx.effective.sensor.scanRadiusMultiplier);
+        expect(poi.radius).toBe(
+          resolveScanRadius(100 * ctx.effective.sensor.scanRadiusMultiplier, ctx.effective.scan),
+        );
         const state = input.sample();
         expect(state).toMatchObject({
           throttle: 1,

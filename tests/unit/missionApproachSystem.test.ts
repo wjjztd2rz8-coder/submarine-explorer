@@ -57,7 +57,11 @@ function fixture(mode: 'arcade' | 'realistic', dataRadius: number) {
     app: { state: 'dive' },
     route: { landmarkId: 'titanic', missionId: 'titanic', tileId: 'titanic', def },
     params: new URLSearchParams(),
-    discovery: { pois: [target] },
+    discovery: {
+      pois: [target],
+      ready: Promise.resolve(),
+      store: { isDiscovered: () => false, record: vi.fn() },
+    },
     meta: JSON.parse(readFileSync('data/tiles/titanic/meta.json', 'utf8')),
     terrain,
     config,
@@ -73,6 +77,7 @@ function fixture(mode: 'arcade' | 'realistic', dataRadius: number) {
     input: {},
     save: { get: () => settings },
     settingsScreen: {},
+    progress: { snapshot: () => ({ awarded: [] }) },
     expose: () => {},
   } as unknown as GameContext;
   missionSystem.init!(ctx);
@@ -88,7 +93,9 @@ for (const mode of ['arcade', 'realistic'] as const) {
       const approachRadius = Math.min(dataRadius, 80, (MISSION_APPROACH_M.titanic - 60) / 2);
       const multiplier = ctx.effective.sensor.scanRadiusMultiplier;
       expect(target.radius).toBe(
-        Math.max(mode === 'arcade' ? 100 : 0, approachRadius * multiplier),
+        mode === 'arcade'
+          ? Math.min(120, Math.max(100, approachRadius * multiplier))
+          : approachRadius * multiplier,
       );
       expect(ctx.baseScanRadii.get(target.id)).toBe(approachRadius);
       const draw = () =>
@@ -108,7 +115,11 @@ for (const mode of ['arcade', 'realistic'] as const) {
       expect(first.hint).toBe(def.objectives[0].hint);
       ctx.applyMissionStart!('surface');
       draw();
-      expect(target.radius).toBe(Math.max(mode === 'arcade' ? 100 : 0, dataRadius * multiplier));
+      expect(target.radius).toBe(
+        mode === 'arcade'
+          ? Math.min(120, Math.max(100, dataRadius * multiplier))
+          : dataRadius * multiplier,
+      );
       expect(ctx.baseScanRadii.get(target.id)).toBe(dataRadius);
       expect(first.title).toBe('Scan the bow');
       const surface = missionStartPose(def, 'surface', [target], ctx.meta, terrain, config);
