@@ -444,3 +444,7 @@ Playwright traces record on first retry; hosted CI uses zero retries, so red sha
 ## 2026-11-13 stale specs hid behind smoke merges
 
 - Three red hosted runs came from UI packages (38, 40, 41) merged on smoke gates; their copy/structure changes broke journal-debrief, f-title-layout, d2-predive and phone-accept specs. Rule restated: a package that changes player-visible text, classes or layout must update the specs that reference them (grep tests/e2e for the old text) and run `--full-e2e` or those spec files before merge; the orchestrator rejects it otherwise.
+
+## 2026-11-14 empty Claude backlog and stale queued brief
+
+- Claude sat idle ~9-17 h/24 h because the visual backlog was empty after item 43 (lane starvation, not budget). The review refilled items 44-49. Brief 199 (item 30) stayed queued after R-ci-red fixed the same flakes; moved to hold and replaced by brief 200 (item 50). Rule: when a Claude package fixes a Codex-lane item, move its queued brief to hold in the same merge.

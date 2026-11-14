@@ -1,5 +1,16 @@
 # Reviews
 
+## 2026-11-14 (PM) comprehensive review (Claude alone; Sol skipped, Codex weekly 3%)
+
+- **Trigger and changed since the AM review:** release tag f79 (hosted CI and Pages green). Merged since: items 38-43 (Home first screen, first-dive hints, Journal phone layout, debrief stars, Titanic bow, Beebe framing) and the CI-red fixes. Golden `2026-11-14-124525` (45 PNGs, complete).
+- **Stage:** about 87% to 1.0; about 4 weeks (3.5-5). Not agreed with Sol (no Codex budget); Codex resets Sun Nov 15 23:00, so his view comes at the next review.
+- **Opening scores (mine, from the new images):** Titanic 4.0 (was 3.7; bow, scour pit and rail read, hull still saturated brown), Beebe 4.0 (was 3.7; stack and plume now the subject), Lost City 4.0 (towers and talus read, far hillside dark, upper band flat), Blue Hole 3.8 (unchanged; sub overlaps wall edge, gallery small), Monterey 3.8 (waiver; strata wall reads), Bismarck 3.3 (floating slab with holes on a dark plain, the weakest site).
+- **Biggest gaps:** (1) Bismarck form; (2) flat dark upper band still on Titanic, Lost City and Bismarck (item 24 made no visible difference); (3) items 38-41 UI were never screenshot-reviewed; (4) phone retest by the owner.
+- **Play flow:** not re-captured this run; the 11-13 findings (16) are fixed by 38-41 on smoke gates only. Item 48 re-captures them with fresh eyes.
+- **Process:** `efficiency.sh`: Claude idle ~9-17 h/24 h was lane starvation (backlog empty since item 43), now refilled; Claude weekly 62% at ~22%/day with 5 days to reset is on pace. Codex weekly 3%, briefs paced to the reset. Stale brief 199 (item 30 already fixed by R-ci-red) moved to hold; brief 200 added to verify UI specs for items 38-43. Hosted CI green on f79.
+- **New priorities:** 48 (Haiku), then 44 Bismarck, 45 Blue Hole, 46 upper band, 47 Titanic tone, 49 Lost City hillside. Codex: 196, 197, 198, 200.
+- **Needs owner:** phone retest; Monterey waiver in the 1.0 definition.
+
 ## 2026-11-14 targeted review 2 (red CI, fixed)
 
 - Read the failing shard logs (3, 8, 32, 33 of 38) on runs ef33506e and d2b98e08: one cause in all four, the landscape-phone `journey 844x390` spec in journal-debrief. It asserted the debrief panel scrolls (`scrollTop > 0`), but the R-ci-red layout fix made that debrief fit without scrolling, so the assertion went stale. The assertion is removed; reachability of the buttons is still tested.
