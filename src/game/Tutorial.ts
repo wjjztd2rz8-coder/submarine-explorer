@@ -239,7 +239,7 @@ export function tutorialText(
       if (scanProgress !== null)
         return `Scanning… ${Math.round(Math.max(0, Math.min(1, scanProgress)) * 100)}% · keep holding ${device === 'touch' ? 'SCAN' : k.scan}.`;
       // A dropped beam says why, in the scan card's words, instead of the generic hold line.
-      if (dropReason === 'facing') return 'BEAM OFF TARGET';
+      if (dropReason === 'facing') return 'Turn toward the marker';
       if (dropReason === 'released')
         return `HOLD ${device === 'touch' ? 'SCAN' : k.scan} TO RESUME`;
       if (scanDistanceM !== undefined) return `Get closer to scan · ${scanDistanceM.toFixed(0)} m`;

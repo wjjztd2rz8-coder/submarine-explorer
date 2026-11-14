@@ -246,9 +246,9 @@ test.describe('B3 mission flow', () => {
     ).toBeLessThan(2);
     expect(opening.range).toBeGreaterThanOrEqual(40);
     expect(opening.range).toBeLessThan(700);
-    // The turn cue replaces the distance while the target is off the bow (by design).
+    // Off-axis targets show plain steering directions alongside the distance.
     await expect(page.locator('.guidance-hint')).toContainText(
-      new RegExp(`TURN (\\d+° (PORT|STARBOARD)|LEFT|RIGHT)|${Math.round(opening.range)} m`),
+      new RegExp(`Turn (left|right|around)|${Math.round(opening.range)} m`),
     );
 
     // Now it simulates: flooding the tanks takes the boat down.

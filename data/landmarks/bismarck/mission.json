@@ -25,7 +25,7 @@
     "heading_deg": 225
   },
   "briefing": {
-    "summary": "Dive to the battleship Bismarck on the flank of an extinct seamount. Scan the upright main hull and the detached gun turrets higher on the slope, then inspect the hull for battle damage.",
+    "summary": "Dive to the battleship Bismarck on the flank of an extinct seamount. Scan the upright main hull, then inspect the nearby battle damage. The detached gun turrets remain an optional find higher on the slope.",
     "depth_m": 4219,
     "facts": [
       "Bismarck sank on 27 May 1941 after a pursuit by the Royal Navy. Robert Ballard’s team found the wreck in June 1989.",
@@ -51,18 +51,10 @@
       "hint": "Find the upright hull on the seamount's southeastern flank, around 4,210 m."
     },
     {
-      "id": "turrets",
-      "type": "scan",
-      "poi": "bismarck-turret-debris",
-      "primary": true,
-      "title": "Survey the detached turrets",
-      "hint": "Head east and upslope from the hull to the turrets, around 4,120 m."
-    },
-    {
       "id": "damage",
       "type": "scan",
       "poi": "bismarck-damage",
-      "primary": false,
+      "primary": true,
       "title": "Inspect the battle damage",
       "hint": "Inspect the battle-damage marker near the main hull, around 4,210 m."
     }

@@ -185,7 +185,7 @@ function powerFixture() {
     discovery: {
       ready: Promise.resolve(),
       pois: [],
-      scanner: { setConfig: vi.fn() },
+      scanner: { setConfig: vi.fn(), nearestUnscannedFixedDistance: () => Infinity },
       guide: { isOpen: false },
       debrief,
       showDebrief,

@@ -190,10 +190,12 @@ export class Scanner {
     this.objectiveSource = poiId;
   }
   private sinceProgressEmit = Infinity;
-  private readonly cosCone: number;
+  private cosCone: number;
+  private rejected: string | null = null;
 
   setConfig(config: ScannerConfig): void {
     this.config = config;
+    this.cosCone = Math.cos((config.coneHalfAngleDeg * Math.PI) / 180);
   }
 
   constructor(
@@ -250,6 +252,16 @@ export class Scanner {
     return this.extra;
   }
 
+  /** All placed POIs, regardless of hint range or objective status; excludes wildlife. */
+  nearestUnscannedFixedDistance(position: Vector3): number {
+    let distance = Infinity;
+    for (const target of this.targets) {
+      if (!this.isScanned(target.landmarkId, target.id))
+        distance = Math.min(distance, position.distanceTo(target.position));
+    }
+    return distance;
+  }
+
   getTargets(): readonly ScanTarget[] {
     return this.targets;
   }
@@ -264,6 +276,7 @@ export class Scanner {
 
   /** A new dive may scan a Journal entry again; persistence is unaffected. */
   resetDive(): void {
+    this.rejected = null;
     this.scannedThisDive.clear();
     this.clearActive();
     this.view.completed = 0;
@@ -282,6 +295,10 @@ export class Scanner {
   update(dt: number, position: Vector3, forward: Vector3, scanHeld: boolean): void {
     const v = this.view;
     const held = scanHeld && this.enabled;
+    if (!held) {
+      this.rejected = null;
+      if (v.phase === 'idle') v.lastAbort = null;
+    }
 
     this.updateObjective(position, forward);
 
@@ -417,6 +434,7 @@ export class Scanner {
     v.activeDistance = activeGeo?.distance ?? Infinity;
 
     if (held && candidate) {
+      this.rejected = null;
       if (this.active !== candidate) {
         // Switching to a different target abandons the old one outright.
         if (this.active && v.phase === 'scanning') {
@@ -448,6 +466,25 @@ export class Scanner {
         this.bus.emit('scan:progress', { poiId: candidate.id, progress: v.progress });
       }
       return;
+    }
+
+    // A rejected initial hold needs the same explanation as a dropped beam.
+    // Emit once per target/reason, not once per frame while the button stays down.
+    if (
+      held &&
+      !candidate &&
+      nearest &&
+      nearest.arrivalRadiusM === undefined &&
+      !v.nearestScanned &&
+      v.phase === 'idle'
+    ) {
+      const reason: AbortReason = nearestGeo?.inRange ? 'facing' : 'range';
+      const rejection = `${nearest.id}/${reason}`;
+      v.lastAbort = reason;
+      if (this.rejected !== rejection) this.bus.emit('scan:aborted', { poiId: nearest.id, reason });
+      this.rejected = rejection;
+    } else {
+      this.rejected = null;
     }
 
     // Not scanning this step.
@@ -494,6 +531,7 @@ export class Scanner {
 
   /** Drop any scan in progress without emitting (e.g. after a teleport). */
   cancel(): void {
+    this.rejected = null;
     this.clearActive();
   }
 

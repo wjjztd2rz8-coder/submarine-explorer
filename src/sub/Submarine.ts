@@ -100,7 +100,21 @@ const LOCKED_INPUT: InputState = Object.freeze({
   togglePhotoMode: false,
 }) as InputState;
 
+/** Linear proximity cap, resolved without modifying the effective config. */
+export function surveySpeedScale(config: SubmarineConfig, distance: number): number {
+  if (!config.surveySpeedEnabled || !Number.isFinite(distance)) return 1;
+  const nearScale = Math.min(1, config.surveyMaxSpeed / config.maxSpeed);
+  const t = clamp((distance - config.surveyNearM) / (config.surveyFarM - config.surveyNearM), 0, 1);
+  return nearScale + (1 - nearScale) * t;
+}
+
 export class Submarine {
+  private surveyDistance = Infinity;
+
+  setSurveyDistance(distance: number): void {
+    this.surveyDistance = distance;
+  }
+
   readonly position = new THREE.Vector3();
   readonly velocity = new THREE.Vector3();
   yaw = 0;
@@ -347,15 +361,17 @@ export class Submarine {
     v.addScaledVector(a, dt);
     // Horizontal and ballast limits are independent: pitch cannot turn
     // the forward cap into an unsafe descent rate.
-    v.y = clamp(v.y, -c.maxVerticalSpeed, c.maxVerticalSpeed);
+    const surveyScale = surveySpeedScale(c, this.surveyDistance);
+    const maxSpeed = c.maxSpeed * surveyScale;
+    v.y = clamp(v.y, -c.maxVerticalSpeed * surveyScale, c.maxVerticalSpeed * surveyScale);
     const horizontalSpeed = Math.hypot(v.x, v.z);
-    if (horizontalSpeed > c.maxSpeed) {
-      const scale = c.maxSpeed / horizontalSpeed;
+    if (horizontalSpeed > maxSpeed) {
+      const scale = maxSpeed / horizontalSpeed;
       v.x *= scale;
       v.z *= scale;
     }
     const totalSpeed = v.length();
-    if (totalSpeed > c.maxSpeed) v.multiplyScalar(c.maxSpeed / totalSpeed);
+    if (totalSpeed > maxSpeed) v.multiplyScalar(maxSpeed / totalSpeed);
     this.position.addScaledVector(v, dt);
 
     // --- constraints --------------------------------------------------------

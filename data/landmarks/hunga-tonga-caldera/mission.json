@@ -45,14 +45,6 @@
       "primary": true,
       "title": "Survey the nearby volcanic flank",
       "hint": "Follow the volcanic flank east-northeast from the rim-slope scan, near 293 m."
-    },
-    {
-      "id": "caldera-floor",
-      "type": "scan",
-      "poi": "hunga-tonga-caldera-floor",
-      "primary": false,
-      "title": "Survey the pre-2022 basin",
-      "hint": "Optional longer survey: look east of the inner wall for the broad caldera basin, near 130 m."
     }
   ],
   "completion": "all_primary"

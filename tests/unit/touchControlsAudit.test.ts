@@ -760,7 +760,7 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
     expect(name.textContent).toBe('Stern section');
-    expect(hint.textContent).toBe('TURN 40° STARBOARD');
+    expect(hint.textContent).toBe('Turn right · 692 m');
     // In scan range the card changes to an aim cue for the same target.
     view.objectiveInRange = true;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
@@ -771,7 +771,7 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
     expect(name.textContent).toBe('Stern section');
-    expect(hint.textContent).toBe('TURN RIGHT');
+    expect(hint.textContent).toBe('Turn right · 692 m');
     view.objectiveTurnDeg = 3;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(hint.textContent).toBe('Get closer to scan · 692 m');
@@ -790,7 +790,7 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     view.objectiveId = null;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(name.textContent).toBe('Debris field');
-    expect(hint.textContent).toBe('TURN LEFT');
+    expect(hint.textContent).toBe('Turn toward the marker · Turn around');
   } finally {
     overlay.dispose();
     f.controls.dispose();

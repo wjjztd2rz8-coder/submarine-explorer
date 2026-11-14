@@ -56,30 +56,6 @@
       "primary": true,
       "title": "Drop to the canyon floor",
       "hint": "Descend south from the wall to the canyon axis, around 1,000 m."
-    },
-    {
-      "id": "upper-channel",
-      "type": "scan",
-      "poi": "monterey-canyon-upper-channel",
-      "primary": false,
-      "title": "Follow the upper channel",
-      "hint": "Optional: follow the channel about 15 km east toward Moss Landing, rising to around 265 m."
-    },
-    {
-      "id": "canyon-head",
-      "type": "scan",
-      "poi": "monterey-canyon-head",
-      "primary": false,
-      "title": "Scan the canyon head",
-      "hint": "Continue east to the shallow canyon head off Moss Landing, around 45 m."
-    },
-    {
-      "id": "mars-node",
-      "type": "scan",
-      "poi": "mbari-mars-node",
-      "primary": false,
-      "title": "Find the MARS observatory node",
-      "hint": "Travel far west from the canyon head to the MARS node, near 890 m."
     }
   ],
   "completion": "all_primary"
