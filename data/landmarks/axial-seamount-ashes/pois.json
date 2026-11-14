@@ -53,9 +53,7 @@
       "guide_entry": "minor-chimneys",
       "confidence": "low",
       "reconstruction": true,
-      "sources": [
-        "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"
-      ],
+      "sources": ["https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"],
       "note": "Hell, Phoenix and Virgin are documented ASHES chimneys, generally under 4 m tall. Virgin Mound is a separate sub-metre anhydrite spire. This smaller-chimney marker's grouping and offset are authored choices; UW describes most field activity within an area about 60-80 m across."
     },
     {
@@ -90,9 +88,7 @@
       "guide_entry": "vent-life",
       "confidence": "medium",
       "reconstruction": true,
-      "sources": [
-        "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"
-      ],
+      "sources": ["https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"],
       "note": "GMRT terrain at about 1,540 m, about 80 m east-southeast of Mushroom, inside the area about 60-80 m across where UW describes most ASHES activity. Added 2026-11 as a route stop for the guide's vent-life entry; the marker stands for the field's animal communities, not one surveyed colony."
     }
   ]

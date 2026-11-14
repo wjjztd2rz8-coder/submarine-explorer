@@ -34,9 +34,7 @@
       "guide_entry": "eastern-floor",
       "confidence": "high",
       "reconstruction": false,
-      "sources": [
-        "https://www.gmrt.org/"
-      ],
+      "sources": ["https://www.gmrt.org/"],
       "note": "Real GMRT terrain: 10920.5 m deep at the centre of row 460, column 452 (zero-based) in data/tiles/challenger-deep/heightmap.bin. This second floor scan lies about 350 m north-east of the Leggo bait-station site (moved 2026-11 from 817 m north so the dive is a short route). The shipped GMRT grid reads about 10,920 m here. It is a terrain survey point chosen for this dive, not the position of another lander deployment. No prop or staged encounter is added."
     },
     {

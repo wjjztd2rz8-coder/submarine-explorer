@@ -34,9 +34,7 @@
       "guide_entry": "wall-transect",
       "confidence": "high",
       "reconstruction": false,
-      "sources": [
-        "https://www.gmrt.org/"
-      ],
+      "sources": ["https://www.gmrt.org/"],
       "note": "Real GMRT terrain: 947.2 m deep at the centre of row 432, column 947 (zero-based) in data/tiles/hudson-canyon/heightmap.bin. This terrain survey is about 280 m north of the coral-habitat ledge marker (moved 2026-11 from 555 m north-west so the dive is a short route). The GMRT grid reads about 947 m here, compared with about 942 m at the ledge marker. The nearby pair samples the surveyed canyon flank. This point was chosen from the terrain grid for the dive; it does not mark a documented coral colony."
     },
     {
@@ -52,10 +50,7 @@
       "guide_entry": "canyon-wall",
       "confidence": "high",
       "reconstruction": false,
-      "sources": [
-        "https://www.gmrt.org/",
-        "https://www.mafmc.org/actions/hudson-canyon"
-      ],
+      "sources": ["https://www.gmrt.org/", "https://www.mafmc.org/actions/hudson-canyon"],
       "note": "Real GMRT terrain (Ryan et al. 2009; value and slope read directly from this tile's grid this session): 541.9 m deep, on a locally steep flank of the upper canyon's north wall. Central-difference slope sampling over one grid cell (~50-60 m) gives roughly 18-19 deg here -- steep for this ~50 m grid, and the true wall relief (rock outcrops and ledges per MAFMC's habitat description) is almost certainly sharper than this coarse sampling can resolve."
     },
     {
@@ -71,9 +66,7 @@
       "guide_entry": "axis-floor",
       "confidence": "medium",
       "reconstruction": false,
-      "sources": [
-        "https://www.gmrt.org/"
-      ],
+      "sources": ["https://www.gmrt.org/"],
       "note": "Real GMRT terrain at about 994 m, east of the flank transect where the seabed falls toward the canyon's axis. Added 2026-11 as a route stop for the guide's 'Down the axis' entry; the entry's depth figures come from the north-wall, upper-floor and deepest-cell readings, not from this point."
     },
     {
@@ -89,9 +82,7 @@
       "guide_entry": "sanctuary",
       "confidence": "medium",
       "reconstruction": true,
-      "sources": [
-        "https://sanctuaries.noaa.gov/hudson-canyon/"
-      ],
+      "sources": ["https://sanctuaries.noaa.gov/hudson-canyon/"],
       "note": "GMRT terrain at about 1,008 m on the canyon flank. Hudson Canyon is the area NOAA proposes for a national marine sanctuary; no boundary is designated, so this marker stands for the canyon as a whole, not a boundary point. Added 2026-11 as a route stop."
     }
   ]
