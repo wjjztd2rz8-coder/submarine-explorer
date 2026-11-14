@@ -152,6 +152,13 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 36. **DONE 2026-11-13 (merge, ~3.5-4, mound grades into seabed; Hudson not re-shot) V-blake-pad-coherence [Sonnet, Sol 2026-11-13]:** Blake coral pads look disconnected from the seabed (`blake-plateau-corals-1-mission.png`); blend bases generically before declaring eight sites coherent.
 37. **T-low-axial-floor [Codex, Sol 2026-11-13]:** Low lacks Axial's new flow shader; verify Low-tier floor readability by unit/shot evidence.
 
+38. **U-home-first-screen [Sonnet, review 2026-11-14, findings 1-6 of `plan/progress/U-play-flow-recheck.md`]:** Home and briefing are jargon-heavy for a casual one-off player. Target: one obvious primary button with a plain depth hint ("Titanic, 3,800 m, a good first dive"), "Rated to X m" reworded as "Safe to X m", one back label everywhere, mode helper text that says what changes. Net fewer words; touch shows no key names.
+39. **U-first-dive-hints [Sonnet, findings 7-10]:** unlabelled joystick, RISE/SINK, SONAR/LIGHTS and SCAN on first dive; compass-degree toasts. Target: one-time short labels on first dive only (reuse the existing guidance surface, no new one), toasts that say "turn left/right" not degrees on touch.
+40. **U-journal-phone-layout [Sonnet, findings 11-12, 15-16]:** Journal entry is a text wall on a phone and a stray translucent box overlaps the art and body text; settings text bleeds through its panel. Target: lead paragraph plus collapsed details/sources, and fix the overlay at its cause (find the element; no patch).
+41. **U-debrief-stars [Haiku, finding 13-14]:** say what the stars mean in one line and make the debrief CTA consistent with the briefing.
+42. **V-titanic-bow-form [Sonnet, review 2026-11-14]:** Titanic mission opening (~3.7) reads as a long brown box on pale sand with scattered plates; the hull is a flat-sided slab. Target composition: bow rising from a scour pit with a visible bow-rail and anchor-recess silhouette, plates concentrated in a debris trail not sprinkled. Per-site profile data plus the shared builder.
+43. **V-beebe-opening-framing [Sonnet, review 2026-11-14]:** Beebe mission opening (~3.7) has the sub filling the lower third and the smokers small and far (155 m). Target: sub smaller in frame or camera lifted so the main stack and plume read as the subject; check Low tier.
+
 ### Release and owner
 
 16. **P2-phone-accept [owner + Codex]:** checklist in `plan/progress/4410-P2-phone-accept-checklist.md`; owner runs it on the current build.

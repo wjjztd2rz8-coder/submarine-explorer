@@ -1,5 +1,15 @@
 # Reviews
 
+## 2026-11-14 comprehensive review (Claude alone; Sol skipped, Codex weekly 4%)
+
+- **Changed since 2026-11-13:** Claude visual items 31-36 merged (Blue Hole lower frame, Hunga silhouette, Challenger floor, Lost City talus, Blake pad blend); hosted CI green on 7024d9f6 and f78 tagged; Codex bug hunts all merged. Golden `2026-11-14-001527`: 0/13 openings flagged by the readability check.
+- **Stage:** about 86% to 1.0; about 4 weeks (range 3.5-5). Not agreed with Sol (no Codex budget); next review should get his view.
+- **Opening scores (mine, from the new images):** Titanic 3.7 (long brown box on pale sand, plates sprinkled), Lost City 3.8 (towers and pale talus read, far hillside dark), Blue Hole 3.8 (gallery readable, sub still touches its edge), Beebe 3.7 (sub fills the lower third, smokers small), Challenger 3.7 (lander + glow reads in 3 s, floor blotchy), Monterey ~3.8 (waiver). Whole-site scores are lower, as Sol argued on 11-13.
+- **Biggest gaps:** (1) first-session clarity: 16 findings from U-play-flow-recheck (jargon, unlabelled controls, text-wall Journal, a stray translucent box over Journal art, unexplained stars); (2) phone Low-tier retest by owner; (3) hero whole-site realism; (4) Titanic and Beebe opening composition.
+- **Process:** `efficiency.sh`: Claude idle 15-30 h/24 h is budget-gated (480 gate skips), Codex weekly 4% with 6%/day burn, briefs 196-199 queued and paced until the Sun Nov 15 23:00 reset. CI is green again after the 11-13 test fixes. Old worktrees 124/131 still hold uncommitted changes (held R-ci-speed work); left untouched.
+- **New priorities:** Claude items 38-43 (Home, first-dive hints, Journal phone layout, debrief stars, Titanic bow, Beebe framing); first-session items lead because they outrank dark-water polish.
+- **Needs owner:** phone retest; Monterey waiver in the 1.0 definition.
+
 ## 2026-11-13 targeted review (red CI x3, fixed on main)
 
 - Hosted CI has been red for days, and earlier targeted reviews logged "no change". This time I read the failures. Shards 20 and 32 failed on all three runs; shard 8 failed only on the latest. They are three separate causes, not hosted-timing flake.

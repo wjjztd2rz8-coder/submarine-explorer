@@ -1,6 +1,6 @@
-# Status (2026-11-13 comprehensive review, joint Claude + Sol)
+# Status (2026-11-14 comprehensive review, Claude alone)
 
-**Stage:** about 85% to 1.0; 4-5 weeks (plan 4-6). Hunga opening fixed (3.5-4); worst openings now Bismarck, Challenger, Blake (~3-3.5); hosted CI still red (brief 180). **f76** is the newest tag; current main is untagged until hosted CI is green.
+**Stage:** about 86% to 1.0; about 4 weeks (3.5-5). Hosted CI is green and f78 is tagged. Hunga opening fixed (3.5-4); worst openings now Bismarck, Challenger, Blake (~3-3.5); hosted CI still red (brief 180). **f76** is the newest tag; current main is untagged until hosted CI is green.
 
 ## 1.0 table
 
@@ -25,7 +25,11 @@ Claude queue: Hunga slab, Challenger lander presence, deep upper frame, Axial fl
 
 CI green, Beebe stacks, Lost City tube forms, Blue Hole hero apron, Bismarck readability, phone landscape HUD, phone and unaided onboarding evidence. Claude weekly budget (about 1 package a day) is the pacing limit; Codex has three briefs queued.
 
-## Latest review (2026-11-13)
+## Latest review (2026-11-14)
+
+Claude visual backlog refilled: items 38-43 lead with first-session clarity (Home, first-dive hints, Journal phone layout, debrief stars), then Titanic bow and Beebe framing. Openings now ~3.7-3.8; Codex briefs 196-199 wait for the Nov 15 reset.
+
+## Previous review (2026-11-13)
 
 Stage ~85%, 5 weeks central (4-6). Hosted CI red from three test failures (brief 199). New Claude art items 31-36; first-session and Low-phone evidence lead the blockers. Whole-site hero scores: Titanic 3.5, Lost City 3.5, Blue Hole 3, Beebe 3-3.5, Monterey 3 (waived).
 
