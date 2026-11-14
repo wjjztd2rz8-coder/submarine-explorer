@@ -9,7 +9,7 @@
       "lat": 48.15,
       "lon": -16.117,
       "snap_to_seabed": true,
-      "y_offset_m": 3,
+      "y_offset_m": 5,
       "heading_deg": 20,
       "scale": 1,
       "dimensions_m": [251, 36, 19],
@@ -17,7 +17,7 @@
       "lod_distance_m": 1500,
       "collision": "box",
       "reconstruction": true,
-      "note": "Upright main hull with attached bow, missing stern and empty main-battery barbettes, following the 2001 expedition photographs (H.M.S. Hood Association). Published overall vessel length 251 m and beam 36 m set the build envelope; 15 m height and heading 20 degrees are build choices. The model snaps to terrain at the published expedition vicinity, about 4,218.5 m here, with an unresolved ~570 m difference from the real wreck depth. Do not lower the hull beneath unchanged terrain. See sources.md."
+      "note": "Upright main hull with attached bow, missing stern and empty main-battery barbettes, following the 2001 expedition photographs (H.M.S. Hood Association). Published overall vessel length 251 m and beam 36 m set the build envelope; 19 m height (hull envelope), a 5 m lift above the lowest footprint sample so the flanks show, and heading 20 degrees are build choices. The model snaps to terrain at the published expedition vicinity, about 4,218.5 m here, with an unresolved ~570 m difference from the real wreck depth. Do not lower the hull beneath unchanged terrain. See sources.md."
     },
     {
       "id": "turret-debris",
