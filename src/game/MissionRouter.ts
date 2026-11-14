@@ -219,6 +219,7 @@ interface XYZ {
 interface MissionDiscovery {
   readonly ready: Promise<void>;
   readonly pois: ReadonlyArray<{ id: string; name: string; position: XYZ }>;
+  readonly siteName: string;
   readonly stats: { snapshot(extra?: Partial<DebriefStats>): DebriefStats };
   readonly guide: { open(entryId?: string): void; readonly isOpen: boolean };
 }
@@ -508,7 +509,7 @@ export class MissionRouter {
   }
 
   private showDebrief(): void {
-    const { discovery, route } = this.opts;
+    const { discovery } = this.opts;
     const m = this.mission;
     const reason = m.endReason ?? 'surface';
     const primaries = m.primaryCounts();
@@ -517,7 +518,7 @@ export class MissionRouter {
     const stats = discovery.stats.snapshot({
       title,
       subtitle,
-      landmarkName: route.def.title,
+      landmarkName: discovery.siteName,
       objectives: { ...primaries, remaining: open.length === 1 ? open[0]?.title : undefined },
     });
     if (!this.debrief) {

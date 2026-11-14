@@ -2218,6 +2218,7 @@ describe('overlay policies across the app', () => {
         },
         discovery: {
           ready: Promise.resolve(),
+          siteName: 'Reef',
           pois: ['primary', 'optional'].map((id) => ({
             id,
             name: id,
@@ -3575,6 +3576,7 @@ it.each(['Enter', 'button'] as const)(
       },
       discovery: {
         ready,
+        siteName: def.title,
         pois: def.objectives.map((o) => ({
           id: o.poi,
           name: o.title,
@@ -3641,6 +3643,7 @@ it.each([false, true])(
       route: { missionId: def.id, tileId: def.tile, landmarkId: def.landmark, skipBriefing, def },
       discovery: {
         ready,
+        siteName: def.title,
         pois: [],
         guide: { isOpen: false, open: vi.fn() },
         stats: { snapshot: () => stats },

@@ -159,8 +159,8 @@ export class Discovery {
     );
   }
 
-  /** guide.json `title`, else the landmarks.json name, else the folder id. */
-  private guideTitle(): string {
+  /** The site's one name (Journal header, debrief): guide.json `title`, else the landmarks.json name, else the folder id. */
+  get siteName(): string {
     return this.guideDoc?.title ?? this.landmarkName;
   }
 
@@ -288,7 +288,7 @@ export class Discovery {
 
   /** Open the debrief with this session's stats and an optional mission title/subtitle. */
   showDebrief(extra: Partial<DebriefStats> = {}, onEscape?: (() => void) | null): DebriefStats {
-    const stats = this.stats.snapshot({ landmarkName: this.guideTitle(), ...extra });
+    const stats = this.stats.snapshot({ landmarkName: this.siteName, ...extra });
     this.overlay.setSuppressed(true);
     this.debrief.show(stats, undefined, undefined, onEscape);
     return stats;

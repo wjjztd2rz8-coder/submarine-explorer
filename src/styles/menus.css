@@ -242,10 +242,11 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
 .field-guide {
   z-index: 95;
 }
-/* The Journal covers the menu it was opened from; hide that menu so it cannot ghost through. */
+/* The Journal covers the menu it was opened from. The menu leaves layout, not just sight:
+   a hidden but laid-out menu still paints its button backgrounds as a ghost box over the Journal. */
 body:has(.field-guide:not([hidden])) .home-screen,
 body:has(.field-guide:not([hidden])) .pause-menu {
-  visibility: hidden;
+  display: none;
 }
 
 .pause-credits {
