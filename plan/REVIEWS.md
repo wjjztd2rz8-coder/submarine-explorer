@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-11-14 targeted review 2 (red CI, fixed)
+
+- Read the failing shard logs (3, 8, 32, 33 of 38) on runs ef33506e and d2b98e08: one cause in all four, the landscape-phone `journey 844x390` spec in journal-debrief. It asserted the debrief panel scrolls (`scrollTop > 0`), but the R-ci-red layout fix made that debrief fit without scrolling, so the assertion went stale. The assertion is removed; reachability of the buttons is still tested.
+- Local check was not conclusive: the spec stops earlier on this machine, at the first pause-menu step (line 2666, before the edited lines), which hosted CI passes. Hosted CI on the fix commit is the check; no tag until green. Not diagnosed further.
+- Process: item 43 and earlier merges again went in without the full spec for the touched layout; the rule from 11-13 (run the specs that mention changed UI) is still the fix.
+
 ## 2026-11-13 targeted review: CI red on main for 3 runs
 
 - Cause: items 38/40/41 changed UI copy and structure (Dive again primary, plainer mode text, stars line, transparent secondary home buttons) and merged on smoke gates only, so the full-suite specs went stale unseen across three pushes. Two were real: the stars line pushed the landscape-phone debrief buttons below the fold (fixed in flow.css), and the stars note reused the `debrief-next` class. Also the props-geo smoker unit test timed out on hosted CI (30 s) in every run; it now runs the tier-independent check once (35 s to 4 s).

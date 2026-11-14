@@ -2780,11 +2780,8 @@ freshTest.describe('Home to scan and return journey', () => {
           );
           await contained(debrief.locator('.debrief-panel'));
           await shot('12-debrief-assisted-scan');
+          // The landscape debrief now fits without scrolling; the buttons must stay reachable.
           await debrief.locator('.debrief-panel').evaluate((e) => (e.scrollTop = e.scrollHeight));
-          if (size === '844x390')
-            expect(
-              await debrief.locator('.debrief-panel').evaluate((e) => e.scrollTop),
-            ).toBeGreaterThan(0);
           await act(debrief.locator('[data-action="keep-exploring"]'), touch);
           await pause(page, touch);
           await act(page.locator('.pause-surface'), touch);
