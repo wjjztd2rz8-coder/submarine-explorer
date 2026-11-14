@@ -36,7 +36,11 @@ export function createTouchSystem(): GameSystem {
     },
     frame: {
       'late.input': (f, ctx) => {
-        touch?.update(!f.frozen && ctx.app.state === 'dive', ctx.photoMode.active);
+        touch?.update(
+          !f.frozen && ctx.app.state === 'dive',
+          ctx.photoMode.active,
+          ctx.discovery.scanner.view.candidateId !== null,
+        );
       },
     },
     dispose() {

@@ -175,6 +175,26 @@
   grid-row: 2 / span 2;
   font-size: calc(14 * var(--tc-s));
 }
+.tc-btn-scan.is-ready:not(.is-held) {
+  border-color: rgba(214, 246, 248, 0.92);
+  background: rgba(24, 116, 122, 0.62);
+  box-shadow:
+    0 0 0 3px rgba(46, 217, 217, 0.2),
+    0 0 18px rgba(46, 217, 217, 0.5);
+  animation: tc-scan-ready 1.4s ease-in-out infinite;
+}
+@keyframes tc-scan-ready {
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(46, 217, 217, 0.08),
+      0 0 24px rgba(46, 217, 217, 0.7);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tc-btn-scan.is-ready {
+    animation: none;
+  }
+}
 
 /* Pause lives in the HUD bar beside Journal (placed by hud-layout.css). */
 /* Pause comes first in the bar, whichever button was added first. */
