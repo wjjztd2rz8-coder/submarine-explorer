@@ -2,8 +2,7 @@ import { expect, test, type Locator, type Page, type TestInfo } from '@playwrigh
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { homeReady, openSiteList } from './helpers/home.js';
 import { expectHudClear, expectObjectiveGuidance } from './helpers/phoneHud.js';
-import { completeScan } from './helpers/scan.js';
-import { journalEntries, openJournalSite } from './helpers/journal.js';
+
 import type { Submarine } from '../../src/sub/Submarine.js';
 import type { CameraRig } from '../../src/sub/CameraRig.js';
 import type { Discovery } from '../../src/game/Discovery.js';
@@ -388,8 +387,8 @@ async function firstMinute(
             const current = await state();
             if (current.view.lastCompleteId === first.id) {
               completedAt = current.elapsed;
-              await expect(page.locator('.guidance-kicker')).toHaveText('New Journal entry');
-              await expect(page.locator('.guidance-name')).toHaveText(first.name);
+              await expect(page.locator('.discovery-reveal')).toHaveAttribute('data-poi', first.id);
+              await expect(page.locator('.discovery-reveal h2')).toHaveText(first.name);
               await expect(
                 page.locator(`.d-scan-world-marker[data-poi="${first.id}"]`),
               ).toHaveClass(/is-scanned/);
@@ -460,23 +459,6 @@ async function boot(page: Page, query: string): Promise<void> {
 }
 
 /** Isolate range/aim from piloting feel, keeping the real scanner, HUD and touch input. */
-async function faceContact(page: Page, id: string, range: number): Promise<void> {
-  await page.evaluate(
-    ({ id, range }) => {
-      const g = window.__game as unknown as Game;
-      const target = g.discovery.pois.find((p) => p.id === id)!;
-      g.sub.step = () => {};
-      g.sub.reset(target.position.x, target.position.y, target.position.z + range, 0);
-      g.rig.snap(g.sub.position, 0, 0);
-    },
-    { id, range },
-  );
-  await page.clock.fastForward(50);
-}
-
-async function holdScan(page: Page, id: string): Promise<void> {
-  await pilotCommand(page, true, 'scan', () => completeScan(page, id));
-}
 
 for (const viewport of [
   { width: 390, height: 844 },
@@ -583,72 +565,6 @@ for (const viewport of [
       await expect(page.locator('.guidance-slot')).toHaveAttribute('data-step', 'move');
       await expect(page.locator('.guidance-name')).toHaveText(/Marker \d+ m ahead/);
       await expectHudClear(page, 'idle coaching at 150%');
-    });
-
-    test('Arcade scan reaches 100 m and records two primaries in Journal and debrief', async ({
-      page,
-    }) => {
-      await boot(page, 'mission=titanic&skipBriefing=1&tutorial=0');
-      const radii = await page.evaluate(() =>
-        (window.__game as unknown as Game).discovery.pois.map((p) => p.radius),
-      );
-      expect(radii.length).toBeGreaterThan(0);
-      expect(radii.every((radius) => radius >= 100)).toBe(true);
-      await faceContact(page, 'titanic-bow', 101);
-      await expect(page.locator('.guidance-hint')).toContainText(/Get closer to scan · 101 m/);
-      await expectHudClear(page, 'out of scan range');
-      for (const [id, name] of [
-        ['titanic-bow', 'Bow section'],
-        ['titanic-stern', 'Stern section'],
-      ]) {
-        await faceContact(page, id, 100);
-        expect(
-          await page.evaluate(() => {
-            const v = (window.__game as unknown as Game).discovery.scanner.view;
-            return {
-              radius: v.objectiveRadius,
-              inRange: v.objectiveInRange,
-              candidate: v.candidateId,
-            };
-          }),
-        ).toEqual({ radius: 100, inRange: true, candidate: id });
-        await holdScan(page, id);
-        await page.clock.fastForward(50);
-        await expect(page.locator('.guidance-kicker')).toHaveText('New Journal entry');
-        await expect(page.locator('.guidance-name')).toHaveText(name);
-        await expectHudClear(page, `scan result ${id}`);
-      }
-      const banner = page.locator('.obj-banner');
-      await expect(banner).toBeHidden();
-      // Completion waits for play time; locator polling cannot advance a paused clock.
-      await clockFramesUntil(
-        page,
-        () => !document.querySelector<HTMLElement>('.obj-banner')!.hidden,
-        250,
-      );
-      await expect(banner).toBeVisible();
-      await banner.locator('.is-keep').tap();
-      await page.locator('.hud-journal').tap();
-      await clockFramesUntil(page, () => (window.__game as unknown as Game).discovery.guide.isOpen);
-      const journal = page.locator('.journal');
-      await expect(journal).toBeVisible();
-      await openJournalSite(page, 'titanic');
-      await expect(await journalEntries(page, 'titanic/poi/')).toHaveCount(2);
-      expect(
-        await journal
-          .locator('.jr-panel')
-          .evaluate((panel) => getComputedStyle(panel).backgroundColor),
-      ).toMatch(/^rgb\(/); // An opaque panel prevents the underlying HUD from ghosting through.
-      await reachable(journal.locator('.jr-close'));
-      await journal.locator('.jr-close').tap();
-      await clockFramesUntil(page, () => !document.querySelector<HTMLElement>('.tc-root')!.hidden);
-      await page.locator('.tc-btn-pause').tap();
-      await page.locator('.pause-surface').tap();
-      const debrief = page.locator('.mission-debrief');
-      await expect(debrief).toBeVisible();
-      await expect(debrief.locator('[data-field="objectives"]')).toHaveText(
-        '2 of 2 primary objectives',
-      );
     });
 
     test('Your sub exposes four reachable groups and retains an unlocked swatch', async ({

@@ -101,7 +101,6 @@ for (const site of [
         expect(entry, poi.id).toBeDefined();
         expect(entry.poiIds).toContain(poi.id);
         // Shared guide entries announce a new entry only on their first unlock.
-        const newEntry = !isEntryUnlocked(journal, entry, discovery.store);
         // Scan each real target in isolation so neighboring targets do not steal it.
         discovery.scanner.setTargets([poi]);
         discovery.scanner.update(
@@ -111,15 +110,7 @@ for (const site of [
           true,
         );
         expect(discovery.scanner.view.lastCompleteId).toBe(poi.id);
-        expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(
-          poi.name,
-          newEntry,
-          {
-            scan: 'G',
-            guide: 'J',
-          },
-          false,
-        );
+        expect(discovery.overlay.showComplete).not.toHaveBeenCalled();
         expect(discovery.guide.focus).toHaveBeenLastCalledWith(entryId);
         expect(isEntryUnlocked(journal, entry, discovery.store)).toBe(true);
         expect(entry.title).toBe(discovery.entries.find((entry) => entry.id === entryId)!.title);
@@ -134,15 +125,7 @@ for (const site of [
         new Vector3(0, 0, -1),
         true,
       );
-      expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(
-        poi.name,
-        false,
-        {
-          scan: 'G',
-          guide: 'J',
-        },
-        false,
-      );
+      expect(discovery.overlay.showComplete).not.toHaveBeenCalled();
       expect(discovery.guide.focus).toHaveBeenLastCalledWith(entryIdForPoi(poi, discovery.entries));
     } finally {
       discovery.dispose();
@@ -196,15 +179,17 @@ it.each([5, 6])(
         if (animal) discovery.onLifeScan(target.name, true, `life/${target.id.slice(5)}`);
         if (animal)
           expect(discovery.guide.focus).toHaveBeenLastCalledWith(`life/${target.id.slice(5)}`);
-        expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(
-          target.name,
-          true,
-          {
-            scan: 'G',
-            guide: 'J',
-          },
-          false,
-        );
+        if (animal)
+          expect(discovery.overlay.showComplete).toHaveBeenLastCalledWith(
+            target.name,
+            true,
+            {
+              scan: 'G',
+              guide: 'J',
+            },
+            false,
+            expect.any(String),
+          );
         // Continuing to hold or releasing/repressing cannot count a discovery twice.
         discovery.scanner.update(0, target.position, new Vector3(0, 0, -1), false);
         discovery.scanner.update(
@@ -282,6 +267,7 @@ it('counts scanned secrets and samples and records the revealed discovery name',
         guide: 'J',
       },
       false,
+      expect.any(String),
     );
   } finally {
     discovery.dispose();

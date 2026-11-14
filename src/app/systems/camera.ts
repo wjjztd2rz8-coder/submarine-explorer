@@ -78,7 +78,7 @@ export const cameraControlsSystem: GameSystem = {
     });
     cleanup.add(
       hud.onResetCamera(() => {
-        if (ctx.app.state === 'dive' && !ctx.photoMode.active) {
+        if (ctx.app.state === 'dive' && !ctx.photoMode.active && !ctx.discovery.reveal?.active) {
           rig.resetView();
         }
       }),

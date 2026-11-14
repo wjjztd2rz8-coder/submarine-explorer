@@ -31,6 +31,14 @@ type PoiKind = (typeof POI_KINDS)[number];
 
 export type Confidence = 'high' | 'medium' | 'low';
 
+export interface RevealSettings {
+  distance_m?: number;
+  elevation_deg?: number;
+  azimuth_deg?: number;
+  sweep_deg?: number;
+  target_offset?: [number, number, number];
+}
+
 /** One entry of `pois.json`, after validation. */
 export interface PoiDef {
   id: string;
@@ -52,6 +60,7 @@ export interface PoiDef {
   /** What the player sees here is a placed prop, not survey data. */
   reconstruction?: boolean;
   sources?: string[];
+  reveal?: RevealSettings;
 }
 
 /** A POI resolved into world space, ready for the {@link Scanner}. */
@@ -143,6 +152,18 @@ export function parsePois(doc: unknown, warn: Warn = defaultWarn): PoiDef[] {
     if (o.reconstruction === true) def.reconstruction = true;
     if (Array.isArray(o.sources)) {
       def.sources = o.sources.filter((s): s is string => typeof s === 'string');
+    }
+    if (typeof o.reveal === 'object' && o.reveal !== null) {
+      const raw = o.reveal as Record<string, unknown>;
+      const reveal: RevealSettings = {};
+      for (const key of ['distance_m', 'elevation_deg', 'azimuth_deg', 'sweep_deg'] as const) {
+        const value = num(raw[key]);
+        if (value !== undefined && (key !== 'distance_m' || value > 0)) reveal[key] = value;
+      }
+      const offset = raw.target_offset;
+      if (Array.isArray(offset) && offset.length === 3 && offset.every((v) => num(v) !== undefined))
+        reveal.target_offset = offset as [number, number, number];
+      def.reveal = reveal;
     }
     out.push(def);
   }

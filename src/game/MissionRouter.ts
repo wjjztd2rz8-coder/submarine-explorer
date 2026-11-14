@@ -217,6 +217,7 @@ interface XYZ {
 
 /** The parts of Discovery the mission uses (Discovery satisfies it). */
 interface MissionDiscovery {
+  reveal?: { readonly active: boolean };
   readonly ready: Promise<void>;
   readonly pois: ReadonlyArray<{ id: string; name: string; position: XYZ }>;
   readonly siteName: string;
@@ -405,6 +406,7 @@ export class MissionRouter {
     _headingDeg: number,
     hull?: MissionHullState,
   ): void {
+    if (this.opts.discovery.reveal?.active) return;
     this.mission.update(dt);
     if (this.blow && hull && !hull.emergencyBlow) this.onBlowComplete();
     this.updateBanner(dt);
