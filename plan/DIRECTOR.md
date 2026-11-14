@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: none. Next in order: 48 (Haiku, evidence), 44, 45, 46, 47, 49.
+- Claude: none. Next in order: 48 (Haiku, evidence), 45, 46, 47, 49.
 
 ## Backlog
 

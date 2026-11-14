@@ -4098,3 +4098,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Comprehensive review (Claude alone; Sol skipped, Codex weekly 3%): golden 2026-11-14-124525; openings Titanic 4.0, Beebe 4.0, Lost City 4.0, Blue Hole 3.8, Monterey 3.8, Bismarck 3.3. Stage ~87%. Backlog refilled (items 44-50), done items archived, REVIEWS/STATUS pushed (54a3f3ba). Stale brief 199 moved to hold; brief 200 queued (4 queued).
 - Item 44 V-bismarck-hull-form launched (Sonnet) in worktree ../subexp-wt/V-bismarck-hull-form; unfinished when this run exited. Next run: collect it when plan/progress/V-bismarck-hull-form.md exists (gates, judge screenshots, merge).
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-14 09:02 CST headless run (Claude): collect item 44
+
+- Merged item 44 V-bismarck-hull-form (Sonnet, f2c4773f): data only (hull lifted 5 m and taller, deeper paler scour, moat shade removed). Agent rated ~3.8; I judged the opening myself at ~3.5: hull now reads as a ship in a scour ring, but still dark on dark, no lit pool. Smoke + project-base gates green on branch and main; not full-e2e'd. Worktree to remove. Next: 48, 45, 46, 47, 49.
+- Process: backgrounded gate watchers using pgrep -f matched themselves and never ended; poll the PID or log instead.
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
