@@ -377,18 +377,24 @@ export class ScanOverlay {
         view.objectiveDistance <= view.objectiveRadius
           ? 'DIVE DEEPER'
           : `Get closer to scan · ${view.objectiveDistance.toFixed(0)} m`;
+      // In range but steeply below or above (hovering over it): turning cannot bring
+      // it into the beam, a depth change can. Touch keeps its slider wording.
+      const inRange = (): string => {
+        const vert = view.objectiveVertDeg;
+        if (Math.abs(vert) < 35) return guide(turn, vert, 'PITCH TOWARD TARGET');
+        if (touch) return guide(0, vert, 'PITCH TOWARD TARGET');
+        return (
+          depthCue(view.objectiveDistance, vert, keys) ?? guide(turn, vert, 'PITCH TOWARD TARGET')
+        );
+      };
       return {
         scan: null,
         objective: {
           kicker: 'OBJECTIVE',
           text: view.objectiveName,
           // Keep the approach distance alongside plain steering directions.
-          // In range but steeply below or above (hovering over it): turning cannot
-          // bring it into the beam, a depth change can.
           detail: view.objectiveInRange
-            ? ((Math.abs(view.objectiveVertDeg) >= 35
-                ? depthCue(view.objectiveDistance, view.objectiveVertDeg, keys)
-                : null) ?? guide(turn, view.objectiveVertDeg, 'PITCH TOWARD TARGET'))
+            ? inRange()
             : [
                 Math.abs(turn) >= 10 ? turnCue(turn) : null,
                 depthCue(view.objectiveDistance, view.objectiveVertDeg, keys),

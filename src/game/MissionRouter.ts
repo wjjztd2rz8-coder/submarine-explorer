@@ -678,7 +678,7 @@ export class MissionRouter {
     this.mission.dispose();
     this.briefing?.dispose();
     this.panel.dispose();
-    this.finishButton.remove();
+    if (this.finishAttached) this.finishButton.remove();
     this.debrief?.dispose();
   }
 }
