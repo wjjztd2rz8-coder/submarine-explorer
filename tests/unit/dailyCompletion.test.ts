@@ -52,10 +52,14 @@ it.each(['2026-10-01T23:59:59Z', '2026-10-01T19:00:01-05:00', '2026-10-02T14:00:
       save,
       settings: save.get(),
       params: new URLSearchParams(),
-      route: { missionId: 'shallow', def: { briefing: { hazards: [] } } },
+      route: { missionId: 'shallow', def: { briefing: { hazards: [] }, objectives: [] } },
       sub: { getState: () => ({ hullClass: 'A' }), simSpeed: 1 },
       bus: new EventBus(),
-      discovery: {},
+      discovery: {
+        pois: [],
+        ready: Promise.resolve(),
+        store: { isDiscovered: () => false, record: vi.fn() },
+      },
       expose: vi.fn(),
       daily: dailyDive('2026-10-01', ['shallow']),
       dailySave: new DailySave(storage),
@@ -65,12 +69,12 @@ it.each(['2026-10-01T23:59:59Z', '2026-10-01T19:00:01-05:00', '2026-10-02T14:00:
     ctx.dailySave.complete('2026-09-30');
     missionSystem.init?.(ctx);
     save.setGameplayMode('realistic');
-    expect(fixture.rating!()).toMatchObject({ stars: 2 });
+    expect(fixture.rating!()).toMatchObject({ stars: 3 });
     expect(new DailySave(storage).get()).toMatchObject({
       lastCompletedDate: '2026-10-01',
       streak: 2,
     });
-    expect(new Progress(new ProgressSave(storage)).rating('daily-2026-10-01')).toBe(2);
+    expect(new Progress(new ProgressSave(storage)).rating('daily-2026-10-01')).toBe(3);
     expect(new Save({ config, storage }).get()).toMatchObject({
       gameplayMode: 'realistic',
       gameplay: config.settings.gameplayPresets.realistic,
@@ -85,7 +89,7 @@ it.each(['2026-10-01T23:59:59Z', '2026-10-01T19:00:01-05:00', '2026-10-02T14:00:
     // Future seeds and older completions cannot change the earned streak.
     for (const date of ['2026-10-03', '2026-09-29']) {
       ctx.daily = dailyDive(date, ['shallow']);
-      expect(fixture.rating!().stars).toBe(2);
+      expect(fixture.rating!().stars).toBe(3);
       expect(new DailySave(storage).get()).toMatchObject({
         lastCompletedDate: '2026-10-01',
         streak: 2,

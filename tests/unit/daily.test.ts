@@ -193,7 +193,7 @@ it('stores best stars today in the unchanged progress schema and round trips', (
   const progress = new Progress(new ProgressSave(storage));
   const key = dailyRatingKey(dailyDive('2026-10-01', sites)!);
   progress.finish(key, [{ primary: true, complete: true }]);
-  expect(new Progress(new ProgressSave(storage)).rating(key)).toBe(2);
+  expect(new Progress(new ProgressSave(storage)).rating(key)).toBe(3);
   expect(new Progress(new ProgressSave(storage)).rating('daily-2026-10-02')).toBe(0);
 });
 

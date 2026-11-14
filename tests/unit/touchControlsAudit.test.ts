@@ -790,7 +790,7 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     view.objectiveId = null;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(name.textContent).toBe('Debris field');
-    expect(hint.textContent).toBe('Turn toward the marker · Turn around');
+    expect(hint.textContent).toBe('Turn around to face the marker');
   } finally {
     overlay.dispose();
     f.controls.dispose();

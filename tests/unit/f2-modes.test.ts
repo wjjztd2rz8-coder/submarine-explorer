@@ -6,6 +6,7 @@ import { Save, migrate, SETTINGS_STORAGE_KEY } from '../../src/core/Save.js';
 import { currentScale, MODES_CONFIG } from '../../src/core/config/modes.js';
 import { modesSystem } from '../../src/app/systems/modes.js';
 import type { GameContext } from '../../src/app/context.js';
+import { resolveScanRadius } from '../../src/game/Scanner.js';
 import titanicPois from '../../data/landmarks/titanic/pois.json' with { type: 'json' };
 
 it('restores Titanic data radii through live Arcade, Realistic and Custom changes without compounding', async () => {
@@ -44,7 +45,7 @@ it('restores Titanic data radii through live Arcade, Realistic and Custom change
           const authored = titanicPois.pois.find((p) => p.id === poi.id)!.radius_m;
           expect(ctx.baseScanRadii.get(poi.id)).toBe(authored);
           expect(poi.radius).toBe(
-            Math.max(mode === 'arcade' ? 100 : 0, authored * (mode === 'arcade' ? 2.4 : 1.2)),
+            resolveScanRadius(authored * (mode === 'arcade' ? 2.4 : 1.2), ctx.effective.scan),
           );
         }
         expect(ctx.discovery.scanner.setConfig).toHaveBeenLastCalledWith(ctx.effective.scan);
@@ -76,7 +77,7 @@ it.each(['arcade', 'realistic'] as const)(
       for (const poi of ctx.discovery.pois) {
         const authored = titanicPois.pois.find((p) => p.id === poi.id)!.radius_m;
         expect(poi.radius).toBe(
-          Math.max(mode === 'arcade' ? 100 : 0, authored * effective.sensor.scanRadiusMultiplier),
+          resolveScanRadius(authored * effective.sensor.scanRadiusMultiplier, effective.scan),
         );
       }
       for (const id of ['titanic-bow', 'titanic-stern']) {

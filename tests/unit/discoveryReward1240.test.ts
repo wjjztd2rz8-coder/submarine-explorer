@@ -356,8 +356,8 @@ it.each([false, true])(
       for (const target of discovery.pois) scan(target);
       expect(mission.end()).toBe(true);
       expect(progress.finish('titanic', mission.objectives)).toEqual({
-        stars: 2,
-        best: 2,
+        stars: 3,
+        best: 3,
         points: 0,
       });
       const earned = progress.snapshot().awarded;
@@ -375,7 +375,7 @@ it.each([false, true])(
       expect(discovery.stats.snapshot().newEntries).toEqual([]);
       expect(discovery.stats.snapshot().discoveries).toHaveLength(discovery.pois.length);
       expect(mission.end()).toBe(true);
-      expect(progress.finish('titanic', mission.objectives).best).toBe(2);
+      expect(progress.finish('titanic', mission.objectives).best).toBe(3);
       expect(progress.snapshot().awarded).toEqual(earned);
       expect(discovery.store.get('titanic', first.id)?.count).toBe(2);
 

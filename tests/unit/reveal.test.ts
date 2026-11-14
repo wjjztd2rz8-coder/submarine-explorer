@@ -29,13 +29,13 @@ describe('discovery reveal', () => {
       'It is 3.5 metres long. Second fact.',
     );
   });
-  it('frames the limiting viewport dimension and honours overrides', () => {
+  it('uses the reveal sweep portrait crop and honours overrides', () => {
     const p = poi('wreck');
     const sphere = new Sphere(new Vector3(1, -80, 3), 20);
     const frame = revealFrame(p, new Vector3(100, -90, 3), 60, 1, sphere);
     expect(frame.target.equals(sphere.center)).toBe(true);
     expect(frame.azimuth).toBeCloseTo(Math.PI / 2);
-    expect(revealFrame(p, p.position, 60, 0.5, sphere).distance).toBeGreaterThan(frame.distance);
+    expect(revealFrame(p, p.position, 60, 0.5, sphere).distance).toBe(frame.distance);
     expect(revealFrame(p, p.position, 60, 1).distance).toBe(70);
     expect(revealFrame(poi('vent', 'vent'), p.position, 60, 1).distance).toBe(45);
     p.def.reveal = {

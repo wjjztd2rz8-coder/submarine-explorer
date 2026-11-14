@@ -165,7 +165,11 @@ it.each(sites)(
         const primary = pois.find((p) => p.id === objective.poi)!;
         expect(primary, objective.id).toBeDefined();
         const baseReach = missionApproachScanRadius(site, primary.radius);
-        for (const radius of [baseReach, baseReach * effective.sensor.scanRadiusMultiplier]) {
+        for (const requestedRadius of [
+          baseReach,
+          baseReach * effective.sensor.scanRadiusMultiplier,
+        ]) {
+          const radius = resolveScanRadius(requestedRadius, effective.scan);
           const target = { ...primary, radius };
           const sub = new Submarine(effective.submarine, terrain);
           sub.setHullClass(mission.hull_class!);

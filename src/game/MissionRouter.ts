@@ -336,7 +336,10 @@ export class MissionRouter {
       );
       this.panel.setObjectives(this.mission.objectives);
       const contacts = this.mission.objectives.filter((o) => !o.primary && o.resolved);
-      this.briefing?.setContactProgress(contacts.filter((o) => o.complete).length, contacts.length);
+      this.briefing?.setContactProgress?.(
+        contacts.filter((o) => o.complete).length,
+        contacts.length,
+      );
     });
 
     if (route.skipBriefing) {

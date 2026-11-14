@@ -110,7 +110,7 @@ export const missionSystem: GameSystem = {
       for (const id of legacyFoundContactIds(
         route.def.objectives,
         route.missionId,
-        ctx.progress?.snapshot().awarded,
+        ctx.progress?.snapshot?.().awarded,
       )) {
         if (
           discovery.pois.some((p) => p.id === id) &&

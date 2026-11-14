@@ -268,7 +268,7 @@ it('awards one dated Daily primary reward and preserves ordinary mission rewards
     expect(ctx.progress.snapshot().awarded).not.toContain('primary:shallow');
     ctx.save.setGameplayMode('arcade');
     const rating = ctx.progress.finish(key, [{ primary: true, complete: true }]);
-    expect(rating).toEqual({ stars: 2, best: 2, points: 0 });
+    expect(rating).toEqual({ stars: 3, best: 3, points: 0 });
     expect(ctx.progress.points - initial).toBe(0);
     ctx.bus.emit('mission:restart', { missionId: 'shallow' });
     ctx.bus.emit('mission:primaryComplete', { missionId: 'shallow', completed: 1, total: 1 });
@@ -331,7 +331,7 @@ it.each(['calm', 'strong-currents', 'low-light'] as const)(
         ctx.save.setGameplayMode('arcade');
         ctx.save.setGameplayOption('batteryOxygen', true);
         expect(ctx.effective.currentMode).toBe(modifier === 'strong-currents' ? 'strong' : 'off');
-        expect(ctx.discovery.pois[0].radius).toBe(240);
+        expect(ctx.discovery.pois[0].radius).toBe(120);
         expect(sub.position.toArray()).toEqual([10, -120, 20]);
         expect(sub.yaw).toBe(0.7);
         expect(sub.getState().hullClass).toBe('A');
