@@ -268,7 +268,7 @@ test('four dives, mode switches, restarts and reloads preserve saves without sce
   expect(errors).toEqual([]);
 });
 
-/** Dive again sits under "More" while Keep exploring is offered. */
+/** Open "More" when the debrief has it, so every action in it is reachable. */
 async function openMoreIfPresent(root: import('@playwright/test').Locator): Promise<void> {
   const toggle = root.locator('.debrief-more-toggle');
   if (await toggle.count()) await toggle.click();

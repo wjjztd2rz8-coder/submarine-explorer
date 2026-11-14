@@ -180,6 +180,8 @@ test('discoveries unlock Your sub cosmetics; photo bonus and best stars survive 
   await expect(debrief.locator('.debrief-stars')).toHaveAttribute('aria-label', '3 of 3 stars');
   await expect(debrief).not.toContainText('research points');
   await shot(page, 'debrief');
+  const more = debrief.locator('.debrief-more-toggle');
+  if (await more.count()) await more.click();
   await debrief.locator('[data-action="dive-sites"]').click();
   await homeReady(page, true);
   const sites = page.locator('.home-sites');

@@ -364,10 +364,10 @@ test.describe('B3 mission flow', () => {
       '2 of 2 primary objectives',
     );
     await expect(debrief.locator('.debrief-btn')).toHaveText([
-      'Dive sites',
+      'Dive again',
       'Keep exploring',
       'Journal',
-      'Dive again',
+      'Dive sites',
       'Home',
     ]);
     await expect(debrief.locator('.debrief-highlight')).toHaveText('Scanned Stern section.');
@@ -497,8 +497,8 @@ test.describe('fix S: mission failure, framing and modals', () => {
     await expect(debrief.locator('.debrief-highlight')).toContainText('Hull failure at');
     // No Keep exploring after an abort: the dive is over.
     await expect(debrief.locator('.debrief-btn')).toHaveText([
-      'Dive sites',
       'Dive again',
+      'Dive sites',
       'Journal',
       'Home',
     ]);

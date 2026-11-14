@@ -90,7 +90,7 @@ export function summarizeDive(
       : rating?.stars === 2
         ? 'Take a photo or scan a species for 3 stars.'
         : rating?.stars === 1
-          ? 'Finish the optional objectives for 2 stars; some are a long transit away.'
+          ? 'Finish the optional objectives.'
           : !scan && !entry
             ? 'Face a target and hold Scan.'
             : stats.objectives && stats.objectives.completed < stats.objectives.total
@@ -180,6 +180,14 @@ export class Debrief {
       );
     }
     p.append(score);
+    if (rating)
+      p.append(
+        el(
+          'p',
+          'debrief-next',
+          'Stars: 1 for the primary objectives, 2 for all, 3 with a photo or species scan.',
+        ),
+      );
     const summary = summarizeDive(stats, rating, this.exploration?.());
     p.append(
       el('p', `debrief-highlight${summary.kind ? ` is-${summary.kind}` : ''}`, summary.highlight),
@@ -199,12 +207,13 @@ export class Debrief {
       },
       { id: 'journal', label: 'Journal', run: () => this.options.onFieldGuide?.() },
     ];
-    // Navigation is the main next step. Resume/replay remain available below it.
+    // Navigation is the main next step (dive again, or resume on an unstarted dive).
+    // Resume/replay remain available below it.
     // With no scans the dive has barely started: resuming is the obvious next step.
     const unstarted = stats.discoveries.length === 0 && list.some((a) => a.id === 'keep-exploring');
     const primary =
       (unstarted ? list.find((a) => a.id === 'keep-exploring') : undefined) ??
-      list.find((a) => a.id === 'dive-sites') ??
+      list.find((a) => a.id === 'dive-again') ??
       list.find((a) => a.primary) ??
       list[0];
     const navigation = el('div', 'debrief-navigation');

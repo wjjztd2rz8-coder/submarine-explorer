@@ -540,17 +540,17 @@ freshTest.describe('mission progression and Home Journal', () => {
       });
       await expect(debrief.locator('.debrief-title')).toHaveText('Primaries complete');
       await expect(debrief.locator('.debrief-next')).toHaveText(
-        'Next: Finish the optional objectives for 2 stars; some are a long transit away.',
+        'Next: Finish the optional objectives.',
       );
       // Optional scans must not make a finished primary mission read as incomplete.
       await expect(debrief.locator('[data-field="objectives"]')).toHaveText(
         '2 of 2 primary objectives',
       );
       await expect(debrief.locator('.debrief-btn')).toHaveText([
-        'Dive sites',
+        'Dive again',
         'Keep exploring',
         'Journal',
-        'Dive again',
+        'Dive sites',
         'Home',
       ]);
       await shot(page, 'debrief');

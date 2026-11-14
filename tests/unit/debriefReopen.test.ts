@@ -106,12 +106,14 @@ it('switches the primary and quiet actions after the first scan without stale Mo
       const { navigation, secondary, toggle, moreBox } = groups();
       expect(navigation.children).toHaveLength(1);
       expect(navigation.children[0].className).toBe('debrief-btn is-primary');
-      expect(navigation.children[0].dataset.action).toBe(scans ? 'dive-sites' : 'keep-exploring');
+      expect(navigation.children[0].dataset.action).toBe(scans ? 'dive-again' : 'keep-exploring');
       expect(secondary.children.slice(0, 2).map((e) => e.dataset.action)).toEqual([
         scans ? 'keep-exploring' : 'dive-sites',
         'journal',
       ]);
-      expect(moreBox.children.map((e) => e.dataset.action)).toEqual(['dive-again', 'home']);
+      expect(moreBox.children.map((e) => e.dataset.action)).toEqual(
+        scans ? ['dive-sites', 'home'] : ['dive-again', 'home'],
+      );
       expect(moreBox.hidden).toBe(true);
       expect(toggle.attributes['aria-expanded']).toBe('false');
       toggle.dispatchEvent(new Event('click'));
@@ -160,7 +162,7 @@ it('keeps zero-scan non-resumable and free dives on their existing primary actio
       { id: 'home', label: 'Home', run },
       { id: 'journal', label: 'Journal', run },
     ]);
-    expect(primary().dataset.action).toBe('dive-sites');
+    expect(primary().dataset.action).toBe('dive-again');
     debrief.hide();
     debrief.show(stats);
     expect(primary().dataset.action).toBe('dive-again');
