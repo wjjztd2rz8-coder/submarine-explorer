@@ -4092,3 +4092,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - No agent, no merge. Backlog empty, main clean, hosted CI and Pages green on f79. Codex weekly 3% (resets Sun Nov 15 23:00), briefs 196-199 stay queued. Claude 5h 92%, week 63%: idle until the owner or next review adds items.
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-14 07:01 CST headless run (Claude): comprehensive review
+
+- Comprehensive review (Claude alone; Sol skipped, Codex weekly 3%): golden 2026-11-14-124525; openings Titanic 4.0, Beebe 4.0, Lost City 4.0, Blue Hole 3.8, Monterey 3.8, Bismarck 3.3. Stage ~87%. Backlog refilled (items 44-50), done items archived, REVIEWS/STATUS pushed (54a3f3ba). Stale brief 199 moved to hold; brief 200 queued (4 queued).
+- Item 44 V-bismarck-hull-form launched (Sonnet) in worktree ../subexp-wt/V-bismarck-hull-form; unfinished when this run exited. Next run: collect it when plan/progress/V-bismarck-hull-form.md exists (gates, judge screenshots, merge).
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
