@@ -2261,10 +2261,16 @@ describe('overlay policies across the app', () => {
       expect(router.panel.bannerOpen).toBe(false);
       const beforeBanner = active();
       tick(false);
-      expect(router.panel.bannerOpen).toBe(true);
       expect(router.mission.elapsedS).toBe(3);
-      expect(active()).toBe(beforeBanner);
-      expect(router.endDive()).toBe(true);
+      if (completion === 'primary') {
+        expect(router.panel.bannerOpen).toBe(true);
+        expect(active()).toBe(beforeBanner);
+        expect(router.endDive()).toBe(true);
+      } else {
+        expect(router.panel.bannerOpen).toBe(false);
+        expect(router.debriefOpen).toBe(true);
+        expect((router.debrief!.root as unknown as Element).contains(active())).toBe(true);
+      }
       const debrief = router.debrief!;
       press('Tab');
       const control = active();

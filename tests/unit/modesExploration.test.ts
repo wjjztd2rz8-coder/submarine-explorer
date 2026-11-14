@@ -361,6 +361,8 @@ it.each([false, true])(
         {
           scan: 'F',
           guide: 'J',
+          rise: 'Space',
+          sink: 'C',
         },
         false,
         'Logged in the Journal.',
@@ -424,6 +426,8 @@ it.each([false, true])(
         {
           scan: 'F',
           guide: 'J',
+          rise: 'Space',
+          sink: 'C',
         },
         false,
         'Logged in the Journal.',
