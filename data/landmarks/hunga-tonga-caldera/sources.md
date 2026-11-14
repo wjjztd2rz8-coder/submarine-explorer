@@ -84,4 +84,4 @@ the pre/post-eruption caveat.
 
 ## Route (2026-11)
 
-The dive now opens on the flank-transect point and follows the slope down to the rim slope, so the sub never has to climb 180 m across the flank. `hunga-tonga-outer-flank` was restored about 300 m down that slope (381.7 m on this grid) as the stop between them.
+`hunga-tonga-outer-flank` was restored on the slope between the rim slope and the flank-transect point, about 300 m below the flank point (381.7 m on this grid), so the climb from the rim to the flank comes in two short legs.

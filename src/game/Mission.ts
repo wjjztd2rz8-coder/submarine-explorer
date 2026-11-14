@@ -342,18 +342,19 @@ export function nextScanObjective(
   return nearest(onTheWay) ?? primary;
 }
 
-/** `nextScanObjective` from a world position, measuring with the placed POIs. */
+/** `nextScanObjective` from a world position, measuring with the placed POIs (read lazily). */
 export function scanObjectiveFrom(
   objectives: readonly ObjectiveStatus[] | undefined,
-  from: { distanceTo(p: { x: number; y: number; z: number }): number },
-  pois: ReadonlyArray<{ id: string; position: { x: number; y: number; z: number } }>,
+  from: () => { distanceTo(p: { x: number; y: number; z: number }): number },
+  pois: () =>
+    ReadonlyArray<{ id: string; position: { x: number; y: number; z: number } }> | undefined,
 ): ObjectiveStatus | undefined {
-  const at = (id: string) => pois.find((p) => p.id === id)?.position;
+  const at = (id: string) => pois()?.find((p) => p.id === id)?.position;
   return nextScanObjective(
     objectives,
     (id) => {
       const p = at(id);
-      return p ? from.distanceTo(p) : 0;
+      return p ? from().distanceTo(p) : 0;
     },
     (a, b) => {
       const pa = at(a);

@@ -87,8 +87,8 @@ export const waypointsSystem: GameSystem = {
     'guide.waypoints': (f, ctx) => {
       f.nextScanObjective = selectScanObjective(
         ctx.missionRouter?.mission.objectives,
-        ctx.sub.position,
-        ctx.discovery.pois,
+        () => ctx.sub.position,
+        () => ctx.discovery.pois,
       );
     },
     'render.prepare': (f, ctx) => {
@@ -102,8 +102,8 @@ function updateWaypoints(ctx: GameContext, position: Vector3) {
   const { missionRouter } = ctx;
   const nextScanObjective = selectScanObjective(
     missionRouter?.mission.objectives,
-    position,
-    ctx.discovery.pois,
+    () => position,
+    () => ctx.discovery.pois,
   );
   // Near-site approaches retain their navigation marker in Realistic too.
   // Once in scan range, resume the pilot's normal visual-waypoint preference.

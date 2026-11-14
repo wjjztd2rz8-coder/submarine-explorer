@@ -328,11 +328,10 @@ export class MissionRouter {
     this.finishButton.className = 'hud-finish';
     this.finishButton.textContent = 'Finish dive';
     this.finishButton.title = 'Surface and debrief';
-    this.finishButton.setAttribute('aria-label', 'Finish dive: surface and debrief');
     this.finishButton.hidden = true;
     // Pointer activation keeps flight focus, like the completion banner's buttons.
-    this.finishButton.addEventListener('mousedown', (e) => e.preventDefault());
-    this.finishButton.addEventListener('click', () => this.endDive());
+    this.finishButton.onmousedown = (e) => e.preventDefault();
+    this.finishButton.onclick = () => this.endDive();
     (opts.parent ? opts.parent : hudBar()).append(this.finishButton);
 
     this.disposers.push(

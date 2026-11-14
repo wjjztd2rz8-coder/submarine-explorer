@@ -637,7 +637,7 @@ describe('MissionRouter completion timing', () => {
     router.keepExploring();
     frame(router);
     expect(finish.hidden).toBe(false);
-    click(finish);
+    (router.finishButton.onclick as () => void)();
     expect(router.debriefOpen).toBe(true);
     expect(router.debrief!.last?.finds).toEqual({ found: 1, total: 2 });
     expect(finish.hidden).toBe(true);

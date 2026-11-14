@@ -57,8 +57,8 @@ export const discoverySystem: GameSystem = {
         () =>
           scanObjectiveFrom(
             ctx.missionRouter?.mission.objectives,
-            ctx.sub.position,
-            ctx.discovery.pois,
+            () => ctx.sub.position,
+            () => ctx.discovery.pois,
           )?.poiId ?? null,
       );
       // Journal shortcuts remain available to the top Journal or Home overlay,
