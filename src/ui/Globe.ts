@@ -208,6 +208,8 @@ export class Globe {
   private groupAlpha = new Float32Array(0);
   private groupHash = new Int32Array(0);
   private hitPx = 0;
+  private closeBtn!: HTMLButtonElement;
+  private hintEl!: HTMLElement;
   private readonly coarse: MediaQueryList | null;
   private chooserLeader = -1;
   private lastPointerType = '';
@@ -260,6 +262,7 @@ export class Globe {
     this.legend = el('div', 'globe-legend', 'LOADING SITES…');
     const close = el('button', 'globe-close', 'ESC  CLOSE');
     close.type = 'button';
+    this.closeBtn = close;
     close.addEventListener('click', () => this.close());
     header.append(heading, this.legend, close);
 
@@ -272,6 +275,7 @@ export class Globe {
       'DRAG ROTATE · WHEEL / + − ZOOM · NUMBERED PINS ZOOM IN · TAB PINS · ENTER SELECT · ESC CLOSE',
     );
 
+    this.hintEl = hint;
     this.chooser = el('div', 'globe-chooser');
     this.chooser.setAttribute('role', 'group');
     this.chooser.setAttribute('aria-label', 'Sites here');
@@ -557,6 +561,11 @@ export class Globe {
     if (hit !== this.hitPx) {
       this.hitPx = hit;
       this.root.style.setProperty('--globe-hit', `${hit}px`);
+      // Touch has no Esc, wheel or Tab keys to name.
+      this.closeBtn.textContent = touch ? 'CLOSE' : 'ESC  CLOSE';
+      this.hintEl.textContent = touch
+        ? 'DRAG ROTATE · PINCH ZOOM · TAP A PIN'
+        : 'DRAG ROTATE · WHEEL / + − ZOOM · NUMBERED PINS ZOOM IN · TAB PINS · ENTER SELECT · ESC CLOSE';
     }
     return hit;
   }

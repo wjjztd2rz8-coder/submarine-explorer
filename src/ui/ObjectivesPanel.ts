@@ -185,7 +185,16 @@ export class ObjectivesPanel {
       }),
     );
     const more = sorted.length - shown.length;
-    if (more > 0) this.listEl.append(el('div', 'obj-more', `+${more} more · Esc for all`));
+    if (more > 0)
+      this.listEl.append(
+        el(
+          'div',
+          'obj-more',
+          document.documentElement.classList.contains('is-touch')
+            ? `+${more} more`
+            : `+${more} more · Esc for all`,
+        ),
+      );
   }
 
   private write(target: HTMLElement, key: string, text: string): void {
