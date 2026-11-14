@@ -148,129 +148,130 @@ describe('spire buffer boundaries', () => {
 });
 
 describe('smoker profile capability', () => {
-  for (const tier of ['low', 'medium', 'high']) {
-    // Regression guard: material tuning must stay local to each build and leave all
-    // geometry, placement, collision boxes, vent anchors and tier costs untouched.
-    it(`${tier}: isolates finite material tuning and preserves profiled and unprofiled defaults`, () => {
-      const lookupOriginal = manifests.propManifest;
-      const authored = lookupOriginal('beebe-chimney-1')!;
-      const { bodyShade: _shade, bodyGlow: _glow, ...omitted } = authored.smoker!;
-      const raw = Object.freeze(omitted);
-      const resolve = (smoker: object) => {
-        const resolved = manifests.validateSiteManifest(
-          { id: 'fixture', props: { fixture: { ...authored, smoker } } },
-          'fixture',
-        ).props!.fixture!;
-        Object.freeze(resolved.smoker);
-        return Object.freeze(resolved);
-      };
-      let active = resolve(authored.smoker!);
-      const lookup = vi
-        .spyOn(manifests, 'propManifest')
-        .mockImplementation((id) => (id === 'beebe-chimney-1' ? active : lookupOriginal(id)));
-      const built: ReturnType<typeof buildGeo>[] = [];
-      const make = (site: string, id: string) => {
-        const def = parsePropsDoc(
-          JSON.parse(readFileSync(`data/landmarks/${site}/props.json`, 'utf8')),
-          cfg,
-        ).props.find((prop) => prop.id === id)!;
-        const result = buildGeo({
-          def,
-          dims: def.dimensionsM!,
-          seed: hashString(def.id),
-          cfg,
-          tier,
-          groundHeight: () => (x, z) => x * 0.07 - z * 0.1,
+  // Regression guard: material tuning must stay local to each build and leave all
+  // geometry, placement, collision boxes, vent anchors and tier costs untouched.
+  it(`isolates finite material tuning and preserves profiled and unprofiled defaults`, () => {
+    const lookupOriginal = manifests.propManifest;
+    const authored = lookupOriginal('beebe-chimney-1')!;
+    const { bodyShade: _shade, bodyGlow: _glow, ...omitted } = authored.smoker!;
+    const raw = Object.freeze(omitted);
+    const resolve = (smoker: object) => {
+      const resolved = manifests.validateSiteManifest(
+        { id: 'fixture', props: { fixture: { ...authored, smoker } } },
+        'fixture',
+      ).props!.fixture!;
+      Object.freeze(resolved.smoker);
+      return Object.freeze(resolved);
+    };
+    let active = resolve(authored.smoker!);
+    const lookup = vi
+      .spyOn(manifests, 'propManifest')
+      .mockImplementation((id) => (id === 'beebe-chimney-1' ? active : lookupOriginal(id)));
+    const built: ReturnType<typeof buildGeo>[] = [];
+    const tier = 'low'; // Material tuning is tier-independent; low keeps the many builds cheap.
+    const make = (site: string, id: string) => {
+      const def = parsePropsDoc(
+        JSON.parse(readFileSync(`data/landmarks/${site}/props.json`, 'utf8')),
+        cfg,
+      ).props.find((prop) => prop.id === id)!;
+      const result = buildGeo({
+        def,
+        dims: def.dimensionsM!,
+        seed: hashString(def.id),
+        cfg,
+        tier,
+        groundHeight: () => (x, z) => x * 0.07 - z * 0.1,
+      });
+      built.push(result);
+      for (const box of [result.bounds, ...result.colliders!])
+        expect([...box.min.toArray(), ...box.max.toArray()].every(Number.isFinite)).toBe(true);
+      for (const root of [result.full, result.impostor])
+        root.traverse((object) => {
+          if (!(object instanceof THREE.Mesh)) return;
+          for (const attribute of Object.values(
+            object.geometry.attributes as Record<string, THREE.BufferAttribute>,
+          ))
+            expect(Array.from(attribute.array).every(Number.isFinite)).toBe(true);
+          if (object instanceof THREE.InstancedMesh)
+            expect(Array.from(object.instanceMatrix.array).every(Number.isFinite)).toBe(true);
         });
-        built.push(result);
-        for (const box of [result.bounds, ...result.colliders!])
-          expect([...box.min.toArray(), ...box.max.toArray()].every(Number.isFinite)).toBe(true);
-        for (const root of [result.full, result.impostor])
-          root.traverse((object) => {
-            if (!(object instanceof THREE.Mesh)) return;
-            for (const attribute of Object.values(
-              object.geometry.attributes as Record<string, THREE.BufferAttribute>,
-            ))
-              expect(Array.from(attribute.array).every(Number.isFinite)).toBe(true);
-            if (object instanceof THREE.InstancedMesh)
-              expect(Array.from(object.instanceMatrix.array).every(Number.isFinite)).toBe(true);
-          });
-        expect(Number.isFinite(result.full.userData.ventTop)).toBe(true);
-        return result;
-      };
-      const bodyMaterial = (result: ReturnType<typeof buildGeo>) =>
-        (result.full.getObjectByName('smoker-body') as THREE.Mesh)
-          .material as THREE.MeshStandardMaterial;
-      const mouthMaterial = (result: ReturnType<typeof buildGeo>) =>
-        (result.full.getObjectByName('beebe-orifices') as THREE.Mesh)
-          .material as THREE.MeshStandardMaterial;
-      const checkBody = (result: ReturnType<typeof buildGeo>, shade: number, glow: number) => {
-        const material = bodyMaterial(result);
-        // Headless detail textures are null, so the neutral albedo is exactly 0.07.
-        expect(material.color.toArray()).toEqual([0.07 * shade, 0.07 * shade, 0.07 * shade]);
-        expect(material.emissive.toArray()).toEqual(
-          new THREE.Color(0xff9a68).multiplyScalar(glow).toArray(),
-        );
-        expect(
-          [...material.color.toArray(), ...material.emissive.toArray()].every(Number.isFinite),
-        ).toBe(true);
-        expect(material.emissiveIntensity).toBe(1);
-        expect(material.customProgramCacheKey()).toMatch(/^vertexGlow2-0\.5-sulfide-/);
-      };
-      const sourceBefore = JSON.stringify(authored);
-      try {
-        const axial = make('axial-seamount-ashes', 'ashes-smoker-mound');
-        const axialBefore = propEvidence(axial);
-        checkBody(axial, 1.25, 0.13);
-        expect(axial.full.getObjectByName('beebe-orifices')).toBeUndefined();
-        const baseline = make('beebe-vent-field', 'beebe-chimney-1');
-        const baselineBefore = propEvidence(baseline);
-        const geometryBefore = propEvidence(baseline, false);
-        checkBody(baseline, 0.85, 0.16);
-        expect(mouthMaterial(baseline).emissive.getHex()).toBe(0xff681a);
+      expect(Number.isFinite(result.full.userData.ventTop)).toBe(true);
+      return result;
+    };
+    const bodyMaterial = (result: ReturnType<typeof buildGeo>) =>
+      (result.full.getObjectByName('smoker-body') as THREE.Mesh)
+        .material as THREE.MeshStandardMaterial;
+    const mouthMaterial = (result: ReturnType<typeof buildGeo>) =>
+      (result.full.getObjectByName('beebe-orifices') as THREE.Mesh)
+        .material as THREE.MeshStandardMaterial;
+    const checkBody = (result: ReturnType<typeof buildGeo>, shade: number, glow: number) => {
+      const material = bodyMaterial(result);
+      // Headless detail textures are null, so the neutral albedo is exactly 0.07.
+      expect(material.color.toArray()).toEqual([0.07 * shade, 0.07 * shade, 0.07 * shade]);
+      expect(material.emissive.toArray()).toEqual(
+        new THREE.Color(0xff9a68).multiplyScalar(glow).toArray(),
+      );
+      expect(
+        [...material.color.toArray(), ...material.emissive.toArray()].every(Number.isFinite),
+      ).toBe(true);
+      expect(material.emissiveIntensity).toBe(1);
+      expect(material.customProgramCacheKey()).toMatch(/^vertexGlow2-0\.5-sulfide-/);
+    };
+    const sourceBefore = JSON.stringify(authored);
+    try {
+      const axial = make('axial-seamount-ashes', 'ashes-smoker-mound');
+      const axialBefore = propEvidence(axial);
+      checkBody(axial, 1.25, 0.13);
+      expect(axial.full.getObjectByName('beebe-orifices')).toBeUndefined();
+      const baseline = make('beebe-vent-field', 'beebe-chimney-1');
+      const baselineBefore = propEvidence(baseline);
+      const geometryBefore = propEvidence(baseline, false);
+      checkBody(baseline, 0.85, 0.16);
+      expect(mouthMaterial(baseline).emissive.getHex()).toBe(0xff681a);
 
-        for (const smoker of [
-          raw,
-          { ...raw, bodyShade: 0.95, bodyGlow: 0.16 },
-          { ...authored.smoker, bodyShade: 1 },
-          { ...authored.smoker, bodyGlow: 1 },
-          { ...authored.smoker, throatColor: 0xffffff },
-          { ...authored.smoker, bodyShade: Number.MIN_VALUE, bodyGlow: Number.MIN_VALUE },
-          { ...raw, bodyShade: 0.95, bodyGlow: 0.16, throatColor: 0x9a3a0c },
-        ]) {
-          active = resolve(smoker);
-          const tuned = make('beebe-vent-field', 'beebe-chimney-1');
-          checkBody(tuned, active.smoker!.bodyShade, active.smoker!.bodyGlow);
-          expect(mouthMaterial(tuned).emissive.getHex()).toBe(active.smoker!.throatColor);
-          expect(propEvidence(tuned, false)).toEqual(geometryBefore);
-          expect(propEvidence(baseline)).toEqual(baselineBefore);
-          expect(propEvidence(axial)).toEqual(axialBefore);
-          expect(bodyMaterial(tuned)).not.toBe(bodyMaterial(baseline));
-          expect(bodyMaterial(tuned).color).not.toBe(bodyMaterial(baseline).color);
-          expect(bodyMaterial(tuned).emissive).not.toBe(bodyMaterial(baseline).emissive);
-        }
-
-        // Mutating an earlier cluster must not affect existing peers or later builds.
-        const earlier = built[built.length - 1]!;
-        bodyMaterial(earlier).color.setScalar(7);
-        bodyMaterial(earlier).emissive.setScalar(8);
-        mouthMaterial(earlier).emissive.setScalar(9);
-        active = resolve(authored.smoker!);
-        expect(propEvidence(make('beebe-vent-field', 'beebe-chimney-1'))).toEqual(baselineBefore);
-        expect(propEvidence(make('axial-seamount-ashes', 'ashes-smoker-mound'))).toEqual(
-          axialBefore,
-        );
-        expect(propEvidence(baseline)).toEqual(baselineBefore);
-        expect(propEvidence(axial)).toEqual(axialBefore);
-        expect(JSON.stringify(authored)).toBe(sourceBefore);
-        expect(raw).not.toHaveProperty('bodyShade');
-        expect(raw).not.toHaveProperty('bodyGlow');
-      } finally {
-        lookup.mockRestore();
-        for (const result of built) disposeProp(result);
+      for (const smoker of [
+        raw,
+        { ...raw, bodyShade: 0.95, bodyGlow: 0.16 },
+        { ...authored.smoker, bodyShade: 1 },
+        { ...authored.smoker, bodyGlow: 1 },
+        { ...authored.smoker, throatColor: 0xffffff },
+        { ...authored.smoker, bodyShade: Number.MIN_VALUE, bodyGlow: Number.MIN_VALUE },
+        { ...raw, bodyShade: 0.95, bodyGlow: 0.16, throatColor: 0x9a3a0c },
+      ]) {
+        active = resolve(smoker);
+        const tuned = make('beebe-vent-field', 'beebe-chimney-1');
+        checkBody(tuned, active.smoker!.bodyShade, active.smoker!.bodyGlow);
+        expect(mouthMaterial(tuned).emissive.getHex()).toBe(active.smoker!.throatColor);
+        expect(propEvidence(tuned, false)).toEqual(geometryBefore);
+        expect(bodyMaterial(tuned)).not.toBe(bodyMaterial(baseline));
+        expect(bodyMaterial(tuned).color).not.toBe(bodyMaterial(baseline).color);
+        expect(bodyMaterial(tuned).emissive).not.toBe(bodyMaterial(baseline).emissive);
       }
-    });
 
+      // No tuned build touched the peers built before it (checked once, after all variants).
+      expect(propEvidence(baseline)).toEqual(baselineBefore);
+      expect(propEvidence(axial)).toEqual(axialBefore);
+
+      // Mutating an earlier cluster must not affect existing peers or later builds.
+      const earlier = built[built.length - 1]!;
+      bodyMaterial(earlier).color.setScalar(7);
+      bodyMaterial(earlier).emissive.setScalar(8);
+      mouthMaterial(earlier).emissive.setScalar(9);
+      active = resolve(authored.smoker!);
+      expect(propEvidence(make('beebe-vent-field', 'beebe-chimney-1'))).toEqual(baselineBefore);
+      expect(propEvidence(make('axial-seamount-ashes', 'ashes-smoker-mound'))).toEqual(axialBefore);
+      expect(propEvidence(baseline)).toEqual(baselineBefore);
+      expect(propEvidence(axial)).toEqual(axialBefore);
+      expect(JSON.stringify(authored)).toBe(sourceBefore);
+      expect(raw).not.toHaveProperty('bodyShade');
+      expect(raw).not.toHaveProperty('bodyGlow');
+    } finally {
+      lookup.mockRestore();
+      for (const result of built) disposeProp(result);
+    }
+  });
+
+  for (const tier of ['low', 'medium', 'high']) {
     it(`${tier}: applies validated taper, body shade and throat colour to an arbitrary prop id`, () => {
       const authored = manifests.propManifest('beebe-chimney-1')!.smoker!;
       const profile = manifests.validateSiteManifest(

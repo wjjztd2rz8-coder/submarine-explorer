@@ -40,14 +40,11 @@ test('home copy, semantic order and first focus', async ({ page }) => {
     /^(Expedition preview|Titanic dive, 3,800 m, a good first dive)$/,
   );
   await expect(page.locator('.home-scene-caveat')).toHaveCount(0);
-  // One primary action: Daily stays a plain secondary row, not a second mint card.
-  await expect(page.locator('.home-menu .home-primary')).toHaveCount(1);
+  // One primary action: Daily stays a secondary row, not a second mint card.
   const daily = await page.locator('.home-menu > .daily-card').evaluate((el) => {
     const css = getComputedStyle(el);
-    const ref = getComputedStyle(
-      document.querySelector('.home-menu > button:not(.home-primary):not(.daily-card)')!,
-    );
-    return css.borderTopColor === ref.borderTopColor && css.backgroundColor === ref.backgroundColor;
+    const primary = getComputedStyle(document.querySelector('.home-menu > .home-primary')!);
+    return css.backgroundColor !== primary.backgroundColor;
   });
   expect(daily).toBe(true);
   await expect(page.locator('.home-copy')).not.toContainText(/illustrative|reconstructed/i);

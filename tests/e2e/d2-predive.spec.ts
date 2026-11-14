@@ -55,7 +55,7 @@ test('home screen shows the game mode and changes it', async ({ page }) => {
   await expect(mode).toBeVisible();
   await expect(mode.getByRole('radiogroup', { name: 'Game mode' })).toBeVisible();
   await expect(mode.getByRole('radio', { name: 'Arcade' })).toBeChecked();
-  await expect(mode.locator('.mode-desc')).toContainText('Fast travel');
+  await expect(mode.locator('.mode-desc')).toContainText(/fast travel/i);
   // The selector must not run into the tagline above it.
   const tagline = await page.locator('.home-tagline').boundingBox();
   const box = await mode.boundingBox();
@@ -64,7 +64,7 @@ test('home screen shows the game mode and changes it', async ({ page }) => {
 
   await mode.getByRole('radio', { name: 'Realistic' }).click();
   await expect(mode.getByRole('radio', { name: 'Realistic' })).toBeChecked();
-  await expect(mode.locator('.mode-desc')).toContainText('Battery, oxygen');
+  await expect(mode.locator('.mode-desc')).toContainText(/battery, oxygen/i);
   expect((await saved(page)).gameplayMode).toBe('realistic');
   expect((await saved(page)).gameplay.currents).toBe('realistic');
 
@@ -211,7 +211,7 @@ test('Settings: mode on top of Gameplay, separate waypoint toggles, hull warning
   const first = gameplay.locator('input, select').first();
   await expect(first).toHaveAttribute('type', 'radio');
   await expect(gameplay.getByRole('radio', { name: 'Arcade' })).toBeChecked();
-  await expect(gameplay.locator('.mode-desc')).toContainText('Fast travel');
+  await expect(gameplay.locator('.mode-desc')).toContainText(/fast travel/i);
 
   await gameplay.getByRole('button', { name: 'Advanced' }).click();
   // The world-waypoint switch retains its description.

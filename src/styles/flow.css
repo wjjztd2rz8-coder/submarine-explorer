@@ -107,6 +107,7 @@
   margin: 16px 0 8px;
   color: var(--b1-cyan);
 }
+.debrief-stars-note,
 .debrief-next {
   margin: 0;
   line-height: 1.5;
@@ -196,6 +197,26 @@
   }
   .debrief-secondary {
     justify-content: flex-start;
+  }
+}
+/* Landscape phones: keep every debrief choice on screen without scrolling. */
+@media (max-height: 480px) {
+  .debrief-panel {
+    padding-block: 12px;
+  }
+  .debrief .debrief-rating {
+    margin: 6px 0;
+    padding: 6px 0;
+  }
+  .debrief-highlight {
+    margin: 8px 0 4px;
+  }
+  .debrief-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    padding-top: 10px;
   }
 }
 /* Nothing of the dive HUD competes with the end-of-dive choices. */

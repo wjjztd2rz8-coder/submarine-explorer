@@ -293,6 +293,8 @@ async function pilotCommand(
   } finally {
     await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     await session.detach();
+    // Chromium drops the next real tap after a detached CDP touch session; spend it on an inert corner.
+    await page.touchscreen.tap(1, 1);
   }
 }
 
