@@ -437,7 +437,7 @@ test.describe('touch viewport', () => {
     await boot(page, '&touch=1');
     const card = page.locator(GUIDANCE.any);
     await expect(page.locator(GUIDANCE.tutorial)).toBeVisible();
-    await expect(card).toContainText(/drag to/i);
+    await expect(card).toContainText(/drag the left pad/i);
     const box = (await card.boundingBox())!;
     const vp = page.viewportSize()!;
     expect(box.x).toBeGreaterThanOrEqual(0);

@@ -250,7 +250,9 @@ for (const layout of [
           inRange: v.objectiveInRange,
           hint:
             Math.abs(turn) >= 10
-              ? `TURN ${Math.abs(turn).toFixed(0)}° ${turn >= 0 ? 'STARBOARD' : 'PORT'}`
+              ? document.documentElement.classList.contains('is-touch')
+                ? `TURN ${turn >= 0 ? 'RIGHT' : 'LEFT'}`
+                : `TURN ${Math.abs(turn).toFixed(0)}° ${turn >= 0 ? 'STARBOARD' : 'PORT'}`
               : near,
         };
       });
