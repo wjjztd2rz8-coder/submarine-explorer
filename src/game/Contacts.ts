@@ -1,5 +1,10 @@
-/** Fixed survey contacts share one naming and progress policy across every HUD. */
-export const CONTACT_CONFIG = { worldMarkerRangeM: 600, maxRangeFromPrimaryM: 1500 };
+/**
+ * Fixed survey contacts share one naming and progress policy across every HUD.
+ * `routeLinkM`: a contact counts toward the dive only when a chain of hops no longer
+ * than this joins it to a primary (through other counted contacts), so a dive is a
+ * short route and its "N of N" is reachable by holding forward and steering.
+ */
+export const CONTACT_CONFIG = { worldMarkerRangeM: 600, routeLinkM: 320 };
 
 export interface ContactPoi {
   id: string;
@@ -22,21 +27,27 @@ export function unknownContactsForSite<T extends ContactPoi>(
   const primary = new Set(primaryIds);
   const optional = new Set(optionalIds);
   const seen = new Set<string>();
-  // A contact kilometres from the dive is still discoverable but is not part of it.
-  const anchors = pois.flatMap((p) => (primary.has(p.id) && p.position ? [p.position] : []));
-  const tooFar = (p: T): boolean =>
-    !!p.position &&
-    anchors.length > 0 &&
-    anchors.every(
-      (a) =>
-        Math.hypot(a.x - p.position!.x, a.z - p.position!.z) > CONTACT_CONFIG.maxRangeFromPrimaryM,
-    );
-  return pois.filter((p) => {
+  const candidates = pois.filter((p) => {
     if (seen.has(p.id) || primary.has(p.id) || /^(life|secret|sample):/.test(p.id)) return false;
-    if (tooFar(p)) return false;
     seen.add(p.id);
     return Boolean(p.guideEntry) || optional.has(p.id);
   });
+  // A contact off the dive's route is still discoverable but is not part of it.
+  const anchors = pois.flatMap((p) => (primary.has(p.id) && p.position ? [p.position] : []));
+  if (!anchors.length) return candidates;
+  const linked = new Set<T>(candidates.filter((p) => !p.position));
+  const reach = [...anchors];
+  for (let i = 0; i < reach.length; i++) {
+    const from = reach[i]!;
+    for (const p of candidates) {
+      if (linked.has(p) || !p.position) continue;
+      if (Math.hypot(from.x - p.position.x, from.z - p.position.z) > CONTACT_CONFIG.routeLinkM)
+        continue;
+      linked.add(p);
+      reach.push(p.position);
+    }
+  }
+  return candidates.filter((p) => linked.has(p));
 }
 export function foundContactCount<T extends ContactPoi>(
   contacts: readonly T[],

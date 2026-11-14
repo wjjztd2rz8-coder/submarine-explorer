@@ -113,8 +113,8 @@ while (el() < +MAX) {
   if (
     await page.evaluate(
       () =>
-        !!document.querySelector('.debrief') &&
-        getComputedStyle(document.querySelector('.debrief')).display !== 'none',
+        !!document.querySelector('.debrief:not([hidden])') &&
+        getComputedStyle(document.querySelector('.debrief:not([hidden])')).display !== 'none',
     )
   ) {
     done = +el().toFixed(0);
@@ -149,14 +149,13 @@ if (done === null && (await sd.count()) && (await sd.first().isVisible())) {
   await sd.first().click();
 }
 await page.waitForTimeout(4000);
-if (await page.locator('.debrief').count()) {
+if (await page.locator('.debrief:not([hidden])').count()) {
   await shot('debrief');
   console.log(
     'DEBRIEF:',
-    (await page.evaluate(() => document.querySelector('.debrief')?.innerText ?? '')).replace(
-      /\s+/g,
-      ' ',
-    ),
+    (
+      await page.evaluate(() => document.querySelector('.debrief:not([hidden])')?.innerText ?? '')
+    ).replace(/\s+/g, ' '),
   );
 }
 console.log(

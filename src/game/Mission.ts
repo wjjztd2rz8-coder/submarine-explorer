@@ -311,16 +311,52 @@ type MissionEventName =
 /** A dive in progress: scans count and the clock runs. */
 const DIVING: ReadonlySet<MissionState> = new Set(['diving', 'primaries-complete']);
 
-/** Shared beam and waypoint priority: unfinished primaries, then nearest unfound contact. */
+/** A contact this close to the straight line to the next primary is visited on the way. */
+export const ROUTE_DETOUR_M = 120;
+
+/**
+ * Shared beam and waypoint priority: unfinished primaries in authored order, but a
+ * contact that lies on the way to that primary first; then the nearest unfound contact.
+ * `between(a, b)` is the distance between two POIs; without it primaries simply lead.
+ */
 export function nextScanObjective(
   objectives: readonly ObjectiveStatus[] = [],
   distance?: (poiId: string) => number,
+  between?: (a: string, b: string) => number,
 ): ObjectiveStatus | undefined {
-  return (
-    objectives.find((o) => o.resolved && !o.complete && o.primary) ??
-    objectives
-      .filter((o) => o.resolved && !o.complete)
-      .sort((a, b) => (distance ? distance(a.poiId) - distance(b.poiId) : 0))[0]
+  const open = objectives.filter((o) => o.resolved && !o.complete);
+  const nearest = (rows: ObjectiveStatus[]) =>
+    rows.sort((a, b) => (distance ? distance(a.poiId) - distance(b.poiId) : 0))[0];
+  const primary = open.find((o) => o.primary);
+  if (!primary) return nearest(open);
+  if (!distance || !between) return primary;
+  const toPrimary = distance(primary.poiId);
+  const onTheWay = open.filter((o) => {
+    if (o.primary) return false;
+    const d = distance(o.poiId);
+    return d < toPrimary && d + between(o.poiId, primary.poiId) <= toPrimary + ROUTE_DETOUR_M;
+  });
+  return nearest(onTheWay) ?? primary;
+}
+
+/** `nextScanObjective` from a world position, measuring with the placed POIs. */
+export function scanObjectiveFrom(
+  objectives: readonly ObjectiveStatus[] | undefined,
+  from: { distanceTo(p: { x: number; y: number; z: number }): number },
+  pois: ReadonlyArray<{ id: string; position: { x: number; y: number; z: number } }>,
+): ObjectiveStatus | undefined {
+  const at = (id: string) => pois.find((p) => p.id === id)?.position;
+  return nextScanObjective(
+    objectives,
+    (id) => {
+      const p = at(id);
+      return p ? from.distanceTo(p) : 0;
+    },
+    (a, b) => {
+      const pa = at(a);
+      const pb = at(b);
+      return pa && pb ? Math.hypot(pa.x - pb.x, pa.y - pb.y, pa.z - pb.z) : Infinity;
+    },
   );
 }
 

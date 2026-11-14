@@ -391,3 +391,32 @@ body:has(.debrief:not([hidden])) .d-scan-waypoints {
     font-size: 13px;
   }
 }
+
+/* "Finish dive": stays in the HUD bar once the primaries are done, so ending is always one tap. */
+.hud-finish {
+  pointer-events: auto;
+  min-height: 32px;
+  padding: 5px 12px;
+  border: 1px solid var(--b3-cyan);
+  border-radius: 4px;
+  background: var(--b3-cyan);
+  color: #06161c;
+  font: inherit;
+  font-size: clamp(12px, calc(12px * var(--ui-scale)), 16px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  animation: d-flow-banner-in 0.35s ease-out;
+}
+.hud-finish[hidden],
+body:not([data-app-state='dive']) .hud-finish {
+  display: none;
+}
+html.is-touch .hud-finish {
+  height: max(48px, calc(50px * var(--ui-scale)));
+}
+@media (prefers-reduced-motion: reduce) {
+  .hud-finish {
+    animation: none;
+  }
+}

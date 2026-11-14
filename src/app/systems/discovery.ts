@@ -6,7 +6,7 @@
  */
 
 import { Discovery } from '../../game/Discovery.js';
-import { nextScanObjective } from '../../game/Mission.js';
+import { scanObjectiveFrom } from '../../game/Mission.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
@@ -55,10 +55,10 @@ export const discoverySystem: GameSystem = {
       // Select before the beam locks; guidance runs later in the same frame.
       ctx.discovery.scanner.setObjective(
         () =>
-          nextScanObjective(ctx.missionRouter?.mission.objectives, (id) =>
-            ctx.sub.position.distanceTo(
-              ctx.discovery.pois.find((p) => p.id === id)?.position ?? ctx.sub.position,
-            ),
+          scanObjectiveFrom(
+            ctx.missionRouter?.mission.objectives,
+            ctx.sub.position,
+            ctx.discovery.pois,
           )?.poiId ?? null,
       );
       // Journal shortcuts remain available to the top Journal or Home overlay,

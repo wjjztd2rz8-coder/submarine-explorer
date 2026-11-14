@@ -126,8 +126,10 @@ export class Waypoints {
         Math.abs(projected.y) < 0.85;
       const marker = this.markers.get(poi.id);
       if (marker) {
+        // Other unknown contacts appear in range; the current target is always marked.
         marker.hidden =
-          !onscreen || (unknown ? !nearby || !this.visualHints : !scanned && !isCurrent);
+          !onscreen ||
+          (unknown ? !(nearby || isCurrent) || !this.visualHints : !scanned && !isCurrent);
         marker.classList.toggle('is-scanned', scanned);
         marker.classList.toggle('is-current', isCurrent);
         marker.textContent = unknown
@@ -144,13 +146,7 @@ export class Waypoints {
         }
       }
     }
-    if (
-      !current ||
-      !this.visualHints ||
-      (!this.state(current).primary &&
-        !this.state(current).found &&
-        _position.distanceTo(current.position) > CONTACT_CONFIG.worldMarkerRangeM)
-    ) {
+    if (!current || !this.visualHints) {
       this.edge.hidden = true;
       return;
     }
