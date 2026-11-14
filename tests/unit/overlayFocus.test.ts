@@ -358,7 +358,7 @@ it('compact shell site rows keep catalog, Tab and activation order while retaini
       };
       const depth = summaries[index].depthM!;
       expect(button.querySelector('.mission-item-meta')?.textContent).toBe(
-        `${Math.round(depth).toLocaleString('en-US')} m · Rated to ${requiredHull(depth).depthM.toLocaleString('en-US')} m`,
+        `${Math.round(depth).toLocaleString('en-US')} m · Safe to ${requiredHull(depth).depthM.toLocaleString('en-US')} m`,
       );
       expect(button.querySelector('.mission-item-progress')?.textContent).toBe(
         summaries[index].id === summaries[0].id ? `1/${doc.objectives.length} logged` : '',
@@ -410,9 +410,9 @@ it('keeps fresh, formerly locked and finished sites in authored order across pro
     expect(select.mock.calls.slice(-3).map(([id]) => id)).toEqual(ids);
     await vi.waitFor(() => {
       expect(buttons.map((b) => b.querySelector('.mission-item-meta')!.textContent)).toEqual([
-        '10,931 m · Rated to 11,000 m',
+        '10,931 m · Safe to 11,000 m',
         '',
-        '125 m · Rated to 1,000 m',
+        '125 m · Safe to 1,000 m',
       ]);
       expect(buttons[0].querySelector('.mission-stars')?.getAttribute('aria-label')).toBe(
         finished ? 'Best dive: 2 of 3 stars' : undefined,

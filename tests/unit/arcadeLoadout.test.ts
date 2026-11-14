@@ -387,7 +387,7 @@ describe('fresh-player mission routing and vehicle loadout', () => {
             content: { meta: string[][]; hazards: string[] };
           }
         ).content;
-        expect(copy.meta.find(([label]) => label === 'HULL')![1]).toBe('Rated to 6,500 m');
+        expect(copy.meta.find(([label]) => label === 'HULL')![1]).toBe('Safe to 6,500 m');
         // The hull meta row says it; the hazard list does not repeat it.
         expect(copy.hazards.join(' ')).not.toMatch(/Class [ABC]|rated to/);
         ctx.save.setGameplayMode('realistic');

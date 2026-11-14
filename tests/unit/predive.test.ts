@@ -25,8 +25,8 @@ describe('game modes', () => {
   it('describes what each preset actually sets', () => {
     const { arcade, realistic } = DEFAULT_CONFIG.settings.gameplayPresets;
     expect(arcade.visualHints && !arcade.batteryOxygen && arcade.currents === 'off').toBe(true);
-    expect(modeDescription('arcade')).toMatch(/waypoints/);
-    expect(modeDescription('arcade')).toMatch(/No battery limit or currents/);
+    expect(modeDescription('arcade')).toMatch(/waypoints/i);
+    expect(modeDescription('arcade')).toMatch(/no battery limit or currents/);
     expect(!realistic.visualHints && realistic.batteryOxygen).toBe(true);
     expect(realistic.currents).toBe('realistic');
     expect(modeDescription('realistic')).toMatch(/battery, oxygen and currents; no waypoints/);
