@@ -61,12 +61,23 @@ export function debriefModel(
     const image =
       photos.find((p) => p.siteId === site?.id && p.poiId === d.poiId)?.image ??
       entry?.guide?.image?.url;
-    return { ...d, image, text: entry?.guide?.paragraphs[0] ?? entry?.life?.info.text };
+    return {
+      ...d,
+      image,
+      text:
+        entry?.guide?.fact ??
+        entry?.life?.info.fact ??
+        entry?.guide?.paragraphs[0] ??
+        entry?.life?.info.text,
+      whole: Boolean(entry?.guide?.fact ?? entry?.life?.info.fact),
+    };
   });
-  const fact = [...finds]
+  const factFind = [...finds]
     .sort((a, b) => Number(primaryIds.includes(b.poiId)) - Number(primaryIds.includes(a.poiId)))
-    .find((d) => d.text)?.text;
-  const sentence = fact?.match(/^.*?[.!?](?=\s|$)|^.+$/s)?.[0];
+    .find((d) => d.text);
+  const fact = factFind?.text;
+  // Authored facts are shown whole; older paragraph text is cut to its first sentence.
+  const sentence = factFind?.whole ? fact : fact?.match(/^.*?[.!?](?=\s|$)|^.+$/s)?.[0];
   const counts = site && store ? siteFinds(site, store) : null;
   return {
     title:

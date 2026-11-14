@@ -64,3 +64,13 @@ body[data-app-state='pause'] .d-scan-waypoints {
 .d-scan-waypoints[data-palette='highContrast'] {
   color: #fff;
 }
+/* Unknown contacts and found names are secondary: a small tag, not a headline. */
+.d-scan-world-marker.is-unknown,
+.d-scan-world-marker.is-scanned {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(6, 16, 24, 0.55);
+  font-size: clamp(12px, calc(14px * var(--ui-scale)), 18px);
+  font-weight: 600;
+  white-space: nowrap;
+}

@@ -45,7 +45,7 @@ interface DiscoveryOptions {
   landmarkId: string;
   params?: URLSearchParams;
   /** Primary key label for an action, e.g. `input.primaryKeyLabel('scan')`. Read lazily. */
-  keyLabel?: (action: 'scan' | 'toggleGuide') => string;
+  keyLabel?: (action: 'scan' | 'toggleGuide' | 'ballastBlow' | 'ballastFlood') => string;
   /** Moves the sub (and snaps the camera) for the `?poi=` spawn. */
   teleport?: (pose: SpawnPose) => void;
   /** undefined = localStorage; null = in-memory only. */
@@ -71,7 +71,7 @@ export class Discovery {
   readonly ready: Promise<void>;
 
   reveal?: RevealController;
-  private lifeFacts: Record<string, { text: string }> = {};
+  private lifeFacts: Record<string, { text: string; fact?: string }> = {};
   pois: PlacedPoi[] = [];
   guideDoc: GuideDoc | null = null;
   entries: GuideEntry[] = [];
@@ -179,6 +179,8 @@ export class Discovery {
     return {
       scan: label ? label('scan') : 'F',
       guide: label ? label('toggleGuide') : 'J',
+      rise: label ? label('ballastBlow') : 'Space',
+      sink: label ? label('ballastFlood') : 'C',
     };
   }
 
@@ -227,11 +229,12 @@ export class Discovery {
       firstTime,
       this.keys(),
       this.scanner.view.lastCompleteSideFind,
-      revealExcerpt(
-        this.lifeFacts[entryId.replace(/^life\//, '')]?.text ?? 'Logged in the Journal.',
-        220,
-        1,
-      ),
+      this.lifeFacts[entryId.replace(/^life\//, '')]?.fact ??
+        revealExcerpt(
+          this.lifeFacts[entryId.replace(/^life\//, '')]?.text ?? 'Logged in the Journal.',
+          220,
+          1,
+        ),
     );
   }
 

@@ -27,6 +27,8 @@ export interface ScreenPoint {
 export interface ScanOverlayKeys {
   scan: string;
   guide: string;
+  rise?: string;
+  sink?: string;
 }
 
 const isTouch = (): boolean => document.documentElement.classList.contains('is-touch');
@@ -34,6 +36,19 @@ const isTouch = (): boolean => document.documentElement.classList.contains('is-t
 /** Plain directions shared by touch, keyboard and controller guidance. */
 export const turnCue = (turn: number): string =>
   Math.abs(turn) > 90 ? 'Turn around' : `Turn ${turn >= 0 ? 'right' : 'left'}`;
+
+/** A depth instruction when the target is well above or below, else null. */
+export const depthCue = (
+  distance: number,
+  vertDeg: number,
+  keys?: Pick<ScanOverlayKeys, 'rise' | 'sink'>,
+): string | null => {
+  const dy = distance * Math.sin((vertDeg * Math.PI) / 180);
+  if (Math.abs(dy) < 40 || Math.abs(vertDeg) < 12) return null;
+  // Touch players have the labelled RISE/SINK slider; keys are named only off touch.
+  const key = isTouch() ? undefined : dy > 0 ? keys?.rise : keys?.sink;
+  return `${dy > 0 ? 'Go up ↑' : 'Go down ↓'} ${Math.abs(dy).toFixed(0)} m${key ? ` (hold ${key})` : ''}`;
+};
 
 export const facingCue = (turn: number): string =>
   Math.abs(turn) > 90
@@ -370,9 +385,16 @@ export class ScanOverlay {
           // Keep the approach distance alongside plain steering directions.
           detail: view.objectiveInRange
             ? guide(turn, view.objectiveVertDeg, 'PITCH TOWARD TARGET')
-            : Math.abs(turn) >= 10
-              ? `${turnCue(turn)} · ${view.objectiveDistance.toFixed(0)} m`
-              : near,
+            : [
+                Math.abs(turn) >= 10 ? turnCue(turn) : null,
+                depthCue(view.objectiveDistance, view.objectiveVertDeg, keys),
+                Math.abs(turn) >= 10 ||
+                depthCue(view.objectiveDistance, view.objectiveVertDeg, keys)
+                  ? `${view.objectiveDistance.toFixed(0)} m`
+                  : near,
+              ]
+                .filter(Boolean)
+                .join(' · '),
           tone: view.objectiveInRange ? 'amber' : 'dim',
           ring: { progress: 0, label: `${view.objectiveDistance.toFixed(0)} m` },
         },

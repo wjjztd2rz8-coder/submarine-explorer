@@ -115,6 +115,8 @@ export interface SiteTable {
 
 export interface LifeJournalEntry {
   text: string;
+  /** One plain sentence for the scan card and debrief. */
+  fact?: string;
   facts?: Record<string, string>;
   sourceTitle: string;
   sourceUrl: string;

@@ -64,6 +64,7 @@ export function parseLifeDoc(raw: unknown): LifeDoc {
       sourceTitle: str(v.sourceTitle) || 'Source',
       sourceUrl: str(v.sourceUrl),
     };
+    if (str(v.fact)) entry.fact = str(v.fact);
     if (isObj(v.facts)) {
       const facts: Record<string, string> = {};
       for (const [k, val] of Object.entries(v.facts)) if (str(val)) facts[k] = str(val);

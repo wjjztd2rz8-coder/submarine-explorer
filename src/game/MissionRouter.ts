@@ -475,17 +475,18 @@ export class MissionRouter {
   }
 
   private showBanner(kind: 'primary' | 'all'): void {
+    // Everything at the site is found: end on the debrief, which leads to the next dive.
+    if (kind === 'all') {
+      this.endDive();
+      return;
+    }
     const { completed, total } = this.mission.counts();
     const left = total - completed;
-    const detail =
-      kind === 'all'
-        ? `${completed} of ${total} objectives. Surface when you are ready.`
-        : `${completed} of ${total} objectives. ` + `${left} unknown contacts remain on sonar.`;
     this.bannerLeft = Math.max(1, this.opts.config.mission.completionBannerS);
     this.panel.showBanner({
       stars: this.opts.stars?.(),
-      title: `${left} unknown contacts remain on sonar.`,
-      detail: detail.trim(),
+      title: 'Primary objectives complete',
+      detail: `${left} unknown ${left === 1 ? 'contact remains' : 'contacts remain'} on sonar.`,
       onKeepExploring: () => this.keepExploring(),
       onSurface: () => this.endDive(),
     });
