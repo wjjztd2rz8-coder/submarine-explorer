@@ -19,7 +19,13 @@
         "https://oceanexplorer.noaa.gov/news/million-mounds-news/",
         "https://www.gmrt.org/"
       ],
-      "note": "Real survey terrain: this tile shows ~72 m of local relief around this point (744.2 m at the sample coordinate against a shallower rim nearby), inside the tile's bbox (part of the wider Blake Plateau coral province mapped by Sowers et al. 2024). At this tile's ~53 x 61 m cell size, individual coral colonies and small mounds are not resolved, but the broader mound-field relief is real terrain, not invented."
+      "note": "Real survey terrain: this tile shows ~72 m of local relief around this point (744.2 m at the sample coordinate against a shallower rim nearby), inside the tile's bbox (part of the wider Blake Plateau coral province mapped by Sowers et al. 2024). At this tile's ~53 x 61 m cell size, individual coral colonies and small mounds are not resolved, but the broader mound-field relief is real terrain, not invented.",
+      "reveal": {
+        "distance_m": 50,
+        "elevation_deg": 18,
+        "azimuth_deg": 205,
+        "target_offset": [0, -3, 0]
+      }
     },
     {
       "id": "blake-coral-thicket",
@@ -38,7 +44,13 @@
         "https://oceanexplorer.noaa.gov/news/million-mounds-news/",
         "https://doi.org/10.3390/geomatics4010002"
       ],
-      "note": "The mound terrain here is real (this tile), but the coral colonies themselves are placed reconstructions -- this game's terrain resolution cannot show individual coral heads. Desmophyllum pertusum is documented as the dominant reef-building species across the wider Blake Plateau province (Sowers et al. 2024, NOAA); its presence at this exact point is inferred from that province-wide finding, not a site-specific survey record, hence medium rather than high confidence."
+      "note": "The mound terrain here is real (this tile), but the coral colonies themselves are placed reconstructions -- this game's terrain resolution cannot show individual coral heads. Desmophyllum pertusum is documented as the dominant reef-building species across the wider Blake Plateau province (Sowers et al. 2024, NOAA); its presence at this exact point is inferred from that province-wide finding, not a site-specific survey record, hence medium rather than high confidence.",
+      "reveal": {
+        "distance_m": 40,
+        "elevation_deg": 16,
+        "azimuth_deg": 195,
+        "target_offset": [-8.7, 31.5, 75.7]
+      }
     },
     {
       "id": "blake-second-mound",
@@ -57,7 +69,13 @@
         "https://www.gmrt.org/",
         "https://oceanexplorer.noaa.gov/news/million-mounds-news/"
       ],
-      "note": "The GMRT grid reads 775.5 m at this marker, about 294 m southwest of the core scan. These local depths do not establish the position of an individual coral mound in the Sowers et al. 2024 classification. The scan samples regional terrain; no colony coordinate is claimed."
+      "note": "The GMRT grid reads 775.5 m at this marker, about 294 m southwest of the core scan. These local depths do not establish the position of an individual coral mound in the Sowers et al. 2024 classification. The scan samples regional terrain; no colony coordinate is claimed.",
+      "reveal": {
+        "distance_m": 48,
+        "elevation_deg": 16,
+        "azimuth_deg": 215,
+        "target_offset": [12, 0.5, -12]
+      }
     },
     {
       "id": "blake-inter-mound-channel",
@@ -73,7 +91,13 @@
       "confidence": "high",
       "reconstruction": false,
       "sources": ["https://www.gmrt.org/"],
-      "note": "The GMRT grid reads 779.7 m at this point, lower than the core marker at 744.2 m. The terrain depth alone does not establish a surveyed channel between individual coral mounds."
+      "note": "The GMRT grid reads 779.7 m at this point, lower than the core marker at 744.2 m. The terrain depth alone does not establish a surveyed channel between individual coral mounds.",
+      "reveal": {
+        "distance_m": 44,
+        "elevation_deg": 18,
+        "azimuth_deg": 170,
+        "target_offset": [-10, -2, 65]
+      }
     }
   ]
 }
