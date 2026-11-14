@@ -130,7 +130,7 @@ export function createRevealSystem(): GameSystem {
               card.show(
                 poi.id,
                 poi.name,
-                revealExcerpt(entry?.paragraphs.join(' ') ?? ''),
+                entry?.fact ?? revealExcerpt(entry?.paragraphs.join(' ') ?? ''),
                 ctx.discovery.pois.filter((p) =>
                   ctx.discovery.store.isDiscovered(p.landmarkId, p.id),
                 ).length,

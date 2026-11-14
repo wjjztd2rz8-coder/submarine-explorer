@@ -1,0 +1,75 @@
+// Scripted player for the sprint build: follows the marker, scans, watches reveals, reports timings.
+// Usage: node tools/playtest/tour.mjs <outDir> <site|''> [maxSeconds] [width] [height] [baseUrl]
+import { createRequire } from 'node:module';
+const require = createRequire('/home/vijay/submarine-explorer/package.json');
+const { chromium } = require('@playwright/test');
+const [OUT, SITE = '', MAX = '240', W = '1280', H = '720', BASE = 'http://127.0.0.1:4787/'] = process.argv.slice(2);
+const tag = SITE || 'first';
+const browser = await chromium.launch({ args: ['--ignore-gpu-blocklist', '--use-angle=vulkan', '--enable-features=Vulkan', '--disable-vulkan-surface'] });
+const page = await (await browser.newContext({ viewport: { width: +W, height: +H } })).newPage();
+const errs = [];
+page.on('pageerror', (e) => errs.push(String(e).slice(0, 200)));
+page.on('console', (m) => m.type() === 'error' && errs.push(m.text().slice(0, 200)));
+let n = 0;
+const shot = async (name) => { n += 1; await page.screenshot({ path: `${OUT}/${tag}-${String(n).padStart(2, '0')}-${name}.png` }); };
+await page.goto(SITE ? `${BASE}?mission=${SITE}` : BASE);
+await page.waitForTimeout(3500);
+if (!SITE) { await shot('home'); await page.getByRole('button', { name: /^Dive:/ }).click(); await page.waitForTimeout(3000); }
+const begin = page.getByRole('button', { name: /Begin dive/ });
+await begin.waitFor({ timeout: 30000 });
+await shot('briefing');
+await begin.click();
+await page.waitForTimeout(2500);
+await shot('start');
+const read = () => page.evaluate(() => {
+  const vis = (el) => { if (!el) return false; const r = el.getBoundingClientRect(); const s = getComputedStyle(el); return r.width > 0 && s.display !== 'none' && s.visibility !== 'hidden' && Number(s.opacity) > 0.05; };
+  const mk = [...document.querySelectorAll('.d-scan-world-marker.is-current'), ...document.querySelectorAll('.d-scan-world-marker')].find(vis);
+  const r = mk && mk.getBoundingClientRect();
+  const rv = document.querySelector('.discovery-reveal');
+  const g = window.__game;
+  let found = null;
+  try { found = g?.discovery?.pois?.filter((p) => g.discoveries.isDiscovered(p.landmarkId, p.id)).length ?? null; } catch {}
+  return {
+    mx: r ? r.x + r.width / 2 : null, w: innerWidth,
+    reveal: vis(rv) ? rv.getAttribute('data-poi') : null,
+    revealText: vis(rv) ? rv.innerText.replace(/\s+/g, ' ') : '',
+    guide: (document.querySelector('.guidance-slot')?.innerText ?? '').replace(/\s+/g, ' '),
+    speed: [...document.querySelectorAll('.hud-value')].map((e) => e.innerText).join(' | '),
+    all: document.body.innerText.replace(/\s+/g, ' ').toLowerCase(),
+    found,
+  };
+});
+const held = new Set();
+const hold = async (k, on) => { if (on && !held.has(k)) { await page.keyboard.down(k); held.add(k); } else if (!on && held.has(k)) { await page.keyboard.up(k); held.delete(k); } };
+const t0 = Date.now(); const el = () => (Date.now() - t0) / 1000;
+let lastGuide = ''; let lastReveal = null; const reveals = []; let done = null; let primariesAt = null;
+while (el() < +MAX) {
+  const s = await read();
+  if (s.reveal) {
+    for (const k of [...held]) await hold(k, false);
+    if (s.reveal !== lastReveal) {
+      lastReveal = s.reveal;
+      reveals.push({ poi: s.reveal, at: +el().toFixed(0), text: s.revealText });
+      console.log(`[${el().toFixed(0)}s] REVEAL ${s.reveal}: ${s.revealText}`);
+      await page.waitForTimeout(2600); await shot(`reveal-${s.reveal}`);
+    }
+    await page.waitForTimeout(400); continue;
+  }
+  lastReveal = null;
+  const sig = s.guide.replace(/\d+/g, '#');
+  if (sig !== lastGuide) { lastGuide = sig; console.log(`[${el().toFixed(0)}s] ${s.guide} | ${s.speed} | found ${s.found}`); if (n < 40) await shot(`t${el().toFixed(0)}`); }
+  if (primariesAt === null && /primary objectives complete|primaries complete/.test(s.all)) primariesAt = +el().toFixed(0);
+  if (/all objectives complete|everything .*found|all contacts found/.test(s.all)) { done = +el().toFixed(0); break; }
+  const c = s.w / 2; let port = false, stbd = false;
+  if (s.mx !== null) { port = s.mx < c - 80; stbd = s.mx > c + 80; } else port = true;
+  const g = s.guide.toLowerCase();
+  const scan = /scan target|scanning|hold g/.test(g) && !/get closer|turn toward/.test(g) && s.mx !== null && Math.abs(s.mx - c) < 170;
+  await hold('a', port); await hold('d', stbd); await hold('g', scan); await hold('w', !scan);
+  await page.waitForTimeout(350);
+}
+for (const k of [...held]) await page.keyboard.up(k);
+await page.waitForTimeout(1000); await shot('end-state');
+const sd = page.getByRole('button', { name: /Surface and debrief/ });
+if (await sd.count() && await sd.first().isVisible()) { await sd.first().click(); await page.waitForTimeout(5000); await shot('debrief'); console.log('DEBRIEF:', (await page.evaluate(() => document.querySelector('.debrief')?.innerText ?? '')).replace(/\s+/g, ' ')); }
+console.log('RESULT', JSON.stringify({ site: tag, firstReveal: reveals[0]?.at ?? null, reveals: reveals.length, primariesAt, allDoneAt: done, seconds: +el().toFixed(0), errs: errs.slice(0, 5) }));
+await browser.close();

@@ -29,6 +29,8 @@ export interface GuideEntry {
   id: string;
   title: string;
   paragraphs: string[];
+  /** One or two plain sentences for the discovery card. */
+  fact?: string;
   facts: GuideFact[];
   image?: GuideImage;
   reconstruction: boolean;
@@ -99,6 +101,7 @@ function parseEntry(raw: unknown): GuideEntry | null {
     id,
     title: str(o.title) ?? id,
     paragraphs: strList(o.paragraphs),
+    ...(str(o.fact) ? { fact: str(o.fact) } : {}),
     facts,
     reconstruction: o.reconstruction === true,
     sources,

@@ -55,6 +55,7 @@ export function resolveEffective(
       coneHalfAngleDeg:
         preset === 'realistic' ? base.scan.coneHalfAngleDeg : base.scan.arcadeConeHalfAngleDeg,
       radiusFloorM: preset === 'realistic' ? 0 : 100,
+      ...(preset === 'realistic' ? {} : { radiusCeilM: 120 }),
       hintRangeFactor:
         base.scan.hintRangeFactor * sensor.hintRangeMultiplier * EQUIPMENT.scanDetail,
     },

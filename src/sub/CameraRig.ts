@@ -61,6 +61,7 @@ export class CameraRig {
 
   private revealShot: {
     target: THREE.Vector3;
+    look?: THREE.Vector3;
     distance: number;
     elevation: number;
     azimuth: number;
@@ -74,6 +75,7 @@ export class CameraRig {
 
   beginReveal(shot: {
     target: THREE.Vector3;
+    look?: THREE.Vector3;
     distance: number;
     elevation: number;
     azimuth: number;
@@ -406,7 +408,7 @@ export class CameraRig {
             this.camera.position.y,
             this.terrain.sampleHeight(this.camera.position.x, this.camera.position.z) + 4,
           );
-        this.camera.lookAt(shot.target);
+        this.camera.lookAt(shot.look ?? shot.target);
         const rotation = this.camera.quaternion.clone();
         this.camera.position.lerpVectors(shot.from, this.camera.position.clone(), eased);
         this.camera.quaternion.slerpQuaternions(shot.rotation, rotation, eased);

@@ -1,10 +1,11 @@
 /** Fixed survey contacts share one naming and progress policy across every HUD. */
-export const CONTACT_CONFIG = { worldMarkerRangeM: 600 };
+export const CONTACT_CONFIG = { worldMarkerRangeM: 600, maxRangeFromPrimaryM: 1500 };
 
 export interface ContactPoi {
   id: string;
   name: string;
   guideEntry?: string | null;
+  position?: { x: number; z: number };
 }
 export interface ContactState {
   primary: boolean;
@@ -21,8 +22,18 @@ export function unknownContactsForSite<T extends ContactPoi>(
   const primary = new Set(primaryIds);
   const optional = new Set(optionalIds);
   const seen = new Set<string>();
+  // A contact kilometres from the dive is still discoverable but is not part of it.
+  const anchors = pois.flatMap((p) => (primary.has(p.id) && p.position ? [p.position] : []));
+  const tooFar = (p: T): boolean =>
+    !!p.position &&
+    anchors.length > 0 &&
+    anchors.every(
+      (a) =>
+        Math.hypot(a.x - p.position!.x, a.z - p.position!.z) > CONTACT_CONFIG.maxRangeFromPrimaryM,
+    );
   return pois.filter((p) => {
     if (seen.has(p.id) || primary.has(p.id) || /^(life|secret|sample):/.test(p.id)) return false;
+    if (tooFar(p)) return false;
     seen.add(p.id);
     return Boolean(p.guideEntry) || optional.has(p.id);
   });

@@ -50,14 +50,15 @@ interface ScanEmitter {
 export type ScannerConfig = Pick<
   ScanConfig,
   'coneHalfAngleDeg' | 'closeRangeM' | 'decayPerSecond' | 'progressEventHz' | 'hintRangeFactor'
-> & { radiusFloorM?: number };
+> & { radiusFloorM?: number; radiusCeilM?: number };
 
 /** Apply the mode floor after sensor scaling and any mission approach cap. */
 export function resolveScanRadius(
   radius: number,
-  config: Pick<ScannerConfig, 'radiusFloorM'>,
+  config: Pick<ScannerConfig, 'radiusFloorM' | 'radiusCeilM'>,
 ): number {
-  return Math.max(radius, config.radiusFloorM ?? 0);
+  // The ceiling keeps wide-area targets from scanning before the approach slows.
+  return Math.min(Math.max(radius, config.radiusFloorM ?? 0), config.radiusCeilM ?? Infinity);
 }
 
 type ScanPhase = 'idle' | 'scanning' | 'interrupted';

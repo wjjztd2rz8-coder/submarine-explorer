@@ -36,7 +36,9 @@ export const turnCue = (turn: number): string =>
   Math.abs(turn) > 90 ? 'Turn around' : `Turn ${turn >= 0 ? 'right' : 'left'}`;
 
 export const facingCue = (turn: number): string =>
-  `Turn toward the marker · ${Math.abs(turn) > 90 ? 'Turn around' : turn >= 0 ? 'right →' : 'left ←'}`;
+  Math.abs(turn) > 90
+    ? 'Turn around to face the marker'
+    : `Turn toward the marker · ${turn >= 0 ? 'right →' : 'left ←'}`;
 
 export class ScanOverlay {
   readonly root: HTMLDivElement;

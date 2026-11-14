@@ -16,6 +16,9 @@ export function revealExcerpt(text: string, max = 220, sentences = 2): string {
   return clean.slice(0, max - 1).replace(/\s+\S*$/, '') + '…';
 }
 
+/** Share of the half-frame height by which the subject is raised above centre. */
+const REVEAL_CARD_SHARE = 0.34;
+
 export function revealFrame(
   poi: PlacedPoi,
   pilot: Vector3,
@@ -27,14 +30,21 @@ export function revealFrame(
   const target = sphere?.center.clone() ?? poi.position.clone().add(new Vector3(0, 5, 0));
   if (settings?.target_offset) target.add(new Vector3(...settings.target_offset));
   const halfFov = MathUtils.degToRad(fov / 2);
-  const fit = sphere
-    ? sphere.radius / Math.sin(Math.atan(Math.tan(halfFov) * Math.min(1, aspect) * 0.6))
-    : 0;
-  const fallback = poi.kind === 'wreck' ? 70 : /vent|tower|chimney/.test(poi.kind) ? 45 : 25;
+  // Fill most of the frame: wide subjects set the distance in landscape, and
+  // portrait accepts cropped ends because the sweep pans across them.
+  const fill = Math.tan(halfFov) * MathUtils.clamp(aspect * 0.75, 0.8, 1.15);
+  const wreck = poi.kind === 'wreck';
+  const fit = sphere ? MathUtils.clamp(sphere.radius / fill, 12, wreck ? 150 : 80) : 0;
+  const fallback = wreck ? 70 : /vent|tower|chimney/.test(poi.kind) ? 45 : 25;
+  const distance = settings?.distance_m ?? (sphere ? fit : fallback);
+  // The card covers the lower third, so aim below the subject to lift it clear.
+  const look = target.clone();
+  look.y -= distance * Math.tan(halfFov) * REVEAL_CARD_SHARE;
   return {
     target,
-    distance: settings?.distance_m ?? (sphere ? Math.max(10, fit) : fallback),
-    elevation: MathUtils.degToRad(settings?.elevation_deg ?? 12),
+    look,
+    distance,
+    elevation: MathUtils.degToRad(settings?.elevation_deg ?? 10),
     azimuth:
       settings?.azimuth_deg !== undefined
         ? MathUtils.degToRad(settings.azimuth_deg)
