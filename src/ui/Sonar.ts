@@ -1,3 +1,4 @@
+import { contactLabel, type ContactState } from '../game/Contacts.js';
 /**
  * 2D canvas minimap ("sonar"): the tile's heightmap, downsampled once into an
  * offscreen ImageData for the local viewport, with heading and scan contacts
@@ -463,6 +464,10 @@ export class Sonar {
     this.faintContacts = contacts;
   }
 
+  private contactState: ((poi: PlacedPoi) => ContactState) | null = null;
+  setContactState(state: (poi: PlacedPoi) => ContactState): void {
+    this.contactState = state;
+  }
   setPois(pois: readonly PlacedPoi[]): void {
     this.pois = pois;
     this.reliefDirty = true;
@@ -959,17 +964,21 @@ export class Sonar {
     this.markers = this.pois.map((poi) => {
       const { px, py } = this.project(poi.position.x, poi.position.z);
       const distanceM = Math.hypot(poi.position.x - s.position.x, poi.position.z - s.position.z);
-      const scanned = this.scanState(poi);
+      const state = this.contactState?.(poi) ?? {
+        primary: poi.primary !== false,
+        found: this.scanState(poi),
+      };
+      const scanned = state.found;
       const current = !scanned && poi.id === this.objectivePoiId;
       return {
         poiId: poi.id,
-        name: poi.name,
+        name: contactLabel(poi, state),
         px,
         py,
         distanceM,
         scanned,
         current,
-        icon: sonarPoiIcon(scanned, current),
+        icon: !state.primary && !scanned ? '?' : sonarPoiIcon(scanned, current),
         // Contacts outside the current view are hidden, including those in
         // sensor range; zoom out or move the boat to reveal them.
         visible: this.showMarkers && sonarPoiVisible(distanceM, this.sensorRangeM, px, py, w, h),

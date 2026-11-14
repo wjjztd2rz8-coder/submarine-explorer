@@ -484,7 +484,9 @@ describe('MissionRouter completion timing', () => {
     expect(current()).toBe('primary');
     scan('primary');
     expect(router.mission.objectives[0].complete).toBe(true);
-    expect(current()).toBe('optional');
+    expect(control(router.panel.root, 'obj-contacts').textContent).toBe(
+      'Unknown contacts: 0 of 1 found',
+    );
     scan('optional');
     expect(control(router.panel.root, 'obj-progress').textContent).toContain('all complete');
   });
@@ -583,7 +585,7 @@ describe('MissionRouter completion timing', () => {
     expect(router.mission.emitted).toEqual(completedEvents);
     frame(router);
     expect(router.panel.bannerOpen).toBe(true);
-    expect(title()).toBe('All objectives complete');
+    expect(title()).toBe('0 unknown contacts remain on sonar.');
     expect(control(router.panel.root, 'obj-banner-detail').textContent).toBe(
       '3 of 3 objectives. Surface when you are ready.',
     );
@@ -617,7 +619,7 @@ describe('MissionRouter completion timing', () => {
       scan('primary');
       scan('optional');
       advance(router, DEFAULT_CONFIG.mission.completeDelayS);
-      expect(control(router.panel.root, 'obj-banner-stars').textContent).toBe('★★☆');
+      expect(control(router.panel.root, 'obj-banner-stars').textContent).toBe('★★★');
       progress.award(kind, kind === 'photo' ? 'reef/primary' : 'ray');
       frame(router);
       expect(control(router.panel.root, 'obj-banner-stars').textContent).toBe('★★★');
@@ -712,7 +714,7 @@ describe('MissionRouter completion timing', () => {
     router.keepExploring();
     bus.emit('scan:complete', { poiId: 'optional', landmarkId: 'reef', firstTime: false });
     advance(router, 3);
-    expect(title()).toBe('All objectives complete');
+    expect(title()).toBe('0 unknown contacts remain on sonar.');
     expect(router.endDive()).toBe(true);
     expect(events().filter((name) => name === 'mission:complete')).toHaveLength(1);
     expect(aborted.counts()).toEqual({ completed: 0, total: 2 });
@@ -727,7 +729,7 @@ describe('MissionRouter completion timing', () => {
         pauseAndResume(router);
       } else {
         advance(router, 3);
-        expect(title()).toBe('Primary objectives complete');
+        expect(title()).toBe('1 unknown contacts remain on sonar.');
         advance(router, phase === 'open' ? 1 : 20);
         expect(router.panel.bannerOpen).toBe(phase === 'open');
       }
@@ -738,7 +740,7 @@ describe('MissionRouter completion timing', () => {
       expect(router.panel.bannerOpen).toBe(false);
       frame(router);
       expect(router.panel.bannerOpen).toBe(true);
-      expect(title()).toBe('All objectives complete');
+      expect(title()).toBe('0 unknown contacts remain on sonar.');
       expect(control(router.panel.root, 'obj-banner-detail').textContent).toBe(
         '2 of 2 objectives. Surface when you are ready.',
       );
@@ -922,7 +924,7 @@ describe('MissionRouter completion timing', () => {
     frame(router, { resumeFrame: true });
     scan('optional');
     advance(router, 3);
-    expect(title()).toBe('All objectives complete');
+    expect(title()).toBe('0 unknown contacts remain on sonar.');
     bus.emit('sub:emergencyBlow', { depth: 200, lockSeconds: 8, cause: 'power' });
     frame(router, { emergencyBlow: false });
     const summary = router.debrief?.last;

@@ -1,3 +1,4 @@
+import { legacyFoundContactIds } from '../../game/Contacts.js';
 /**
  * Missions (docs/missions.md): the briefing (freezes the game until "Begin
  * dive" / Enter), objectives panel, completion and the mission debrief.
@@ -103,6 +104,21 @@ export const missionSystem: GameSystem = {
       headlights.setEnabled(true);
     };
     ctx.applyMissionStart = applyMissionStart;
+    // Register before the router resolves contacts; migration is idempotent in the discovery store.
+    void discovery.ready.then(() => {
+      if (disposed || !route) return;
+      for (const id of legacyFoundContactIds(
+        route.def.objectives,
+        route.missionId,
+        ctx.progress?.snapshot().awarded,
+      )) {
+        if (
+          discovery.pois.some((p) => p.id === id) &&
+          !discovery.store.isDiscovered(route.landmarkId, id)
+        )
+          discovery.store.record(route.landmarkId, id);
+      }
+    });
     const missionRouter = route
       ? new MissionRouter({
           route: {

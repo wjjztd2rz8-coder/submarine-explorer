@@ -1,3 +1,4 @@
+import poiData from '../../data/landmarks/titanic/pois.json' with { type: 'json' };
 import missionData from '../../data/landmarks/titanic/mission.json' with { type: 'json' };
 import fixtureGuide from '../../data/landmarks/_test/guide.json' with { type: 'json' };
 import { reviewScreenshot } from './helpers/render.js';
@@ -305,7 +306,7 @@ freshTest.describe('legacy save persistence', () => {
   }
 });
 
-const objectiveCount = missionData.objectives.length;
+const objectiveCount = poiData.pois.length;
 const primaryCount = missionData.objectives.filter((o) => o.primary).length;
 const secondaryCount = objectiveCount - primaryCount;
 
@@ -487,9 +488,11 @@ freshTest.describe('mission progression and Home Journal', () => {
       expect(p.state).toBe('primaries-complete');
       const banner = page.locator('.obj-banner');
       await expect(banner).toBeVisible({ timeout: 30_000 });
-      await expect(banner.locator('.obj-banner-title')).toHaveText('Primary objectives complete');
+      await expect(banner.locator('.obj-banner-title')).toHaveText(
+        `${secondaryCount} unknown contacts remain on sonar.`,
+      );
       await expect(banner.locator('.obj-banner-detail')).toHaveText(
-        `${primaryCount} of ${objectiveCount} objectives. ${secondaryCount} optional targets remain.`,
+        `${primaryCount} of ${objectiveCount} objectives. ${secondaryCount} unknown contacts remain on sonar.`,
       );
       await expect(banner.locator('button')).toHaveText(['Keep exploring', 'Surface and debrief']);
       // The banner is the one completion presentation: it carries the stars earned so far.

@@ -707,7 +707,9 @@ describe('guidance slot', () => {
       };
       const edge = (waypoints.root as unknown as FakeElement).children[0];
       const checkWaypoint = () => {
-        const objective = nextScanObjective(mission.objectives);
+        const objective = nextScanObjective(mission.objectives, (id) =>
+          position.distanceTo(pois.find((p) => p.id === id)!.position),
+        );
         expect(frame.nextScanObjective?.poiId).toBe(objective?.poiId);
         const next = pois.find((p) => p.id === objective?.poiId);
         expect(edge.children).toHaveLength(0);
@@ -780,7 +782,7 @@ describe('guidance slot', () => {
               expect(card.kind).toBe('discovery');
               if (!touch)
                 expect(card.detail).toBe(firstTime ? 'PRESS J · JOURNAL' : 'LOGGED · JOURNAL');
-              else if (turn !== 0) {
+              else if (turn !== 0 && scanner.view.objectiveId !== scanner.view.candidateId) {
                 expect(card.detail).toBe(`${next.name} · TURN ${turn < 0 ? 'RIGHT' : 'LEFT'}`);
               } else expect(card.detail).toBe(firstTime ? 'OPEN JOURNAL' : 'LOGGED · JOURNAL');
             }

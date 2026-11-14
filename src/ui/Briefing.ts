@@ -150,6 +150,11 @@ export class Briefing {
     return this.trap.active;
   }
 
+  setContactProgress(found: number, total: number): void {
+    const row = this.root.querySelector('.briefing-contacts');
+    if (row) row.textContent = `Unknown contacts: ${found} of ${total} found`;
+  }
+
   show(c: BriefingContent): void {
     const p = this.panel;
     p.replaceChildren();
@@ -172,7 +177,7 @@ export class Briefing {
     const obj = el('section', 'briefing-section is-objectives');
     obj.append(el('h2', 'briefing-section-title', 'OBJECTIVES'));
     const ol = el('ul', 'briefing-objectives');
-    for (const o of c.objectives) {
+    for (const o of c.objectives.filter((o) => o.primary)) {
       const li = el('li', o.primary ? 'is-primary' : 'is-secondary');
       li.append(
         el('span', 'briefing-box', '☐'),
@@ -181,6 +186,8 @@ export class Briefing {
       );
       ol.append(li);
     }
+    const contacts = c.objectives.filter((o) => !o.primary);
+    ol.append(el('li', 'briefing-contacts', `Unknown contacts: 0 of ${contacts.length} found`));
     obj.append(ol);
     p.append(obj);
     // The memorial note stays on the card; everything else about the site is

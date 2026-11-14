@@ -338,7 +338,7 @@ it('compact shell site rows keep catalog, Tab and activation order while retaini
     expect(button.title).toBe(summaries[index].summary);
     // Reward labels appear only on the earned row; unvisited rows carry no empty stars.
     expect(button.querySelector('.mission-stars')?.getAttribute('aria-label')).toBe(
-      index === 0 ? 'Best dive: 2 of 3 stars' : undefined,
+      index === 0 ? 'Best dive: 3 of 3 stars' : undefined,
     );
     button.dispatchEvent(new Event('focus'));
     expect(preview).toHaveBeenLastCalledWith(summaries[index].id);
@@ -415,7 +415,7 @@ it('keeps fresh, formerly locked and finished sites in authored order across pro
         '125 m · Safe to 1,000 m',
       ]);
       expect(buttons[0].querySelector('.mission-stars')?.getAttribute('aria-label')).toBe(
-        finished ? 'Best dive: 2 of 3 stars' : undefined,
+        finished ? 'Best dive: 3 of 3 stars' : undefined,
       );
       expect(buttons[1].querySelector('.mission-stars')).toBeNull();
       expect(buttons[0].querySelector('.mission-item-progress')!.textContent).toBe(
@@ -2437,108 +2437,29 @@ describe('overlay policies across the app', () => {
     expect(surface).toHaveBeenCalledOnce();
   });
 
-  it.each([
-    {
-      done: [],
-      optionalOnly: false,
-      rows: ['a', 'b', 'side'],
-      current: 'a',
-      progress: '0 of 3 objectives · 0 of 2 primary',
-    },
-    {
-      done: ['a'],
-      optionalOnly: false,
-      rows: ['b', 'side'],
-      current: 'b',
-      progress: '1 of 3 objectives · 1 of 2 primary',
-    },
-    {
-      done: ['a', 'b'],
-      optionalOnly: false,
-      rows: ['side'],
-      current: 'side',
-      progress: '2 of 3 objectives · primaries done',
-    },
-    {
-      done: ['a', 'b', 'side'],
-      optionalOnly: false,
-      rows: ['a', 'b', 'side'],
-      current: 'a',
-      progress: '3 of 3 objectives · all complete',
-    },
-    {
-      done: ['a'],
-      optionalOnly: true,
-      rows: ['side', 'b'],
-      current: 'side',
-      progress: '1 of 3 objectives · 0 of 0 primary',
-    },
-  ])(
-    'keeps objective rows and the current step honest for $done (optionalOnly=$optionalOnly)',
-    (test) => {
-      // Guards completed-row filtering, stable authored order and accessible current-step handoff.
-      const panel = new ObjectivesPanel();
-      cleanup.push(() => panel.dispose());
-      const objectives: ObjectiveStatus[] = ['side', 'a', 'b'].map((id) => ({
-        id,
-        title: `Scan ${id}`,
-        hint: `Find ${id}`,
-        poiId: id,
-        primary: !test.optionalOnly && id !== 'side',
-        resolved: true,
-        complete: false,
-      }));
-      panel.setObjectives(objectives);
-      panel.setObjectives(objectives.map((o) => ({ ...o, complete: test.done.includes(o.id) })));
-      const root = panel.root as unknown as Element;
-      const rows = root.querySelectorAll('.obj-item');
-      expect(rows.map((row) => row.dataset.objective)).toEqual(test.rows);
-      expect(
-        rows
-          .filter((row) => row.getAttribute('aria-current') === 'step')
-          .map((row) => row.dataset.objective),
-      ).toEqual([test.current]);
-      expect(rows.filter((row) => row.classList.contains('is-complete'))).toHaveLength(
-        test.done.length === 3 ? 3 : 0,
-      );
-      expect(root.querySelector('.obj-progress')!.textContent).toBe(test.progress);
-      expect(root.querySelector('.obj-hint')).toBeNull();
-      expect(root.querySelector('.obj-nav')).toBeNull();
-      expect(objectives.map((o) => o.id)).toEqual(['side', 'a', 'b']);
-      panel.setObjectives([]);
-      expect(root.querySelectorAll('.obj-item')).toHaveLength(0);
-      expect(root.querySelector('.obj-hint')).toBeNull();
-    },
-  );
-
-  it('wraps a long objective list around the selected step and drops finished rows before counting more', () => {
+  it('shows named primaries and one contact count through completion', () => {
     const panel = new ObjectivesPanel();
     cleanup.push(() => panel.dispose());
-    const objectives: ObjectiveStatus[] = Array.from({ length: 8 }, (_, i) => ({
-      id: `o${i}`,
-      title: `Scan ${i}`,
+    const objectives: ObjectiveStatus[] = ['a', 'b', 'side'].map((id) => ({
+      id,
+      title: `Scan ${id}`,
       hint: '',
-      poiId: `p${i}`,
-      primary: i < 6,
+      poiId: id,
+      primary: id !== 'side',
       resolved: true,
-      complete: i === 0,
+      complete: false,
     }));
     panel.setObjectives(objectives);
-    // Unresolved early rows must not hide the next navigable primary near the end.
-    panel.setObjectives(objectives.map((o, i) => ({ ...o, resolved: i === 0 || i >= 5 })));
     const root = panel.root as unknown as Element;
     expect(root.querySelectorAll('.obj-item').map((row) => row.dataset.objective)).toEqual([
-      'o5',
-      'o6',
-      'o7',
-      'o1',
+      'a',
+      'b',
     ]);
-    expect(root.querySelector('.obj-more')!.textContent).toBe('+3 more · Esc for all');
-    expect(
-      root
-        .querySelectorAll('.obj-item')
-        .filter((row) => row.getAttribute('aria-current') === 'step'),
-    ).toHaveLength(1);
+    expect(root.querySelector('.obj-contacts')!.textContent).toBe('Unknown contacts: 0 of 1 found');
+    panel.setObjectives(objectives.map((o) => ({ ...o, complete: true })));
+    expect(root.querySelectorAll('.obj-item')).toHaveLength(2);
+    expect(root.querySelector('.obj-contacts')!.textContent).toBe('Unknown contacts: 1 of 1 found');
+    expect(root.querySelector('.obj-optional')).toBeNull();
   });
 
   it.each(['Settings', 'Briefing', 'Debrief', 'Journal', 'Controls', 'Pause', 'Photo'] as const)(

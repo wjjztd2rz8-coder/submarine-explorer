@@ -218,7 +218,13 @@ interface XYZ {
 /** The parts of Discovery the mission uses (Discovery satisfies it). */
 interface MissionDiscovery {
   readonly ready: Promise<void>;
-  readonly pois: ReadonlyArray<{ id: string; name: string; position: XYZ }>;
+  readonly pois: ReadonlyArray<{
+    id: string;
+    name: string;
+    position: XYZ;
+    guideEntry?: string | null;
+  }>;
+  readonly store?: { isDiscovered(site: string, poi: string): boolean };
   readonly siteName: string;
   readonly stats: { snapshot(extra?: Partial<DebriefStats>): DebriefStats };
   readonly guide: { open(entryId?: string): void; readonly isOpen: boolean };
@@ -320,7 +326,13 @@ export class MissionRouter {
     void opts.discovery.ready.then(() => {
       if (this.disposed) return;
       this.mission.resolve(opts.discovery.pois.map((p) => p.id));
+      this.mission.setContacts(
+        opts.discovery.pois,
+        (id) => opts.discovery.store?.isDiscovered(route.landmarkId, id) ?? false,
+      );
       this.panel.setObjectives(this.mission.objectives);
+      const contacts = this.mission.objectives.filter((o) => !o.primary && o.resolved);
+      this.briefing?.setContactProgress(contacts.filter((o) => o.complete).length, contacts.length);
     });
 
     if (route.skipBriefing) {
@@ -463,12 +475,11 @@ export class MissionRouter {
     const detail =
       kind === 'all'
         ? `${completed} of ${total} objectives. Surface when you are ready.`
-        : `${completed} of ${total} objectives. ` +
-          (left ? `${left} optional ${left === 1 ? 'target remains' : 'targets remain'}.` : '');
+        : `${completed} of ${total} objectives. ` + `${left} unknown contacts remain on sonar.`;
     this.bannerLeft = Math.max(1, this.opts.config.mission.completionBannerS);
     this.panel.showBanner({
       stars: this.opts.stars?.(),
-      title: kind === 'all' ? 'All objectives complete' : 'Primary objectives complete',
+      title: `${left} unknown contacts remain on sonar.`,
       detail: detail.trim(),
       onKeepExploring: () => this.keepExploring(),
       onSurface: () => this.endDive(),

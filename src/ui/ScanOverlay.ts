@@ -1,3 +1,4 @@
+import { contactLabel, type ContactState } from '../game/Contacts.js';
 /**
  * Scan HUD (DOM only, never the WebGL canvas).
  *
@@ -160,7 +161,23 @@ export class ScanOverlay {
    * @param screen CSS-pixel position of the nearest POI, or null if it is
    *   off-screen / behind the camera.
    */
+  private contactState: ((id: string) => ContactState | null) | null = null;
+  setContactState(state: (id: string) => ContactState | null): void {
+    this.contactState = state;
+  }
+
   update(view: ScanView, keys: ScanOverlayKeys, screen: ScreenPoint | null, dt: number): void {
+    // Copy the view so scanner state and completion reveal retain the authored names.
+    const label = (id: string | null, name: string): string => {
+      const state = id ? this.contactState?.(id) : null;
+      return state ? contactLabel({ name }, state) : name;
+    };
+    view = {
+      ...view,
+      activeName: label(view.activeId, view.activeName),
+      nearestName: label(view.nearestId, view.nearestName),
+      objectiveName: label(view.objectiveId, view.objectiveName),
+    };
     this.slot.tick(dt);
     if (this.suppressed) return;
     this.updateReticle(view, screen);

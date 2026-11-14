@@ -1,3 +1,4 @@
+import poiData from '../../data/landmarks/titanic/pois.json' with { type: 'json' };
 import missionData from '../../data/landmarks/titanic/mission.json' with { type: 'json' };
 import { waitForFrames } from './helpers/frames.js';
 import { GUIDANCE } from './helpers/guidance.js';
@@ -20,7 +21,7 @@ import { expect, test, type Page } from './helpers/unlocked.js';
  * State is read through `window.__game.{mission, missionRouter, discovery, scanner}`.
  */
 
-const objectiveCount = missionData.objectives.length;
+const objectiveCount = poiData.pois.length;
 const primaryCount = missionData.objectives.filter((o) => o.primary).length;
 const secondaryCount = objectiveCount - primaryCount;
 
@@ -164,7 +165,9 @@ test.describe('B3 mission flow', () => {
     await expect(briefing).toBeVisible();
     await expect(page.locator('.briefing-title')).toHaveText('Titanic dive');
     await expect(page.locator('.briefing-objectives li.is-primary')).toHaveCount(primaryCount);
-    await expect(page.locator('.briefing-objectives li.is-secondary')).toHaveCount(secondaryCount);
+    await expect(page.locator('.briefing-contacts')).toHaveText(
+      `Unknown contacts: 0 of ${secondaryCount} found`,
+    );
     await expect(page.locator('.briefing-section.is-hazards li')).not.toHaveCount(0);
     await expect(page.locator('.briefing-section.is-hazards li:visible')).toHaveCount(0);
     await expect(page.locator('.briefing-memorial')).toBeVisible();
@@ -309,7 +312,7 @@ test.describe('B3 mission flow', () => {
     await expect(panel.locator('.obj-item.is-current')).toContainText('stern');
     // The result temporarily owns the slot; completed rows leave the checklist.
     await expect(page.locator(GUIDANCE.objective)).toHaveCount(0);
-    await expect(panel.locator('.obj-item.is-complete')).toHaveCount(0);
+    await expect(panel.locator('.obj-item.is-complete')).toHaveCount(1);
     await page.screenshot({ path: 'tests/e2e/screenshots/mission-objectives.png' });
 
     // Teleport next to the stern, using the same placement as the ?poi= spawn.
@@ -345,7 +348,7 @@ test.describe('B3 mission flow', () => {
     expect(m.state).toBe('primaries-complete');
     expect(m.emitted.at(-1)).toBe('mission:primaryComplete');
     // The dive goes on: the next target is optional, and a banner offers the choice.
-    await expect(panel.locator('.obj-item.is-current')).toHaveClass(/is-optional/);
+    await expect(panel.locator('.obj-contacts')).toHaveText(/Unknown contacts: 0 of \d+ found/);
     const banner = panel.locator('.obj-banner');
     await expect(banner).toBeVisible({ timeout: 10_000 });
     const debrief = page.locator('.mission-debrief');
