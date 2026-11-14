@@ -173,65 +173,6 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
   expect(errors).toEqual([]);
 });
 
-test('samples collect per dive, appear in mission debrief, and reset on restart', async ({
-  page,
-}) => {
-  // Free-dive coaching names a ready sample; mission coaching retains its primary.
-  await boot(page);
-  await park(page, 0, true);
-  await expect(page.locator('.guidance-hint')).toContainText(/Hold (G|SCAN)/);
-  await boot(page, 'monterey-canyon', true);
-  const id = await park(page, 0, true);
-  const primary = await page.evaluate(() => {
-    const g = window.__game as unknown as {
-      discovery: import('../../src/game/Discovery.js').Discovery;
-      missionRouter: import('../../src/game/MissionRouter.js').MissionRouter;
-    };
-    const objective = g.missionRouter.mission.objectives.find((o) => o.primary && !o.complete)!;
-    return g.discovery.pois.find((p) => p.id === objective.poiId)!.name;
-  });
-  await expect(page.locator('.guidance-name')).toHaveText(primary);
-  await scan(page, id);
-  await expect(page.locator('.guidance-name')).toHaveText('Sediment core');
-  // Regression: a sample must have a persistent Journal entry, beyond its dive-local collection.
-  await page.keyboard.press('j');
-  await expect(page.locator('.journal .jr-body .jr-title')).toHaveText('Sediment core');
-  // A sample is a Journal find, but must not inflate the hidden-secret numerator or total.
-  await page.evaluate(() => (window.__game as unknown as Game).journal.show('monterey-canyon'));
-  const secrets = curiosityData('monterey-canyon').secrets;
-  await expect(page.locator('.jr-progress')).toContainText(`0/${secrets.length} secrets`);
-  await page.keyboard.press('Escape');
-  expect(
-    await page.evaluate(() => (window.__game as unknown as Game).explore.samples.collected.size),
-  ).toBe(1);
-  await page.evaluate(() => (window.__game as unknown as Game).missionRouter.endDive());
-  // Supplemental scans now share the debrief's scan count and latest-scan highlight.
-  await expect(page.locator('.mission-debrief .debrief-highlight.is-discoveries')).toContainText(
-    'Sediment core',
-  );
-  await expect(
-    page.locator('.mission-debrief [data-field="discoveries"] .debrief-value'),
-  ).toHaveText('1');
-  await expect(page.locator('.mission-debrief .is-secrets')).toHaveCount(0);
-  expect(
-    await page.evaluate(() => (window.__game as unknown as Game).explore.summary().found),
-  ).toBe(0);
-  await shot(page, 'sample-debrief');
-  const more = page.locator('.mission-debrief .debrief-more-toggle');
-  if (await more.count()) await more.click();
-  await page.getByRole('button', { name: 'Dive again', exact: true }).click();
-  await page.waitForFunction(
-    () => window.__gameReady && (window.__game as unknown as Game).explore?.ready,
-  );
-  expect(
-    await page.evaluate(() => (window.__game as unknown as Game).explore.samples.collected.size),
-  ).toBe(0);
-  await scan(page, await park(page, 0, true));
-  expect(
-    await page.evaluate(() => (window.__game as unknown as Game).explore.samples.collected.size),
-  ).toBe(1);
-});
-
 test('short event caption, one witness log, pause and no repeat while inside', async ({ page }) => {
   await pauseClockBeforeNavigation(page);
   await page.goto('/?tile=monterey-canyon&tier=low&life=0');

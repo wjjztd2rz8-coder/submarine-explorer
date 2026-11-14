@@ -148,7 +148,7 @@ export function titleAudit(base = '/') {
     await expect.poll(() => requested.filter((path) => path.endsWith('.woff2')).length).toBe(3);
     expect(requested.every((path) => path.startsWith(base))).toBe(true);
     await expect(page.locator('.home-scene-caption')).toHaveText(
-      'Titanic dive, 3,800 m, a good first dive',
+      'RMS Titanic, 3,800 m, a good first dive',
     );
     await expect(page.locator('.home-mark')).toBeVisible();
     await page

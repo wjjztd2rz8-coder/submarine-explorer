@@ -196,12 +196,8 @@ for (const id of missionIds) {
     await expect(page.locator('.mission-debrief')).toHaveCount(0);
     await banner.locator('button', { hasText: 'Surface and debrief' }).click();
     await expect(page.locator('.mission-debrief')).toBeVisible();
-    const allComplete = await page.evaluate(
-      () => (window.__game as { mission: { allComplete: boolean } }).mission.allComplete,
-    );
-    await expect(page.locator('.mission-debrief .debrief-title')).toHaveText(
-      allComplete ? 'All objectives complete' : 'Primaries complete',
-    );
+
+    await expect(page.locator('.mission-debrief .debrief-title')).toHaveText('Dive complete');
     const state = await page.evaluate(
       () => (window.__game as { mission: { state: string } }).mission.state,
     );

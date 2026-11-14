@@ -427,9 +427,9 @@ test('Home needs no dive tile; selecting a site keeps loading until its first fr
 });
 
 for (const [saved, destination, title] of [
-  [null, 'titanic', 'Titanic dive'],
-  ['great-blue-hole', 'great-blue-hole', 'Great Blue Hole: Lighthouse Reef'],
-  ['missing-site', 'titanic', 'Titanic dive'],
+  [null, 'titanic', 'RMS Titanic'],
+  ['great-blue-hole', 'great-blue-hole', 'Lighthouse Reef / Great Blue Hole'],
+  ['missing-site', 'titanic', 'RMS Titanic'],
 ] as const) {
   test(`Home button and caption share the launch destination: ${saved ?? 'first visit'}`, async ({
     page,
@@ -442,7 +442,7 @@ for (const [saved, destination, title] of [
     }, saved);
     await boot(page, '/?tier=low');
     const primary = page.locator('.home-primary');
-    await expect(primary).toHaveText(`Dive: ${title}`);
+    await expect(primary).toHaveText(`${saved === destination ? 'Continue' : 'Dive'}: ${title}`);
     await expect(page.locator('.home-scene-caption')).toHaveText(
       new RegExp(`^${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}, [\\d,]+ m`),
     );

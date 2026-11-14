@@ -1,3 +1,4 @@
+import { siteComplete } from '../game/Tour.js';
 /**
  * Mission / dive-site selector: plain DOM.
  *
@@ -239,7 +240,7 @@ export class MissionSelect {
 
       const name = document.createElement('span');
       name.className = 'mission-item-name';
-      name.textContent = m.title;
+      name.textContent = `${this.progress && siteComplete(m.id, this.progress) ? '✓ ' : ''}${m.title}`;
       const row = document.createElement('span');
       row.className = 'mission-item-row';
       row.append(name);

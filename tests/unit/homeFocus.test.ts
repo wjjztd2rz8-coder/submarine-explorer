@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { Progress } from '../../src/game/Progress.js';
+import { ProgressSave } from '../../src/core/Save.js';
 import { Home } from '../../src/ui/Home.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
@@ -12,6 +14,26 @@ import {
   shellSystem,
 } from '../../src/app/systems/shell.js';
 import type { ShellContext } from '../../src/app/context.js';
+
+vi.mock('../../src/game/Tour.js', async (original) => {
+  const { buildJournalSite } = await import('../../src/game/JournalData.js');
+  return {
+    ...(await original<typeof import('../../src/game/Tour.js')>()),
+    tourJournal: () =>
+      Promise.resolve([
+        {
+          ...buildJournalSite({ id: 'titanic', guide: null, pois: [], species: null }),
+          name: 'Titanic dive',
+          depthM: 3800,
+        },
+        {
+          ...buildJournalSite({ id: 'great-blue-hole', guide: null, pois: [], species: null }),
+          name: 'Great Blue Hole: Lighthouse Reef',
+          depthM: 125,
+        },
+      ]),
+  };
+});
 
 vi.mock('../../src/game/Mission.js', async (original) => ({
   ...(await original<typeof import('../../src/game/Mission.js')>()),
@@ -138,6 +160,7 @@ function shell(savedSite: string | null = null, inDive = false, reuse?: ShellCon
     save: new Save({ config: DEFAULT_CONFIG, storage: null }),
     journal: { open: vi.fn() },
     discoveries: { isDiscovered: () => false },
+    progress: new Progress(new ProgressSave(null)),
     app: { state: inDive ? 'dive' : 'home', lastSite: readLastSite() },
     shellBaseHref: () =>
       'https://example.test/submarine-explorer/?tier=low&touch=1&daily=old&tile=old',
@@ -153,6 +176,7 @@ function shell(savedSite: string | null = null, inDive = false, reuse?: ShellCon
     async arrive(list = catalogue) {
       resolve(list);
       await ready;
+      await Promise.resolve();
     },
     launch(id: string, title: string | null, tileId = id) {
       const announced = ctx.home.diveButton.textContent;
@@ -162,7 +186,9 @@ function shell(savedSite: string | null = null, inDive = false, reuse?: ShellCon
       expect(window.location.href).toBe(
         `https://example.test/submarine-explorer/?mission=${id}&tier=low&touch=1`,
       );
-      expect(announced).toBe(title ? `Dive: ${title}` : 'Dive');
+      expect(announced).toBe(
+        title ? `${ctx.app.lastSite === id ? 'Continue' : 'Dive'}: ${title}` : 'Dive',
+      );
       const nodes = (node: Element): Element[] => [node, ...node.children.flatMap(nodes)];
       const caption = nodes(ctx.home.root as unknown as Element).find(
         (node) => node.className === 'home-scene-caption',
@@ -226,9 +252,9 @@ describe('Home announced destination', () => {
   );
 
   it('uses the catalogue tile when mission and tile identities differ', async () => {
-    const fixture = shell('survey-mission');
-    await fixture.arrive([{ ...catalogue[1], id: 'survey-mission' }]);
-    fixture.launch('survey-mission', catalogue[1].title, 'great-blue-hole');
+    const fixture = shell('great-blue-hole');
+    await fixture.arrive([{ ...catalogue[1], tile: 'survey-tile' }]);
+    fixture.launch('great-blue-hole', catalogue[1].title, 'survey-tile');
   });
 
   it.each([false, true])(

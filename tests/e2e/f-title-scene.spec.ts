@@ -105,7 +105,7 @@ for (const tier of ['low', 'high'] as const) {
     await expect(page.locator('.globe.is-embedded')).toBeHidden();
     await expect.poll(async () => (await title(page)).terrainReady).toBe(true);
     await expect(page.locator('.home-scene-caption')).toHaveText(
-      'Titanic dive, 3,800 m, a good first dive',
+      'RMS Titanic, 3,800 m, a good first dive',
     );
     await expect.poll(async () => (await title(page)).animated).toBe(true);
     const before = (await title(page)).drawCount;
@@ -358,7 +358,7 @@ test('optional title terrain and font failures leave an honest, usable fallback'
   // Seeing the request abort is earlier than the title loader's catch handler.
   await expect.poll(() => fallbackSettled).toBe(true);
   await expect(page.locator('.home-scene-caption')).toHaveText(
-    'Titanic dive, 3,800 m, a good first dive',
+    'RMS Titanic, 3,800 m, a good first dive',
   );
   expect((await title(page)).terrainReady).toBe(false);
   expect(await page.evaluate(() => window.__gameError)).toBeFalsy();

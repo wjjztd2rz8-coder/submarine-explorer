@@ -490,10 +490,10 @@ describe('MissionRouter completion timing', () => {
   });
 
   it.each([
-    { optional: false, completed: false, heading: 'Dive summary' },
-    { optional: false, completed: true, heading: 'All objectives complete' },
-    { optional: true, completed: false, heading: 'Dive summary' },
-    { optional: true, completed: true, heading: 'Primaries complete' },
+    { optional: false, completed: false, heading: 'Dive ended' },
+    { optional: false, completed: true, heading: 'Dive complete' },
+    { optional: true, completed: false, heading: 'Dive ended' },
+    { optional: true, completed: true, heading: 'Dive complete' },
   ])(
     'debrief primary progress with optional=$optional and completed=$completed survives reopening',
     async ({ optional, completed, heading }) => {
@@ -523,10 +523,6 @@ describe('MissionRouter completion timing', () => {
           remaining: completed ? undefined : 'Primary',
         });
         expect(debrief.last?.subtitle).toBeUndefined();
-        const metric = descendants(debrief.root).find((e) => e.dataset.field === 'objectives')!;
-        expect(metric.children.map((e) => e.textContent).join('')).toBe(
-          `${Number(completed)} of 1 primary objectives`,
-        );
         expect(router.mission.emitted.at(-1)?.payload).toMatchObject({
           completed: Number(completed),
           total: optional ? 2 : 1,

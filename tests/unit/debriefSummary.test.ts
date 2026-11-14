@@ -1,108 +1,97 @@
-import { describe, expect, it } from 'vitest';
+import { expect, it } from 'vitest';
+import { debriefModel, primaryDebriefAction } from '../../src/ui/Debrief.js';
+import { buildJournalSite } from '../../src/game/JournalData.js';
+import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
 import type { DebriefStats } from '../../src/game/Objectives.js';
-import { summarizeDive } from '../../src/ui/Debrief.js';
+import type { Photo } from '../../src/game/PhotoStore.js';
 
-const empty: DebriefStats = {
-  elapsedS: 60,
-  distanceM: 100,
-  maxDepthM: 4000,
-  discoveries: [],
-  newEntries: [],
-};
-const scanned: DebriefStats = {
-  ...empty,
-  discoveries: [
-    { poiId: 'bow', name: 'Bow section' },
-    { poiId: 'stern', name: 'Stern section' },
+const site = buildJournalSite({
+  id: 'titanic',
+  species: null,
+  guide: {
+    version: 1,
+    landmark: 'titanic',
+    entries: [
+      {
+        id: 'bow',
+        title: 'Bow',
+        paragraphs: ['The bow is preserved. A second sentence.'],
+        facts: [],
+        sources: [],
+        reconstruction: false,
+      },
+      {
+        id: 'stern',
+        title: 'Stern',
+        paragraphs: ['The stern broke apart. More detail.'],
+        facts: [],
+        sources: [],
+        reconstruction: false,
+      },
+    ],
+  },
+  pois: [
+    { id: 'bow', name: 'Bow', guide_entry: 'bow', lat: 0, lon: 0, kind: 'wreck', primary: true },
+    {
+      id: 'stern',
+      name: 'Stern',
+      guide_entry: 'stern',
+      lat: 0,
+      lon: 0,
+      kind: 'wreck',
+      primary: false,
+    },
   ],
-  newEntries: [{ id: 'bow', title: 'The bow' }],
-  objectives: { completed: 1, total: 4 },
+});
+const stats: DebriefStats = {
+  elapsedS: 60,
+  distanceM: 10,
+  maxDepthM: 100,
+  landmarkName: 'Titanic',
+  newEntries: [],
+  discoveries: [
+    { poiId: 'stern', name: 'Stern' },
+    { poiId: 'bow', name: 'Bow' },
+    { poiId: 'life:jelly', name: 'Jelly' },
+    { poiId: 'secret:box', name: 'Box' },
+  ],
+  objectives: { completed: 1, total: 1 },
 };
-
-describe('compact dive summary', () => {
-  it('gives an unscanned dive a warm highlight and a concrete scan instruction', () => {
-    expect(summarizeDive(empty)).toEqual({
-      highlight: 'The site is waiting for your first scan.',
-      next: 'Face a target and hold Scan.',
-      kind: null,
-    });
-  });
-  it('names the latest discovery despite earlier scans and new Journal entries', () => {
-    expect(summarizeDive(scanned, { stars: 0, points: 40, best: 0 })).toEqual({
-      highlight: 'Scanned Stern section.',
-      next: 'Keep exploring to finish the primary objectives.',
-      kind: 'discoveries',
-    });
-  });
-  it.each([
-    ['life:coral', 'Golden coral'],
-    ['secret:frame', 'Buried steel frame'],
-    ['sample:mud', 'Sediment core'],
-  ])('can name a most recent %s discovery after a mission scan', (poiId, name) => {
-    expect(
-      summarizeDive({
-        ...scanned,
-        discoveries: [...scanned.discoveries, { poiId, name }],
-      }).highlight,
-    ).toBe(`Scanned ${name}.`);
-  });
-  it.each([
-    [1, 'Finish the optional objectives.'],
-    [2, 'Take a photo or scan a species for 3 stars.'],
-    [3, 'Try another dive site.'],
-  ])('suggests the next step for a %s-star dive', (stars, next) => {
-    expect(summarizeDive(scanned, { stars, points: 80, best: stars }).next).toBe(next);
-    // Existing objectives can carry over to a return dive with no fresh scans.
-    expect(summarizeDive(empty, { stars, points: 0, best: stars }).next).toBe(next);
-  });
-  it('names the one primary still open, and stays generic with more than one', () => {
-    const one = {
-      ...scanned,
-      objectives: { completed: 1, total: 2, remaining: 'Scan the eastern stalactite gallery' },
-    };
-    expect(summarizeDive(one).next).toBe('Scan the eastern stalactite gallery.');
-    expect(summarizeDive({ ...scanned, objectives: { completed: 0, total: 3 } }).next).toBe(
-      'Keep exploring to finish the primary objectives.',
-    );
-  });
-  it('uses the Journal as the next step on a free dive with a scan', () => {
-    expect(summarizeDive({ ...scanned, objectives: undefined }).next).toBe(
-      'Open the Journal to read your finds.',
-    );
-  });
-  it.each([
-    ['secrets', 'Found Hidden marker.'],
-    ['events', 'Witnessed Hidden marker.'],
-    ['samples', 'Found Hidden marker.'],
-  ] as const)('highlights an exploration %s when there are no scans', (kind, highlight) => {
-    const result = summarizeDive(empty, undefined, {
-      found: 1,
-      total: 3,
-      secrets: [],
-      samples: [],
-      events: [],
-      [kind]: ['Hidden marker', 'Another find'],
-    });
-    expect(result.highlight).toBe(highlight);
-    expect(result.kind).toBe(kind);
-  });
-  it('keeps an aborted dive cause and gives one recovery suggestion', () => {
-    expect(
-      summarizeDive({
-        ...scanned,
-        subtitle: 'Hull failure at 1,180 m',
-      }),
-    ).toEqual({
-      highlight: 'Hull failure at 1,180 m.',
-      next: 'Try a shallower route or a stronger hull.',
-      kind: null,
-    });
-    expect(
-      summarizeDive({ ...empty, subtitle: 'Supplies exhausted · safe ascent completed' }),
-    ).toEqual({
-      highlight: 'Supplies exhausted · safe ascent completed.',
-      next: 'Refill supplies before diving again.',
-      kind: null,
-    });
-  });
+it('lists distinct scans this dive including species, reads the newest picture, and prefers a primary fact', () => {
+  const store = new DiscoveryStore(null);
+  store.record('titanic', 'bow');
+  const model = debriefModel(
+    stats,
+    site,
+    store,
+    [{ siteId: 'titanic', poiId: 'bow', image: 'newest' } as Photo],
+    ['bow'],
+  );
+  expect(model.finds.map((f) => f.name)).toEqual(['Stern', 'Bow', 'Jelly']);
+  expect(model.finds[1].image).toBe('newest');
+  expect(model.finds[0].image).toBeUndefined();
+  expect(model.fact).toBe('The bow is preserved.');
+  expect(model.progress).toBe('Found 1 of 2 at Titanic');
+  expect(model.title).toBe('Dive complete');
+});
+it('handles empty, incomplete and aborted dives without inventing facts', () => {
+  const model = debriefModel({ ...stats, discoveries: [], objectives: { completed: 0, total: 2 } });
+  expect(model.title).toBe('Dive ended');
+  expect(model.finds).toEqual([]);
+  expect(model.fact).toBeNull();
+  expect(debriefModel({ ...stats, subtitle: 'Hull failure' }).title).toBe('Dive complete');
+});
+it('bounds a long first sentence and never includes a second one', () => {
+  const long = structuredClone(site);
+  long.entries.find((e) => e.id === 'bow')!.guide!.paragraphs = [
+    'A'.repeat(250) + '. Another fact.',
+  ];
+  expect(debriefModel(stats, long, undefined, [], ['bow']).fact).toHaveLength(198);
+});
+it('prioritizes the next site or the chooser ahead of replay and exploring', () => {
+  const actions = ['dive-again', 'keep-exploring', 'journal', 'dive-sites', 'next-dive'].map(
+    (id) => ({ id, label: id, run() {} }),
+  );
+  expect(primaryDebriefAction(actions)?.id).toBe('next-dive');
+  expect(primaryDebriefAction(actions.slice(0, -1))?.id).toBe('dive-sites');
 });

@@ -91,6 +91,7 @@ export class Discovery {
     this.overlay = new ScanOverlay(config.scan, opts.parent);
     this.guide = new FieldGuide(bus, opts.parent);
     this.debrief = new Debrief({
+      context: { siteId: landmarkId, store: this.store, primaryIds: [] },
       parent: opts.parent,
       onFieldGuide: () => this.guide.open(),
     });

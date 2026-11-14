@@ -184,7 +184,7 @@ for (const [viewportIndex, viewport] of [
         const debrief = page.locator('.mission-debrief');
         await expect(debrief).toBeVisible();
         await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText('1');
-        await expect(debrief.locator('.debrief-highlight')).toContainText(first.name);
+        await expect(debrief.locator('.debrief-finds')).toContainText(first.name);
         const primaryTotal = await page.evaluate(
           () =>
             (window.__game as unknown as Game).missionRouter.mission.def.objectives.filter(
@@ -499,7 +499,7 @@ for (const viewport of [
       await page.goto('/?tier=low&touch=1');
       await homeReady(page, true);
       const primary = page.locator('.home-primary');
-      await expect(primary).toHaveAccessibleName('Dive: Titanic dive');
+      await expect(primary).toHaveAccessibleName('Dive: RMS Titanic');
       await reachable(primary);
       await page.evaluate(() =>
         localStorage.setItem(
@@ -509,9 +509,9 @@ for (const viewport of [
       );
       await page.reload();
       await homeReady(page, true);
-      await expect(primary).toHaveAccessibleName('Dive: Great Blue Hole: Lighthouse Reef');
+      await expect(primary).toHaveAccessibleName('Continue: Lighthouse Reef / Great Blue Hole');
       await expect(page.locator('.home-scene-caption')).toHaveText(
-        'Great Blue Hole: Lighthouse Reef, 125 m',
+        'Lighthouse Reef / Great Blue Hole, 125 m',
       );
       await reachable(primary);
       await primary.tap();
