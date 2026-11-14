@@ -21,6 +21,6 @@ Net: Journal.ts is shorter (shared `disclosure()` and `factsTable()`), no new el
 
 Journal entry and box fix: 4.5 (cause removed, text wall gone; the summary row is plain and the empty space under it on a tall phone is plain). Settings: 4 (opaque, but the "Sonar relief / Hull warning / UI scale" labels still lack context and Master volume sits at the scroll edge; out of scope here). Site name: 4.5.
 
-## Notes
+## Gates
 
-- Some `journal-debrief.spec` cases (frozen debrief 390x844) failed before this change on the debrief primary button assertion from the item 41 commit (`dive-again` is now primary when scans > 0); not touched here.
+`tools/gates.sh` (PW_PORT=4392) green: python, content, build, unit, e2e smoke, e2e-base, attribution. Relevant specs (journal-debrief, mission, settings, d-shell): 86 passed, 31 failed. None is caused by this change. Re-ran on the commit before this one: `journey 390x844 great-blue-hole` and `summary and Journal 390x844 great-blue-hole` fail there too. The failures are the item 41 debrief assertions (`.debrief-next` count 2 from the new stars line, primary is `dive-again`) and a pause-button tap that does not open the pause menu in the opening-to-debrief journey (a "Get closer to scan" card with Skip is on screen). `d-shell` Back and Forward failed once under load and passed alone. Left for the owners of those items so their fixes do not conflict.
