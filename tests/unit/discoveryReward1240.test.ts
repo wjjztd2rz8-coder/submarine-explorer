@@ -68,7 +68,13 @@ function setup(site: string, storage: StorageLike | null = null) {
     seabed: { sampleHeight: () => meta.min_m },
     landmarkId: site,
     storage,
-    keyLabel: (action) => (action === 'scan' ? 'G' : 'J'),
+    keyLabel: (action) =>
+      ({
+        scan: 'G',
+        toggleGuide: 'J',
+        ballastBlow: 'Space',
+        ballastFlood: 'Ctrl',
+      })[action],
   });
   return { bus, discovery, meta };
 }
@@ -186,6 +192,8 @@ it.each([5, 6])(
             {
               scan: 'G',
               guide: 'J',
+              rise: 'Space',
+              sink: 'Ctrl',
             },
             false,
             expect.any(String),
@@ -265,6 +273,8 @@ it('counts scanned secrets and samples and records the revealed discovery name',
       {
         scan: 'G',
         guide: 'J',
+        rise: 'Space',
+        sink: 'Ctrl',
       },
       false,
       expect.any(String),
