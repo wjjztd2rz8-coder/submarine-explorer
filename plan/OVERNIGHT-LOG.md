@@ -4064,3 +4064,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - CI was red 3 runs (stale e2e specs after items 38/40/41, a real landscape debrief overflow, props-geo unit timeout). Merged R-ci-red (9a6f5ecd, Sonnet) and pushed; hosted CI result pending, no tag. Open: items 42, 43. Codex weekly 3%, briefs 196-199 stay queued.
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-14 01:11 CST headless run (Claude)
+
+- Merged item 42 V-titanic-bow-form (Sonnet, 22dbe93d): raked stem, solid bow rail, deeper scour pit, single debris trail. I judged the opening myself: visible but modest gain (~3.9, was 3.7); hull is still a dark brown body on pale sand; anchor wells not verifiable from shipped poses. Smoke + project-base gates green on main; pushed. Two journal-debrief Titanic phone journeys fail on baseline too (pause menu). Not full-e2e'd.
+- Open: item 43 (Sonnet). Codex weekly 3% (resets Sun Nov 15 23:00), briefs 196-199 stay queued. Hosted CI of R-ci-red pending at start of run; no tag.
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
