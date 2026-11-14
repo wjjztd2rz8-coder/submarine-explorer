@@ -12,85 +12,49 @@ out of time for this project, called it "off the rails", and said to be ruthless
 rule is binding except usage limits. Target: 3-5 minutes per site, each landmark seen up
 close, one real fact per discovery, and a clear lead into the next site. Thirteen sites.
 
-## State (Sat 2026-11-14, 13:40 CST)
+## State (Sat 2026-11-14, 15:45 CST)
 
-- **Deployed.** `main` at `2762130c` is pushed, CI is green and the Pages build is live at
-  https://wjjztd2rz8-coder.github.io/submarine-explorer/ (first deploy of the new loop). Later
-  local commits are pushed with the next merge.
-- The loop works end to end in a played build: dive, steer to the marker, the sub slows near
-  targets, scan, **discovery reveal** (close camera shot plus a card with the name and one
-  fact), unnamed "?" sonar contacts for everything that is not a primary objective, and a
-  debrief that opens by itself when everything is found and offers "Next dive: <site>".
-- Unit suite: green in CI. Both test-fix branches are merged; the only source
-  changes were three guards in `camera.ts`, `mission.ts` and `MissionRouter.ts`.
-- Push CI is static checks, unit tests, builds and one base-path browser check; the 38-shard
-  e2e matrix is in `e2e-full.yml` (manual only). Deploy follows a green CI run on main.
-- The old automation is off: systemd timers `subexp-resume` and `subexp-tick` are disabled,
-  and old Codex briefs 196-200 are in `.cache/codex/hold/`. Leave them off.
+- **Live:** https://wjjztd2rz8-coder.github.io/submarine-explorer/ serves `adccf981` (new loop,
+  Blue Hole and Monterey routes, SCAN-ready highlight). `main` is at `5048bfab`, pushed at
+  15:38 with the reveal framing and F-endings merges; check that its CI went green and the
+  deploy ran (`gh run list --branch main --limit 4`).
+- Full unit suite green locally on `5048bfab` (202 files, 4,781 tests).
+- All delegates have reported and are merged. Nothing is in flight.
+- Touch scanning works (the 0-scan result was a script bug, fixed). Lost City by touch: two
+  scans in 15 s. Blue Hole by touch: first find only, second never reached (unproven).
 
-### Played results (scripted player, desktop 1280x720, build `2762130c`, 240 s per site)
+### Played results
 
-| Site                | Found  | Outcome                                              |
-| ------------------- | ------ | ---------------------------------------------------- |
-| Lost City           | 4 of 4 | debrief at 97 s                                      |
-| Beebe               | 3 of 3 | debrief at 87 s                                      |
-| Endurance           | 4 of 4 | debrief at 127 s                                     |
-| Challenger Deep     | 2 of 5 | debrief at 91 s, "Dive complete" over "Found 2 of 5" |
-| Titanic             | 5 of 7 | never ends; contact 591 m away at 213 s              |
-| Bismarck            | 2 of 3 | landmarks by 33 s, then circles a contact 900 m away |
-| Kama'ehuakanaloa    | 2 of 3 | same, contact 692 m away                             |
-| Blake Plateau       | 3 of 4 | same, contact 409 m away                             |
-| Axial               | 3 of 4 | stuck from 53 s on "Go up 95 m"                      |
-| Hunga               | 1 of 3 | stuck from 22 s; next target 155 m up a slope        |
-| Hudson Canyon       | 1 of 3 | stuck from 32 s; next target stays 600 m away        |
-| Blue Hole, Monterey | n/a    | stall (earlier runs); F-vertical is on them          |
+F-endings (Opus) measured, with its own steering script, every site ending on the debrief
+by itself with N of N: Titanic 6/6 166 s, Bismarck 5/5 135 s, Kama'ehuakanaloa 4/4 87 s,
+Blake 4/4 88 s, Axial 5/5 83 s, Hunga 3/3 140 s, Hudson 4/4 139 s, Challenger 4/4 121 s,
+Beebe 4/4 91 s, Lost City and Endurance 60 s each. F-vertical measured Blue Hole 3 finds
+90 s and Monterey 3 finds 71 s.
 
-`tour.mjs` never detects the debrief (`allDoneAt` always null): read endings from the last
-log line (HUD fields blank means the debrief is open) until a delegate's fix lands.
-
-Touch (`touch-drive.mjs`, Lost City, 390x844 and 844x390, same build): **0 scans in 150 s in
-both orientations**. The sub stops 85 m from the objective under "Hold SCAN" and no scan
-starts. Game bug or stale script is not yet known; F-touch is finding out.
-
-## In flight
-
-A branch is finished when it has a commit ahead of the commit it started from.
-
-1. **V-reveal-qa** (Cursor, Gemini 4 Carbon): branch `t3/discovery-reveal-visual-qa`, started
-   from `aa9b7cd7` by the first thread and reports there, so check the branch for a commit.
-   Adds `tools/playtest/capture-reveals.mjs` and per-POI `reveal` overrides in
-   `data/landmarks/*/pois.json`. Contact sheets go to `.cache/sprint/reveals-final/index.html`.
-2. **F-vertical** (Cursor, GPT-5.6 Sol): backlog item 3, reports to the second thread. Owns
-   the Blue Hole and Monterey site data and `tools/playtest/tour.mjs`.
-3. **F-endings** (Claude Opus 5.5): backlog item 4's fix. Nine sites must end on the debrief
-   in 2 to 5 minutes with 4 to 6 reachable discoveries, an honest N of N count, an obvious
-   finish control after both landmarks, and homing that closes on far contacts.
-4. **F-touch** (Cursor, GPT-5.6 Sol): backlog item 5. Why touch scanning fails, the fix, and
-   a SCAN button that shows when a scan is possible.
-
-`.cache/sprint/tour-all.sh <sites...>` replays sites two at a time on the build in
-`.cache/sprint/play-dist` and writes `.cache/sprint/tour/table.txt`.
+Orchestrator check on merged main with `tools/playtest/tour.mjs` (which presses "Finish
+dive" as soon as both primaries are found, so it does not measure full routes): Titanic,
+Bismarck and Kama'ehuakanaloa end on the debrief; **Hunga does not** (2 of 3, caught on the
+slope at 246 s).
 
 ## Backlog, in order
 
-1. ~~Ship today.~~ Done 13:37 CST: deployed, owner told.
-2. **Merge V-reveal-qa.** If it reports a general framing fault on slopes, fix the default in
-   `src/game/Reveal.ts` (`revealFrame`), not per POI.
-3. **Vertical sites.** Blue Hole and Monterey must be completable by a casual player.
-   Options, cheapest first: start the dive at the depth of the first target; pick primaries
-   that are reachable without a long descent; fix whatever stops the sub (terrain collision
-   near the wall at Blue Hole, the stop near 919 m at Monterey); check the chase camera at
-   Blue Hole, where the sub appears from below. The "Go down ↓ N m (hold Ctrl)" hint exists.
-4. **Play all 13 sites.** One background job runs `tools/playtest/tour.mjs` per site and
-   writes a table (first reveal, finds, time to debrief, stalls). Fix what the table shows.
-5. **Touch pass.** Re-run `touch-drive.mjs` on the new build at 390x844 and 844x390; check
-   the reveal card and debrief at both sizes. The SCAN button should show when a scan is
-   possible (today only the guidance card does).
-6. **Polish, only if 1-5 are done:** the objectives panel still prints "2 of 7 objectives ·
-   primaries done"; the tutorial jumps from "STEP 1 OF 3" to "STEP 3 OF 3"; six terrain-data
-   Journal facts are dry (`wall-transect`, `flank-transect`, `inter-mound-channel`,
-   `eastern-floor`, `upper-canyon`, `south-wall`); README still describes the old loop.
-7. **Owner phone test** of the deployed build, ten minutes. Act on what they say.
+1. **Measure full routes.** Give `tools/playtest/tour.mjs` the steering F-endings described
+   (current marker, then edge arrow, then left/right text; ignore scanned markers) and an
+   option not to press "Finish dive". Then run `.cache/sprint/tour-all.sh` over all 13 sites
+   and replace the table above. Small scripted job: Composer or Codex.
+2. **Hunga** must be finishable by the plain script; fix the route or the slope behaviour.
+3. **Close-range circling** costs 20 to 35 s per find: the turning circle at survey speed is
+   too wide. Tighten turning at low speed (`src/sub/Submarine.ts`,
+   `src/core/config/submarine.ts`).
+4. **Touch:** "Finish dive" wraps to two lines in phone landscape; play Blue Hole by touch;
+   check the reveal card and debrief at 390x844 and 844x390.
+5. **Facts (Claude Sonnet):** no fact repeats within a dive (new contacts at Monterey, Blue
+   Hole and the F-endings sites reuse guide entries); six dry terrain facts (`wall-transect`,
+   `flank-transect`, `inter-mound-channel`, `eastern-floor`, `upper-canyon`, `south-wall`).
+6. **Polish:** tutorial jumps from "STEP 1 OF 3" to "STEP 3 OF 3"; README still describes
+   the old loop; five dives run under 100 s (accepted for now: short with 4 to 5 close finds
+   beats padding).
+7. **Owner phone test** of the deployed build. Act on what they say.
 
 Not in this sprint: opening-frame art passes, bug-hunt and verify briefs, CI shard tuning,
 Realistic mode, cosmetics, new plan documents.
@@ -122,6 +86,9 @@ These rules exist so that does not repeat.
   - Claude Sonnet: writing that needs taste (facts, copy).
 - **If a delegate dies at a usage limit, look at its worktree first.** Staged or committed
   work that typechecks can be committed and merged by the orchestrator.
+- **Site-data changes break tests far from the change.** Twice a delegate's focused test
+  run passed and the full suite failed (26 tests, then 2). After any merge that touches
+  `data/landmarks/**`, run the full unit suite once before pushing; a red CI blocks deploy.
 - **Slow checks run in the background**, once: the unit suite takes 15 minutes; a play of
   one site takes 4. Never wait on them in the foreground, and never run the unit suite twice
   for one merge.
@@ -137,11 +104,13 @@ These rules exist so that does not repeat.
 ## Budgets (owner, 2026-11-14)
 
 - The owner does not care to have any resets left after this weekend. Spend freely.
-- **Claude:** the reset was applied at about 13:30 CST (5-hour window 100%, resets 18:30).
-  No reset is left. The weekly figure does not matter.
+- **Claude:** the reset was applied at about 13:30 CST and is gone. One Opus delegate at high
+  effort plus a long orchestrator thread took the 5-hour window from 100% to 7% by 15:40.
+  Window resets 18:30. Use Opus at medium effort and keep the orchestrator thread short.
 - **Codex:** 5-hour window empty until 16:41 CST; 84% of the week left. Two tasks at a time.
 - **Cursor:** two separate pools, both fine to run to zero: "Cursor Models" (Composer, Grok),
-  99% left, and "Other Models" (Gemini, GPT, Claude), 73% left at 13:30. Reset Nov 24.
+  99% left, and "Other Models" (Gemini, GPT, Claude), 35% left at 15:40 (five GPT-5.6 Sol
+  tasks and one Gemini run cost about 38 points). Prefer Composer for small work. Reset Nov 24.
 - **OpenCode:** free models, no limit to manage.
 - Check Claude, Codex and Cursor with `~/.local/bin/ai-limits --refresh` (poll no faster than every
   2 minutes).
