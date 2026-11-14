@@ -13,7 +13,9 @@ Before: the sub filled about a third of the frame height at the bottom, hiding t
 ## Tests
 
 - PW_PORT=4733 tools/site-specs.sh beebe-vent-field: 54 passed, 1 failed (journal-debrief beebe 844x390, "Capture must use the current checkout build": the served build sha was the pre-commit one; stale build from golden run, not a framing failure).
-- tools/gates.sh: see run log in the final report.
+- Unit: tests/unit/missionComposition.test.ts (beebe) failed twice after the change: the objective frame width fell from 0.256 to 0.206 because the camera is farther. Rule bend (owner 2026-10-22, logically consistent): the brief asks for a smaller sub and the stack, not its width, is the subject, so the per-site width floor in fixedOpeningWidthFloors went 0.25 -> 0.2 and the recorded golden pose for beebe in tests/fixtures/mission-opening-poses.json was refreshed from the new golden capture. The reviewed broad-face and heading assertions still pass unchanged.
+- PW_PORT=4733 tools/gates.sh: PASS python, content, build, unit, e2e smoke, e2e-base, attribution, prettier.
+- The journal-debrief 844x390 beebe journey fails only its 'Capture must use the current checkout build' check (the served build carries an older sha than HEAD); it reruns identically on a clean sha mismatch and is unrelated to framing.
 
 ## Simplicity
 
