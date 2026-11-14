@@ -1,4 +1,4 @@
-# Director's plan and handoff: two-day fun sprint (2026-11-14 to 2026-11-16)
+# Director's plan: two-day fun sprint (2026-11-14 to 2026-11-16)
 
 This file is the single source of forward work and the handoff for a new orchestrator
 thread. Read it top to bottom, then act. The pre-sprint backlog is in
@@ -12,20 +12,19 @@ out of time for this project, called it "off the rails", and said to be ruthless
 rule is binding except usage limits. Target: 3-5 minutes per site, each landmark seen up
 close, one real fact per discovery, and a clear lead into the next site. Thirteen sites.
 
-## State at handoff (Sat 2026-11-14, 12:55 CST)
+## State (Sat 2026-11-14, 13:40 CST)
 
-- `main` is at `f76bdaa6` plus this handoff commit, **about 20 commits ahead of
-  `origin/main`, not pushed**. Tag `pre-sprint-merge` marks the point before the gameplay
-  merges.
-- The new loop works end to end in a played build: dive, steer to the marker, the sub slows
-  near targets, scan, **discovery reveal** (close camera shot plus a card with the name and one
+- **Deployed.** `main` at `2762130c` is pushed, CI is green and the Pages build is live at
+  https://wjjztd2rz8-coder.github.io/submarine-explorer/ (first deploy of the new loop). Later
+  local commits are pushed with the next merge.
+- The loop works end to end in a played build: dive, steer to the marker, the sub slows near
+  targets, scan, **discovery reveal** (close camera shot plus a card with the name and one
   fact), unnamed "?" sonar contacts for everything that is not a primary objective, and a
   debrief that opens by itself when everything is found and offers "Next dive: <site>".
-- Typecheck is clean and the build works. **The unit suite is red: 68 failures in 9 files**
-  (run before the last two code commits). A fixer is in flight (below).
-- Push CI is trimmed to static checks, unit tests, builds and one base-path browser check.
-  The 38-shard e2e matrix is in `e2e-full.yml` (manual only). Deploy still follows a green
-  CI run on main. None of this has run on GitHub yet.
+- Unit suite: green in CI (4,783 tests). Both test-fix branches are merged; the only source
+  changes were three guards in `camera.ts`, `mission.ts` and `MissionRouter.ts`.
+- Push CI is static checks, unit tests, builds and one base-path browser check; the 38-shard
+  e2e matrix is in `e2e-full.yml` (manual only). Deploy follows a green CI run on main.
 - The old automation is off: systemd timers `subexp-resume` and `subexp-tick` are disabled,
   and old Codex briefs 196-200 are in `.cache/codex/hold/`. Leave them off.
 
@@ -43,25 +42,22 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
 Touch: `tools/playtest/touch-drive.mjs` completed two scans in both phone orientations on the
 pre-merge build (first scan about 13 s). Not re-run on the new build.
 
-## In flight (both report to the OLD thread; the new thread owns merging them)
+## In flight
 
-A branch is finished when it has a commit ahead of the commit it started from
-(`git log main..<branch>`). Both started from `aa9b7cd7`, a few commits behind `main`.
+A branch is finished when it has a commit ahead of the commit it started from.
 
-1. **T-unit-green** (Cursor, GPT-5.6 Sol): branch `t3/fix-unit-suite-after-merge`. Fixes the
-   68 failing unit tests, separating stale expectations from real merge bugs. Its report
-   lists each source change; treat those as real bugs found. The failure list is in
-   `.cache/sprint/unit-failures.txt`.
-2. **V-reveal-qa** (Cursor, Gemini 4 Carbon): branch `t3/discovery-reveal-visual-qa`. Adds
-   `tools/playtest/capture-reveals.mjs`, captures every reveal shot, and tunes per-POI
-   `reveal` overrides in `data/landmarks/*/pois.json`. Contact sheets go to
-   `.cache/sprint/reveals-final/index.html`.
+1. **V-reveal-qa** (Cursor, Gemini 4 Carbon): branch `t3/discovery-reveal-visual-qa`, started
+   from `aa9b7cd7` by the first thread and reports there, so check the branch for a commit.
+   Adds `tools/playtest/capture-reveals.mjs` and per-POI `reveal` overrides in
+   `data/landmarks/*/pois.json`. Contact sheets go to `.cache/sprint/reveals-final/index.html`.
+2. **F-vertical** (Cursor, GPT-5.6 Sol): backlog item 3, reports to the second thread. Owns
+   the Blue Hole and Monterey site data and `tools/playtest/tour.mjs`.
+3. **Tour table**: `.cache/sprint/tour-all.sh <sites...>` plays sites two at a time on the
+   build in `.cache/sprint/play-dist` and writes `.cache/sprint/tour/table.txt`.
 
 ## Backlog, in order
 
-1. **Ship today.** Merge T-unit-green, run the unit suite once (15 minutes, in the
-   background), push, confirm CI and the Pages deploy, and tell the owner the build is ready
-   to play on a phone. The owner playing tonight is worth more than further tuning.
+1. ~~Ship today.~~ Done 13:37 CST: deployed, owner told.
 2. **Merge V-reveal-qa.** If it reports a general framing fault on slopes, fix the default in
    `src/game/Reveal.ts` (`revealFrame`), not per POI.
 3. **Vertical sites.** Blue Hole and Monterey must be completable by a casual player.
@@ -125,14 +121,13 @@ These rules exist so that does not repeat.
 ## Budgets (owner, 2026-11-14)
 
 - The owner does not care to have any resets left after this weekend. Spend freely.
-- **Claude:** one reset available. The owner will apply it when the Claude limit is close to
-  5%, so run Claude down to about 5% and then say so at the top of a reply. The weekly figure
-  does not matter. At handoff: 5-hour window 27% (resets 16:10 CST), week 42%.
+- **Claude:** the reset was applied at about 13:30 CST (5-hour window 100%, resets 18:30).
+  No reset is left. The weekly figure does not matter.
 - **Codex:** 5-hour window empty until 16:41 CST; 84% of the week left. Two tasks at a time.
-- **Cursor:** two separate pools, both at about 100% and both fine to run to zero: "Cursor
-  Models" (Composer, Grok) and "Other Models" (Gemini, GPT, Claude). Reset in 10 days.
+- **Cursor:** two separate pools, both fine to run to zero: "Cursor Models" (Composer, Grok),
+  99% left, and "Other Models" (Gemini, GPT, Claude), 73% left at 13:30. Reset Nov 24.
 - **OpenCode:** free models, no limit to manage.
-- Check Claude and Codex with `~/.local/bin/ai-limits --refresh` (poll no faster than every
+- Check Claude, Codex and Cursor with `~/.local/bin/ai-limits --refresh` (poll no faster than every
   2 minutes).
 
 ## Practical notes
