@@ -208,10 +208,16 @@ export class Home {
     return !this.sites.hidden;
   }
 
-  /** Names the primary action's site ("Dive: Titanic"); plain "Dive" while the catalogue loads. */
-  setDiveSite(title: string | null): void {
+  /**
+   * Names the primary action's site ("Dive: Titanic"); plain "Dive" while the catalogue loads. The
+   * caption gives its depth, and "a good first dive" until the player has dived anywhere.
+   */
+  setDiveSite(title: string | null, depthM: number | null = null, firstDive = false): void {
     this.diveButton.textContent = title ? `Dive: ${title}` : 'Dive';
-    this.sceneCaption.textContent = title ? `${title} · Next dive` : SCENE_FALLBACK;
+    const depth = depthM === null ? '' : `, ${Math.round(depthM).toLocaleString('en-US')} m`;
+    this.sceneCaption.textContent = title
+      ? `${title}${depth}${firstDive ? ', a good first dive' : ''}`
+      : SCENE_FALLBACK;
   }
 
   show(): void {

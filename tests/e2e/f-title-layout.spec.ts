@@ -37,7 +37,7 @@ test('home copy, semantic order and first focus', async ({ page }) => {
   await expect(page.locator('.home-notes')).toContainText('Play in your browser');
   await expect(page.locator('.home-notes')).toContainText('Touch, keyboard or controller');
   await expect(page.locator('.home-scene-caption')).toHaveText(
-    /^(Expedition preview|Titanic dive · Next dive)$/,
+    /^(Expedition preview|Titanic dive, 3,800 m, a good first dive)$/,
   );
   await expect(page.locator('.home-scene-caveat')).toHaveCount(0);
   // One primary action: Daily stays a plain secondary row, not a second mint card.

@@ -2617,7 +2617,7 @@ freshTest.describe('Home to scan and return journey', () => {
           await ready(page);
           await expect(page.locator('.briefing')).toBeVisible();
           await shot('03-briefing');
-          const cancel = page.getByRole('button', { name: 'Back to home', exact: true });
+          const cancel = page.getByRole('button', { name: 'Back to menu', exact: true });
           await cancel.scrollIntoViewIfNeeded();
           await act(cancel, touch);
           await expect(home).toBeVisible();

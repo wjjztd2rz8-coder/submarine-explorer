@@ -594,7 +594,7 @@ export class MissionRouter {
     }
     if (hull) {
       const rating = Math.abs(hull.ratedDepth).toLocaleString('en-US');
-      content.meta.push(['HULL', `Rated to ${rating} m`]);
+      content.meta.push(['HULL', `Safe to ${rating} m`]);
     }
     content.startPosition = this.opts.defaultStartPosition ?? 'near-site';
     if (def.briefing.memorial_note) content.memorialNote = def.briefing.memorial_note;

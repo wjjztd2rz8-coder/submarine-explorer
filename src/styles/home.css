@@ -234,6 +234,10 @@
 .home-menu > .mode-selector {
   grid-column: 1 / -1;
 }
+.home-menu > button:not(.home-primary):not(.daily-card) {
+  background: transparent;
+  font-weight: 500;
+}
 .home-menu > .home-primary {
   border-color: var(--home-mint);
   background: var(--home-mint);

@@ -167,7 +167,11 @@ function shell(savedSite: string | null = null, inDive = false, reuse?: ShellCon
       const caption = nodes(ctx.home.root as unknown as Element).find(
         (node) => node.className === 'home-scene-caption',
       );
-      expect(caption?.textContent).toBe(title ? `${title} · Next dive` : 'Expedition preview');
+      expect(caption?.textContent).toMatch(
+        title
+          ? new RegExp(`^${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}, [\\d,]+ m`)
+          : /^Expedition preview$/,
+      );
     },
   };
 }

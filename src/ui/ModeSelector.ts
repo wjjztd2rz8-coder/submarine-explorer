@@ -19,12 +19,12 @@ export const GAME_MODES: ReadonlyArray<{ id: GameplayMode; label: string; descri
   {
     id: 'arcade',
     label: 'Arcade',
-    description: 'Fast travel and waypoints. No battery limit or currents.',
+    description: 'Easy. Waypoints and fast travel; no battery limit or currents.',
   },
   {
     id: 'realistic',
     label: 'Realistic',
-    description: 'True speed and light. Battery, oxygen and currents; no waypoints.',
+    description: 'Harder. Real speed; battery, oxygen and currents; no waypoints.',
   },
 ];
 
@@ -34,7 +34,7 @@ export function modeDescription(
   baseMode: 'arcade' | 'realistic' = 'arcade',
 ): string {
   if (mode === 'custom')
-    return `Your switches with ${baseMode === 'realistic' ? 'Realistic' : 'Arcade'} speed, lights and sensors.`;
+    return `Pick each switch yourself, starting from ${baseMode === 'realistic' ? 'Realistic' : 'Arcade'}.`;
   return GAME_MODES.find((m) => m.id === mode)?.description ?? '';
 }
 

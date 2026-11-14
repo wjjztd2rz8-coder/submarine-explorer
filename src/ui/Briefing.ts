@@ -220,7 +220,7 @@ export class Briefing {
     begin.addEventListener('click', () => this.begin());
     go.append(el('span', 'briefing-hint', 'OR PRESS ENTER'), begin);
     if (this.options.onCancel) {
-      const cancel = el('button', 'briefing-cancel', 'Back to home');
+      const cancel = el('button', 'briefing-cancel', 'Back to menu');
       cancel.type = 'button';
       cancel.addEventListener('click', () => {
         this.hide();

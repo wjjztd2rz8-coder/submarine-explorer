@@ -14,7 +14,7 @@ import {
 describe('game modes', () => {
   it('lists only Arcade and Realistic, each with a one-line description', () => {
     expect(GAME_MODES.map((m) => m.id)).toEqual(['arcade', 'realistic']);
-    expect(modeDescription('custom')).toBe('Your switches with Arcade speed, lights and sensors.');
+    expect(modeDescription('custom')).toBe('Pick each switch yourself, starting from Arcade.');
     for (const mode of GAME_MODES) {
       expect(modeDescription(mode.id)).toBe(mode.description);
       expect(mode.description).not.toMatch(/\n/);
@@ -29,7 +29,7 @@ describe('game modes', () => {
     expect(modeDescription('arcade')).toMatch(/No battery limit or currents/);
     expect(!realistic.visualHints && realistic.batteryOxygen).toBe(true);
     expect(realistic.currents).toBe('realistic');
-    expect(modeDescription('realistic')).toMatch(/Battery, oxygen and currents; no waypoints/);
+    expect(modeDescription('realistic')).toMatch(/battery, oxygen and currents; no waypoints/);
   });
 });
 

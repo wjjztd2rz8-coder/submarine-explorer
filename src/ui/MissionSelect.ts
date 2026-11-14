@@ -289,7 +289,7 @@ export class MissionSelect {
           // Rated depth, not a hull class id: casual players don't know what a class is.
           const hull =
             this.progress && m.depthM !== null
-              ? `Rated to ${requiredHull(m.depthM).depthM.toLocaleString('en-US')} m`
+              ? `Safe to ${requiredHull(m.depthM).depthM.toLocaleString('en-US')} m`
               : '';
           meta.textContent = [
             m.depthM !== null ? `${Math.round(m.depthM).toLocaleString('en-US')} m` : '',

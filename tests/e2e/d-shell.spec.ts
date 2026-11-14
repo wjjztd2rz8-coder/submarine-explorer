@@ -284,7 +284,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
     .toBeLessThan(0.02);
   await expectGlobeClearEdges(page);
   await expect(sites.locator('[data-mission="titanic"]')).toBeVisible();
-  await expect(sites.locator('[data-mission="titanic"]')).toContainText(/Rated to 6,500 m/);
+  await expect(sites.locator('[data-mission="titanic"]')).toContainText(/Safe to 6,500 m/);
   // Regression guard: a first-time player sees one recommended row (listed first) and no
   // empty stars or "0/N logged" noise on rows with nothing earned yet.
   await expect(sites.locator('.mission-badge')).toHaveText(['Recommended first dive']);
@@ -443,7 +443,9 @@ for (const [saved, destination, title] of [
     await boot(page, '/?tier=low');
     const primary = page.locator('.home-primary');
     await expect(primary).toHaveText(`Dive: ${title}`);
-    await expect(page.locator('.home-scene-caption')).toHaveText(`${title} · Next dive`);
+    await expect(page.locator('.home-scene-caption')).toHaveText(
+      new RegExp(`^${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}, [\\d,]+ m`),
+    );
     // Regression guard: the first-dive recommendation disappears once a site has been dived.
     await expect(page.locator('.home-sites .mission-badge.is-recommended')).toHaveCount(
       saved === null ? 1 : 0,

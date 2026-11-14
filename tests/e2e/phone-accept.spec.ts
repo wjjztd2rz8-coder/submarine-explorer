@@ -509,7 +509,7 @@ for (const viewport of [
       await homeReady(page, true);
       await expect(primary).toHaveAccessibleName('Dive: Great Blue Hole: Lighthouse Reef');
       await expect(page.locator('.home-scene-caption')).toHaveText(
-        'Great Blue Hole: Lighthouse Reef · Next dive',
+        'Great Blue Hole: Lighthouse Reef, 125 m',
       );
       await reachable(primary);
       await primary.tap();
