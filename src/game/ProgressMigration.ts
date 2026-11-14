@@ -95,7 +95,7 @@ export async function creditPreviousDives(
         const primary = route.filter((o) => o.primary);
         if (!primary.length || !primary.every((o) => o.complete)) continue;
         progress.bonus = evidence.bonus;
-        progress.finish(site, route);
+        progress.finish(site, route, false, true);
       }
       return def || absent ? null : evidence;
     }),

@@ -418,6 +418,20 @@ describe('sonar live contact metadata', () => {
   const b = { id: 'b', name: 'Next contact', position: { x: 40, z: 0 } } as PlacedPoi;
   const pilot = { position: { x: 0, z: 0 }, headingDeg: 0 } as SubmarineState;
 
+  it('shows unknown question contacts and persistent found names independently of the active objective', () => {
+    const { sonar } = sonarInputFixture(true);
+    let found = false;
+    sonar.setPois([a, b]);
+    sonar.setContactState((poi) => ({ primary: poi.id === 'a', found }));
+    sonar.setObjective(a.id);
+    sonar.update(pilot);
+    expect(sonar.markers[0]).toMatchObject({ name: 'First contact', icon: '◇' });
+    expect(sonar.markers[1]).toMatchObject({ name: 'Unknown contact', icon: '?' });
+    found = true;
+    sonar.update(pilot);
+    expect(sonar.markers[1]).toMatchObject({ name: 'Next contact', icon: '✓', scanned: true });
+  });
+
   it('replaces objectives and POIs while consuming live and replaced scan callbacks', () => {
     vi.spyOn(performance, 'now').mockReturnValue(1000);
     const { sonar } = sonarInputFixture(true);

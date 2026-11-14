@@ -1,7 +1,9 @@
+import poiData from '../../data/landmarks/titanic/pois.json' with { type: 'json' };
 import missionData from '../../data/landmarks/titanic/mission.json' with { type: 'json' };
 import { waitForFrames } from './helpers/frames.js';
-
+import { GUIDANCE } from './helpers/guidance.js';
 import { homeReady } from './helpers/home.js';
+import { scanWithKeyboard } from './helpers/scan.js';
 import { siteData } from './helpers/site.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 
@@ -19,7 +21,7 @@ import { expect, test, type Page } from './helpers/unlocked.js';
  * State is read through `window.__game.{mission, missionRouter, discovery, scanner}`.
  */
 
-const objectiveCount = missionData.objectives.length;
+const objectiveCount = poiData.pois.length;
 const primaryCount = missionData.objectives.filter((o) => o.primary).length;
 const secondaryCount = objectiveCount - primaryCount;
 
@@ -72,6 +74,18 @@ async function subPos(page: Page): Promise<{ x: number; y: number; z: number }> 
       .position;
     return { x: p.x, y: p.y, z: p.z };
   });
+}
+
+async function holdScanUntil(page: Page, objectiveId: string): Promise<void> {
+  await scanWithKeyboard(page);
+  await page.waitForFunction(
+    (id) =>
+      (
+        window.__game as { mission: { objectives: Array<{ id: string; complete: boolean }> } }
+      ).mission.objectives.some((o) => o.id === id && o.complete),
+    objectiveId,
+    { timeout: 20_000 },
+  );
 }
 
 for (const touch of [false, true]) {
@@ -151,7 +165,9 @@ test.describe('B3 mission flow', () => {
     await expect(briefing).toBeVisible();
     await expect(page.locator('.briefing-title')).toHaveText('Titanic dive');
     await expect(page.locator('.briefing-objectives li.is-primary')).toHaveCount(primaryCount);
-    await expect(page.locator('.briefing-objectives li.is-secondary')).toHaveCount(secondaryCount);
+    await expect(page.locator('.briefing-contacts')).toHaveText(
+      `Unknown contacts: 0 of ${secondaryCount} found`,
+    );
     await expect(page.locator('.briefing-section.is-hazards li')).not.toHaveCount(0);
     await expect(page.locator('.briefing-section.is-hazards li:visible')).toHaveCount(0);
     await expect(page.locator('.briefing-memorial')).toBeVisible();
@@ -233,9 +249,9 @@ test.describe('B3 mission flow', () => {
     ).toBeLessThan(2);
     expect(opening.range).toBeGreaterThanOrEqual(40);
     expect(opening.range).toBeLessThan(700);
-    // Off-axis targets show plain steering directions alongside the distance.
+    // The turn cue replaces the distance while the target is off the bow (by design).
     await expect(page.locator('.guidance-hint')).toContainText(
-      new RegExp(`Turn (left|right|around)|${Math.round(opening.range)} m`),
+      new RegExp(`TURN (\\d+° (PORT|STARBOARD)|LEFT|RIGHT)|${Math.round(opening.range)} m`),
     );
 
     // Now it simulates: flooding the tanks takes the boat down.
@@ -260,6 +276,132 @@ test.describe('B3 mission flow', () => {
     });
     expect(sonar.h).toBe(220);
     expect(Math.abs(sonar.w / sonar.h - sonar.aspect)).toBeLessThan(0.01);
+
+    expect(errors, errors.join(' | ')).toEqual([]);
+  });
+
+  test('scan bow and stern -> banner -> surface -> debrief', async ({ page }) => {
+    const errors = collectErrors(page);
+    await boot(page, '/?mission=titanic&poi=titanic-bow&skipBriefing=1');
+    await expect(page.locator('.briefing')).toHaveCount(0);
+    await page.waitForFunction(
+      () => {
+        const g = window.__game as {
+          discovery: { spawnedAt: string | null };
+          scanner: { view: { candidateId: string | null } };
+        };
+        return (
+          g.discovery.spawnedAt === 'titanic-bow' && g.scanner.view.candidateId === 'titanic-bow'
+        );
+      },
+      undefined,
+      { timeout: 15_000 },
+    );
+    expect((await missionProbe(page)).state).toBe('diving');
+
+    await holdScanUntil(page, 'find-bow');
+    let m = await missionProbe(page);
+    expect(m.state).toBe('diving');
+    expect(m.objectives.find((o) => o.id === 'find-bow')?.complete).toBe(true);
+    expect(m.emitted).toEqual(['mission:started', 'mission:objective']);
+    const panel = page.locator('.objectives-panel');
+    await expect(panel).toBeVisible();
+    await expect(panel.locator('.obj-progress')).toHaveText(
+      `1 of ${objectiveCount} objectives · 1 of ${primaryCount} primary`,
+    );
+    await expect(panel.locator('.obj-item.is-current')).toContainText('stern');
+    // The result temporarily owns the slot; completed rows leave the checklist.
+    await expect(page.locator(GUIDANCE.objective)).toHaveCount(0);
+    await expect(panel.locator('.obj-item.is-complete')).toHaveCount(1);
+    await page.screenshot({ path: 'tests/e2e/screenshots/mission-objectives.png' });
+
+    // Teleport next to the stern, using the same placement as the ?poi= spawn.
+    await page.evaluate(() => {
+      const g = window.__game as {
+        sub: {
+          reset(x: number, y: number, z: number, yaw: number): void;
+          position: unknown;
+          yaw: number;
+          pitch: number;
+        };
+        rig: { snap(p: unknown, yaw: number, pitch: number): void };
+        discovery: {
+          spawnPose(id: string): { x: number; y: number; z: number; yaw: number } | null;
+          stats: { markTeleport(): void };
+        };
+      };
+      const pose = g.discovery.spawnPose('titanic-stern');
+      if (!pose) throw new Error('no stern POI');
+      g.sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+      g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
+      g.discovery.stats.markTeleport();
+    });
+    await page.waitForFunction(
+      () =>
+        (window.__game as { scanner: { view: { candidateId: string | null } } }).scanner.view
+          .candidateId === 'titanic-stern',
+      undefined,
+      { timeout: 10_000 },
+    );
+    await holdScanUntil(page, 'find-stern');
+    m = await missionProbe(page);
+    expect(m.state).toBe('primaries-complete');
+    expect(m.emitted.at(-1)).toBe('mission:primaryComplete');
+    // The dive goes on: the next target is optional, and a banner offers the choice.
+    await expect(panel.locator('.obj-contacts')).toHaveText(/Unknown contacts: 0 of \d+ found/);
+    const banner = panel.locator('.obj-banner');
+    await expect(banner).toBeVisible({ timeout: 10_000 });
+    const debrief = page.locator('.mission-debrief');
+    await expect(debrief).toHaveCount(0);
+    await banner.locator('button', { hasText: 'Surface and debrief' }).click();
+
+    await expect(debrief).toBeVisible();
+    m = await missionProbe(page);
+    expect(m.state).toBe('debrief');
+    expect(m.emitted.slice(-2)).toEqual(['mission:complete', 'mission:ended']);
+    expect(m.durationS).toBeGreaterThan(3);
+    await expect(debrief.locator('.debrief-title')).toHaveText('Primaries complete');
+    await expect(debrief.locator('.debrief-kicker')).toHaveText('RMS TITANIC');
+    // Unscanned optional targets must not dilute completed primary progress.
+    await expect(debrief.locator('[data-field="objectives"]')).toHaveText(
+      '2 of 2 primary objectives',
+    );
+    await expect(debrief.locator('.debrief-btn')).toHaveText([
+      'Dive again',
+      'Keep exploring',
+      'Journal',
+      'Dive sites',
+      'Home',
+    ]);
+    await expect(debrief.locator('.debrief-highlight')).toHaveText('Scanned Stern section.');
+    await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText('2');
+    await page.screenshot({ path: 'tests/e2e/screenshots/mission-debrief.png' });
+
+    // "Dive again" announces a restart, then reloads the same URL.
+    await page.evaluate(() => {
+      const w = window as unknown as { __restart: unknown[] };
+      w.__restart = [];
+      (window.__game as { bus: { on(n: string, h: (p: unknown) => void): void } }).bus.on(
+        'mission:restart',
+        (p) => w.__restart.push(p),
+      );
+      window.addEventListener('beforeunload', () => {
+        sessionStorage.setItem('b3-restart', JSON.stringify(w.__restart));
+      });
+    });
+    await debrief.locator('.debrief-more-toggle').click();
+    await Promise.all([
+      page.waitForEvent('load'),
+      // Guards duplicate restart/reset events while the reload is still pending.
+      debrief.locator('.debrief-btn', { hasText: 'Dive again' }).evaluate((button) => {
+        (button as HTMLButtonElement).click();
+        (button as HTMLButtonElement).click();
+      }),
+    ]);
+    expect(page.url()).toContain('mission=titanic');
+    expect(await page.evaluate(() => sessionStorage.getItem('b3-restart'))).toBe(
+      JSON.stringify([{ missionId: 'titanic' }]),
+    );
 
     expect(errors, errors.join(' | ')).toEqual([]);
   });
@@ -292,6 +434,134 @@ test.describe('B3 mission flow', () => {
 });
 
 test.describe('fix S: mission failure, framing and modals', () => {
+  test('crush depth -> HULL FAILURE banner -> "Dive aborted" debrief -> Dive again', async ({
+    page,
+  }) => {
+    const errors = collectErrors(page);
+    await boot(page, '/?mission=titanic&skipBriefing=1');
+    expect((await missionProbe(page)).state).toBe('diving');
+
+    // The mission clock uses unfrozen frame time, independent of
+    // the eight-step physics cap. Time.tick clamps each frame to 250 ms;
+    // accumulate the same observed frame deltas instead of sleeping for two
+    // wall seconds, which can contain only a few frames on SwiftShader.
+    const clockAdvance = await page.evaluate(
+      () =>
+        new Promise<number>((resolve) => {
+          const mission = (window.__game as { mission: { elapsedS: number } }).mission;
+          let last: number | undefined;
+          let start = 0;
+          let frameTime = 0;
+          const sample = (now: number): void => {
+            if (last === undefined) start = mission.elapsedS;
+            else frameTime += Math.min(0.25, Math.max(0, (now - last) / 1000));
+            last = now;
+            if (frameTime >= 2) resolve(mission.elapsedS - start);
+            else requestAnimationFrame(sample);
+          };
+          requestAnimationFrame(sample);
+        }),
+    );
+    expect(clockAdvance).toBeGreaterThan(1.6);
+    expect(clockAdvance).toBeLessThan(2.6);
+
+    // The Titanic seabed (~3,980 m) is inside the Class B rating, so fit the
+    // 1,000 m coastal hull and put the boat just below it in open water.
+    await page.evaluate(() => {
+      const g = window.__game as {
+        sub: {
+          reset(x: number, y: number, z: number, yaw?: number): void;
+          setHullClass(id: string): boolean;
+          getCrushDepth(): number;
+        };
+        bus: { on(n: string, h: (p: unknown) => void): void };
+      };
+      const w = window as unknown as { __aborted: unknown[] };
+      w.__aborted = [];
+      g.bus.on('mission:aborted', (p) => w.__aborted.push(p));
+      g.sub.setHullClass('A');
+      g.sub.reset(0, g.sub.getCrushDepth() - 5, 0, 0);
+    });
+    const alert = page.locator('.guidance-slot[data-kind="urgent"] .guidance-name');
+    await expect(alert).toBeVisible();
+    await expect(alert).toHaveText('HULL FAILURE — EMERGENCY ASCENT');
+
+    const debrief = page.locator('.mission-debrief');
+    // The blow lock lasts five simulated seconds, which takes much longer
+    // on a software renderer. Wait for the router to observe its completion;
+    // keep the UI, event, hull-depth and frozen-state assertions below.
+    await expect
+      .poll(async () => (await missionProbe(page)).state, { timeout: 120_000 })
+      .toBe('debrief');
+    await expect(debrief).toBeVisible();
+    await expect(alert).toBeHidden();
+    await expect(debrief).toHaveClass(/is-aborted/);
+    await expect(debrief.locator('.debrief-title')).toHaveText('Dive aborted');
+    await expect(debrief.locator('.debrief-highlight')).toContainText('Hull failure at');
+    // No Keep exploring after an abort: the dive is over.
+    await expect(debrief.locator('.debrief-btn')).toHaveText([
+      'Dive again',
+      'Dive sites',
+      'Journal',
+      'Home',
+    ]);
+    const m = await missionProbe(page);
+    expect(m.state).toBe('debrief');
+    expect(m.emitted).toEqual(['mission:started', 'mission:aborted', 'mission:ended']);
+    expect(
+      await page.evaluate(() => (window as unknown as { __aborted: unknown[] }).__aborted),
+    ).toEqual([{ missionId: 'titanic', reason: 'crush' }]);
+    // The boat is back above its rating and the controls are its own again.
+    const st = await page.evaluate(() => {
+      const g = window.__game as {
+        sub: { getState(): { depth: number; emergencyBlow: boolean }; getCrushDepth(): number };
+        missionRouter: { frozen: boolean };
+      };
+      return { ...g.sub.getState(), crush: g.sub.getCrushDepth(), frozen: g.missionRouter.frozen };
+    });
+    expect(st.depth).toBeGreaterThan(st.crush);
+    expect(st.emergencyBlow).toBe(false);
+    expect(st.frozen).toBe(true); // nothing simulates under the aborted debrief
+
+    // Escape does not dismiss the decision; Tab stays inside the card.
+    await page.keyboard.press('Escape');
+    await waitForFrames(page, 2);
+    await expect(debrief).toBeVisible();
+    for (let i = 0; i < 5; i++) {
+      await page.keyboard.press('Tab');
+      expect(await page.evaluate(() => !!document.activeElement?.closest('.mission-debrief'))).toBe(
+        true,
+      );
+    }
+    await page.screenshot({ path: 'tests/e2e/screenshots/fix-s-aborted-debrief.png' });
+
+    await page.evaluate(() => {
+      const w = window as unknown as { __restart: unknown[] };
+      w.__restart = [];
+      (window.__game as { bus: { on(n: string, h: (p: unknown) => void): void } }).bus.on(
+        'mission:restart',
+        (p) => w.__restart.push(p),
+      );
+      window.addEventListener('beforeunload', () => {
+        sessionStorage.setItem('fixs-restart', JSON.stringify(w.__restart));
+      });
+    });
+    await debrief.locator('.debrief-more-toggle').click();
+    await Promise.all([
+      page.waitForEvent('load'),
+      // Guards duplicate restart/reset events after a hull-aborted dive too.
+      debrief.locator('.debrief-btn', { hasText: 'Dive again' }).evaluate((button) => {
+        (button as HTMLButtonElement).click();
+        (button as HTMLButtonElement).click();
+      }),
+    ]);
+    expect(page.url()).toContain('mission=titanic');
+    expect(await page.evaluate(() => sessionStorage.getItem('fixs-restart'))).toBe(
+      JSON.stringify([{ missionId: 'titanic' }]),
+    );
+    expect(errors, errors.join(' | ')).toEqual([]);
+  });
+
   test('briefing traps Tab focus and Escape returns home without starting the dive', async ({
     page,
   }) => {

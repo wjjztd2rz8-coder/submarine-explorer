@@ -14,10 +14,10 @@ test('polished dive HUD keeps mission, telemetry, speed, and the controls guide 
   await page.waitForFunction(
     () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
   );
-  await expect(page.locator('.obj-item')).toHaveCount(4);
+  await expect(page.locator('.obj-item')).toHaveCount(2);
   await expect(page.locator('.obj-item.is-current')).toContainText('Scan the bow');
-  await expect(page.locator('.obj-item.is-optional')).toHaveCount(2);
-  await expect(page.locator('.obj-check')).toHaveText(['○', '○', '○', '○']);
+  await expect(page.locator('.obj-item.is-optional')).toHaveCount(0);
+  await expect(page.locator('.obj-check')).toHaveText(['○', '○']);
   await expect(page.locator('.obj-hint, .obj-nav')).toHaveCount(0);
   await expect(page.locator('.guidance-name')).toHaveText('Bow section');
   const depthSize = await page
@@ -71,37 +71,4 @@ test('polished dive HUD keeps mission, telemetry, speed, and the controls guide 
   await expect(guide).toContainText('Speed ahead and astern');
   await page.keyboard.press('Escape');
   await page.locator('.pause-menu').getByRole('button', { name: 'Resume', exact: true }).click();
-});
-
-test('a long objective list shows the current target and the next few', async ({ page }) => {
-  await page.goto('/?mission=lost-city&skipBriefing=1');
-  await page.waitForFunction(() => window.__gameReady === true);
-  await page.waitForFunction(
-    () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
-  );
-  await expect(page.locator('.obj-item.is-current')).toContainText('Scan Poseidon');
-  await page.evaluate(() => {
-    const g = window.__game as {
-      mission: { objectives: Array<{ id: string; title: string }> };
-      missionRouter: {
-        panel: { setObjectives(objectives: Array<{ id: string; title: string }>): void };
-      };
-    };
-    const objectives = g.mission.objectives;
-    g.missionRouter.panel.setObjectives([
-      ...objectives,
-      { ...objectives[2]!, id: 'extra-vent-1', title: 'Extra vent one' },
-      { ...objectives[3]!, id: 'extra-vent-2', title: 'Extra vent two' },
-    ]);
-  });
-  await expect(page.locator('.obj-item')).toHaveCount(4);
-  await expect(page.locator('.obj-item.is-current')).toContainText('Scan Poseidon');
-  await expect(page.locator('.obj-item-title')).toHaveText([
-    'Scan Poseidon',
-    'Scan IMAX Tower',
-    'Extra vent one',
-    'Scan Beehive',
-  ]);
-  await expect(page.locator('.obj-more')).toHaveText('+2 more · Esc for all');
-  await expect(page.locator('.obj-item', { hasText: 'Extra vent two' })).toHaveCount(0);
 });

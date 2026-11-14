@@ -1,3 +1,4 @@
+import { contactLabel, unknownContactsForSite, type ContactPoi } from './Contacts.js';
 /**
  * Mission flow core (D-FLOW): the `mission.json` schema
  * (plan/PHASE-B-CONTRACTS.md §2.4), its validator/loader, the
@@ -10,9 +11,8 @@
  * Pure TS: no DOM, no Three.js. The DOM overlays (Briefing, ObjectivesPanel,
  * the debrief) and the engine wiring live in MissionRouter.ts.
  *
- * Objectives count scans made *during this dive*, not the persisted discovery
- * store (the Journal): a player who already found the bow last week still has
- * to dive to it again for the mission to complete (docs/missions.md).
+ * Primaries count scans during this dive. Fixed non-primary contacts retain
+ * discoveries across dives, and stay anonymous until first scanned.
  */
 
 import type { EventBus, GameEvents } from '../core/EventBus.js';
@@ -311,13 +311,16 @@ type MissionEventName =
 /** A dive in progress: scans count and the clock runs. */
 const DIVING: ReadonlySet<MissionState> = new Set(['diving', 'primaries-complete']);
 
-/** Shared beam and waypoint priority: unfinished primaries, then optional objectives. */
+/** Shared beam and waypoint priority: unfinished primaries, then nearest unfound contact. */
 export function nextScanObjective(
   objectives: readonly ObjectiveStatus[] = [],
+  distance?: (poiId: string) => number,
 ): ObjectiveStatus | undefined {
   return (
     objectives.find((o) => o.resolved && !o.complete && o.primary) ??
-    objectives.find((o) => o.resolved && !o.complete)
+    objectives
+      .filter((o) => o.resolved && !o.complete)
+      .sort((a, b) => (distance ? distance(a.poiId) - distance(b.poiId) : 0))[0]
   );
 }
 
@@ -385,6 +388,40 @@ export class Mission {
       warn(`${this.id}: no primary objective resolves to a POI; the mission cannot complete`);
     }
   }
+
+  /** Replace authored optional rows with the complete fixed contact set. */
+  setContacts(pois: readonly ContactPoi[], isFound: (id: string) => boolean): void {
+    const primary = this.objectives.filter((o) => o.primary);
+    const optional = this.def.objectives.filter((o) => !o.primary);
+    const previous = new Map(this.objectives.map((o) => [o.poiId, o.complete]));
+    const contacts = unknownContactsForSite(
+      pois,
+      primary.map((o) => o.poiId),
+      optional.map((o) => o.poi),
+    );
+    this.objectives.splice(
+      0,
+      this.objectives.length,
+      ...primary,
+      ...contacts.map((p) => {
+        const complete = isFound(p.id) || previous.get(p.id) === true;
+        return {
+          id: optional.find((o) => o.poi === p.id)?.id ?? `contact:${p.id}`,
+          poiId: p.id,
+          primary: false,
+          complete,
+          resolved: true,
+          hint: '',
+          title: contactLabel(p, { primary: false, found: complete }),
+        };
+      }),
+    );
+    this.contactPois = new Map(contacts.map((p) => [p.id, p]));
+    this.contactFound = isFound;
+    this.changed();
+  }
+  private contactPois = new Map<string, ContactPoi>();
+  private contactFound: (id: string) => boolean = () => false;
 
   /** Primary objectives that count toward completion. */
   requiredPrimaries(): ObjectiveStatus[] {
@@ -503,7 +540,11 @@ export class Mission {
     this.endReason = null;
     this.resumeState = null;
     this.completeEmitted = false;
-    for (const o of this.objectives) o.complete = false;
+    for (const o of this.objectives) {
+      o.complete = !o.primary && this.contactFound(o.poiId);
+      const poi = this.contactPois.get(o.poiId);
+      if (poi) o.title = contactLabel(poi, { primary: false, found: o.complete });
+    }
     this.changed();
   }
 
@@ -527,6 +568,8 @@ export class Mission {
     for (const o of this.objectives) {
       if (o.poiId !== poiId || o.complete || !o.resolved) continue;
       o.complete = true;
+      const poi = this.contactPois.get(o.poiId);
+      if (poi) o.title = contactLabel(poi, { primary: false, found: true });
       any = true;
       this.emit('mission:objective', { missionId: this.id, objectiveId: o.id, complete: true });
     }

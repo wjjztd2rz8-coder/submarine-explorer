@@ -27,7 +27,9 @@ for (const layout of [
           index.landmarks.map(async (id) => {
             const response = await page.request.get(`/data/landmarks/${id}/mission.json`);
             expect(response.ok(), id).toBe(true);
-            return ((await response.json()) as { objectives: MissionObjectiveDef[] }).objectives;
+            return (
+              (await response.json()) as { objectives: MissionObjectiveDef[] }
+            ).objectives.filter((o) => o.primary);
           }),
         )
       )

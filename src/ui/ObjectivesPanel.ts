@@ -1,3 +1,4 @@
+import { contactLabel } from '../game/Contacts.js';
 /** Mission checklist, progress tally and completion choices. Target guidance lives in the guidance slot. */
 
 import { hudRegions } from './hudRegions.js';
@@ -157,44 +158,37 @@ export class ObjectivesPanel {
   }
 
   private renderList(): void {
-    // Finished rows collapse into the progress line while something is outstanding,
-    // so the checklist continues at the next unfinished objective.
-    const open = this.objectives.filter((o) => !o.complete);
-    const sorted = [...(open.length ? open : this.objectives)].sort(
-      (a, b) => Number(b.primary) - Number(a.primary),
-    );
-    const current = sorted.find((o) => o.id === this.currentId);
-    // For a long mission, continue from the active objective and wrap to the
-    // next entries if it is near the end of the ordered list.
-    const start = Math.max(0, sorted.indexOf(current ?? sorted[0]!));
-    const shown =
-      sorted.length < 6 ? sorted : [...sorted.slice(start), ...sorted.slice(0, start)].slice(0, 4);
+    const primaries = this.objectives.filter((o) => o.primary);
+    const contacts = this.objectives.filter((o) => !o.primary && o.resolved);
     this.listEl.replaceChildren(
-      ...shown.map((objective) => {
+      ...primaries.map((objective) => {
         const row = el('div', 'obj-item');
         row.dataset.objective = objective.id;
         if (objective.id === this.currentId) row.setAttribute('aria-current', 'step');
         row.classList.toggle('is-current', objective.id === this.currentId);
-        row.classList.toggle('is-optional', !objective.primary);
         row.classList.toggle('is-complete', objective.complete);
-        const check = el('span', 'obj-check', objective.complete ? '✓' : '○');
-        const title = el('span', 'obj-item-title', objective.title);
-        row.append(check, title);
-        if (!objective.primary) row.append(el('span', 'obj-optional', 'OPTIONAL'));
+        row.append(
+          el('span', 'obj-check', objective.complete ? '✓' : '○'),
+          el(
+            'span',
+            'obj-item-title',
+            contactLabel(
+              { name: objective.title },
+              { primary: objective.primary, found: objective.complete },
+            ),
+          ),
+        );
         return row;
       }),
+      el(
+        'div',
+        'obj-contacts',
+        `Unknown contacts: ${contacts.filter((o) => o.complete).length} of ${contacts.length} found`,
+      ),
     );
-    const more = sorted.length - shown.length;
-    if (more > 0)
-      this.listEl.append(
-        el(
-          'div',
-          'obj-more',
-          document.documentElement.classList.contains('is-touch')
-            ? `+${more} more`
-            : `+${more} more · Esc for all`,
-        ),
-      );
+    if (this.banner && primaries.every((o) => o.complete)) {
+      this.bannerTitle.textContent = `${contacts.filter((o) => !o.complete).length} unknown contacts remain on sonar.`;
+    }
   }
 
   private write(target: HTMLElement, key: string, text: string): void {

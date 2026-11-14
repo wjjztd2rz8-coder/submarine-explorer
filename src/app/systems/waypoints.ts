@@ -1,3 +1,4 @@
+import { unknownContactsForSite } from '../../game/Contacts.js';
 /**
  * Scan guidance: the in-world waypoint to the next objective and the scanned
  * state on the sonar.
@@ -25,6 +26,29 @@ export const waypointsSystem: GameSystem = {
       waypoints.dispose();
     });
     ctx.waypoints = waypoints;
+    const state = (poi: (typeof discovery.pois)[number]) => {
+      const objectives = ctx.route?.def.objectives;
+      const primaryIds = objectives
+        ? objectives.filter((o) => o.primary).map((o) => o.poi)
+        : discovery.pois.filter((p) => p.primary).map((p) => p.id);
+      const contacts = unknownContactsForSite(
+        discovery.pois,
+        primaryIds,
+        objectives?.filter((o) => !o.primary).map((o) => o.poi),
+      );
+      return {
+        primary: !contacts.some((p) => p.id === poi.id),
+        found:
+          discovery.store.isDiscovered(poi.landmarkId, poi.id) ||
+          discovery.scanner.isScanned(poi.landmarkId, poi.id),
+      };
+    };
+    waypoints.setContactState?.(state);
+    sonar.setContactState?.(state);
+    discovery.overlay?.setContactState((id) => {
+      const poi = discovery.pois.find((p) => p.id === id);
+      return poi ? state(poi) : null;
+    });
     visualHints = ctx.effective.gameplay.visualHints;
     waypoints.setVisualHints(visualHints);
     waypoints.setPalette(settings.sonarPalette);
@@ -61,7 +85,11 @@ export const waypointsSystem: GameSystem = {
   },
   frame: {
     'guide.waypoints': (f, ctx) => {
-      f.nextScanObjective = selectScanObjective(ctx.missionRouter?.mission.objectives);
+      f.nextScanObjective = selectScanObjective(ctx.missionRouter?.mission.objectives, (id) =>
+        ctx.sub.position.distanceTo(
+          ctx.discovery.pois.find((p) => p.id === id)?.position ?? ctx.sub.position,
+        ),
+      );
     },
     'render.prepare': (f, ctx) => {
       // Tutorial, warning and mission panels now have their final geometry.
@@ -72,7 +100,9 @@ export const waypointsSystem: GameSystem = {
 
 function updateWaypoints(ctx: GameContext, position: Vector3) {
   const { missionRouter } = ctx;
-  const nextScanObjective = selectScanObjective(missionRouter?.mission.objectives);
+  const nextScanObjective = selectScanObjective(missionRouter?.mission.objectives, (id) =>
+    position.distanceTo(ctx.discovery.pois.find((p) => p.id === id)?.position ?? position),
+  );
   // Near-site approaches retain their navigation marker in Realistic too.
   // Once in scan range, resume the pilot's normal visual-waypoint preference.
   const approach = nextScanObjective?.approachTo !== undefined;

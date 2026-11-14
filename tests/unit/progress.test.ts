@@ -221,8 +221,8 @@ describe('ratings and hull unlocks', () => {
           mission.end();
           const rating = progress.finish(site, mission.objectives, mission.endReason === 'abort');
           expect(rating).toEqual({
-            stars: outcome === 'all' ? 2 : outcome === 'primary' ? 1 : 0,
-            best: 2,
+            stars: outcome === 'all' ? 3 : outcome === 'primary' ? 1 : 0,
+            best: 3,
             points: 0,
           });
           expect(progress.points).toBe(0);
@@ -240,8 +240,8 @@ describe('ratings and hull unlocks', () => {
         }
       }
     }
-    expect(progress.stars).toBe(6);
-    expect(progress.snapshot().awarded).toHaveLength(21);
+    expect(progress.stars).toBe(9);
+    expect(progress.snapshot().awarded).toHaveLength(24);
   });
 
   const primary = { primary: true, complete: true };
@@ -251,17 +251,17 @@ describe('ratings and hull unlocks', () => {
     (site) => {
       const { progress, store } = researcher();
       expect(progress.rating(site)).toBe(0);
-      expect(progress.finish(site, [primary])).toMatchObject({ stars: 2, best: 2 });
+      expect(progress.finish(site, [primary])).toMatchObject({ stars: 3, best: 3 });
       expect(progress.selectCosmetic('paint', 'stock')).toBe(true);
       const restored = new Progress(new ProgressSave(store));
-      expect(restored.rating(site)).toBe(2);
+      expect(restored.rating(site)).toBe(3);
       restored.beginDive();
       expect(restored.finish(site, [primary, secondary])).toEqual({
         stars: 1,
-        best: 2,
+        best: 3,
         points: 0,
       });
-      expect(new Progress(new ProgressSave(store)).rating(site)).toBe(2);
+      expect(new Progress(new ProgressSave(store)).rating(site)).toBe(3);
     },
   );
   it('recovers lost best stars from reward tokens without paying them again', () => {
@@ -307,11 +307,11 @@ describe('ratings and hull unlocks', () => {
     expect(progress.points).toBe(0);
     expect(progress.lifetime).toBe(0);
   });
-  it('needs primaries, then every secondary, then a bonus; aborts earn no stars', () => {
+  it('rates completed fixed contacts independently of wildlife bonuses; aborts earn no stars', () => {
     expect(diveStars([], true)).toBe(0);
     expect(diveStars([{ ...primary, complete: false }], true)).toBe(0);
     expect(diveStars([primary, secondary], true)).toBe(1);
-    expect(diveStars([primary, { ...secondary, complete: true }], false)).toBe(2);
+    expect(diveStars([primary, { ...secondary, complete: true }], false)).toBe(3);
     expect(diveStars([primary, { ...secondary, complete: true }], true)).toBe(3);
     expect(diveStars([primary], true, true)).toBe(0);
   });
@@ -348,14 +348,15 @@ describe('ratings and hull unlocks', () => {
       expect(mission.counts()).toEqual({ completed: 1, total: 1 });
       expect(mission.end()).toBe(true);
       expect(mission.endReason).toBe('all');
-      expect(progress.previewStars(mission.objectives)).toBe(2);
-      expect(progress.finish('site', mission.objectives)).toEqual({ stars: 2, best: 2, points: 0 });
+      expect(progress.previewStars(mission.objectives)).toBe(3);
+      expect(progress.finish('site', mission.objectives)).toEqual({ stars: 3, best: 3, points: 0 });
       const restored = new Progress(new ProgressSave(store));
-      expect(restored.rating('site')).toBe(2);
+      expect(restored.rating('site')).toBe(3);
       expect(restored.snapshot().awarded).toEqual([
         'primary:site',
         'rating:site/1',
         'rating:site/2',
+        'rating:site/3',
       ]);
       // No resolvable primary still means no completion, even with a bonus.
       mission.resolve([]);

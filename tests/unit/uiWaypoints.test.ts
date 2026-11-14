@@ -224,6 +224,22 @@ describe('waypoint objective state', () => {
     };
   }
 
+  it('conceals nearby contacts, hides remote world markers, and restores persistent names', () => {
+    const f = fixture();
+    let found = false;
+    f.view.setContactState(() => ({ primary: false, found }));
+    f.draw();
+    expect(f.marker('a').textContent).toMatch(/^\? · \d+ m$/);
+    expect(f.marker('a').title).toBe('Unknown contact');
+    f.pois[0]!.position.z = -800;
+    f.draw();
+    expect(f.marker('a').hidden).toBe(true);
+    found = true;
+    f.draw();
+    expect(f.marker('a').textContent).toBe('✓ First contact');
+    expect(f.marker('a').title).toBe('First contact');
+  });
+
   it('hands the current cue from a completed scan to the next objective, then removes it', () => {
     const f = fixture();
     f.draw();
@@ -244,8 +260,8 @@ describe('waypoint objective state', () => {
     expect(f.currentIds()).toEqual([]);
     expect(f.marker('a')).toMatchObject({
       hidden: false,
-      textContent: '✓',
-      title: 'First contact · scanned this dive',
+      textContent: '✓ First contact',
+      title: 'First contact',
     });
     expect(f.marker('a').classList.contains('is-scanned')).toBe(true);
     expect(f.edge.hidden).toBe(true);
@@ -269,7 +285,7 @@ describe('waypoint objective state', () => {
     expect(f.currentIds()).toEqual([]);
     expect(f.edge.hidden).toBe(true);
     for (const poi of f.pois) {
-      expect(f.marker(poi.id)).toMatchObject({ hidden: false, textContent: '✓' });
+      expect(f.marker(poi.id)).toMatchObject({ hidden: false, textContent: `✓ ${poi.name}` });
       expect(f.marker(poi.id).classList.contains('is-scanned')).toBe(true);
     }
   });
@@ -284,14 +300,14 @@ describe('waypoint objective state', () => {
     expect(f.currentIds()).toEqual([]);
     expect(f.edge.hidden).toBe(true);
     expect(f.marker('b').hidden).toBe(true);
-    expect(f.marker('a')).toMatchObject({ hidden: false, textContent: '✓' });
+    expect(f.marker('a')).toMatchObject({ hidden: false, textContent: '✓ First contact' });
     expect(f.marker('a').classList.contains('is-scanned')).toBe(true);
 
     f.view.setVisualHints(true);
     f.draw();
     expect(f.currentIds()).toEqual(['b']);
     expect(f.marker('b')).toMatchObject({ hidden: false, textContent: '◇' });
-    expect(f.marker('a')).toMatchObject({ hidden: false, textContent: '✓' });
+    expect(f.marker('a')).toMatchObject({ hidden: false, textContent: '✓ First contact' });
     expect(f.marker('a').classList.contains('is-scanned')).toBe(true);
     expect(f.edge.hidden).toBe(true);
   });

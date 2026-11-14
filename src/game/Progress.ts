@@ -1,3 +1,4 @@
+import { contactStars, legacyContactStars } from './Contacts.js';
 import { PROGRESS_CONFIG } from '../core/config/progress.js';
 import {
   migrateProgress,
@@ -29,15 +30,10 @@ interface RatingObjective {
 }
 export function diveStars(
   objectives: readonly RatingObjective[],
-  bonus: boolean,
+  _bonus: boolean,
   aborted = false,
 ): number {
-  // Missing POIs are excluded from mission completion and its rating alike.
-  objectives = objectives.filter((o) => o.resolved !== false);
-  const primary = objectives.filter((o) => o.primary);
-  if (aborted || !primary.length || primary.some((o) => !o.complete)) return 0;
-  if (objectives.some((o) => !o.primary && !o.complete)) return 1;
-  return bonus ? 3 : 2;
+  return contactStars(objectives, aborted);
 }
 export function requiredHull(depthM: number) {
   return PROGRESS_CONFIG.hulls.find((h) => depthM <= h.depthM) ?? PROGRESS_CONFIG.hulls[2];
@@ -159,8 +155,15 @@ export class Progress {
   previewStars(objectives: readonly RatingObjective[]): number {
     return diveStars(objectives, this.bonus, false);
   }
-  finish(site: string, objectives: readonly RatingObjective[], aborted = false): DiveRating {
-    const stars = diveStars(objectives, this.bonus, aborted);
+  finish(
+    site: string,
+    objectives: readonly RatingObjective[],
+    aborted = false,
+    legacy = false,
+  ): DiveRating {
+    const stars = legacy
+      ? legacyContactStars(objectives, this.bonus)
+      : diveStars(objectives, this.bonus, aborted);
     if (stars > 0) this.award('primary', site);
     for (let i = 1; i <= stars; i++) this.award('rating', `${site}/${i}`);
     if (!this.save.readOnly)

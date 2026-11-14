@@ -1,3 +1,4 @@
+import { contactLabel, CONTACT_CONFIG, type ContactState } from '../game/Contacts.js';
 /** DOM guidance for POIs. Positions are projected from the real world; this never changes survey data. */
 import { Vector3, type Camera } from 'three';
 import type { PlacedPoi } from '../game/Pois.js';
@@ -67,13 +68,17 @@ export class Waypoints {
     parent.appendChild(this.root);
   }
 
+  private contactState: ((poi: PlacedPoi) => ContactState) | null = null;
+  setContactState(state: (poi: PlacedPoi) => ContactState): void {
+    this.contactState = state;
+  }
   setPois(pois: readonly PlacedPoi[]): void {
     this.pois = pois;
     for (const poi of pois) {
       const marker = document.createElement('div');
       marker.className = 'd-scan-world-marker';
       marker.dataset.poi = poi.id;
-      marker.setAttribute('aria-label', poi.name);
+      marker.setAttribute('aria-label', contactLabel(poi, this.state(poi)));
       this.root.appendChild(marker);
       this.markers.set(poi.id, marker);
     }
@@ -92,13 +97,26 @@ export class Waypoints {
     this.root.dataset.palette = name;
   }
 
+  private state(poi: PlacedPoi): ContactState {
+    return (
+      this.contactState?.(poi) ?? {
+        primary: poi.primary,
+        found: this.scanner.isScanned(poi.landmarkId, poi.id),
+      }
+    );
+  }
+
   /** The guidance slot owns target text; world navigation uses symbols only. */
   update(camera: Camera, _position: Vector3, objective: WaypointObjective | null): void {
     const width = window.innerWidth;
     const height = window.innerHeight;
     const current = objective ? this.pois.find((p) => p.id === objective.poiId) : null;
     for (const poi of this.pois) {
-      const scanned = this.scanner.isScanned(poi.landmarkId, poi.id);
+      const state = this.state(poi);
+      const scanned = state.found;
+      const unknown = !state.primary && !scanned;
+      const distance = _position.distanceTo(poi.position);
+      const nearby = distance <= CONTACT_CONFIG.worldMarkerRangeM;
       const isCurrent = poi === current && this.visualHints && !scanned;
       const projected = this.projection.copy(poi.position).project(camera);
       const onscreen =
@@ -108,21 +126,40 @@ export class Waypoints {
         Math.abs(projected.y) < 0.85;
       const marker = this.markers.get(poi.id);
       if (marker) {
-        marker.hidden = !onscreen || (!scanned && !isCurrent);
+        marker.hidden =
+          !onscreen || (unknown ? !nearby || !this.visualHints : !scanned && !isCurrent);
         marker.classList.toggle('is-scanned', scanned);
         marker.classList.toggle('is-current', isCurrent);
-        marker.textContent = scanned ? '✓' : '◇';
-        marker.title = scanned ? `${poi.name} · scanned this dive` : poi.name;
+        marker.textContent = unknown
+          ? `? · ${Math.round(distance)} m`
+          : scanned
+            ? `✓ ${contactLabel(poi, state)}`
+            : '◇';
+        marker.title = contactLabel(poi, state);
+        marker.setAttribute('aria-label', contactLabel(poi, state));
+        marker.classList.toggle('is-unknown', unknown);
         if (!marker.hidden) {
           marker.style.left = `${((projected.x + 1) / 2) * width}px`;
           marker.style.top = `${((1 - projected.y) / 2) * height}px`;
         }
       }
     }
-    if (!current || !this.visualHints) {
+    if (
+      !current ||
+      !this.visualHints ||
+      (!this.state(current).primary &&
+        !this.state(current).found &&
+        _position.distanceTo(current.position) > CONTACT_CONFIG.worldMarkerRangeM)
+    ) {
       this.edge.hidden = true;
       return;
     }
+    const state = this.state(current);
+    this.edge.textContent =
+      !state.primary && !state.found
+        ? `? · ${Math.round(_position.distanceTo(current.position))} m`
+        : '';
+    this.edge.setAttribute('aria-label', contactLabel(current, state));
     const point = this.projection.copy(current.position).project(camera);
     const onscreen =
       point.z > -1 && point.z < 1 && Math.abs(point.x) < 0.9 && Math.abs(point.y) < 0.85;
