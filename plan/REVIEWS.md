@@ -1,5 +1,11 @@
 # Reviews
 
+## 2026-11-13 targeted review: CI red on main for 3 runs
+
+- Cause: items 38/40/41 changed UI copy and structure (Dive again primary, plainer mode text, stars line, transparent secondary home buttons) and merged on smoke gates only, so the full-suite specs went stale unseen across three pushes. Two were real: the stars line pushed the landscape-phone debrief buttons below the fold (fixed in flow.css), and the stars note reused the `debrief-next` class. Also the props-geo smoker unit test timed out on hosted CI (30 s) in every run; it now runs the tier-independent check once (35 s to 4 s).
+- Fixed by R-ci-red (Sonnet), merged as 9a6f5ecd and pushed; gates smoke green locally. Hosted CI on that commit is the check; no tag until it is green.
+- Process: UI-copy or layout packages must run `--full-e2e` (or at least the specs that mention the changed text) before merge. Logged in plan/PROCESS-LOG.md.
+
 ## 2026-11-14 comprehensive review (Claude alone; Sol skipped, Codex weekly 4%)
 
 - **Changed since 2026-11-13:** Claude visual items 31-36 merged (Blue Hole lower frame, Hunga silhouette, Challenger floor, Lost City talus, Blake pad blend); hosted CI green on 7024d9f6 and f78 tagged; Codex bug hunts all merged. Golden `2026-11-14-001527`: 0/13 openings flagged by the readability check.

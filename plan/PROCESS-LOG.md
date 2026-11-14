@@ -440,3 +440,7 @@ Single-spec playwright runs serve `dist/`; a build older than the source hid the
 Playwright traces record on first retry; hosted CI uses zero retries, so red shards were triaged as "hosted timing" for days. Queued brief 197 (item 27) to retain failure traces. Reason: diagnose red CI by evidence, not guesses.
 
 - 2026-11-13: targeted reviews logged 'no change' on red CI for days without reading job logs; two of three failures were stale/racy specs, fixed. Rule: read each failing shard's log (`gh api repos/{owner}/{repo}/actions/jobs/<id>/logs`) first.
+
+## 2026-11-13 stale specs hid behind smoke merges
+
+- Three red hosted runs came from UI packages (38, 40, 41) merged on smoke gates; their copy/structure changes broke journal-debrief, f-title-layout, d2-predive and phone-accept specs. Rule restated: a package that changes player-visible text, classes or layout must update the specs that reference them (grep tests/e2e for the old text) and run `--full-e2e` or those spec files before merge; the orchestrator rejects it otherwise.

@@ -4059,3 +4059,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged item 40 U-journal-phone-layout (Sonnet; stray box was the hidden pause-menu button painting over the Journal, fixed with display:none; entry shows lead paragraph + one collapsed "Details and sources" on phone; opaque settings panel; one site name in debrief/journal) and item 39 U-first-dive-hints (Sonnet; partial: touch "TURN LEFT/RIGHT" instead of degrees, move card names the left pad; SONAR/LIGHTS/edge-arrow labels deliberately not added, agent self-rated 6/10). Smoke + project-base gates green on each; pushed journal merge, hints merge pushed below. Not full-e2e'd; agents report ~31 pre-existing failures in journal-debrief/phone-accept specs (item 41 debrief assertions, pause-tap in opening-to-debrief journey): triage from hosted CI. Screenshots not reviewed by me.
 - Open: 42, 43 (Sonnet). Codex weekly 3% (resets Sun Nov 15 23:00), briefs 196-199 stay queued. No tag.
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-13 23:36 CST targeted review (Claude)
+
+- CI was red 3 runs (stale e2e specs after items 38/40/41, a real landscape debrief overflow, props-geo unit timeout). Merged R-ci-red (9a6f5ecd, Sonnet) and pushed; hosted CI result pending, no tag. Open: items 42, 43. Codex weekly 3%, briefs 196-199 stay queued.
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
