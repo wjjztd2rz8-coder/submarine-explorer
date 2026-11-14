@@ -21,7 +21,14 @@
         "https://www.magellan.gg/vrov-pilot-bismarck/",
         "https://www.hmshood.org.uk/hoodtoday/2001expedition/bismarck/encrypt.htm"
       ],
-      "note": "Uses the 2001 expedition’s published vicinity (48.15 N, 16.117 W), not a precise survey fix. Terrain reads 4,218.5 m; the scan at 4,213 m is about 5 m above it. Published real wreck depth is 4,790–4,791 m. The ~570 m coordinate/grid/depth discrepancy is unresolved; no sourced cause or more precise fix was established. The hull remains supported on the current terrain. See sources.md."
+      "note": "Uses the 2001 expedition’s published vicinity (48.15 N, 16.117 W), not a precise survey fix. Terrain reads 4,218.5 m; the scan at 4,213 m is about 5 m above it. Published real wreck depth is 4,790–4,791 m. The ~570 m coordinate/grid/depth discrepancy is unresolved; no sourced cause or more precise fix was established. The hull remains supported on the current terrain. See sources.md.",
+      "reveal": {
+        "distance_m": 100,
+        "elevation_deg": 14,
+        "azimuth_deg": 75,
+        "sweep_deg": 20,
+        "target_offset": [0, -6, 0]
+      }
     },
     {
       "id": "bismarck-turret-debris",
@@ -40,7 +47,13 @@
         "https://www.kbismarck.org/forum/viewtopic.php?t=1470",
         "https://www.magellan.gg/vrov-pilot-bismarck/"
       ],
-      "note": "The four main turrets fell out during capsizing. This authored marker and matching prop sit about 900 m east-northeast and upslope of the hull. Public individual turret coordinates are not available; the layout follows the general slope setting rather than surveyed turret positions."
+      "note": "The four main turrets fell out during capsizing. This authored marker and matching prop sit about 900 m east-northeast and upslope of the hull. Public individual turret coordinates are not available; the layout follows the general slope setting rather than surveyed turret positions.",
+      "reveal": {
+        "distance_m": 32,
+        "elevation_deg": 22,
+        "azimuth_deg": 335,
+        "target_offset": [0, -2, 0]
+      }
     },
     {
       "id": "bismarck-damage",
@@ -60,7 +73,13 @@
         "https://www.usni.org/magazines/proceedings/1991/june/who-sank-bismarck",
         "https://www.kbismarck.com/wreck.html"
       ],
-      "note": "Marks the historical question, not a single surveyed feature: whether British shellfire and torpedoes, or the crew's own scuttling charges, caused the final sinking. kbismarck.com's survey notes describe the hull as in surprisingly good condition given the battering it took, with the stern the most heavily damaged section. Illustrative placement near the hull; moved 2026-09 with the hull to the sourced wreck position (see sources.md)."
+      "note": "Marks the historical question, not a single surveyed feature: whether British shellfire and torpedoes, or the crew's own scuttling charges, caused the final sinking. kbismarck.com's survey notes describe the hull as in surprisingly good condition given the battering it took, with the stern the most heavily damaged section. Illustrative placement near the hull; moved 2026-09 with the hull to the sourced wreck position (see sources.md).",
+      "reveal": {
+        "distance_m": 105,
+        "elevation_deg": 18,
+        "azimuth_deg": 345,
+        "target_offset": [-20, -3, 45]
+      }
     }
   ]
 }

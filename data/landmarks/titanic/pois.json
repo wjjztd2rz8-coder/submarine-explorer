@@ -16,7 +16,13 @@
       "confidence": "high",
       "reconstruction": true,
       "sources": ["https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"],
-      "note": "Game scan marker at a commonly reported wreck-section position. The source grid gives the local seabed depth, while WHOI describes about 600 m between the sections. Marker geometry and placement do not constitute a georeferenced wreck survey."
+      "note": "Game scan marker at a commonly reported wreck-section position. The source grid gives the local seabed depth, while WHOI describes about 600 m between the sections. Marker geometry and placement do not constitute a georeferenced wreck survey.",
+      "reveal": {
+        "distance_m": 96,
+        "elevation_deg": 14,
+        "azimuth_deg": 115,
+        "target_offset": [0, -4, -15]
+      }
     },
     {
       "id": "titanic-stern",
@@ -32,7 +38,13 @@
       "confidence": "high",
       "reconstruction": true,
       "sources": ["https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"],
-      "note": "Game scan marker at a commonly reported wreck-section position. The source grid gives the local seabed depth, while WHOI describes about 600 m between the sections. Marker geometry and placement do not constitute a georeferenced wreck survey."
+      "note": "Game scan marker at a commonly reported wreck-section position. The source grid gives the local seabed depth, while WHOI describes about 600 m between the sections. Marker geometry and placement do not constitute a georeferenced wreck survey.",
+      "reveal": {
+        "distance_m": 82,
+        "elevation_deg": 15,
+        "azimuth_deg": 145,
+        "target_offset": [0, -4, -12]
+      }
     },
     {
       "id": "titanic-boilers",
@@ -53,7 +65,13 @@
         "https://www.whoi.edu/press-room/news-release/titanic-40th/",
         "https://sanctuaries.noaa.gov/maritime/titanic/expedition_results.html"
       ],
-      "note": "Local boiler-field scan marker near the stern. WHOI documents a boiler as the first recognised object in 1985; NOAA maps boilers in the 2010 debris survey. These accounts do not establish this exact marker coordinate or a surveyed boiler count here."
+      "note": "Local boiler-field scan marker near the stern. WHOI documents a boiler as the first recognised object in 1985; NOAA maps boilers in the 2010 debris survey. These accounts do not establish this exact marker coordinate or a surveyed boiler count here.",
+      "reveal": {
+        "distance_m": 21,
+        "elevation_deg": 16,
+        "azimuth_deg": 115,
+        "target_offset": [0, -2.2, 0]
+      }
     },
     {
       "id": "titanic-debris-field",
@@ -69,7 +87,13 @@
       "confidence": "low",
       "reconstruction": true,
       "sources": ["https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"],
-      "note": "Representative scan point between the hull sections. WHOI reports a 15–20 square mile survey area in 2010, distinct from individual debris clusters. No exact footprint for this marker is inferred."
+      "note": "Representative scan point between the hull sections. WHOI reports a 15–20 square mile survey area in 2010, distinct from individual debris clusters. No exact footprint for this marker is inferred.",
+      "reveal": {
+        "distance_m": 34,
+        "elevation_deg": 20,
+        "azimuth_deg": 155,
+        "target_offset": [-124, -4, 0]
+      }
     },
     {
       "id": "titanic-big-piece",
@@ -85,7 +109,13 @@
       "confidence": "low",
       "reconstruction": true,
       "sources": ["https://rmstitanicinc.com/titanic-artifacts/"],
-      "note": "Approximate marker in the stern-side debris area. RMS Titanic Inc. reports recovery of the hull section in 1998; it is no longer on the seabed. This coordinate does not establish its historical resting place."
+      "note": "Approximate marker in the stern-side debris area. RMS Titanic Inc. reports recovery of the hull section in 1998; it is no longer on the seabed. This coordinate does not establish its historical resting place.",
+      "reveal": {
+        "distance_m": 24,
+        "elevation_deg": 22,
+        "azimuth_deg": 205,
+        "target_offset": [0, -2, 0]
+      }
     },
     {
       "id": "titanic-memorial",
@@ -101,7 +131,13 @@
       "confidence": "low",
       "reconstruction": true,
       "sources": ["https://titanichistoricalsociety.org/titanic-past-present/"],
-      "note": "Approximate stern memorial marker. The Titanic Historical Society confirms the 1986 placement on the stern; the exact aft-starboard footprint and a 1996 disappearance date were not verified against a primary source. No plaque is modelled."
+      "note": "Approximate stern memorial marker. The Titanic Historical Society confirms the 1986 placement on the stern; the exact aft-starboard footprint and a 1996 disappearance date were not verified against a primary source. No plaque is modelled.",
+      "reveal": {
+        "distance_m": 58,
+        "elevation_deg": 16,
+        "azimuth_deg": 165,
+        "target_offset": [5, -3, -36]
+      }
     },
     {
       "id": "titanic-channel",
@@ -117,7 +153,12 @@
       "confidence": "medium",
       "reconstruction": false,
       "sources": ["https://www.gmrt.org/"],
-      "note": "Eastern flank of a shallow NNE–SSW channel visible in the GMRT tile, ~4.8 km north-west of the bow (seabed 3,873 m here, axis ~3,890 m). This is survey data, not a reconstruction."
+      "note": "Eastern flank of a shallow NNE–SSW channel visible in the GMRT tile, ~4.8 km north-west of the bow (seabed 3,873 m here, axis ~3,890 m). This is survey data, not a reconstruction.",
+      "reveal": {
+        "distance_m": 85,
+        "elevation_deg": 22,
+        "azimuth_deg": 235
+      }
     }
   ]
 }

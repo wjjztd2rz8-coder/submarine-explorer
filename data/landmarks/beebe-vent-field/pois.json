@@ -38,7 +38,13 @@
         "http://www.joncopley.com/docs/Rimicaris_hybisae.pdf",
         "https://www.nature.com/articles/ncomms1636"
       ],
-      "note": "Real GMRT terrain, -4,979.2 m, ~57 m from the main vent POI, inside the same real vent complex where Nye et al. (2012) described Rimicaris hybisae swarming by the thousand around Beebe's chimneys. `reconstruction: true` because no published survey gives exact individual-shrimp or swarm-density coordinates to place -- the swarm's real presence at this vent field is sourced, its precise mapped position here is not."
+      "note": "Real GMRT terrain, -4,979.2 m, ~57 m from the main vent POI, inside the same real vent complex where Nye et al. (2012) described Rimicaris hybisae swarming by the thousand around Beebe's chimneys. `reconstruction: true` because no published survey gives exact individual-shrimp or swarm-density coordinates to place -- the swarm's real presence at this vent field is sourced, its precise mapped position here is not.",
+      "reveal": {
+        "distance_m": 24,
+        "elevation_deg": 15,
+        "azimuth_deg": 215,
+        "target_offset": [-46, -6, -16]
+      }
     },
     {
       "id": "bvf-sulfide-mound-west",
@@ -57,7 +63,13 @@
         "https://www.gmrt.org/",
         "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879"
       ],
-      "note": "Real GMRT terrain, -4,957.1 m, about 346 m southwest of the main vent POI. Webber et al. (2015) describe at least six sulfide mounds; this marker is an authored local target, not the surveyed coordinate of a specific mound."
+      "note": "Real GMRT terrain, -4,957.1 m, about 346 m southwest of the main vent POI. Webber et al. (2015) describe at least six sulfide mounds; this marker is an authored local target, not the surveyed coordinate of a specific mound.",
+      "reveal": {
+        "distance_m": 20,
+        "elevation_deg": 10,
+        "azimuth_deg": 285,
+        "target_offset": [-5.3, 1, 27.8]
+      }
     }
   ]
 }

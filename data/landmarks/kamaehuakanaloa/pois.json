@@ -20,7 +20,13 @@
         "https://www.usgs.gov/news/volcano-watch-treasures-deep-sea-loihi-hosts-hydrothermal-vents",
         "https://fire.biol.wwu.edu/cmoyer/research/Sylvan_nitrogen_loihi_geocosmo17.pdf"
       ],
-      "note": "Real GMRT terrain: -1,300.3 m at this point, ~660 m southwest of the summit POI, matching the published depth of the Hiolo North vent site (~1,300 m, within Pele's Pit) closely. This tile's ~58x61 m grid does not resolve Pele's Pit's own reported ~600 m-diameter crater rim, so this point is this survey's closest real-terrain approach to Hiolo North's published depth, not a traced crater outline. `reconstruction: true`: the low-temperature chimney/mat props placed here approximate the site's appearance, not a surveyed structure. Published site depth and fluid temperatures are supported by Sylvan et al. (2017), not just Jesser et al. (2015). The marker coordinate was selected from this grid; matching depth does not verify a vent position."
+      "note": "Real GMRT terrain: -1,300.3 m at this point, ~660 m southwest of the summit POI, matching the published depth of the Hiolo North vent site (~1,300 m, within Pele's Pit) closely. This tile's ~58x61 m grid does not resolve Pele's Pit's own reported ~600 m-diameter crater rim, so this point is this survey's closest real-terrain approach to Hiolo North's published depth, not a traced crater outline. `reconstruction: true`: the low-temperature chimney/mat props placed here approximate the site's appearance, not a surveyed structure. Published site depth and fluid temperatures are supported by Sylvan et al. (2017), not just Jesser et al. (2015). The marker coordinate was selected from this grid; matching depth does not verify a vent position.",
+      "reveal": {
+        "distance_m": 27,
+        "elevation_deg": 8,
+        "azimuth_deg": 280,
+        "target_offset": [4, -2.5, 3]
+      }
     },
     {
       "id": "kh-hiolo-south",
@@ -40,7 +46,13 @@
         "https://www.usgs.gov/news/volcano-watch-treasures-deep-sea-loihi-hosts-hydrothermal-vents",
         "https://fire.biol.wwu.edu/cmoyer/research/Sylvan_nitrogen_loihi_geocosmo17.pdf"
       ],
-      "note": "Real GMRT terrain: -1,274.3 m at this point, ~330 m from Hiolo North, matching the published depth of Hiolo South (~1,274 m) closely. Same grid-resolution caveat as Hiolo North. `reconstruction: true` for the same reason. Published site depth and fluid temperatures are supported by Sylvan et al. (2017), not just Jesser et al. (2015). The marker coordinate was selected from this grid; matching depth does not verify a vent position."
+      "note": "Real GMRT terrain: -1,274.3 m at this point, ~330 m from Hiolo North, matching the published depth of Hiolo South (~1,274 m) closely. Same grid-resolution caveat as Hiolo North. `reconstruction: true` for the same reason. Published site depth and fluid temperatures are supported by Sylvan et al. (2017), not just Jesser et al. (2015). The marker coordinate was selected from this grid; matching depth does not verify a vent position.",
+      "reveal": {
+        "distance_m": 19,
+        "elevation_deg": 8,
+        "azimuth_deg": 290,
+        "target_offset": [0, -2, 0]
+      }
     },
     {
       "id": "kh-south-rift",
@@ -60,7 +72,13 @@
         "https://www.gmrt.org/",
         "https://www.usgs.gov/volcanoes/loihi-seamount"
       ],
-      "note": "GMRT terrain at 1,281.3 m, roughly 1.4 km south of the summit high. This is an authored transect point along the general south-rift bearing, not a surveyed vent or rift boundary. USGS describes a 31 km rift system extending northwest and southeast from the caldera."
+      "note": "GMRT terrain at 1,281.3 m, roughly 1.4 km south of the summit high. This is an authored transect point along the general south-rift bearing, not a surveyed vent or rift boundary. USGS describes a 31 km rift system extending northwest and southeast from the caldera.",
+      "reveal": {
+        "distance_m": 48,
+        "elevation_deg": 6,
+        "azimuth_deg": 230,
+        "target_offset": [10, 12, 0]
+      }
     }
   ]
 }

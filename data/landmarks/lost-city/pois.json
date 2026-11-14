@@ -20,7 +20,13 @@
         "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf",
         "https://repository.library.noaa.gov/view/noaa/56451/noaa_56451_DS1.pdf"
       ],
-      "note": "The older catalog pin (30.1167, -42.1167) landed on the south wall at 1,332 m. The catalog now uses the published Beehive outlet reference (Aquino et al. 2022, Table 1). This authored tower marker samples seabed at about 801 m; its 775 m scan depth sits partway up the model. It is not an exact surveyed Poseidon footprint."
+      "note": "The older catalog pin (30.1167, -42.1167) landed on the south wall at 1,332 m. The catalog now uses the published Beehive outlet reference (Aquino et al. 2022, Table 1). This authored tower marker samples seabed at about 801 m; its 775 m scan depth sits partway up the model. It is not an exact surveyed Poseidon footprint.",
+      "reveal": {
+        "distance_m": 155,
+        "elevation_deg": 4,
+        "azimuth_deg": 325,
+        "target_offset": [0, 16, 0]
+      }
     },
     {
       "id": "lost-city-beehive",
@@ -39,7 +45,13 @@
         "https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005869",
         "https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2023GC011011"
       ],
-      "note": "Beehive was a roughly 1 m vent on Poseidon; Aquino et al. 2024 report the chimney was absent by the 2018 visit. This separately scannable marker is placed about 74 m from Poseidon, not at a surveyed Beehive footprint."
+      "note": "Beehive was a roughly 1 m vent on Poseidon; Aquino et al. 2024 report the chimney was absent by the 2018 visit. This separately scannable marker is placed about 74 m from Poseidon, not at a surveyed Beehive footprint.",
+      "reveal": {
+        "distance_m": 10,
+        "elevation_deg": 3,
+        "azimuth_deg": 295,
+        "target_offset": [0, -0.4, 0]
+      }
     },
     {
       "id": "lost-city-imax-tower",
@@ -58,7 +70,13 @@
         "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf",
         "https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005869"
       ],
-      "note": "IMAX is a parasitic chimney and flange on Poseidon's north face; a 2005 account gives about 8 m and a 2016 survey describes a roughly 30 m multipronged structure. This separate marker is placed near Poseidon."
+      "note": "IMAX is a parasitic chimney and flange on Poseidon's north face; a 2005 account gives about 8 m and a 2016 survey describes a roughly 30 m multipronged structure. This separate marker is placed near Poseidon.",
+      "reveal": {
+        "distance_m": 32,
+        "elevation_deg": 6,
+        "azimuth_deg": 295,
+        "target_offset": [0, 0.2, 0]
+      }
     },
     {
       "id": "lost-city-microbial-mat",
@@ -74,7 +92,13 @@
       "confidence": "medium",
       "reconstruction": true,
       "sources": ["https://obis.org/", "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf"],
-      "note": "Local biofilm scan marker near Poseidon; GMRT seabed about 793 m. Lost City chimney microbial communities are documented by Kelley (2005). The retained OBIS export has no collection depths and does not verify this marker as an exact sampling location or identify it with a single 2003 cruise."
+      "note": "Local biofilm scan marker near Poseidon; GMRT seabed about 793 m. Lost City chimney microbial communities are documented by Kelley (2005). The retained OBIS export has no collection depths and does not verify this marker as an exact sampling location or identify it with a single 2003 cruise.",
+      "reveal": {
+        "distance_m": 135,
+        "elevation_deg": 4,
+        "azimuth_deg": 315,
+        "target_offset": [-8, 12, 10]
+      }
     }
   ]
 }

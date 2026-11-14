@@ -19,7 +19,14 @@
         "https://schmidtocean.org/cruise/expanding-mariana-trench-perspectives/",
         "https://schmidtocean.org/cruise-log-post/the-deepest-living-animals/"
       ],
-      "note": "Real event and real position, corrected this session against Schmidt Ocean Institute's own cruise page (previously mis-sourced to Wikipedia and mis-dated 2018): the benthic lander 'Leggo', deployed from RV Falkor during the December 2014 'Expanding Mariana Trench Perspectives' cruise (FK141215), recorded amphipods (Hirondellea gigas) feeding on bait at 11.368536 N, 142.5875166 E, 10,929 m, on 19 December 2014. This tile's terrain reads 10,925.1 m at that point, 4 m away. `reconstruction: true` because Leggo was recovered after the cruise and nothing physical remains on the seabed here; the marker/prop at this position stands in for the historic sampling event, not a permanent structure."
+      "note": "Real event and real position, corrected this session against Schmidt Ocean Institute's own cruise page (previously mis-sourced to Wikipedia and mis-dated 2018): the benthic lander 'Leggo', deployed from RV Falkor during the December 2014 'Expanding Mariana Trench Perspectives' cruise (FK141215), recorded amphipods (Hirondellea gigas) feeding on bait at 11.368536 N, 142.5875166 E, 10,929 m, on 19 December 2014. This tile's terrain reads 10,925.1 m at that point, 4 m away. `reconstruction: true` because Leggo was recovered after the cruise and nothing physical remains on the seabed here; the marker/prop at this position stands in for the historic sampling event, not a permanent structure.",
+      "reveal": {
+        "distance_m": 205,
+        "elevation_deg": 24,
+        "azimuth_deg": 350,
+        "sweep_deg": 20,
+        "target_offset": [0, -35, 30]
+      }
     },
     {
       "id": "cd-eastern-floor",
@@ -35,7 +42,12 @@
       "confidence": "high",
       "reconstruction": false,
       "sources": ["https://www.gmrt.org/"],
-      "note": "Real GMRT terrain: 10919.8 m deep at the centre of row 450, column 446 (zero-based) in data/tiles/challenger-deep/heightmap.bin. This second floor scan lies about 817 m north of the Leggo bait-station site. The shipped GMRT grid reads about 10,920 m here. It is a terrain survey point chosen for this dive, not the position of another lander deployment. No prop or staged encounter is added."
+      "note": "Real GMRT terrain: 10919.8 m deep at the centre of row 450, column 446 (zero-based) in data/tiles/challenger-deep/heightmap.bin. This second floor scan lies about 817 m north of the Leggo bait-station site. The shipped GMRT grid reads about 10,920 m here. It is a terrain survey point chosen for this dive, not the position of another lander deployment. No prop or staged encounter is added.",
+      "reveal": {
+        "distance_m": 70,
+        "elevation_deg": 22,
+        "azimuth_deg": 160
+      }
     },
     {
       "id": "cd-north-wall",
@@ -54,7 +66,13 @@
         "http://nora.nerc.ac.uk/id/eprint/524544/1/Stewart_and_Jamieson_2019_The%20five%20deeps.pdf",
         "https://www.gmrt.org/"
       ],
-      "note": "GMRT grid depth 9,977.7 m on the north (landward) inner wall. Central-difference slopes are about 25–29° depending on baseline; the approximately 60 m grid does not resolve smaller slopes. This is the overriding-plate side of the trench; the Pacific Plate subducts beneath the Mariana Arc system."
+      "note": "GMRT grid depth 9,977.7 m on the north (landward) inner wall. Central-difference slopes are about 25–29° depending on baseline; the approximately 60 m grid does not resolve smaller slopes. This is the overriding-plate side of the trench; the Pacific Plate subducts beneath the Mariana Arc system.",
+      "reveal": {
+        "distance_m": 78,
+        "elevation_deg": 6,
+        "azimuth_deg": 325,
+        "target_offset": [0, 4, 0]
+      }
     },
     {
       "id": "cd-central-basin",
@@ -73,7 +91,11 @@
         "https://fivedeeps.com/wp-content/uploads/2019/05/FDE-Challenger-Release-FINAL-5132019.pdf",
         "https://www.gmrt.org/"
       ],
-      "note": "Real GMRT terrain (Ryan et al. 2009; value read directly from this tile's grid): 10,926.5 m deep, about 18.6 km west of the Eastern Pool. The Five Deeps Expedition's 5 May 2019 dive (Lahey/Ramsay) explicitly named and dove this 'Central Pool', focused on the trench's north and south subduction-zone edges (Five Deeps press release). Nearly as deep as the Eastern Pool. Optional: far enough from the required objectives that reaching it is a deliberate long transit, not a required detour."
+      "note": "Real GMRT terrain (Ryan et al. 2009; value read directly from this tile's grid): 10,926.5 m deep, about 18.6 km west of the Eastern Pool. The Five Deeps Expedition's 5 May 2019 dive (Lahey/Ramsay) explicitly named and dove this 'Central Pool', focused on the trench's north and south subduction-zone edges (Five Deeps press release). Nearly as deep as the Eastern Pool. Optional: far enough from the required objectives that reaching it is a deliberate long transit, not a required detour.",
+      "reveal": {
+        "distance_m": 75,
+        "elevation_deg": 22
+      }
     },
     {
       "id": "cd-axis-sill",
@@ -92,7 +114,12 @@
         "http://nora.nerc.ac.uk/id/eprint/524544/1/Stewart_and_Jamieson_2019_The%20five%20deeps.pdf",
         "https://www.gmrt.org/"
       ],
-      "note": "Real GMRT terrain (Ryan et al. 2009), located this session by tracing the deepest continuous path along the trench axis between the Central and Eastern Pool minima (same method as the Monterey Canyon pack's axis trace): a shallower sill at 10,704 m separates the two pools here, roughly 220 m shallower than either pool it sits between. Stewart & Jamieson (2019) independently confirm a three-basin, sill-separated structure (their Fig. 6 caption notes the deepest soundings sit in 'the westernmost of the 3 basins'), but no source consulted gives an exact coordinate for this specific sill -- this point is a terrain trace, not a citation."
+      "note": "Real GMRT terrain (Ryan et al. 2009), located this session by tracing the deepest continuous path along the trench axis between the Central and Eastern Pool minima (same method as the Monterey Canyon pack's axis trace): a shallower sill at 10,704 m separates the two pools here, roughly 220 m shallower than either pool it sits between. Stewart & Jamieson (2019) independently confirm a three-basin, sill-separated structure (their Fig. 6 caption notes the deepest soundings sit in 'the westernmost of the 3 basins'), but no source consulted gives an exact coordinate for this specific sill -- this point is a terrain trace, not a citation.",
+      "reveal": {
+        "distance_m": 85,
+        "elevation_deg": 22,
+        "azimuth_deg": 75
+      }
     }
   ]
 }
