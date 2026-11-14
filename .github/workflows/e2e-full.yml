@@ -1,0 +1,172 @@
+# Full Playwright e2e matrix on demand (38 shards). Not part of push/PR CI.
+name: E2E full matrix
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-full-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  builds:
+    name: build (${{ matrix.label }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: root
+            base: /
+            outdir: dist-root
+          - label: project-base
+            base: /submarine-explorer/
+            outdir: dist-project-base
+    env:
+      CI: true
+      VITE_BASE: ${{ matrix.base }}
+      PW_OUTDIR: ${{ matrix.outdir }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.23.4
+          cache: npm
+
+      - name: Install dependencies
+        timeout-minutes: 5
+        run: npm ci
+
+      - name: Build deployment base and manifest
+        timeout-minutes: 5
+        run: bash tools/gates.sh --phase build
+
+      - name: Upload immutable build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-build-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.label }}
+          path: ${{ matrix.outdir }}/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 14
+
+  e2e:
+    name: e2e (${{ matrix.shard }}/${{ strategy.job-total }})
+    # Match the nightly browser/font baseline during ubuntu-latest migrations.
+    runs-on: ubuntu-24.04
+    needs: builds
+    # Build matrix completes before consumers; static checks run independently.
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard:
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+          ]
+    env:
+      CI: true
+      PLAYWRIGHT_JSON_OUTPUT_FILE: test-results/e2e-timings.json
+      PW_OUTDIR: dist-root
+      VITE_BASE: /
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.23.4
+          cache: npm
+
+      - name: Install dependencies
+        timeout-minutes: 5
+        run: npm ci
+
+      - name: Download root build
+        uses: actions/download-artifact@v4
+        with:
+          name: ci-build-${{ github.run_id }}-${{ github.run_attempt }}-root
+          path: dist-root
+
+      - name: Install Playwright Chromium
+        timeout-minutes: 8
+        uses: ./.github/actions/install-chromium
+
+      - name: End-to-end tests (Playwright)
+        # Refreshed hosted weights and 38 shards target two waves at 20 runner slots,
+        # leaving two slots for static checks and the project-base browser check.
+        # Finish every test in the shard so one failure does not hide later failures.
+        # The suite budget permits a graceful failure/report before the job deadline.
+        run: >-
+          bash tools/gates.sh --phase e2e --prebuilt --
+          ${{ matrix.shard }}/${{ strategy.job-total }}
+          --reporter=list,json,html --global-timeout=1500000 --retries=0
+
+      - name: Upload e2e timings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-timings-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
+          path: test-results/e2e-timings.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload e2e screenshots and report
+        if: failure()
+        timeout-minutes: 2
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-artifacts-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
+          path: |
+            tests/e2e/screenshots
+            .cache/codex/shots
+            playwright-report
+            test-results
+          if-no-files-found: ignore
+          include-hidden-files: true
+          retention-days: 14

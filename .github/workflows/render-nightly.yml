@@ -2,8 +2,6 @@
 name: Nightly golden and performance diagnostics
 
 on:
-  schedule:
-    - cron: '23 8 * * *'
   workflow_dispatch:
 
 permissions:
