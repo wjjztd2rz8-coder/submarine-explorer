@@ -24,8 +24,8 @@
     {
       "id": "cd-eastern-floor",
       "name": "Eastern Pool floor transect",
-      "lat": 11.3758609130288,
-      "lon": 142.58688354492188,
+      "lat": 11.3703677489663,
+      "lon": 142.59017944335938,
       "snap_to_seabed": true,
       "radius_m": 120,
       "kind": "geology",
@@ -34,8 +34,10 @@
       "guide_entry": "eastern-floor",
       "confidence": "high",
       "reconstruction": false,
-      "sources": ["https://www.gmrt.org/"],
-      "note": "Real GMRT terrain: 10919.8 m deep at the centre of row 450, column 446 (zero-based) in data/tiles/challenger-deep/heightmap.bin. This second floor scan lies about 817 m north of the Leggo bait-station site. The shipped GMRT grid reads about 10,920 m here. It is a terrain survey point chosen for this dive, not the position of another lander deployment. No prop or staged encounter is added."
+      "sources": [
+        "https://www.gmrt.org/"
+      ],
+      "note": "Real GMRT terrain: 10920.5 m deep at the centre of row 460, column 452 (zero-based) in data/tiles/challenger-deep/heightmap.bin. This second floor scan lies about 350 m north-east of the Leggo bait-station site (moved 2026-11 from 817 m north so the dive is a short route). The shipped GMRT grid reads about 10,920 m here. It is a terrain survey point chosen for this dive, not the position of another lander deployment. No prop or staged encounter is added."
     },
     {
       "id": "cd-north-wall",
@@ -93,6 +95,44 @@
         "https://www.gmrt.org/"
       ],
       "note": "Real GMRT terrain (Ryan et al. 2009), located this session by tracing the deepest continuous path along the trench axis between the Central and Eastern Pool minima (same method as the Monterey Canyon pack's axis trace): a shallower sill at 10,704 m separates the two pools here, roughly 220 m shallower than either pool it sits between. Stewart & Jamieson (2019) independently confirm a three-basin, sill-separated structure (their Fig. 6 caption notes the deepest soundings sit in 'the westernmost of the 3 basins'), but no source consulted gives an exact coordinate for this specific sill -- this point is a terrain trace, not a citation."
+    },
+    {
+      "id": "cd-published-coordinate",
+      "name": "Catalog coordinate (11°22.4'N 142°35.5'E)",
+      "lat": 11.3733,
+      "lon": 142.5917,
+      "snap_to_seabed": true,
+      "radius_m": 200,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "published-coordinate",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": [
+        "http://nora.nerc.ac.uk/id/eprint/524544/1/Stewart_and_Jamieson_2019_The%20five%20deeps.pdf",
+        "https://www.gmrt.org/"
+      ],
+      "note": "Restored 2026-11 as a route contact. Real GMRT terrain (Ryan et al. 2009; value read directly from this tile's grid): 10,917.9 m deep, about 0.6 km southwest of the eastern-pool minimum and within its depth tolerance. This is the long-published, rounded IHO-IOC GEBCO Gazetteer coordinate (11.373333 N, 142.591667 E, cited as 10,920+/-10 m by Stewart & Jamieson 2019, Table 1) carried by this game's own data/landmarks.json pin -- close enough to the true deepest cell that (unlike Lost City's catalog pin) it does not land on the wrong feature, but it predates the precision multibeam and CTD-pressure surveys (2019-2020) that pinned down the Eastern/Central Pool basins individually."
+    },
+    {
+      "id": "cd-kairei-position",
+      "name": "Eastern Pool: 1998/99 Kairei survey position",
+      "lat": 11.371,
+      "lon": 142.593,
+      "snap_to_seabed": true,
+      "radius_m": 150,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "eastern-pool",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": [
+        "http://nora.nerc.ac.uk/id/eprint/524544/1/Stewart_and_Jamieson_2019_The%20five%20deeps.pdf",
+        "https://www.gmrt.org/"
+      ],
+      "note": "A published Eastern Pool position: Nakanishi and Hashimoto (2011), from RV Kairei 1998/99 multibeam data, 11.371 N / 142.593 E, 10,920 +/- 5 m, as listed by Stewart & Jamieson (2019) Table 1 and quoted in guide.json (eastern-pool). This tile's grid reads about 10,919 m here. Added 2026-11 as a route contact between the Leggo site and the catalog coordinate; the deepest cell in this tile lies about 550 m further east."
     }
   ]
 }

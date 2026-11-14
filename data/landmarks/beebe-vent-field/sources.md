@@ -88,7 +88,10 @@ no POI, no prop and no objective in this mission.
 Primary objectives (`bvf-main-vents`, `bvf-shrimp-swarm`) are ~35 m apart and both ~500-700 m
 from `mission.json`'s spawn point (18.548, -81.716) -- well inside a 10-minute budget. The
 western sulfide mound remains the optional scan; the unmarked eastern margin and regional
-spreading-axis points were removed in D3.
+spreading-axis points were removed in D3. In 2026-11 `bvf-spreading-floor` (18.54541,
+-81.71927, about 4,983 m) was added between the main vents and the western mound, so the dive
+is a short route of four scans; it stands for the spreading-centre seafloor (Connelly et al.
+2012), not a mapped plate boundary.
 
 ## Descent time
 

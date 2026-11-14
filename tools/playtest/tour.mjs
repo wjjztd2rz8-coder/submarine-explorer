@@ -46,11 +46,11 @@ const read = () =>
         r.width > 0 && s.display !== 'none' && s.visibility !== 'hidden' && Number(s.opacity) > 0.05
       );
     };
-    const mk = [
-      ...document.querySelectorAll('.d-scan-world-marker.is-current'),
-      ...document.querySelectorAll('.d-scan-world-marker'),
-    ].find(vis);
+    // Steer like a player: the current target's marker, else its edge arrow.
+    const mk = [...document.querySelectorAll('.d-scan-world-marker.is-current')].find(vis);
     const r = mk && mk.getBoundingClientRect();
+    const edge = document.querySelector('.d-scan-edge');
+    const er = vis(edge) ? edge.getBoundingClientRect() : null;
     const rv = document.querySelector('.discovery-reveal');
     const g = window.__game;
     let found = null;
@@ -61,6 +61,7 @@ const read = () =>
     } catch {}
     return {
       mx: r ? r.x + r.width / 2 : null,
+      ex: er ? er.x + er.width / 2 : null,
       w: innerWidth,
       reveal: vis(rv) ? rv.getAttribute('data-poi') : null,
       revealText: vis(rv) ? rv.innerText.replace(/\s+/g, ' ') : '',
@@ -123,11 +124,13 @@ while (el() < +MAX) {
   const c = s.w / 2;
   let port = false,
     stbd = false;
-  if (s.mx !== null) {
-    port = s.mx < c - 80;
-    stbd = s.mx > c + 80;
-  } else port = true;
   const g = s.guide.toLowerCase();
+  const aim = s.mx ?? s.ex;
+  if (aim !== null) {
+    port = aim < c - 80;
+    stbd = aim > c + 80;
+  } else if (/right/.test(g)) stbd = true;
+  else port = true;
   const scan =
     /scan target|scanning|hold g/.test(g) &&
     !/get closer|turn toward/.test(g) &&

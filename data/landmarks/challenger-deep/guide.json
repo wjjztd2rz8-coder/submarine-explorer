@@ -333,15 +333,15 @@
     {
       "id": "eastern-floor",
       "title": "Eastern Pool floor transect",
-      "fact": "The Eastern Pool floor is about 10,925 m deep at the Leggo lander site and about 10,920 m just 817 m to the north.",
+      "fact": "The Eastern Pool floor is about 10,925 m deep at the Leggo lander site and about 10,920 m just 350 m to the north-east.",
       "paragraphs": [
-        "This second floor scan lies about 817 m north of the Leggo bait-station site. The shipped GMRT grid reads about 10,920 m here. It is a terrain survey point chosen for this dive, not the position of another lander deployment.",
+        "This second floor scan lies about 350 m north-east of the Leggo bait-station site. The shipped GMRT grid reads about 10,920 m here. It is a terrain survey point chosen for this dive, not the position of another lander deployment.",
         "The two required scans sample the same Eastern Pool floor: the terrain is about 10,925 m deep at the historic bait-station site and about 10,920 m here. These values come from the shipped survey grid; they do not establish a new deepest sounding."
       ],
       "facts": [
         {
           "label": "Depth here (this tile)",
-          "value": "10,919.8 m"
+          "value": "10,920.5 m"
         }
       ],
       "reconstruction": false,

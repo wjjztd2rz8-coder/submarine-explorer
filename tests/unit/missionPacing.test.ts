@@ -60,7 +60,7 @@ describe('mission pacing: required-target gaps', () => {
 // mission completion so removing remote objectives cannot hide a broken route.
 describe('nearby terrain surveys', () => {
   for (const [site, added, optional, depthM, optionalPoi] of [
-    ['challenger-deep', 'eastern-floor', 'north-wall', 10919.8, 'cd-north-wall'],
+    ['challenger-deep', 'eastern-floor', 'north-wall', 10920.5, 'cd-north-wall'],
     ['hunga-tonga-caldera', 'flank-transect', 'caldera-floor', 292.9, 'hunga-tonga-caldera-floor'],
     ['hudson-canyon', 'wall-transect', 'wall', 976.7, 'hc-canyon-wall'],
   ] as const) {

@@ -58,6 +58,25 @@
         "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879"
       ],
       "note": "Real GMRT terrain, -4,957.1 m, about 346 m southwest of the main vent POI. Webber et al. (2015) describe at least six sulfide mounds; this marker is an authored local target, not the surveyed coordinate of a specific mound."
+    },
+    {
+      "id": "bvf-spreading-floor",
+      "name": "Spreading-centre seafloor",
+      "lat": 18.54541,
+      "lon": -81.71927,
+      "snap_to_seabed": true,
+      "radius_m": 120,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 2.4,
+      "guide_entry": "spreading-axis",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": [
+        "https://www.nature.com/articles/ncomms1636",
+        "https://www.pnas.org/doi/full/10.1073/pnas.1009205107"
+      ],
+      "note": "Real GMRT terrain, about 4,983 m, between the main vents and the western sulfide mound. Connelly et al. (2012) place the Beebe field on the ultraslow Mid-Cayman Spreading Centre, so this marker stands for the spreading-centre seafloor the vents rise from. Its placement is an authored route stop (added 2026-11), not a mapped fault or plate-boundary line; the Journal's axial-valley depth reference lies about 13 km away."
     }
   ]
 }
