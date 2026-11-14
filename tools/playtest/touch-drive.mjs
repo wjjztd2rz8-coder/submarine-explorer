@@ -20,7 +20,12 @@ if (!outDir || !(W > 0) || !(H > 0)) {
 mkdirSync(outDir, { recursive: true });
 
 const browser = await chromium.launch({
-  args: ['--ignore-gpu-blocklist', '--use-angle=vulkan', '--enable-features=Vulkan', '--disable-vulkan-surface'],
+  args: [
+    '--ignore-gpu-blocklist',
+    '--use-angle=vulkan',
+    '--enable-features=Vulkan',
+    '--disable-vulkan-surface',
+  ],
 });
 const ctx = await browser.newContext({
   viewport: { width: W, height: H },
@@ -38,7 +43,9 @@ page.on('console', (m) => m.type() === 'error' && errs.push(m.text().slice(0, 20
 let shotN = 0;
 const shot = async (name) => {
   shotN += 1;
-  await page.screenshot({ path: join(outDir, `${W}x${H}-${String(shotN).padStart(2, '0')}-${name}.png`) });
+  await page.screenshot({
+    path: join(outDir, `${W}x${H}-${String(shotN).padStart(2, '0')}-${name}.png`),
+  });
 };
 
 // ---- real touch via CDP -----------------------------------------------------
@@ -75,16 +82,31 @@ const releaseAll = async () => {
 
 // ---- open the game ----------------------------------------------------------
 await page.goto(SITE ? new URL(`?mission=${encodeURIComponent(SITE)}`, BASE).href : BASE);
-await page.waitForFunction(() => window.__gameReady || window.__gameError, null, { timeout: 60000 });
-if (await page.evaluate(() => !!window.__gameError)) throw new Error(String(await page.evaluate(() => window.__gameError)));
+await page.waitForFunction(() => window.__gameReady || window.__gameError, null, {
+  timeout: 60000,
+});
+if (await page.evaluate(() => !!window.__gameError))
+  throw new Error(String(await page.evaluate(() => window.__gameError)));
 await page.waitForTimeout(1200);
 
 if (SITE) {
-  await page.getByRole('button', { name: /Begin dive/ }).first().tap();
+  await page
+    .getByRole('button', { name: /Begin dive/ })
+    .first()
+    .tap();
 } else {
-  await page.getByRole('button', { name: /^Dive(:|$)/ }).first().tap();
-  await page.getByRole('button', { name: /Begin dive/ }).first().waitFor({ timeout: 30000 });
-  await page.getByRole('button', { name: /Begin dive/ }).first().tap();
+  await page
+    .getByRole('button', { name: /^Dive(:|$)/ })
+    .first()
+    .tap();
+  await page
+    .getByRole('button', { name: /Begin dive/ })
+    .first()
+    .waitFor({ timeout: 30000 });
+  await page
+    .getByRole('button', { name: /Begin dive/ })
+    .first()
+    .tap();
 }
 await page.waitForFunction(() => window.__game?.scanner, null, { timeout: 60000 });
 await page.locator('.tc-root').waitFor({ state: 'visible', timeout: 20000 });
@@ -98,7 +120,13 @@ const geometry = await page.evaluate(() => {
     const r = el.getBoundingClientRect();
     return r.width > 0 ? { x: r.x, y: r.y, w: r.width, h: r.height } : null;
   };
-  return { stick: box('.tc-stick'), slider: box('.tc-slider'), scan: box('.tc-btn-scan'), w: innerWidth, h: innerHeight };
+  return {
+    stick: box('.tc-stick'),
+    slider: box('.tc-slider'),
+    scan: box('.tc-btn-scan'),
+    w: innerWidth,
+    h: innerHeight,
+  };
 });
 if (!geometry.stick || !geometry.scan) throw new Error('touch controls not laid out');
 const STICK = {
@@ -107,7 +135,11 @@ const STICK = {
   r: Math.max(18, geometry.stick.w * 0.36),
 };
 const SLIDER = geometry.slider
-  ? { cx: geometry.slider.x + geometry.slider.w / 2, top: geometry.slider.y + geometry.slider.h * 0.1, bottom: geometry.slider.y + geometry.slider.h * 0.9 }
+  ? {
+      cx: geometry.slider.x + geometry.slider.w / 2,
+      top: geometry.slider.y + geometry.slider.h * 0.1,
+      bottom: geometry.slider.y + geometry.slider.h * 0.9,
+    }
   : null;
 const SCAN = { x: geometry.scan.x + geometry.scan.w / 2, y: geometry.scan.y + geometry.scan.h / 2 };
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -141,10 +173,15 @@ const read = () =>
     const visible = (el) => {
       if (!el || el.hidden) return false;
       const r = el.getBoundingClientRect();
-      return r.width > 0 && getComputedStyle(el).visibility !== 'hidden' && Number(getComputedStyle(el).opacity) > 0.05;
+      return (
+        r.width > 0 &&
+        getComputedStyle(el).visibility !== 'hidden' &&
+        Number(getComputedStyle(el).opacity) > 0.05
+      );
     };
     const all = [...document.querySelectorAll('.d-scan-world-marker')];
-    const marker = all.find((e) => e.classList.contains('is-current') && visible(e)) || all.find(visible);
+    const marker =
+      all.find((e) => e.classList.contains('is-current') && visible(e)) || all.find(visible);
     const mr = marker?.getBoundingClientRect();
     const root = document.querySelector('.tc-root');
     return {

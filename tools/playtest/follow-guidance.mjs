@@ -9,7 +9,12 @@ const MAX_S = Number(process.argv[4] ?? 240);
 const tag = process.argv[5] ?? (SITE || 'first');
 
 const browser = await chromium.launch({
-  args: ['--ignore-gpu-blocklist', '--use-angle=vulkan', '--enable-features=Vulkan', '--disable-vulkan-surface'],
+  args: [
+    '--ignore-gpu-blocklist',
+    '--use-angle=vulkan',
+    '--enable-features=Vulkan',
+    '--disable-vulkan-surface',
+  ],
 });
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 } });
 const page = await ctx.newPage();
@@ -42,7 +47,9 @@ const read = () =>
       if (!el) return false;
       const r = el.getBoundingClientRect();
       const s = getComputedStyle(el);
-      return r.width > 0 && s.display !== 'none' && s.visibility !== 'hidden' && Number(s.opacity) > 0.05;
+      return (
+        r.width > 0 && s.display !== 'none' && s.visibility !== 'hidden' && Number(s.opacity) > 0.05
+      );
     };
     const t = (sel) => {
       const el = document.querySelector(sel);
@@ -50,12 +57,16 @@ const read = () =>
     };
     // any visible overlay text that is not the standing HUD
     const extra = [];
-    for (const el of document.querySelectorAll('[class*=toast], [class*=debrief], [class*=scan-prompt], [class*=d-scan], [role=dialog], [role=status], [role=alert]')) {
+    for (const el of document.querySelectorAll(
+      '[class*=toast], [class*=debrief], [class*=scan-prompt], [class*=d-scan], [role=dialog], [role=status], [role=alert]',
+    )) {
       if (!vis(el)) continue;
       const x = el.innerText?.trim().replace(/\s+/g, ' ');
       if (x && x.length < 400) extra.push(`${el.className.toString().split(' ')[0]}: ${x}`);
     }
-    const mk = document.querySelector('.d-scan-world-marker.is-current') || document.querySelector('.d-scan-world-marker');
+    const mk =
+      document.querySelector('.d-scan-world-marker.is-current') ||
+      document.querySelector('.d-scan-world-marker');
     const mr = vis(mk) ? mk.getBoundingClientRect() : null;
     const all = document.body.innerText.replace(/\s+/g, ' ').slice(0, 1500);
     return {
@@ -89,7 +100,9 @@ while ((Date.now() - t0) / 1000 < MAX_S && !done) {
   const el = ((Date.now() - t0) / 1000).toFixed(0);
   const sig = key.replace(/\d+/g, '#');
   if (sig !== last) {
-    console.log(`[${el}s] ${s.kicker} | ${s.name} | ${s.depth}${s.extra ? ' | EXTRA ' + s.extra : ''}`);
+    console.log(
+      `[${el}s] ${s.kicker} | ${s.name} | ${s.depth}${s.extra ? ' | EXTRA ' + s.extra : ''}`,
+    );
     last = sig;
     if (n < 28) await shot(`t${el}`);
   }
@@ -97,15 +110,22 @@ while ((Date.now() - t0) / 1000 < MAX_S && !done) {
   // human-like: steer toward the on-screen diamond marker
   let port = /turn\s+\d+°?\s*port|turn left/.test(txt);
   let stbd = /turn\s+\d+°?\s*starboard|turn right/.test(txt);
-  if (s.mx !== null) { port = s.mx < 560; stbd = s.mx > 720; }
-  else if (!port && !stbd) port = true; // marker off screen: come about
-  const scan = /hold g\b|scanning/.test(txt) && !/get closer/.test(txt) && s.mx !== null && s.mx > 480 && s.mx < 800;
+  if (s.mx !== null) {
+    port = s.mx < 560;
+    stbd = s.mx > 720;
+  } else if (!port && !stbd) port = true; // marker off screen: come about
+  const scan =
+    /hold g\b|scanning/.test(txt) &&
+    !/get closer/.test(txt) &&
+    s.mx !== null &&
+    s.mx > 480 &&
+    s.mx < 800;
   const up = /ascend|go up|climb|above you|rise/.test(txt);
   const down = /descend|go down|below you|dive deeper|sink/.test(txt);
   await hold('a', port);
   await hold('d', stbd);
   await hold('g', scan);
-  await hold('w', !scan && !(/hold g\b/.test(txt)));
+  await hold('w', !scan && !/hold g\b/.test(txt));
   await hold('Space', up);
   await hold('Shift', down);
   if (/dive again|mission complete|dive complete/.test(s.all.toLowerCase())) done = true;
