@@ -184,7 +184,7 @@ export class Debrief {
       p.append(
         el(
           'p',
-          'debrief-next',
+          'debrief-stars-note',
           'Stars: 1 for the primary objectives, 2 for all, 3 with a photo or species scan.',
         ),
       );

@@ -1248,7 +1248,7 @@ freshTest.describe('frozen debrief and resume', () => {
             await expect(debrief.locator('.debrief-btn.is-primary')).toHaveCount(1);
             await expect(debrief.locator('.debrief-btn.is-primary')).toHaveAttribute(
               'data-action',
-              scans === 0 ? 'keep-exploring' : 'dive-sites',
+              scans === 0 ? 'keep-exploring' : 'dive-again',
             );
             const quiet = scans === 0 ? 'dive-sites' : 'keep-exploring';
             await expect(debrief.locator('.debrief-secondary > [data-action]')).toHaveCount(2);
@@ -1280,7 +1280,7 @@ freshTest.describe('frozen debrief and resume', () => {
             await page.keyboard.up('w');
             expect(await snapshot(page)).toEqual(ended);
             // Opening intentionally blurs focus to avoid held flight keys firing a button.
-            const primary = scans === 0 ? 'keep-exploring' : 'dive-sites';
+            const primary = scans === 0 ? 'keep-exploring' : 'dive-again';
             for (const target of [primary, quiet, 'journal', 'more', primary]) {
               await page.keyboard.press('Tab');
               await expect(
@@ -1296,7 +1296,7 @@ freshTest.describe('frozen debrief and resume', () => {
               'aria-expanded',
               'true',
             );
-            for (const target of ['dive-again', 'home', primary]) {
+            for (const target of [scans === 0 ? 'dive-again' : 'dive-sites', 'home', primary]) {
               await page.keyboard.press('Tab');
               await expect(debrief.locator(`[data-action="${target}"]`)).toBeFocused();
             }
@@ -1383,6 +1383,7 @@ freshTest.describe('frozen debrief and resume', () => {
           expect((await snapshot(page)).frozen).toBe(false);
           await page.keyboard.press('Escape');
           await act('.pause-surface');
+          await act('.mission-debrief .debrief-more-toggle');
           await act('.mission-debrief [data-action="dive-sites"]');
           await expect(page.locator('.home-sites')).toBeVisible();
           await page.getByRole('button', { name: 'Back to menu', exact: true }).click();
@@ -1509,9 +1510,9 @@ freshTest.describe('summary, disclosures and provenance', () => {
             await expect(debrief.locator('.debrief-btn.is-primary')).toHaveCount(1);
             await expect(debrief.locator('.debrief-btn.is-primary')).toHaveAttribute(
               'data-action',
-              round === 1 ? 'keep-exploring' : 'dive-sites',
+              round === 1 ? 'keep-exploring' : 'dive-again',
             );
-            // Zero scans: Dive sites is demoted to a quiet link; otherwise it is the primary.
+            // Zero scans: Dive sites is demoted to a quiet link; otherwise Dive again is the primary.
             await expect(
               debrief.locator('.debrief-secondary > [data-action="dive-sites"]'),
             ).toHaveCount(round === 1 ? 1 : 0);
@@ -1681,6 +1682,7 @@ freshTest.describe('summary, disclosures and provenance', () => {
           }
           await page.keyboard.press('Escape');
           await page.locator('.pause-surface').click();
+          await page.locator('.mission-debrief .debrief-more-toggle').click();
           await page.locator('.mission-debrief [data-action="dive-sites"]').click();
           await expect(page.locator('.home-sites')).toBeVisible();
           await page.getByRole('button', { name: 'Back to menu', exact: true }).click();
