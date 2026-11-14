@@ -333,7 +333,9 @@ it('compact shell site rows keep catalog, Tab and activation order while retaini
   for (const [index, button] of buttons.entries()) {
     press('Tab');
     expect(active()).toBe(button);
-    expect(button.querySelector('.mission-item-name')?.textContent).toBe(summaries[index].title);
+    expect(button.querySelector('.mission-item-name')?.textContent).toBe(
+      `${index === 0 ? '✓ ' : ''}${summaries[index].title}`,
+    );
     expect(button.querySelector('.mission-item-summary')).toBeNull();
     expect(button.title).toBe(summaries[index].summary);
     // Reward labels appear only on the earned row; unvisited rows carry no empty stars.

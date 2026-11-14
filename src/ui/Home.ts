@@ -1,3 +1,35 @@
+import {
+  nextSite,
+  siteComplete,
+  siteFinds,
+  tourJournal,
+  TOUR_ORDER,
+  type TourProgress,
+} from '../game/Tour.js';
+import type { DiscoveryReader, JournalSite } from '../game/JournalData.js';
+
+export function homeTourModel(
+  progress: TourProgress,
+  store: DiscoveryReader,
+  sites: JournalSite[],
+  lastSite: string | null = null,
+) {
+  const continuing =
+    !!lastSite && TOUR_ORDER.some((id) => id === lastSite) && !siteComplete(lastSite, progress);
+  const siteId = continuing ? lastSite : nextSite(progress);
+  const site = sites.find((s) => s.id === siteId);
+  const counts = sites
+    .filter((s) => TOUR_ORDER.some((id) => id === s.id))
+    .map((s) => siteFinds(s, store));
+  return {
+    siteId,
+    label: siteId
+      ? `${continuing ? 'Continue' : 'Dive'}: ${site?.name ?? siteId.replaceAll('-', ' ')}`
+      : 'Dive sites',
+    progress: `${TOUR_ORDER.filter((id) => siteComplete(id, progress)).length} of ${TOUR_ORDER.length} sites explored · ${counts.reduce((n, c) => n + c.found, 0)} of ${counts.reduce((n, c) => n + c.total, 0)} discoveries`,
+  };
+}
+
 import { APP_NAME, APP_TAGLINE } from '../core/Brand.js';
 import mark from '../../public/bathyline-mark.svg?raw';
 import { FocusTrap, observeOverlayOpen } from './FocusTrap.js';
@@ -33,6 +65,10 @@ export class Home {
   readonly diveButton: HTMLButtonElement;
   /** The Arcade / Realistic selector, Advanced beside the segments (with a settings source). */
   readonly modeSelector: ModeSelector | null;
+  private tourSites: JournalSite[] = [];
+  private refreshTour: (() => void) | null = null;
+  private tourDive: (() => void) | null = null;
+  private readonly tourProgress: HTMLParagraphElement;
   private readonly dailyCard: HTMLButtonElement;
   private readonly diveSitesButton: HTMLButtonElement;
   private readonly menu: HTMLElement;
@@ -105,8 +141,11 @@ export class Home {
     };
     // DOM order is the Tab order: Dive, Dive sites, Free dive, Daily dive,
     // mode, Journal, Your sub, Settings, Controls.
-    this.diveButton = entry('Dive', actions.dive);
+    this.diveButton = entry('Dive', () => (this.tourDive ?? actions.dive)());
     this.diveButton.className = 'home-primary';
+    this.tourProgress = document.createElement('p');
+    this.tourProgress.className = 'home-tour-progress';
+    menu.append(this.tourProgress);
     this.diveSitesButton = entry('Dive sites', () => this.showSites(false, this.diveSitesButton));
     this.freeDiveButton = entry('Free dive', () => this.showSites(true, this.freeDiveButton));
     this.dailyCard = document.createElement('button');
@@ -220,8 +259,32 @@ export class Home {
       : SCENE_FALLBACK;
   }
 
+  /** Shell hook: keep the primary destination and its label derived from the same state. */
+  setTour(
+    progress: TourProgress,
+    store: DiscoveryReader,
+    lastSite: string | null,
+    launch: (id: string) => void,
+  ): void {
+    const apply = (sites: JournalSite[]) => {
+      const model = homeTourModel(progress, store, sites, lastSite);
+      const site = sites.find((s) => s.id === model.siteId);
+      if (site) this.setDiveSite(site.name, site.depthM, !lastSite);
+      this.diveButton.textContent = model.label;
+      this.tourProgress.textContent = sites.length ? model.progress : '';
+      this.tourDive = () => (model.siteId ? launch(model.siteId) : this.showSites(false));
+    };
+    this.refreshTour = () => apply(this.tourSites);
+    this.refreshTour();
+    void tourJournal().then((sites) => {
+      this.tourSites = sites;
+      this.refreshTour?.();
+    });
+  }
+
   show(): void {
     if (this.isOpen) return;
+    this.refreshTour?.();
     this.trap.show();
     this.diveButton.focus();
   }
@@ -234,6 +297,7 @@ export class Home {
 
   dispose(): void {
     this.hide();
+    this.refreshTour = null;
     for (const dispose of this.disposers.splice(0)) dispose();
     this.trap.dispose();
     this.modeSelector?.dispose();

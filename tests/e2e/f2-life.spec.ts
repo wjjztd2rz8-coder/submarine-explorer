@@ -217,7 +217,7 @@ test('an animal can be scanned: banner, Journal wildlife entry, persistence', as
   );
   const debrief = page.getByRole('dialog', { name: 'Dive debrief' });
   await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText('1');
-  await expect(debrief.locator('.debrief-highlight')).toHaveText('Scanned Lobate comb jelly.');
+  await expect(debrief.locator('.debrief-finds')).toContainText('Lobate comb jelly');
   await debrief.getByRole('button', { name: 'Journal', exact: true }).click();
   await expect(page.locator('.jr-title')).toHaveText('Lobate comb jelly');
 

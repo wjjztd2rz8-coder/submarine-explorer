@@ -101,6 +101,7 @@ export function initializeShell(ctx: ShellContext): void {
   const updateDiveSite = (): void => {
     const site = ctx.missionSummaries.find((entry) => entry.id === diveSite());
     home.setDiveSite(site?.title ?? null, site?.depthM ?? null, !app.lastSite);
+    if (ctx.progress) home.setTour(ctx.progress, discoveries, app.lastSite, selectMission);
   };
   // Progress text only for sites where something has been logged.
   const completion = (id: string, pois: string[]): string => {

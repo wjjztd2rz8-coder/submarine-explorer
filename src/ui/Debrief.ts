@@ -1,13 +1,17 @@
 /**
- * End-of-dive debrief (DOM): score, one highlight and a next suggestion. The mission
+ * End-of-dive log: scanned subjects, a Journal fact and the next tour destination. The mission
  * router (D-FLOW) opens it when the player surfaces and passes its own
  * actions (Keep exploring, Dive again, Dive sites, Home, Journal);
  * `?debrief=1` opens the free-dive variant for screenshots.
  */
 
+import { nextSiteAfter, siteFinds, tourJournal } from '../game/Tour.js';
+import type { DiscoveryReader, JournalSite } from '../game/JournalData.js';
+import { PhotoStore, type Photo } from '../game/PhotoStore.js';
 import { el } from './dom.js';
 
-import type { DiveRating } from '../game/Progress.js';
+import { Progress, type DiveRating } from '../game/Progress.js';
+import { missionUrl } from './MissionSelect.js';
 import type { DebriefStats } from '../game/Objectives.js';
 import { FocusTrap } from './FocusTrap.js';
 
@@ -16,6 +20,7 @@ export interface DebriefAction {
   id: string;
   label: string;
   primary?: boolean;
+  siteId?: string;
   run: () => void;
 }
 
@@ -27,7 +32,72 @@ export interface ExplorationSummary {
   events: string[];
 }
 
+export interface DebriefContext {
+  siteId: string;
+  primaryIds: string[];
+  store: DiscoveryReader;
+}
+
+/** Pure content model: only this dive's fixed targets and scanned wildlife become tiles. */
+export function debriefModel(
+  stats: DebriefStats,
+  site?: JournalSite,
+  store?: DiscoveryReader,
+  photos: readonly Photo[] = [],
+  primaryIds: readonly string[] = [],
+) {
+  const finds = [
+    ...new Map(
+      stats.discoveries
+        .filter((d) => d.poiId.startsWith('life:') || !d.poiId.includes(':'))
+        .map((d) => [d.poiId, d]),
+    ).values(),
+  ].map((d) => {
+    const entry = site?.entries.find(
+      (e) =>
+        (e.kind === 'poi' || e.kind === 'life') &&
+        (e.kind === 'life' ? `life:${e.id}` === d.poiId : e.poiIds.includes(d.poiId)),
+    );
+    const image =
+      photos.find((p) => p.siteId === site?.id && p.poiId === d.poiId)?.image ??
+      entry?.guide?.image?.url;
+    return { ...d, image, text: entry?.guide?.paragraphs[0] ?? entry?.life?.info.text };
+  });
+  const fact = [...finds]
+    .sort((a, b) => Number(primaryIds.includes(b.poiId)) - Number(primaryIds.includes(a.poiId)))
+    .find((d) => d.text)?.text;
+  const sentence = fact?.match(/^.*?[.!?](?=\s|$)|^.+$/s)?.[0];
+  const counts = site && store ? siteFinds(site, store) : null;
+  return {
+    title:
+      stats.objectives &&
+      stats.objectives.total > 0 &&
+      stats.objectives.completed === stats.objectives.total
+        ? 'Dive complete'
+        : 'Dive ended',
+    finds,
+    fact: sentence
+      ? sentence.length > 200
+        ? sentence.slice(0, 197).trimEnd() + '…'
+        : sentence
+      : null,
+    progress: counts
+      ? `Found ${counts.found} of ${counts.total} at ${stats.landmarkName ?? site?.name}`
+      : null,
+  };
+}
+
+export function primaryDebriefAction(actions: DebriefAction[]): DebriefAction | undefined {
+  return (
+    actions.find((a) => a.id === 'next-dive') ??
+    actions.find((a) => a.id === 'dive-sites') ??
+    actions.find((a) => a.primary && a.id !== 'dive-again') ??
+    actions.find((a) => a.id !== 'dive-again')
+  );
+}
+
 interface DebriefOptions {
+  context?: DebriefContext;
   /** Default: reload the same URL. Used when `show()` gets no actions. */
   onDiveAgain?: () => void;
   /** Opens the Journal. Used when `show()` gets no actions. */
@@ -35,75 +105,11 @@ interface DebriefOptions {
   parent?: HTMLElement;
 }
 
-/** Keep a surfaced dive rewarding, with a single concrete thing to do next. */
-export function summarizeDive(
-  stats: DebriefStats,
-  rating?: DiveRating,
-  exploration?: ExplorationSummary,
-): {
-  highlight: string;
-  next: string;
-  kind: 'discoveries' | 'secrets' | 'events' | 'samples' | null;
-} {
-  const cause = stats.subtitle?.split(' · ')[0];
-  if (cause?.startsWith('Hull failure'))
-    return {
-      highlight: `${cause}.`,
-      next: 'Try a shallower route or a stronger hull.',
-      kind: null,
-    };
-  if (cause === 'Supplies exhausted')
-    return {
-      highlight: 'Supplies exhausted · safe ascent completed.',
-      next: 'Refill supplies before diving again.',
-      kind: null,
-    };
-
-  const scan = stats.discoveries.at(-1);
-  const secret = exploration?.secrets[0];
-  const event = exploration?.events[0];
-  const sample = exploration?.samples[0];
-  const entry = stats.newEntries[0];
-  const kind = scan
-    ? 'discoveries'
-    : secret
-      ? 'secrets'
-      : event
-        ? 'events'
-        : sample
-          ? 'samples'
-          : null;
-  const highlight = scan
-    ? `Scanned ${scan.name}.`
-    : secret
-      ? `Found ${secret}.`
-      : event
-        ? `Witnessed ${event}.`
-        : sample
-          ? `Found ${sample}.`
-          : entry
-            ? `Logged ${entry.title}.`
-            : 'The site is waiting for your first scan.';
-  const next =
-    rating?.stars === 3
-      ? 'Try another dive site.'
-      : rating?.stars === 2
-        ? 'Take a photo or scan a species for 3 stars.'
-        : rating?.stars === 1
-          ? 'Finish the optional objectives.'
-          : !scan && !entry
-            ? 'Face a target and hold Scan.'
-            : stats.objectives && stats.objectives.completed < stats.objectives.total
-              ? stats.objectives.remaining
-                ? `${stats.objectives.remaining}.`
-                : 'Keep exploring to finish the primary objectives.'
-              : 'Open the Journal to read your finds.';
-  return { highlight, next, kind };
-}
-
 export class Debrief {
   readonly root: HTMLDivElement;
   private readonly panel: HTMLDivElement;
+  private sites: JournalSite[] = [];
+  private photos: PhotoStore | null = null;
   private escape: (() => void) | null = null;
   /** Read when shown, so both free dives and mission debriefs include curiosity. */
   exploration: (() => ExplorationSummary) | null = null;
@@ -135,6 +141,24 @@ export class Debrief {
     rating?: DiveRating,
     onEscape?: (() => void) | null,
   ): void {
+    if (this.options.context) this.photos = new PhotoStore();
+    if (this.options.context && !this.sites.length) {
+      void tourJournal().then((sites) => {
+        if (!this.isOpen || this.last !== stats || !sites.length) return;
+        this.sites = sites;
+        if (!this.trap.isTop) return;
+        this.show(stats, actions, rating, onEscape);
+      });
+    }
+    const context = this.options.context;
+    const site = this.sites.find((s) => s.id === context?.siteId);
+    const model = debriefModel(
+      stats,
+      site,
+      context?.store,
+      this.photos?.photos,
+      context?.primaryIds,
+    );
     this.escape = onEscape === undefined ? () => this.hide() : onEscape;
     this.last = stats;
     const p = this.panel;
@@ -148,7 +172,7 @@ export class Debrief {
         stats.landmarkName ? stats.landmarkName.toUpperCase() : 'DIVE LOG',
       ),
     );
-    head.append(el('h1', 'debrief-title', stats.title ?? 'Dive debrief'));
+    head.append(el('h1', 'debrief-title', model.title));
     p.append(head);
 
     const score = el('div', 'debrief-rating debrief-score');
@@ -161,39 +185,55 @@ export class Debrief {
       stars.setAttribute('aria-label', `${rating.stars} of 3 stars`);
       score.append(stars);
     }
-    const metric = (field: string, value: string, label: string): void => {
-      const item = el('span', 'debrief-score-item');
-      item.dataset.field = field;
-      item.append(el('span', 'debrief-value', value), el('span', undefined, ` ${label}`));
-      score.append(item);
-    };
-    // With no scans the highlight line already says the site awaits the first one.
-    if (stats.discoveries.length > 0)
-      metric(
-        'discoveries',
-        String(stats.discoveries.length),
-        stats.discoveries.length === 1 ? 'scan' : 'scans',
-      );
-    if (stats.objectives) {
-      metric(
-        'objectives',
-        `${stats.objectives.completed} of ${stats.objectives.total}`,
-        'primary objectives',
-      );
+    if (model.progress) score.append(el('span', 'debrief-found', model.progress));
+    const finds = el('div', 'debrief-finds');
+    finds.setAttribute('aria-label', 'Scanned this dive');
+    for (const find of model.finds) {
+      const tile = el('div', 'debrief-find');
+      if (find.image) {
+        const img = el('img', 'debrief-thumb');
+        img.src = find.image;
+        img.alt = '';
+        tile.append(img);
+      }
+      tile.append(el('span', 'debrief-find-name', find.name));
+      finds.append(tile);
     }
-    p.append(score);
-    const summary = summarizeDive(stats, rating, this.exploration?.());
-    p.append(
-      el('p', `debrief-highlight${summary.kind ? ` is-${summary.kind}` : ''}`, summary.highlight),
-      el('p', 'debrief-next', `Next: ${summary.next}`),
-    );
+    if (!model.finds.length)
+      finds.append(el('p', 'debrief-empty', 'No scans this dive. There is more to discover.'));
+    p.append(finds, score);
+    if (stats.subtitle) p.append(el('p', 'debrief-cause', stats.subtitle));
+    if (model.fact) p.append(el('p', 'debrief-fact', `Did you know? ${model.fact}`));
 
     const row = el('div', 'debrief-actions');
+    const next = context ? nextSiteAfter(context.siteId, new Progress()) : null;
     const list = actions ?? [
+      ...(next
+        ? [
+            {
+              id: 'next-dive',
+              siteId: next,
+              label: `Next dive: ${next.replaceAll('-', ' ')}`,
+              primary: true,
+              run: () => {
+                window.location.href = missionUrl(window.location.href, next);
+              },
+            },
+          ]
+        : [
+            {
+              id: 'dive-sites',
+              label: 'Choose a dive site',
+              primary: true,
+              run: () => {
+                window.location.href = './';
+              },
+            },
+          ]),
       {
         id: 'dive-again',
         label: 'Dive again',
-        primary: true,
+        primary: false,
         run: () => {
           if (this.options.onDiveAgain) this.options.onDiveAgain();
           else window.location.reload();
@@ -201,15 +241,11 @@ export class Debrief {
       },
       { id: 'journal', label: 'Journal', run: () => this.options.onFieldGuide?.() },
     ];
-    // Navigation is the main next step (dive again, or resume on an unstarted dive).
-    // Resume/replay remain available below it.
-    // With no scans the dive has barely started: resuming is the obvious next step.
-    const unstarted = stats.discoveries.length === 0 && list.some((a) => a.id === 'keep-exploring');
-    const primary =
-      (unstarted ? list.find((a) => a.id === 'keep-exploring') : undefined) ??
-      list.find((a) => a.id === 'dive-again') ??
-      list.find((a) => a.primary) ??
-      list[0];
+    const primary = primaryDebriefAction(list);
+    if (primary?.id === 'next-dive') {
+      const next = this.sites.find((s) => s.id === primary.siteId);
+      if (next) primary.label = `Next dive: ${next.name}`;
+    }
     const navigation = el('div', 'debrief-navigation');
     const secondary = el('div', 'debrief-secondary');
     const more = el('div', 'debrief-more');
@@ -223,13 +259,9 @@ export class Debrief {
       toggle.setAttribute('aria-expanded', String(!moreBox.hidden));
     });
     more.append(toggle, moreBox);
-    // One filled primary; at most two quiet links (first choice + Journal); the rest tuck under More options.
     const rest = list.filter((a) => a !== primary);
-    // When resuming is primary, Dive sites is the quiet link beside Journal.
-    if (unstarted)
-      rest.sort((a, b) => Number(b.id === 'dive-sites') - Number(a.id === 'dive-sites'));
     const quiet = [
-      rest.find((a) => a.id !== 'journal' && a.id !== 'home'),
+      rest.find((a) => a.id === 'keep-exploring'),
       rest.find((a) => a.id === 'journal'),
     ];
     const mk = (a: DebriefAction, cls: string): HTMLButtonElement => {
@@ -239,7 +271,8 @@ export class Debrief {
       b.addEventListener('click', () => a.run());
       return b;
     };
-    if (primary) navigation.append(mk(primary, 'debrief-btn is-primary'));
+    const primaryButton = primary ? mk(primary, 'debrief-btn is-primary') : null;
+    if (primaryButton) navigation.append(primaryButton);
     for (const a of quiet) if (a) secondary.append(mk(a, 'debrief-btn'));
     for (const a of rest) if (!quiet.includes(a)) moreBox.append(mk(a, 'debrief-btn'));
     if (moreBox.childElementCount) secondary.append(more);
@@ -247,6 +280,7 @@ export class Debrief {
     p.append(row);
 
     this.trap.show();
+    primaryButton?.focus?.();
     // Returning from Keep exploring creates a new summary in the same panel.
     p.scrollTop = 0;
   }
@@ -257,6 +291,7 @@ export class Debrief {
 
   dispose(): void {
     this.trap.dispose();
+    this.last = null;
     this.root.remove();
   }
 }

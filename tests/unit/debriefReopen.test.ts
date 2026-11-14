@@ -35,46 +35,7 @@ class Element extends EventTarget {
 
 afterEach(() => vi.unstubAllGlobals());
 
-it.each([0, 1, 5, 6])('renders %s scans from the per-dive discovery list', (count) => {
-  const body = new Element();
-  vi.stubGlobal('HTMLElement', Element);
-  vi.stubGlobal('window', new EventTarget());
-  vi.stubGlobal('document', { body, activeElement: body, createElement: () => new Element() });
-  const debrief = new Debrief();
-  try {
-    debrief.show({
-      elapsedS: 60,
-      distanceM: 20,
-      maxDepthM: 100,
-      discoveries: Array.from({ length: count }, (_, i) => ({
-        poiId: `target-${i}`,
-        name: `Target ${i}`,
-      })),
-      newEntries: [],
-      objectives: { completed: 3, total: 4 },
-    });
-    const panel = (debrief.root as unknown as Element).children[0];
-    const score = panel.children.find((el) => el.className.includes('debrief-score'))!;
-    const scans = score.children.find((el) => el.dataset.field === 'discoveries');
-    // An empty count is left out: the highlight line already says nothing was scanned.
-    if (count === 0) expect(scans).toBeUndefined();
-    else
-      expect(scans!.children.map((el) => el.textContent)).toEqual([
-        String(count),
-        count === 1 ? ' scan' : ' scans',
-      ]);
-    // The count must identify primaries rather than imply optional targets are required.
-    expect(
-      score.children
-        .find((el) => el.dataset.field === 'objectives')!
-        .children.map((el) => el.textContent),
-    ).toEqual(['3 of 4', ' primary objectives']);
-  } finally {
-    debrief.dispose();
-  }
-});
-
-it('switches the primary and quiet actions after the first scan without stale More state', () => {
+it('lists this dive and keeps next destination primary when reopened', () => {
   const body = new Element();
   vi.stubGlobal('HTMLElement', Element);
   vi.stubGlobal('window', new EventTarget());
@@ -82,165 +43,46 @@ it('switches the primary and quiet actions after the first scan without stale Mo
   const debrief = new Debrief();
   const run = vi.fn();
   const actions: DebriefAction[] = [
-    { id: 'keep-exploring', label: 'Keep exploring', primary: true, run },
-    { id: 'dive-again', label: 'Dive again', run },
-    { id: 'dive-sites', label: 'Dive sites', run },
-    { id: 'home', label: 'Home', run },
+    { id: 'next-dive', label: 'Next dive: Lost City', primary: true, run },
+    { id: 'keep-exploring', label: 'Keep exploring', run },
     { id: 'journal', label: 'Journal', run },
+    { id: 'dive-again', label: 'Dive again', run },
   ];
   const stats: DebriefStats = {
-    elapsedS: 60,
-    distanceM: 20,
+    elapsedS: 10,
+    distanceM: 0,
     maxDepthM: 100,
     discoveries: [],
     newEntries: [],
   };
-  const panel = (debrief.root as unknown as Element).children[0];
-  const groups = () => {
-    const row = panel.children.find((e) => e.className === 'debrief-actions')!;
-    const [navigation, secondary] = row.children;
-    const more = secondary.children.find((e) => e.className === 'debrief-more')!;
-    return { navigation, secondary, toggle: more.children[0], moreBox: more.children[1] };
-  };
   try {
-    for (const scans of [0, 1, 0]) {
-      stats.discoveries = scans ? [{ poiId: 'bow', name: 'Bow' }] : [];
+    for (const count of [0, 3, 1]) {
+      stats.discoveries = Array.from({ length: count }, (_, i) => ({
+        poiId: String(i),
+        name: `Target ${i}`,
+      }));
       debrief.show(stats, actions);
-      const { navigation, secondary, toggle, moreBox } = groups();
-      expect(navigation.children).toHaveLength(1);
-      expect(navigation.children[0].className).toBe('debrief-btn is-primary');
-      expect(navigation.children[0].dataset.action).toBe(scans ? 'dive-again' : 'keep-exploring');
+      const panel = (debrief.root as unknown as Element).children[0];
+      const finds = panel.children.find((e) => e.className === 'debrief-finds')!;
+      expect(finds.children).toHaveLength(count || 1);
+      const row = panel.children.find((e) => e.className === 'debrief-actions')!;
+      expect(row.children[0].children[0].dataset.action).toBe('next-dive');
+      const secondary = row.children[1];
       expect(secondary.children.slice(0, 2).map((e) => e.dataset.action)).toEqual([
-        scans ? 'keep-exploring' : 'dive-sites',
+        'keep-exploring',
         'journal',
       ]);
-      expect(moreBox.children.map((e) => e.dataset.action)).toEqual(
-        scans ? ['dive-sites', 'home'] : ['dive-again', 'home'],
-      );
-      expect(moreBox.hidden).toBe(true);
-      expect(toggle.attributes['aria-expanded']).toBe('false');
+      const [toggle, more] = secondary.children[2].children;
+      expect(more.hidden).toBe(true);
+      expect(more.children[0].dataset.action).toBe('dive-again');
       toggle.dispatchEvent(new Event('click'));
-      expect(moreBox.hidden).toBe(false);
-      expect(toggle.attributes['aria-expanded']).toBe('true');
-      const keep = [...navigation.children, ...secondary.children].find(
-        (e) => e.dataset.action === 'keep-exploring',
-      )!;
-      keep.dispatchEvent(new Event('click'));
+      expect(more.hidden).toBe(false);
+      panel.scrollTop = 100;
+      debrief.hide();
+      debrief.show(stats, actions);
+      expect(panel.scrollTop).toBe(0);
       debrief.hide();
     }
-    expect(run).toHaveBeenCalledTimes(3);
-    expect(actions.map((a) => a.id)).toEqual([
-      'keep-exploring',
-      'dive-again',
-      'dive-sites',
-      'home',
-      'journal',
-    ]);
-  } finally {
-    debrief.dispose();
-  }
-});
-
-it('keeps zero-scan non-resumable and free dives on their existing primary actions', () => {
-  const body = new Element();
-  vi.stubGlobal('HTMLElement', Element);
-  vi.stubGlobal('window', new EventTarget());
-  vi.stubGlobal('document', { body, activeElement: body, createElement: () => new Element() });
-  const run = vi.fn();
-  const debrief = new Debrief({ onDiveAgain: run });
-  const stats: DebriefStats = {
-    elapsedS: 60,
-    distanceM: 20,
-    maxDepthM: 100,
-    discoveries: [],
-    newEntries: [],
-  };
-  const panel = (debrief.root as unknown as Element).children[0];
-  const primary = () =>
-    panel.children.find((e) => e.className === 'debrief-actions')!.children[0].children[0];
-  try {
-    debrief.show(stats, [
-      { id: 'dive-again', label: 'Dive again', primary: true, run },
-      { id: 'dive-sites', label: 'Dive sites', run },
-      { id: 'home', label: 'Home', run },
-      { id: 'journal', label: 'Journal', run },
-    ]);
-    expect(primary().dataset.action).toBe('dive-again');
-    debrief.hide();
-    debrief.show(stats);
-    expect(primary().dataset.action).toBe('dive-again');
-    primary().dispatchEvent(new Event('click'));
-    expect(run).toHaveBeenCalledOnce();
-  } finally {
-    debrief.dispose();
-  }
-});
-
-it('a second surfaced dive opens at the new summary heading after scrolling and resuming', () => {
-  const body = new Element();
-  vi.stubGlobal('HTMLElement', Element);
-  vi.stubGlobal('window', new EventTarget());
-  vi.stubGlobal('document', { body, activeElement: body, createElement: () => new Element() });
-  const debrief = new Debrief();
-  const first: DebriefStats = {
-    title: 'Dive summary',
-    elapsedS: 60,
-    distanceM: 20,
-    maxDepthM: 100,
-    discoveries: [],
-    newEntries: [],
-  };
-  try {
-    debrief.show(first);
-    const panel = (debrief.root as unknown as Element).children[0];
-    panel.scrollTop = 220;
-    debrief.hide();
-    const second: DebriefStats = {
-      ...first,
-      title: 'Mission complete',
-      elapsedS: 180,
-      discoveries: [{ poiId: 'bow', name: 'Bow' }],
-      newEntries: [{ id: 'bow', title: 'The bow' }],
-    };
-    debrief.show(second);
-    expect(debrief.isOpen).toBe(true);
-    expect(debrief.last).toEqual(second);
-    expect(panel.children[0].children[1].textContent).toBe('Mission complete');
-    expect(panel.scrollTop).toBe(0);
-  } finally {
-    debrief.dispose();
-  }
-});
-
-it('renders a collected sample as the single classified highlight and clears it on the next dive', () => {
-  const body = new Element();
-  vi.stubGlobal('HTMLElement', Element);
-  vi.stubGlobal('window', new EventTarget());
-  vi.stubGlobal('document', { body, activeElement: body, createElement: () => new Element() });
-  const debrief = new Debrief();
-  const stats: DebriefStats = {
-    elapsedS: 60,
-    distanceM: 20,
-    maxDepthM: 100,
-    discoveries: [],
-    newEntries: [],
-  };
-  const exploration = { found: 0, total: 0, secrets: [], samples: ['Sediment core'], events: [] };
-  debrief.exploration = () => exploration;
-  const panel = (debrief.root as unknown as Element).children[0];
-  const highlights = () =>
-    panel.children.filter((el) => el.className.split(' ').includes('debrief-highlight'));
-  try {
-    debrief.show(stats);
-    expect(highlights()).toHaveLength(1);
-    expect(highlights()[0].className).toBe('debrief-highlight is-samples');
-    expect(highlights()[0].textContent).toBe('Found Sediment core.');
-    debrief.hide();
-    exploration.samples = [];
-    debrief.show(stats);
-    expect(highlights()).toHaveLength(1);
-    expect(highlights()[0].className).toBe('debrief-highlight');
-    expect(highlights()[0].textContent).toBe('The site is waiting for your first scan.');
   } finally {
     debrief.dispose();
   }

@@ -246,7 +246,7 @@ for (const viewport of [
             await page.keyboard.press('Escape');
             await page.clock.fastForward(34);
             await page.locator('.pause-surface').click();
-            await expect(page.locator('.mission-debrief .debrief-highlight')).toContainText(name);
+            await expect(page.locator('.mission-debrief .debrief-finds')).toContainText(name);
             await reviewShot(page, 'debrief');
             expect(errors).toEqual([]);
           },

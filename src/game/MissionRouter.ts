@@ -22,7 +22,10 @@
  *   Dive again, Dive sites, Home, Journal). The debrief freezes the game.
  */
 
-import type { DiveRating } from './Progress.js';
+import { Progress, type DiveRating } from './Progress.js';
+import { nextSiteAfter } from './Tour.js';
+import { DiscoveryStore } from './DiscoveryStore.js';
+import { missionUrl } from '../ui/MissionSelect.js';
 import type { GameConfig } from '../core/Config.js';
 import type { EventBus } from '../core/EventBus.js';
 import type { InputState } from '../core/Input.js';
@@ -218,6 +221,7 @@ interface XYZ {
 /** The parts of Discovery the mission uses (Discovery satisfies it). */
 interface MissionDiscovery {
   readonly ready: Promise<void>;
+  readonly store?: DiscoveryStore;
   readonly pois: ReadonlyArray<{ id: string; name: string; position: XYZ }>;
   readonly siteName: string;
   readonly stats: { snapshot(extra?: Partial<DebriefStats>): DebriefStats };
@@ -522,33 +526,53 @@ export class MissionRouter {
       objectives: { ...primaries, remaining: open.length === 1 ? open[0]?.title : undefined },
     });
     if (!this.debrief) {
-      this.debrief = new Debrief({ parent: this.opts.parent });
+      this.debrief = new Debrief({
+        parent: this.opts.parent,
+        context: {
+          siteId: this.opts.route.landmarkId,
+          primaryIds: m.requiredPrimaries().map((o) => o.poiId),
+          store: discovery.store ?? new DiscoveryStore(),
+        },
+      });
       this.debrief.root.classList.add('mission-debrief');
     }
     const aborted = reason === 'abort';
     this.debrief.root.classList.toggle('is-aborted', aborted);
-    const actions: DebriefAction[] = [];
+    const rating = this.opts.rating?.();
+    const next = nextSiteAfter(this.opts.route.missionId, new Progress());
+    const actions: DebriefAction[] = [
+      next
+        ? {
+            id: 'next-dive',
+            siteId: next,
+            label: `Next dive: ${next.replaceAll('-', ' ')}`,
+            primary: true,
+            run: () => this.navigate(missionUrl(window.location.href, next)),
+          }
+        : {
+            id: 'dive-sites',
+            label: 'Choose a dive site',
+            primary: true,
+            run: () => this.leave(this.opts.onDiveSites),
+          },
+    ];
     if (m.canResume) {
       actions.push({
         id: 'keep-exploring',
         label: 'Keep exploring',
-        primary: true,
         run: () => this.keepExploring(),
       });
     }
     actions.push(
-      { id: 'dive-again', label: 'Dive again', primary: aborted, run: () => this.diveAgain() },
-      { id: 'dive-sites', label: 'Dive sites', run: () => this.leave(this.opts.onDiveSites) },
+      { id: 'dive-again', label: 'Dive again', run: () => this.diveAgain() },
+      ...(next
+        ? [{ id: 'dive-sites', label: 'Dive sites', run: () => this.leave(this.opts.onDiveSites) }]
+        : []),
       { id: 'home', label: 'Home', run: () => this.leave(this.opts.onHome) },
       { id: 'journal', label: 'Journal', run: () => discovery.guide.open() },
     );
     this.debrief.exploration = this.exploration;
-    this.debrief.show(
-      stats,
-      actions,
-      this.opts.rating?.(),
-      m.canResume ? () => this.keepExploring() : null,
-    );
+    this.debrief.show(stats, actions, rating, m.canResume ? () => this.keepExploring() : null);
     this.panel.setVisible(false);
   }
 
