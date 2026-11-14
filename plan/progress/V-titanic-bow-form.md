@@ -37,3 +37,7 @@ Net simpler on data: one prop and one instanced rail run deleted, no new setting
 ## Rating
 
 Opening about 3.7 before, about 3.9 after. Approach about 4.2 before, about 4.3 after.
+
+## Gates (director addendum)
+
+unit 4886/4886, e2e smoke, e2e-base, attribution, prettier pass. `site-specs titanic`: 93 pass, 2 fail (journal-debrief 844x390 and 390x844 pause menu; same failures on baseline). Anchor wells unverified from the shipped poses.
