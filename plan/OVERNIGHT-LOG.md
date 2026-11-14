@@ -4071,3 +4071,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Open: item 43 (Sonnet). Codex weekly 3% (resets Sun Nov 15 23:00), briefs 196-199 stay queued. Hosted CI of R-ci-red pending at start of run; no tag.
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
 - Hosted CI on e21390e5 (after R-ci-red) is still red: e2e shards 3, 8, 32, 33 of 38 failed (run 43562256974). Triage its failing specs in the next run; no tag.
+
+## 2026-11-14 02:32 CST headless run (Claude)
+
+- Merged item 43 V-beebe-opening-framing (Sonnet, 1dcb38e7): data-only change (chaseRadius 46->85, chaseOffsetY -8->6 in Beebe site.json); sub about half its size, stack and plume sit upper-middle. I judged before/after myself: real but modest gain (~3.9-4.0); stack still smallish at 155 m (scan floor). Rule bend: Beebe opening width floor 0.25->0.2 in missionComposition test, pose fixture updated. Smoke + project-base gates green on main; pushed. Not full-e2e'd.
+- Claude visual backlog now empty. Hosted CI on e21390e5 still red (shards 3, 8, 32, 33) and not triaged this run; no tag. Codex weekly 3% (resets Sun Nov 15 23:00), briefs 196-199 stay queued.
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
