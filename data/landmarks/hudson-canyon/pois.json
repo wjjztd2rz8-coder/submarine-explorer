@@ -57,7 +57,7 @@
       "id": "hc-down-axis",
       "name": "Canyon flank, toward the axis",
       "lat": 39.41317,
-      "lon": -72.17697,
+      "lon": -72.17814,
       "snap_to_seabed": true,
       "radius_m": 120,
       "kind": "geology",
@@ -67,12 +67,12 @@
       "confidence": "medium",
       "reconstruction": false,
       "sources": ["https://www.gmrt.org/"],
-      "note": "Real GMRT terrain at about 994 m, east of the flank transect where the seabed falls toward the canyon's axis. Added 2026-11 as a route stop for the guide's 'Down the axis' entry; the entry's depth figures come from the north-wall, upper-floor and deepest-cell readings, not from this point."
+      "note": "Real GMRT terrain at about 977 m, south-east of the flank transect where the seabed falls toward the canyon's axis. Added 2026-11 as a route stop for the guide's 'Down the axis' entry; the entry's depth figures come from the north-wall, upper-floor and deepest-cell readings, not from this point."
     },
     {
       "id": "hc-sanctuary-waters",
       "name": "Proposed sanctuary waters",
-      "lat": 39.41416,
+      "lat": 39.41129,
       "lon": -72.18069,
       "snap_to_seabed": true,
       "radius_m": 120,
@@ -83,7 +83,7 @@
       "confidence": "medium",
       "reconstruction": true,
       "sources": ["https://sanctuaries.noaa.gov/hudson-canyon/"],
-      "note": "GMRT terrain at about 1,008 m on the canyon flank. Hudson Canyon is the area NOAA proposes for a national marine sanctuary; no boundary is designated, so this marker stands for the canyon as a whole, not a boundary point. Added 2026-11 as a route stop."
+      "note": "GMRT terrain at about 928 m on the canyon flank, between the coral ledge and the flank transect. Hudson Canyon is the area NOAA proposes for a national marine sanctuary; no boundary is designated, so this marker stands for the canyon as a whole, not a boundary point. Added 2026-11 as a route stop."
     }
   ]
 }

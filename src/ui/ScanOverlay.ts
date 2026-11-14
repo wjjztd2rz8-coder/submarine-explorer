@@ -383,8 +383,12 @@ export class ScanOverlay {
           kicker: 'OBJECTIVE',
           text: view.objectiveName,
           // Keep the approach distance alongside plain steering directions.
+          // In range but steeply below or above (hovering over it): turning cannot
+          // bring it into the beam, a depth change can.
           detail: view.objectiveInRange
-            ? guide(turn, view.objectiveVertDeg, 'PITCH TOWARD TARGET')
+            ? ((Math.abs(view.objectiveVertDeg) >= 35
+                ? depthCue(view.objectiveDistance, view.objectiveVertDeg, keys)
+                : null) ?? guide(turn, view.objectiveVertDeg, 'PITCH TOWARD TARGET'))
             : [
                 Math.abs(turn) >= 10 ? turnCue(turn) : null,
                 depthCue(view.objectiveDistance, view.objectiveVertDeg, keys),
