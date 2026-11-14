@@ -20,3 +20,7 @@ Opening about 3.3 before, about 3.8 after. The hull now reads as a long ship wit
 - No explicit sediment drape along the hull base; the moat reads as a ring only.
 - The bow end (left) is still a plain wedge; the raised bow is mostly the deckBow sheer.
 - Unverified on Low and from the approach/detail poses.
+
+## Gates
+
+`tools/gates.sh` green (unit, e2e smoke, e2e-base, attribution, prettier). Updated the free-dive opening snapshot (camera y shifted 0.6 m with the deeper scour).
