@@ -24,6 +24,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **U-fresh-eyes-fixes:** text cuts. Debrief: removed the "Stars: 1 for the primary objectives, 2 for all, 3 with a photo or species scan." paragraph (the Next line already names what earns the next star) and the "0 scans" count when nothing is scanned (the highlight line says so). The dive HUD (sonar, readouts, Journal bar) now hides while a debrief is open, so the landscape card no longer covers the minimap. Short landscape Home hides the game-mode heading and one-line mode explanation so Settings and Controls fit without scrolling. Journal data credits drop the " · " separators (flex gap instead) and read at 13 px minimum.
+
 - Coral mounds (Blake Plateau, Hudson Canyon) now grade into the seabed: the rim sinks gradually below the ground and the pale framework fades to seabed sediment near the base, so the mound no longer reads as a disc sitting on the floor.
 
 - Lost City: the seabed near the chimney field takes a carbonate-pale, cooler talus tint (per-site `paleTalus` terrain data) so the opening slope reads pale rather than flat mud-green.

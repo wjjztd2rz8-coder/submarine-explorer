@@ -1135,7 +1135,10 @@ freshTest.describe('scan persistence and fixture debrief', () => {
       const debrief = page.locator('.debrief');
       await expect(debrief).toBeVisible({ timeout: 15_000 });
       await expect(page.locator('.debrief-title')).toHaveText('Dive debrief');
-      await expect(debrief.locator('.debrief-score')).toContainText('0 scans');
+      await expect(debrief.locator('[data-field="discoveries"]')).toHaveCount(0);
+      await expect(debrief.locator('.debrief-highlight')).toHaveText(
+        'The site is waiting for your first scan.',
+      );
       await expect(debrief.locator('.debrief-next')).toHaveText(
         'Next: Face a target and hold Scan.',
       );
@@ -1239,9 +1242,13 @@ freshTest.describe('frozen debrief and resume', () => {
             await expect(debrief).toBeVisible();
             await expect(page.locator('.pause-menu')).toBeHidden();
             await expect(page.locator('.objectives-panel')).toBeHidden();
-            await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText(
-              String(scans),
-            );
+            // A dive without scans leaves the count out; the highlight line says so.
+            if (scans === 0)
+              await expect(debrief.locator('[data-field="discoveries"]')).toHaveCount(0);
+            else
+              await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText(
+                String(scans),
+              );
             await expect(debrief.locator('.debrief-highlight')).toHaveText(
               scans === 0 ? 'The site is waiting for your first scan.' : `Scanned ${scanName}.`,
             );
@@ -1481,9 +1488,12 @@ freshTest.describe('summary, disclosures and provenance', () => {
             const debrief = page.locator('.mission-debrief');
             await expect(debrief).toBeVisible();
             await contained(debrief.locator('.debrief-panel'));
-            await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText(
-              round === 1 ? '0' : '1',
-            );
+            if (round === 1)
+              await expect(debrief.locator('[data-field="discoveries"]')).toHaveCount(0);
+            else
+              await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText(
+                '1',
+              );
             // Primary progress stays explicit in the same compact row on every viewport.
             const primary = await page.evaluate(() =>
               (window.__game as unknown as Game).mission.primaryCounts(),
@@ -2685,9 +2695,7 @@ freshTest.describe('Home to scan and return journey', () => {
           const debrief = page.locator('.mission-debrief');
           await expect(debrief).toBeVisible();
           await expect(debrief.locator('.debrief-title')).toHaveText('Dive summary');
-          await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText(
-            '0',
-          );
+          await expect(debrief.locator('[data-field="discoveries"]')).toHaveCount(0);
           await shot('09-debrief-unscanned');
           await act(debrief.locator('[data-action="journal"]'), touch);
           await expect(journal).toBeVisible();

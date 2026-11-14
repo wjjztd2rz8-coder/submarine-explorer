@@ -167,11 +167,13 @@ export class Debrief {
       item.append(el('span', 'debrief-value', value), el('span', undefined, ` ${label}`));
       score.append(item);
     };
-    metric(
-      'discoveries',
-      String(stats.discoveries.length),
-      stats.discoveries.length === 1 ? 'scan' : 'scans',
-    );
+    // With no scans the highlight line already says the site awaits the first one.
+    if (stats.discoveries.length > 0)
+      metric(
+        'discoveries',
+        String(stats.discoveries.length),
+        stats.discoveries.length === 1 ? 'scan' : 'scans',
+      );
     if (stats.objectives) {
       metric(
         'objectives',
@@ -180,14 +182,6 @@ export class Debrief {
       );
     }
     p.append(score);
-    if (rating)
-      p.append(
-        el(
-          'p',
-          'debrief-stars-note',
-          'Stars: 1 for the primary objectives, 2 for all, 3 with a photo or species scan.',
-        ),
-      );
     const summary = summarizeDive(stats, rating, this.exploration?.());
     p.append(
       el('p', `debrief-highlight${summary.kind ? ` is-${summary.kind}` : ''}`, summary.highlight),

@@ -107,7 +107,6 @@
   margin: 16px 0 8px;
   color: var(--b1-cyan);
 }
-.debrief-stars-note,
 .debrief-next {
   margin: 0;
   line-height: 1.5;
@@ -219,10 +218,11 @@
     padding-top: 10px;
   }
 }
-/* Nothing of the dive HUD competes with the end-of-dive choices. */
-body:has(.mission-debrief:not([hidden])) .d-scan-waypoints,
-body:has(.mission-debrief:not([hidden])) .objectives-panel {
-  display: none;
+/* The debrief owns the screen: the whole dive HUD (sonar, readouts, bar) steps aside so a
+   short landscape card cannot cover the minimap or crowd the Journal button. */
+body:has(.debrief:not([hidden])) .hud-regions,
+body:has(.debrief:not([hidden])) .d-scan-waypoints {
+  visibility: hidden;
 }
 
 /* D-POLISH: mission and telemetry form one right-hand stack. */

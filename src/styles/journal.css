@@ -498,12 +498,18 @@
 .jr-site-more[open] {
   padding-bottom: 6px;
 }
+/* Each credit stays on one line; the flex gap replaces a separator that could dangle. */
 .jr-credit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 14px;
   margin: 16px 0 0;
-  font-size: 0.8em;
-  opacity: 0.7;
+  font-size: max(13px, 0.8em);
+  opacity: 0.9;
 }
 .jr-credit a {
+  white-space: nowrap;
   color: inherit;
 }
 /* References remain usable touch targets even when their titles fit one line. */

@@ -55,11 +55,14 @@ it.each([0, 1, 5, 6])('renders %s scans from the per-dive discovery list', (coun
     });
     const panel = (debrief.root as unknown as Element).children[0];
     const score = panel.children.find((el) => el.className.includes('debrief-score'))!;
-    const scans = score.children.find((el) => el.dataset.field === 'discoveries')!;
-    expect(scans.children.map((el) => el.textContent)).toEqual([
-      String(count),
-      count === 1 ? ' scan' : ' scans',
-    ]);
+    const scans = score.children.find((el) => el.dataset.field === 'discoveries');
+    // An empty count is left out: the highlight line already says nothing was scanned.
+    if (count === 0) expect(scans).toBeUndefined();
+    else
+      expect(scans!.children.map((el) => el.textContent)).toEqual([
+        String(count),
+        count === 1 ? ' scan' : ' scans',
+      ]);
     // The count must identify primaries rather than imply optional targets are required.
     expect(
       score.children

@@ -801,10 +801,7 @@ export class Journal {
     const credit = dataCreditFor(this.tileSources.get(site.id));
     if (credit) {
       const line = el('p', 'jr-credit', `${credit.label}: `);
-      credit.links.forEach(([text, href], i) => {
-        if (i) line.append(' · ');
-        line.append(link(href, text));
-      });
+      for (const [text, href] of credit.links) line.append(link(href, text));
       foot.append(line);
     }
   }
