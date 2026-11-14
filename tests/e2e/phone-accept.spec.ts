@@ -351,7 +351,7 @@ async function firstMinute(
       if (tick === 120) break;
       let command: PilotCommand = null;
       if (completedAt === null) {
-        const turn = text.match(/TURN (\d+)° (PORT|STARBOARD)/i);
+        const turn = text.match(/TURN (?:\d+° )?(PORT|STARBOARD|LEFT|RIGHT)/i);
         const step = await guidance.getAttribute('data-step');
         if (step === 'scan') {
           // The optional lesson can mask steering; reveal the standing objective through Skip.
@@ -365,7 +365,7 @@ async function firstMinute(
             'the game scan check accepts the first objective',
           ).toBe(first.id);
           command = 'scan';
-        } else if (turn) command = turn[2] === 'STARBOARD' ? 'starboard' : 'port';
+        } else if (turn) command = /STARBOARD|RIGHT/i.test(turn[1]) ? 'starboard' : 'port';
         else if (step === 'move' || /Get closer to scan/i.test(text)) command = 'ahead';
         else if (step === 'depth' || /RISE TOWARD TARGET/i.test(text)) command = 'rise';
         else if (/SINK TOWARD TARGET|DIVE DEEPER/i.test(text)) command = 'sink';

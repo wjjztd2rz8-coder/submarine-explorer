@@ -1583,7 +1583,7 @@ experiencedTest.describe('mission opening guidance', () => {
           ).toHaveCount(1);
           // The hint shows a turn cue while the target is off the bow, otherwise the range.
           await expect(page.locator('.guidance-hint')).toHaveText(
-            new RegExp(`${metrics.range} m|TURN \\d+° (PORT|STARBOARD)`),
+            new RegExp(`${metrics.range} m|TURN (LEFT|RIGHT)`),
           );
           await expect(
             page.locator('.obj-nav, .obj-hint, .d-scan-edge-name, .d-scan-edge-info'),

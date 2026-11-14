@@ -217,7 +217,9 @@ export function tutorialText(
       if (device === 'touch') {
         if (markerDistanceM !== undefined && destination)
           return `Marker ${Math.max(5, Math.round(markerDistanceM / 5) * 5)} m ahead`;
-        return destination ? `Follow the marker toward ${destination}.` : 'Drag to move and turn.';
+        return destination
+          ? `Steer with the left pad toward ${destination}.`
+          : 'Drag the left pad to move and turn.';
       }
       const guidance = destination ? `Follow the marker toward ${destination}. ` : '';
       return (
