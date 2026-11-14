@@ -6,6 +6,7 @@
     {
       "id": "overview",
       "title": "Endurance: Shackleton's polar ship",
+      "fact": "Endurance sank in 1915 and was found upright on 5 March 2022 at 3,008 m. All 28 of her crew had survived.",
       "paragraphs": [
         "Endurance carried Sir Ernest Shackleton's Imperial Trans-Antarctic Expedition into the Weddell Sea in 1914-15. Construction began in 1911 at the Framnæs yard in Sandefjord, Norway. Launched as Polaris on 17 December 1912, she was a three-masted barquentine reinforced for polar ice. The Conservation Management Plan dates Shackleton’s purchase and renaming to 25 March 1914. Pack ice closed around her in January 1915, and after ten months drifting, beset, the ice finally crushed her hull. Captain Frank Worsley recorded her sinking position on 21 November 1915. All 28 men aboard survived; they camped on the drifting ice and eventually reached Elephant Island, from where Shackleton and five others made the 1,300 km open-boat journey to South Georgia for rescue.",
         "The wreck was found on 5 March 2022 by the Endurance22 expedition, organised by the Falklands Maritime Heritage Trust (FMHT) aboard the South African polar vessel S.A. Agulhas II -- exactly 100 years to the day after Shackleton was buried at Grytviken, South Georgia. She lies 3,008 m deep in the Weddell Sea, within the search area the team had defined before departure. The expedition found her upright, with much of her hull and fittings preserved.",
@@ -78,6 +79,7 @@
     {
       "id": "wreck-hull",
       "title": "The hull, upright and intact",
+      "fact": "Cold water and a lack of wood-boring animals kept Endurance's oak and pine hull so well preserved that it looks almost intact.",
       "paragraphs": [
         "Endurance rests upright, with much of her wooden structure preserved. The Conservation Management Plan describes oak framing and external planking, pine internal planking and greenheart sheathing. Maximum hull thickness was about 0.76 m (30 in). Cold water and the absence of destructive wood-boring animals help explain her preservation.",
         "The Falklands Maritime Heritage Trust's team, led by Director of Exploration Mensun Bound, surveyed her with Saab Sabertooth hybrid underwater vehicles fitted with Voyis optical laser scanners, capturing about 25,000 high-resolution images that were digitally stitched into a precise 44 m bow-to-stern 3D composite.",
@@ -141,6 +143,7 @@
     {
       "id": "stern-nameplate",
       "title": "\"ENDURANCE\", and the star of her old name",
+      "fact": "The name ENDURANCE is still legible on her stern, with a star beneath it from her original name, Polaris.",
       "paragraphs": [
         "The ship's name is still clearly legible on the stern, painted directly below the taffrail. Below the name is a five-pointed star -- a survival of her original name, Polaris, the pole star, under which she was launched at the Framnæs yard in 1912 before Shackleton bought and renamed her.",
         "Finding the name intact after 106 years on the seabed was one of the expedition's most striking moments, and it is the clearest piece of evidence that this is, beyond doubt, Shackleton's ship.",
@@ -184,6 +187,7 @@
     {
       "id": "helm-and-life",
       "title": "The wheel, and life in total darkness",
+      "fact": "Endurance's wheel still stands at her stern, and sea stars, glass sponges and a ghostly white squat lobster now live on the wreck.",
       "paragraphs": [
         "Endurance22's cameras also captured the ship's wheel, still standing at her stern. No sunlight reaches 3,008 m, so nothing here photosynthesises; instead the hull has become a deep-sea oasis of filter feeders that strain edible particles from the passing water.",
         "Marine biologists reviewing the footage identified sea stars (including brisingid sea stars), glass sponges, sea squirts, a bright yellow stalked sea lily (a crinoid), and a large white anemone near the wheel. They also spotted a ghostly white squat lobster, likely of the genus Munidopsis -- the first record of that kind of animal in this part of the Weddell Sea. \"The ship is cool,\" said British Antarctic Survey marine biogeographer Huw Griffiths, \"but look at those things living on it.\""
@@ -218,6 +222,7 @@
     {
       "id": "structural-damage",
       "title": "Masts down, funnel toppled",
+      "fact": "Her masts are down and her funnel has toppled, but the hull itself came through the sinking remarkably sound.",
       "paragraphs": [
         "Although the hull is remarkably sound, Endurance did not come through entirely undamaged. FMHT's survey found her masts down and her funnel toppled, with the heaviest damage concentrated around the poop deck at the stern and the waist amidships. Photographs of the wreck suggest she struck the seabed bow- or keel-first as she went down.",
         "The Conservation Management Plan records that she sank bow-first on 21 November 1915. The precise sequence of damage during the sinking and impact remains uncertain.",
@@ -265,6 +270,7 @@
     {
       "id": "worsley-position",
       "title": "Worsley's position, and the search that found her",
+      "fact": "Captain Worsley's logged sinking position was about 5.4 nautical miles (10 km) from where the wreck was found.",
       "paragraphs": [
         "Captain Frank Worsley logged the sinking position as 68°39′30″S 52°26′30″W. Bergman and Stuart examined the navigation in a paper published online in 2018 and in the 2019 Journal of Navigation volume. Bergman, Mearns and Stuart’s later chronometer study (2022 volume, first published online in 2023) assessed longitude errors and reported the discovered wreck position in its postscript.",
         "The later study gives the wreck as 4.9 nautical miles south and 2.4 nautical miles east of the logged position: 5.4 nautical miles overall, about 10 km south-southeast. UKAHT’s public webpage also quotes 6.4 km south, but the coordinates and peer-reviewed postscript support the larger distance; the reason for the webpage’s differing figure is unresolved.",
@@ -312,6 +318,7 @@
     {
       "id": "abyssal-plain",
       "title": "A very flat piece of ocean floor",
+      "fact": "Across the whole 27 by 33 km tile, the Weddell Sea floor varies by less than 200 m.",
       "paragraphs": [
         "Away from the wreck, this part of the Weddell Sea floor is remarkably featureless: across the whole ~27 x 33 km tile the terrain ranges only from about 2,915 m to 3,096 m, a relief of under 200 m. Two kilometres west of the wreck the seabed is about 2,988 m deep, a gentle 12 m rise from the 3,000 m reading at the wreck itself.",
         "The deep Weddell Sea plain lies far from ridges and canyons. The coarser GEBCO-derived grid used here also smooths seabed features smaller than a few kilometres."
@@ -350,6 +357,7 @@
     {
       "id": "protection",
       "title": "A protected monument, not a grave",
+      "fact": "Endurance has been a protected monument since 2019, three years before anyone found her, so touching anything there is an offence.",
       "paragraphs": [
         "Every man aboard Endurance survived her sinking; Shackleton had already led the crew off onto the ice before she went down. So unlike Titanic or Bismarck, this wreck is not a war grave or a gravesite -- but she is still one of the best-preserved and most significant wrecks in the world, and international law protects her accordingly.",
         "The Antarctic Treaty System designated the (then still unfound) wreck a Historic Site and Monument, HSM No. 93, in 2019 -- three years before anyone located her. That status makes it an offence to touch, disturb, or remove anything from the site; Endurance22's own survey and filming work had to be carried out without any contact with the wreck.",

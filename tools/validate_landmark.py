@@ -261,6 +261,8 @@ def check_guide(doc, report, landmark):
             report.err(where, '"paragraphs" must be a non-empty list of strings')
         elif len(paras) < 2:
             report.warn(where, "only %d paragraph(s); aim for 2-4" % len(paras))
+        if "fact" in e and not (_nonempty_str(e["fact"]) and len(e["fact"]) <= 170):
+            report.err(where, '"fact" must be a non-empty string of at most 170 characters')
         facts = e.get("facts", [])
         if not isinstance(facts, list) or not all(
                 isinstance(f, dict) and _nonempty_str(f.get("label")) and _nonempty_str(f.get("value"))

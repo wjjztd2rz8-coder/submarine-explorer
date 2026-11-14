@@ -5,6 +5,7 @@
     {
       "id": "overview",
       "title": "Kama'ehuakanaloa",
+      "fact": "Kama'ehuakanaloa is the youngest volcano in the Hawaiian chain, and it may take up to 200,000 years to become an island.",
       "paragraphs": [
         "Kama'ehuakanaloa is an active submarine volcano about 30 km off the southeast shore of the island of Hawai'i, and the youngest volcano in the Hawaiian chain. Its summit remains roughly 975-1,000 m below sea level; this tile's shallowest grid cell reads about 975.2 m.",
         "Rift zones extend northwest and southeast from the summit, forming a volcanic ridge about 31 km long. Its emergence as a new island depends on future eruption rates; USGS gives a speculative estimate of as much as 200,000 years.",
@@ -52,6 +53,7 @@
     {
       "id": "renaming",
       "title": "A name restored: Lo'ihi to Kama'ehuakanaloa",
+      "fact": "Hawai'i's Board on Geographic Names restored the volcano's Hawaiian name in 2021, taken from chants older than the 1955 chart name Lo'ihi.",
       "paragraphs": [
         "For decades this volcano was known on charts as Lo'ihi, Hawaiian for 'long,' a purely descriptive name chosen in 1955. That year, USC geologist Kenneth O. Emery -- after a 1954 bathymetric survey found several seamounts off Hawai'i's south coast -- asked Bishop Museum staff Mary Kawena Pukui and Martha Hohu, together with Hawaiian Volcano Observatory director Gordon A. Macdonald, to name them; they picked 'Lo'ihi' for this one's elongated shape. Emery originally thought it was a passive, parasitic bump on Kilauea's flank; it was only later recognized as its own active volcano.",
         "In July 2021 the Hawai'i Board on Geographic Names voted unanimously to rename it Kama'ehuakanaloa. The new name is not invented for the occasion -- it comes from mele (chants) documented decades before Emery's 1954 survey, describing an undersea volcano by that name. As Ku'ulei Kanahele of the Edith Kanaka'ole Foundation put it, Kama'ehuakanaloa 'is a powerful name that invokes the name of Pelehonuamea and her birth out of Kanaloa [the ocean]' -- restoring Hawaiian cultural knowledge of the volcano that the 1955 descriptive name had left out entirely."
@@ -86,6 +88,7 @@
     {
       "id": "peles-pit",
       "title": "Pele's Pit: the 1996 collapse",
+      "fact": "A 1996 swarm of more than 4,000 earthquakes collapsed the summit and formed Pele's Pit, about 600 m across.",
       "paragraphs": [
         "More than 4,000 earthquakes were recorded between 16 July and 9 August 1996 during Kama'ehuakanaloa's most intense recorded swarm. Summit collapse formed Pele's Pit, about 600 m across, with its floor about 300 m below the previous surface, destroying the earlier summit vent site.",
         "Hydrothermal venting did not stop after the collapse; it moved and changed. Diffuse ~30 degC vents that had existed on the pre-collapse summit gave way, within Pele's Pit itself, to much hotter fluids -- around 80 degC soon after the collapse, and exceeding 200 degC by late 1997 during submersible dives -- before settling into the cooler, iron-rich venting the pit hosts today.",
@@ -125,6 +128,7 @@
     {
       "id": "vents",
       "title": "Pele's and Hiolo vents: iron, not sulfide",
+      "fact": "Vents here are rich in iron and low in sulfide, so rust-coloured mats of iron-eating bacteria grow where black smokers would be.",
       "paragraphs": [
         "Research cruises in 2006, 2008, 2009 and 2013 sampled Hiolo North at roughly 1,300 m and Hiolo South at roughly 1,274 m inside Pele's Pit. Sylvan and colleagues reported a mean Hiolo South fluid temperature of about 47 degC, roughly 7 degC warmer than Hiolo North. These are diffuse, warm-fluid sites.",
         "The fluids are rich in dissolved iron and CO2 and depleted in sulfide compared with typical mid-ocean-ridge vents. Iron-oxidizing Zetaproteobacteria help form rust-colored iron oxyhydroxide mats. Jesser and colleagues documented mats over small venting chimneys at Hiolo North and cauliflower-shaped mats around an active orifice at Hiolo South. Mineral precipitation builds the sulfide chimneys of black smokers; sulfur-oxidizing microbes use the vent chemicals as an energy source."
@@ -163,6 +167,7 @@
     {
       "id": "south-rift",
       "title": "The south rift zone",
+      "fact": "Away from the summit, ultra-diffuse vents exist near the volcano's base at Ula Nui, about 5,000 m deep.",
       "paragraphs": [
         "A rift system extends northwest and southeast from the summit for about 31 km in total. This tile's terrain deepens southward, from about 1,281 m at a reference point roughly 1.4 km south of the summit high to about 1,897 m at 3.4 km. These grid samples follow the general south-rift bearing.",
         "Hydrothermal activity also occurs away from the summit: research cruises documented ultra-diffuse venting at Ula Nui near the volcano's base, about 5,000 m deep. Venting is not confined to Pele's Pit or the upper south rift."

@@ -5,6 +5,7 @@
     {
       "id": "overview",
       "title": "Monterey Canyon",
+      "fact": "Monterey Canyon's walls rise about 1,700 m, and storm-driven flows of sediment keep carving it deeper.",
       "paragraphs": [
         "Monterey Canyon begins just offshore of Moss Landing, beside the Monterey Bay Aquarium Research Institute (MBARI). Its walls reach about 1,700 m from floor to rim. MBARI describes a main channel extending more than 470 km offshore, continuing through the Monterey Deep Sea Fan and ending below 4,000 m on the abyssal plain.",
         "Sediment supplied from nearby beaches accumulates at the canyon head. Storm waves and slope failures can turn it into turbidity currents: fast underwater flows of sediment and seawater. Earthquakes can trigger sediment flows, but none of the flows in the 2015–2017 Coordinated Canyon Experiment coincided with earthquakes above magnitude 2, and some powerful flows occurred without major external triggers. These flows continue to carve and reshape the canyon.",
@@ -53,6 +54,7 @@
     {
       "id": "canyon-head",
       "title": "The canyon head",
+      "fact": "Monterey Canyon begins right off the beach at Moss Landing, so research ships reach water over a mile deep in under three hours.",
       "paragraphs": [
         "Monterey Canyon's head lies right off the beach at Moss Landing. The seafloor here drops away steeply, and MBARI's research vessels can reach areas more than a mile deep in a little over two and a half hours.",
         "This closeness to shore helps explain why the canyon is so well studied: deep-sea habitats and processes are within easy reach of MBARI's shore-based marine laboratory.",
@@ -80,6 +82,7 @@
     {
       "id": "canyon-wall",
       "title": "A canyon wall",
+      "fact": "Monterey Canyon's walls climb as much as about 1,700 m, comparable to the depth of the Grand Canyon.",
       "paragraphs": [
         "From the axis out to the rim, Monterey Canyon's walls climb as much as about 1,700 m, comparable to the depth of the Grand Canyon. Along the way they are cut by smaller side gullies, and repeated small slope failures feed sediment into the turbidity currents that scour the canyon floor below.",
         "This point samples the canyon's north wall at about 748 m depth."
@@ -106,6 +109,7 @@
     {
       "id": "canyon-axis",
       "title": "Following the canyon floor",
+      "fact": "Turbidity currents in Monterey Canyon were clocked at up to 7.2 m/s (16 mph), and some travelled at least 50 km down-canyon.",
       "paragraphs": [
         "The canyon's axis, or thalweg, is its deepest, most continuously carved line -- the path a turbidity current follows on its way downhill. Tracing it through this tile's survey data shows a fairly steady deepening from the shallow head out past 2,000 m, punctuated by side channels and terraces where sediment has piled up between major flow events.",
         "In the Coordinated Canyon Experiment, researchers deployed moorings and seabed instruments along a 50 km stretch of Monterey Canyon. They measured turbidity-current fronts moving at up to about 7.2 m/s (16 mph). Some flows travelled at least 50 km down-canyon.",
@@ -149,6 +153,7 @@
     {
       "id": "upper-canyon",
       "title": "The upper canyon descent",
+      "fact": "Within 2.85 km of the canyon head, the seabed drops from about 44 m to 265 m.",
       "paragraphs": [
         "A few kilometres down-canyon from the head marker, this tile shows the bottom dropping from about 44 m to 265 m over about 2.85 km in a straight line. The descent exposes the steep channel within the continental shelf; depth alone does not establish the regional shelf-break position.",
         "The upper channel carries sediment toward deeper water and is close enough to the head marker for a short dive before continuing toward the deeper wall and the MARS observatory farther offshore.",
@@ -180,6 +185,7 @@
     {
       "id": "mars-node",
       "title": "MARS: a deep-sea power outlet",
+      "fact": "MARS is a deep-sea power outlet: a 52 km cable carries 10,000 volts from shore to run instruments on the seabed for years.",
       "paragraphs": [
         "The Monterey Accelerated Research System (MARS) is a cabled seafloor observatory: a science node on the continental slope in Monterey Bay connected to shore by a 52 km (32 mi) power and data cable. It converts 10,000 volts from shore down to 375 and 48 volts DC for scientific instruments, and offers up to 100 megabits per second of data bandwidth per instrument across eight ports, so researchers can run experiments for months or years without worrying about battery life.",
         "Its trawl-resistant frame, about 3.7 by 4.6 m at the base and 1.2 m tall, has smoothed corners and sloping sides so fishing gear and anchors slide off rather than snag, while still letting a remotely operated vehicle open its side doors to plug in new instruments.",

@@ -5,6 +5,7 @@
     {
       "id": "overview",
       "title": "Lighthouse Reef and the Great Blue Hole",
+      "fact": "The Great Blue Hole is a flooded limestone sinkhole about 320 m wide and 125 m deep, set inside an atoll lagoon.",
       "paragraphs": [
         "Explore the Great Blue Hole and Lighthouse Reef’s shallow platform and outer drop-offs. The flooded limestone sinkhole is about 320 m wide and 125 m deep, inside the atoll lagoon.",
         "The Blue Hole Natural Monument and Half Moon Caye Natural Monument are protected components of the Belize Barrier Reef Reserve System, inscribed as a UNESCO World Heritage Site in 1996."
@@ -55,6 +56,7 @@
     {
       "id": "the-hole",
       "title": "Stalactite gallery",
+      "fact": "The stalactites in the Blue Hole formed in dry caves during an ice age, and were flooded as the sea rose.",
       "paragraphs": [
         "The Great Blue Hole is a flooded limestone sinkhole. Its submerged stalactites formed in air-filled caves during glacial sea-level lows. They and the submerged ledges preserve traces of those caves, flooded as the sea rose.",
         "Below roughly 90 m, the lower water is oxygen-depleted and rich in hydrogen sulfide."
@@ -89,6 +91,7 @@
     {
       "id": "eastern-gallery",
       "title": "Eastern stalactite gallery",
+      "fact": "Cousteau explored the Great Blue Hole in 1971, and a crewed submarine and sonar expedition in 2018 mapped it in far more detail.",
       "paragraphs": [
         "Jacques Cousteau’s Calypso expedition explored the Great Blue Hole in 1971. A crewed-submarine and sonar expedition in 2018 mapped the interior in much greater detail, including submerged stalactite galleries.",
         "Reef fish stay in the upper water; the lower sediment still supports microbial life."
@@ -123,6 +126,7 @@
     {
       "id": "reef-rim",
       "title": "The reef flat",
+      "fact": "Lighthouse Reef's shallow platform stretches for kilometres around the lagoon, with the sinkhole plunging through its centre.",
       "paragraphs": [
         "Lighthouse Reef’s shallow platform stretches for kilometres around the lagoon. Coral, sand and reef rock form a broad shelf before the outer edge falls away into the Caribbean.",
         "Shaped by wave action and slow coral growth over thousands of years, this shallow rim stands in sharp contrast to the sinkhole plunging through its centre."
@@ -153,6 +157,7 @@
     {
       "id": "outer-dropoff",
       "title": "Where the atoll ends",
+      "fact": "East of the hole the reef flat falls from a few metres to nearly 200 m in about half a kilometre, then keeps dropping past 3,000 m.",
       "paragraphs": [
         "A few kilometres east of the hole, the reef flat ends abruptly: this tile's terrain plunges from a few metres deep to nearly 200 m within about half a kilometre, then keeps falling past 3,000 m further out into the open Caribbean. That is the outer wall of the Lighthouse Reef atoll -- a real, steep undersea cliff, and one of the more dramatic features this tile's bathymetry does resolve well.",
         "Beyond the reef edge, the open slope provides a route from sunlit shallows into much darker water."
@@ -183,6 +188,7 @@
     {
       "id": "reef-biology",
       "title": "Life on the rim",
+      "fact": "Caribbean reef sharks, nurse sharks, groupers and angelfish patrol the reef, but the Blue Hole's oxygen-poor lower water keeps reef fish out.",
       "paragraphs": [
         "Caribbean reef sharks, nurse sharks, groupers, squirrelfish and angelfish use Lighthouse Reef’s shallow reef and upper drop-offs.",
         "Reef corals depend on light and belong near the surface. The Blue Hole’s oxygen-depleted lower water excludes reef fish."
@@ -213,6 +219,7 @@
     {
       "id": "western-dropoff",
       "title": "The western atoll slope",
+      "fact": "On the west side the seabed is only 2 to 4 m deep across the platform, then falls past 300 m at its outer edge.",
       "paragraphs": [
         "West of the Great Blue Hole, Lighthouse Reef stays almost level for several kilometres before its outer edge drops into deeper water. Along this latitude the mapped seabed is about 2 to 4 m deep over the platform, around 30 m at 87.59° W, 157 m at this scan point, and more than 300 m deep at 87.60° W.",
         "The eastern edge falls away closer to the hole. Scanning both sides shows the width and uneven profile of the atoll platform surrounding the sinkhole."

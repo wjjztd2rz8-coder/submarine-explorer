@@ -5,6 +5,7 @@
     {
       "id": "overview",
       "title": "The Beebe Hydrothermal Vent Field",
+      "fact": "Beebe sits nearly 5,000 m down in the Cayman Trench. Its vents were found in 2010 and named for William Beebe, who dived the Bathysphere.",
       "paragraphs": [
         "The Beebe Hydrothermal Vent Field, also called Piccard, lies nearly 5,000 m down in the Cayman Trough south of Grand Cayman. A 2009 cruise on RV Cape Hatteras detected its hydrothermal plume using Nereus. In 2010 a team on RRS James Cook located and sampled the vents with Autosub6000 and HyBIS. The discovery paper by Connelly and colleagues appeared in 2012. The field honours William Beebe, the naturalist who explored deep water in the Bathysphere.",
         "This tile covers only the Beebe field and the axial valley to its northwest; Von Damm, the Mid-Cayman Spreading Centre's other well-studied vent field, sits about 21 km south-southwest at roughly 2,300 m depth -- entirely outside this survey's bounding box -- so it is described here for context only and is not a scan target."
@@ -55,6 +56,7 @@
     {
       "id": "vents",
       "title": "Supercritical black smokers",
+      "fact": "Beebe's black smokers pour out fluid at about 401 to 403 °C, so hot and squeezed that it is supercritical, neither liquid nor gas.",
       "paragraphs": [
         "Beebe’s black smokers release extremely hot, low-salinity fluid at roughly 500 bar of pressure. During the February 2013 survey, Webber and colleagues measured about 401–403 °C and showed that this fluid can be supercritical: its liquid and gas states are no longer distinct. The dark chimneys are built from iron- and copper-bearing sulfide minerals.",
         "Webber et al. (2015) mapped at least six sulfide mounds, three with active focused venting. The deposits grow and collapse through successive generations of chimneys."
@@ -97,6 +99,7 @@
     {
       "id": "shrimp",
       "title": "Rimicaris hybisae",
+      "fact": "Beebe's vent shrimp have an enlarged eye on their back that cannot form images but can still detect faint light.",
       "paragraphs": [
         "Dense swarms of Rimicaris hybisae crowd Beebe’s chimneys. Nye, Copley and Plouviez described the species in 2012 and named it after HyBIS, the vehicle that collected the first specimens. Its enlarged dorsal eye lacks image-forming optics but detects light. A 2025 study measured visible-light sensitivity in its opsins; detecting faint vent light and bioluminescence is a proposed role.",
         "The shrimp’s enlarged cephalothorax shelters bacteria associated with its mouthparts and gill chamber. These microbes contribute chemosynthetic carbon to its diet. Fatty-acid studies also found a contribution from photosynthetic carbon, so the shrimp is not wholly independent of food made in sunlit water."
@@ -147,6 +150,7 @@
     {
       "id": "spreading-axis",
       "title": "The Mid-Cayman spreading axis",
+      "fact": "The Mid-Cayman Spreading Centre is the world's deepest spreading centre. The seafloor there pulls apart only about 15 mm a year.",
       "paragraphs": [
         "The Mid-Cayman Spreading Centre is the world’s deepest seafloor spreading centre, with an ultraslow full spreading rate of about 15 mm per year. Its thin crust is cut by faults through which seawater circulates. The pressure at Beebe’s depth, together with its fluid temperature and salinity, allows supercritical fluid to reach the seafloor.",
         "A northwest–southeast transect through this tile’s western half sampled about 5,395.8 m depth near 18.57667° N, 81.80333° W. That is a terrain-derived axial-valley reference, not a surveyed plate-boundary coordinate or the tile’s deepest cell. Across the entire shipped grid, the deepest cell is about 6,575.3 m."

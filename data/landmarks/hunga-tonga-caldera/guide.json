@@ -5,6 +5,7 @@
     {
       "id": "overview",
       "title": "Hunga Tonga-Hunga Ha'apai: a survey from before the eruption",
+      "fact": "The January 2022 eruption sent a plume about 58 km high and deepened the caldera to around 850 m.",
       "paragraphs": [
         "This dive follows Hunga Tonga–Hunga Ha’apai’s landscape before the 15 January 2022 eruption: a shallow summit basin, an island connection and volcanic slopes falling into deeper water.",
         "The volcano rises roughly 2 km from the surrounding seafloor. Before 2022, its central basin lay about 150–200 m below sea level. A cone built in 2014–2015 joined the two older rim islands.",
@@ -60,6 +61,7 @@
     {
       "id": "caldera-floor",
       "title": "The caldera floor, before 2022",
+      "fact": "Before 2022 this basin was about 150 to 200 m deep. Later mapping found its deepest part around 850 m.",
       "paragraphs": [
         "The earlier caldera contained a broad central basin, about 150–200 m deep in detailed surveys. This terrain grid reads about 132 m at the scan point.",
         "Multibeam mapping before and after the January 2022 eruption reveals how dramatically the basin changed. The later surveys found its deepest part around 850 m."
@@ -102,6 +104,7 @@
     {
       "id": "island-saddle",
       "title": "The islands, joined",
+      "fact": "In 2014 and 2015 an eruption built a cone that joined two islands, and the 2022 eruption removed much of it.",
       "paragraphs": [
         "The 2014–2015 eruption built a tephra cone between Hunga Tonga and Hunga Ha’apai, joining the two older islands. Tephra is fragmented volcanic material thrown out during an eruption.",
         "The January 2022 eruption removed much of this connection and left the islands smaller and separated."
@@ -140,6 +143,7 @@
     {
       "id": "rim-wall",
       "title": "The volcanic rim slope",
+      "fact": "West of the basin the volcano's wall falls to about 469 m, where gullies and loose rock mark a steep tuff slope.",
       "paragraphs": [
         "West of the shallow basin, volcanic terrain falls toward deeper water. The scan point is about 469 m deep, beyond the central basin’s 150–200 m floor.",
         "The banded tuff scarp's gullies and talus show how fragmented volcanic rock can form a steep slope."
@@ -170,6 +174,7 @@
     {
       "id": "outer-flank",
       "title": "The outer flank of a 2-km volcano",
+      "fact": "Hunga Tonga rises roughly 2 km from the seafloor to its summit islands, and the 2022 eruption scoured its outer slopes.",
       "paragraphs": [
         "Beyond the caldera rim, the seafloor drops away down the volcano's outer flank. This grid reads about 1,029 m at the reference point. The wider volcanic edifice rises roughly 2 km from the surrounding seafloor to the summit islands; this scan is partway down the flank.",
         "The flank is part of the wider volcanic edifice. The 2022 eruption also scoured slopes outside the caldera through fast-moving volcanic sediment flows."
@@ -208,6 +213,7 @@
     {
       "id": "flank-transect",
       "title": "Volcanic flank transect (pre-2022 survey)",
+      "fact": "This flank point reads about 293 m deep, against about 469 m at the rim-slope point 660 m away.",
       "paragraphs": [
         "This terrain survey is about 660 m east-northeast of the volcanic rim-slope scan. The pre-2022 GMRT grid reads about 293 m here, compared with about 469 m at the rim-slope point.",
         "The nearby pair samples the volcanic flank beyond the shallow central basin. This point was chosen from the survey grid for the dive; it is not a separately named volcanic feature. Continue east to the optional shallow basin-floor scan to compare that earlier landscape."
