@@ -15,13 +15,13 @@
     "heading_deg": 250
   },
   "briefing": {
-    "summary": "Explore Hunga Tonga–Hunga Ha’apai before the January 2022 eruption. Scan the volcanic rim slope and a nearby stretch of the flank; the shallow basin floor is an optional longer survey.",
+    "summary": "Explore Hunga Tonga–Hunga Ha’apai before the January 2022 eruption. Survey a stretch of the volcanic flank, then follow it down to the rim slope; the shallow basin floor is an optional longer survey.",
     "depth_m": 469,
     "facts": [
       "Before the 15 January 2022 eruption, Hunga’s central basin was about 150–200 m deep and roughly 4.5 km across.",
       "The 2014–2015 eruption built a cone that joined the two older islands, Hunga Tonga and Hunga Ha’apai.",
       "The January 2022 eruption deepened the basin to about 850 m and separated the islands. This dive follows the earlier landscape.",
-      "With a surface start, head west-southwest and descend toward the volcanic rim slope."
+      "With a surface start, head west-southwest and descend toward the volcanic flank."
     ],
     "hazards": [
       "Steep volcanic slopes: watch your altitude as you cross the rim.",
@@ -31,20 +31,20 @@
   },
   "objectives": [
     {
-      "id": "rim-wall",
-      "type": "scan",
-      "poi": "hunga-tonga-rim-wall",
-      "primary": true,
-      "title": "Follow the volcanic rim slope",
-      "hint": "Find the volcanic slope beyond the shallow basin, near 470 m."
-    },
-    {
       "id": "flank-transect",
       "type": "scan",
       "poi": "hunga-tonga-flank-transect",
       "primary": true,
       "title": "Survey the nearby volcanic flank",
-      "hint": "Follow the volcanic flank east-northeast from the rim-slope scan, near 293 m."
+      "hint": "Find the volcanic flank point east-northeast of the rim slope, near 293 m."
+    },
+    {
+      "id": "rim-wall",
+      "type": "scan",
+      "poi": "hunga-tonga-rim-wall",
+      "primary": true,
+      "title": "Follow the volcanic rim slope",
+      "hint": "Follow the flank down west-southwest to the volcanic rim slope, near 470 m."
     }
   ],
   "completion": "all_primary"

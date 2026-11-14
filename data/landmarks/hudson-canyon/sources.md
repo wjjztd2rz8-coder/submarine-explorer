@@ -139,3 +139,12 @@ $ python3 tools/validate_landmark.py hudson-canyon --strict
   publicly citable form during this session.
 - The USGS Hudson Shelf Valley GIS centerline was not cross-checked point-by-point against this
   tile's grid; `hc-shelf-valley` is a coarse approximation, confidence "medium."
+
+## Route stops (2026-11)
+
+`hc-wall-transect` moved to the centre of grid row 432, column 947 (39.41251, -72.17990), 947.2 m,
+about 280 m north of the coral-habitat ledge, so the dive is a short route. Two stops were added
+on the same flank: `hc-sanctuary-waters` (39.41416, -72.18069, about 1,008 m) for the guide's
+proposed-sanctuary entry, and `hc-down-axis` (39.41317, -72.17697, about 994 m) where the seabed
+falls east toward the canyon axis. Both are authored route stops on real grid terrain, not
+surveyed features or boundary points.

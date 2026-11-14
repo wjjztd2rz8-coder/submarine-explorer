@@ -60,7 +60,10 @@ own source citation rather than presented as a direct read.
 - `kh-south-rift` (18.9053, -155.2646) and `kh-flank-relief` (18.8878, -155.2655) both lie on a
   straight transect run due south from the summit at a fixed longitude step, reading -1,281.3 m
   (~1.4 km out) and -1,896.6 m (~3.4 km out) -- a terrain trace of the general south-rift
-  direction, not a citation to a mapped rift-zone polygon.
+  direction, not a citation to a mapped rift-zone polygon. In 2026-11 `kh-south-rift` moved to
+  (18.90862, -155.26534), about 1,269 m deep and roughly 1 km south of the summit high, 300 m
+  from Hiolo South, so the dive is a short route; `kh-peles-pit` (18.91185, -155.26691, about
+  1,275 m) was added between the two Hiolo markers for the guide's Pele's Pit entry.
 
 ## Pacing
 

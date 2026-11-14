@@ -169,7 +169,7 @@
       "title": "The south rift zone",
       "fact": "Away from the summit, ultra-diffuse vents exist near the volcano's base at Ula Nui, about 5,000 m deep.",
       "paragraphs": [
-        "A rift system extends northwest and southeast from the summit for about 31 km in total. This tile's terrain deepens southward, from about 1,281 m at a reference point roughly 1.4 km south of the summit high to about 1,897 m at 3.4 km. These grid samples follow the general south-rift bearing.",
+        "A rift system extends northwest and southeast from the summit for about 31 km in total. This tile's terrain deepens southward, from about 1,269 m at a reference point roughly 1 km south of the summit high to about 1,897 m at 3.4 km. These grid samples follow the general south-rift bearing.",
         "Hydrothermal activity also occurs away from the summit: research cruises documented ultra-diffuse venting at Ula Nui near the volcano's base, about 5,000 m deep. Venting is not confined to Pele's Pit or the upper south rift."
       ],
       "facts": [
@@ -178,8 +178,8 @@
           "value": "~31 km total (USGS)"
         },
         {
-          "label": "This tile's south-rift depth at 1.4 km / 3.4 km from summit",
-          "value": "-1,281 m / -1,897 m"
+          "label": "This tile's south-rift depth at 1 km / 3.4 km from summit",
+          "value": "-1,269 m / -1,897 m"
         }
       ],
       "reconstruction": false,

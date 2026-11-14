@@ -62,17 +62,19 @@ describe('nearby terrain surveys', () => {
   for (const [site, added, optional, depthM, optionalPoi] of [
     ['challenger-deep', 'eastern-floor', 'north-wall', 10920.5, 'cd-north-wall'],
     ['hunga-tonga-caldera', 'flank-transect', 'caldera-floor', 292.9, 'hunga-tonga-caldera-floor'],
-    ['hudson-canyon', 'wall-transect', 'wall', 976.7, 'hc-canyon-wall'],
+    ['hudson-canyon', 'wall-transect', 'wall', 947.2, 'hc-canyon-wall'],
   ] as const) {
     it(`${site}: nearby required survey sits on real bathymetry and completes the route`, () => {
       const def = parseMission(json(`${root}/${site}/mission.json`), site)!;
       const required = def.objectives.filter((o) => o.primary);
       expect(required).toHaveLength(2);
-      expect(required[1].id).toBe(added);
+      // The survey point may open the dive (hunga-tonga's route runs downhill from it).
+      const survey = required.find((o) => o.id === added)!;
+      expect(survey).toBeDefined();
       expect(def.objectives.find((o) => o.id === optional)).toBeUndefined();
       const pois = json(`${root}/${site}/pois.json`).pois;
-      const first = pois.find((p: Poi) => p.id === required[0].poi);
-      const target = pois.find((p: Poi) => p.id === required[1].poi);
+      const first = pois.find((p: Poi) => p.id === required.find((o) => o !== survey)!.poi);
+      const target = pois.find((p: Poi) => p.id === survey.poi);
       expect(distanceM(first, target)).toBeLessThanOrEqual(1000);
       expect(target.snap_to_seabed).toBe(true);
       expect(target.reconstruction).toBe(false);

@@ -126,7 +126,7 @@ depth figure.
 | Point                         | lat, lon                           | Tile terrain | Published                               |
 | ----------------------------- | ---------------------------------- | ------------ | --------------------------------------- |
 | bismarck-hull                 | 48.15, -16.117                     | 4,218.5 m    | 4,790-4,791 m (sources 1-2)             |
-| bismarck-turret-debris        | 48.15114, -16.10497                | 4,129.2 m    | (illustrative, no published coordinate) |
+| bismarck-turret-debris        | 48.15076, -16.10900 (2026-11)      | 4,167.6 m    | (illustrative, no published coordinate) |
 | bismarck-skid-trail           | 48.15089, -16.11317 (2026-11)      | 4,207.4 m    | (illustrative)                          |
 | Tile shallowest cell (summit) | 48.15504, -16.08147                | 4,023.8 m    | (GMRT only)                             |
 | Tile deepest cell             | (unsampled; see meta.json `min_m`) | 5,009.1 m    | (GMRT only)                             |
@@ -185,4 +185,4 @@ See `species.json`'s own `note` for the result and any widening applied.
 
 ## Route markers (2026-11)
 
-`bismarck-memorial` (beside the hull) and `bismarck-skid-trail` ("The seamount flank") were restored so the dive is a short route of four scans. The flank marker moved from about 500 m to about 300 m up-slope (north-east) of the hull, on the same grid slope; its depth reading is in the table above. The turret marker stays about 900 m up-slope as an optional find that the dive's tally does not count.
+`bismarck-memorial` (beside the hull) and `bismarck-skid-trail` ("The seamount flank") were restored so the dive is a short route of four scans. The flank marker moved from about 500 m to about 300 m up-slope (north-east) of the hull, on the same grid slope; its depth reading is in the table above. The turret marker and its prop moved from about 900 m to about 600 m up-slope, on the same line, so the dive's route ends there.

@@ -315,8 +315,9 @@ const DIVING: ReadonlySet<MissionState> = new Set(['diving', 'primaries-complete
 export const ROUTE_DETOUR_M = 120;
 
 /**
- * Shared beam and waypoint priority: unfinished primaries in authored order, but a
- * contact that lies on the way to that primary first; then the nearest unfound contact.
+ * Shared beam and waypoint priority: unfinished primaries in authored order, but after
+ * the first one a contact that lies on the way to the next primary comes first; then the
+ * nearest unfound contact.
  * `between(a, b)` is the distance between two POIs; without it primaries simply lead.
  */
 export function nextScanObjective(
@@ -329,7 +330,9 @@ export function nextScanObjective(
     rows.sort((a, b) => (distance ? distance(a.poiId) - distance(b.poiId) : 0))[0];
   const primary = open.find((o) => o.primary);
   if (!primary) return nearest(open);
-  if (!distance || !between) return primary;
+  // The dive opens on its first primary; detours start once it is scanned.
+  const opened = objectives.some((o) => o.primary && o.resolved && o.complete);
+  if (!distance || !between || !opened) return primary;
   const toPrimary = distance(primary.poiId);
   const onTheWay = open.filter((o) => {
     if (o.primary) return false;

@@ -41,12 +41,12 @@ No props are placed (per the task brief); `props.json` is an empty array.
 
 ## Terrain check (this tile, bilinear sample of `heightmap.bin`)
 
-| Point                     | lat, lon           | This tile's reading | Published (pre-eruption)                                          |
-| ------------------------- | ------------------ | ------------------- | ----------------------------------------------------------------- |
-| hunga-tonga-caldera-floor | -20.560, -175.390  | 131.6 m             | ~150-155 m (sources 1-2)                                          |
-| hunga-tonga-island-saddle | -20.553, -175.4075 | ~0 m (sea level)    | shallow saddle, above/near sea level pre-2022 (source 1)          |
-| hunga-tonga-rim-wall      | -20.570, -175.420  | 468.6 m             | not separately published; identified from this tile's own terrain |
-| hunga-tonga-outer-flank   | -20.518, -175.432  | 1,028.9 m           | consistent with a ~2 km edifice (source 2)                        |
+| Point                     | lat, lon              | This tile's reading | Published (pre-eruption)                                          |
+| ------------------------- | --------------------- | ------------------- | ----------------------------------------------------------------- |
+| hunga-tonga-caldera-floor | -20.560, -175.390     | 131.6 m             | ~150-155 m (sources 1-2)                                          |
+| hunga-tonga-island-saddle | -20.553, -175.4075    | ~0 m (sea level)    | shallow saddle, above/near sea level pre-2022 (source 1)          |
+| hunga-tonga-rim-wall      | -20.570, -175.420     | 468.6 m             | not separately published; identified from this tile's own terrain |
+| hunga-tonga-outer-flank   | -20.56892, -175.41675 | 381.7 m (2026-11)   | consistent with a ~2 km edifice (source 2)                        |
 
 The caldera-floor reading (131.6 m) is within about 20 m of the widely cited
 pre-eruption figure (~150-155 m), a reasonable match for real pre-eruption survey
@@ -81,3 +81,7 @@ python3 tools/obis_export.py --landmark hunga-tonga-caldera --tile-bbox --out da
 Returned 25 kept taxa (of 134 matching at species rank, 175 in the bbox at any rank),
 1,068 records — mostly shallow Tongan reef fish. See `species.json`'s own `note` for
 the pre/post-eruption caveat.
+
+## Route (2026-11)
+
+The dive now opens on the flank-transect point and follows the slope down to the rim slope, so the sub never has to climb 180 m across the flank. `hunga-tonga-outer-flank` was restored about 300 m down that slope (381.7 m on this grid) as the stop between them.

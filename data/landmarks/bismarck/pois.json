@@ -26,9 +26,9 @@
     {
       "id": "bismarck-turret-debris",
       "name": "Detached main gun turrets",
-      "lat": 48.15114,
-      "lon": -16.10497,
-      "depth_m": 4124,
+      "lat": 48.15076,
+      "lon": -16.109,
+      "depth_m": 4164,
       "radius_m": 60,
       "kind": "debris",
       "primary": true,
@@ -40,7 +40,7 @@
         "https://www.kbismarck.org/forum/viewtopic.php?t=1470",
         "https://www.magellan.gg/vrov-pilot-bismarck/"
       ],
-      "note": "The four main turrets fell out during capsizing. This authored marker and matching prop sit about 900 m east-northeast and upslope of the hull. Public individual turret coordinates are not available; the layout follows the general slope setting rather than surveyed turret positions."
+      "note": "The four main turrets fell out during capsizing. This authored marker and matching prop sit about 600 m east-northeast and upslope of the hull (moved 2026-11 from about 900 m so the dive is a short route; the 2001 expedition identified one turret near the hull). Public individual turret coordinates are not available; the layout follows the general slope setting rather than surveyed turret positions."
     },
     {
       "id": "bismarck-damage",

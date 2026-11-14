@@ -187,3 +187,12 @@ OK: challenger-deep, 0 error(s), 0 warning(s)
   above.
 
 Phase F protection and sounding wording: the [NOAA 2024 Monument Management Plan](https://www.fisheries.noaa.gov/s3/2024-06/Mariana-Trench-Marine-National-Monument-Management-Plan-202405-FINAL.pdf) places Challenger Deep just outside the Monument boundary, within the Federated States of Micronesia EEZ. The June 2020 high-precision measurement is dated rather than described as the most recent; the Western Pool placement is attributed to its 2019 review rather than asserted as consensus.
+
+## Route stops (2026-11)
+
+`cd-eastern-floor` moved to the centre of grid row 460, column 452 (11.37037, 142.59018), 10,920.5 m,
+about 350 m north-east of the Leggo site, so the dive is a short route. Two published positions
+became route contacts: `cd-kairei-position` (11.371, 142.593; Nakanishi and Hashimoto 2011, RV
+Kairei 1998/99, as listed by Stewart & Jamieson 2019), where this tile reads about 10,919 m, and
+`cd-published-coordinate` (11.3733, 142.5917; the GEBCO Gazetteer coordinate), restored from the
+D3 audit.

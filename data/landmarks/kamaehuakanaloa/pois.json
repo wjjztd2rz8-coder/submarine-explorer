@@ -45,8 +45,8 @@
     {
       "id": "kh-south-rift",
       "name": "South rift zone",
-      "lat": 18.9053,
-      "lon": -155.2646,
+      "lat": 18.90862,
+      "lon": -155.26534,
       "snap_to_seabed": true,
       "radius_m": 300,
       "kind": "geology",
@@ -60,7 +60,26 @@
         "https://www.gmrt.org/",
         "https://www.usgs.gov/volcanoes/loihi-seamount"
       ],
-      "note": "GMRT terrain at 1,281.3 m, roughly 1.4 km south of the summit high. This is an authored transect point along the general south-rift bearing, not a surveyed vent or rift boundary. USGS describes a 31 km rift system extending northwest and southeast from the caldera."
+      "note": "GMRT terrain at about 1,269 m, roughly 1 km south of the summit high and 300 m south-east of Hiolo South (moved 2026-11 from 1.4 km so the dive is a short route). This is an authored transect point along the general south-rift bearing, not a surveyed vent or rift boundary. USGS describes a 31 km rift system extending northwest and southeast from the caldera."
+    },
+    {
+      "id": "kh-peles-pit",
+      "name": "Pele's Pit floor",
+      "lat": 18.91185,
+      "lon": -155.26691,
+      "snap_to_seabed": true,
+      "radius_m": 120,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 2.4,
+      "guide_entry": "peles-pit",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount",
+        "https://www.gmrt.org/"
+      ],
+      "note": "GMRT terrain at about 1,275 m, between the Hiolo North and Hiolo South vent markers, which published cruises place inside Pele's Pit. Added 2026-11 as a route stop. This tile's ~58x61 m grid does not resolve the pit's ~600 m rim, so this marks the pit's floor around the vents, not a traced crater outline."
     }
   ]
 }
