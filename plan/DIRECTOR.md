@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: 33 V-bluehole-opening-clear (Sonnet, 2026-11-14), 36 U-fresh-eyes-recheck (Haiku, 2026-11-14). Next: 34, 35, 37.
+- Claude: none. Next: 39, 34, 35, 37.
 
 ## Backlog
 
@@ -147,12 +147,13 @@ Evidence: golden `2026-11-07-180922`, review 2026-11-07 (evening) in `plan/REVIE
 31. **T-low-axial-floor [Codex, Sol 2026-11-13]:** Low lacks Axial's new flow shader; verify Low-tier floor readability by unit/shot evidence.
 
 32. **DONE 2026-11-14 (f2c4773f; ~3.5, hull sunk in scour ring, still dark on dark, no lit pool) V-bismarck-hull-form [Sonnet, review 2026-11-14 (PM)]:** Bismarck opening (`bismarck-1-mission.png`, ~3.3) is the weakest site: a flat slab with round holes that floats on a featureless dark plain. Target composition: hull sunk into the seabed with a scour rim and sediment drape along its base, a raised bow or broken stern silhouette, and a lit ground pool so the hull edge separates from the floor. Reuse the Titanic scour/bow builders by data (no site branch).
-33. **V-bluehole-opening-clear [Sonnet, review 2026-11-14 (PM)]:** Blue Hole opening (~3.8) has the sub overlapping the near wall edge and the stalactite gallery small and mid-frame. Target: sub clear of the wall, gallery as the right-third subject with a visible overhang; adjust pose/chase data first, props second.
+33. **DONE 2026-11-14 (merged; ~4.0, sub clear of rim, gallery right third, camera low so underside shows slightly) V-bluehole-opening-clear [Sonnet, review 2026-11-14 (PM)]:** Blue Hole opening (~3.8) has the sub overlapping the near wall edge and the stalactite gallery small and mid-frame. Target: sub clear of the wall, gallery as the right-third subject with a visible overhang; adjust pose/chase data first, props second.
 34. **V-deep-upper-band-2 [Sonnet, review 2026-11-14 (PM)]:** item 24 did not visibly change the upper 40% of Titanic, Lost City and Bismarck openings: still a flat dark band with sparse snow dots. Target: one generic horizon treatment (soft lit haze line or distant relief silhouette) from preset data, never darker; compare before/after in the golden set.
 35. **V-titanic-hull-tone [Sonnet, item 42 follow-up]:** Titanic hull is saturated brown against pale sand; the anchor recesses are unverified. Target: rust-streaked, desaturated hull with a darker lower plating band, and a bow-quarter pose that shows the anchor wells.
-36. **U-fresh-eyes-recheck [Haiku]:** items 38-41 (Home, first-dive labels, Journal layout, debrief stars) merged on smoke gates without screenshot review. Capture Home -> briefing -> first 60 s -> Journal -> debrief at phone portrait, phone landscape and 1280x720 from the existing e2e screenshots, and list confusions, overlaps and truncations as findings in `plan/progress/U-fresh-eyes-recheck.md` (no fixes).
+36. **DONE 2026-11-14 (merged; findings in plan/progress/U-fresh-eyes-recheck.md; fixes are item 39) U-fresh-eyes-recheck [Haiku]:** items 38-41 (Home, first-dive labels, Journal layout, debrief stars) merged on smoke gates without screenshot review. Capture Home -> briefing -> first 60 s -> Journal -> debrief at phone portrait, phone landscape and 1280x720 from the existing e2e screenshots, and list confusions, overlaps and truncations as findings in `plan/progress/U-fresh-eyes-recheck.md` (no fixes).
 37. **V-lostcity-hillside [Sonnet, review 2026-11-14 (PM)]:** Lost City opening (~4.0) towers read, but the far hillside is dark mud and the right slope is a smooth ramp. Target: carbonate-pale mid-distance ridge and a break in the slope, via preset/terrain data.
 38. **T-verify-ui-specs-38-43 [Codex, brief 200]:** run the full specs that mention text or layout changed by items 38-43 and fix stale assertions or real overflow; process gap logged 2026-11-13.
+39. **U-fresh-eyes-fixes [Sonnet, from item 36]:** fix the medium findings in `plan/progress/U-fresh-eyes-recheck.md`: 844x390 debrief covering the sonar and crowding Journal, landscape Home clipping Settings/Controls, debrief repeating the scan count with a long star legend (cut text). Low findings (Journal title repeat, attribution wrap) if cheap.
 
 ### Release and owner
 

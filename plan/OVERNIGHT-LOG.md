@@ -4104,3 +4104,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged item 44 V-bismarck-hull-form (Sonnet, f2c4773f): data only (hull lifted 5 m and taller, deeper paler scour, moat shade removed). Agent rated ~3.8; I judged the opening myself at ~3.5: hull now reads as a ship in a scour ring, but still dark on dark, no lit pool. Smoke + project-base gates green on branch and main; not full-e2e'd. Worktree to remove. Next: 48, 45, 46, 47, 49.
 - Process: backgrounded gate watchers using pgrep -f matched themselves and never ended; poll the PID or log instead.
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-14 10:43 CST headless run (Claude): items 33, 36
+
+- Merged item 33 V-bluehole-opening-clear (Sonnet): data only (chaseOffsetY -45->-66, yawOffset -12->-20). I judged before/after: sub clear of the rim, gallery in the right third, ~4.0 (agent said 4.3); camera sits low so the sub underside shows slightly. Merged item 36 U-fresh-eyes-recheck (Haiku, evidence only): medium findings are landscape debrief covering the sonar, landscape Home clipping Settings/Controls, and debrief text repetition; queued as item 39. Smoke + project-base gates green on main; pushed; not full-e2e'd.
+- Claude 5h ~65%, week 58%. The Blue Hole agent took ~84 min. Stale worktrees 124/131 (old Codex R-ci-speed, uncommitted) left alone. Briefs 196-198, 200 stay queued; Codex weekly 3% until Nov 15 23:00. Next: 39, 34, 35, 37.
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
