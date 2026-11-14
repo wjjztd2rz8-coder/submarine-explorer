@@ -4077,3 +4077,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Merged item 43 V-beebe-opening-framing (Sonnet, 1dcb38e7): data-only change (chaseRadius 46->85, chaseOffsetY -8->6 in Beebe site.json); sub about half its size, stack and plume sit upper-middle. I judged before/after myself: real but modest gain (~3.9-4.0); stack still smallish at 155 m (scan floor). Rule bend: Beebe opening width floor 0.25->0.2 in missionComposition test, pose fixture updated. Smoke + project-base gates green on main; pushed. Not full-e2e'd.
 - Claude visual backlog now empty. Hosted CI on e21390e5 still red (shards 3, 8, 32, 33) and not triaged this run; no tag. Codex weekly 3% (resets Sun Nov 15 23:00), briefs 196-199 stay queued.
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-14 02:46 CST headless run (Claude)
+
+- No merge, no agent. Triaged red CI (run 43569918528, shards 3/8/32/33): all four are one failure, the stale `.debrief-panel` scrollTop > 0 assertion in the 844x390 journal-debrief journey (journal-debrief.spec.ts:2787). Already removed in cabf4dc6; hosted CI on it (43577078778) was pending, so no tag. Claude visual backlog empty; Codex weekly 3% (resets Sun Nov 15 23:00), briefs 196-199 stay queued.
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
