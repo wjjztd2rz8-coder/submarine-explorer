@@ -359,11 +359,11 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
       "high": {
         "buffers": [
           {
-            "aCavity": "3f6f8d3f79e6978fdbbf9faeae73a455d951031f13076cbab39626249f5b3488",
+            "aCavity": "40031627464218737cf9a71318bdcdd401f0e0482f8c173ae07a2ff7fc7ce433",
             "color": "35c5a4619a0939b4efd3d44b4b542b22f01fbcda1f0f3983d4c2a73d0273b8ef",
             "index": "f99cbbcd98870d781adc69e4d513fa038faf0885c106a0d3834f8f21aec2dcec",
-            "normal": "2c3dca5abdba1d79b50fa9e00c9dd491ef145f93d958b2ecc667de4b3547b463",
-            "position": "092635842ecdb0f6df39b17fd903a7393ecf87af582af8249612d2917d2b5411",
+            "normal": "1571b303941c38ab0e4ce0ac91c11e1324d5f43afcb8ee47a882bc487558b5ba",
+            "position": "21e0b3a4e33e6268d5cfbe17230f3c0fcaabb1035865e0ac8d5ff628f90c27a9",
           },
         ],
         "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP-abyss-fade",
@@ -373,11 +373,11 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
       "low": {
         "buffers": [
           {
-            "aCavity": "e971cff3c50f38f2575f2415e74bbafab64b548951ed1537dc05a2f40256fbf3",
+            "aCavity": "d4f0a9fee42622bbdaba32ee96ff282465572be946801c77bde2c7c91d6d8ad9",
             "color": "3055327ef9b6415330864ea60617896b2d5f1257e424511ebafdf70b65d42977",
             "index": "bef797cfac7f24a4d614b6c1145bf2aa4db3537c68f6fe12f395a34d3ba543b5",
-            "normal": "a6ae363c5af93bf6d3d4b3a93ab174a013a13ac1a9e782850735ece7d2a18cf5",
-            "position": "3d6940eae70f5272a9e600743d3a3c47f4f87b119f060d4aaef34ae402d1a800",
+            "normal": "a7ffa4b3c66cd214389b2303315614ebae8ccf1810399ecf818cd4b84c5a9649",
+            "position": "8a38347af9bb76621fc8eb29bf1b30b362bae9b718121d279397b37f746d97a2",
           },
         ],
         "cache": "seabed--abyss-fade",

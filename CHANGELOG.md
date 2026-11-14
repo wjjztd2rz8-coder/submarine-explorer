@@ -99,6 +99,8 @@ without an entry here is not done.
 
 ### Removed
 
+- Titanic: the evenly scattered `debris-bow` cluster is removed and the instanced bow rail run is replaced by a solid rail in the hull mesh; the single debris trail now carries the plates. Reason: the bow opening read as a brown box with plates sprinkled around it (V-titanic-bow-form).
+
 - **S-dead-code-audit:** remove six uncalled methods/getters, including the Globe mission-access lock callback and branches, and 22 unused export modifiers. Keep save migrations, guidance, settings resolution and rendering unchanged.
 
 - **S-dead third sweep:** remove unused export modifiers and two basic tests covered by the uncarved-site and nearest-contact tables; live code and regression assertions remain.
