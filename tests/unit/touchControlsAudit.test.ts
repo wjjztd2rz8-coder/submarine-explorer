@@ -771,7 +771,7 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
     expect(name.textContent).toBe('Stern section');
-    expect(hint.textContent).toBe('TURN 40° STARBOARD');
+    expect(hint.textContent).toBe('TURN RIGHT');
     view.objectiveTurnDeg = 3;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(hint.textContent).toBe('Get closer to scan · 692 m');
@@ -790,7 +790,7 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     view.objectiveId = null;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(name.textContent).toBe('Debris field');
-    expect(hint.textContent).toBe('TURN 108° PORT');
+    expect(hint.textContent).toBe('TURN LEFT');
   } finally {
     overlay.dispose();
     f.controls.dispose();

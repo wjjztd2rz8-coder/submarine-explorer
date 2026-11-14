@@ -348,7 +348,7 @@ describe('guidance slot', () => {
       expect(texts(overlay.slot)).toMatchObject({
         name: 'Next contact',
         kind: 'objective',
-        detail: 'TURN 90° STARBOARD',
+        detail: touch ? 'TURN RIGHT' : 'TURN 90° STARBOARD',
       });
 
       // Free exploration retains its logged-contact confirmation without an objective.
@@ -439,7 +439,7 @@ describe('guidance slot', () => {
       expect(scanner.view.candidateId).toBe('memorial');
       expect(card.name).toBe('Stern');
       expect(card.kind).toBe('objective');
-      expect(card.detail).toBe('TURN 90° PORT');
+      expect(card.detail).toBe(touch ? 'TURN LEFT' : 'TURN 90° PORT');
       // On touch a New Journal entry card keeps the direction to the objective; elsewhere it keeps its own line.
       overlay.showComplete('Memorial', true, keys);
       if (touch) expect(texts(overlay.slot).detail).toContain('Stern');
@@ -469,7 +469,7 @@ describe('guidance slot', () => {
       expect(f.step().kicker).toBe('SCAN TARGET');
       f.scanner.setObjective('stern');
       f.keys.scan = 'X';
-      expect(f.step().detail).toBe('TURN 90° PORT');
+      expect(f.step().detail).toBe(touch ? 'TURN LEFT' : 'TURN 90° PORT');
       // The objective wins when it becomes eligible, even beside a nearer contact.
       f.targets[1].position.set(0, 0, -15);
       expect(f.step()).toMatchObject({
@@ -482,7 +482,7 @@ describe('guidance slot', () => {
       expect(f.step()).toMatchObject({
         name: 'Stern',
         kind: 'objective',
-        detail: 'TURN 17° PORT',
+        detail: touch ? 'TURN LEFT' : 'TURN 17° PORT',
       });
       f.position.set(0, 0, 0);
       expect(f.step()).toMatchObject({ name: 'Stern', kicker: 'OBJECTIVE' });
@@ -530,7 +530,7 @@ describe('guidance slot', () => {
       expect(texts(f.overlay.slot)).toMatchObject({
         name: 'Stern',
         kind: 'objective',
-        detail: 'TURN 17° PORT',
+        detail: touch ? 'TURN LEFT' : 'TURN 17° PORT',
       });
       f.position.set(0, 0, 0);
       expect(f.step()).toMatchObject({ name: 'Stern', kicker: 'OBJECTIVE' });
@@ -549,7 +549,7 @@ describe('guidance slot', () => {
       f.overlay.showComplete('Whale', firstTime, f.keys);
       expect(texts(f.overlay.slot)).toMatchObject({
         name: 'Whale',
-        detail: 'Stern · TURN 90° PORT',
+        detail: 'Stern · TURN LEFT',
       });
       f.forward.set(-1, 0, 0);
       expect(f.step(0.2).detail).toBe('Stern · 300 m AHEAD');
@@ -580,7 +580,7 @@ describe('guidance slot', () => {
         firstTime ? 'PRESS J · JOURNAL' : 'LOGGED · JOURNAL',
       );
       document.documentElement.classList.contains = () => true;
-      expect(f.step(0.2).detail).toBe('Stern · TURN 90° PORT');
+      expect(f.step(0.2).detail).toBe('Stern · TURN LEFT');
       document.documentElement.classList.contains = () => false;
       f.keys.guide = 'K';
       expect(f.step(0.2).detail).toBe(firstTime ? 'PRESS K · JOURNAL' : 'LOGGED · JOURNAL');
@@ -597,7 +597,7 @@ describe('guidance slot', () => {
     // direction must not send the pilot back to the contact just scanned.
     expect(texts(f.overlay.slot).detail).toBe('OPEN JOURNAL');
     f.scanner.setObjective('stern');
-    expect(f.step().detail).toBe('Stern · TURN 90° PORT');
+    expect(f.step().detail).toBe('Stern · TURN LEFT');
     f.scanner.setObjective(null);
     expect(f.step().detail).toBe('OPEN JOURNAL');
     f.overlay.dispose();
@@ -751,14 +751,13 @@ describe('guidance slot', () => {
             const detail = texts(overlay.slot).detail;
             if (touch) {
               expect(detail.startsWith(`${next.name} · `)).toBe(true);
-              const turn = detail.match(/TURN (\d+)° (PORT|STARBOARD)/);
+              const turn = detail.match(/TURN (LEFT|RIGHT)/);
               if (turn) {
                 const delta = next.position.clone().sub(position);
                 const heading = Math.atan2(forward.x, -forward.z);
                 const bearing = Math.atan2(delta.x, -delta.z);
                 const degrees = ((((bearing - heading) * 180) / Math.PI + 540) % 360) - 180;
-                expect(Number(turn[1])).toBe(Math.round(Math.abs(degrees)));
-                expect(turn[2]).toBe(degrees >= 0 ? 'STARBOARD' : 'PORT');
+                expect(turn[1]).toBe(degrees >= 0 ? 'RIGHT' : 'LEFT');
               }
               if (detail.includes('RISE'))
                 expect(next.position.y).toBeGreaterThanOrEqual(position.y);
@@ -782,9 +781,7 @@ describe('guidance slot', () => {
               if (!touch)
                 expect(card.detail).toBe(firstTime ? 'PRESS J · JOURNAL' : 'LOGGED · JOURNAL');
               else if (turn !== 0) {
-                expect(card.detail).toBe(
-                  `${next.name} · TURN 90° ${turn < 0 ? 'STARBOARD' : 'PORT'}`,
-                );
+                expect(card.detail).toBe(`${next.name} · TURN ${turn < 0 ? 'RIGHT' : 'LEFT'}`);
               } else expect(card.detail).toBe(firstTime ? 'OPEN JOURNAL' : 'LOGGED · JOURNAL');
             }
           }
@@ -815,7 +812,7 @@ describe('guidance slot', () => {
     expect(f.step()).toMatchObject({
       name: 'Stern',
       kind: 'objective',
-      detail: 'TURN 90° PORT',
+      detail: 'TURN LEFT',
     });
     f.overlay.dispose();
   });
@@ -830,7 +827,7 @@ describe('guidance slot', () => {
     f.overlay.showComplete('Whale', true, f.keys);
     expect(texts(f.overlay.slot)).toMatchObject({
       name: 'Whale',
-      detail: 'Stern · TURN 90° STARBOARD',
+      detail: 'Stern · TURN RIGHT',
     });
     f.forward.set(1, 0, 0);
     expect(f.step().detail).toBe('OPEN JOURNAL');
@@ -1041,9 +1038,11 @@ describe('tutorial copy', () => {
       expect(tutorialText(step.id, 'touch', keys).length).toBeLessThanOrEqual(42);
     // Touch names the target the same way desktop does, without the key hint.
     expect(tutorialText('move', 'touch', keys, null, 'Bow section')).toBe(
-      'Follow the marker toward Bow section.',
+      'Steer with the left pad toward Bow section.',
     );
-    expect(tutorialText('move', 'touch', keys, null, undefined)).toBe('Drag to move and turn.');
+    expect(tutorialText('move', 'touch', keys, null, undefined)).toBe(
+      'Drag the left pad to move and turn.',
+    );
     // A dropped beam keeps its cue in the scan card's words, not the generic hold line.
     expect(
       tutorialText('scan', 'keyboard', keys, null, undefined, undefined, undefined, 'facing'),

@@ -30,6 +30,12 @@ export interface ScanOverlayKeys {
 
 const isTouch = (): boolean => document.documentElement.classList.contains('is-touch');
 
+/** Touch players read left and right; keyboard and pad players get the heading change. */
+const turnCue = (turn: number, touch: boolean): string =>
+  touch
+    ? `TURN ${turn >= 0 ? 'RIGHT' : 'LEFT'}`
+    : `TURN ${Math.abs(turn).toFixed(0)}° ${turn >= 0 ? 'STARBOARD' : 'PORT'}`;
+
 export class ScanOverlay {
   readonly root: HTMLDivElement;
   /** The one guidance card; every text source offers its message here. */
@@ -228,7 +234,7 @@ export class ScanOverlay {
     const turn = view.objectiveTurnDeg;
     const how =
       Math.abs(turn) >= 10
-        ? `TURN ${Math.abs(turn).toFixed(0)}° ${turn >= 0 ? 'STARBOARD' : 'PORT'}`
+        ? turnCue(turn, isTouch())
         : view.objectiveInRange
           ? view.objectiveVertDeg >= 0
             ? 'RISE TOWARD TARGET'
@@ -307,7 +313,7 @@ export class ScanOverlay {
     // candidate; where-to-go guidance follows the mission objective.
     const guide = (turn: number, vert: number, fallback: string): string => {
       if (Math.abs(turn) >= 10) {
-        return `TURN ${Math.abs(turn).toFixed(0)}° ${turn >= 0 ? 'STARBOARD' : 'PORT'}`;
+        return turnCue(turn, touch);
       }
       // Touch has no pitch control: the ballast slider is the vertical aid.
       if (touch) return vert >= 0 ? 'RISE TOWARD TARGET' : 'SINK TOWARD TARGET';
