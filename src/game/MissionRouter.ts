@@ -332,7 +332,6 @@ export class MissionRouter {
     // Pointer activation keeps flight focus, like the completion banner's buttons.
     this.finishButton.onmousedown = (e) => e.preventDefault();
     this.finishButton.onclick = () => this.endDive();
-    (opts.parent ? opts.parent : hudBar()).append(this.finishButton);
 
     this.disposers.push(
       this.mission.onChange((m) => this.onMissionChange(m)),
@@ -449,7 +448,13 @@ export class MissionRouter {
     const show =
       this.mission.state === 'primaries-complete' && this.canEndDive && !this.panel.bannerOpen;
     if (this.finishButton.hidden === show) this.finishButton.hidden = !show;
+    // Attached on first use, beside Journal and Pause in the HUD bar.
+    if (show && !this.finishAttached) {
+      this.finishAttached = true;
+      (this.opts.parent ?? hudBar()).append(this.finishButton);
+    }
   }
+  private finishAttached = false;
 
   /**
    * The checklist repeats the step banner's goal, so it stays hidden until the
