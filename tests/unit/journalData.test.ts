@@ -87,7 +87,7 @@ it('keeps consecutive gallery entries independent and restores both from existin
   expect(first.title).toBe('Stalactite gallery');
   expect(second.title).toBe('Eastern stalactite gallery');
   expect(first.guide!.paragraphs).not.toEqual(second.guide!.paragraphs);
-  expect(siteProgress(site, store)).toMatchObject({ logged: 0, total: 4 });
+  expect(siteProgress(site, store)).toMatchObject({ logged: 0, total: 5 });
 
   store.record(site.id, 'great-blue-hole-stalactites');
   expect(isEntryUnlocked(site, first, store)).toBe(true);
@@ -95,14 +95,14 @@ it('keeps consecutive gallery entries independent and restores both from existin
   expect(
     site.entries.filter((e) => e.kind === 'site').every((e) => isEntryUnlocked(site, e, store)),
   ).toBe(true);
-  expect(siteProgress(site, store)).toMatchObject({ logged: 1, total: 4 });
+  expect(siteProgress(site, store)).toMatchObject({ logged: 1, total: 5 });
 
   store.record(site.id, 'great-blue-hole-stalactites-east');
   const archived = bytes.get(DISCOVERY_STORAGE_KEY);
   const reloaded = new DiscoveryStore(storage);
   expect(isEntryUnlocked(site, first, reloaded)).toBe(true);
   expect(isEntryUnlocked(site, second, reloaded)).toBe(true);
-  expect(siteProgress(site, reloaded)).toMatchObject({ logged: 2, total: 4 });
+  expect(siteProgress(site, reloaded)).toMatchObject({ logged: 2, total: 5 });
   expect(writes).toEqual([DISCOVERY_STORAGE_KEY, DISCOVERY_STORAGE_KEY]);
   expect(bytes.get(DISCOVERY_STORAGE_KEY)).toBe(archived);
 });

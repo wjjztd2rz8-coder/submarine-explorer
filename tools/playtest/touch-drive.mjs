@@ -184,18 +184,21 @@ const read = () =>
       all.find((e) => e.classList.contains('is-current') && visible(e)) || all.find(visible);
     const mr = marker?.getBoundingClientRect();
     const root = document.querySelector('.tc-root');
+    const candidate = v?.candidateId ?? null;
+    const fixed = [...(sc?.getTargets?.() ?? []), ...(sc?.getSupplementalTargets?.() ?? [])];
     return {
       mx: mr ? mr.x + mr.width / 2 : null,
       w: innerWidth,
       scans: sc?.scannedThisDive?.size ?? v?.completed ?? 0,
-      candidate: v?.candidateId ?? null,
+      candidate,
+      candidateFixed: candidate !== null && fixed.some((target) => target.id === candidate),
       objectiveId: v?.objectiveId ?? null,
       objDist: v?.objectiveDistance ?? Infinity,
       objRadius: v?.objectiveRadius ?? 0,
       objTurn: v?.objectiveTurnDeg ?? 0,
       objVert: v?.objectiveVertDeg ?? 0,
       nearVert: v?.nearestVertDeg ?? 0,
-      reveal: !!document.querySelector('.discovery-reveal'),
+      reveal: visible(document.querySelector('.discovery-reveal')),
       touchVisible: !!root && !root.hidden && root.getBoundingClientRect().width > 0,
     };
   });
@@ -219,8 +222,11 @@ let layoutStayedTouch = true;
 while ((Date.now() - t0) / 1000 < MAX_S && scans < 2) {
   const st = await read();
   const elapsed = (Date.now() - t0) / 1000;
-  if (!st.touchVisible) layoutStayedTouch = false;
-  if (st.reveal) await dismissReveal();
+  if (!st.touchVisible && !st.reveal) layoutStayedTouch = false;
+  if (st.reveal) {
+    await dismissReveal();
+    continue;
+  }
 
   if (st.scans > scans) {
     scans = st.scans;
@@ -233,8 +239,10 @@ while ((Date.now() - t0) / 1000 < MAX_S && scans < 2) {
     await shot(`${lastBucket * 15}s`);
   }
 
-  // Only the marked objective counts as "the target"; ignore passing wildlife.
-  const ready = !!st.candidate && (st.objectiveId === null || st.candidate === st.objectiveId);
+  // Reach the marked objective first, then accept nearby fixed side finds for
+  // a second discovery reveal. Passing wildlife does not satisfy this drive.
+  const ready =
+    st.candidateFixed && (scans > 0 || st.objectiveId === null || st.candidate === st.objectiveId);
   const scanning = points.has(1);
   if (scanning && !ready) await holdScan(false);
 

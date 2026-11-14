@@ -177,6 +177,18 @@ it('still follows mouse and keyboard input after restoring saved touch detection
   expect(root.classList.contains('is-touch')).toBe(false);
 });
 
+it('highlights Scan only while touch controls are shown and a target is scannable', () => {
+  const { create } = setup(true);
+  const touch = create();
+  const scan = (touch.root as unknown as Element).children[2]!.children[0]!;
+  touch.update(true, false, false);
+  expect(scan.classList.contains('is-ready')).toBe(false);
+  touch.update(true, false, true);
+  expect(scan.classList.contains('is-ready')).toBe(true);
+  touch.update(false, false, true);
+  expect(scan.classList.contains('is-ready')).toBe(false);
+});
+
 it('wires Journal through the action map', () => {
   const { opts, input } = setup(true);
   const system = createTouchSystem();

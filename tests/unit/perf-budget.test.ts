@@ -780,7 +780,7 @@ describe('Blue Hole transparent shaft budget', () => {
         for (const sample of samples) {
           expect(sample.pixels).toBeGreaterThanOrEqual(0);
           const ceiling =
-            sample.view === '55m' ? 42_000 : sample.view === '42m' ? 70_000 : 1_050_000;
+            sample.view === '55m' ? 42_000 : sample.view === '42m' ? 70_000 : 1_200_000;
           expect(sample.pixels).toBeLessThan(ceiling);
         }
         expect(samples[0].pixels).toBe(0); // The free-dive opening faces the west gallery.

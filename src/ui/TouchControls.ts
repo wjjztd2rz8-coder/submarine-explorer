@@ -51,6 +51,7 @@ export class TouchControls {
   private readonly stickKnob: HTMLDivElement;
   private readonly sliderTrack: HTMLDivElement;
   private readonly sliderThumb: HTMLDivElement;
+  private readonly scanButton: HTMLButtonElement;
   private readonly pauseButton: HTMLButtonElement;
   private readonly rotateHint: HTMLDivElement;
   private readonly disposers: Array<() => void> = [];
@@ -99,8 +100,9 @@ export class TouchControls {
 
     // Buttons.
     const buttons = el('div', 'tc-buttons');
+    this.scanButton = this.holdButton('scan', 'SCAN', 'tc-btn-scan');
     buttons.append(
-      this.holdButton('scan', 'SCAN', 'tc-btn-scan'),
+      this.scanButton,
       this.tapButton('toggleLights', 'LIGHTS', 'tc-btn-lights'),
       this.tapButton('toggleSonar', 'SONAR', 'tc-btn-sonar'),
       this.tapButton('togglePhotoMode', 'PHOTO', 'tc-btn-photo'),
@@ -160,7 +162,7 @@ export class TouchControls {
    * menu); `photo` while photo mode frames a shot (controls stay hidden so the
    * frame is clear, look and pinch still work).
    */
-  update(inDive: boolean, photo: boolean): void {
+  update(inDive: boolean, photo: boolean, scanReady = false): void {
     if (this.disposed) return;
     if (photo !== this.photoMode) this.releaseAll();
     this.photoMode = photo;
@@ -174,6 +176,7 @@ export class TouchControls {
       if (!show) this.releaseAll();
       else this.maybeShowRotateHint();
     }
+    this.scanButton.classList.toggle('is-ready', show && scanReady);
     if (show) this.root.classList.toggle('tc-sonar-open', this.opts.sonar.expanded);
   }
 

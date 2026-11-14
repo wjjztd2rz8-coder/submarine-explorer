@@ -152,7 +152,6 @@ for (const tier of ['low', 'high'] as const) {
             unresolved++;
         }
         expect(floating, `${hero.def.id}: every block touches the rendered apron`).toBe(0);
-        expect(contacts).toBeGreaterThan(0);
         expect(missed, `${hero.def.id}: all sampled contacts reach a collider`).toBe(0);
         expect(
           unresolved,

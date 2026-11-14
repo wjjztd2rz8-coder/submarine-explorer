@@ -25,6 +25,7 @@
       "lat": 17.31473,
       "lon": -87.53502,
       "snap_to_seabed": true,
+      "y_offset_m": -6.5,
       "heading_deg": 327,
       "scale": 1,
       "dimensions_m": [56, 20, 16],
