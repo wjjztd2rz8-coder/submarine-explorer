@@ -38,6 +38,45 @@ describe('fixed contacts', () => {
     rows[2]!.complete = true;
     expect(nextScanObjective(rows, distance)?.id).toBe('far');
   });
+  it('visits a contact on the way to the next primary once the dive has opened', () => {
+    const at: Record<string, [number, number]> = {
+      p1: [0, 0],
+      p2: [600, 0],
+      onway: [300, 40],
+      aside: [250, 400],
+    };
+    const rows = Object.keys(at).map((id) => ({
+      id,
+      poiId: id,
+      title: id,
+      hint: '',
+      primary: id.startsWith('p'),
+      resolved: true,
+      complete: false,
+    }));
+    const from = (x: number, z: number) => (id: string) =>
+      Math.hypot(at[id]![0] - x, at[id]![1] - z);
+    const between = (a: string, b: string) =>
+      Math.hypot(at[a]![0] - at[b]![0], at[a]![1] - at[b]![1]);
+    // The first primary leads even when a contact is nearer.
+    expect(nextScanObjective(rows, from(250, 0), between)?.id).toBe('p1');
+    rows[0]!.complete = true;
+    expect(nextScanObjective(rows, from(0, 0), between)?.id).toBe('onway');
+    rows[2]!.complete = true;
+    expect(nextScanObjective(rows, from(300, 40), between)?.id).toBe('p2');
+    rows[1]!.complete = true;
+    expect(nextScanObjective(rows, from(600, 0), between)?.id).toBe('aside');
+  });
+  it('counts only contacts joined to a primary by short hops', () => {
+    const placed = [
+      { id: 'a', name: 'A', guideEntry: 'a', position: { x: 0, z: 0 } },
+      { id: 'b', name: 'B', guideEntry: 'b', position: { x: 300, z: 0 } },
+      { id: 'c', name: 'C', guideEntry: 'c', position: { x: 600, z: 0 } },
+      { id: 'far', name: 'Far', guideEntry: 'far', position: { x: 2000, z: 0 } },
+    ];
+    expect(unknownContactsForSite(placed, ['a']).map((p) => p.id)).toEqual(['b', 'c']);
+    expect(unknownContactsForSite(placed, ['far']).map((p) => p.id)).toEqual([]);
+  });
   it('conceals only unfound non-primary names', () => {
     expect(contactLabel(pois[1]!, { primary: false, found: false })).toBe('Unknown contact');
     expect(contactLabel(pois[1]!, { primary: false, found: true })).toBe('Boiler');

@@ -625,6 +625,24 @@ describe('MissionRouter completion timing', () => {
     },
   );
 
+  it('keeps Finish dive on screen once the primaries are done, and it opens the debrief', () => {
+    const finish = router.finishButton as unknown as Element;
+    advance(router, 1);
+    expect(finish.hidden).toBe(true);
+    scan('primary');
+    advance(router, DEFAULT_CONFIG.mission.completeDelayS + 1);
+    // The banner offers the same choice while it is open.
+    expect(router.panel.bannerOpen).toBe(true);
+    expect(finish.hidden).toBe(true);
+    router.keepExploring();
+    frame(router);
+    expect(finish.hidden).toBe(false);
+    click(finish);
+    expect(router.debriefOpen).toBe(true);
+    expect(router.debrief!.last?.finds).toEqual({ found: 1, total: 2 });
+    expect(finish.hidden).toBe(true);
+  });
+
   it('ignores a retained replay action after leaving the mission', () => {
     expect(router.endDive()).toBe(true);
     const replay = descendants(router.debrief!.root).find(
