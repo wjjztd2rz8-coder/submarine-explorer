@@ -73,7 +73,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude: none. Next in order: 48 (Haiku, evidence), 45, 46, 47, 49.
+- Claude: 33 V-bluehole-opening-clear (Sonnet, 2026-11-14), 36 U-fresh-eyes-recheck (Haiku, 2026-11-14). Next: 34, 35, 37.
 
 ## Backlog
 
