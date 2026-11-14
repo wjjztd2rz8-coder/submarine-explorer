@@ -358,7 +358,7 @@ test.describe('B3 mission flow', () => {
     expect(m.emitted.slice(-2)).toEqual(['mission:complete', 'mission:ended']);
     expect(m.durationS).toBeGreaterThan(3);
     await expect(debrief.locator('.debrief-title')).toHaveText('Primaries complete');
-    await expect(debrief.locator('.debrief-kicker')).toHaveText('TITANIC DIVE');
+    await expect(debrief.locator('.debrief-kicker')).toHaveText('RMS TITANIC');
     // Unscanned optional targets must not dilute completed primary progress.
     await expect(debrief.locator('[data-field="objectives"]')).toHaveText(
       '2 of 2 primary objectives',

@@ -396,6 +396,7 @@ describe('MissionRouter completion timing', () => {
       route: { missionId: 'reef', tileId: 'reef', landmarkId: 'reef', skipBriefing: true, def },
       discovery: {
         ready: Promise.resolve(),
+        siteName: def.title,
         pois: ['primary', 'optional'].map((id) => ({ id, name: id, position: POSITION })),
         guide: { isOpen: false, open() {} },
         stats: { snapshot: (extra) => ({ ...stats, ...extra }) },

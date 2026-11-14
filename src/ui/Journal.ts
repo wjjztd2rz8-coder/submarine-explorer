@@ -844,6 +844,17 @@ export class Journal {
     return box;
   }
 
+  /** A collapsed disclosure; `openOnDesktop` leaves it open where the page has room. */
+  private disclosure(label: string, openOnDesktop: boolean): HTMLDetailsElement {
+    const more = el('details', 'jr-site-more');
+    const summary = el('summary', undefined, label);
+    more.open = openOnDesktop && !this.phone;
+    summary.setAttribute('aria-expanded', String(more.open));
+    more.addEventListener('toggle', () => summary.setAttribute('aria-expanded', String(more.open)));
+    more.append(summary);
+    return more;
+  }
+
   /** Facts, hazards and references: one collapsed disclosure, nothing said twice. */
   private renderAbout(
     site: JournalSite,
@@ -854,11 +865,7 @@ export class Journal {
     const { overview, facts, hazards } = aboutLists(site, catalogue, shown);
     const links = catalogue ? site.links : [];
     if (!overview && !facts.length && !hazards.length && !links.length) return;
-    const more = el('details', 'jr-site-more');
-    const summary = el('summary', undefined, 'About this site');
-    summary.setAttribute('aria-expanded', 'false');
-    more.addEventListener('toggle', () => summary.setAttribute('aria-expanded', String(more.open)));
-    more.append(summary);
+    const more = this.disclosure('About this site', false);
     if (overview) more.append(el('p', 'jr-para', overview));
     for (const [title, items] of [
       ['FACTS', facts],
@@ -934,17 +941,16 @@ export class Journal {
       if (credit) fig.append(el('figcaption', undefined, credit));
       b.append(fig);
     }
-    for (const para of g.paragraphs) b.append(el('p', 'jr-para', para));
-    if (g.facts.length) {
-      const table = el('table', 'jr-facts');
-      for (const f of g.facts) {
-        const tr = el('tr');
-        tr.append(el('th', undefined, f.label), el('td', undefined, f.value));
-        table.append(tr);
-      }
-      b.append(table);
+    // The lead paragraph reads first; on a phone the rest, the facts and the sources fold away.
+    const [lead, ...rest] = g.paragraphs;
+    if (lead) b.append(el('p', 'jr-para', lead));
+    if (rest.length || g.facts.length || g.sources.length) {
+      const more = this.disclosure('Details and sources', true);
+      for (const para of rest) more.append(el('p', 'jr-para', para));
+      if (g.facts.length) more.append(this.factsTable(g.facts.map((f) => [f.label, f.value])));
+      this.renderSources(g.sources, more);
+      b.append(more);
     }
-    this.renderSources(g.sources);
     this.renderEntryPhotos(site, entry);
   }
 
@@ -994,18 +1000,13 @@ export class Journal {
     if (rare) name.append(el('span', 'jr-group-tag', 'Rare sighting'));
     b.append(name);
     b.append(el('p', 'jr-para', info.text));
-    if (info.facts) {
-      const table = el('table', 'jr-facts');
-      for (const [k, v] of Object.entries(info.facts)) {
-        const tr = el('tr');
-        tr.append(el('th', undefined, k), el('td', undefined, v));
-        table.append(tr);
-      }
-      b.append(table);
-    }
-    this.renderSources([
-      { title: info.sourceTitle, ...(info.sourceUrl ? { url: info.sourceUrl } : {}) },
-    ]);
+    const more = this.disclosure('Details and sources', true);
+    if (info.facts) more.append(this.factsTable(Object.entries(info.facts)));
+    this.renderSources(
+      [{ title: info.sourceTitle, ...(info.sourceUrl ? { url: info.sourceUrl } : {}) }],
+      more,
+    );
+    b.append(more);
   }
 
   private renderSpecies(site: JournalSite, entry: JournalEntry): void {
@@ -1015,16 +1016,11 @@ export class Journal {
     name.append(el('i', undefined, r.scientificName));
     if (r.group) name.append(el('span', 'jr-group-tag', r.group));
     b.append(name);
-    const table = el('table', 'jr-facts');
-    const row = (k: string, v: string): void => {
-      const tr = el('tr');
-      tr.append(el('th', undefined, k), el('td', undefined, v));
-      table.append(tr);
-    };
-    if (r.commonName) row('Common name', r.commonName);
-    row('Survey records here', r.records.toLocaleString('en-US'));
-    row('Recorded depth', formatDepthRange(r.depthRange_m));
-    b.append(table);
+    const rows: Array<[string, string]> = [];
+    if (r.commonName) rows.push(['Common name', r.commonName]);
+    rows.push(['Survey records here', r.records.toLocaleString('en-US')]);
+    rows.push(['Recorded depth', formatDepthRange(r.depthRange_m)]);
+    b.append(this.factsTable(rows));
     const linked = entry.linkedEntryIds
       .map((id) => site.entries.find((e) => e.kind === 'poi' && e.id === id))
       .filter((e): e is JournalEntry => !!e);
@@ -1047,7 +1043,19 @@ export class Journal {
       title: doc?.source_url ? `${doc.source} occurrence query` : 'OBIS',
       url: doc?.source_url ?? OBIS_HOME_URL,
     });
-    this.renderSources(sources);
+    const more = this.disclosure('Details and sources', true);
+    this.renderSources(sources, more);
+    b.append(more);
+  }
+
+  private factsTable(rows: ReadonlyArray<readonly [string, string]>): HTMLTableElement {
+    const table = el('table', 'jr-facts');
+    for (const [k, v] of rows) {
+      const tr = el('tr');
+      tr.append(el('th', undefined, k), el('td', undefined, v));
+      table.append(tr);
+    }
+    return table;
   }
 
   private renderSources(

@@ -6,7 +6,7 @@
    attention, neutral grey for labels. */
 :root {
   --b1-panel: rgba(6, 14, 18, 0.55);
-  --b1-panel-solid: rgba(6, 14, 18, 0.9);
+  --b1-panel-solid: #060e12;
   --b1-cyan: #2ed9d9;
   --b1-amber: #ffb020;
   --b1-text: #cde0e5;
