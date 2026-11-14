@@ -582,7 +582,7 @@ describe('Scanner', () => {
     const { scanner, log } = setup();
     const far = new Vector3(0, -100, 200); // 300 m away
     run(scanner, 3, far, NORTH, true);
-    expect(log).toEqual([]);
+    expect(log).toEqual([['scan:aborted', { poiId: 'bow', reason: 'range' }]]);
     expect(scanner.view.candidateId).toBeNull();
     expect(scanner.view.nearestId).toBe('bow');
     expect(scanner.view.nearestInRange).toBe(false);
@@ -600,7 +600,7 @@ describe('Scanner', () => {
   it('does nothing while facing away, and says which way to turn', () => {
     const { scanner, log } = setup();
     run(scanner, 3, AT, EAST, true);
-    expect(log).toEqual([]);
+    expect(log).toEqual([['scan:aborted', { poiId: 'bow', reason: 'facing' }]]);
     expect(scanner.view.nearestInRange).toBe(true);
     expect(scanner.view.nearestFacing).toBe(false);
     // Target is north, we face east: turn to port (negative).

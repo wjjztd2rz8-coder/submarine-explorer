@@ -56,22 +56,6 @@
       "primary": true,
       "title": "Scan the eastern stalactite gallery",
       "hint": "Follow the wall a short way south-east to the second limestone alcove."
-    },
-    {
-      "id": "outer-dropoff",
-      "type": "scan",
-      "poi": "great-blue-hole-outer-dropoff",
-      "primary": false,
-      "title": "Survey the eastern atoll edge",
-      "hint": "Optional: head about 4 km east of the hole to the steep reef edge, around 200 m."
-    },
-    {
-      "id": "western-dropoff",
-      "type": "scan",
-      "poi": "great-blue-hole-western-dropoff",
-      "primary": false,
-      "title": "Survey the western atoll edge",
-      "hint": "Optional: head about 6 km west of the hole to where the reef flat steepens toward 200 m."
     }
   ],
   "completion": "all_primary"

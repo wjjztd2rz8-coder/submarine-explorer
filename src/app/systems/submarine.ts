@@ -102,7 +102,12 @@ export function createSubmarineSystem(): GameSystem {
     },
     frame: {
       'sim.vehicles': (f, ctx) => {
-        for (let i = 0; i < f.steps; i++) ctx.sub.step(f.state, f.fixedDt);
+        for (let i = 0; i < f.steps; i++) {
+          ctx.sub.setSurveyDistance(
+            ctx.discovery.scanner.nearestUnscannedFixedDistance(ctx.sub.position),
+          );
+          ctx.sub.step(f.state, f.fixedDt);
+        }
       },
       'controls.vehicle': (f, ctx) => {
         if (f.state.toggleLights) ctx.headlights.toggle();

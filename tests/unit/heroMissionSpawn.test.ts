@@ -30,22 +30,19 @@ import { Terrain } from '../../src/world/Terrain.js';
 import type { TileMeta } from '../../src/util/types.js';
 
 const heroes = [
-  { site: 'titanic', primary: ['find-bow', 'find-stern'], before: ['find-bow', 'find-stern'] },
+  { site: 'titanic', primary: ['find-bow', 'find-stern'] },
   {
     site: 'lost-city',
     primary: ['find-poseidon', 'imax-tower'],
-    before: ['find-poseidon', 'imax-tower'],
   },
   {
     site: 'great-blue-hole',
     primary: ['stalactites', 'stalactites-east'],
-    before: ['outer-dropoff', 'western-dropoff'],
   },
-  { site: 'beebe-vent-field', primary: ['main-vents', 'shrimp'], before: ['main-vents', 'shrimp'] },
+  { site: 'beebe-vent-field', primary: ['main-vents', 'shrimp'] },
   {
     site: 'monterey-canyon',
     primary: ['canyon-wall', 'canyon-axis'],
-    before: ['canyon-head', 'upper-channel'],
   },
 ];
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
@@ -56,7 +53,7 @@ afterAll(() => {
     writeFileSync('.cache/verify-1000-missions.json', JSON.stringify(audit, null, 2) + '\n');
 });
 
-for (const { site, primary, before } of heroes) {
+for (const { site, primary } of heroes) {
   for (const tier of ['low', 'medium', 'high'] as const) {
     it(`${site} ${tier}: mission opens on a safe approach outside scan range`, async () => {
       const config = makeConfig();
@@ -406,21 +403,6 @@ for (const { site, primary, before } of heroes) {
           }
           run.dispose();
         }
-
-        // Keep the old primary selection measurable for the progress note.
-        const oldObjectives = before.map((id) => mission.objectives.find((o) => o.id === id)!);
-        const oldPrimaries = pois.filter((p) => oldObjectives.some((o) => o.poi === p.id));
-        const oldPose = poseFor(oldPrimaries);
-        const oldFirst = pois.find((p) => p.id === oldObjectives[0].poi)!;
-        const oldRange = Math.hypot(
-          oldFirst.position.x - oldPose.x,
-          oldFirst.position.y - oldPose.y,
-          oldFirst.position.z - oldPose.z,
-        );
-        const oldDelta = Math.hypot(oldPose.x - free.x, oldPose.y - free.y, oldPose.z - free.z);
-        console.log(
-          `MISSION-HERO ${site} ${tier}: beforeFirst=${oldRange.toFixed(2)} beforeFreeDelta=${oldDelta.toFixed(2)} afterFirst=${range.toFixed(2)} afterFreeDelta=${Math.hypot(pose.x - free.x, pose.y - free.y, pose.z - free.z).toFixed(2)}`,
-        );
       } finally {
         terrain.dispose();
       }

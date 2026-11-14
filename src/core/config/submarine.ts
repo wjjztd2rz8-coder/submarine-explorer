@@ -30,6 +30,11 @@ export interface SubmarineConfig {
   buoyancyAccel: number;
   /** Speed above which we clamp, as a safety net (m/s). */
   maxSpeed: number;
+  /** Arcade survey cap; disabled in the research profile. */
+  surveySpeedEnabled: boolean;
+  surveyNearM: number;
+  surveyFarM: number;
+  surveyMaxSpeed: number;
   /** Independent vertical velocity cap; forward thrust cannot increase descent speed. */
   maxVerticalSpeed: number;
   /** Depth (negative metres) at which the hull fails. */
@@ -157,6 +162,10 @@ export const DEFAULT_SUBMARINE: SubmarineConfig = {
   verticalDragScale: 1.8,
   buoyancyAccel: 0.05,
   maxSpeed: 40,
+  surveySpeedEnabled: false,
+  surveyNearM: 120,
+  surveyFarM: 260,
+  surveyMaxSpeed: 5,
   maxVerticalSpeed: 8,
   // Fallback game failure threshold when no named hull is fitted.
   crushDepth: -7150,

@@ -46,30 +46,6 @@
       "primary": true,
       "title": "Survey the Eastern Pool floor",
       "hint": "Follow the Eastern Pool floor north from the Leggo site, near 10,920 m."
-    },
-    {
-      "id": "north-wall",
-      "type": "scan",
-      "poi": "cd-north-wall",
-      "primary": false,
-      "title": "Survey the north inner wall",
-      "hint": "Optional longer survey: climb northwest from the Leggo site to the steep inner wall, near 9,980 m."
-    },
-    {
-      "id": "central-basin",
-      "type": "scan",
-      "poi": "cd-central-basin",
-      "primary": false,
-      "title": "Cross to the Central Pool",
-      "hint": "Follow the trench axis far west to the Central Pool, near 10,930 m."
-    },
-    {
-      "id": "axis-sill",
-      "type": "scan",
-      "poi": "cd-axis-sill",
-      "primary": false,
-      "title": "Find the sill between pools",
-      "hint": "Look west along the axis for the sill between the pools, near 10,700 m."
     }
   ],
   "completion": "all_primary",

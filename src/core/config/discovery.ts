@@ -40,6 +40,7 @@ export interface ScanConfig {
    * on the seabed below the boat and pitch is limited to 45 deg.
    */
   coneHalfAngleDeg: number;
+  arcadeConeHalfAngleDeg: number;
   /** Inside this 3D distance (m) the facing test is waived: you are on top of it. */
   closeRangeM: number;
   /** Progress fraction (0..1) lost per second while a scan is interrupted. */
@@ -87,6 +88,7 @@ export const DEFAULT_SCAN: ScanConfig = {
   defaultSeconds: 2.4,
   defaultRadiusM: 150,
   coneHalfAngleDeg: 35,
+  arcadeConeHalfAngleDeg: 45,
   closeRangeM: 25,
   decayPerSecond: 0.35, // a full ring drains in ~3 s, so a brief wobble is forgiven
   progressEventHz: 10,

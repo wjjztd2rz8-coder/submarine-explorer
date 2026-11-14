@@ -48,10 +48,12 @@ export function resolveEffective(
     gameplay,
     currentMode,
     speedName,
-    submarine: { ...base.submarine, ...speed },
+    submarine: { ...base.submarine, ...speed, surveySpeedEnabled: speedName === 'fast' },
     camera: { ...base.camera, lookAheadPerSpeed: speed.cameraLookAheadPerSpeed },
     scan: {
       ...base.scan,
+      coneHalfAngleDeg:
+        preset === 'realistic' ? base.scan.coneHalfAngleDeg : base.scan.arcadeConeHalfAngleDeg,
       radiusFloorM: preset === 'realistic' ? 0 : 100,
       hintRangeFactor:
         base.scan.hintRangeFactor * sensor.hintRangeMultiplier * EQUIPMENT.scanDetail,

@@ -114,6 +114,7 @@ function context(site: string, mode: GameplayMode): GameContext {
   return {
     config,
     baseScanRadii: new Map(),
+    discovery: { scanner: { nearestUnscannedFixedDistance: () => Infinity } },
     save,
     settings: save.get(),
     effective: resolveEffective(save.get(), mode, null, config),

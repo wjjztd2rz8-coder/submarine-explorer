@@ -57,28 +57,26 @@ describe('mission pacing: required-target gaps', () => {
 });
 
 // Check the authored depth claims against actual survey cells, and exercise
-// mission completion so making the remote target optional cannot hide a broken route.
+// mission completion so removing remote objectives cannot hide a broken route.
 describe('nearby terrain surveys', () => {
-  for (const [site, added, optional, depthM] of [
-    ['challenger-deep', 'eastern-floor', 'north-wall', 10919.8],
-    ['hunga-tonga-caldera', 'flank-transect', 'caldera-floor', 292.9],
-    ['hudson-canyon', 'wall-transect', 'wall', 976.7],
+  for (const [site, added, optional, depthM, optionalPoi] of [
+    ['challenger-deep', 'eastern-floor', 'north-wall', 10919.8, 'cd-north-wall'],
+    ['hunga-tonga-caldera', 'flank-transect', 'caldera-floor', 292.9, 'hunga-tonga-caldera-floor'],
+    ['hudson-canyon', 'wall-transect', 'wall', 976.7, 'hc-canyon-wall'],
   ] as const) {
     it(`${site}: nearby required survey sits on real bathymetry and completes the route`, () => {
       const def = parseMission(json(`${root}/${site}/mission.json`), site)!;
       const required = def.objectives.filter((o) => o.primary);
       expect(required).toHaveLength(2);
       expect(required[1].id).toBe(added);
-      expect(def.objectives.find((o) => o.id === optional)?.primary).toBe(false);
+      expect(def.objectives.find((o) => o.id === optional)).toBeUndefined();
       const pois = json(`${root}/${site}/pois.json`).pois;
       const first = pois.find((p: Poi) => p.id === required[0].poi);
       const target = pois.find((p: Poi) => p.id === required[1].poi);
       expect(distanceM(first, target)).toBeLessThanOrEqual(1000);
       expect(target.snap_to_seabed).toBe(true);
       expect(target.reconstruction).toBe(false);
-      expect(
-        pois.find((p: Poi) => p.id === def.objectives.find((o) => o.id === optional)!.poi).primary,
-      ).toBe(false);
+      expect(pois.find((p: Poi) => p.id === optionalPoi).primary).toBe(false);
 
       const meta = json(`data/tiles/${site}/meta.json`) as TileMeta;
       expect(meta.source).toBe('GMRT');
@@ -110,7 +108,7 @@ describe('nearby terrain surveys', () => {
         for (const objective of required)
           bus.emit('scan:complete', { poiId: objective.poi, landmarkId: site, firstTime: true });
         expect(mission.primaryComplete).toBe(true);
-        expect(mission.allComplete).toBe(false);
+        expect(mission.allComplete).toBe(true);
         expect(mission.state).toBe('primaries-complete');
         expect(mission.end()).toBe(true);
         expect(mission.emitted.filter((e) => e.name === 'mission:complete')).toHaveLength(1);
@@ -121,25 +119,20 @@ describe('nearby terrain surveys', () => {
   }
 });
 
-describe('optional long-transit guidance', () => {
+describe('optional world finds', () => {
   it.each([
     ['outer-dropoff', 'east'],
     ['western-dropoff', 'west'],
-  ])('%s warns of the distance and direction without blocking completion', (id, direction) => {
+  ])('%s stays in the world outside the mission', (id, direction) => {
     const site = 'great-blue-hole';
     const def = parseMission(json(`${root}/${site}/mission.json`), site)!;
     const pois: Poi[] = json(`${root}/${site}/pois.json`).pois;
-    const objective = def.objectives.find((o) => o.id === id)!;
-    expect(objective.primary).toBe(false);
-    const hint = objective.hint!.match(/^Optional:.*about (\d+(?:\.\d+)?) km (east|west)\b/);
-    expect(hint).not.toBeNull();
-    expect(hint![2]).toBe(direction);
+    expect(def.objectives.find((o) => o.id === id)).toBeUndefined();
     const origin = pois.find((p) => p.id === def.objectives.find((o) => o.primary)!.poi)!;
-    const target = pois.find((p) => p.id === objective.poi)!;
+    const target = pois.find((p) => p.id === `great-blue-hole-${id}`)!;
+    expect(target).toBeDefined();
     const distance = distanceM(origin, target);
     expect(distance).toBeGreaterThan(MAX_GAP_M);
-    // Whole-kilometre hints must remain honest if a survey contact moves.
-    expect(Math.abs(Number(hint![1]) * 1000 - distance)).toBeLessThan(1000);
     expect(Math.sign(target.lon - origin.lon)).toBe(direction === 'east' ? 1 : -1);
 
     const bus = new EventBus();
@@ -150,7 +143,7 @@ describe('optional long-transit guidance', () => {
       for (const primary of def.objectives.filter((o) => o.primary))
         bus.emit('scan:complete', { poiId: primary.poi, landmarkId: site, firstTime: true });
       expect(mission.primaryComplete).toBe(true);
-      expect(mission.allComplete).toBe(false);
+      expect(mission.allComplete).toBe(true);
       expect(mission.end()).toBe(true);
     } finally {
       mission.dispose();

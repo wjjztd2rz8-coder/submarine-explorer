@@ -50,14 +50,6 @@
       "primary": true,
       "title": "Survey the nearby canyon flank",
       "hint": "Follow the canyon flank northwest from the coral-habitat ledge, near 977 m."
-    },
-    {
-      "id": "wall",
-      "type": "scan",
-      "poi": "hc-canyon-wall",
-      "primary": false,
-      "title": "Scan the north canyon wall",
-      "hint": "Optional longer survey: find the steep north wall of the upper canyon, near 540 m."
     }
   ],
   "completion": "all_primary",

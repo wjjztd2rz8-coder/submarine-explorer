@@ -549,6 +549,7 @@ it.each(placements)(
         guidance: { visible: false },
         discovery: {
           ready: ready.promise,
+          scanner: { nearestUnscannedFixedDistance: () => Infinity },
           pois: [],
           guide: { isOpen: false },
           debrief: { isOpen: false },
