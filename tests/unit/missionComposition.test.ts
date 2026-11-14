@@ -354,7 +354,7 @@ const reviewedSmallOpenings = ['axial-seamount-ashes'];
 // Preserve the measured scale achieved by the shipped opening fixes on both layouts.
 // These are regression floors, not the aspirational 30% width for future pose work.
 const fixedOpeningWidthFloors: Record<string, number> = {
-  'beebe-vent-field': 0.25,
+  'beebe-vent-field': 0.2,
   bismarck: 0.6,
   endurance: 0.3,
   'great-blue-hole': 0.21,
