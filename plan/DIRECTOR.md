@@ -104,6 +104,9 @@ These rules exist so that does not repeat.
     before its final test run. Codex cannot open a browser.
   - OpenCode free models (DeepSeek V4.1 Flash, Inkling 2): self-contained scripts outside
     the game code that can check themselves.
+  - Claude Opus 5.5 (owner, 2026-11-14): ambitious work that has to be done well, for less
+    than Fable costs: cross-cutting gameplay design and implementation, or a fix another
+    delegate failed at. It spends the Claude window, so one at a time.
   - Claude Sonnet: writing that needs taste (facts, copy).
 - **If a delegate dies at a usage limit, look at its worktree first.** Staged or committed
   work that typechecks can be committed and merged by the orchestrator.
