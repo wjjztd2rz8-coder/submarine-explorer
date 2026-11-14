@@ -6,6 +6,7 @@
     {
       "id": "overview",
       "title": "RMS Titanic wreck site",
+      "fact": "Titanic sank in about two hours and forty minutes, and her bow and stern now lie about 600 m apart, facing opposite ways.",
       "paragraphs": [
         "RMS Titanic sank in the early hours of 15 April 1912 on her maiden voyage from Southampton to New York, about two hours and forty minutes after striking an iceberg. About 1,500 of the roughly 2,200 people aboard died.",
         "The wreck lies about 3,800 m down in the North Atlantic. A French–American expedition led by Jean-Louis Michel (IFREMER) and Robert Ballard (WHOI) found it on 1 September 1985. The Argo camera sled, towed from RV Knorr, first revealed a boiler; the team followed the debris north to the ship.",
@@ -102,6 +103,7 @@
     {
       "id": "bow",
       "title": "The bow section",
+      "fact": "Iron-eating microbes have been consuming Titanic's steel since 1912, leaving icicle-like growths of rust called rusticles.",
       "paragraphs": [
         "The bow stands upright and remains more intact than the stern. Its impact disturbed and ploughed the sediment, leaving marks visible in the 2010 sonar survey.",
         "Iron-eating microbes have been slowly consuming the steel since 1912. They leave rusticles, icicle-like growths of rust that hang from every surface. In 2019 divers in the submersible Limiting Factor found that the starboard officers' quarters, including the captain's cabin and his bathtub, had collapsed. In 2024, RMS Titanic Inc. documented a fallen 4.5 m (15 ft) section of port-side bow railing, confirmed by multibeam imagery."
@@ -148,6 +150,7 @@
     {
       "id": "stern",
       "title": "The stern section",
+      "fact": "The stern turned around as it sank, so its rear now points back toward the bow.",
       "paragraphs": [
         "The stern lies about 600 m from the bow and is much more badly damaged. WHOI's 2010 images show its collapsed decks and distorted hull. It sank more slowly than the bow.",
         "The stern turned around as it sank, so its rear end now points back towards the bow. The two halves of the ship face in opposite directions.",
@@ -191,6 +194,7 @@
     {
       "id": "boilers",
       "title": "The boiler field",
+      "fact": "Titanic had 29 coal-fired boilers, each about 4.8 m across, and the 1985 team first spotted one on Argo's cameras.",
       "paragraphs": [
         "Titanic had 29 coal-fired boilers: 24 double-ended and five single-ended. Each was about 4.8 m (15 ft 9 in) in diameter, according to the 1912 British inquiry. Boilers are among the machinery documented in the wreck's debris field.",
         "One boiler was the first object the 1985 expedition recognised. Just after 1 a.m. on 1 September, Argo's cameras showed its distinctive rivets; the team followed the debris north to the wreck."
@@ -249,6 +253,7 @@
     {
       "id": "debris-field",
       "title": "The debris field",
+      "fact": "When Titanic broke apart, thousands of objects fell 3.8 km, and pairs of shoes still lie where bodies once rested.",
       "paragraphs": [
         "As the ship broke apart, thousands of objects fell 3.8 km through the dark water: coal, hull plates, furniture, crockery, bottles, and the belongings of passengers and crew. Heavy pieces fell almost straight down. Lighter pieces drifted with the currents and settled in long trails.",
         "The 2010 expedition used two REMUS 6000 autonomous vehicles and an ROV to survey the wreck site. WHOI describes mapping 15–20 square miles (about 39–52 km²) of seafloor. NOAA's account distinguishes the broad scatter from close-up surveys of particular clusters of wreckage.",
@@ -289,6 +294,7 @@
     {
       "id": "big-piece",
       "title": "Where the \"Big Piece\" lay",
+      "fact": "A 17-ton section of Titanic's hull with portholes was raised in 1998 and split into the 15-ton Big Piece and the 2-ton Little Piece.",
       "paragraphs": [
         "The \"Chunk\" is a recovered section of hull with portholes spanning C-Deck cabins and D-Deck kitchens. RMS Titanic Inc. describes the recovered section as weighing 17 tons.",
         "Recovery work began in 1994. Weather and equipment problems stopped an attempt in 1996; the section was finally raised in 1998. Conservators divided the 17-ton Chunk into the 15-ton Big Piece and the 2-ton Little Piece. The operator lists the Big Piece on display in Las Vegas and the Little Piece in Orlando.",
@@ -328,6 +334,7 @@
     {
       "id": "memorial",
       "title": "The memorial plaque",
+      "fact": "A bronze memorial plaque was placed on Titanic's stern in 1986, and a US-UK agreement favours preserving the wreck in place.",
       "paragraphs": [
         "In 1986, Robert Ballard returned to the wreck and placed a bronze Titanic Historical Society memorial plaque on the stern in honour of those who died.",
         "NOAA treats Titanic as a grave site and maritime memorial. The RMS Titanic Maritime Memorial Act of 1986 directed the United States to negotiate an international agreement and develop guidelines for the site. The US–UK agreement entered into force on 18 November 2019 and favours preserving the wreck in place.",
@@ -367,6 +374,7 @@
     {
       "id": "channel",
       "title": "An abyssal channel",
+      "fact": "Five km north-west of Titanic a shallow channel about a kilometre wide and 50 to 60 m deep crosses the otherwise flat seabed.",
       "paragraphs": [
         "The wreck rests on a nearly flat stretch of seabed south-east of the Grand Banks of Newfoundland. The ground varies by only a few metres over hundreds of metres. About 5 km to the north-west, the open survey data shows a shallow channel running roughly north-north-east to south-south-west. It is about a kilometre wide and 50–60 m deep.",
         "The survey grid records the channel shape and depth. It does not establish when the channel formed or which currents and sediment flows shaped it.",

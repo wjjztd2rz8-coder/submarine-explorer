@@ -5,6 +5,7 @@
     {
       "id": "overview",
       "title": "Lost City Hydrothermal Field",
+      "fact": "Lost City's white carbonate towers rise up to 60 m, powered by seawater reacting with mantle rock rather than by magma.",
       "paragraphs": [
         "The Lost City Hydrothermal Field sits near the southern summit of the Atlantis Massif, an oceanic core complex of exposed mantle and lower-crust rocks near 30°N on the Mid-Atlantic Ridge. Seawater reacting with olivine-rich mantle rock through serpentinization releases heat and hydrogen and creates alkaline, methane-rich fluids. Cooling of the lithosphere also supplies heat; the system does not require a shallow magma chamber.",
         "The field was found on 4 December 2000 during an Argo II camera survey from the research vessel Atlantis. Gretchen Früh-Green and Barbara John were leading the camera watch when the white deposits appeared. Donna Blackman was the expedition's chief scientist, with Deborah Kelley and Jeffrey Karson as co-principal investigators. Kelley and Karson visited in DSV Alvin with pilot Patrick Hickey on 5 December. The carbonate towers rise as much as 60 m above the seabed.",
@@ -86,6 +87,7 @@
     {
       "id": "poseidon",
       "title": "Poseidon, the tallest tower",
+      "fact": "Poseidon is a carbonate tower about 60 m tall, and carbonate from Lost City dates back up to about 120,000 years.",
       "paragraphs": [
         "Poseidon is a composite carbonate edifice about 60 m tall and 100 m long, with a width of many tens of metres. Its adjoining towers, spires and flanges grow as warm vent fluid mixes with cold seawater and deposits minerals.",
         "Uranium-thorium dating of carbonate samples from across Lost City gives ages up to about 120,000 years. These samples record the field’s long history; they do not date the entire active Poseidon tower.",
@@ -141,6 +143,7 @@
     {
       "id": "beehive",
       "title": "Beehive",
+      "fact": "Beehive was a small vent that released some of Lost City's hottest fluid, 96 to 116 °C, and by 2018 its chimney had vanished.",
       "paragraphs": [
         "Beehive was a small, roughly 1 m high vent on Poseidon's flank. It released some of the hottest fluid measured at Lost City, about 91 °C in Kelley’s 2005 account and 96–116 °C in later measurements reported by Aquino and colleagues in 2024. Later researchers reported that the chimney itself was gone by their 2018 visit, although fluid still vented from its former opening.",
         "Look northeast of Poseidon for the Beehive scan marker."
@@ -171,6 +174,7 @@
     {
       "id": "imax-tower",
       "title": "IMAX Tower",
+      "fact": "Published heights of the IMAX tower range from 8 m to about 30 m, and the reason for the difference is unresolved.",
       "paragraphs": [
         "IMAX is a parasitic chimney and flange on Poseidon's north face, built as warm, alkaline vent fluid mixed with seawater and deposited carbonate minerals. A 2005 expedition account described the chimney as about 8 m tall; a later detailed geologic survey described a roughly 30 m multipronged structure. The reason for the difference between these published heights remains unresolved.",
         "Look northwest of Poseidon for the IMAX scan marker."
@@ -197,6 +201,7 @@
     {
       "id": "microbial-mat",
       "title": "Microbial life on the chimneys",
+      "fact": "Chimney microbes at Lost City live on hydrogen and methane from the vents rather than on sunlight.",
       "paragraphs": [
         "Lost City's chimney biofilms contain archaea and bacteria that draw energy from vent chemistry, including hydrogen and methane, rather than directly from sunlight. Methanosarcinales-related archaea dominate the hot, oxygen-poor interiors of active chimneys. Exterior biofilms grow where vent fluid mixes with seawater, which supplies oxygen and sulfate.",
         "Most of the invertebrates associated with the chimneys are small, often less than a centimetre long. Snails, bivalves, worms and small crustaceans inhabit the structures, alongside microbial biofilms. The dense beds of large tubeworms, mussels and clams familiar from many black-smoker fields are absent.",
@@ -236,6 +241,7 @@
     {
       "id": "summit",
       "title": "The Atlantis Massif summit",
+      "fact": "The Atlantis Massif is an oceanic core complex: a dome of deep mantle rock pulled up to the seafloor by a long-lived fault.",
       "paragraphs": [
         "The Atlantis Massif is an oceanic core complex: a dome of deep mantle and lower-crust rock, normally buried many kilometres down, exposed at the seafloor by a long-lived detachment fault that exposes deep rocks as the overlying crust moves away. Its summit, the shallowest point in this tile at 724 m, sits about 15 km from the main Mid-Atlantic Ridge spreading axis -- unusually far for hydrothermal activity, another sign that Lost City is not driven by fresh volcanic heat like a ridge-axis black smoker field.",
         "This is the actual shallowest terrain sampled anywhere in this tile."
@@ -266,6 +272,7 @@
     {
       "id": "south-wall",
       "title": "A coordinate discrepancy",
+      "fact": "The south wall of the Atlantis Massif is steep and drops to about 1,332 m, more than 500 m below the main vent field.",
       "paragraphs": [
         "The Atlantis Massif’s south wall falls steeply below the carbonate terrace. At this scan point the terrain is about 1,332 m deep, more than 500 m below the main vent field.",
         "An older catalog pin at 30.1167° N, 42.1167° W landed on this wall. The catalog now uses the published Beehive outlet position near Poseidon; the dive’s tower markers lie on terrain within the field’s documented depth band."

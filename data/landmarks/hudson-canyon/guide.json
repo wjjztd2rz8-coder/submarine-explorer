@@ -5,6 +5,7 @@
     {
       "id": "overview",
       "title": "Hudson Canyon",
+      "fact": "Hudson Canyon runs roughly 350 miles out to sea. It is the drowned seaward continuation of the ancestral Hudson River.",
       "paragraphs": [
         "Hudson Canyon is the largest submarine canyon on the US Atlantic seaboard and one of the largest in the world: it begins on the outer continental shelf about 100 miles southeast of New York City, runs roughly 350 miles out across the shelf and continental slope, and is up to 7.5 miles wide. Its lower reaches, well beyond this survey tile, reach 2 to 2.5 miles (roughly 3,200-4,000 m) deep.",
         "The canyon is the drowned seaward continuation of the ancestral Hudson River: during past glacial low-sea-level periods the river cut a channel across what is now the continental shelf, and that channel -- the Hudson Shelf Valley -- still runs from near the harbor mouth out to the canyon's head, even though it has not been buried by sediment the way most other shelf valleys on this coast have.",
@@ -48,6 +49,7 @@
     {
       "id": "sanctuary",
       "title": "A proposed sanctuary, not yet designated",
+      "fact": "NOAA is working toward a Hudson Canyon National Marine Sanctuary, and staff are reviewing more than 17,000 public comments.",
       "paragraphs": [
         "NOAA opened the process toward a Hudson Canyon National Marine Sanctuary in June 2022 and, as of this survey, the sanctuary has not been designated -- it remains a formal proposal. NOAA's own sanctuary website describes the effort as being in its early stages, with staff reviewing more than 17,000 public comments gathered during a 2022 scoping period and preparing draft designation documents; no target date for a final rule has been published.",
         "Part of Hudson Canyon is already protected under a separate fisheries rule: the Frank R. Lautenberg Deep Sea Coral Protection Area restricts most bottom-tending commercial fishing gear across Mid-Atlantic canyon and slope habitat. The Council recalculated its area as about 41,440 square miles. American lobster traps and the deep-sea red crab trap fishery have exceptions.",
@@ -91,6 +93,7 @@
     {
       "id": "shelf-valley",
       "title": "The Hudson Shelf Valley and the canyon's head",
+      "fact": "A catastrophic glacial-meltwater flood carved the Hudson Shelf Valley's modern form, cutting 15 m-high banks.",
       "paragraphs": [
         "The Hudson Shelf Valley is a roughly 150 km submerged extension of the ancestral Hudson River Valley. Unlike many nearby shelf valleys, it has not filled with sediment during the Holocene. USGS researchers found evidence that a catastrophic glacial-meltwater flood shaped its modern form, cutting 15 m-high banks, forming a 120 sq km bedform field and depositing a delta on the outer shelf. Earlier river and meltwater flows also contributed to the valley's development.",
         "This survey tile's shallowest sounded point, 67.9 m deep at its northwest corner, sits on the outer shelf approaching that transition; published sources place the canyon's actual head -- where the shelf valley funnels over the shelf break and the seafloor begins dropping steeply -- a little further north and east, just outside this tile, around 39.66-39.67 deg N, 72.47-72.48 deg W."
@@ -129,6 +132,7 @@
     {
       "id": "canyon-wall",
       "title": "Steep walls, hard ground, deep-sea corals",
+      "fact": "Corals and sponges anchor to hard rock on the canyon walls and catch the food that local currents carry past.",
       "paragraphs": [
         "Hard outcrops on canyon walls provide attachment surfaces for deep-sea corals and sponges. Local currents carry the suspended food these animals feed on. NOAA surveys document coral and sponge habitat in Hudson Canyon.",
         "This scan marks coral habitat on a steep stretch of the canyon wall."
@@ -163,6 +167,7 @@
     {
       "id": "axis-floor",
       "title": "Down the axis",
+      "fact": "Following the canyon floor, the seabed drops from about 542 m to 1,683 m, and the canyon goes on to 3,200 to 4,000 m.",
       "paragraphs": [
         "Following the canyon floor (its thalweg) southeast from the wall, the seabed drops from about 542 m at the wall to 1,220 m at the upper floor point and on to this tile's deepest grid cell, 1,683.1 m, near its southeast edge -- and the canyon keeps going from there. Published figures put Hudson Canyon's full extent at 2 to 2.5 miles (roughly 3,200-4,000 m) deep before it opens onto the continental rise, more than twice as deep as anything this ~52 x 56 km survey tile reaches.",
         "That mismatch is simply a coverage limit, not a claim about the canyon's true depth: this tile was sized to capture the canyon's upper and middle reaches, where the shelf-to-slope transition and the steepest walls are, rather than its full run to the abyssal plain."
@@ -201,6 +206,7 @@
     {
       "id": "wall-transect",
       "title": "Canyon flank transect",
+      "fact": "This survey point reads about 977 m, compared with about 942 m at the nearby coral ledge marker.",
       "paragraphs": [
         "This terrain survey is about 555 m northwest of the coral-habitat ledge marker. The GMRT grid reads about 977 m here, compared with about 942 m at the ledge marker.",
         "The nearby pair samples the surveyed canyon flank. This point was chosen from the terrain grid for the dive; it does not mark a documented coral colony. Continue northwest to the optional north-wall scan, where the grid reads about 542 m."
