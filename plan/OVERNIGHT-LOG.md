@@ -4047,3 +4047,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Golden set 2026-11-14-001527 reviewed (openings ~3.7-3.8); Sol skipped, Codex weekly 4%. Backlog refilled with Claude items 38-43 (first-session clarity first); briefs 196-199 stay queued. Stage ~86%. No agents run, no code changed. See plan/REVIEWS.md.
 - **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
+
+## 2026-11-13 19:43 CST headless run (Claude)
+
+- Merged item 38 U-home-first-screen (Sonnet; plain home caption with depth and "a good first dive", "Safe to X m", one back label, plainer mode helper text, no key names on touch globe/objectives) and item 41 U-debrief-stars (Haiku; one line explaining stars, debrief primary CTA "Dive again", Dive sites to quiet link). Smoke + project-base gates green on each; pushed. Neither was screenshot-reviewed (no full e2e run): check 390x844 home/briefing/debrief on the next golden or phone test. Haiku added a net ~5 words to the debrief (stars line is longer than the hint it shortened).
+- Open: items 39, 40, 42, 43 (Sonnet). Codex weekly 3% (resets Sun Nov 15 23:00), briefs 196-199 stay queued. No tag (hosted CI of new commits unchecked).
+- **Needs owner:** phone retest; Monterey waiver in 1.0 definition.
