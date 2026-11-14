@@ -37,12 +37,12 @@ const heroes = [
   },
   {
     site: 'great-blue-hole',
-    primary: ['stalactites', 'stalactites-east'],
+    primary: ['stalactites', 'lower-chamber', 'stalactites-east'],
   },
   { site: 'beebe-vent-field', primary: ['main-vents', 'shrimp'] },
   {
     site: 'monterey-canyon',
-    primary: ['canyon-wall', 'canyon-axis'],
+    primary: ['canyon-wall', 'inner-bend', 'canyon-axis'],
   },
 ];
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
