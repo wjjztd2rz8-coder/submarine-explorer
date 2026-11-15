@@ -101,10 +101,13 @@ export class PropContact {
   private deflectAlongSurface(body: CollidingBody, throttle: number, dt: number): void {
     if (!body.getForward || throttle <= 0.05) return;
     const fwd = body.getForward(this.forward);
-    const into = fwd.dot(this.normal);
+    // The contact normal points out of the prop: driving into it makes forward·normal negative.
+    const into = -fwd.dot(this.normal);
     const horiz = Math.hypot(body.velocity.x, body.velocity.z);
-    if (into < 0.2 && horiz > 2) return;
-    this.slide.copy(fwd).addScaledVector(this.normal, -into);
+    // Pointing away needs no help, and a glancing pass at speed already slides.
+    if (into <= 0 || (into < 0.2 && horiz > 2)) return;
+    // Forward with its into-surface part removed: the way along the face.
+    this.slide.copy(fwd).addScaledVector(this.normal, into);
     if (this.slide.lengthSq() < 0.04) {
       const nxz = new THREE.Vector3(this.normal.x, 0, this.normal.z);
       if (nxz.lengthSq() > 1e-6) {
