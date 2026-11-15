@@ -21,11 +21,11 @@
       ],
       "note": "Real event and real position, corrected this session against Schmidt Ocean Institute's own cruise page (previously mis-sourced to Wikipedia and mis-dated 2018): the benthic lander 'Leggo', deployed from RV Falkor during the December 2014 'Expanding Mariana Trench Perspectives' cruise (FK141215), recorded amphipods (Hirondellea gigas) feeding on bait at 11.368536 N, 142.5875166 E, 10,929 m, on 19 December 2014. This tile's terrain reads 10,925.1 m at that point, 4 m away. `reconstruction: true` because Leggo was recovered after the cruise and nothing physical remains on the seabed here; the marker/prop at this position stands in for the historic sampling event, not a permanent structure.",
       "reveal": {
-        "distance_m": 54,
+        "distance_m": 60,
         "elevation_deg": 11,
         "azimuth_deg": 32,
         "sweep_deg": 14,
-        "target_offset": [4, -12.5, 2]
+        "target_offset": [4, -8, 2]
       }
     },
     {

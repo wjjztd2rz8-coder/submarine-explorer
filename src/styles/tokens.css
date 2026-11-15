@@ -33,4 +33,6 @@ body {
   display: block;
   width: 100vw;
   height: 100vh;
+  /* The visible viewport: iOS Safari's 100vh assumes the toolbar is hidden. */
+  height: 100dvh;
 }

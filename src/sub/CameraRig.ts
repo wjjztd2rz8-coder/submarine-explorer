@@ -24,6 +24,99 @@ interface CameraUpdateOptions {
 /** Aim drop (m) at full chase-arm retraction on portrait phones. */
 const PORTRAIT_RETRACTED_AIM_DROP_M = 30;
 
+/** Seconds for the reveal's opening move (and the return to the chase view). */
+const REVEAL_MOVE_S = 0.6;
+/** Seconds over which a takeover during the opening move blends into the orbit. */
+const REVEAL_TAKEOVER_S = 0.35;
+/** Orbit easing toward the dragged angle, and how fast a fling dies out. */
+const REVEAL_EASE_HALF_LIFE_S = 0.06;
+const REVEAL_FLING_HALF_LIFE_S = 0.14;
+/** Reveal orbit elevation limits (radians): a little below level, never overhead. */
+export const REVEAL_MIN_ELEVATION = THREE.MathUtils.degToRad(-8);
+export const REVEAL_MAX_ELEVATION = THREE.MathUtils.degToRad(70);
+const REVEAL_TERRAIN_CLEARANCE_M = 4;
+
+interface RevealShotInput {
+  target: THREE.Vector3;
+  /** Where the target sits on screen, in normalized device coordinates (0,0 = centre). */
+  screen?: { x: number; y: number };
+  distance: number;
+  /** Zoom limits for player control (default 0.6x and 2.5x the distance). */
+  minDistance?: number;
+  maxDistance?: number;
+  elevation: number;
+  azimuth: number;
+  sweep: number;
+}
+
+interface RevealUser {
+  azimuth: number;
+  elevation: number;
+  distance: number;
+  goalAzimuth: number;
+  goalElevation: number;
+  goalDistance: number;
+  velAzimuth: number;
+  velElevation: number;
+  dragging: boolean;
+  /** 0..1 blend from the pose at takeover (only below 1 when the move was cut short). */
+  blend: number;
+  fromPosition: THREE.Vector3;
+  fromRotation: THREE.Quaternion;
+}
+
+interface RevealShot extends RevealShotInput {
+  screen: { x: number; y: number };
+  minDistance: number;
+  maxDistance: number;
+  elapsed: number;
+  duration: number;
+  returning: boolean;
+  from: THREE.Vector3;
+  rotation: THREE.Quaternion;
+  user: RevealUser | null;
+}
+
+/**
+ * Orient `camera` (no roll) so `target` projects to (`sx`, `sy`) in normalized
+ * device coordinates. Exact for a perspective camera with world-up yaw/pitch.
+ */
+export function aimAtScreenPoint(
+  camera: THREE.PerspectiveCamera,
+  target: THREE.Vector3,
+  sx: number,
+  sy: number,
+  euler = new THREE.Euler(0, 0, 0, 'YXZ'),
+): void {
+  const w = _aim.copy(target).sub(camera.position);
+  const len = w.length();
+  if (!(len > 1e-9)) return;
+  w.divideScalar(len);
+  const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  // Direction to the target in camera space, before normalization.
+  const cx = sx * tanV * camera.aspect;
+  const cy = sy * tanV;
+  const cz = -1;
+  const cn = Math.hypot(cx, cy, cz);
+  const ux = cx / cn;
+  const uy = cy / cn;
+  const uz = cz / cn;
+  // Pitch: rotate (uy, uz) about X so its height matches the world direction.
+  const r = Math.hypot(uy, uz);
+  const phi = Math.atan2(uz, uy);
+  const a = Math.acos(clamp(w.y / r, -1, 1));
+  const wrap = (v: number): number => Math.atan2(Math.sin(v), Math.cos(v));
+  const p1 = wrap(a - phi);
+  const p2 = wrap(-a - phi);
+  const pitch = Math.abs(p1) < Math.abs(p2) ? p1 : p2;
+  // Yaw: turn the pitched vector's horizontal part onto the world direction.
+  const z1 = uy * Math.sin(pitch) + uz * Math.cos(pitch);
+  const yaw = Math.atan2(w.x, w.z) - Math.atan2(ux, z1);
+  euler.set(pitch, yaw, 0, 'YXZ');
+  camera.quaternion.setFromEuler(euler);
+}
+const _aim = new THREE.Vector3();
+
 export class CameraRig {
   readonly camera: THREE.PerspectiveCamera;
   mode: CameraMode = 'chase';
@@ -59,35 +152,20 @@ export class CameraRig {
   /** Mode the camera returns to when photo mode is switched off. */
   private modeBeforeOrbit: CameraMode = 'chase';
 
-  private revealShot: {
-    target: THREE.Vector3;
-    look?: THREE.Vector3;
-    distance: number;
-    elevation: number;
-    azimuth: number;
-    sweep: number;
-    elapsed: number;
-    duration: number;
-    returning: boolean;
-    from: THREE.Vector3;
-    rotation: THREE.Quaternion;
-  } | null = null;
+  private revealShot: RevealShot | null = null;
 
-  beginReveal(shot: {
-    target: THREE.Vector3;
-    look?: THREE.Vector3;
-    distance: number;
-    elevation: number;
-    azimuth: number;
-    sweep: number;
-  }): void {
+  beginReveal(shot: RevealShotInput): void {
     this.revealShot = {
       ...shot,
+      screen: shot.screen ?? { x: 0, y: 0 },
+      minDistance: shot.minDistance ?? shot.distance * 0.6,
+      maxDistance: shot.maxDistance ?? shot.distance * 2.5,
       elapsed: 0,
       duration: 6,
       returning: false,
       from: this.camera.position.clone(),
       rotation: this.camera.quaternion.clone(),
+      user: null,
     };
   }
 
@@ -99,6 +177,93 @@ export class CameraRig {
     shot.from.copy(this.camera.position);
     shot.rotation.copy(this.camera.quaternion);
     if (this.reduceMotion) this.revealShot = null;
+  }
+
+  /** True once the player has taken the reveal camera (drag, pinch or wheel). */
+  get revealUserControl(): boolean {
+    return !!this.revealShot && !this.revealShot.returning && !!this.revealShot.user;
+  }
+
+  /**
+   * Take the reveal camera from the authored move, starting from the shot's
+   * current authored angle. A move still in progress yields: the camera eases
+   * from wherever it is.
+   */
+  private revealTakeover(): RevealUser | null {
+    const shot = this.revealShot;
+    if (!shot || shot.returning) return null;
+    if (shot.user) return shot.user;
+    const azimuth = this.revealAuthoredAzimuth(shot);
+    const elevation = clamp(shot.elevation, REVEAL_MIN_ELEVATION, REVEAL_MAX_ELEVATION);
+    const distance = clamp(shot.distance, shot.minDistance, shot.maxDistance);
+    const settled = this.reduceMotion || shot.elapsed >= REVEAL_MOVE_S;
+    shot.user = {
+      azimuth,
+      elevation,
+      distance,
+      goalAzimuth: azimuth,
+      goalElevation: elevation,
+      goalDistance: distance,
+      velAzimuth: 0,
+      velElevation: 0,
+      dragging: false,
+      blend: settled ? 1 : 0,
+      fromPosition: this.camera.position.clone(),
+      fromRotation: this.camera.quaternion.clone(),
+    };
+    return shot.user;
+  }
+
+  /**
+   * Finish the opening move now (the authored framing, for the journal still),
+   * before the player's first gesture takes the camera.
+   */
+  revealSettle(): void {
+    const shot = this.revealShot;
+    if (shot && !shot.returning && !shot.user) shot.elapsed = Math.max(shot.elapsed, REVEAL_MOVE_S);
+  }
+
+  /** Drag on the view during a reveal: orbit the subject (radians). */
+  revealOrbit(dAzimuth: number, dElevation: number): boolean {
+    const user = this.revealTakeover();
+    if (!user) return false;
+    user.dragging = true;
+    user.velAzimuth = 0;
+    user.velElevation = 0;
+    user.goalAzimuth += dAzimuth;
+    user.goalElevation = clamp(
+      user.goalElevation + dElevation,
+      REVEAL_MIN_ELEVATION,
+      REVEAL_MAX_ELEVATION,
+    );
+    return true;
+  }
+
+  /** Finger lifted: keep turning at `vAzimuth`/`vElevation` (rad/s), decaying quickly. */
+  revealRelease(vAzimuth = 0, vElevation = 0): void {
+    const user = this.revealShot?.user;
+    if (!user || this.revealShot!.returning) return;
+    user.dragging = false;
+    const cap = 6;
+    user.velAzimuth = clamp(vAzimuth, -cap, cap);
+    user.velElevation = clamp(vElevation, -cap, cap);
+  }
+
+  /** Pinch / wheel during a reveal: multiply the distance (clamped to the shot's limits). */
+  revealZoom(factor: number): boolean {
+    if (!(factor > 0) || !Number.isFinite(factor)) return false;
+    const user = this.revealTakeover();
+    if (!user) return false;
+    const shot = this.revealShot!;
+    user.goalDistance = clamp(user.goalDistance * factor, shot.minDistance, shot.maxDistance);
+    return true;
+  }
+
+  private revealAuthoredAzimuth(shot: RevealShot): number {
+    return (
+      shot.azimuth +
+      (this.reduceMotion ? 0 : shot.sweep * Math.min(1, shot.elapsed / shot.duration))
+    );
   }
 
   get revealReturning(): boolean {
@@ -379,46 +544,114 @@ export class CameraRig {
 
   private updateReveal(dt: number): void {
     const shot = this.revealShot;
-    if (shot) {
-      shot.elapsed += Math.max(0, dt);
-      const t = Math.min(1, shot.elapsed / 0.6);
-      const eased = this.reduceMotion ? 1 : t * t * (3 - 2 * t);
-      if (shot.returning) {
-        this.camera.position.lerpVectors(shot.from, this.camera.position.clone(), eased);
-        this.camera.quaternion.slerpQuaternions(
-          shot.rotation,
-          this.camera.quaternion.clone(),
-          eased,
-        );
-        if (t >= 1) this.revealShot = null;
-      } else {
-        const angle =
-          shot.azimuth +
-          (this.reduceMotion ? 0 : shot.sweep * Math.min(1, shot.elapsed / shot.duration));
-        this.camera.position
-          .set(
-            Math.sin(angle) * Math.cos(shot.elevation),
-            Math.sin(shot.elevation),
-            Math.cos(angle) * Math.cos(shot.elevation),
-          )
-          .multiplyScalar(shot.distance)
-          .add(shot.target);
-        if (this.terrain)
-          this.camera.position.y = Math.max(
-            this.camera.position.y,
-            this.terrain.sampleHeight(this.camera.position.x, this.camera.position.z) + 4,
-          );
-        this.camera.lookAt(shot.look ?? shot.target);
-        const rotation = this.camera.quaternion.clone();
-        this.camera.position.lerpVectors(shot.from, this.camera.position.clone(), eased);
-        this.camera.quaternion.slerpQuaternions(shot.rotation, rotation, eased);
-      }
-      if (this.terrain)
-        this.camera.position.y = Math.max(
-          this.camera.position.y,
-          this.terrain.sampleHeight(this.camera.position.x, this.camera.position.z) + 4,
-        );
+    if (!shot) return;
+    shot.elapsed += Math.max(0, dt);
+    const t = Math.min(1, shot.elapsed / REVEAL_MOVE_S);
+    const eased = this.reduceMotion ? 1 : t * t * (3 - 2 * t);
+    if (shot.returning) {
+      this.camera.position.lerpVectors(shot.from, this.camera.position.clone(), eased);
+      this.camera.quaternion.slerpQuaternions(shot.rotation, this.camera.quaternion.clone(), eased);
+      if (t >= 1) this.revealShot = null;
+      this.liftAboveTerrain();
+      return;
     }
+    const user = shot.user;
+    if (user) {
+      const step = Math.max(0, dt);
+      if (!user.dragging) {
+        user.goalAzimuth += user.velAzimuth * step;
+        user.goalElevation = clamp(
+          user.goalElevation + user.velElevation * step,
+          REVEAL_MIN_ELEVATION,
+          REVEAL_MAX_ELEVATION,
+        );
+        const fade = 1 - decay(REVEAL_FLING_HALF_LIFE_S, step);
+        user.velAzimuth *= fade;
+        user.velElevation *= fade;
+      }
+      const k = this.reduceMotion ? 1 : decay(REVEAL_EASE_HALF_LIFE_S, step);
+      user.azimuth += (user.goalAzimuth - user.azimuth) * k;
+      user.elevation += (user.goalElevation - user.elevation) * k;
+      user.distance += (user.goalDistance - user.distance) * k;
+      const raised = this.placeRevealCamera(
+        shot,
+        user.azimuth,
+        user.elevation,
+        user.distance,
+        true,
+      );
+      // Terrain lifted the eye: adopt that elevation so dragging up has no dead zone.
+      const lifted = raised ? this.revealLiftedElevation(shot, user.distance) : -Infinity;
+      if (lifted > user.goalElevation) {
+        user.goalElevation = Math.min(lifted, REVEAL_MAX_ELEVATION);
+        user.elevation = Math.max(user.elevation, user.goalElevation);
+        user.velElevation = Math.max(0, user.velElevation);
+      }
+      if (user.blend < 1) {
+        user.blend = Math.min(1, user.blend + step / REVEAL_TAKEOVER_S);
+        const b = user.blend * user.blend * (3 - 2 * user.blend);
+        const rotation = this.camera.quaternion.clone();
+        this.camera.position.lerpVectors(user.fromPosition, this.camera.position.clone(), b);
+        this.camera.quaternion.slerpQuaternions(user.fromRotation, rotation, b);
+      }
+    } else {
+      this.placeRevealCamera(shot, this.revealAuthoredAzimuth(shot), shot.elevation, shot.distance);
+      const rotation = this.camera.quaternion.clone();
+      this.camera.position.lerpVectors(shot.from, this.camera.position.clone(), eased);
+      this.camera.quaternion.slerpQuaternions(shot.rotation, rotation, eased);
+    }
+    this.liftAboveTerrain();
+  }
+
+  /** Elevation of the camera as placed, relative to the reveal target. */
+  private revealLiftedElevation(shot: RevealShot, distance: number): number {
+    return Math.asin(
+      clamp((this.camera.position.y - shot.target.y) / Math.max(distance, 1e-6), -1, 1),
+    );
+  }
+
+  /**
+   * Put the camera on the reveal sphere and aim so the target lands at the
+   * shot's screen point (the middle of the area the card leaves clear).
+   */
+  private placeRevealCamera(
+    shot: RevealShot,
+    azimuth: number,
+    elevation: number,
+    distance: number,
+    clearArm = false,
+  ): boolean {
+    const p = this.camera.position;
+    const ce = Math.cos(elevation);
+    p.set(Math.sin(azimuth) * ce, Math.sin(elevation), Math.cos(azimuth) * ce)
+      .multiplyScalar(distance)
+      .add(shot.target);
+    let raised = false;
+    if (this.terrain) {
+      // The eye, and (while orbiting) the line of sight, stay above the seabed.
+      let y = this.terrain.sampleHeight(p.x, p.z) + REVEAL_TERRAIN_CLEARANCE_M;
+      if (clearArm) {
+        for (let i = 4; i < 10; i++) {
+          const f = i / 10;
+          const h =
+            this.terrain.sampleHeight(
+              shot.target.x + (p.x - shot.target.x) * f,
+              shot.target.z + (p.z - shot.target.z) * f,
+            ) + REVEAL_TERRAIN_CLEARANCE_M;
+          if (h > shot.target.y) y = Math.max(y, shot.target.y + (h - shot.target.y) / f);
+        }
+      }
+      raised = y > p.y;
+      p.y = Math.max(p.y, y);
+    }
+    aimAtScreenPoint(this.camera, shot.target, shot.screen.x, shot.screen.y, this.euler);
+    return raised;
+  }
+
+  private liftAboveTerrain(): void {
+    if (!this.terrain) return;
+    const p = this.camera.position;
+    p.y = Math.max(p.y, this.terrain.sampleHeight(p.x, p.z) + REVEAL_TERRAIN_CLEARANCE_M);
   }
 
   /** Portrait can keep a close authored view while sharing desktop's zoom/reset state. */
