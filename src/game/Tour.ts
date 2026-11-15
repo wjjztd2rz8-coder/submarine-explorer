@@ -23,7 +23,7 @@ export const SITE_HOOKS: Record<(typeof TOUR_ORDER)[number], string> = {
   titanic: 'Two halves of a liner lie about 600 m apart, the bow still hung with rust icicles.',
   'lost-city': 'White stone towers, one about 60 m tall, grown from seawater reacting with rock.',
   'great-blue-hole':
-    'A round blue sinkhole 320 m wide, hung with stalactites from when it was dry cave.',
+    'A round blue sinkhole 320 m wide, hung with stalactites from when it was a dry cave.',
   'beebe-vent-field':
     'Black smokers near 5,000 m down, hotter than 400 °C, swarmed by shrimp with an eye on their back.',
   'monterey-canyon':
