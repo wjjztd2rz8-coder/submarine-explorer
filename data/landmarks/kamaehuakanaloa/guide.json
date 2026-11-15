@@ -46,6 +46,10 @@
         {
           "title": "USGS Hawaiian Volcano Observatory — Kama‘ehuakanaloa overview",
           "url": "https://www.usgs.gov/volcanoes/loihi-seamount"
+        },
+        {
+          "title": "USGS — Kamaʻehuakanaloa volcano, rifts and 1996 collapse",
+          "url": "https://www.usgs.gov/volcanoes/kama%E2%80%98ehuakanaloa"
         }
       ],
       "confidence": "high"
@@ -55,7 +59,7 @@
       "title": "A name restored: Lo'ihi to Kama'ehuakanaloa",
       "fact": "Hawai'i's Board on Geographic Names restored the volcano's Hawaiian name in 2021, taken from chants older than the 1955 chart name Lo'ihi.",
       "paragraphs": [
-        "For decades this volcano was known on charts as Lo'ihi, Hawaiian for 'long,' a purely descriptive name chosen in 1955. That year, USC geologist Kenneth O. Emery -- after a 1954 bathymetric survey found several seamounts off Hawai'i's south coast -- asked Bishop Museum staff Mary Kawena Pukui and Martha Hohu, together with Hawaiian Volcano Observatory director Gordon A. Macdonald, to name them; they picked 'Lo'ihi' for this one's elongated shape. Emery originally thought it was a passive, parasitic bump on Kilauea's flank; it was only later recognized as its own active volcano.",
+        "For decades this volcano was known on charts as Lo'ihi, Hawaiian for 'long,' a purely descriptive name chosen in 1955. That year, USC geologist Kenneth O. Emery -- after a 1954 bathymetric survey found several seamounts off Hawai'i's south coast -- asked Bishop Museum staff Mary Kawena Pukui and Martha Hohu, together with Hawaiian Volcano Observatory director Gordon A. Macdonald, to name them; they picked 'Lo'ihi' for this one's elongated shape. Emery interpreted it as a volcanic cone formed by Kilauea. Earthquake swarms in the 1970s helped establish that it was an active volcano in its own right.",
         "In July 2021 the Hawai'i Board on Geographic Names voted unanimously to rename it Kama'ehuakanaloa. The new name is not invented for the occasion -- it comes from mele (chants) documented decades before Emery's 1954 survey, describing an undersea volcano by that name. As Ku'ulei Kanahele of the Edith Kanaka'ole Foundation put it, Kama'ehuakanaloa 'is a powerful name that invokes the name of Pelehonuamea and her birth out of Kanaloa [the ocean]' -- restoring Hawaiian cultural knowledge of the volcano that the 1955 descriptive name had left out entirely."
       ],
       "facts": [
@@ -121,6 +125,10 @@
         {
           "title": "USGS Hawaiian Volcano Observatory — 1996 swarm and Pele’s Pit dimensions",
           "url": "https://www.usgs.gov/volcanoes/loihi-seamount"
+        },
+        {
+          "title": "USGS — Kamaʻehuakanaloa volcano, rifts and 1996 collapse",
+          "url": "https://www.usgs.gov/volcanoes/kama%E2%80%98ehuakanaloa"
         }
       ],
       "confidence": "high"
@@ -234,6 +242,10 @@
         {
           "title": "Sylvan et al. (2017) — summit vents and Ula Nui basal venting",
           "url": "https://fire.biol.wwu.edu/cmoyer/research/Sylvan_nitrogen_loihi_geocosmo17.pdf"
+        },
+        {
+          "title": "USGS — Kamaʻehuakanaloa volcano, rifts and 1996 collapse",
+          "url": "https://www.usgs.gov/volcanoes/kama%E2%80%98ehuakanaloa"
         }
       ],
       "confidence": "medium"
