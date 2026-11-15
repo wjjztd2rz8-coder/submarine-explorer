@@ -42,22 +42,30 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
     HUD hidden behind briefing; `.hud-finish` clear of `.hud-bar` (Composer);
     S12 "Unknown contacts: 0 of 0" line and wording, catalogue-only globe pins (Codex medium);
     S13 reveal close-ups that show sand instead of the subject (Gemini; framing data only).
-- **21:50 state.** Merged locally, batch 2 gate running (`.cache/sprint/gate3/`): S3b scan
-  available promptly at close range (cause was the scan cone when the sub sits above the
-  target, not turning; S3's turning branch dropped), S9 teach `C`, S10 debrief thumbnails
-  and grid, banner stays, reveal Continue and 13 s, S11 first visit (3 buttons, 56 words).
-  Accepted, merge after the gate: S4b `t3/fix-touch-dive-depth` (Blue Hole by touch 3/3),
-  S12 `t3/bonus-contacts-playable-pins`, S15 `t3/answer-completion-banner` (tour script
-  presses Keep exploring; Titanic full route 6/6, debrief 131 s).
+- **22:05 state.** Local `main` holds everything accepted and is NOT pushed (live is still
+  `b17ec3a0`): S3b close-range scan, S9 teach `C`, S10 debrief and reveal reading time, S11
+  first visit, S4b Blue Hole by touch, S12 bonus contacts wording and 13 playable pins, S15
+  tour answers the banner, S16 headless route check plus the sustained-contact collision
+  damping fix (the root cause of the seabed stalls; 106 of 106 legs pass), S14 faster
+  transit and scanned labels hidden, S17 Read more text checked (15 wrong claims fixed),
+  S18 six lifecycle bugs.
+- **Blocking the push:** the batch 2 unit run failed for real in `overlayFocus.test.ts`
+  (about 22 tests) and `dailySystem.test.ts` (home More tray, focus return). S19 (Codex
+  medium, branch `t3/fix-unit-test-suite`) is fixing it. Then: merge S19, one gate on main
+  (content, prettier, py, typecheck, build, full-route plays of titanic, lost-city and
+  hunga, full unit suite; re-run timed-out files alone), push.
+- **Open:** Lost City's IMAX Tower leg failed in about half the browser runs before S16's
+  fix and is not covered by the simulation (props). Re-measure three times after the push.
+- **Reveal framing:** S13 (Gemini) died when Cursor's Other Models pool hit 0% (resets Nov
+  24). Its unreviewed work is committed as WIP on `t3/improve-landmark-reveals`
+  (`fe6c8a69`). A scheduled wake at 23:33 launches S13b on Sonnet to review and finish it.
+- **S2 cancelled** (Hunga data route): superseded by S16's code fix.
+- **Limits at 22:00:** Claude 33% until 23:30; Codex 95% of a new window, weekly 68%;
+  Cursor Models 25.5%, Other Models 0%. No Gemini for the rest of the sprint: anything
+  judged from screenshots goes to Sonnet.
 - **Machine load distorts play timings and causes 30 s unit timeouts** when more than about
   four delegates play at once (load average 22 to 28 on 12 cores). Read delegate timings
   with their load figure; tell delegates not to run the full unit suite.
-- **Codex, launched 21:50 (owner: Codex was far behind its window):** S16 headless route
-  check of every leg under seabed clearance, with fixes (Lost City IMAX Tower fails about
-  half of runs; Hunga, Axial stalls); S17 fact check of the Read more paragraphs and
-  figures; S18 dive lifecycle bug sweep with failing tests first.
-- Still out from earlier: S2 Hunga route (Composer), S13 reveal framing (Gemini), S14
-  faster transit and scanned labels (Composer).
 - **Live at 20:06:** `b17ec3a0` deployed (CI green): facts, phone Finish dive, tutorial
   labels, README.
 - **Held from S8, waiting for S3b:** hide the "✓" world pills once scanned (crowd the sub);
