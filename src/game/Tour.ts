@@ -48,6 +48,42 @@ export const SITE_HOOKS: Record<(typeof TOUR_ORDER)[number], string> = {
 export function siteHook(id: string | undefined): string | null {
   return (id && (SITE_HOOKS as Record<string, string>)[id]) || null;
 }
+/** Guide entries about each site's landmarks, excluding survey transects and surrounding terrain.
+ * Geologic sites retain the features that define the destination itself.
+ */
+export const SITE_LANDMARK_ENTRIES: Record<(typeof TOUR_ORDER)[number], readonly string[]> = {
+  titanic: [
+    'bow',
+    'stern',
+    'debris-coal',
+    'missing-piece',
+    'boilers',
+    'debris-field',
+    'big-piece',
+    'memorial',
+  ],
+  'lost-city': ['poseidon', 'beehive', 'imax-tower', 'microbial-mat'],
+  'great-blue-hole': ['the-hole', 'lower-water', 'eastern-gallery'],
+  'beebe-vent-field': ['vents', 'shrimp', 'sulfide-mounds'],
+  'monterey-canyon': ['canyon-head', 'upper-canyon', 'mars-node'],
+  endurance: ['wreck-hull', 'stern-nameplate', 'helm-and-life', 'structural-damage'],
+  kamaehuakanaloa: ['vents', 'hiolo-south', 'peles-pit'],
+  'hudson-canyon': ['canyon-wall', 'sanctuary'],
+  'challenger-deep': ['hadal-life', 'three-pools', 'eastern-pool'],
+  bismarck: ['wreck-hull', 'turret-debris', 'sinking-and-debate', 'memorial'],
+  'axial-seamount-ashes': ['mushroom-chimney', 'mushroom-inferno', 'minor-chimneys', 'vent-life'],
+  'blake-plateau-corals': ['mound-field', 'coral-thicket', 'second-mound'],
+  'hunga-tonga-caldera': ['rim-wall', 'caldera-floor'],
+};
+
+/** Only fixed POI-linked guide entries may supply a debrief fact. */
+export function siteLandmarkEntries(site: JournalSite): JournalSite['entries'] {
+  const ids = (SITE_LANDMARK_ENTRIES as Record<string, readonly string[]>)[site.id] ?? [];
+  return site.entries.filter(
+    (entry) => entry.kind === 'poi' && !!entry.guide && ids.includes(entry.id),
+  );
+}
+
 export type TourProgress =
   | (Pick<Progress, 'rating'> & Partial<Pick<Progress, 'snapshot'>>)
   | (Pick<ProgressRecord, 'ratings'> & Partial<Pick<ProgressRecord, 'awarded'>>);

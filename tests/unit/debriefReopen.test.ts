@@ -151,6 +151,11 @@ it('renders wildlife as a text tile and a framed landmark as a photo card', () =
     expect((tiles[0].children[0] as unknown as HTMLImageElement).src).toBe(
       'data:image/jpeg;base64,YQ==',
     );
+    expect(
+      tiles.map(
+        (tile) => tile.children.find((e) => e.className === 'debrief-find-name')?.textContent,
+      ),
+    ).toEqual(['Bow', 'White sea anemone']);
     expect(tiles[1].className).toContain('debrief-find-text');
     expect(tiles[1].children.map((e) => e.textContent)).toEqual(['White sea anemone', 'Wildlife']);
     expect(tiles[1].children.some((e) => e.className === 'debrief-thumb')).toBe(false);
@@ -198,4 +203,15 @@ it('shows the next site hook with the next-dive button, and none for the chooser
   } finally {
     debrief.dispose();
   }
+});
+
+it('keeps touch captions unshrunk and separates the hook from the button in both layouts', async () => {
+  // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+  const { readFileSync } = await import('node:fs');
+  const css = readFileSync('src/styles/flow.css', 'utf8');
+  expect(css).toMatch(/\.debrief-find-name\s*\{[^}]*flex-shrink: 0;/);
+  expect(css).not.toMatch(/\.debrief-find-name\s*\{[^}]*(?:overflow: hidden|-webkit-line-clamp)/);
+  expect(css).toMatch(/\.debrief-navigation\.has-hook\s*\{[^}]*gap: 14px;/);
+  // Short landscape uses display: contents, so the action row owns the hook's gap.
+  expect(css).toMatch(/\.debrief-actions:has\(\.has-hook\)\s*\{[^}]*gap: 14px 16px;/);
 });
