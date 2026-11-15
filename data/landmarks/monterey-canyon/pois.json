@@ -60,7 +60,7 @@
       "kind": "geology",
       "primary": false,
       "scan_seconds": 1.8,
-      "guide_entry": "canyon-axis",
+      "guide_entry": "inner-bend",
       "confidence": "medium",
       "reconstruction": false,
       "sources": [

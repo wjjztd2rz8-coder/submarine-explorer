@@ -192,7 +192,9 @@ describe('880 content compatibility after f30', () => {
       expect(guide.entries.map((e) => e.id)).toEqual(expect.arrayContaining(historical.guide_ids));
       for (const old of historical.pois) {
         const current = pois.find((p) => p.id === old.id);
-        expect(current?.guide_entry, `f27 saved contact ${old.id}`).toBe(old.guide_entry);
+        // Saves key on the POI id. A POI may have moved to its own, newer guide entry.
+        expect(current, `f27 saved contact ${old.id}`).toBeDefined();
+        expect(guide.entries.map((e) => e.id)).toContain(current?.guide_entry);
       }
       const journal = buildJournalSite({
         id: site,

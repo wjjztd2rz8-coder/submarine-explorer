@@ -151,6 +151,37 @@
       "confidence": "medium"
     },
     {
+      "id": "inner-bend",
+      "title": "Terraces and side channels",
+      "fact": "Along Monterey Canyon's winding inner floor, side channels and terraces hold sediment that piles up between big flows until the next one sweeps it away.",
+      "paragraphs": [
+        "Tracing the canyon's deepest line through this tile's survey data shows a fairly steady deepening, punctuated by side channels and terraces where sediment has piled up between major flow events.",
+        "Turbidity currents in the upper canyon happen several times a year."
+      ],
+      "facts": [
+        {
+          "label": "Frequency (upper canyon)",
+          "value": "several times a year"
+        }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Monterey Canyon — MBARI, Know Your Ocean",
+          "url": "https://www.mbari.org/know-your-ocean/monterey-canyon/"
+        },
+        {
+          "title": "Large underwater experiment in Monterey Canyon shows turbidity currents involve movement of the seafloor — USGS",
+          "url": "https://www.usgs.gov/center-news/large-underwater-experiment-monterey-canyon-shows-turbidity-currents-involve-seafloor"
+        },
+        {
+          "title": "Paull et al. 2018 — Powerful turbidity currents driven by dense basal layers",
+          "url": "https://www.nature.com/articles/s41467-018-06254-6"
+        }
+      ],
+      "confidence": "medium"
+    },
+    {
       "id": "upper-canyon",
       "title": "The upper canyon descent",
       "fact": "Beach sand piles up at the head of Monterey Canyon, and storms can set it sliding down this steep channel as an underwater avalanche.",

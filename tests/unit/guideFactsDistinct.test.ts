@@ -26,5 +26,25 @@ describe('guide facts', () => {
       }
       expect(repeats).toEqual([]);
     });
+
+    it(`${site}: no two points of interest resolve to the same fact`, () => {
+      const guide = JSON.parse(readFileSync(`data/landmarks/${site}/guide.json`, 'utf8')) as {
+        entries: { id: string; fact?: string }[];
+      };
+      const pois = JSON.parse(readFileSync(`data/landmarks/${site}/pois.json`, 'utf8')) as {
+        pois: { id: string; guide_entry: string }[];
+      };
+      const facts = new Map(guide.entries.map((e) => [e.id, e.fact ? norm(e.fact) : '']));
+      const seen = new Map<string, string>();
+      const repeats: string[] = [];
+      for (const p of pois.pois) {
+        const key = facts.get(p.guide_entry);
+        if (!key) continue;
+        const first = seen.get(key);
+        if (first) repeats.push(`${first} = ${p.id}`);
+        else seen.set(key, p.id);
+      }
+      expect(repeats).toEqual([]);
+    });
   }
 });

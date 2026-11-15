@@ -96,6 +96,40 @@
       "confidence": "high"
     },
     {
+      "id": "mushroom-chimney",
+      "title": "Mushroom chimney",
+      "fact": "Mushroom is a sulfide chimney about 4 m tall that vents fluid hotter than 275 °C, with clear flow in places and small black-smoker chimlets in others.",
+      "paragraphs": [
+        "Mushroom is a roughly 4 m sulfide chimney with several discharge points. OOI footage shows clear flow as well as small active black-smoker chimlets, so one chimney can carry more than one kind of discharge. The cabled observatory’s HD camera watches the chimney and the animals around it."
+      ],
+      "facts": [
+        {
+          "label": "Mushroom height / temperature",
+          "value": "about 4 m; fluid over 275 degC"
+        },
+        {
+          "label": "Mushroom-Inferno separation",
+          "value": "about 10 m"
+        }
+      ],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "ASHES Vent Field (RS03ASHS) -- Ocean Observatories Initiative",
+          "url": "https://oceanobservatories.org/site/rs03ashs/"
+        },
+        {
+          "title": "ASHES -- Axial Caldera, OOI Regional Cabled Array, University of Washington Interactive Oceans",
+          "url": "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes/"
+        },
+        {
+          "title": "Inferno Vent at Axial -- OOI Regional Cabled Array",
+          "url": "https://interactiveoceans.washington.edu/inferno-vent-at-axial/"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
       "id": "minor-chimneys",
       "title": "Hell, Phoenix, Virgin and Virgin Mound",
       "fact": "Virgin Mound is a sub-metre spire of anhydrite, yet it vents some of the most CO2-rich fluid found anywhere in the caldera.",

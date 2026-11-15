@@ -102,7 +102,7 @@
       "kind": "geology",
       "primary": false,
       "scan_seconds": 2.4,
-      "guide_entry": "three-pools",
+      "guide_entry": "axis-sill",
       "confidence": "medium",
       "reconstruction": false,
       "sources": [

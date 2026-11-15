@@ -165,6 +165,41 @@
       "confidence": "medium"
     },
     {
+      "id": "hiolo-south",
+      "title": "Hiolo South",
+      "fact": "Hiolo South, about 1,274 m down inside Pele's Pit, vents fluid at around 47 °C, with cauliflower-shaped iron mats growing around the vent opening.",
+      "paragraphs": [
+        "Research cruises in 2006, 2008, 2009 and 2013 sampled Hiolo South at roughly 1,274 m inside Pele's Pit. Sylvan and colleagues reported a mean fluid temperature of about 47 degC, roughly 7 degC warmer than Hiolo North.",
+        "Jesser and colleagues documented cauliflower-shaped iron-oxidizing mats around an active orifice at Hiolo South."
+      ],
+      "facts": [
+        {
+          "label": "Hiolo South depth / mean fluid temperature",
+          "value": "~1,274 m / ~47 degC (sampled cruises)"
+        },
+        {
+          "label": "Characteristic mat microbes",
+          "value": "iron-oxidizing Zetaproteobacteria"
+        }
+      ],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "Jesser et al. (2015) — Quantitative PCR Analysis of Functional Genes in Iron-Rich Microbial Mats (Figure 2)",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4393452/"
+        },
+        {
+          "title": "Volcano Watch: Treasures of the Deep Sea: Lo'ihi Hosts Hydrothermal Vents — USGS Hawaiian Volcano Observatory",
+          "url": "https://www.usgs.gov/news/volcano-watch-treasures-deep-sea-loihi-hosts-hydrothermal-vents"
+        },
+        {
+          "title": "Sylvan et al. (2017) — Evidence for microbial mediation of subseafloor nitrogen redox processes at Loihi Seamount, §§1, 3.1 and Table 1",
+          "url": "https://fire.biol.wwu.edu/cmoyer/research/Sylvan_nitrogen_loihi_geocosmo17.pdf"
+        }
+      ],
+      "confidence": "medium"
+    },
+    {
       "id": "south-rift",
       "title": "The south rift zone",
       "fact": "Away from the summit, ultra-diffuse vents exist near the volcano's base at Ula Nui, about 5,000 m deep.",

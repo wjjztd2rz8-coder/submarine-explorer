@@ -56,7 +56,7 @@
       "kind": "geology",
       "primary": false,
       "scan_seconds": 2.4,
-      "guide_entry": "vents",
+      "guide_entry": "sulfide-mounds",
       "confidence": "low",
       "reconstruction": true,
       "sources": [
