@@ -30,7 +30,7 @@
       "kind": "geology",
       "primary": false,
       "scan_seconds": 2.4,
-      "guide_entry": "overview",
+      "guide_entry": "lower-water",
       "confidence": "low",
       "reconstruction": true,
       "sources": ["https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"],

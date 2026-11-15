@@ -97,6 +97,37 @@
       "confidence": "high"
     },
     {
+      "id": "sulfide-mounds",
+      "title": "Sulfide mounds that grow and collapse",
+      "fact": "Beebe's seafloor holds at least six mounds of metal sulfide, built up and knocked down again by generation after generation of chimneys.",
+      "paragraphs": [
+        "Webber et al. (2015) mapped at least six sulfide mounds at Beebe, three with active focused venting. The deposits grow and collapse through successive generations of chimneys.",
+        "The discovery-survey mound was about 80 m wide and 50 m high (Connelly 2012)."
+      ],
+      "facts": [
+        {
+          "label": "Mapped sulfide mounds",
+          "value": "at least 6; 3 with active focused venting (Webber 2015)"
+        },
+        {
+          "label": "Discovery-survey mound",
+          "value": "about 80 m wide and 50 m high (Connelly 2012)"
+        }
+      ],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "Connelly, D.P. et al. 2012, Nature Communications 3:620",
+          "url": "https://www.nature.com/articles/ncomms1636"
+        },
+        {
+          "title": "Webber, A.P. et al. 2015, \"Geology, sulfide geochemistry and supercritical venting at the Beebe Hydrothermal Vent Field, Cayman Trough\", Geochemistry, Geophysics, Geosystems 16",
+          "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
       "id": "shrimp",
       "title": "Rimicaris hybisae",
       "fact": "Beebe's vent shrimp have an enlarged eye on their back that cannot form images but can still detect faint light.",

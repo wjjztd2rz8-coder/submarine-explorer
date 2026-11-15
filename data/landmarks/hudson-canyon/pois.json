@@ -53,7 +53,7 @@
       "kind": "geology",
       "primary": false,
       "scan_seconds": 3,
-      "guide_entry": "canyon-wall",
+      "guide_entry": "north-wall",
       "confidence": "high",
       "reconstruction": false,
       "sources": ["https://www.gmrt.org/", "https://www.mafmc.org/actions/hudson-canyon"],

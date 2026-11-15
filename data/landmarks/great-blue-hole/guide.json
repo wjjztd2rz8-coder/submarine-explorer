@@ -54,6 +54,45 @@
       "confidence": "high"
     },
     {
+      "id": "lower-water",
+      "title": "The airless lower water",
+      "fact": "Below about 90 m the Blue Hole's water holds almost no oxygen and is rich in hydrogen sulfide, so reef fish stay out of its lower chamber.",
+      "paragraphs": [
+        "Below roughly 90 m, the lower water is oxygen-depleted and rich in hydrogen sulfide. The hole's reported depth is about 125 m.",
+        "Reef corals depend on light and belong near the surface. The Blue Hole’s oxygen-depleted lower water excludes reef fish."
+      ],
+      "facts": [
+        {
+          "label": "Anoxic layer",
+          "value": "below about 90 m"
+        },
+        {
+          "label": "Real hole depth",
+          "value": "about 125 m"
+        }
+      ],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "Gischler et al. 2013 — Blue Hole setting and stratification",
+          "url": "https://limnogeology.ethz.ch/GischlerMarine.pdf"
+        },
+        {
+          "title": "UNESCO — Belize Barrier Reef Reserve System",
+          "url": "https://whc.unesco.org/en/list/764"
+        },
+        {
+          "title": "Gischler et al. 2025 — 30 m core from the Great Blue Hole",
+          "url": "https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
       "id": "the-hole",
       "title": "Stalactite gallery",
       "fact": "The stalactites in the Blue Hole formed in dry caves during an ice age, and were flooded as the sea rose.",

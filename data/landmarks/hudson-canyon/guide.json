@@ -165,6 +165,40 @@
       "confidence": "medium"
     },
     {
+      "id": "north-wall",
+      "title": "The steep north wall",
+      "fact": "Hudson Canyon's north wall tilts about 18 to 19 degrees even at this survey's coarse resolution, and its real rock ledges are probably steeper.",
+      "paragraphs": [
+        "This scan marks a locally steep flank of the upper canyon's north wall, 541.9 m deep. Slope sampling over one grid cell (about 50-60 m) gives roughly 18-19 degrees. The true wall relief, with rock outcrops and ledges, is almost certainly sharper than this coarse grid can resolve."
+      ],
+      "facts": [
+        {
+          "label": "Wall slope (this survey's wall POI)",
+          "value": "~18-19 deg"
+        },
+        {
+          "label": "Depth at this point",
+          "value": "541.9 m"
+        }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Proposed Designation of Hudson Canyon National Marine Sanctuary — Mid-Atlantic Fishery Management Council",
+          "url": "https://www.mafmc.org/actions/hudson-canyon"
+        },
+        {
+          "title": "Explore the Depths: Hudson Canyon Live! — NOAA Office of National Marine Sanctuaries",
+          "url": "https://sanctuaries.noaa.gov/news/2025/explore-the-depths-hudson-canyon-live.html"
+        },
+        {
+          "title": "Mid-Atlantic Fishery Management Council — regional coral protection",
+          "url": "https://www.mafmc.org/newsfeed/2016/noaa-fisheries-announces-final-rule-on-mid-atlantic-councils-frank-r-lautenberg-deep-sea-coral-protection-area"
+        }
+      ],
+      "confidence": "medium"
+    },
+    {
       "id": "axis-floor",
       "title": "Down the axis",
       "fact": "Following the canyon floor, the seabed drops from about 542 m to 1,683 m, and the canyon goes on to 3,200 to 4,000 m.",

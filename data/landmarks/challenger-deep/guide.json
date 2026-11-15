@@ -331,6 +331,41 @@
       "confidence": "medium"
     },
     {
+      "id": "axis-sill",
+      "title": "The sill between the pools",
+      "fact": "Between the Central and Eastern Pools the trench floor climbs to a sill about 10,704 m down, roughly 220 m shallower than either pool.",
+      "paragraphs": [
+        "Between the Central and Eastern Pools this mission marks a shallower sill, about 10,704 m at its lowest point in this tile, roughly 220 m higher than either pool. It was located by tracing the deepest continuous path along the trench axis through the real GMRT heightmap.",
+        "No source consulted publishes an exact coordinate for this sill; this point is a terrain trace, not a citation. Stewart & Jamieson (2019) independently confirm a three-basin structure."
+      ],
+      "facts": [
+        {
+          "label": "Sill depth (terrain trace)",
+          "value": "~10,704 m"
+        },
+        {
+          "label": "Height above either pool",
+          "value": "~220 m"
+        }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Deepest Submarine Dive in History, Five Deeps Expedition Conquers Challenger Deep — Five Deeps Expedition press release, 13 May 2019",
+          "url": "https://fivedeeps.com/wp-content/uploads/2019/05/FDE-Challenger-Release-FINAL-5132019.pdf"
+        },
+        {
+          "title": "Stewart, H.A. & Jamieson, A.J. 2019, \"The five deeps...\", Earth-Science Reviews 197:102896 (open access, CC BY)",
+          "url": "http://nora.nerc.ac.uk/id/eprint/524544/1/Stewart_and_Jamieson_2019_The%20five%20deeps.pdf"
+        },
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332 (value read directly from this tile's grid)",
+          "url": "https://www.gmrt.org/"
+        }
+      ],
+      "confidence": "medium"
+    },
+    {
       "id": "eastern-floor",
       "title": "Eastern Pool floor transect",
       "fact": "In 1875 HMS Challenger lowered a weighted rope 8,184 m near here, a record for its time. The Eastern Pool floor is more than 2.7 km deeper still.",
