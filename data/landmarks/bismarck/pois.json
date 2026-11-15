@@ -23,11 +23,15 @@
       ],
       "note": "Uses the 2001 expedition’s published vicinity (48.15 N, 16.117 W), not a precise survey fix. Terrain reads 4,218.5 m; the scan at 4,213 m is about 5 m above it. Published real wreck depth is 4,790–4,791 m. The ~570 m coordinate/grid/depth discrepancy is unresolved; no sourced cause or more precise fix was established. The hull remains supported on the current terrain. See sources.md.",
       "reveal": {
-        "distance_m": 100,
-        "elevation_deg": 14,
-        "azimuth_deg": 75,
-        "sweep_deg": 20,
-        "target_offset": [0, -6, 0]
+        "distance_m": 96,
+        "elevation_deg": 13,
+        "azimuth_deg": 78,
+        "sweep_deg": 18,
+        "target_offset": [
+          0,
+          -6.5,
+          0
+        ]
       }
     },
     {
@@ -69,10 +73,15 @@
       ],
       "note": "Marks the historical question, not a single surveyed feature: whether British shellfire and torpedoes, or the crew's own scuttling charges, caused the final sinking. kbismarck.com's survey notes describe the hull as in surprisingly good condition given the battering it took, with the stern the most heavily damaged section. Illustrative placement near the hull; moved 2026-09 with the hull to the sourced wreck position (see sources.md).",
       "reveal": {
-        "distance_m": 105,
-        "elevation_deg": 18,
-        "azimuth_deg": 345,
-        "target_offset": [-20, -3, 45]
+        "distance_m": 72,
+        "elevation_deg": 15,
+        "azimuth_deg": 156,
+        "sweep_deg": 16,
+        "target_offset": [
+          -38,
+          -5.5,
+          98
+        ]
       }
     },
     {
@@ -88,8 +97,21 @@
       "guide_entry": "memorial",
       "confidence": "high",
       "reconstruction": false,
-      "sources": ["https://en.wikipedia.org/wiki/German_battleship_Bismarck"],
-      "note": "Restored 2026-11. A respectful marker near the hull, not a surveyed structure or a prop. Of Bismarck's crew of 2,221, only around 114 were rescued; roughly 2,100 died. This game has no salvage, collection or loot of any kind at any site."
+      "sources": [
+        "https://en.wikipedia.org/wiki/German_battleship_Bismarck"
+      ],
+      "note": "Restored 2026-11. A respectful marker near the hull, not a surveyed structure or a prop. Of Bismarck's crew of 2,221, only around 114 were rescued; roughly 2,100 died. This game has no salvage, collection or loot of any kind at any site.",
+      "reveal": {
+        "distance_m": 56,
+        "elevation_deg": 12,
+        "azimuth_deg": 62,
+        "sweep_deg": 16,
+        "target_offset": [
+          14,
+          -3.5,
+          -48
+        ]
+      }
     },
     {
       "id": "bismarck-skid-trail",
@@ -104,8 +126,22 @@
       "guide_entry": "seamount-flank",
       "confidence": "medium",
       "reconstruction": false,
-      "sources": ["https://www.gmrt.org/", "https://www.magellan.gg/vrov-pilot-bismarck/"],
-      "note": "Real survey data. Restored 2026-11 about 300 m up-slope (north-east) of the hull so the dive's route reaches it: this tile's terrain shoals from 4,218.5 m at the hull to about 4,207 m here, and on to about 4,182 m some 500 m up-slope, toward the seamount summit (~4,024 m about 3 km further along the same line). Published accounts describe the real debris trail as about 1 km long down a much steeper (~14.5 degree) slope, formed when the turrets hit the seamount first and triggered a landslide that carried the hull further down -- so this point sits between the turret-debris marker (further up-slope) and the hull (down-slope), on the same real slope. This tile's grid, built from GMRT's coarser global (GEBCO-derived) fill rather than a dedicated survey of the wreck site, is far too coarse to resolve the true trail or slope angle -- what you scan here is real but smoothed terrain, not the skid mark itself."
+      "sources": [
+        "https://www.gmrt.org/",
+        "https://www.magellan.gg/vrov-pilot-bismarck/"
+      ],
+      "note": "Real survey data. Restored 2026-11 about 300 m up-slope (north-east) of the hull so the dive's route reaches it: this tile's terrain shoals from 4,218.5 m at the hull to about 4,207 m here, and on to about 4,182 m some 500 m up-slope, toward the seamount summit (~4,024 m about 3 km further along the same line). Published accounts describe the real debris trail as about 1 km long down a much steeper (~14.5 degree) slope, formed when the turrets hit the seamount first and triggered a landslide that carried the hull further down -- so this point sits between the turret-debris marker (further up-slope) and the hull (down-slope), on the same real slope. This tile's grid, built from GMRT's coarser global (GEBCO-derived) fill rather than a dedicated survey of the wreck site, is far too coarse to resolve the true trail or slope angle -- what you scan here is real but smoothed terrain, not the skid mark itself.",
+      "reveal": {
+        "distance_m": 82,
+        "elevation_deg": 13,
+        "azimuth_deg": 68,
+        "sweep_deg": 14,
+        "target_offset": [
+          -195,
+          -8.5,
+          20
+        ]
+      }
     }
   ]
 }

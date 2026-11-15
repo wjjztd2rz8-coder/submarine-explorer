@@ -16,8 +16,21 @@
       "guide_entry": "the-hole",
       "confidence": "low",
       "reconstruction": true,
-      "sources": ["https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"],
-      "note": "Game scan contact at the authored karst-grotto prop, on the locally carved ledge. Submerged stalactite galleries are documented at the real Blue Hole, but this marker's coordinate and geometry are not a surveyed gallery location."
+      "sources": [
+        "https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"
+      ],
+      "note": "Game scan contact at the authored karst-grotto prop, on the locally carved ledge. Submerged stalactite galleries are documented at the real Blue Hole, but this marker's coordinate and geometry are not a surveyed gallery location.",
+      "reveal": {
+        "distance_m": 21,
+        "elevation_deg": 4,
+        "azimuth_deg": 82,
+        "sweep_deg": 14,
+        "target_offset": [
+          16,
+          7.2,
+          0
+        ]
+      }
     },
     {
       "id": "great-blue-hole-lower-chamber",
@@ -33,8 +46,21 @@
       "guide_entry": "lower-water",
       "confidence": "low",
       "reconstruction": true,
-      "sources": ["https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"],
-      "note": "Game scan contact on the reconstructed lower floor of the Great Blue Hole. The hole's reported depth is about 125 m, but this marker is not a surveyed feature location."
+      "sources": [
+        "https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"
+      ],
+      "note": "Game scan contact on the reconstructed lower floor of the Great Blue Hole. The hole's reported depth is about 125 m, but this marker is not a surveyed feature location.",
+      "reveal": {
+        "distance_m": 44,
+        "elevation_deg": 6,
+        "azimuth_deg": 82,
+        "sweep_deg": 14,
+        "target_offset": [
+          -190,
+          38.5,
+          110
+        ]
+      }
     },
     {
       "id": "great-blue-hole-stalactites-east",
@@ -56,10 +82,15 @@
       ],
       "note": "Game scan contact at the authored karst-grotto-east prop on the south-eastern ledge. Position and gallery geometry are a reconstruction, not a surveyed gallery location.",
       "reveal": {
-        "distance_m": 38,
-        "elevation_deg": 8,
-        "azimuth_deg": 195,
-        "target_offset": [0, -4, 0]
+        "distance_m": 33,
+        "elevation_deg": 5,
+        "azimuth_deg": 204,
+        "sweep_deg": 14,
+        "target_offset": [
+          -5,
+          11.5,
+          -5
+        ]
       }
     },
     {
@@ -75,13 +106,20 @@
       "guide_entry": "outer-dropoff",
       "confidence": "high",
       "reconstruction": false,
-      "sources": ["https://www.gmrt.org/"],
+      "sources": [
+        "https://www.gmrt.org/"
+      ],
       "note": "Real survey terrain: about 4.3 km east of the hole marker, the reef flat gives way to a steep drop-off, from a few metres deep to about 196 m here and falling to well over 3,000 m further out. This transition is genuine atoll-margin bathymetry, resolved at this tile's ~58 x 61 m cell size.",
       "reveal": {
-        "distance_m": 34,
-        "elevation_deg": 12,
-        "azimuth_deg": 20,
-        "target_offset": [-12, 4, 0]
+        "distance_m": 54,
+        "elevation_deg": 5,
+        "azimuth_deg": 218,
+        "sweep_deg": 14,
+        "target_offset": [
+          -4298,
+          110.5,
+          61.5
+        ]
       }
     },
     {
@@ -97,13 +135,20 @@
       "guide_entry": "western-dropoff",
       "confidence": "high",
       "reconstruction": false,
-      "sources": ["https://www.gmrt.org/"],
+      "sources": [
+        "https://www.gmrt.org/"
+      ],
       "note": "Real GMRT terrain on the western edge of Lighthouse Reef: along 17.3153 N, the floor remains 2-4 m deep from the hole coordinate to about 87.58 W, then drops to about 30 m at 87.59 W and about 304 m at 87.60 W. This target is 157 m deep on the visible western slope, about 6.5 km west of the hole coordinate.",
       "reveal": {
-        "distance_m": 34,
-        "elevation_deg": 12,
-        "azimuth_deg": 200,
-        "target_offset": [12, 4, 0]
+        "distance_m": 58,
+        "elevation_deg": 6,
+        "azimuth_deg": 72,
+        "sweep_deg": 14,
+        "target_offset": [
+          6264,
+          127,
+          -33
+        ]
       }
     }
   ]

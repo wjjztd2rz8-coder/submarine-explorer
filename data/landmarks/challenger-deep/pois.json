@@ -21,11 +21,15 @@
       ],
       "note": "Real event and real position, corrected this session against Schmidt Ocean Institute's own cruise page (previously mis-sourced to Wikipedia and mis-dated 2018): the benthic lander 'Leggo', deployed from RV Falkor during the December 2014 'Expanding Mariana Trench Perspectives' cruise (FK141215), recorded amphipods (Hirondellea gigas) feeding on bait at 11.368536 N, 142.5875166 E, 10,929 m, on 19 December 2014. This tile's terrain reads 10,925.1 m at that point, 4 m away. `reconstruction: true` because Leggo was recovered after the cruise and nothing physical remains on the seabed here; the marker/prop at this position stands in for the historic sampling event, not a permanent structure.",
       "reveal": {
-        "distance_m": 205,
-        "elevation_deg": 24,
-        "azimuth_deg": 350,
-        "sweep_deg": 20,
-        "target_offset": [0, -35, 30]
+        "distance_m": 54,
+        "elevation_deg": 11,
+        "azimuth_deg": 32,
+        "sweep_deg": 14,
+        "target_offset": [
+          4,
+          -12.5,
+          2
+        ]
       }
     },
     {
@@ -41,8 +45,21 @@
       "guide_entry": "eastern-floor",
       "confidence": "high",
       "reconstruction": false,
-      "sources": ["https://www.gmrt.org/"],
-      "note": "Real GMRT terrain: 10920.5 m deep at the centre of row 460, column 452 (zero-based) in data/tiles/challenger-deep/heightmap.bin. This second floor scan lies about 350 m north-east of the Leggo bait-station site (moved 2026-11 from 817 m north so the dive is a short route). The shipped GMRT grid reads about 10,920 m here. It is a terrain survey point chosen for this dive, not the position of another lander deployment. No prop or staged encounter is added."
+      "sources": [
+        "https://www.gmrt.org/"
+      ],
+      "note": "Real GMRT terrain: 10920.5 m deep at the centre of row 460, column 452 (zero-based) in data/tiles/challenger-deep/heightmap.bin. This second floor scan lies about 350 m north-east of the Leggo bait-station site (moved 2026-11 from 817 m north so the dive is a short route). The shipped GMRT grid reads about 10,920 m here. It is a terrain survey point chosen for this dive, not the position of another lander deployment. No prop or staged encounter is added.",
+      "reveal": {
+        "distance_m": 72,
+        "elevation_deg": 11,
+        "azimuth_deg": 138,
+        "sweep_deg": 14,
+        "target_offset": [
+          -278,
+          -9,
+          203
+        ]
+      }
     },
     {
       "id": "cd-north-wall",
@@ -63,10 +80,15 @@
       ],
       "note": "GMRT grid depth 9,977.7 m on the north (landward) inner wall. Central-difference slopes are about 25–29° depending on baseline; the approximately 60 m grid does not resolve smaller slopes. This is the overriding-plate side of the trench; the Pacific Plate subducts beneath the Mariana Arc system.",
       "reveal": {
-        "distance_m": 78,
-        "elevation_deg": 6,
-        "azimuth_deg": 325,
-        "target_offset": [0, 4, 0]
+        "distance_m": 125,
+        "elevation_deg": 12,
+        "azimuth_deg": 338,
+        "sweep_deg": 16,
+        "target_offset": [
+          0,
+          -14,
+          22
+        ]
       }
     },
     {
@@ -88,8 +110,15 @@
       ],
       "note": "Real GMRT terrain (Ryan et al. 2009; value read directly from this tile's grid): 10,926.5 m deep, about 18.6 km west of the Eastern Pool. The Five Deeps Expedition's 5 May 2019 dive (Lahey/Ramsay) explicitly named and dove this 'Central Pool', focused on the trench's north and south subduction-zone edges (Five Deeps press release). Nearly as deep as the Eastern Pool. Optional: far enough from the required objectives that reaching it is a deliberate long transit, not a required detour.",
       "reveal": {
-        "distance_m": 75,
-        "elevation_deg": 22
+        "distance_m": 135,
+        "elevation_deg": 12,
+        "azimuth_deg": 20,
+        "sweep_deg": 14,
+        "target_offset": [
+          17025,
+          938,
+          -4220
+        ]
       }
     },
     {
@@ -111,9 +140,15 @@
       ],
       "note": "Real GMRT terrain (Ryan et al. 2009), located this session by tracing the deepest continuous path along the trench axis between the Central and Eastern Pool minima (same method as the Monterey Canyon pack's axis trace): a shallower sill at 10,704 m separates the two pools here, roughly 220 m shallower than either pool it sits between. Stewart & Jamieson (2019) independently confirm a three-basin, sill-separated structure (their Fig. 6 caption notes the deepest soundings sit in 'the westernmost of the 3 basins'), but no source consulted gives an exact coordinate for this specific sill -- this point is a terrain trace, not a citation.",
       "reveal": {
-        "distance_m": 85,
-        "elevation_deg": 22,
-        "azimuth_deg": 75
+        "distance_m": 120,
+        "elevation_deg": 11,
+        "azimuth_deg": 312,
+        "sweep_deg": 14,
+        "target_offset": [
+          7421,
+          716,
+          -4842
+        ]
       }
     },
     {
@@ -133,7 +168,18 @@
         "http://nora.nerc.ac.uk/id/eprint/524544/1/Stewart_and_Jamieson_2019_The%20five%20deeps.pdf",
         "https://www.gmrt.org/"
       ],
-      "note": "Restored 2026-11 as a route contact. Real GMRT terrain (Ryan et al. 2009; value read directly from this tile's grid): 10,917.9 m deep, about 0.6 km southwest of the eastern-pool minimum and within its depth tolerance. This is the long-published, rounded IHO-IOC GEBCO Gazetteer coordinate (11.373333 N, 142.591667 E, cited as 10,920+/-10 m by Stewart & Jamieson 2019, Table 1) carried by this game's own data/landmarks.json pin -- close enough to the true deepest cell that (unlike Lost City's catalog pin) it does not land on the wrong feature, but it predates the precision multibeam and CTD-pressure surveys (2019-2020) that pinned down the Eastern/Central Pool basins individually."
+      "note": "Restored 2026-11 as a route contact. Real GMRT terrain (Ryan et al. 2009; value read directly from this tile's grid): 10,917.9 m deep, about 0.6 km southwest of the eastern-pool minimum and within its depth tolerance. This is the long-published, rounded IHO-IOC GEBCO Gazetteer coordinate (11.373333 N, 142.591667 E, cited as 10,920+/-10 m by Stewart & Jamieson 2019, Table 1) carried by this game's own data/landmarks.json pin -- close enough to the true deepest cell that (unlike Lost City's catalog pin) it does not land on the wrong feature, but it predates the precision multibeam and CTD-pressure surveys (2019-2020) that pinned down the Eastern/Central Pool basins individually.",
+      "reveal": {
+        "distance_m": 120,
+        "elevation_deg": 11,
+        "azimuth_deg": 18,
+        "sweep_deg": 14,
+        "target_offset": [
+          -949,
+          928,
+          -3585
+        ]
+      }
     },
     {
       "id": "cd-kairei-position",
@@ -152,7 +198,18 @@
         "http://nora.nerc.ac.uk/id/eprint/524544/1/Stewart_and_Jamieson_2019_The%20five%20deeps.pdf",
         "https://www.gmrt.org/"
       ],
-      "note": "A published Eastern Pool position: Nakanishi and Hashimoto (2011), from RV Kairei 1998/99 multibeam data, 11.371 N / 142.593 E, 10,920 +/- 5 m, as listed by Stewart & Jamieson (2019) Table 1 and quoted in guide.json (eastern-pool). This tile's grid reads about 10,919 m here. Added 2026-11 as a route contact between the Leggo site and the catalog coordinate; the deepest cell in this tile lies about 550 m further east."
+      "note": "A published Eastern Pool position: Nakanishi and Hashimoto (2011), from RV Kairei 1998/99 multibeam data, 11.371 N / 142.593 E, 10,920 +/- 5 m, as listed by Stewart & Jamieson (2019) Table 1 and quoted in guide.json (eastern-pool). This tile's grid reads about 10,919 m here. Added 2026-11 as a route contact between the Leggo site and the catalog coordinate; the deepest cell in this tile lies about 550 m further east.",
+      "reveal": {
+        "distance_m": 56,
+        "elevation_deg": 11,
+        "azimuth_deg": 295,
+        "sweep_deg": 14,
+        "target_offset": [
+          -592,
+          -9.5,
+          274
+        ]
+      }
     }
   ]
 }

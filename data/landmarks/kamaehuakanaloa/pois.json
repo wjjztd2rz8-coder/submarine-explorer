@@ -25,7 +25,11 @@
         "distance_m": 27,
         "elevation_deg": 8,
         "azimuth_deg": 280,
-        "target_offset": [4, -2.5, 3]
+        "target_offset": [
+          4,
+          -2.5,
+          3
+        ]
       }
     },
     {
@@ -51,7 +55,11 @@
         "distance_m": 19,
         "elevation_deg": 8,
         "azimuth_deg": 290,
-        "target_offset": [0, -2, 0]
+        "target_offset": [
+          0,
+          -2,
+          0
+        ]
       }
     },
     {
@@ -72,7 +80,18 @@
         "https://www.gmrt.org/",
         "https://www.usgs.gov/volcanoes/loihi-seamount"
       ],
-      "note": "GMRT terrain at about 1,269 m, roughly 1 km south of the summit high and 300 m south-east of Hiolo South (moved 2026-11 from 1.4 km so the dive is a short route). This is an authored transect point along the general south-rift bearing, not a surveyed vent or rift boundary. USGS describes a 31 km rift system extending northwest and southeast from the caldera."
+      "note": "GMRT terrain at about 1,269 m, roughly 1 km south of the summit high and 300 m south-east of Hiolo South (moved 2026-11 from 1.4 km so the dive is a short route). This is an authored transect point along the general south-rift bearing, not a surveyed vent or rift boundary. USGS describes a 31 km rift system extending northwest and southeast from the caldera.",
+      "reveal": {
+        "distance_m": 26,
+        "elevation_deg": 25,
+        "azimuth_deg": 165,
+        "sweep_deg": 16,
+        "target_offset": [
+          -240.1,
+          -44,
+          -371.8
+        ]
+      }
     },
     {
       "id": "kh-peles-pit",
@@ -91,7 +110,18 @@
         "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount",
         "https://www.gmrt.org/"
       ],
-      "note": "GMRT terrain at about 1,275 m, between the Hiolo North and Hiolo South vent markers, which published cruises place inside Pele's Pit. Added 2026-11 as a route stop. This tile's ~58x61 m grid does not resolve the pit's ~600 m rim, so this marks the pit's floor around the vents, not a traced crater outline."
+      "note": "GMRT terrain at about 1,275 m, between the Hiolo North and Hiolo South vent markers, which published cruises place inside Pele's Pit. Added 2026-11 as a route stop. This tile's ~58x61 m grid does not resolve the pit's ~600 m rim, so this marks the pit's floor around the vents, not a traced crater outline.",
+      "reveal": {
+        "distance_m": 36,
+        "elevation_deg": 12,
+        "azimuth_deg": 315,
+        "sweep_deg": 16,
+        "target_offset": [
+          -80.7,
+          -29,
+          -52
+        ]
+      }
     }
   ]
 }

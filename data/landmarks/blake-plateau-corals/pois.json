@@ -24,7 +24,11 @@
         "distance_m": 50,
         "elevation_deg": 18,
         "azimuth_deg": 205,
-        "target_offset": [0, -3, 0]
+        "target_offset": [
+          0,
+          -3,
+          0
+        ]
       }
     },
     {
@@ -49,7 +53,11 @@
         "distance_m": 40,
         "elevation_deg": 16,
         "azimuth_deg": 195,
-        "target_offset": [-8.7, 31.5, 75.7]
+        "target_offset": [
+          -8.7,
+          31.5,
+          75.7
+        ]
       }
     },
     {
@@ -71,10 +79,15 @@
       ],
       "note": "The GMRT grid reads 775.5 m at this marker, about 294 m southwest of the core scan. These local depths do not establish the position of an individual coral mound in the Sowers et al. 2024 classification. The scan samples regional terrain; no colony coordinate is claimed.",
       "reveal": {
-        "distance_m": 48,
-        "elevation_deg": 16,
-        "azimuth_deg": 215,
-        "target_offset": [12, 0.5, -12]
+        "distance_m": 44,
+        "elevation_deg": 15,
+        "azimuth_deg": 228,
+        "sweep_deg": 16,
+        "target_offset": [
+          142.7,
+          38.5,
+          -159.2
+        ]
       }
     },
     {
@@ -90,13 +103,20 @@
       "guide_entry": "inter-mound-channel",
       "confidence": "high",
       "reconstruction": false,
-      "sources": ["https://www.gmrt.org/"],
+      "sources": [
+        "https://www.gmrt.org/"
+      ],
       "note": "The GMRT grid reads 779.7 m at this point, lower than the core marker at 744.2 m. The terrain depth alone does not establish a surveyed channel between individual coral mounds.",
       "reveal": {
-        "distance_m": 44,
-        "elevation_deg": 18,
-        "azimuth_deg": 170,
-        "target_offset": [-10, -2, 65]
+        "distance_m": 64,
+        "elevation_deg": 16,
+        "azimuth_deg": 318,
+        "sweep_deg": 14,
+        "target_offset": [
+          78,
+          32,
+          118
+        ]
       }
     }
   ]
