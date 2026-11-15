@@ -89,7 +89,9 @@ export const cameraControlsSystem: GameSystem = {
         !ctx.photoMode.active &&
         !ctx.settingsScreen.isOpen &&
         !ctx.globe.isOpen &&
-        !(ctx.missionRouter?.frozen ?? false)
+        !(ctx.missionRouter?.frozen ?? false) &&
+        // A double-click while looking around a reveal is part of the drag.
+        !(ctx.discovery?.reveal?.active ?? false)
       ) {
         rig.resetView();
       }

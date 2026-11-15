@@ -5,19 +5,34 @@ import {
   RevealQueue,
   revealExcerpt,
   revealFrame,
+  revealVisibleRect,
   revealStillSubjectY,
 } from '../../game/Reveal.js';
+import type { RevealViewRect } from '../../game/Reveal.js';
 import { entryIdForPoi } from '../../game/Guide.js';
 import { DiscoveryCard } from '../../ui/DiscoveryCard.js';
 import { canvasThumbnail } from '../../ui/PhotoMode.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
-import { Vector3 } from 'three';
+import { Box3, Vector3 } from 'three';
+import type { Object3D } from 'three';
+import { REVEAL_DRAG_GRACE_S, RevealGestures } from './revealGestures.js';
+
+/** The look-around hint shows on the first reveal of a page session only. */
+let lookHintShown = false;
 
 export function createRevealSystem(): GameSystem {
   const cleanup = new Disposables();
   const queue = new RevealQueue();
   let elapsed = 0;
+  /** Auto-close clock: stands still while the player is looking around. */
+  let autoElapsed = 0;
+  /** Take the journal still this frame (the player is about to move the camera). */
+  let captureNow = false;
+  let gestures: RevealGestures | null = null;
+  let subject: Object3D | null = null;
+  let clearRect: RevealViewRect | null = null;
+  let frameScale = 1;
   let captured = false;
   let finishing = false;
   let returning = false;
@@ -38,6 +53,40 @@ export function createRevealSystem(): GameSystem {
           return queue.active;
         },
         skip,
+        /**
+         * Debug/QA: the reveal subject's on-screen bounds as canvas fractions
+         * (y down), or null without a matched prop. Precise; call sparingly.
+         */
+        /** Debug/QA: the clear area the current reveal was framed for, and its distance scale. */
+        get framing() {
+          return queue.current ? { clearRect, scale: frameScale } : null;
+        },
+        subjectRect() {
+          if (!queue.current || !subject) return null;
+          const box = new Box3().setFromObject(subject, true);
+          if (box.isEmpty()) return null;
+          const cam = ctx.rig.camera;
+          cam.updateMatrixWorld();
+          const v = new Vector3();
+          let x0 = Infinity;
+          let x1 = -Infinity;
+          let y0 = Infinity;
+          let y1 = -Infinity;
+          let behind = false;
+          for (let i = 0; i < 8; i++) {
+            v.set(
+              i & 1 ? box.max.x : box.min.x,
+              i & 2 ? box.max.y : box.min.y,
+              i & 4 ? box.max.z : box.min.z,
+            ).project(cam);
+            if (v.z > 1) behind = true;
+            x0 = Math.min(x0, (v.x + 1) / 2);
+            x1 = Math.max(x1, (v.x + 1) / 2);
+            y0 = Math.min(y0, (1 - v.y) / 2);
+            y1 = Math.max(y1, (1 - v.y) / 2);
+          }
+          return { x0, x1, y0, y1, behind, distance: cam.position.distanceTo(box.getCenter(v)) };
+        },
       };
       ctx.discovery.reveal = controller;
       ctx.expose({ reveal: controller });
@@ -47,7 +96,13 @@ export function createRevealSystem(): GameSystem {
           skip();
         }
       });
+      gestures = new RevealGestures(
+        ctx.canvas,
+        () => !!queue.current && !returning && !finishing && ctx.app.state === 'dive',
+      );
       cleanup.add(() => {
+        gestures?.dispose();
+        gestures = null;
         card.dispose();
         queue.reset();
         ctx.rig.endReveal();
@@ -64,6 +119,7 @@ export function createRevealSystem(): GameSystem {
       const clearReveal = (): void => {
         queue.reset();
         card.hide();
+        gestures?.reset();
         ctx.rig.endReveal();
         returning = false;
       };
@@ -105,6 +161,9 @@ export function createRevealSystem(): GameSystem {
             const poi = queue.next();
             if (poi) {
               elapsed = 0;
+              autoElapsed = 0;
+              captureNow = false;
+              gestures?.reset();
               captured = false;
               finishing = false;
               returning = false;
@@ -122,14 +181,6 @@ export function createRevealSystem(): GameSystem {
                     a.root.position.distanceToSquared(poi.position) -
                     b.root.position.distanceToSquared(poi.position),
                 )[0];
-              const frame = revealFrame(
-                poi,
-                ctx.sub.position,
-                ctx.rig.camera.fov,
-                ctx.rig.camera.aspect,
-                prop?.sphere,
-              );
-              ctx.rig.beginReveal(frame);
               document.exitPointerLock?.();
               const entry = ctx.discovery.entries.find(
                 (e) => e.id === entryIdForPoi(poi, ctx.discovery.entries),
@@ -146,13 +197,55 @@ export function createRevealSystem(): GameSystem {
                 counts?.total ?? tally.length,
                 ctx.discovery.siteName,
               );
+              subject = prop?.root ?? null;
+              const canvas = ctx.canvas;
+              // Frame for what the card leaves clear, measured now that it is laid out.
+              const width = canvas.clientWidth || window.innerWidth;
+              const height = canvas.clientHeight || window.innerHeight;
+              const bounds = canvas.getBoundingClientRect?.();
+              clearRect = (bounds && card.clearRect?.(bounds)) ?? revealVisibleRect(width, height);
+              const frame = revealFrame(
+                poi,
+                ctx.sub.position,
+                ctx.rig.camera.fov,
+                ctx.rig.camera.aspect,
+                prop?.sphere,
+                {
+                  width,
+                  height,
+                  baseFovDeg: ctx.config.camera.fovDeg,
+                  rect: clearRect,
+                  box: subject ? new Box3().setFromObject(subject) : undefined,
+                },
+              );
+              frameScale = frame.scale;
+              ctx.rig.beginReveal(frame);
+              if (!lookHintShown) {
+                lookHintShown = true;
+                card.showHint();
+              }
             }
           }
         }
         if (!queue.active) return;
         if (queue.current) {
-          if (!f.blocked) elapsed += f.dt;
-          if (elapsed >= REVEAL_AUTO_DISMISS_S) finishing = true;
+          if (!f.blocked) {
+            elapsed += f.dt;
+            gestures?.tick(f.dt);
+            // Looking around holds the auto-close until a moment after the last drag.
+            const looking =
+              !!gestures && (gestures.dragging || gestures.sinceInput < REVEAL_DRAG_GRACE_S);
+            if (!looking) autoElapsed += f.dt;
+          }
+          if (gestures?.used) card.hideHint();
+          if (gestures?.pending && !returning && !finishing) {
+            // The journal still keeps the authored framing: take it before the first move.
+            if (!captured) {
+              captureNow = true;
+              ctx.rig.revealSettle();
+            } else gestures.flush(ctx.rig);
+          }
+          if (autoElapsed >= REVEAL_AUTO_DISMISS_S) finishing = true;
           if (finishing && captured && !returning) {
             ctx.rig.endReveal();
             returning = true;
@@ -160,6 +253,7 @@ export function createRevealSystem(): GameSystem {
           if (returning && !ctx.rig.revealReturning) {
             const poi = queue.current;
             queue.current = null;
+            gestures?.reset();
             card.hide();
             if (readMore) ctx.journal.open(entryIdForPoi(poi, ctx.discovery.entries));
           }
@@ -170,8 +264,10 @@ export function createRevealSystem(): GameSystem {
       },
       'render.capture': (_f, ctx) => {
         const poi = queue.current;
-        if (!poi || captured || (elapsed < REVEAL_STILL_CAPTURE_S && !finishing)) return;
+        if (!poi || captured) return;
+        if (elapsed < REVEAL_STILL_CAPTURE_S && !finishing && !captureNow) return;
         captured = true;
+        captureNow = false;
         if (!poi.def.reveal) return;
         stillTarget.copy(poi.position);
         const subjectY = revealStillSubjectY(ctx.rig.camera, stillTarget);

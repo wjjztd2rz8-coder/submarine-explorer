@@ -1,5 +1,9 @@
-// Capture discovery reveal shots (landscape + phone portrait) across landmarks.
-// Usage: node tools/playtest/capture-reveals.mjs <outDir> [siteId ...] [--base=http://127.0.0.1:4793/]
+// Capture discovery reveal shots across landmarks (default 1280x720 and phone
+// portrait 390x844; `--sizes=844x390,390x844` picks others, phone-sized ones
+// with touch emulation). `--only=site/poi,...` limits to listed reveals.
+// index.json records, per size, the matched subject's on-screen bounds
+// (canvas fractions, y down) next to the area the card leaves clear.
+// Usage: node tools/playtest/capture-reveals.mjs <outDir> [siteId ...] [--base=http://127.0.0.1:4793/] [--sizes=WxH,...] [--only=site/poi,...]
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -14,11 +18,28 @@ const { chromium } = require('@playwright/test');
 
 const rawArgs = process.argv.slice(2);
 let base = 'http://127.0.0.1:4793/';
+let sizes = [
+  [1280, 720],
+  [390, 844],
+];
+let only = null;
 const posArgs = [];
 for (const arg of rawArgs) {
   if (arg.startsWith('--base=')) base = arg.slice('--base='.length);
+  else if (arg.startsWith('--sizes='))
+    sizes = arg
+      .slice('--sizes='.length)
+      .split(',')
+      .map((s) => s.split('x').map(Number));
+  else if (arg.startsWith('--only=')) only = new Set(arg.slice('--only='.length).split(','));
   else posArgs.push(arg);
 }
+const sizeName = ([w, h]) =>
+  w === 1280 && h === 720 ? '' : w === 390 && h === 844 ? '__portrait' : `__${w}x${h}`;
+const contextFor = ([w, h]) =>
+  Math.min(w, h) < 500
+    ? { viewport: { width: w, height: h }, isMobile: true, hasTouch: true, deviceScaleFactor: 3 }
+    : { viewport: { width: w, height: h } };
 if (!base.endsWith('/')) base += '/';
 
 const [outDir, ...requestedSites] = posArgs;
@@ -65,7 +86,8 @@ async function captureOne(url, poiId, outPath, contextOptions) {
       .waitFor({ state: 'visible', timeout: 40000 });
     await page.waitForTimeout(2800);
     await page.screenshot({ path: outPath });
-    return { ok: true, error: null };
+    const rect = await page.evaluate(() => window.__game?.reveal?.subjectRect?.() ?? null);
+    return { ok: true, error: null, rect };
   } catch (err) {
     const msg = errors[0] ?? String(err?.message ?? err).slice(0, 200);
     return { ok: false, error: msg };
@@ -88,21 +110,20 @@ try {
     const doc = JSON.parse(fs.readFileSync(poisPath, 'utf8'));
     const pois = Array.isArray(doc) ? doc : (doc.pois ?? []);
     for (const poi of pois) {
+      if (only && !only.has(`${site}/${poi.id}`)) continue;
       const url = `${base}?mission=${encodeURIComponent(site)}&skipBriefing=1&reveal=${encodeURIComponent(poi.id)}`;
-      const landFile = `${site}__${poi.id}.png`;
-      const portFile = `${site}__${poi.id}__portrait.png`;
-      const land = await captureOne(url, poi.id, path.join(outDir, landFile), {
-        viewport: { width: 1280, height: 720 },
-      });
-      const port = await captureOne(url, poi.id, path.join(outDir, portFile), {
-        viewport: { width: 390, height: 844 },
-        isMobile: true,
-        hasTouch: true,
-        deviceScaleFactor: 2,
-      });
-      const succeeded = land.ok && port.ok;
-      const error = land.error ?? port.error ?? undefined;
+      const shots = [];
+      for (const size of sizes) {
+        const file = `${site}__${poi.id}${sizeName(size)}.png`;
+        const r = await captureOne(url, poi.id, path.join(outDir, file), contextFor(size));
+        shots.push({ size: `${size[0]}x${size[1]}`, file, ...r });
+      }
+      const landFile = shots[0].file;
+      const portFile = shots[1]?.file ?? shots[0].file;
+      const succeeded = shots.every((x) => x.ok);
+      const error = shots.find((x) => x.error)?.error ?? undefined;
       results.push({
+        shots: shots.map(({ size, file, rect }) => ({ size, file, rect })),
         site,
         poi: poi.id,
         name: poi.name ?? poi.id,
@@ -134,7 +155,10 @@ const cards = results
   }
   <figcaption>
     <strong>${esc(r.site)}</strong> · <code>${esc(r.poi)}</code>${r.primary ? ' <span class="pri">primary</span>' : ''}<br>
-    ${esc(r.name)} <em>(${esc(r.kind)})</em> · <a href="${esc(r.portraitFile)}" target="_blank">portrait</a>
+    ${esc(r.name)} <em>(${esc(r.kind)})</em> · ${r.shots
+      .slice(1)
+      .map((x) => `<a href="${esc(x.file)}" target="_blank">${esc(x.size)}</a>`)
+      .join(' · ')}
   </figcaption>
 </figure>`,
   )
