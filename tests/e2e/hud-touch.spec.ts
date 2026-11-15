@@ -13,7 +13,7 @@ import {
 } from './helpers/phoneHud.js';
 import type { Waypoints } from '../../src/ui/Waypoints.js';
 import { completeScan } from './helpers/scan.js';
-import { homeReady } from './helpers/home.js';
+import { homeReady, homeSiteEntry, homeTrayButton, openHomeMore } from './helpers/home.js';
 import { diveReady } from './helpers/dive.js';
 import { type Discovery } from '../../src/game/Discovery.js';
 import { type Submarine } from '../../src/sub/Submarine.js';
@@ -527,6 +527,15 @@ freshTest.describe('large UI and menu reachability', () => {
           await expect(page.locator('.globe.is-embedded')).toBeHidden();
           expect(
             await menu
+              .locator(':scope > button:not(.home-more-toggle)')
+              .evaluateAll((elements) =>
+                elements.map((element) => element.textContent?.replace(/^Dive: .*/, 'Dive')),
+              ),
+          ).toEqual(['Dive', 'Dive sites']);
+          await openHomeMore(page);
+          const more = home.locator('.home-more');
+          expect(
+            await more
               .locator(':scope > *')
               .evaluateAll((elements) =>
                 elements.map((element) =>
@@ -538,8 +547,6 @@ freshTest.describe('large UI and menu reachability', () => {
                 ),
               ),
           ).toEqual([
-            'Dive',
-            'Dive sites',
             'Free dive',
             'Daily dive',
             'Mode',
@@ -548,8 +555,8 @@ freshTest.describe('large UI and menu reachability', () => {
             'Settings',
             'Controls',
           ]);
-          for (const name of ['Dive sites', 'Free dive']) {
-            const origin = menu.getByRole('button', { name, exact: true });
+          for (const name of ['Dive sites', 'Free dive'] as const) {
+            const origin = await homeSiteEntry(page, name);
             await reachable(origin);
             await origin.tap();
             await expect(home.locator('.home-sites h2')).toHaveText(name);
@@ -562,7 +569,7 @@ freshTest.describe('large UI and menu reachability', () => {
             await expect(page.locator('.globe.is-embedded')).toBeHidden();
             await expect(origin).toBeFocused();
           }
-          const mode = home.locator('.mode-selector');
+          const mode = more.locator('.mode-selector');
           for (const radio of await mode.getByRole('radio').all()) await reachable(radio);
           await mode.getByRole('radio', { name: 'Realistic' }).tap();
           await expect(mode.getByRole('radio', { name: 'Realistic' })).toBeChecked();
@@ -573,9 +580,9 @@ freshTest.describe('large UI and menu reachability', () => {
           await mode.getByLabel('Currents', { exact: true }).uncheck();
           await expect(mode.locator('.mode-custom-tag')).toBeVisible();
           for (const name of ['Daily dive', 'Controls', 'Journal'])
-            await reachable(menu.getByRole('button', { name: new RegExp(name) }));
+            await reachable(more.getByRole('button', { name: new RegExp(name) }));
           // Daily must launch even while the expanded picker is scrolled out of view.
-          await menu.getByRole('button', { name: /Daily dive/ }).tap();
+          await more.locator('.daily-card').tap();
           await expect(page.locator('.briefing')).toBeVisible();
           const briefing = page.locator('.briefing');
           await briefing.getByRole('button', { name: 'Advanced' }).tap();
@@ -591,10 +598,8 @@ freshTest.describe('large UI and menu reachability', () => {
           page,
         }) => {
           await ready(page, '/?touch=1&tier=low');
-          await page
-            .locator('.home-menu')
-            .getByRole('button', { name: 'Journal', exact: true })
-            .tap();
+          await openHomeMore(page);
+          await homeTrayButton(page, 'Journal').tap();
           const journal = page.getByRole('dialog', { name: 'Journal', exact: true });
           await expect(journal).toBeVisible();
           // Initial async catalogue loading replaces the sheet. Measure only its settled content.

@@ -1,5 +1,5 @@
 import { siteIds } from '../content.js';
-import { homeReady } from './helpers/home.js';
+import { homeReady, homeTrayButton, openHomeMore } from './helpers/home.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { scanWithKeyboard } from './helpers/scan.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
@@ -237,13 +237,13 @@ for (const [width, height] of [
     });
     await page.goto('/');
     await homeReady(page, true);
-    await page.locator('.home-menu').getByRole('button', { name: 'Journal', exact: true }).click();
+    await openHomeMore(page);
+    await homeTrayButton(page, 'Journal').click();
     await expect(page.locator('.journal')).toBeVisible();
     await expect(page.locator('.journal [data-cosmetic]')).toHaveCount(0);
     await page.locator('.jr-close').click();
-    const opener = page
-      .locator('.home-menu')
-      .getByRole('button', { name: 'Your sub', exact: true });
+    await openHomeMore(page);
+    const opener = homeTrayButton(page, 'Your sub');
     await opener.click();
     const sub = page.locator('.sub-screen');
     await expect(sub).toBeVisible();

@@ -3,6 +3,7 @@ import type * as THREE from 'three';
 import { clockFramesUntil, pauseClockBeforeNavigation, withClockFrames } from './helpers/clock.js';
 import type { Journal } from '../../src/ui/Journal.js';
 import { expect, test, type Page, type Locator } from './helpers/unlocked.js';
+import { homeSiteEntry, homeTrayButton, openHomeMore } from './helpers/home.js';
 
 test.beforeEach(async ({ page }) => pauseClockBeforeNavigation(page));
 
@@ -133,7 +134,8 @@ test('home menus and nested dialogs cycle visibly, close with Escape, and restor
     ['Settings', '.settings', 'Settings'],
     ['Controls', '.controls-card', 'Controls guide'],
   ]) {
-    const opener = home.getByRole('button', { name, exact: true });
+    await openHomeMore(page);
+    const opener = homeTrayButton(page, name);
     await opener.focus();
     await page.keyboard.press('Enter');
     // Regression: Home Controls must expose the named device guide to keyboard users.
@@ -146,8 +148,9 @@ test('home menus and nested dialogs cycle visibly, close with Escape, and restor
     await expect(dialog).toBeHidden();
     await expect(opener).toBeFocused();
   }
-  for (const name of ['Dive sites', 'Free dive']) {
-    await home.getByRole('button', { name, exact: true }).focus();
+  for (const name of ['Dive sites', 'Free dive'] as const) {
+    const entry = await homeSiteEntry(page, name);
+    await entry.focus();
     await page.keyboard.press('Enter');
     await expect(page.locator('.home-sites')).toBeVisible();
     await cycle(page, home);
@@ -161,9 +164,8 @@ test.describe('touch Home guidance', () => {
   test('Controls exposes the touch guide and restores focus on close', async ({ page }) => {
     // Regression: touch Home opened keyboard rebinding instead of the accessible touch guide.
     await boot(page, '/?tier=low');
-    const opener = page
-      .locator('.home-menu')
-      .getByRole('button', { name: 'Controls', exact: true });
+    await openHomeMore(page);
+    const opener = homeTrayButton(page, 'Controls');
     const guide = page.getByRole('dialog', { name: 'How to play', exact: true });
     for (let opening = 0; opening < 2; opening++) {
       await opener.focus();

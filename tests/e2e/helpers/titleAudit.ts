@@ -1,6 +1,7 @@
 import { expect, test, type Page } from './unlocked.js';
 import type { GameContext } from '../../../src/app/context.js';
 import { waitForFrames } from './frames.js';
+import { homeSiteEntry, homeTrayButton, openHomeMore } from './home.js';
 
 type AuditGame = Pick<
   GameContext,
@@ -66,32 +67,40 @@ export function titleAudit(base = '/') {
   test('title focus order, selectors and modal Escape return', async ({ page }) => {
     await boot(page, `${base}?tier=low`);
     const menu = page.locator('.home-menu');
+    const moreToggle = page.locator('.home-more-toggle');
     await expect(menu.getByRole('button', { name: /^(Dive|Continue)(:|$)/ })).toBeFocused();
     await trapped(page, '.home-menu');
-    for (const entry of ['Dive sites', 'Free dive']) {
-      for (const exit of ['Back to menu', 'Escape']) {
-        await menu.getByRole('button', { name: entry, exact: true }).click();
+    for (const entry of ['Dive sites', 'Free dive'] as const) {
+      for (const exit of ['Back to menu', 'Escape'] as const) {
+        const origin = await homeSiteEntry(page, entry);
+        await origin.click();
         await trapped(page, '.home-screen');
         if (exit === 'Escape') await page.keyboard.press('Escape');
         else await page.getByRole('button', { name: exit }).click();
-        await expect(menu.getByRole('button', { name: entry, exact: true })).toBeFocused();
+        await expect(origin).toBeFocused();
       }
     }
+    await openHomeMore(page);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.home-more')).toBeHidden();
+    await expect(moreToggle).toBeFocused();
     for (const [name, selector] of [
       ['Settings', '.settings'],
       ['Controls', '.controls-card'],
       ['Journal', '.journal'],
-    ]) {
-      const origin = menu.getByRole('button', { name, exact: true });
+      ['Your sub', '.sub-screen'],
+    ] as const) {
+      await openHomeMore(page);
+      const origin = homeTrayButton(page, name);
       await origin.click();
       await expect(page.locator(selector)).toBeVisible();
       await trapped(page, selector);
-      await idle(page);
+      if (name !== 'Your sub') await idle(page);
       const before = await draws(page);
       await page.keyboard.press('Escape');
       await expect(page.locator(selector)).toBeHidden();
       await expect(origin).toBeFocused();
-      await expect.poll(() => draws(page)).toBeGreaterThan(before);
+      if (name !== 'Your sub') await expect.poll(() => draws(page)).toBeGreaterThan(before);
     }
   });
 
@@ -196,7 +205,8 @@ export function titleAudit(base = '/') {
     await page.setViewportSize({ width: 390, height: 844 });
     await expect.poll(() => draws(page)).toBeGreaterThan(before);
     await idle(page);
-    await page.locator('.home-menu').getByRole('button', { name: 'Settings', exact: true }).click();
+    await openHomeMore(page);
+    await homeTrayButton(page, 'Settings').click();
     const settings = page.locator('.settings');
     const reduceMotion = settings.getByRole('checkbox', {
       name: 'Reduce motion (no banking, particles or flashes)',
@@ -214,7 +224,8 @@ export function titleAudit(base = '/') {
     expect(
       await page.evaluate(() => (window.__game as unknown as AuditGame).titleScene.animated),
     ).toBe(false);
-    await page.locator('.home-menu').getByRole('button', { name: 'Settings', exact: true }).click();
+    await openHomeMore(page);
+    await homeTrayButton(page, 'Settings').click();
     await expect(settings).toBeVisible();
     await reduceMotion.uncheck();
     await expect(reduceMotion).not.toBeChecked();
@@ -302,10 +313,8 @@ export function titleAudit(base = '/') {
     expect(await gameplay(page)).toEqual(initial);
     for (let i = 0; i < 3; i++) {
       const before = await draws(page);
-      await page
-        .locator('.home-menu')
-        .getByRole('button', { name: 'Journal', exact: true })
-        .click();
+      await openHomeMore(page);
+      await homeTrayButton(page, 'Journal').click();
       await idle(page);
       await page.keyboard.press('Escape');
       await expect.poll(() => draws(page)).toBeGreaterThan(before);
