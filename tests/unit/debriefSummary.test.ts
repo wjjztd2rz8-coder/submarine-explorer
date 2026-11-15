@@ -57,6 +57,17 @@ const stats: DebriefStats = {
   ],
   objectives: { completed: 1, total: 1 },
 };
+it('lists landmarks before wildlife in discovery order', () => {
+  const dive = {
+    ...stats,
+    discoveries: [
+      { poiId: 'life:jelly', name: 'Jelly' },
+      { poiId: 'bow', name: 'Bow' },
+      { poiId: 'stern', name: 'Stern' },
+    ],
+  };
+  expect(debriefModel(dive, site).finds.map((f) => f.name)).toEqual(['Bow', 'Stern', 'Jelly']);
+});
 it('lists distinct scans this dive including species, reads the newest picture, and omits facts already revealed', () => {
   const store = new DiscoveryStore(null);
   store.record('titanic', 'bow');
