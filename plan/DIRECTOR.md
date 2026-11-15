@@ -129,23 +129,26 @@ under 100 s.
 Not in this sprint: opening-frame art passes, bug-hunt and verify briefs, CI shard tuning,
 Realistic mode, cosmetics, new plan documents.
 
-## Start of the next thread: use the Cursor Models pool first (owner, 2026-11-14 15:55)
+## Routing from Saturday night: Codex first (owner's usage panel, 2026-11-14 late evening)
 
-The owner looked at the usage panel and said the spending "seemed off": Claude's session was
-at 4% while Cursor's "Cursor Models" pool (Composer, Grok) sat at 100%, unused all day, and
-"Other Models" at 35%. The first two threads sent every code task to GPT-5.6 Sol or Opus.
+Cursor's "Other Models" pool (Gemini, GPT-5.6 Sol, Claude) is at 3% and does not reset until
+Nov 24, so it is retired. "Cursor Models" (Composer, Grok) fell from 99% to 28% in about six
+hours and will not last Sunday as the default. Codex has a full 5-hour window, 69% of its
+week and one reset in hand. Claude has 67% of its week (Fable 53%).
 
-- **Default code delegate is now Cursor Composer 2.5** (Grok as the alternative), for every
-  task where it fits: script work, config, test updates after data changes, small and
-  medium game-code changes with a clear spec. Backlog items 1, 3, 4 and 6 fit; try item 2
-  there first too.
-- Step up to GPT-5.6 Sol, Codex or Opus (medium effort) only when Composer has failed at a
-  task or the task is a cross-cutting design problem. Say why in the brief.
-- Sonnet stays for item 5 (facts); Gemini for anything judged from screenshots.
-- The orchestrator itself is the largest Claude cost. Keep the thread short, do not read
-  images or logs that a delegate can summarise, and check `ai-limits` before each launch.
-- This thread paused at 15:55 until the Claude session reset at about 17:50 (18:30 by
-  `ai-limits`). Nothing is running.
+- **Default code delegate is now Codex**, three at a time at medium effort: GPT-5.6 Sol for
+  well-specified changes, GPT-6.1 Sol for cross-cutting or previously failed work. If the
+  5-hour window empties on Sunday, ask the owner for the Codex reset.
+- **Composer** only for small mechanical changes (config, one-line test updates), so the
+  28% lasts through Sunday.
+- **Screenshot judgement moves from Gemini to Claude Sonnet.** Anything of S13's reveal
+  framing that Gemini did not finish goes to Sonnet.
+- **Sunday's first-time-player review** (the S8 kind) goes to Sonnet, after the owner's
+  phone test.
+- **Opus** unchanged: one at a time, medium effort, for work Codex has failed at.
+- **OpenCode** unchanged; try it once on a small mechanical change before Composer runs out.
+- The limit of about four delegates playing at once still holds: it is the machine, not
+  the budgets.
 
 ## How to work (lessons from the first 80 minutes)
 
@@ -153,25 +156,26 @@ The first orchestrator thread spent 63 points of the Claude 5-hour window in 80 
 These rules exist so that does not repeat.
 
 - **The orchestrator specifies, accepts and merges. It does not implement or read images.**
-  Source edits go to a delegate, even small ones. Screenshot judgement goes to Gemini.
+  Source edits go to a delegate, even small ones. Screenshot judgement goes to Sonnet.
   Read tables and short reports.
 - **Keep the thread short.** State lives in this file, in git and in memory. Update this
   file's State and Backlog when something lands; do not narrate in chat. Hand off to a fresh
   thread again if this one grows long.
 - **Delegates, by job** (all through T3 `delegate_task`, `isolation: "worktree"`, one clear
   file-ownership list each, final report capped at about 20 lines):
-  - Cursor GPT-5.6 Sol (reasoning high): game code, test fixes.
-  - Cursor Composer 2.5: small config or mechanical changes.
-  - Cursor Gemini 4 Carbon: anything judged by looking at screenshots.
-  - Codex GPT-6.1 Sol: game code, **at most two at a time**, medium effort for well-specified
-    work. Four at high effort emptied its 5-hour window in 35 minutes and every task died
-    before its final test run. Codex cannot open a browser.
+  - Codex (default for game code and test fixes): GPT-5.6 Sol for well-specified work,
+    GPT-6.1 Sol for harder work; **at most three at a time, medium effort**. Four at high
+    effort emptied its 5-hour window in 35 minutes and every task died before its final
+    test run. Codex delegates do not play the game; give them test-verifiable work.
+  - Cursor Composer 2.5: small config or mechanical changes only (pool at 28%).
+  - Cursor "Other Models" (Gemini, GPT, Claude): retired, pool empty until Nov 24.
   - OpenCode free models (DeepSeek V4.1 Flash, Inkling 2): self-contained scripts outside
     the game code that can check themselves.
   - Claude Opus 5.5 (owner, 2026-11-14): ambitious work that has to be done well, for less
     than Fable costs: cross-cutting gameplay design and implementation, or a fix another
     delegate failed at. It spends the Claude window, so one at a time.
-  - Claude Sonnet: writing that needs taste (facts, copy).
+  - Claude Sonnet: writing that needs taste (facts, copy), and anything judged by looking
+    at screenshots.
 - **If a delegate dies at a usage limit, look at its worktree first.** Staged or committed
   work that typechecks can be committed and merged by the orchestrator.
 - **Site-data changes break tests far from the change.** Twice a delegate's focused test
@@ -196,13 +200,13 @@ These rules exist so that does not repeat.
 ## Budgets (owner, 2026-11-14)
 
 - The owner does not care to have any resets left after this weekend. Spend freely.
-- **Claude:** the reset was applied at about 13:30 CST and is gone. One Opus delegate at high
-  effort plus a long orchestrator thread took the 5-hour window from 100% to 7% by 15:40.
-  Window resets 18:30. Use Opus at medium effort and keep the orchestrator thread short.
-- **Codex:** 5-hour window empty until 16:41 CST; 84% of the week left. Two tasks at a time.
-- **Cursor:** two separate pools, both fine to run to zero: "Cursor Models" (Composer, Grok),
-  99% left, and "Other Models" (Gemini, GPT, Claude), 35% left at 15:40 (five GPT-5.6 Sol
-  tasks and one Gemini run cost about 38 points). Prefer Composer for small work. Reset Nov 24.
+- **Claude:** no reset left. 35% of the 5-hour window at 21:46 Saturday (resets 23:30), 67%
+  of the week, Fable 53%. Opus at medium effort, one at a time; keep the orchestrator
+  thread short.
+- **Codex:** full 5-hour window at 21:46 Saturday, 69% of the week, one reset available.
+  Three tasks at a time.
+- **Cursor:** "Cursor Models" (Composer, Grok) 28% left; "Other Models" 3% left, retired.
+  Both reset Nov 24, after the sprint.
 - **OpenCode:** free models, no limit to manage.
 - Check Claude, Codex and Cursor with `~/.local/bin/ai-limits --refresh` (poll no faster than every
   2 minutes).
