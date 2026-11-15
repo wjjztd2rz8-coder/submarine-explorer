@@ -757,10 +757,10 @@ it('scan card guidance points at the mission objective, not the nearest contact'
   try {
     // Range guidance occupies the shared slot on every device.
     f.controls.setTouchMode(false);
-    overlay.update(view, { scan: 'G', guide: 'J', rise: 'Space', sink: 'Ctrl' }, null, 0);
+    overlay.update(view, { scan: 'G', guide: 'J', rise: 'Space', sink: 'C' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
     expect(name.textContent).toBe('Stern section');
-    expect(hint.textContent).toBe('Turn right · Go down ↓ 237 m (hold Ctrl) · 692 m');
+    expect(hint.textContent).toBe('Turn right · Go down ↓ 237 m (hold C) · 692 m');
     // In scan range the card changes to an aim cue for the same target.
     view.objectiveInRange = true;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);

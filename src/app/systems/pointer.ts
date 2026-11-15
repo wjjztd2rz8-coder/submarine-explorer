@@ -183,57 +183,93 @@ export function createPointerSystem(): GameSystem {
         true,
       );
 
-      // A one-time tip the first time Ctrl+W is pressed in a dive.
-      let ctrlTipShown = false;
+      // Ctrl+W tip: dismissible during active driving; hidden under modals and after dismiss.
+      let ctrlTipDismissedForever = false;
       try {
-        ctrlTipShown =
+        ctrlTipDismissedForever =
           JSON.parse(localStorage.getItem('subexplorer.tips.v1') ?? '{}').ctrlW === true;
       } catch {
         /* A session-only tip is still useful. */
       }
+      let ctrlTipDismissedThisDive = false;
+      let ctrlTipArmed = false;
       const ctrlTip = document.createElement('div');
       ctrlTip.className = 'hud-ctrl-tip';
       ctrlTip.hidden = true;
       ctrlTip.innerHTML = '<span>Ctrl+W may close this tab. Use C or fullscreen.</span>';
+      const dismissCtrlTip = (persist: boolean): void => {
+        ctrlTipArmed = false;
+        ctrlTipDismissedThisDive = true;
+        ctrlTip.hidden = true;
+        if (!persist) return;
+        ctrlTipDismissedForever = true;
+        try {
+          localStorage.setItem('subexplorer.tips.v1', JSON.stringify({ ctrlW: true }));
+        } catch {
+          /* Private storage is optional. */
+        }
+      };
       const dismissTip = document.createElement('button');
       dismissTip.type = 'button';
       dismissTip.textContent = 'Dismiss';
-      dismissTip.addEventListener('click', () => {
-        ctrlTip.hidden = true;
-      });
+      dismissTip.addEventListener('click', () => dismissCtrlTip(true));
       const fullscreenTip = document.createElement('button');
       fullscreenTip.type = 'button';
       fullscreenTip.textContent = 'Fullscreen';
       fullscreenTip.addEventListener('click', () => {
         void canvas.requestFullscreen?.().catch(() => {});
-        ctrlTip.hidden = true;
+        dismissCtrlTip(false);
       });
       ctrlTip.append(fullscreenTip, dismissTip);
       document.body.append(ctrlTip);
       cleanup.add(() => ctrlTip.remove());
+      const ctrlTipBlocked = (c: typeof ctx, frozen: boolean): boolean =>
+        c.app.state !== 'dive' ||
+        frozen ||
+        c.pause.isOpen ||
+        c.settingsScreen.isOpen ||
+        c.globe.isOpen ||
+        c.discovery.guide.isOpen ||
+        c.discovery.debrief.isOpen ||
+        (c.discovery.reveal?.active ?? false) ||
+        (c.missionRouter?.frozen ?? false) ||
+        (c.missionRouter?.debriefOpen ?? false) ||
+        c.photoMode.active;
+      const syncCtrlTip = (c: typeof ctx, frozen: boolean): void => {
+        const blocked = ctrlTipBlocked(c, frozen);
+        ctrlTip.hidden =
+          blocked ||
+          ctrlTipDismissedForever ||
+          ctrlTipDismissedThisDive ||
+          !ctrlTipArmed ||
+          c.app.state !== 'dive' ||
+          frozen;
+      };
+      cleanup.add(
+        ctx.bus.on('mission:started', () => {
+          ctrlTipDismissedThisDive = false;
+          ctrlTipArmed = false;
+          ctrlTip.hidden = true;
+        }),
+      );
       cleanup.listen(window, 'keydown', (e) => {
         const target = e.target as HTMLElement | null;
         if (
-          ctrlTipShown ||
+          ctrlTipDismissedForever ||
+          ctrlTipDismissedThisDive ||
           !(e.ctrlKey && e.key.toLowerCase() === 'w') ||
           e.repeat ||
-          ctx.globe.isOpen ||
-          ctx.settingsScreen.isOpen ||
-          (ctx.missionRouter?.frozen ?? false) ||
+          ctrlTipBlocked(ctx, ctx.missionRouter?.frozen ?? false) ||
           (target &&
             (target.tagName === 'INPUT' ||
               target.tagName === 'TEXTAREA' ||
               target.isContentEditable))
         )
           return;
-        ctrlTipShown = true;
-        ctrlTip.hidden = false;
-        try {
-          localStorage.setItem('subexplorer.tips.v1', JSON.stringify({ ctrlW: true }));
-        } catch {
-          /* Private storage is optional. */
-        }
+        ctrlTipArmed = true;
+        syncCtrlTip(ctx, ctx.missionRouter?.frozen ?? false);
       });
+      ctx.pointerLook.syncCtrlTip = (frozen: boolean) => syncCtrlTip(ctx, frozen);
     },
     frame: {
       'gate.pointer': (f, ctx) => {
@@ -246,6 +282,7 @@ export function createPointerSystem(): GameSystem {
         // D-INPUT-HUD: re-take the keyboard lock when play resumes.
         if (wasFrozen && !f.frozen) void ctx.keyboard.lock();
         wasFrozen = f.frozen;
+        ctx.pointerLook.syncCtrlTip?.(f.frozen);
       },
     },
   };

@@ -149,7 +149,7 @@ for (const layout of [
               await expect(page.locator('.guidance-slot')).toHaveAttribute('data-step', step!);
               await expect(page.locator('.guidance-name')).toHaveText(
                 step === 'depth'
-                  ? 'Hold Space to rise or Ctrl to sink.'
+                  ? 'Hold Space to rise or C to sink.'
                   : /^(Get closer to scan · \d+ m|Hold G on a glowing target\.)$/,
               );
               await expect(page.getByRole('button', { name: 'Skip', exact: true })).toBeVisible();

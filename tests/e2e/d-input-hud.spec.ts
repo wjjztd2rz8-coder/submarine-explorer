@@ -74,7 +74,7 @@ test('readable contextual HUD, controls and UI scale survive reload', async ({ p
   await settings.getByRole('button', { name: 'Controls' }).click();
   await expect(page.getByRole('dialog', { name: 'Controls' })).toBeVisible();
   await expect(settings.locator('[data-action="scan"]')).toHaveText('G');
-  await expect(settings.locator('[data-action="ballastFlood"]')).toContainText('Ctrl');
+  await expect(settings.locator('[data-action="ballastFlood"]')).toContainText('C');
   await expect(settings.locator('[data-action="ping"]')).toHaveCount(0);
   await expect(settings.locator('[data-action="togglePhotoMode"]')).toHaveText('P');
   await expect(settings.locator('[data-action="capturePhoto"]')).toHaveText('Enter');
@@ -222,7 +222,7 @@ test('v1 custom bindings migrate without taking new one-handed defaults', async 
     ahead: ['KeyI'],
     toggleLights: [],
     scan: ['KeyG'],
-    descend: ['ControlLeft', 'ControlRight', 'KeyC'],
+    descend: ['KeyC', 'ControlLeft', 'ControlRight'],
     journal: ['KeyH'],
     saved: 3,
   });

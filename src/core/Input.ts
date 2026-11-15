@@ -138,7 +138,7 @@ export function defaultActions(): ActionBinding[] {
       id: 'ballastFlood',
       label: 'Flood ballast (dive)',
       category: 'Piloting',
-      keys: ['ControlLeft', 'ControlRight', 'KeyC'],
+      keys: ['KeyC', 'ControlLeft', 'ControlRight'],
       pad: 'B / circle',
     },
     { id: 'toggleLights', label: 'Headlights', category: 'Systems', keys: ['KeyL'], pad: 'X' },
