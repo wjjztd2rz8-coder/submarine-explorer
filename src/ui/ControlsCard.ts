@@ -100,7 +100,8 @@ export function controlGroups(device: InputDevice, key: KeyOf, input?: Input): C
     {
       heading: 'Explore',
       rows: [
-        [`${key('scan')} (hold)`, 'Scan what you are facing'],
+        [`${key('scan')} (hold)`, 'Scan the armed target'],
+        [key('cycleScanTarget'), 'Next scan target'],
         [key('toggleLights'), 'Headlights'],
         [key('togglePhotoMode'), 'Photo mode'],
         [key('toggleJournal'), 'Journal'],

@@ -281,7 +281,7 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
       if (device === 'touch') pointer(f.scan, 'pointerdown', 1);
       else if (device === 'keyboard') input.injectKey('KeyG', true);
       else buttons[5] = { value: 1, pressed: true };
-      for (const id of ['objective', 'sample:rock', 'life:fish']) {
+      for (const id of ['objective', 'life:fish', 'sample:rock']) {
         tick(0.5);
         expect(scanner.view.activeId).toBe(id);
         expect(scanner.view.candidateId).toBe(id);
@@ -298,7 +298,7 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
       expect(scanner.view.objectiveId).toBeNull();
       expect(card.children[0].textContent).not.toBe('OBJECTIVE');
       expect(complete.mock.calls).toEqual(
-        ['objective', 'sample:rock', 'life:fish'].map((poiId) => [
+        ['objective', 'life:fish', 'sample:rock'].map((poiId) => [
           { poiId, landmarkId: 'site', firstTime: true },
         ]),
       );
@@ -784,12 +784,12 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     f.controls.setTouchMode(true);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 1.2);
     expect(hint.textContent).toBe('SINK TOWARD TARGET');
-    // A scannable side contact must not replace the primary's name or direction.
+    // A ready scan prompt must name the candidate it will take.
     view.candidateId = 'debris';
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
-    expect(kicker.textContent).toBe('OBJECTIVE');
-    expect(name.textContent).toBe('Stern section');
-    expect(hint.textContent).toBe('SINK TOWARD TARGET');
+    expect(kicker.textContent).toBe('SCAN TARGET');
+    expect(name.textContent).toBe('Debris field');
+    expect(hint.textContent).toBe('Hold SCAN');
     // No objective: nearest-contact guidance as before.
     view.candidateId = null;
     view.objectiveId = null;
@@ -926,8 +926,8 @@ it.each(['keyboard', 'touch'] as const)(
       overlay.setSuppressed(false);
       expect(overlay.slot.visible).toBe(false);
       overlay.update(view, keys, null, 0);
-      expect(overlay.slot.kind).toBe('objective');
-      expect(name.textContent).toBe('Stern section');
+      expect(overlay.slot.kind).toBe('scan');
+      expect(name.textContent).toBe('Bow');
       view.nearestInRange = false;
       view.candidateId = null;
       overlay.update(view, keys, null, 0);
