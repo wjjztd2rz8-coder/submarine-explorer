@@ -19,12 +19,23 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   15:38 with the reveal framing and F-endings merges; check that its CI went green and the
   deploy ran (`gh run list --branch main --limit 4`).
 - Full unit suite green locally on `5048bfab` (202 files, 4,781 tests).
-- **In flight since 18:40 CST** (T3 delegates, each in its own worktree, none merged yet):
-  S1 full-route tour measurement (Composer, item 1), S3 tighter turning (Composer, item 3),
-  S4 touch layout and Blue Hole by touch (Composer, item 4), S6 tutorial steps and README
-  (Composer, item 6), S5 facts (Sonnet medium, item 5; runs the full unit suite itself).
-  Item 2 (Hunga) waits for S1's table. After merging the batch: one full unit run in the
-  background, build, one played site, push.
+- **Merged locally by 19:25 CST, not pushed until the gate is green** (gate log
+  `.cache/sprint/gate2/`): S6 tutorial step labels and README; S5 and S5b facts (no repeats,
+  one card per point of interest, test `guideFactsDistinct`); S4 one-line Finish dive on
+  phones. Blue Hole by keyboard on this build: 3 finds, 91 s.
+- **In flight** (T3 delegates, own worktrees):
+  - S1 full-route tour measurement (Composer, item 1), since 18:40.
+  - S4b Blue Hole second find by touch (Composer): touch player sticks at 26 m with
+    "SEABED CLOSE · RISE"; owns touch and vertical-motion code in `src/sub/**`.
+  - S2 Hunga finishable by the plain player (Composer, item 2): site data only.
+  - S3b where the seconds go at each find (Opus medium, item 3): the turning circle was
+    not the cause (S3 branch `t3/survey-speed-turning-radius`, 9.6 m to 7.8 m, no change
+    in reveal times, unmerged; S3b decides whether to include it).
+  - S7 fact check against sources (Codex GPT-6.1 Sol high): no fact has been checked
+    against an outside source yet; also rewrites Hudson `north-wall`.
+- Owner 19:25: Codex has reset and a reset is spare; use every provider's allowance
+  where it is efficient. Codex cannot play, so it gets source-checked content and
+  test-verifiable code.
 - Touch scanning works (the 0-scan result was a script bug, fixed). Lost City by touch: two
   scans in 15 s. Blue Hole by touch: first find only, second never reached (unproven).
 
