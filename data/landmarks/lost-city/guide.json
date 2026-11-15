@@ -167,6 +167,10 @@
         {
           "title": "Aquino et al. 2024, Lost City chimney fluid mixing",
           "url": "https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2023GC011011"
+        },
+        {
+          "title": "Aquino et al. 2024 — Beehive temperature and missing structure in 2018",
+          "url": "https://par.nsf.gov/servlets/purl/10527341"
         }
       ],
       "confidence": "low"
@@ -174,7 +178,7 @@
     {
       "id": "imax-tower",
       "title": "IMAX Tower",
-      "fact": "Published heights of the IMAX tower range from 8 m to about 30 m, and the reason for the difference is unresolved.",
+      "fact": "IMAX has ledges that trap hot vent water underneath them; clear fluid spills over their lips like an upside-down waterfall.",
       "paragraphs": [
         "IMAX is a parasitic chimney and flange on Poseidon's north face, built as warm, alkaline vent fluid mixed with seawater and deposited carbonate minerals. A 2005 expedition account described the chimney as about 8 m tall; a later detailed geologic survey described a roughly 30 m multipronged structure. The reason for the difference between these published heights remains unresolved.",
         "Look northwest of Poseidon for the IMAX scan marker."
@@ -272,7 +276,7 @@
     {
       "id": "south-wall",
       "title": "A coordinate discrepancy",
-      "fact": "This cliff is the south face of the Atlantis Massif, an undersea mountain about as tall as Mount Rainier. Lost City sits near its top, more than 500 m above this point.",
+      "fact": "Atlantis Massif rises nearly 4,000 m above the surrounding seafloor. Its steep south face exposes rocks once buried deep beneath the crust.",
       "paragraphs": [
         "The Atlantis Massif’s south wall falls steeply below the carbonate terrace. At this scan point the terrain is about 1,332 m deep, more than 500 m below the main vent field.",
         "An older catalog pin at 30.1167° N, 42.1167° W landed on this wall. The catalog now uses the published Beehive outlet position near Poseidon; the dive’s tower markers lie on terrain within the field’s documented depth band."
@@ -300,6 +304,10 @@
         {
           "title": "Kelley et al. 2005 — published field-depth range",
           "url": "https://doi.org/10.1126/science.1102556"
+        },
+        {
+          "title": "Kelley 2005 — Atlantis Massif relief and uplift",
+          "url": "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf"
         }
       ],
       "confidence": "high"

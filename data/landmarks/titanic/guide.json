@@ -294,7 +294,7 @@
     {
       "id": "big-piece",
       "title": "Where the \"Big Piece\" lay",
-      "fact": "A 17-ton section of Titanic's hull with portholes was raised in 1998 and split into the 15-ton Big Piece and the 2-ton Little Piece.",
+      "fact": "A roughly 15-tonne section of Titanic’s hull was raised in 1998, then divided into the Big Piece and Little Piece for safe handling.",
       "paragraphs": [
         "The \"Chunk\" is a recovered section of hull with portholes spanning C-Deck cabins and D-Deck kitchens. RMS Titanic Inc. describes the recovered section as weighing 17 tons.",
         "Recovery work began in 1994. Weather and equipment problems stopped an attempt in 1996; the section was finally raised in 1998. Conservators divided the 17-ton Chunk into the 15-ton Big Piece and the 2-ton Little Piece. The operator lists the Big Piece on display in Las Vegas and the Little Piece in Orlando.",
@@ -374,7 +374,7 @@
     {
       "id": "channel",
       "title": "An abyssal channel",
-      "fact": "Five km north-west of Titanic a shallow channel about a kilometre wide and 50 to 60 m deep crosses the otherwise flat seabed.",
+      "fact": "Sonar and underwater robots helped researchers build a complete map of Titanic’s wreck site in 2010, revealing how far the debris spread.",
       "paragraphs": [
         "The wreck rests on a nearly flat stretch of seabed south-east of the Grand Banks of Newfoundland. The ground varies by only a few metres over hundreds of metres. About 5 km to the north-west, the open survey data shows a shallow channel running roughly north-north-east to south-south-west. It is about a kilometre wide and 50–60 m deep.",
         "The survey grid records the channel shape and depth. It does not establish when the channel formed or which currents and sediment flows shaped it.",
@@ -407,6 +407,10 @@
         {
           "title": "GMRT GridServer — source dataset request for this Titanic tile",
           "url": "https://www.gmrt.org/services/GridServer?north=41.88&south=41.58&east=-49.8&west=-50.1&layer=topo&format=esriascii&resolution=high"
+        },
+        {
+          "title": "WHOI — The Quest to Map Titanic",
+          "url": "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
         }
       ],
       "confidence": "medium"

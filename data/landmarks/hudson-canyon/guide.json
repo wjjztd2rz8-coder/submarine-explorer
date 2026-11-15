@@ -5,7 +5,7 @@
     {
       "id": "overview",
       "title": "Hudson Canyon",
-      "fact": "Hudson Canyon runs roughly 350 miles out to sea. It is the drowned seaward continuation of the ancestral Hudson River.",
+      "fact": "Hudson Canyon extends roughly 560 km out to sea, continuing the route of the ancestral Hudson River beneath the Atlantic.",
       "paragraphs": [
         "Hudson Canyon is the largest submarine canyon on the US Atlantic seaboard and one of the largest in the world: it begins on the outer continental shelf about 100 miles southeast of New York City, runs roughly 350 miles out across the shelf and continental slope, and is up to 7.5 miles wide. Its lower reaches, well beyond this survey tile, reach 2 to 2.5 miles (roughly 3,200-4,000 m) deep.",
         "The canyon is the drowned seaward continuation of the ancestral Hudson River: during past glacial low-sea-level periods the river cut a channel across what is now the continental shelf, and that channel -- the Hudson Shelf Valley -- still runs from near the harbor mouth out to the canyon's head, even though it has not been buried by sediment the way most other shelf valleys on this coast have.",
@@ -49,7 +49,7 @@
     {
       "id": "sanctuary",
       "title": "A proposed sanctuary, not yet designated",
-      "fact": "NOAA is working toward a Hudson Canyon National Marine Sanctuary, and staff are reviewing more than 17,000 public comments.",
+      "fact": "NOAA began the Hudson Canyon sanctuary designation process in 2022. The first public comment period drew more than 17,000 comments.",
       "paragraphs": [
         "NOAA opened the process toward a Hudson Canyon National Marine Sanctuary in June 2022 and, as of this survey, the sanctuary has not been designated -- it remains a formal proposal. NOAA's own sanctuary website describes the effort as being in its early stages, with staff reviewing more than 17,000 public comments gathered during a 2022 scoping period and preparing draft designation documents; no target date for a final rule has been published.",
         "Part of Hudson Canyon is already protected under a separate fisheries rule: the Frank R. Lautenberg Deep Sea Coral Protection Area restricts most bottom-tending commercial fishing gear across Mid-Atlantic canyon and slope habitat. The Council recalculated its area as about 41,440 square miles. American lobster traps and the deep-sea red crab trap fishery have exceptions.",
@@ -167,7 +167,7 @@
     {
       "id": "north-wall",
       "title": "The steep north wall",
-      "fact": "Hudson Canyon's north wall tilts about 18 to 19 degrees even at this survey's coarse resolution, and its real rock ledges are probably steeper.",
+      "fact": "Hudson Canyon’s steep slopes and rocky outcrops help create habitats for deep-sea corals and other marine life.",
       "paragraphs": [
         "This scan marks a locally steep flank of the upper canyon's north wall, 541.9 m deep. Slope sampling over one grid cell (about 50-60 m) gives roughly 18-19 degrees. The true wall relief, with rock outcrops and ledges, is almost certainly sharper than this coarse grid can resolve."
       ],
@@ -194,6 +194,10 @@
         {
           "title": "Mid-Atlantic Fishery Management Council — regional coral protection",
           "url": "https://www.mafmc.org/newsfeed/2016/noaa-fisheries-announces-final-rule-on-mid-atlantic-councils-frank-r-lautenberg-deep-sea-coral-protection-area"
+        },
+        {
+          "title": "NOAA — Hudson Canyon habitats",
+          "url": "https://sanctuaries.noaa.gov/hudson-canyon/"
         }
       ],
       "confidence": "medium"
@@ -201,7 +205,7 @@
     {
       "id": "axis-floor",
       "title": "Down the axis",
-      "fact": "Following the canyon floor, the seabed drops from about 542 m to 1,683 m, and the canyon goes on to 3,200 to 4,000 m.",
+      "fact": "Hudson Canyon reaches about 3,200–4,000 m below the surface, carrying the shape of a river valley into the deep Atlantic.",
       "paragraphs": [
         "Following the canyon floor (its thalweg) southeast from the wall, the seabed drops from about 542 m at the wall to 1,220 m at the upper floor point and on to this tile's deepest grid cell, 1,683.1 m, near its southeast edge -- and the canyon keeps going from there. Published figures put Hudson Canyon's full extent at 2 to 2.5 miles (roughly 3,200-4,000 m) deep before it opens onto the continental rise, more than twice as deep as anything this ~52 x 56 km survey tile reaches.",
         "That mismatch is simply a coverage limit, not a claim about the canyon's true depth: this tile was sized to capture the canyon's upper and middle reaches, where the shelf-to-slope transition and the steepest walls are, rather than its full run to the abyssal plain."
@@ -233,6 +237,10 @@
         {
           "title": "Hudson Canyon — Britannica",
           "url": "https://www.britannica.com/place/Hudson-Canyon"
+        },
+        {
+          "title": "NOAA — Hudson Canyon dimensions",
+          "url": "https://sanctuaries.noaa.gov/hudson-canyon/"
         }
       ],
       "confidence": "high"
@@ -240,7 +248,7 @@
     {
       "id": "wall-transect",
       "title": "Canyon flank transect",
-      "fact": "Hudson Canyon starts about 100 miles southeast of New York City and grows up to 7.5 miles wide, the largest canyon on the US Atlantic seaboard.",
+      "fact": "Hudson Canyon begins about 160 km southeast of New York City and reaches 12 km wide, making it the largest canyon on the US Atlantic coast.",
       "paragraphs": [
         "This terrain survey is about 280 m north of the coral-habitat ledge marker. The GMRT grid reads about 947 m here, compared with about 942 m at the ledge marker.",
         "The nearby pair samples the surveyed canyon flank. This point was chosen from the terrain grid for the dive; it does not mark a documented coral colony. Continue northwest to the optional north-wall scan, where the grid reads about 542 m."
@@ -260,6 +268,10 @@
         {
           "title": "GMRT GridServer request for this shipped bathymetry tile",
           "url": "https://www.gmrt.org/services/GridServer?north=39.65&south=39.15&east=-72.1&west=-72.7&layer=topo&format=esriascii&resolution=max"
+        },
+        {
+          "title": "NOAA — Hudson Canyon dimensions",
+          "url": "https://sanctuaries.noaa.gov/hudson-canyon/"
         }
       ],
       "confidence": "high"
