@@ -484,7 +484,7 @@ function classA(low: boolean): Blueprint {
   pb.add('frame', bar([-1.2, -0.72, -1.3], [1.2, -0.72, 1.5], 0.03, 6), undefined, PAINT.gunmetal);
   skids(pb, 1.2, -0.98, -1.9, 2.0, 0.055, PAINT.gunmetal);
 
-  // Thrusters: two aft on the pontoon tails, two vertical on the pontoons, one lateral.
+  // Thrusters: two aft on the pontoon tails, two vertical on the pontoons, one lateral at the stern.
   const props: PropSpec[] = [];
   props.push(
     thruster(pb, V(-1.2, 0.12, 2.42), V(0, 0, 1), 0.2, 'port', 1, {
@@ -511,7 +511,7 @@ function classA(low: boolean): Blueprint {
     }),
   );
   props.push(
-    thruster(pb, V(0, 1.42, 1.2), V(1, 0, 0), 0.15, 'lateral', 1, { mount: V(0, 1.26, 1.2) }),
+    thruster(pb, V(0, 0.12, 2.42), V(1, 0, 0), 0.15, 'lateral', 1, { mount: V(0, 0.12, 2.08) }),
   );
 
   // Lights: a bar across the front under the sphere, lamps on the pontoon noses.
