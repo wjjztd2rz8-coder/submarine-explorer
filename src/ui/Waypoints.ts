@@ -3,10 +3,41 @@ import { contactLabel, CONTACT_CONFIG, type ContactState } from '../game/Contact
 import { Vector3, type Camera } from 'three';
 import type { PlacedPoi } from '../game/Pois.js';
 import type { ScanTarget, Scanner } from '../game/Scanner.js';
+import { touchControlRects } from './TouchControlRects.js';
 
 const SECONDARY_DISTANCE_M = 200;
 
 type Rect = Pick<DOMRect, 'left' | 'top' | 'right' | 'bottom'>;
+
+const intersects = (a: Rect, b: Rect): boolean =>
+  a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+
+/** Conservative CSS size bounds, including padding/armed outline, without reading layout.
+ * Keep these maxima in sync with waypoints.css's clamped fonts and minimum sizes.
+ */
+function worldMarkerRect(
+  x: number,
+  y: number,
+  text: string,
+  unknown: boolean,
+  secondary: boolean,
+  scannable: boolean,
+  armed: boolean,
+  scale: number,
+): Rect {
+  const font = secondary ? 14 : unknown ? 18 : 40;
+  const padding = unknown ? 16 : 0;
+  const outline = armed ? 10 : 0;
+  const width =
+    (Math.max(scannable ? 40 : 36 + padding, text.length * font + padding) + outline) * scale;
+  const height = (Math.max(scannable ? 40 : 0, font * 1.5 + (unknown ? 4 : 0)) + outline) * scale;
+  return {
+    left: x - width / 2,
+    right: x + width / 2,
+    top: y - height / 2,
+    bottom: y + height / 2,
+  };
+}
 
 /** Keep the offscreen arrow nearest its projection, clear of the composed HUD. */
 export function clampWaypointLabel(
@@ -158,6 +189,14 @@ export class Waypoints {
   update(camera: Camera, _position: Vector3, objective: WaypointObjective | null): void {
     const width = window.innerWidth;
     const height = window.innerHeight;
+    const touch = document.documentElement.classList.contains('is-touch');
+    const controls = touch ? touchControlRects() : [];
+    const visible: Array<{
+      marker: HTMLDivElement;
+      rect: Rect;
+      distance: number;
+      current: boolean;
+    }> = [];
     const current = objective ? this.pois.find((p) => p.id === objective.poiId) : null;
     const targets: readonly ScanTarget[] = [
       ...this.pois,
@@ -198,12 +237,11 @@ export class Waypoints {
       const marker = this.markers.get(poi.id);
       if (marker) {
         // Other unknown contacts appear in range; the current target is always marked.
-        this.hide(
-          marker,
+        const hidden =
           scanned ||
-            !onscreen ||
-            (!scannable && (unknown ? !(nearby || isCurrent) || !this.visualHints : !isCurrent)),
-        );
+          !onscreen ||
+          (!scannable && (unknown ? !(nearby || isCurrent) || !this.visualHints : !isCurrent));
+        if (hidden) this.hide(marker, true);
         this.toggle(marker, 'is-scannable', scannable);
         this.toggle(marker, 'is-armed', this.scanner.view.candidateId === poi.id);
         this.toggle(marker, 'is-scanned', scanned);
@@ -212,7 +250,7 @@ export class Waypoints {
         this.text(
           marker,
           unknown
-            ? secondary && distance > SECONDARY_DISTANCE_M
+            ? (touch && !isCurrent) || (secondary && distance > SECONDARY_DISTANCE_M)
               ? '?'
               : `? · ${Math.round(distance)} m`
             : scanned
@@ -221,10 +259,38 @@ export class Waypoints {
         );
         this.label(marker, label);
         this.toggle(marker, 'is-unknown', unknown);
-        if (!marker.hidden) {
-          this.position(marker, ((projected.x + 1) / 2) * width, ((1 - projected.y) / 2) * height);
+        if (!hidden) {
+          const x = Math.round(((projected.x + 1) / 2) * width);
+          const y = Math.round(((1 - projected.y) / 2) * height);
+          this.position(marker, x, y);
+          visible.push({
+            marker,
+            rect: worldMarkerRect(
+              x,
+              y,
+              marker.textContent ?? '',
+              unknown,
+              secondary,
+              scannable,
+              this.scanner.view.candidateId === poi.id,
+              touch && isCurrent ? 1.4 : 1,
+            ),
+            distance,
+            current: isCurrent,
+          });
         }
       }
+    }
+    // Priority is independent of POI order: the objective always wins, then nearer contacts.
+    visible.sort((a, b) => Number(b.current) - Number(a.current) || a.distance - b.distance);
+    const occupiedMarkers: Rect[] = [];
+    for (const entry of visible) {
+      const hidden =
+        !entry.current &&
+        (controls.some((rect) => intersects(entry.rect, rect)) ||
+          occupiedMarkers.some((rect) => intersects(entry.rect, rect)));
+      this.hide(entry.marker, hidden);
+      if (!hidden) occupiedMarkers.push(entry.rect);
     }
     if (!current || !this.visualHints) {
       this.hide(this.edge, true);

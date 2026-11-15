@@ -102,3 +102,8 @@ body[data-app-state='pause'] .d-scan-waypoints {
 .d-scan-world-marker[hidden] {
   display: none;
 }
+
+/* Make the objective easy to pick out above the smaller touch contacts. */
+html.is-touch .d-scan-world-marker.is-current {
+  transform: translate(-50%, -50%) scale(1.4);
+}
