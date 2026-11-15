@@ -111,6 +111,28 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   25 px: the longest four-line tile name clips slightly (accepted).
 - **06:45 Sunday: LIVE is `08fad020`** (S31 hooks; CI green, deployed about 06:36).
   Nothing in flight, no scheduled tasks pending. Next: the owner's phone test.
+- **Owner test, Sunday morning (laptop and iPhone), their words.** Laptop: "Odd performance
+  and hitching even at lower settings"; "So many things to scan, but no way to switch
+  between them. When trying to scan an objective, I sometimes accidentally scanned several
+  fish." Phone: "Scanning items is now super cool. Would be cool if I could control the
+  camera by swiping around. Feels like I should be able to but I can't"; "Camera is also a
+  weird distance. After I scan an item, sometimes its a little too close to see the item";
+  "Faster cruise feels so much better, same with faster scan"; "Debrief screen feels good".
+- **In flight from it:**
+  - S32 (Opus medium): drag to orbit and pinch/wheel to zoom during a reveal; reveal
+    distance adapts to the area the card leaves visible (the owner's phone was probably in
+    landscape, where the card is a right-hand rail and framing was never tuned). Owns
+    CameraRig, reveal code, pointer/touch drag handling, `reveal` fields in pois.json.
+  - S33 (Codex high): scan priority objective > other mission finds > wildlife, most
+    central within a class; a scan in progress never switches; a key to cycle candidates
+    and tap-a-marker on touch. Owns Scanner, discovery, the scan prompt, markers, Input.
+    Runs the full unit suite.
+  - S34 (Sonnet medium): frame-time profiling harness (`tools/playtest/frame-times.mjs`),
+    then fixes for long frames. Suspects: the per-frame prop ray-probe in `hud.ts`, the
+    synchronous canvas readback for thumbnails, bursts of tile loading at 2x transit,
+    per-frame DOM writes. It may not edit files S32 and S33 own; it reports those instead.
+    When they land: merge, apply any fixes S34 could only report, gate (static, build,
+    keyboard 13, touch 6, units), look at one reveal capture at 844x390, push.
 - **Lesson:** look at one capture before merging any layout change. S30's report and
   measurements were clean while its portrait screenshot showed tiles stacked on top of
   each other; it had measured horizontal clipping only.
