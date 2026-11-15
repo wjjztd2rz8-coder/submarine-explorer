@@ -483,7 +483,7 @@ describe('MissionRouter completion timing', () => {
     scan('primary');
     expect(router.mission.objectives[0].complete).toBe(true);
     expect(control(router.panel.root, 'obj-contacts').textContent).toBe(
-      'Unknown contacts: 0 of 1 found',
+      'Bonus sonar contacts: 0 of 1 found',
     );
     scan('optional');
     expect(control(router.panel.root, 'obj-progress').textContent).toContain('all complete');
@@ -712,7 +712,7 @@ describe('MissionRouter completion timing', () => {
         advance(router, 3);
         expect(title()).toBe('Primary objectives complete');
         expect(control(router.panel.root, 'obj-banner-detail').textContent).toBe(
-          '1 unknown contact remains on sonar.',
+          '1 bonus sonar contact remains on sonar.',
         );
         advance(router, phase === 'open' ? 1 : 20);
         expect(router.panel.bannerOpen).toBe(phase === 'open');

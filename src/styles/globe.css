@@ -40,7 +40,7 @@
 /* --globe-hit is the pin hit-area side; Globe.ts sets it from Config.globe
    (pinHitPx / pinHitTouchPx) and uses the same number for clustering. */
 .globe {
-  --globe-hit: 32px;
+  --globe-hit: 40px;
 }
 
 .globe-pins {
@@ -54,10 +54,10 @@
   position: absolute;
   left: 0;
   top: 0;
-  width: var(--globe-hit);
-  height: var(--globe-hit);
-  min-width: var(--globe-hit);
-  min-height: var(--globe-hit);
+  width: max(40px, var(--globe-hit));
+  height: max(40px, var(--globe-hit));
+  min-width: max(40px, var(--globe-hit));
+  min-height: max(40px, var(--globe-hit));
   padding: 0;
   border: 0;
   background: transparent;
@@ -99,31 +99,6 @@
 .globe-legend-item.is-tile .globe-legend-dot {
   background: rgba(1, 5, 9, 0.7);
   border: 2px solid var(--b1-cyan);
-}
-
-/* Card-only sites: faint specks under the playable pins. Not pointer targets;
-   keyboard focus still reaches them and shows their card. */
-.globe-pin.is-catalogue {
-  width: 14px;
-  height: 14px;
-  min-width: 0;
-  min-height: 0;
-  pointer-events: none;
-  cursor: default;
-  z-index: 1;
-}
-
-.globe-pin.is-catalogue .globe-pin-dot,
-.globe-legend-item.is-catalogue .globe-legend-dot {
-  width: 4px;
-  height: 4px;
-  background: rgba(205, 224, 229, 0.38);
-}
-
-.globe-pin.is-catalogue.is-active .globe-pin-dot {
-  width: 8px;
-  height: 8px;
-  background: rgba(205, 224, 229, 0.9);
 }
 
 .globe-legend-item.is-catalogue .globe-legend-dot {

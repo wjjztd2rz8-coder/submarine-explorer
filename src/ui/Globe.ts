@@ -5,13 +5,13 @@
  * - Earth: NASA Blue Marble Next Generation with topography and bathymetry
  *   (public domain; ATTRIBUTION.md), styled ocean-forward in the shader: land
  *   and ice dimmed and desaturated, a cyan hairline graticule, a hairline rim.
- * - Pins: one real `<button>` per landmark in data/landmarks.json, projected
+ * - Pins: one real `<button>` per playable site, projected
  *   over the canvas every frame, so Tab / Enter / screen readers work without
  *   a custom focus model. Three states (GlobeModel.resolvePinState): mission,
- *   tile (free dive), catalogue (card only). Every pin is drawn exactly at its
+ *   tile (free dive), catalogue (omitted). Every pin is drawn exactly at its
  *   projected location; playable pins whose hit areas would overlap merge into
  *   one counted cluster pin (click: zoom in until they separate, or a chooser
- *   at full zoom). Catalogue pins are faint, non-pointer specks.
+ *   at full zoom). Catalogue-only places have no picker pins.
  * - Controls: drag to orbit (with inertia), wheel to zoom, idle auto-rotate;
  *   arrows orbit, +/- zoom, Tab cycles pins (the camera turns to face the
  *   focused one), Enter selects, Escape (or the toggle key) closes.
@@ -182,7 +182,7 @@ export class Globe {
   readonly root: HTMLDivElement;
   readonly catalog: Promise<GlobeCatalog>;
   readonly orbit: OrbitState;
-  /** Pins in Tab order (missions, free dives, catalogue). Empty until the catalogue loads. */
+  /** Sites in catalogue order; only missions and free dives get pins. Empty until the catalogue loads. */
   sites: GlobeSite[] = [];
   /** True once the Earth texture has loaded (screenshots wait on it). */
   textureReady = false;
@@ -453,71 +453,73 @@ export class Globe {
     this.pinLayer.replaceChildren();
     this.clusterEls = [];
     this.closeChooser();
-    this.pins = sites.map((site) => {
-      const b = el('button', `globe-pin is-${site.state}`);
-      b.type = 'button';
-      b.dataset.landmark = site.id;
-      b.dataset.state = site.state;
-      if (site.id === this.opts.currentId) b.classList.add('is-current');
-      if (site.id === this.opts.recommendedId) b.classList.add('is-recommended');
-      b.setAttribute(
-        'aria-label',
-        `${site.name}, ${site.type}, ${formatDepth(site.depthM)}. ${pinBadge(site)}`,
-      );
-      // The small visible dot sits in a larger transparent button (the hit area).
-      b.append(el('span', 'globe-pin-dot'), el('span', 'globe-pin-label', shortName(site.name)));
-      b.addEventListener('pointerdown', (e) => {
-        this.lastPointerType = e.pointerType;
-      });
-      b.addEventListener('pointerenter', () => {
-        this.hovered = site;
-        this.opts.onSiteFocus?.(site.id);
-        this.orbit.poke();
-        this.renderCard();
-      });
-      b.addEventListener('pointerleave', () => {
-        if (this.hovered === site) this.hovered = null;
-        this.renderCard();
-      });
-      b.addEventListener('focus', () => {
-        this.focused = site;
-        this.opts.onSiteFocus?.(site.id);
-        // Only keyboard focus turns the globe: a mouse press must not move the
-        // pin out from under the pointer before the click lands.
-        if (b.matches(':focus-visible')) this.orbit.faceLatLon(site.lat, site.lon);
-        this.renderCard();
-      });
-      b.addEventListener('blur', () => {
-        if (this.focused === site) this.focused = null;
-        this.renderCard();
-      });
-      b.addEventListener('click', (e) => {
-        // First touch tap names the pin (label, card, list highlight); the
-        // second tap on it goes. Mouse and keyboard act at once.
-        const touchTap = this.lastPointerType === 'touch' && e.detail > 0;
-        this.lastPointerType = '';
-        if (touchTap && site.state !== 'catalogue' && this.pinned !== site) {
-          this.pinned = site;
+    this.pins = sites
+      .filter((site) => site.state !== 'catalogue')
+      .map((site) => {
+        const b = el('button', `globe-pin is-${site.state}`);
+        b.type = 'button';
+        b.dataset.landmark = site.id;
+        b.dataset.state = site.state;
+        if (site.id === this.opts.currentId) b.classList.add('is-current');
+        if (site.id === this.opts.recommendedId) b.classList.add('is-recommended');
+        b.setAttribute(
+          'aria-label',
+          `${site.name}, ${site.type}, ${formatDepth(site.depthM)}. ${pinBadge(site)}`,
+        );
+        // The small visible dot sits in a larger transparent button (the hit area).
+        b.append(el('span', 'globe-pin-dot'), el('span', 'globe-pin-label', shortName(site.name)));
+        b.addEventListener('pointerdown', (e) => {
+          this.lastPointerType = e.pointerType;
+        });
+        b.addEventListener('pointerenter', () => {
+          this.hovered = site;
+          this.opts.onSiteFocus?.(site.id);
+          this.orbit.poke();
           this.renderCard();
-          return;
-        }
-        this.select(site);
+        });
+        b.addEventListener('pointerleave', () => {
+          if (this.hovered === site) this.hovered = null;
+          this.renderCard();
+        });
+        b.addEventListener('focus', () => {
+          this.focused = site;
+          this.opts.onSiteFocus?.(site.id);
+          // Only keyboard focus turns the globe: a mouse press must not move the
+          // pin out from under the pointer before the click lands.
+          if (b.matches(':focus-visible')) this.orbit.faceLatLon(site.lat, site.lon);
+          this.renderCard();
+        });
+        b.addEventListener('blur', () => {
+          if (this.focused === site) this.focused = null;
+          this.renderCard();
+        });
+        b.addEventListener('click', (e) => {
+          // First touch tap names the pin (label, card, list highlight); the
+          // second tap on it goes. Mouse and keyboard act at once.
+          const touchTap = this.lastPointerType === 'touch' && e.detail > 0;
+          this.lastPointerType = '';
+          if (touchTap && site.state !== 'catalogue' && this.pinned !== site) {
+            this.pinned = site;
+            this.renderCard();
+            return;
+          }
+          this.select(site);
+        });
+        this.pinLayer.append(b);
+        const u = latLonToUnit(site.lat, site.lon);
+        return {
+          site,
+          el: b,
+          unit: { x: u.x * PIN_ALTITUDE, y: u.y * PIN_ALTITUDE, z: u.z * PIN_ALTITUDE },
+          playable: site.state !== 'catalogue',
+          x: NaN,
+          y: NaN,
+          opacity: NaN,
+          clustered: false,
+          back: false,
+          flip: false,
+        };
       });
-      this.pinLayer.append(b);
-      const u = latLonToUnit(site.lat, site.lon);
-      return {
-        site,
-        el: b,
-        unit: { x: u.x * PIN_ALTITUDE, y: u.y * PIN_ALTITUDE, z: u.z * PIN_ALTITUDE },
-        playable: site.state !== 'catalogue',
-        x: NaN,
-        y: NaN,
-        opacity: NaN,
-        clustered: false,
-        back: false,
-        flip: false,
-      };
-    });
     const n = this.pins.length;
     this.sx = new Float32Array(n);
     this.sy = new Float32Array(n);
@@ -533,7 +535,6 @@ export class Globe {
     this.legend.replaceChildren(
       this.legendItem('is-mission', `${count('mission')} MISSIONS`),
       this.legendItem('is-tile', `${count('tile')} FREE DIVES`),
-      this.legendItem('is-catalogue', `${count('catalogue')} CATALOGUE`),
     );
     const current = sites.find((s) => s.id === this.opts.currentId);
     if (current && !this.centred) {
@@ -557,7 +558,7 @@ export class Globe {
     const cfg = this.opts.config;
     const touch =
       document.documentElement.classList.contains('is-touch') || this.coarse?.matches === true;
-    const hit = touch ? cfg.pinHitTouchPx : cfg.pinHitPx;
+    const hit = Math.max(40, touch ? cfg.pinHitTouchPx : cfg.pinHitPx);
     if (hit !== this.hitPx) {
       this.hitPx = hit;
       this.root.style.setProperty('--globe-hit', `${hit}px`);

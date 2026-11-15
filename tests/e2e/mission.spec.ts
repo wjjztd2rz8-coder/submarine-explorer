@@ -166,7 +166,7 @@ test.describe('B3 mission flow', () => {
     await expect(page.locator('.briefing-title')).toHaveText('Titanic dive');
     await expect(page.locator('.briefing-objectives li.is-primary')).toHaveCount(primaryCount);
     await expect(page.locator('.briefing-contacts')).toHaveText(
-      `Unknown contacts: 0 of ${secondaryCount} found`,
+      `Bonus sonar contacts: 0 of ${secondaryCount} found`,
     );
     await expect(page.locator('.briefing-section.is-hazards li')).not.toHaveCount(0);
     await expect(page.locator('.briefing-section.is-hazards li:visible')).toHaveCount(0);
@@ -348,7 +348,7 @@ test.describe('B3 mission flow', () => {
     expect(m.state).toBe('primaries-complete');
     expect(m.emitted.at(-1)).toBe('mission:primaryComplete');
     // The dive goes on: the next target is optional, and a banner offers the choice.
-    await expect(panel.locator('.obj-contacts')).toHaveText(/Unknown contacts: 0 of \d+ found/);
+    await expect(panel.locator('.obj-contacts')).toHaveText(/Bonus sonar contacts: 0 of \d+ found/);
     const banner = panel.locator('.obj-banner');
     await expect(banner).toBeVisible({ timeout: 10_000 });
     const debrief = page.locator('.mission-debrief');

@@ -104,8 +104,8 @@ test.describe('globe mission select', () => {
       ).toHaveAttribute('data-state', 'tile');
     }
     await expect(
-      page.locator('.globe:not(.is-embedded) .globe-pin[data-state="catalogue"]').first(),
-    ).toBeAttached();
+      page.locator('.globe:not(.is-embedded) .globe-pin[data-state="catalogue"]'),
+    ).toHaveCount(0);
 
     // Frozen, and keys never reach the game.
     const before = await subPos(page);
