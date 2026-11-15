@@ -3,6 +3,7 @@ import { afterEach, vi } from 'vitest';
 import { DEFAULT_CONFIG, GRAPHICS_TIERS, resolveGraphicsTier } from '../../src/core/Config.js';
 import {
   DynamicResolution,
+  qualityPixelRatio,
   detectTier,
   readDeviceCaps,
   resolveQuality,
@@ -64,10 +65,13 @@ describe('detectTier', () => {
   });
 
   it('gives discrete desktop GPUs high and old Intel low', () => {
-    expect(detectTier(caps({ renderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 3070)' })).tier).toBe(
+    expect(
+      detectTier(caps({ renderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 3070)', devicePixelRatio: 1 }))
+        .tier,
+    ).toBe('high');
+    expect(detectTier(caps({ renderer: 'AMD Radeon RX 6800 XT', devicePixelRatio: 1 })).tier).toBe(
       'high',
     );
-    expect(detectTier(caps({ renderer: 'AMD Radeon RX 6800 XT' })).tier).toBe('high');
     expect(detectTier(caps({ renderer: 'Intel(R) HD Graphics 620' })).tier).toBe('low');
     expect(detectTier(desktop).tier).toBe('medium');
     expect(detectTier(caps({ renderer: '', vendor: '' })).tier).toBe('medium');
@@ -145,7 +149,7 @@ describe('resolveQuality', () => {
       new Save({ config: DEFAULT_CONFIG, storage }).save({ graphicsTier: setting });
       const original = records.get(SETTINGS_STORAGE_KEY);
       for (const device of [sw, caps({ renderer: 'NVIDIA GeForce RTX 4080' })]) {
-        const detected = device === sw ? 'low' : 'high';
+        const detected = device === sw ? 'low' : 'medium';
         for (const url of [null, 'medium', 'auto', 'bogus']) {
           const restored = new Save({ config: DEFAULT_CONFIG, storage });
           const quality = resolveQuality(url, restored.get().graphicsTier, device);
@@ -418,7 +422,9 @@ describe('DynamicResolution', () => {
 
   it('caps pixel ratio per tier', () => {
     const t = DEFAULT_CONFIG.quality.tiers;
-    expect([t.low.maxPixelRatio, t.medium.maxPixelRatio, t.high.maxPixelRatio]).toEqual([2, 2, 2]);
+    expect([t.low.maxPixelRatio, t.medium.maxPixelRatio, t.high.maxPixelRatio]).toEqual([
+      1, 1.5, 2,
+    ]);
   });
 });
 
@@ -515,4 +521,35 @@ describe('diagnostic graphics tiers', () => {
     for (const value of ['ultra', 'low,ultra', 'auto', '', 'low,', 'bogus', 'constructor'])
       expect(() => diagnosticTiers(value)).toThrow(/Unknown diagnostic graphics tier/);
   });
+});
+
+it('caps desktop tiers independently while preserving every handheld tier', () => {
+  for (const [tier, expected] of [
+    ['low', 1],
+    ['medium', 1.5],
+    ['high', 2],
+  ] as const) {
+    expect(qualityPixelRatio(tier, desktop, DEFAULT_CONFIG.quality)).toBe(expected);
+    for (const hints of [{ touchPrimary: true }, { mobileUa: true }]) {
+      expect(
+        qualityPixelRatio(tier, caps({ ...hints, devicePixelRatio: 3 }), DEFAULT_CONFIG.quality),
+      ).toBe(2);
+    }
+    expect(qualityPixelRatio(tier, caps({ devicePixelRatio: 0.8 }), DEFAULT_CONFIG.quality)).toBe(
+      0.8,
+    );
+    const dr = new DynamicResolution(DEFAULT_CONFIG.quality.dynamicResolution, expected);
+    for (let i = 0; i < 10000; i++) dr.update(i < 1000 ? 40 : 8);
+    expect(dr.pixelRatio).toBe(expected);
+  }
+});
+
+it('defaults Retina discrete desktops to medium while respecting saved tiers and weaker detection', () => {
+  const retina = caps({ renderer: 'Apple M4 Pro' });
+  expect(resolveQuality(null, 'auto', retina).tier).toBe('medium');
+  expect(resolveQuality(null, 'auto', { ...retina, renderer: 'Intel HD Graphics 620' }).tier).toBe(
+    'low',
+  );
+  for (const tier of GRAPHICS_TIERS) expect(resolveQuality(null, tier, retina).tier).toBe(tier);
+  expect(resolveQuality('high', 'auto', retina).tier).toBe('high');
 });

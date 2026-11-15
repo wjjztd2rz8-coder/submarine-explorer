@@ -458,3 +458,38 @@ it.each(PHOTO_FRAMES)('captures the selected $id photo frame', (frame) => {
     vi.unstubAllGlobals();
   }
 });
+
+it.each([
+  [3024, 1964, 0.5],
+  [1964, 3024, 0.05],
+  [1964, 3024, 0.99],
+  [320, 640, 0.5],
+])(
+  'encodes reveal %i x %i from a canvas with long side at most 480 using the authored crop',
+  (width, height, subjectY) => {
+    const source = { width, height, toDataURL: vi.fn() } as unknown as HTMLCanvasElement;
+    const drawImage = vi.fn();
+    const out = {
+      width: 0,
+      height: 0,
+      getContext: () => ({ drawImage }),
+      toDataURL: vi.fn(() => 'data:image/jpeg;base64,YQ=='),
+    };
+    vi.stubGlobal('document', { createElement: () => out });
+    try {
+      expect(canvasThumbnail(source, 480, undefined, 'stock', subjectY)).toBe(
+        'data:image/jpeg;base64,YQ==',
+      );
+      const band = Math.min(height, width * 0.75);
+      const sy = Math.max(0, Math.min(height - band, subjectY * height - band / 2));
+      const w = Math.min(480, width);
+      const h = Math.max(1, Math.round((band * w) / width));
+      expect(drawImage).toHaveBeenCalledExactlyOnceWith(source, 0, sy, width, band, 0, 0, w, h);
+      expect(Math.max(out.width, out.height)).toBeLessThanOrEqual(480);
+      expect(out.toDataURL).toHaveBeenCalledOnce();
+      expect(source.toDataURL).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  },
+);

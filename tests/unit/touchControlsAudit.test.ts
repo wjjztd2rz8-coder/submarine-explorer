@@ -951,17 +951,14 @@ it('hides an anchored reticle behind visible touch controls and restores it afte
   });
   let visible = true;
   let left = 210;
-  Object.assign(f.doc, {
-    querySelectorAll: (selector: string) => {
-      expect(selector).toContain('.tc-buttons');
-      return [
-        {
-          checkVisibility: () => visible,
-          getBoundingClientRect: () => ({ left, right: left + 101, top: 786, bottom: 832 }),
-        },
-      ];
-    },
+  const bounds = vi.fn(() => ({ left, right: left + 101, top: 786, bottom: 832 }));
+  const visibility = vi.fn(() => visible);
+  const control = Object.assign(new TouchElement(), {
+    checkVisibility: visibility,
+    getBoundingClientRect: bounds,
+    getAttribute: () => '',
   });
+  Object.assign(f.doc, { querySelectorAll: () => [control] });
   const reticle = (overlay.root as unknown as TouchElement).children[0];
   const view = {
     phase: 'idle',
@@ -976,15 +973,27 @@ it('hides an anchored reticle behind visible touch controls and restores it afte
     overlay.update(view, { scan: 'G', guide: 'J' }, { x: 217, y: 794 }, 0);
     expect(reticle.hidden).toBe(true);
     expect(overlay.slot.visible).toBe(true);
+    expect(bounds).toHaveBeenCalledOnce();
+    for (let i = 0; i < 10; i++)
+      overlay.update(view, { scan: 'G', guide: 'J' }, { x: 217, y: 794 }, 0);
+    expect(bounds).toHaveBeenCalledOnce();
+    expect(visibility).toHaveBeenCalledOnce();
     left = 300;
+    f.win.dispatchEvent(new Event('resize'));
     overlay.update(view, { scan: 'G', guide: 'J' }, { x: 217, y: 794 }, 0);
     expect(reticle.hidden).toBe(false);
     expect(reticle.style.transform).toBe('translate(217.0px, 794.0px)');
     left = 210;
     visible = false;
+    control.hidden = true;
     overlay.update(view, { scan: 'G', guide: 'J' }, { x: 217, y: 794 }, 0);
     expect(reticle.hidden).toBe(false);
     visible = true;
+    control.hidden = false;
+    f.win.dispatchEvent(new Event('orientationchange'));
+    overlay.update(view, { scan: 'G', guide: 'J' }, { x: 217, y: 794 }, 0);
+    expect(reticle.hidden).toBe(true);
+    expect(bounds).toHaveBeenCalledTimes(3);
     f.controls.setTouchMode(false);
     overlay.update(view, { scan: 'G', guide: 'J' }, { x: 217, y: 794 }, 0);
     expect(reticle.hidden).toBe(false);

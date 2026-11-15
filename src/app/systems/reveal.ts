@@ -273,7 +273,8 @@ export function createRevealSystem(): GameSystem {
         const subjectY = revealStillSubjectY(ctx.rig.camera, stillTarget);
         const image = canvasThumbnail(
           ctx.renderer.domElement,
-          undefined,
+          // Authored subject crop is at most 4:3, so 480 wide also caps the long side.
+          480,
           undefined,
           ctx.progress.cosmetics.frame,
           subjectY,

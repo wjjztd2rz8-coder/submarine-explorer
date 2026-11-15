@@ -8,9 +8,10 @@ import { loadSavedProgress } from './systems/progress.js';
 import * as THREE from 'three';
 import { makeConfig } from '../core/Config.js';
 import { EventBus } from '../core/EventBus.js';
-import { readDeviceCaps, resolveQuality } from '../core/Quality.js';
+import { qualityPixelRatio, readDeviceCaps, resolveQuality } from '../core/Quality.js';
 import { Save } from '../core/Save.js';
 import { chooseTileId, resolveMissionRoute } from '../game/MissionRouter.js';
+import { reserveGlowLights } from '../world/presets/shared.js';
 import { TileLoader } from '../world/TileLoader.js';
 import { makeExposer, type AppState, type BootContext } from './context.js';
 import { resolveEffective } from '../game/EffectiveSettings.js';
@@ -102,16 +103,11 @@ export async function boot(): Promise<BootContext | null> {
   });
   // Quality tiers v2: `?tier=low|medium|high` beats the saved setting,
   // and `auto` (the default) detects from the GPU and device (core/Quality.ts).
-  const quality = resolveQuality(
-    params.get('tier'),
-    settings.graphicsTier,
-    readDeviceCaps(renderer.getContext()),
-  );
+  const caps = readDeviceCaps(renderer.getContext());
+  const quality = resolveQuality(params.get('tier'), settings.graphicsTier, caps);
   const tier = quality.tier;
   console.info(`[quality] ${tier} (${quality.source}: ${quality.reason})`);
-  renderer.setPixelRatio(
-    Math.min(config.quality.tiers[tier].maxPixelRatio, window.devicePixelRatio || 1),
-  );
+  renderer.setPixelRatio(qualityPixelRatio(tier, caps, config.quality));
   renderer.setSize(window.innerWidth, window.innerHeight, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   // ACES lifts the very dark midtones the abyss lives in and keeps the
@@ -120,6 +116,7 @@ export async function boot(): Promise<BootContext | null> {
   renderer.toneMappingExposure = 1.0;
 
   const scene = new THREE.Scene();
+  reserveGlowLights(scene);
 
   return {
     params,
