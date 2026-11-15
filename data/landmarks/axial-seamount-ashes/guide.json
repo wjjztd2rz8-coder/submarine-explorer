@@ -46,6 +46,10 @@
         {
           "title": "Axial Seamount, ASHES -- Marine Regions Gazetteer (InterRidge Global Database of Active Submarine Hydrothermal Vent Fields v3.4)",
           "url": "https://marineregions.org/gazetteer.php?p=details&id=64780"
+        },
+        {
+          "title": "USGS — Axial Seamount and its recorded eruptions",
+          "url": "https://www.usgs.gov/observatories/cvo/science/axial-seamount"
         }
       ],
       "confidence": "high"
@@ -219,6 +223,10 @@
         {
           "title": "GMRT Synthesis -- Ryan et al. 2009, doi:10.1029/2008GC002332",
           "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "University of Washington — ASHES field and boundary fault",
+          "url": "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes/"
         }
       ],
       "confidence": "high"
@@ -229,7 +237,7 @@
       "fact": "Lava from the 1998, 2011 and 2015 eruptions resurfaced the caldera floor, and the 2015 eruption was spotted live by the cabled observatory.",
       "paragraphs": [
         "Axial's caldera floor has been resurfaced by lava during its recorded eruptions in 1998, 2011 and 2015. The 2015 eruption was detected in real time by the seafloor cabled observatory.",
-        "This POI sits on a broad, shallow rise on the caldera floor south of ASHES, about 1,460 m deep against roughly 1,530-1,540 m on the surrounding floor -- the kind of low, hummocky high left behind by a lava flow. No source maps this specific rise to one dated eruption, so it is described here as caldera-floor lava terrain in general rather than attributed to a single flow."
+        "This scan sits on a broad rise south of ASHES, about 1,460 m deep against roughly 1,530–1,540 m on the surrounding floor. The grid shows the rise's shape. Repeated seafloor surveys, rather than its shape alone, are needed to connect a particular patch of terrain to a dated lava flow."
       ],
       "facts": [
         {
