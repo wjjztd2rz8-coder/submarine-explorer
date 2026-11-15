@@ -30,10 +30,16 @@ export const cameraSystem: GameSystem = {
   },
   frame: {
     'camera.rig': (f, ctx) => {
-      ctx.rig.update(f.pilotPosition, f.pilotYaw, f.pilotPitch, f.dt, {
-        roll: ctx.sub.roll,
-        velocity: f.pilotVelocity,
-      });
+      ctx.rig.update(
+        f.renderPosition ?? f.pilotPosition,
+        f.renderYaw ?? f.pilotYaw,
+        f.renderPitch ?? f.pilotPitch,
+        f.dt,
+        {
+          roll: ctx.sub.roll,
+          velocity: f.pilotVelocity,
+        },
+      );
     },
   },
 };

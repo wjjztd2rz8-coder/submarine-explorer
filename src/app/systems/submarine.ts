@@ -13,9 +13,22 @@ import { Submarine } from '../../sub/Submarine.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
+/** Shortest signed turn from `a` to `b` (radians). */
+function angleDelta(a: number, b: number): number {
+  const d = (b - a) % (Math.PI * 2);
+  return d > Math.PI ? d - Math.PI * 2 : d < -Math.PI ? d + Math.PI * 2 : d;
+}
+
 export function createSubmarineSystem(): GameSystem {
   const cleanup = new Disposables();
   const forward = new THREE.Vector3();
+  // Pose before the last physics step: with the live pose it gives the drawn pose between steps,
+  // so a 120 Hz (or jittery) display does not see the boat hop in 60 Hz steps.
+  const prevPosition = new THREE.Vector3();
+  const renderPosition = new THREE.Vector3();
+  let prevYaw = 0;
+  let prevPitch = 0;
+  let hasPrev = false;
   let lastHullStress = 0;
   let emergencyBlowAnnounced = false;
   return {
@@ -103,6 +116,10 @@ export function createSubmarineSystem(): GameSystem {
     frame: {
       'sim.vehicles': (f, ctx) => {
         for (let i = 0; i < f.steps; i++) {
+          prevPosition.copy(ctx.sub.position);
+          prevYaw = ctx.sub.yaw;
+          prevPitch = ctx.sub.pitch;
+          hasPrev = true;
           ctx.sub.setSurveyDistance(
             ctx.discovery.scanner.nearestUnscannedFixedDistance(ctx.sub.position),
           );
@@ -147,10 +164,23 @@ export function createSubmarineSystem(): GameSystem {
       },
       pose: (f, ctx) => {
         const { sub, subMesh, rig } = ctx;
+        // Drawn pose: between the pose before the last step and now. A teleport, restart or
+        // frozen frame (no sim) draws the live pose.
+        const alpha = f.frozen || f.resumeFrame ? 1 : Math.min(1, Math.max(0, f.alpha ?? 1));
+        if (!hasPrev || prevPosition.distanceToSquared(sub.position) > 25 * 25 || alpha >= 1) {
+          renderPosition.copy(sub.position);
+          f.renderYaw = sub.yaw;
+          f.renderPitch = sub.pitch;
+        } else {
+          renderPosition.lerpVectors(prevPosition, sub.position, alpha);
+          f.renderYaw = prevYaw + angleDelta(prevYaw, sub.yaw) * alpha;
+          f.renderPitch = prevPitch + (sub.pitch - prevPitch) * alpha;
+        }
+        f.renderPosition = renderPosition;
         // Present the boat.
         subMesh.setHullClass(f.sub.hullClass);
         subMesh.vehicle.reduceMotion = rig.reduceMotion;
-        subMesh.setPose(sub.position, sub.yaw, sub.pitch, sub.roll);
+        subMesh.setPose(renderPosition, f.renderYaw, f.renderPitch, sub.roll);
         subMesh.update(f.state.throttle, f.dt, {
           yaw: f.state.yaw,
           vertical: f.state.ballast,

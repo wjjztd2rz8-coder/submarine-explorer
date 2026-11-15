@@ -262,6 +262,9 @@ export function canSonarWheelStep(now: number, lastStepAt: number): boolean {
   return now - lastStepAt >= 150;
 }
 
+/** Main-thread time one frame may spend rebuilding the relief raster (ms). */
+const RELIEF_SLICE_MS = 3;
+
 export class Sonar {
   readonly root: HTMLDivElement;
   readonly canvas: HTMLCanvasElement;
@@ -273,6 +276,9 @@ export class Sonar {
   private readonly ctx: CanvasRenderingContext2D;
   private base: HTMLCanvasElement;
   private reliefDirty = true;
+  /** A relief rebuild spread over several frames (see `startReliefJob`). */
+  private reliefJob: Generator<void, void, void> | null = null;
+  private sliceDeadline = Infinity;
   private flatness = 0;
   private reliefCenter = { x: 0, z: 0 };
   private scanState: (poi: PlacedPoi) => boolean = () => false;
@@ -517,6 +523,24 @@ export class Sonar {
 
   /** Rebuild the measured-depth relief around the visible map, with cached margins for smooth tracking. */
   private renderBathymetry(centerX: number, centerZ: number): void {
+    this.reliefJob = null;
+    this.sliceDeadline = Infinity;
+    const job = this.bathymetryJob(centerX, centerZ);
+    while (!job.next().done);
+  }
+
+  /**
+   * Rebuild the relief in slices of a few ms per frame instead of one 15-50 ms
+   * (4x that on a Retina canvas) block that stalls the frame. The old raster keeps drawing
+   * until the new one is swapped in.
+   */
+  private advanceReliefJob(): void {
+    if (!this.reliefJob) return;
+    this.sliceDeadline = performance.now() + RELIEF_SLICE_MS;
+    if (this.reliefJob.next().done) this.reliefJob = null;
+  }
+
+  private *bathymetryJob(centerX: number, centerZ: number): Generator<void, void, void> {
     const zoom = this.zoom;
     // Sample the bilinear terrain field at backing-pixel resolution. A CSS-sized
     // relief raster becomes visibly blocky on Retina screens and expanded maps.
@@ -524,9 +548,10 @@ export class Sonar {
     const margin = zoom === 'tile' ? 0 : this.zoomConfig.rasterMarginPx * resolution;
     const w = Math.round(this.canvas.width + margin * 2);
     const h = Math.round(this.canvas.height + margin * 2);
-    this.base.width = w;
-    this.base.height = h;
-    const ctx = this.base.getContext('2d');
+    const target = document.createElement('canvas');
+    target.width = w;
+    target.height = h;
+    const ctx = target.getContext('2d');
     if (!ctx) return;
     const scale =
       resolution *
@@ -541,6 +566,7 @@ export class Sonar {
     let lo = Infinity;
     let hi = -Infinity;
     for (let py = 0; py < h; py++) {
+      if (performance.now() > this.sliceDeadline) yield;
       const z = centerZ + (py - margin - this.canvas.height / 2) * metresPerPixel;
       for (let px = 0; px < w; px++) {
         const x = centerX + (px - margin - this.canvas.width / 2) * metresPerPixel;
@@ -600,6 +626,7 @@ export class Sonar {
     const shadeReef =
       blueHoleCentre !== null && this.terrain.contains(blueHoleCentre.x, blueHoleCentre.z);
     for (let py = 0; py < h; py++) {
+      if (performance.now() > this.sliceDeadline) yield;
       for (let px = 0; px < w; px++) {
         const index = py * w + px;
         const height = heights[index] as number;
@@ -679,7 +706,7 @@ export class Sonar {
       this.relief.contourIntervalM = contourInterval;
     }
     if (Number.isFinite(contourInterval))
-      this.drawContours(
+      yield* this.drawContours(
         ctx,
         contourHeights,
         w,
@@ -691,11 +718,12 @@ export class Sonar {
         resolution,
         Boolean(ridges),
       );
+    this.base = target;
     this.reliefCenter = { x: centerX, z: centerZ };
     this.reliefDirty = false;
   }
 
-  private drawContours(
+  private *drawContours(
     ctx: CanvasRenderingContext2D,
     heights: Float32Array,
     w: number,
@@ -706,7 +734,7 @@ export class Sonar {
     margin: number,
     resolution: number,
     authoredRelief = false,
-  ): void {
+  ): Generator<void, void, void> {
     const levels: number[] = [];
     for (let level = Math.ceil(lo / interval) * interval; level <= hi; level += interval)
       levels.push(level);
@@ -720,6 +748,7 @@ export class Sonar {
       ctx.beginPath();
       let anchor: { x: number; y: number } | null = null;
       for (let y = 0; y < h - 1; y++) {
+        if (performance.now() > this.sliceDeadline) yield;
         for (let x = 0; x < w - 1; x++) {
           const a = heights[y * w + x] as number;
           const b = heights[y * w + x + 1] as number;
@@ -904,14 +933,20 @@ export class Sonar {
     const scale = this.zoom === 'tile' ? 0 : Math.max(w, h) / this.zoom;
     const centerX = s.position.x * (1 - this.tileCenterFraction);
     const centerZ = s.position.z * (1 - this.tileCenterFraction);
+    if (this.reliefDirty) this.renderBathymetry(centerX, centerZ);
+    else if (
+      !this.reliefJob &&
+      this.zoom !== 'tile' &&
+      Math.max(
+        Math.abs((this.reliefCenter.x - centerX) * scale),
+        Math.abs((this.reliefCenter.z - centerZ) * scale),
+      ) > this.zoomConfig.refreshShiftPx
+    )
+      this.reliefJob = this.bathymetryJob(centerX, centerZ);
+    this.advanceReliefJob();
+    // After any swap, so the new raster is placed against its own centre.
     const shiftX = (this.reliefCenter.x - centerX) * scale;
     const shiftY = (this.reliefCenter.z - centerZ) * scale;
-    if (
-      this.reliefDirty ||
-      (this.zoom !== 'tile' &&
-        Math.max(Math.abs(shiftX), Math.abs(shiftY)) > this.zoomConfig.refreshShiftPx)
-    )
-      this.renderBathymetry(centerX, centerZ);
     const margin = this.zoom === 'tile' ? 0 : this.zoomConfig.rasterMarginPx;
     ctx.imageSmoothingEnabled = true;
     ctx.drawImage(this.base, -margin + shiftX, -margin + shiftY, w + margin * 2, h + margin * 2);

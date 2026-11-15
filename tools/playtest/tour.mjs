@@ -13,12 +13,28 @@ const tag = SITE || 'first';
 const browser = await chromium.launch({
   args: [
     '--ignore-gpu-blocklist',
+    '--enable-precise-memory-info',
     '--use-angle=vulkan',
     '--enable-features=Vulkan',
     '--disable-vulkan-surface',
   ],
 });
-const page = await (await browser.newContext({ viewport: { width: +W, height: +H } })).newPage();
+const page = await (
+  await browser.newContext({
+    viewport: { width: +W, height: +H },
+    deviceScaleFactor: +(process.env.TOUR_DSF ?? 1),
+  })
+).newPage();
+// TOUR_HOOK=<module>: default export async ({ page, browser, site }) => ({ finish }) for profiling.
+const hook = process.env.TOUR_HOOK
+  ? await (
+      await import(new URL(process.env.TOUR_HOOK, `file://${process.cwd()}/`).href)
+    ).default({
+      page,
+      browser,
+      site: tag,
+    })
+  : null;
 const errs = [];
 page.on('pageerror', (e) => errs.push(String(e).slice(0, 200)));
 page.on('console', (m) => m.type() === 'error' && errs.push(m.text().slice(0, 200)));
@@ -27,7 +43,7 @@ const shot = async (name) => {
   n += 1;
   await page.screenshot({ path: `${OUT}/${tag}-${String(n).padStart(2, '0')}-${name}.png` });
 };
-await page.goto(SITE ? `${BASE}?mission=${SITE}` : BASE);
+await page.goto(SITE ? `${BASE}?mission=${SITE}${process.env.TOUR_QUERY ?? ''}` : BASE);
 await page.waitForTimeout(3500);
 if (!SITE) {
   await shot('home');
@@ -341,4 +357,5 @@ console.log(
     errs: errs.slice(0, 5),
   }),
 );
+await hook?.finish?.();
 await browser.close();

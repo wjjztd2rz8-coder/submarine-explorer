@@ -228,8 +228,11 @@ export class Atmosphere {
 
     if (this.caustics) {
       const strength = s.causticsStrength;
-      this.caustics.visible = strength > 0.01;
-      if (this.caustics.visible) {
+      // Stays in the scene at intensity 0 below the photic zone: toggling `visible` changes the
+      // light count, and three.js then re-links every material's shader program in one frame.
+      const lit = strength > 0.01;
+      if (!lit) this.caustics.intensity = 0;
+      if (lit) {
         this.caustics.intensity = this.config.causticsIntensity * strength;
         const height = this.config.causticsFootprintM * 0.8;
         // Project straight down from just under the surface onto the seabed.
