@@ -26,6 +26,59 @@
       }
     },
     {
+      "id": "titanic-debris-coal",
+      "name": "Coal and ceramics scatter",
+      "lat": 41.7313,
+      "lon": -49.9464,
+      "depth_m": 3798,
+      "radius_m": 150,
+      "kind": "debris",
+      "primary": false,
+      "scan_seconds": 2.4,
+      "guide_entry": "debris-coal",
+      "confidence": "low",
+      "reconstruction": true,
+      "sources": [
+        "https://sanctuaries.noaa.gov/maritime/titanic/expedition_results.html",
+        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
+      ],
+      "note": "Representative scan point in the debris field between the bow and stern. The 2010 survey plotted distinct scatters of coal and ceramics across the site; no coordinate for this scatter is published, so the marker stands in for the debris crossed on the route.",
+      "reveal": {
+        "distance_m": 15,
+        "elevation_deg": 23,
+        "azimuth_deg": 148,
+        "sweep_deg": 16,
+        "target_offset": [16, -2.6, -22]
+      }
+    },
+    {
+      "id": "titanic-missing-piece",
+      "name": "The \"missing piece\"",
+      "lat": 41.7285,
+      "lon": -49.9473,
+      "depth_m": 3797,
+      "radius_m": 150,
+      "kind": "debris",
+      "primary": false,
+      "scan_seconds": 2.4,
+      "guide_entry": "missing-piece",
+      "confidence": "low",
+      "reconstruction": true,
+      "sources": [
+        "https://sanctuaries.noaa.gov/maritime/titanic/expedition_results.html",
+        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
+        "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
+      ],
+      "note": "Representative scan point in the debris field between the sections. NOAA describes a roughly 70 ft section of Titanic's bottom, including the keel, found in the scatter; its exact position is unpublished, so this marker stands in for the debris crossed between the bow and stern.",
+      "reveal": {
+        "distance_m": 16,
+        "elevation_deg": 24,
+        "azimuth_deg": 142,
+        "sweep_deg": 16,
+        "target_offset": [-21, -3, 18]
+      }
+    },
+    {
       "id": "titanic-stern",
       "name": "Stern section",
       "lat": 41.72639,
@@ -103,7 +156,7 @@
       "id": "titanic-big-piece",
       "name": "Where the \"Big Piece\" lay",
       "lat": 41.7252,
-      "lon": -49.9497,
+      "lon": -49.949,
       "depth_m": 3798,
       "radius_m": 100,
       "kind": "debris",

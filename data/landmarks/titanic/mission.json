@@ -60,6 +60,22 @@
       "hint": "Head roughly 700 m south from the bow to the damaged stern, around 3,795 m."
     },
     {
+      "id": "debris-coal",
+      "type": "scan",
+      "poi": "titanic-debris-coal",
+      "primary": false,
+      "title": "Survey the coal and ceramics",
+      "hint": "Follow the debris trail south from the bow to the coal and ceramics scatter, around 3,798 m."
+    },
+    {
+      "id": "missing-piece",
+      "type": "scan",
+      "poi": "titanic-missing-piece",
+      "primary": false,
+      "title": "Find the \"missing piece\"",
+      "hint": "Look for the 70 ft hull-bottom section in the debris field between the bow and stern, around 3,797 m."
+    },
+    {
       "id": "boilers",
       "type": "scan",
       "poi": "titanic-boilers",
