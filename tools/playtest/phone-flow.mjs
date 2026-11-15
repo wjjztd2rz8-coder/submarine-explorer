@@ -79,11 +79,7 @@ async function measureFinish(page) {
   });
   await page.waitForFunction(() => window.__gameReady === true, null, { timeout: 60000 });
   await page.waitForTimeout(1500);
-  for (const id of [
-    'monterey-canyon-wall',
-    'monterey-canyon-inner-bend',
-    'monterey-canyon-axis',
-  ]) {
+  for (const id of ['monterey-canyon-wall', 'monterey-canyon-inner-bend', 'monterey-canyon-axis']) {
     await page.evaluate((poiId) => window.__game.bus.emit('scan:complete', { poiId }), id);
     await page.waitForTimeout(150);
   }
@@ -135,10 +131,10 @@ async function openReveal(page, site, poi) {
 }
 
 async function openDebrief(page, site) {
-  await page.goto(
-    `${BASE}?mission=${encodeURIComponent(site)}&skipBriefing=1&touch=1&debrief=1`,
-    { waitUntil: 'domcontentloaded', timeout: 60000 },
-  );
+  await page.goto(`${BASE}?mission=${encodeURIComponent(site)}&skipBriefing=1&touch=1&debrief=1`, {
+    waitUntil: 'domcontentloaded',
+    timeout: 60000,
+  });
   await page.locator('.debrief').waitFor({ state: 'visible', timeout: 60000 });
   await page.waitForTimeout(2500);
   const audit = await auditOverlay(page, '.debrief');
@@ -180,7 +176,12 @@ const report = {
 console.log(JSON.stringify(report, null, 2));
 await browser.close();
 process.exit(
-  finish.oneLine && !finish.overlapScan && !finish.overlapStick && revealA.ok && revealB.ok && debrief.ok
+  finish.oneLine &&
+    !finish.overlapScan &&
+    !finish.overlapStick &&
+    revealA.ok &&
+    revealB.ok &&
+    debrief.ok
     ? 0
     : 1,
 );

@@ -355,9 +355,7 @@ if (end.scans > scans) {
 }
 const timedOut = scans < 2 && (Date.now() - t0) / 1000 >= MAX_S - 1;
 if (errs.length) console.error('page errors:', errs.slice(0, 5).join(' | '));
-const debrief = await page.evaluate(
-  () => !document.querySelector('.debrief')?.hidden,
-);
+const debrief = await page.evaluate(() => !document.querySelector('.debrief')?.hidden);
 console.log(
   JSON.stringify({
     viewport: `${W}x${H}`,

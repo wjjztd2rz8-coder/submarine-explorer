@@ -31,18 +31,13 @@ export function tutorialStepsShown(
   currentStepId?: TutorialStepId,
 ): readonly TutorialStep[] {
   const skipDepth =
-    currentStepId !== 'depth' &&
-    targetGapM !== undefined &&
-    targetGapM <= DEPTH_SKIP_M;
+    currentStepId !== 'depth' && targetGapM !== undefined && targetGapM <= DEPTH_SKIP_M;
   if (skipDepth) return TUTORIAL_STEPS.filter((s) => s.id !== 'depth');
   return TUTORIAL_STEPS;
 }
 
 /** Desktop step card kicker; numbers count only steps that are shown. */
-export function tutorialStepKicker(
-  stepId: TutorialStepId,
-  targetGapM?: number,
-): string {
+export function tutorialStepKicker(stepId: TutorialStepId, targetGapM?: number): string {
   const shown = tutorialStepsShown(targetGapM, stepId);
   const current = shown.findIndex((s) => s.id === stepId) + 1;
   return `STEP ${current} OF ${shown.length}`;
