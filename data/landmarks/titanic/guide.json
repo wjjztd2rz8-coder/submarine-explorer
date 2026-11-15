@@ -294,28 +294,27 @@
     {
       "id": "missing-piece",
       "title": "The \"missing piece\"",
-      "fact": "A roughly 70 ft (21 m) section of Titanic's bottom survived in the debris field and is the source of most of the scattered wreckage.",
+      "fact": "A middle section making up less than a tenth of Titanic broke apart and supplied almost all the wreckage scattered across the site.",
       "paragraphs": [
-        "When Titanic broke apart, a section of the ship between the bow and stern disintegrated. Expeditions found two large sections of the bottom of the hull with the keel, including one roughly 70 ft (21 m) long that the survey team called \"the missing piece\".",
-        "That section held the galleys, pantries, wine stores, the silverware locker, a handful of cabins, the ship's hospital, coal bunkers, the verandah café and part of the first-class dining room. The 2010 mapping showed that this less-than-10-percent fragment is the source for almost everything scattered on the site.",
-        "The debris crossed here is real, but its exact position is not published. This scan marks a representative point between the two hull sections."
+        "In 2005, a History Channel expedition with John Chatterton and Richie Kohler documented two large pieces of Titanic's double bottom. Each measured about 40 × 90 ft (12 × 27 m).",
+        "The 2010 mapping traced almost all the scattered wreckage to a middle section that disintegrated, not to the surviving bottom pieces. NOAA describes this section as about 70 ft (21 m) long and less than 10 percent of the ship. It held galleys, pantries, wine stores, the hospital and coal bunkers, among other rooms."
       ],
       "facts": [
         {
-          "label": "Length",
-          "value": "about 70 ft (21 m)"
+          "label": "Bottom pieces",
+          "value": "two, each about 40 × 90 ft (12 × 27 m)"
         },
         {
-          "label": "Survey",
+          "label": "Documented",
+          "value": "2005 (History Channel expedition)"
+        },
+        {
+          "label": "Mapping",
           "value": "2010 (RMS Titanic Inc., WHOI, Waitt Institute)"
         },
         {
-          "label": "Compartments",
-          "value": "galleys, pantries, wine stores, hospital"
-        },
-        {
-          "label": "Position confidence",
-          "value": "low (representative point)"
+          "label": "Disintegrated section",
+          "value": "about 70 ft (21 m); less than 10 percent of the ship"
         }
       ],
       "reconstruction": true,
@@ -331,6 +330,14 @@
         {
           "title": "The Quest to Map Titanic — WHOI Oceanus Vol. 49 No. 2 (2012)",
           "url": "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
+        },
+        {
+          "title": "RMS Titanic — Richie Kohler, 2005 expedition account",
+          "url": "https://www.richiekohler.com/project-files/rms-titanic/"
+        },
+        {
+          "title": "Marine Cultural and Historic Newsletter, December 2005 — contemporary report on the two hull sections",
+          "url": "https://nmsmarineprotectedareas.blob.core.windows.net/marineprotectedareas-prod/media/archive/pdf/cultural_resources/c-n-h-news-vol2-12-1205.pdf"
         }
       ],
       "confidence": "low"
@@ -338,11 +345,10 @@
     {
       "id": "debris-coal",
       "title": "Coal and ceramics",
-      "fact": "Scatters of coal and ceramics lie where currents sorted the lighter debris as Titanic broke apart and sank.",
+      "fact": "Bottles on Titanic's seabed still outline the wooden crate that once held them, even though the crate has disintegrated.",
       "paragraphs": [
-        "Titanic carried thousands of tonnes of coal for her boilers, and tons of it spilled from ruptured bunkers when the ship broke apart. The 2010 survey plotted distinct scatters of coal and ceramics — plates, cups and saucers — across the site.",
-        "Ocean currents sorted the lighter objects into patterns on the seabed. Bottles, silverware, suitcases and shoes were documented too, and pairs of shoes still mark where people came to rest.",
-        "The debris crossed here is real, but this marker is a representative point in the debris field, not a surveyed find spot."
+        "Tons of coal spilled from Titanic's ruptured bunkers. The 2010 survey mapped separate scatters of coal and ceramics, including plates, cups and saucers.",
+        "The debris also holds traces of containers that have vanished. NOAA's photographs show bottles outlining a wooden crate that has disintegrated. Silverware, suitcases and pairs of shoes also lie among the wreckage."
       ],
       "facts": [
         {
@@ -356,10 +362,6 @@
         {
           "label": "Ceramics",
           "value": "plates, cups and saucers"
-        },
-        {
-          "label": "Position confidence",
-          "value": "low (representative point)"
         }
       ],
       "reconstruction": true,
