@@ -408,9 +408,9 @@ export class ScanOverlay {
             ? inRange()
             : (() => {
                 const depth = depthCue(view.objectiveDistance, view.objectiveVertDeg, keys);
-                // A blocked path asks for a climb, which replaces a "Go up" depth cue. When the
-                // target is below (vertical dives), climbing is wrong: the depth cue wins.
-                const obstacle = depth?.startsWith('Go down') ? null : this.approachObstacle;
+                // A blocked path asks for a climb. It replaces the depth cue: the two together
+                // read "go up · go down". The HUD decides when the climb cue applies.
+                const obstacle = this.approachObstacle;
                 return [
                   obstacle,
                   Math.abs(turn) >= 10 ? turnCue(turn) : null,

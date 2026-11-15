@@ -95,12 +95,16 @@ export const hudSystem: GameSystem = {
         scanView.phase === 'idle' &&
         !scanView.objectiveInRange &&
         approachBlockedByProp(ctx, scanView);
-      // Climbing only helps when the target is level with the sub or above it. On a vertical
-      // dive the target is below and "go up" would send the player to the surface.
+      // Thrusting head-on into a prop: climbing clears it wherever the target is (Lost City's
+      // IMAX Tower is below the sub but behind the Poseidon tower). A line of sight that is
+      // merely blocked only earns the cue when the target is level or above: on a vertical dive
+      // it is below, and "go up" would send the player to the surface, where no cue applies.
       const targetNotBelow = scanView.objectiveVertDeg > -5;
+      const nearSurface = sub.position.y > -12;
       const obstacle =
-        targetNotBelow &&
-        ((blockedApproach && (pc!.headOn || pc!.contactNormal.y < 0.85)) || pathBlocked)
+        !nearSurface &&
+        ((blockedApproach && (pc!.headOn || pc!.contactNormal.y < 0.85)) ||
+          (pathBlocked && targetNotBelow))
           ? 'Blocked ahead · go up ↑'
           : null;
       ctx.discovery.overlay.setApproachObstacle(obstacle);
