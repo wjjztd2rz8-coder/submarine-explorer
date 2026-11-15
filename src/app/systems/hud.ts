@@ -25,8 +25,11 @@ function approachBlockedByProp(ctx: GameContext, view: ScanView): boolean {
   const target = ctx.discovery.scanner.getTargets().find((t) => t.id === id);
   if (!target) return false;
   const r = ctx.effective.submarine.hullRadius;
+  // The target's own prop surrounds it; climbing never clears that, so only the way there counts.
+  const near = Math.max(15, view.objectiveRadius * 0.25);
   for (let step = 1; step <= 12; step++) {
     pathProbe.copy(sub.position).lerp(target.position, step / 12);
+    if (pathProbe.distanceTo(target.position) < near) break;
     if (props.collide(pathProbe, r, pathNormal) && Math.abs(pathNormal.y) < 0.85) return true;
   }
   return false;

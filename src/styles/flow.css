@@ -451,12 +451,21 @@ body:has(.debrief:not([hidden])) .d-scan-waypoints {
     max-width: calc(100vw - 116px - env(safe-area-inset-right, 0px));
   }
 }
+/* Phone landscape: a second row of the bar, under Pause and Journal and clear of the depth
+   readout above and the touch buttons below. */
 @media (orientation: landscape) and (max-height: 460px) {
+  html.is-touch .hud-bar:has(> .hud-finish:not([hidden])) {
+    justify-self: stretch;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
   html.is-touch .hud-bar > .hud-finish {
-    left: auto;
-    right: calc(12px + env(safe-area-inset-right, 0px));
+    position: static;
     transform: none;
-    max-width: min(200px, 42vw);
+    order: 1;
+    flex: 1 0 100%;
+    max-width: none;
   }
 }
 .hud-finish {

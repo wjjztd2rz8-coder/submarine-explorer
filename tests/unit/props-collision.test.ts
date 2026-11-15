@@ -286,6 +286,59 @@ describe('Props.collide + PropContact', () => {
     expect(body.velocity.length()).toBeLessThan(0.5);
   });
 
+  it('slides along the face when driving obliquely into it at speed', async () => {
+    const props = await hullProps();
+    const contact = new PropContact(props, new EventBus(), cfg, 8);
+    const { x, z } = latLonToWorld(meta, 41.73, -49.95);
+    // North face, normal (0,0,-1); heading south-east into it while moving south at 3 m/s.
+    const body = {
+      position: v(x, -3790, z - 16),
+      velocity: v(0, 0, 3),
+      getForward: (out = new THREE.Vector3()) => out.set(0.6, 0, 0.8),
+    };
+    expect(contact.resolve(body, 1 / 60, 1)).toBe(true);
+    expect(contact.headOn).toBe(true);
+    expect(body.velocity.x).toBeGreaterThan(1); // along the face, the way the bow points
+    expect(body.velocity.z).toBeLessThan(0.5); // not into it
+  });
+
+  it('lifts a hull held in place against props out after a second without headway', async () => {
+    const props = await hullProps();
+    const contact = new PropContact(props, new EventBus(), cfg, 8);
+    const { x, z } = latLonToWorld(meta, 41.73, -49.95);
+    // No forward vector, so no slide: thrust alone pins it against the north face.
+    const body = { position: v(x, -3790, z - 16), velocity: v(0, 0, 0) };
+    const start = body.position.clone();
+    for (let i = 0; i < 150; i++) {
+      body.position.z += 3 / 60; // thrust south, into the hull
+      body.velocity.set(0, 0, 0);
+      contact.resolve(body, 1 / 60, 1);
+    }
+    expect(body.position.y - start.y).toBeGreaterThan(1);
+    // Coasting into the face is not being held there: nothing lifts it.
+    const coast = { position: v(x, -3790, z - 16), velocity: v(0, 0, 0) };
+    const idle = new PropContact(props, new EventBus(), cfg, 8);
+    for (let i = 0; i < 150; i++) {
+      coast.position.z += 3 / 60;
+      idle.resolve(coast, 1 / 60, 0);
+    }
+    expect(coast.position.y).toBeCloseTo(-3790);
+  });
+
+  it('adds no slide when pointing away from the face', async () => {
+    const props = await hullProps();
+    const contact = new PropContact(props, new EventBus(), cfg, 8);
+    const { x, z } = latLonToWorld(meta, 41.73, -49.95);
+    const body = {
+      position: v(x, -3790, z - 16),
+      velocity: v(0, 0, 0),
+      getForward: (out = new THREE.Vector3()) => out.set(0.6, 0, -0.8),
+    };
+    contact.resolve(body, 1 / 60, 1);
+    expect(contact.headOn).toBe(false);
+    expect(Math.abs(body.velocity.x)).toBeLessThan(1e-9);
+  });
+
   it('damps into-surface velocity and emits sub:collided once per contact', async () => {
     const props = await hullProps();
     const bus = new EventBus();
