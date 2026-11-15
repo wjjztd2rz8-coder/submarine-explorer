@@ -128,8 +128,9 @@ export class Waypoints {
       if (marker) {
         // Other unknown contacts appear in range; the current target is always marked.
         marker.hidden =
+          scanned ||
           !onscreen ||
-          (unknown ? !(nearby || isCurrent) || !this.visualHints : !scanned && !isCurrent);
+          (unknown ? !(nearby || isCurrent) || !this.visualHints : !isCurrent);
         marker.classList.toggle('is-scanned', scanned);
         marker.classList.toggle('is-current', isCurrent);
         marker.textContent = unknown

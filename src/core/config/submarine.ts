@@ -35,6 +35,14 @@ export interface SubmarineConfig {
   surveyNearM: number;
   surveyFarM: number;
   surveyMaxSpeed: number;
+  /**
+   * Arcade transit boost while holding forward: scales the forward speed cap up
+   * toward `transitMaxScale` when the nearest unscanned contact is beyond
+   * `transitFarM`, easing back to 1 by `transitNearM`. Disabled in research.
+   */
+  transitFarM: number;
+  transitNearM: number;
+  transitMaxScale: number;
   /** Independent vertical velocity cap; forward thrust cannot increase descent speed. */
   maxVerticalSpeed: number;
   /** Depth (negative metres) at which the hull fails. */
@@ -163,9 +171,12 @@ export const DEFAULT_SUBMARINE: SubmarineConfig = {
   buoyancyAccel: 0.05,
   maxSpeed: 40,
   surveySpeedEnabled: false,
-  surveyNearM: 120,
+  surveyNearM: 100,
   surveyFarM: 260,
   surveyMaxSpeed: 5,
+  transitFarM: 300,
+  transitNearM: 180,
+  transitMaxScale: 2,
   maxVerticalSpeed: 8,
   // Fallback game failure threshold when no named hull is fitted.
   crushDepth: -7150,

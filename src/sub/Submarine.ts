@@ -108,6 +108,22 @@ export function surveySpeedScale(config: SubmarineConfig, distance: number): num
   return nearScale + (1 - nearScale) * t;
 }
 
+/**
+ * Arcade transit boost while driving forward toward a distant unscanned contact.
+ * Blends from `transitMaxScale` beyond `transitFarM` down to 1 at `transitNearM`.
+ */
+export function transitSpeedScale(
+  config: SubmarineConfig,
+  distance: number,
+  forwardThrottle: number,
+): number {
+  if (!config.surveySpeedEnabled || forwardThrottle <= 0 || !Number.isFinite(distance)) return 1;
+  const span = config.transitFarM - config.transitNearM;
+  if (span <= 0) return distance >= config.transitFarM ? config.transitMaxScale : 1;
+  const t = clamp((distance - config.transitNearM) / span, 0, 1);
+  return 1 + (config.transitMaxScale - 1) * t;
+}
+
 export class Submarine {
   private surveyDistance = Infinity;
 
@@ -329,7 +345,9 @@ export class Submarine {
 
     // --- accelerations ------------------------------------------------------
     const throttle = curve(clamp(cmd.throttle, -1, 1), c.thrustCurve);
-    const accelMag = throttle >= 0 ? throttle * c.thrustAccel : throttle * c.reverseAccel;
+    const transitScale = transitSpeedScale(c, this.surveyDistance, throttle);
+    let accelMag = throttle >= 0 ? throttle * c.thrustAccel : throttle * c.reverseAccel;
+    if (throttle > 0 && transitScale > 1) accelMag *= transitScale;
     const a = this.tmp.copy(fwd).multiplyScalar(accelMag);
 
     // Ballast lags the stick (the tanks take time to flood or blow).
@@ -362,7 +380,7 @@ export class Submarine {
     // Horizontal and ballast limits are independent: pitch cannot turn
     // the forward cap into an unsafe descent rate.
     const surveyScale = surveySpeedScale(c, this.surveyDistance);
-    const maxSpeed = c.maxSpeed * surveyScale;
+    const maxSpeed = c.maxSpeed * surveyScale * transitScale;
     v.y = clamp(v.y, -c.maxVerticalSpeed * surveyScale, c.maxVerticalSpeed * surveyScale);
     const horizontalSpeed = Math.hypot(v.x, v.z);
     if (horizontalSpeed > maxSpeed) {

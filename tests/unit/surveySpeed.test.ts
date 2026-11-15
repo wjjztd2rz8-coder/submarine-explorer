@@ -5,20 +5,64 @@ import { defaultSettings } from '../../src/core/Save.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { resolveEffective } from '../../src/game/EffectiveSettings.js';
 import { Scanner } from '../../src/game/Scanner.js';
-import { Submarine, surveySpeedScale } from '../../src/sub/Submarine.js';
+import { Submarine, surveySpeedScale, transitSpeedScale } from '../../src/sub/Submarine.js';
 import { FROZEN_INPUT } from '../../src/game/MissionRouter.js';
 import { facingCue, turnCue } from '../../src/ui/ScanOverlay.js';
 
 const arcade = resolveEffective(defaultSettings(DEFAULT_CONFIG), 'arcade', null);
 const realistic = resolveEffective(defaultSettings(DEFAULT_CONFIG), 'realistic', null);
-it('linearly caps arcade speed at 5 m/s inside 120 m and releases at 260 m', () => {
+it('linearly caps arcade speed at 5 m/s inside 100 m and releases at 260 m', () => {
   const c = arcade.submarine;
-  expect(surveySpeedScale(c, 120) * c.maxSpeed).toBeCloseTo(5);
+  expect(surveySpeedScale(c, 100) * c.maxSpeed).toBeCloseTo(5);
   expect(surveySpeedScale(c, 0) * c.maxSpeed).toBeCloseTo(5);
-  expect(surveySpeedScale(c, 190) * c.maxSpeed).toBeCloseTo((5 + c.maxSpeed) / 2);
+  expect(surveySpeedScale(c, 180) * c.maxSpeed).toBeCloseTo((5 + c.maxSpeed) / 2);
   expect(surveySpeedScale(c, 260)).toBe(1);
   expect(surveySpeedScale(c, Infinity)).toBe(1);
   expect(surveySpeedScale(realistic.submarine, 0)).toBe(1);
+});
+it('doubles the forward cap beyond 300 m while holding forward, easing to cruise by 180 m', () => {
+  const c = arcade.submarine;
+  expect(transitSpeedScale(c, 400, 1)).toBe(2);
+  expect(transitSpeedScale(c, 300, 1)).toBe(2);
+  expect(transitSpeedScale(c, 240, 1)).toBeCloseTo(1.5);
+  expect(transitSpeedScale(c, 180, 1)).toBe(1);
+  expect(transitSpeedScale(c, 400, 0)).toBe(1);
+  expect(transitSpeedScale(c, 400, -1)).toBe(1);
+  expect(transitSpeedScale(realistic.submarine, 400, 1)).toBe(1);
+});
+it('reaches roughly twice cruise thrust far from contacts', () => {
+  const c = arcade.submarine;
+  const terrain = {
+    sampleHeight: () => -10000,
+    getNormal: (_x: number, _z: number, out = new Vector3()) => out.set(0, 1, 0),
+  };
+  const near = new Submarine(c, terrain);
+  near.reset(0, -1000, 0);
+  near.setSurveyDistance(120);
+  const far = new Submarine(c, terrain);
+  far.reset(0, -1000, 0);
+  far.setSurveyDistance(500);
+  const inp = { ...FROZEN_INPUT, throttle: 1 };
+  for (let i = 0; i < 120 * 60; i++) {
+    near.step(inp, 1 / 60);
+    far.step(inp, 1 / 60);
+  }
+  expect(far.getState().speed).toBeGreaterThan(near.getState().speed * 1.6);
+});
+it('raises forward cap in transit without affecting vertical limits', () => {
+  const c = arcade.submarine;
+  const sub = new Submarine(c, {
+    sampleHeight: () => -10000,
+    getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
+  });
+  sub.reset(0, -1000, 0);
+  sub.setSurveyDistance(400);
+  sub.velocity.set(30, 0, 0);
+  sub.step({ ...FROZEN_INPUT, throttle: 1 }, 1 / 60);
+  expect(sub.velocity.length()).toBeGreaterThan(c.maxSpeed * 0.9);
+  sub.velocity.set(0, 30, 0);
+  sub.step({ ...FROZEN_INPUT, throttle: 1 }, 1 / 60);
+  expect(sub.velocity.y).toBeLessThanOrEqual(c.maxVerticalSpeed + 1e-6);
 });
 it('applies the same scale to vertical speed without mutating settings', () => {
   const c = arcade.submarine;
