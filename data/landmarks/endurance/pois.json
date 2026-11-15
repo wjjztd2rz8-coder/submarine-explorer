@@ -25,7 +25,11 @@
         "distance_m": 54,
         "elevation_deg": 15,
         "azimuth_deg": 65,
-        "target_offset": [0, 2.5, 0]
+        "target_offset": [
+          0,
+          2.5,
+          0
+        ]
       }
     },
     {
@@ -50,7 +54,11 @@
         "distance_m": 22,
         "elevation_deg": 14,
         "azimuth_deg": 335,
-        "target_offset": [0, 1, 18]
+        "target_offset": [
+          0,
+          1,
+          18
+        ]
       }
     },
     {
@@ -72,10 +80,15 @@
       ],
       "note": "Endurance22 photographed \"the helm of the Endurance\" (History.com) and a large white anemone near the wheel, among sea stars, sponges and sea squirts colonising the hull (Smithsonian, quoting BAS marine biogeographer Huw Griffiths). Placed near the stern, illustrative position (no coordinate published for the wheel itself).",
       "reveal": {
-        "distance_m": 15,
-        "elevation_deg": 18,
-        "azimuth_deg": 25,
-        "target_offset": [0, 0.5, 19]
+        "distance_m": 14.5,
+        "elevation_deg": 10,
+        "azimuth_deg": 22,
+        "sweep_deg": 14,
+        "target_offset": [
+          -0.5,
+          5.2,
+          19.5
+        ]
       }
     },
     {
@@ -98,10 +111,15 @@
       ],
       "note": "FMHT's survey team (Mensun Bound) found the masts down and the funnel toppled, with damage concentrated around the poop and waist; History.com's photo set shows the ship appears to have struck the seabed bow/keel-first. No coordinates are published for the fallen rigging itself; placed forward of the hull centre, illustrative position.",
       "reveal": {
-        "distance_m": 26,
-        "elevation_deg": 20,
-        "azimuth_deg": 200,
-        "target_offset": [2, -6, 16]
+        "distance_m": 25,
+        "elevation_deg": 17,
+        "azimuth_deg": 195,
+        "sweep_deg": 14,
+        "target_offset": [
+          -6,
+          -1.2,
+          5.5
+        ]
       }
     }
   ]

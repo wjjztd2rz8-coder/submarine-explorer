@@ -21,10 +21,15 @@
       ],
       "note": "OOI's RS03ASHS platform reference is 45.9337 N, -130.0139 W at 1,552 m; it is used here as the Mushroom marker's reference, not an independently surveyed chimney coordinate. The local grid reads 1,540.1 m. Mushroom is about 4 m tall with fluids over 275 degC. UW describes most ASHES activity within an area 60-80 m across. Individual chimney geometry is a reconstruction.",
       "reveal": {
-        "distance_m": 7.5,
-        "elevation_deg": 15,
-        "azimuth_deg": 25,
-        "target_offset": [0, -0.5, 0]
+        "distance_m": 15,
+        "elevation_deg": 11,
+        "azimuth_deg": 35,
+        "sweep_deg": 16,
+        "target_offset": [
+          73.5,
+          -0.8,
+          -39.1
+        ]
       }
     },
     {
@@ -46,10 +51,15 @@
       ],
       "note": "UW/OOI places Inferno about 10 m from Mushroom without publishing a bearing. This scan marker shares the prop’s 0.00009 degree (~10 m) northward offset. The bearing is authored; the marker snaps to the terrain.",
       "reveal": {
-        "distance_m": 8.5,
-        "elevation_deg": 15,
-        "azimuth_deg": 45,
-        "target_offset": [0, -0.5, 0]
+        "distance_m": 15,
+        "elevation_deg": 11,
+        "azimuth_deg": 15,
+        "sweep_deg": 18,
+        "target_offset": [
+          -19.4,
+          -0.4,
+          -12.2
+        ]
       }
     },
     {
@@ -65,13 +75,20 @@
       "guide_entry": "minor-chimneys",
       "confidence": "low",
       "reconstruction": true,
-      "sources": ["https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"],
+      "sources": [
+        "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"
+      ],
       "note": "Hell, Phoenix and Virgin are documented ASHES chimneys, generally under 4 m tall. Virgin Mound is a separate sub-metre anhydrite spire. This smaller-chimney marker's grouping and offset are authored choices; UW describes most field activity within an area about 60-80 m across.",
       "reveal": {
-        "distance_m": 11,
-        "elevation_deg": 18,
-        "azimuth_deg": 195,
-        "target_offset": [3, -0.8, 1]
+        "distance_m": 14,
+        "elevation_deg": 11,
+        "azimuth_deg": 135,
+        "sweep_deg": 18,
+        "target_offset": [
+          15.5,
+          -0.8,
+          8.9
+        ]
       }
     },
     {
@@ -91,7 +108,18 @@
         "https://oceanobservatories.org/site/rs03ashs/",
         "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"
       ],
-      "note": "Real GMRT terrain, about 1,508 m deep and about 130 m west of Mushroom, on the lower part of the rise from ~1,540 m at the vents to ~1,416 m some 300 m west, a slope consistent with the caldera's western boundary fault -- OOI states ASHES sits 'near the base of the western caldera wall' and 'about 130 m east of the caldera boundary fault'. Moved 2026-11 from the top of the rise (the +300 m point, 1,416 m) so the dive does not have to climb 125 m. The exact fault trace itself is not resolved at this tile's ~43-61 m cell size, so this POI marks the rising wall terrain rather than a specific scarp line."
+      "note": "Real GMRT terrain, about 1,508 m deep and about 130 m west of Mushroom, on the lower part of the rise from ~1,540 m at the vents to ~1,416 m some 300 m west, a slope consistent with the caldera's western boundary fault -- OOI states ASHES sits 'near the base of the western caldera wall' and 'about 130 m east of the caldera boundary fault'. Moved 2026-11 from the top of the rise (the +300 m point, 1,416 m) so the dive does not have to climb 125 m. The exact fault trace itself is not resolved at this tile's ~43-61 m cell size, so this POI marks the rising wall terrain rather than a specific scarp line.",
+      "reveal": {
+        "distance_m": 78,
+        "elevation_deg": 7,
+        "azimuth_deg": 76,
+        "sweep_deg": 14,
+        "target_offset": [
+          82,
+          -22,
+          -24
+        ]
+      }
     },
     {
       "id": "axial-ashes-vent-life",
@@ -106,8 +134,21 @@
       "guide_entry": "vent-life",
       "confidence": "medium",
       "reconstruction": true,
-      "sources": ["https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"],
-      "note": "GMRT terrain at about 1,540 m, about 80 m east-southeast of Mushroom, inside the area about 60-80 m across where UW describes most ASHES activity. Added 2026-11 as a route stop for the guide's vent-life entry; the marker stands for the field's animal communities, not one surveyed colony."
+      "sources": [
+        "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"
+      ],
+      "note": "GMRT terrain at about 1,540 m, about 80 m east-southeast of Mushroom, inside the area about 60-80 m across where UW describes most ASHES activity. Added 2026-11 as a route stop for the guide's vent-life entry; the marker stands for the field's animal communities, not one surveyed colony.",
+      "reveal": {
+        "distance_m": 14,
+        "elevation_deg": 11,
+        "azimuth_deg": 125,
+        "sweep_deg": 18,
+        "target_offset": [
+          0,
+          -15.8,
+          0
+        ]
+      }
     }
   ]
 }
