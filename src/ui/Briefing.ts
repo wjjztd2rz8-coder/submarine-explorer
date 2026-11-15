@@ -20,6 +20,7 @@
 
 import type { GameplayOptions } from '../core/Config.js';
 import { el } from './dom.js';
+import { contactProgress } from './contactProgress.js';
 import { FocusTrap } from './FocusTrap.js';
 import type { MissionStartPosition } from '../game/MissionRouter.js';
 import { ModeSelector, type GameplaySettingsSource } from './ModeSelector.js';
@@ -159,8 +160,16 @@ export class Briefing {
   }
 
   setContactProgress(found: number, total: number): void {
-    const row = this.root.querySelector('.briefing-contacts');
-    if (row) row.textContent = `Unknown contacts: ${found} of ${total} found`;
+    let row = this.root.querySelector('.briefing-contacts');
+    if (!total) {
+      row?.remove();
+      return;
+    }
+    if (!row) {
+      row = el('li', 'briefing-contacts');
+      this.root.querySelector('.briefing-objectives')?.append(row);
+    }
+    row.textContent = contactProgress(found, total);
   }
 
   show(c: BriefingContent): void {
@@ -186,7 +195,8 @@ export class Briefing {
       ol.append(li);
     }
     const contacts = c.objectives.filter((o) => !o.primary);
-    ol.append(el('li', 'briefing-contacts', `Unknown contacts: 0 of ${contacts.length} found`));
+    if (contacts.length)
+      ol.append(el('li', 'briefing-contacts', contactProgress(0, contacts.length)));
     obj.append(ol);
     p.append(obj);
     const facts = unique(c.facts);

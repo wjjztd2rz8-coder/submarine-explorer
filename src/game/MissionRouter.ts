@@ -511,7 +511,7 @@ export class MissionRouter {
     this.panel.showBanner({
       stars: this.opts.stars?.(),
       title: 'Primary objectives complete',
-      detail: `${left} unknown ${left === 1 ? 'contact remains' : 'contacts remain'} on sonar.`,
+      detail: `${left} bonus sonar ${left === 1 ? 'contact remains' : 'contacts remain'} on sonar.`,
       onKeepExploring: () => this.keepExploring(),
       onSurface: () => this.endDive(),
     });
