@@ -47,7 +47,7 @@
       ],
       "note": "Beehive was a roughly 1 m vent on Poseidon; Aquino et al. 2024 report the chimney was absent by the 2018 visit. This separately scannable marker is placed about 74 m from Poseidon, not at a surveyed Beehive footprint.",
       "reveal": {
-        "distance_m": 10,
+        "distance_m": 8,
         "elevation_deg": 3,
         "azimuth_deg": 295,
         "target_offset": [0, -0.4, 0]

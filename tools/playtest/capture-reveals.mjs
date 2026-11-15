@@ -86,8 +86,15 @@ async function captureOne(url, poiId, outPath, contextOptions) {
       .waitFor({ state: 'visible', timeout: 40000 });
     await page.waitForTimeout(2800);
     await page.screenshot({ path: outPath });
-    const rect = await page.evaluate(() => window.__game?.reveal?.subjectRect?.() ?? null);
-    return { ok: true, error: null, rect };
+    const { rect, framing, card } = await page.evaluate(() => {
+      const panel = document.querySelector('.discovery-reveal-panel')?.getBoundingClientRect();
+      return {
+        rect: window.__game?.reveal?.subjectRect?.() ?? null,
+        framing: window.__game?.reveal?.framing ?? null,
+        card: panel ? { left: panel.left / innerWidth, top: panel.top / innerHeight } : null,
+      };
+    });
+    return { ok: true, error: null, rect, framing, card };
   } catch (err) {
     const msg = errors[0] ?? String(err?.message ?? err).slice(0, 200);
     return { ok: false, error: msg };
@@ -123,7 +130,13 @@ try {
       const succeeded = shots.every((x) => x.ok);
       const error = shots.find((x) => x.error)?.error ?? undefined;
       results.push({
-        shots: shots.map(({ size, file, rect }) => ({ size, file, rect })),
+        shots: shots.map(({ size, file, rect, framing, card }) => ({
+          size,
+          file,
+          rect,
+          framing,
+          card,
+        })),
         site,
         poi: poi.id,
         name: poi.name ?? poi.id,

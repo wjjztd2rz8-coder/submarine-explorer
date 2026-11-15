@@ -182,7 +182,7 @@ export function revealFrame(
   const distance = authored * fitView.scale;
   // Orbiting must stay clear of the subject: the camera keeps outside most of
   // its bounding sphere (never farther than the authored framing requires).
-  const subjectGuard = sphere ? sphere.radius * 0.6 + sphere.center.distanceTo(target) : 0;
+  const subjectGuard = sphere ? sphere.radius * 0.35 + sphere.center.distanceTo(target) : 0;
   return {
     target,
     // The card covers part of the view, so the subject sits in the middle of what is left.
