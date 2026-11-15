@@ -2501,7 +2501,7 @@ describe('overlay policies across the app', () => {
       mission.setContacts(pois, () => false);
       const objectives = mission.objectives;
       const contacts = objectives.filter((o) => !o.primary && o.resolved);
-      expect(contacts).toHaveLength(id === 'titanic' ? 4 : 0);
+      expect(contacts).toHaveLength(id === 'titanic' ? 6 : 0);
       const briefing = new Briefing({ onBegin: vi.fn() });
       const panel = new ObjectivesPanel();
       cleanup.push(() => {

@@ -64,7 +64,13 @@ describe('Mission.abort', () => {
     expect(m.resume()).toBe(false);
     expect(m.emitted.map((e) => e.name)).not.toContain('mission:complete');
     expect(ended).toEqual([
-      { missionId: 'titanic', reason: 'abort', completed: 2, total: 4, durationS: 4 },
+      {
+        missionId: 'titanic',
+        reason: 'abort',
+        completed: 2,
+        total: titanicMission.objectives.length,
+        durationS: 4,
+      },
     ]);
   });
 
