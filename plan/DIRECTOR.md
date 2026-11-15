@@ -109,6 +109,8 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   tests; Titanic and Lost City by keyboard (114 s, 44 s) and by touch (118 s at 844x390,
   42 s at 390x844), all on the debrief. In landscape the hook costs the finds grid about
   25 px: the longest four-line tile name clips slightly (accepted).
+- **06:45 Sunday: LIVE is `08fad020`** (S31 hooks; CI green, deployed about 06:36).
+  Nothing in flight, no scheduled tasks pending. Next: the owner's phone test.
 - **Lesson:** look at one capture before merging any layout change. S30's report and
   measurements were clean while its portrait screenshot showed tiles stacked on top of
   each other; it had measured horizontal clipping only.
