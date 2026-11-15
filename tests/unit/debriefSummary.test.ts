@@ -68,7 +68,7 @@ it('lists landmarks before wildlife in discovery order', () => {
   };
   expect(debriefModel(dive, site).finds.map((f) => f.name)).toEqual(['Bow', 'Stern', 'Jelly']);
 });
-it('lists distinct scans this dive including species, reads the newest picture, and omits facts already revealed', () => {
+it('lists distinct scans this dive including species, reads the newest picture, and falls back to a landmark fact', () => {
   const store = new DiscoveryStore(null);
   store.record('titanic', 'bow');
   const model = debriefModel(
@@ -81,7 +81,7 @@ it('lists distinct scans this dive including species, reads the newest picture, 
   expect(model.finds.map((f) => f.name)).toEqual(['Stern', 'Bow', 'Jelly']);
   expect(model.finds[1].image).toBe('newest');
   expect(model.finds[0].image).toBeUndefined();
-  expect(model.fact).toBeNull();
+  expect(model.fact).toBe('The bow is preserved. A second sentence.');
   expect(model.progress).toBe('1 more to find here');
   expect(model.title).toBe('You found 1 of 2');
 });
@@ -94,7 +94,7 @@ it('handles empty, incomplete and aborted dives without inventing facts', () => 
     debriefModel({ ...stats, subtitle: 'Hull failure', finds: { found: 2, total: 6 } }).title,
   ).toBe('You found 2 of 6');
 });
-it('chooses an unscanned find first, then an unattached guide fact, otherwise nothing', () => {
+it('prefers an unseen landmark fact and falls back without using site or terrain facts', () => {
   const source = structuredClone(site);
   source.entries[0].guide!.fact = 'A fact already shown.';
   source.entries[1].guide!.fact = 'A new find fact.';
@@ -108,17 +108,17 @@ it('chooses an unscanned find first, then an unattached guide fact, otherwise no
     poiIds: [],
     guide: { ...source.entries[0].guide!, fact: 'An unseen guide fact.' },
   });
-  expect(debriefModel(dive, source).fact).toBe('An unseen guide fact.');
+  expect(debriefModel(dive, source).fact).toBe('A fact already shown.');
   source.entries[2].guide!.fact = 'a fact already shown.';
-  expect(debriefModel(dive, source).fact).toBeNull();
+  expect(debriefModel(dive, source).fact).toBe('A fact already shown.');
 });
-it('does not reuse a guide entry shared with a scanned find', () => {
+it('falls back to a landmark fact when all linked finds were scanned', () => {
   const source = structuredClone(site);
   source.entries[0].poiIds.push('stern');
   source.entries.splice(1);
   expect(
     debriefModel({ ...stats, discoveries: [{ poiId: 'bow', name: 'Bow' }] }, source).fact,
-  ).toBeNull();
+  ).toBe('The bow is preserved. A second sentence.');
 });
 it.each([
   [6, 6, 2, 'You found everything here'],
@@ -147,4 +147,73 @@ it('prioritizes the next site or the chooser ahead of replay and exploring', () 
   );
   expect(primaryDebriefAction(actions)?.id).toBe('next-dive');
   expect(primaryDebriefAction(actions.slice(0, -1))?.id).toBe('dive-sites');
+});
+
+const landmarkIds: Record<string, string[]> = {
+  titanic: [
+    'bow',
+    'stern',
+    'debris-coal',
+    'missing-piece',
+    'boilers',
+    'debris-field',
+    'big-piece',
+    'memorial',
+  ],
+  'lost-city': ['poseidon', 'beehive', 'imax-tower', 'microbial-mat'],
+  'great-blue-hole': ['the-hole', 'lower-water', 'eastern-gallery'],
+  'beebe-vent-field': ['vents', 'shrimp', 'sulfide-mounds'],
+  'monterey-canyon': ['canyon-head', 'upper-canyon', 'mars-node'],
+  endurance: ['wreck-hull', 'stern-nameplate', 'helm-and-life', 'structural-damage'],
+  kamaehuakanaloa: ['vents', 'hiolo-south', 'peles-pit'],
+  'hudson-canyon': ['canyon-wall', 'sanctuary'],
+  'challenger-deep': ['hadal-life', 'three-pools', 'eastern-pool'],
+  bismarck: ['wreck-hull', 'turret-debris', 'sinking-and-debate', 'memorial'],
+  'axial-seamount-ashes': ['mushroom-chimney', 'mushroom-inferno', 'minor-chimneys', 'vent-life'],
+  'blake-plateau-corals': ['mound-field', 'coral-thicket', 'second-mound'],
+  'hunga-tonga-caldera': ['rim-wall', 'caldera-floor'],
+};
+
+it('chooses only current-site landmark guide facts for all 13 sites, even after every reveal', async () => {
+  // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+  const { readFileSync } = await import('node:fs');
+  const { loadJournalSites } = await import('../../src/game/JournalData.js');
+  const { TOUR_ORDER } = await import('../../src/game/Tour.js');
+  const sites = await loadJournalSites([], async (url) => {
+    try {
+      const body = readFileSync(`.${url}`, 'utf8');
+      return { ok: true, text: async () => body };
+    } catch {
+      return { ok: false, text: async () => '' };
+    }
+  });
+  expect(sites.map((s) => s.id).sort()).toEqual([...TOUR_ORDER].sort());
+  for (const current of sites) {
+    const guide = JSON.parse(readFileSync(`data/landmarks/${current.id}/guide.json`, 'utf8')) as {
+      entries: { id: string; fact: string }[];
+    };
+    const allowed = guide.entries.filter((e) => landmarkIds[current.id].includes(e.id));
+    expect(allowed.length, current.id).toBeGreaterThan(1);
+    // An unscanned wildlife entry must never become the curiosity fallback.
+    current.entries.unshift({
+      ...current.entries[0],
+      kind: 'life',
+      id: 'wildlife',
+      poiIds: [],
+      guide: { ...current.entries[0].guide!, fact: 'Off-topic wildlife fact.' },
+    });
+    const landmarks = current.entries.filter((e) => landmarkIds[current.id].includes(e.id));
+    for (const scanned of [[], landmarks.slice(0, 1), landmarks]) {
+      const dive = {
+        ...stats,
+        discoveries: scanned.flatMap((e) => e.poiIds.map((poiId) => ({ poiId, name: e.title }))),
+      };
+      const fact = debriefModel(dive, current).fact;
+      expect(
+        allowed.map((e) => e.fact),
+        current.id,
+      ).toContain(fact);
+      if (scanned.length === 1) expect(fact, current.id).not.toBe(scanned[0].guide!.fact);
+    }
+  }
 });

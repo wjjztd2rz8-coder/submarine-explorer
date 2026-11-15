@@ -5,7 +5,13 @@
  * `?debrief=1` opens the free-dive variant for screenshots.
  */
 
-import { nextSiteAfter, siteFinds, siteHook, tourJournal } from '../game/Tour.js';
+import {
+  nextSiteAfter,
+  siteFinds,
+  siteHook,
+  siteLandmarkEntries,
+  tourJournal,
+} from '../game/Tour.js';
 import type { DiscoveryReader, JournalSite } from '../game/JournalData.js';
 import { PhotoStore, type Photo } from '../game/PhotoStore.js';
 import { el } from './dom.js';
@@ -84,17 +90,16 @@ export function debriefModel(
     entry.poiIds.some((id) => scanned.has(id)) ||
     (entry.kind === 'life' && scanned.has(`life:${entry.id}`));
   const entryFact = (entry: NonNullable<typeof site>['entries'][number]) =>
-    entry.guide?.fact ??
-    entry.life?.info.fact ??
-    revealExcerpt(entry.guide?.paragraphs.join(' ') ?? entry.life?.info.text ?? '');
+    entry.guide?.fact ?? revealExcerpt(entry.guide?.paragraphs.join(' ') ?? '');
   const normalise = (text: string) => text.trim().replace(/\s+/g, ' ').toLowerCase();
-  const seen = new Set((site?.entries ?? []).filter(attachedToScan).map(entryFact).map(normalise));
-  const candidates = (site?.entries ?? []).filter((entry) => !attachedToScan(entry));
-  const ordered = [
-    ...candidates.filter((entry) => entry.kind === 'poi' || entry.kind === 'life'),
-    ...candidates.filter((entry) => entry.guide && entry.kind !== 'poi' && entry.kind !== 'life'),
-  ];
-  const fact = ordered.map(entryFact).find((text) => text.trim() && !seen.has(normalise(text)));
+  const landmarks = site ? siteLandmarkEntries(site) : [];
+  const seen = new Set(landmarks.filter(attachedToScan).map(entryFact).map(normalise));
+  const fact =
+    landmarks
+      .filter((entry) => !attachedToScan(entry))
+      .map(entryFact)
+      .find((text) => text.trim() && !seen.has(normalise(text))) ??
+    landmarks.map(entryFact).find((text) => text.trim());
   // A mission counts its own route; a free dive counts the site's Journal finds.
   const counts = stats.finds ?? (site && store ? siteFinds(site, store) : null);
   return {
