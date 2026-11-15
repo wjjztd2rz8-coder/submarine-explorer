@@ -392,6 +392,12 @@ export class Props {
     const footprint = followsTerrain(def) ? null : localBounds;
     computePlacement(def, this.meta, this.hf, footprint, root.position, root.quaternion);
     root.scale.set(...def.scale);
+    // Props have no transform animation. Recompose only on placement/replacement,
+    // including new terrain-following children added by the placement editor.
+    root.traverse((object) => {
+      object.updateMatrix();
+      object.matrixAutoUpdate = false;
+    });
     root.updateMatrixWorld(true);
 
     const scale = new THREE.Vector3(...def.scale);

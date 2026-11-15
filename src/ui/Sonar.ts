@@ -293,6 +293,7 @@ export class Sonar {
   private lastWheelZoomAt = -Infinity;
   private sensorRangeM = 2000;
   private showMarkers = true;
+  private ariaLabel = '';
   private pois: readonly PlacedPoi[] = [];
   private footprints: readonly SonarFootprint[] = [];
   private objectivePoiId: string | null = null;
@@ -1023,15 +1024,16 @@ export class Sonar {
       this.drawMarker(ctx, marker);
     for (const marker of this.markers.filter((m) => m.visible && m.current))
       this.drawMarker(ctx, marker);
-    this.canvas.setAttribute(
-      'aria-label',
-      `Sonar map: ${
-        this.markers
-          .filter((m) => m.visible)
-          .map((m) => `${m.name}, ${m.scanned ? 'scanned' : m.current ? 'objective' : 'contact'}`)
-          .join('; ') || 'no contacts in view'
-      }`,
-    );
+    const ariaLabel = `Sonar map: ${
+      this.markers
+        .filter((m) => m.visible)
+        .map((m) => `${m.name}, ${m.scanned ? 'scanned' : m.current ? 'objective' : 'contact'}`)
+        .join('; ') || 'no contacts in view'
+    }${this.showMarkers && this.faintContacts.length ? '; faint unidentified contact' : ''}`;
+    if (ariaLabel !== this.ariaLabel) {
+      this.canvas.setAttribute('aria-label', ariaLabel);
+      this.ariaLabel = ariaLabel;
+    }
 
     ctx.save();
     ctx.fillStyle =
@@ -1044,11 +1046,6 @@ export class Sonar {
       ctx.fill();
     }
     ctx.restore();
-    if (this.showMarkers && this.faintContacts.length)
-      this.canvas.setAttribute(
-        'aria-label',
-        `${this.canvas.getAttribute('aria-label')}; faint unidentified contact`,
-      );
 
     // The sub: a triangle pointing along its heading. Canvas y grows downward
     // and so does +Z (south), so a heading of 0 (north) must point up: -y.

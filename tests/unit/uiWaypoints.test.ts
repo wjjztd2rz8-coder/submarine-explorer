@@ -300,6 +300,20 @@ describe('waypoint objective state', () => {
     };
   }
 
+  it('refreshes fixed-contact lookup when POIs are replaced or removed', () => {
+    const f = fixture();
+    f.view.setContactState(() => ({ primary: false, found: true }));
+    const replacement = { ...f.pois[0]!, name: 'Replacement contact' };
+    f.view.setPois([replacement]);
+    f.draw();
+    expect(f.marker(replacement.id).title).toBe('Replacement contact');
+    expect(f.marker(replacement.id).textContent).toBe('✓ Replacement contact');
+    f.view.setPois([]);
+    f.draw(null);
+    expect(f.currentIds()).toEqual([]);
+    expect(f.view.root.children.length).toBe(1);
+  });
+
   it('conceals nearby contacts, marks only the current remote one, and restores persistent names', () => {
     const f = fixture();
     let found = false;

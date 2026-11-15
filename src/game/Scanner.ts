@@ -200,6 +200,10 @@ export class Scanner {
   }
   /** Public per-dive state for sonar, objectives and other presentation layers. */
   readonly scannedThisDive = new Set<string>();
+  // Geometry is private frame scratch: each call needs its own slot because
+  // nearest/active/candidate results are retained until the end of update().
+  private readonly geometryPool: Geometry[] = [];
+  private geometryUsed = 0;
   private active: ScanTarget | null = null;
   private objectiveSource: string | null | (() => string | null) = null;
 
@@ -340,6 +344,7 @@ export class Scanner {
    * @param forward unit forward vector of the sub (`sub.getForward()`).
    */
   update(dt: number, position: Vector3, forward: Vector3, scanHeld: boolean): void {
+    this.geometryUsed = 0;
     const v = this.view;
     const held = scanHeld && this.enabled;
     if (!held) {
@@ -426,12 +431,17 @@ export class Scanner {
     v.candidateNames = Object.fromEntries(
       eligible.map((entry) => [entry.target.id, entry.target.name]),
     );
-    const manual = [...this.targets, ...this.supplemental, ...this.extra].find(
-      (t) =>
+    let manual: ScanTarget | undefined;
+    if (this.manualId !== null) {
+      const validManual = (t: ScanTarget): boolean =>
         t.id === this.manualId &&
         !this.isScanned(t.landmarkId, t.id) &&
-        this.geometry(t, position, forward).inRange,
-    );
+        this.geometry(t, position, forward).inRange;
+      manual =
+        this.targets.find(validManual) ??
+        this.supplemental.find(validManual) ??
+        this.extra.find(validManual);
+    }
     if (!manual) this.manualId = null;
     const auto =
       eligible.find((e) => e.target.id === v.objectiveId)?.target ?? eligible[0]?.target ?? null;
@@ -670,6 +680,21 @@ export class Scanner {
             180) /
           Math.PI
         : 0;
-    return { distance, angleDeg, turnDeg: turn, vertDeg, inRange, facing };
+    const index = this.geometryUsed++;
+    const result = (this.geometryPool[index] ??= {
+      distance: 0,
+      angleDeg: 0,
+      turnDeg: 0,
+      vertDeg: 0,
+      inRange: false,
+      facing: false,
+    });
+    result.distance = distance;
+    result.angleDeg = angleDeg;
+    result.turnDeg = turn;
+    result.vertDeg = vertDeg;
+    result.inRange = inRange;
+    result.facing = facing;
+    return result;
   }
 }

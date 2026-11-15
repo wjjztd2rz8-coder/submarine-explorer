@@ -1203,3 +1203,22 @@ describe('held objective range recovery', () => {
     expect(scanner.isScanning).toBe(false);
   });
 });
+
+it('keeps objective, nearest and active geometry independent across contact-heavy frames', () => {
+  const objective = target();
+  const distant = Array.from({ length: 80 }, (_, i) =>
+    target({ id: `far-${i}`, position: new Vector3(1000 + i, -100, 1000) }),
+  );
+  const { scanner } = setup([objective, ...distant]);
+  scanner.setObjective(objective.id);
+  scanner.update(DT, AT, NORTH, true);
+  expect(scanner.view.activeId).toBe(objective.id);
+  expect(scanner.view.nearestDistance).toBe(100);
+  expect(scanner.view.objectiveDistance).toBe(100);
+  objective.position.z = -75;
+  scanner.update(DT, AT, NORTH, true);
+  expect(scanner.view.activeDistance).toBe(75);
+  expect(scanner.view.nearestDistance).toBe(75);
+  expect(scanner.view.objectiveDistance).toBe(75);
+  expect(scanner.view.nearestFacing).toBe(true);
+});

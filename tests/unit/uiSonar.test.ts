@@ -603,6 +603,10 @@ describe('sonar live contact metadata', () => {
     expect(sonar.canvas.getAttribute('aria-label')).toBe(
       'Sonar map: no contacts in view; faint unidentified contact',
     );
+    const attributeWrite = vi.spyOn(sonar.canvas, 'setAttribute');
+    sonar.update(pilot);
+    sonar.update(pilot);
+    expect(attributeWrite).not.toHaveBeenCalled();
     sonar.setMarkersVisible(false);
     sonar.update(pilot);
     expect(sonar.canvas.getAttribute('aria-label')).toBe('Sonar map: no contacts in view');
