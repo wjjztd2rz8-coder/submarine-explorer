@@ -5,7 +5,7 @@
     {
       "id": "overview",
       "title": "Hunga Tonga-Hunga Ha'apai: a survey from before the eruption",
-      "fact": "The January 2022 eruption sent a plume about 58 km high, far above the cruising height of airliners.",
+      "fact": "Hunga Tonga’s 15 January 2022 eruption sent its plume about 57 km high, reaching the mesosphere above the stratosphere.",
       "paragraphs": [
         "This dive follows Hunga Tonga–Hunga Ha’apai’s landscape before the 15 January 2022 eruption: a shallow summit basin, an island connection and volcanic slopes falling into deeper water.",
         "The volcano rises roughly 2 km from the surrounding seafloor. Before 2022, its central basin lay about 150–200 m below sea level. A cone built in 2014–2015 joined the two older rim islands.",
@@ -54,6 +54,10 @@
         {
           "title": "Ribó et al. 2026 — author-deposited full text",
           "url": "https://openrepository.aut.ac.nz/items/739ece41-4021-4129-b3ee-d2928eea8089"
+        },
+        {
+          "title": "Proud et al. 2022 — Hunga Tonga plume reached the mesosphere",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36378963/"
         }
       ],
       "confidence": "high"
@@ -143,7 +147,7 @@
     {
       "id": "rim-wall",
       "title": "The volcanic rim slope",
-      "fact": "West of the basin the volcano's wall falls to about 469 m, where gullies and loose rock mark a steep tuff slope.",
+      "fact": "Hunga’s caldera widened from about 4.5 to 4.8 km during the 2022 eruption as its floor collapsed.",
       "paragraphs": [
         "West of the shallow basin, volcanic terrain falls toward deeper water. The scan point is about 469 m deep, beyond the central basin’s 150–200 m floor.",
         "The banded tuff scarp's gullies and talus show how fragmented volcanic rock can form a steep slope."

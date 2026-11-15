@@ -5,7 +5,7 @@
     {
       "id": "overview",
       "title": "Monterey Canyon",
-      "fact": "Monterey Canyon's main channel runs more than 470 km out to sea, ending below 4,000 m on the abyssal plain.",
+      "fact": "Monterey Canyon stretches about 470 km from the coast into the deep Pacific, with walls that rival the Grand Canyon.",
       "paragraphs": [
         "Monterey Canyon begins just offshore of Moss Landing, beside the Monterey Bay Aquarium Research Institute (MBARI). Its walls reach about 1,700 m from floor to rim. MBARI describes a main channel extending more than 470 km offshore, continuing through the Monterey Deep Sea Fan and ending below 4,000 m on the abyssal plain.",
         "Sediment supplied from nearby beaches accumulates at the canyon head. Storm waves and slope failures can turn it into turbidity currents: fast underwater flows of sediment and seawater. Earthquakes can trigger sediment flows, but none of the flows in the 2015–2017 Coordinated Canyon Experiment coincided with earthquakes above magnitude 2, and some powerful flows occurred without major external triggers. These flows continue to carve and reshape the canyon.",
@@ -47,6 +47,10 @@
         {
           "title": "Johnson et al. 2022 — Bolinopsis taxonomy in the northeastern Pacific",
           "url": "https://www.frontiersin.org/journals/genetics/articles/10.3389/fgene.2022.970314/full"
+        },
+        {
+          "title": "SIMoN — Monterey Bay submarine canyons",
+          "url": "https://sanctuarysimon.org/monterey-bay-nms/submarine-canyons/"
         }
       ],
       "confidence": "high"
@@ -54,7 +58,7 @@
     {
       "id": "canyon-head",
       "title": "The canyon head",
-      "fact": "Monterey Canyon begins right off the beach at Moss Landing, so research ships reach water over a mile deep in under three hours.",
+      "fact": "Monterey Canyon begins just off Moss Landing’s beach, bringing the deep sea unusually close to shore.",
       "paragraphs": [
         "Monterey Canyon's head lies right off the beach at Moss Landing. The seafloor here drops away steeply, and MBARI's research vessels can reach areas more than a mile deep in a little over two and a half hours.",
         "This closeness to shore helps explain why the canyon is so well studied: deep-sea habitats and processes are within easy reach of MBARI's shore-based marine laboratory.",
@@ -109,7 +113,7 @@
     {
       "id": "canyon-axis",
       "title": "Following the canyon floor",
-      "fact": "Turbidity currents in Monterey Canyon were clocked at up to 7.2 m/s (16 mph), and some travelled at least 50 km down-canyon.",
+      "fact": "Underwater sediment flows in Monterey Canyon have reached 7.2 m/s, fast enough to sweep 800 kg instruments along the seabed.",
       "paragraphs": [
         "The canyon's axis, or thalweg, is its deepest, most continuously carved line -- the path a turbidity current follows on its way downhill. Tracing it through this tile's survey data shows a fairly steady deepening from the shallow head out past 2,000 m, punctuated by side channels and terraces where sediment has piled up between major flow events.",
         "In the Coordinated Canyon Experiment, researchers deployed moorings and seabed instruments along a 50 km stretch of Monterey Canyon. They measured turbidity-current fronts moving at up to about 7.2 m/s (16 mph). Some flows travelled at least 50 km down-canyon.",
@@ -153,7 +157,7 @@
     {
       "id": "inner-bend",
       "title": "Terraces and side channels",
-      "fact": "Along Monterey Canyon's winding inner floor, side channels and terraces hold sediment that piles up between big flows until the next one sweeps it away.",
+      "fact": "Monterey Canyon’s sediment flows can remobilise the sandy seabed itself, rather than simply carrying a cloud of mud above it.",
       "paragraphs": [
         "Tracing the canyon's deepest line through this tile's survey data shows a fairly steady deepening, punctuated by side channels and terraces where sediment has piled up between major flow events.",
         "Turbidity currents in the upper canyon happen several times a year."

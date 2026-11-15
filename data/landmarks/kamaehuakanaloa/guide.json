@@ -5,7 +5,7 @@
     {
       "id": "overview",
       "title": "Kama'ehuakanaloa",
-      "fact": "Kama'ehuakanaloa is the youngest volcano in the Hawaiian chain, and it may take up to 200,000 years to become an island.",
+      "fact": "Kama’ehuakanaloa is Hawai‘i’s youngest volcano. Its summit still lies about 1,000 m below the ocean surface.",
       "paragraphs": [
         "Kama'ehuakanaloa is an active submarine volcano about 30 km off the southeast shore of the island of Hawai'i, and the youngest volcano in the Hawaiian chain. Its summit remains roughly 975-1,000 m below sea level; this tile's shallowest grid cell reads about 975.2 m.",
         "Rift zones extend northwest and southeast from the summit, forming a volcanic ridge about 31 km long. Its emergence as a new island depends on future eruption rates; USGS gives a speculative estimate of as much as 200,000 years.",
@@ -88,7 +88,7 @@
     {
       "id": "peles-pit",
       "title": "Pele's Pit: the 1996 collapse",
-      "fact": "A 1996 swarm of more than 4,000 earthquakes collapsed the summit and formed Pele's Pit, about 600 m across.",
+      "fact": "More than 4,000 earthquakes shook the volcano in 1996, when its summit collapsed to form Pele’s Pit, about 600 m across.",
       "paragraphs": [
         "More than 4,000 earthquakes were recorded between 16 July and 9 August 1996 during Kama'ehuakanaloa's most intense recorded swarm. Summit collapse formed Pele's Pit, about 600 m across, with its floor about 300 m below the previous surface, destroying the earlier summit vent site.",
         "Hydrothermal venting did not stop after the collapse; it moved and changed. Diffuse ~30 degC vents that had existed on the pre-collapse summit gave way, within Pele's Pit itself, to much hotter fluids -- around 80 degC soon after the collapse, and exceeding 200 degC by late 1997 during submersible dives -- before settling into the cooler, iron-rich venting the pit hosts today.",

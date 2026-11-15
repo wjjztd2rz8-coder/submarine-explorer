@@ -187,7 +187,7 @@
     {
       "id": "helm-and-life",
       "title": "The wheel, and life in total darkness",
-      "fact": "Endurance's wheel still stands at her stern, and sea stars, glass sponges and a ghostly white squat lobster now live on the wreck.",
+      "fact": "Endurance’s wheel still stands at her stern. Sea anemones, sea lilies and pale squat lobsters have colonised the wreck.",
       "paragraphs": [
         "Endurance22's cameras also captured the ship's wheel, still standing at her stern. No sunlight reaches 3,008 m, so nothing here photosynthesises; instead the hull has become a deep-sea oasis of filter feeders that strain edible particles from the passing water.",
         "Marine biologists reviewing the footage identified sea stars (including brisingid sea stars), glass sponges, sea squirts, a bright yellow stalked sea lily (a crinoid), and a large white anemone near the wheel. They also spotted a ghostly white squat lobster, likely of the genus Munidopsis -- the first record of that kind of animal in this part of the Weddell Sea. \"The ship is cool,\" said British Antarctic Survey marine biogeographer Huw Griffiths, \"but look at those things living on it.\""
@@ -215,6 +215,10 @@
         {
           "title": "Shackleton's 'Endurance' Shipwreck Is Teeming With Bizarre Ocean Life — Smithsonian Magazine",
           "url": "https://www.smithsonianmag.com/smart-news/shackletons-endurance-shipwreck-is-teeming-with-bizarre-ocean-life-180979719/"
+        },
+        {
+          "title": "Endurance Conservation Management Plan, April 2024",
+          "url": "https://www.enduranceshipwreck.org/s/CMP_Endurance_amends_April24-4.pdf"
         }
       ],
       "confidence": "medium"
@@ -270,7 +274,7 @@
     {
       "id": "worsley-position",
       "title": "Worsley's position, and the search that found her",
-      "fact": "Captain Worsley's logged sinking position was about 5.4 nautical miles (10 km) from where the wreck was found.",
+      "fact": "Captain Worsley’s recorded position helped searchers find Endurance more than a century after she sank.",
       "paragraphs": [
         "Captain Frank Worsley logged the sinking position as 68°39′30″S 52°26′30″W. Bergman and Stuart examined the navigation in a paper published online in 2018 and in the 2019 Journal of Navigation volume. Bergman, Mearns and Stuart’s later chronometer study (2022 volume, first published online in 2023) assessed longitude errors and reported the discovered wreck position in its postscript.",
         "The later study gives the wreck as 4.9 nautical miles south and 2.4 nautical miles east of the logged position: 5.4 nautical miles overall, about 10 km south-southeast. UKAHT’s public webpage also quotes 6.4 km south, but the coordinates and peer-reviewed postscript support the larger distance; the reason for the webpage’s differing figure is unresolved.",
@@ -311,6 +315,10 @@
         {
           "title": "Endurance Conservation Management Plan — UKAHT / Historic England, April 2024",
           "url": "https://ukaht.org/wp-content/uploads/2026/07/CMP_Endurance_April24_final.pdf"
+        },
+        {
+          "title": "Endurance22 — Endurance is Found",
+          "url": "https://endurance22.org/endurance-is-found"
         }
       ],
       "confidence": "high"
@@ -318,7 +326,7 @@
     {
       "id": "abyssal-plain",
       "title": "A very flat piece of ocean floor",
-      "fact": "Across the whole 27 by 33 km tile, the Weddell Sea floor varies by less than 200 m.",
+      "fact": "Endurance rests on the Weddell Sea floor at 3,008 m, far below the sea ice that crushed her.",
       "paragraphs": [
         "Away from the wreck, this part of the Weddell Sea floor is remarkably featureless: across the whole ~27 x 33 km tile the terrain ranges only from about 2,915 m to 3,096 m, a relief of under 200 m. Two kilometres west of the wreck the seabed is about 2,988 m deep, a gentle 12 m rise from the 3,000 m reading at the wreck itself.",
         "The deep Weddell Sea plain lies far from ridges and canyons. The coarser GEBCO-derived grid used here also smooths seabed features smaller than a few kilometres."
@@ -350,6 +358,10 @@
         {
           "title": "Endurance Conservation Management Plan — UKAHT / Historic England, April 2024",
           "url": "https://ukaht.org/wp-content/uploads/2026/07/CMP_Endurance_April24_final.pdf"
+        },
+        {
+          "title": "Endurance22 — Endurance is Found",
+          "url": "https://endurance22.org/endurance-is-found"
         }
       ],
       "confidence": "medium"
@@ -357,7 +369,7 @@
     {
       "id": "protection",
       "title": "A protected monument, not a grave",
-      "fact": "Endurance has been a protected monument since 2019, three years before anyone found her, so touching anything there is an offence.",
+      "fact": "Endurance became a protected historic monument in 2019, three years before searchers found her wreck.",
       "paragraphs": [
         "Every man aboard Endurance survived her sinking; Shackleton had already led the crew off onto the ice before she went down. So unlike Titanic or Bismarck, this wreck is not a war grave or a gravesite -- but she is still one of the best-preserved and most significant wrecks in the world, and international law protects her accordingly.",
         "The Antarctic Treaty System designated the (then still unfound) wreck a Historic Site and Monument, HSM No. 93, in 2019 -- three years before anyone located her. That status makes it an offence to touch, disturb, or remove anything from the site; Endurance22's own survey and filming work had to be carried out without any contact with the wreck.",
@@ -407,6 +419,10 @@
         {
           "title": "Antarctic Treaty Secretariat — Measure 18 (2024), effective 28 October 2024",
           "url": "https://www.ats.aq/devAS/Meetings/Measure/830?lang=e"
+        },
+        {
+          "title": "Antarctic Treaty — Measure 12 (2019)",
+          "url": "https://www.ats.aq/devAS/e/Meetings/Measure/693"
         }
       ],
       "confidence": "high"
