@@ -24,7 +24,6 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   one card per point of interest, test `guideFactsDistinct`); S4 one-line Finish dive on
   phones. Blue Hole by keyboard on this build: 3 finds, 91 s.
 - **In flight** (T3 delegates, own worktrees):
-  - S1 full-route tour measurement (Composer, item 1), since 18:40.
   - S4b Blue Hole second find by touch (Composer): touch player sticks at 26 m with
     "SEABED CLOSE · RISE"; owns touch and vertical-motion code in `src/sub/**`.
   - S2 Hunga finishable by the plain player (Composer, item 2): site data only.
@@ -53,23 +52,36 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
 
 ### Played results
 
-F-endings (Opus) measured, with its own steering script, every site ending on the debrief
-by itself with N of N: Titanic 6/6 166 s, Bismarck 5/5 135 s, Kama'ehuakanaloa 4/4 87 s,
-Blake 4/4 88 s, Axial 5/5 83 s, Hunga 3/3 140 s, Hudson 4/4 139 s, Challenger 4/4 121 s,
-Beebe 4/4 91 s, Lost City and Endurance 60 s each. F-vertical measured Blue Hole 3 finds
-90 s and Monterey 3 finds 71 s.
+Full routes on `3e95564e` (S1, 19:45 CST), `tools/playtest/tour-all.sh` with `--no-finish`
+(never presses "Finish dive"), keyboard, 300 s cap. All 13 end on the debrief by themselves.
+"Finds" can exceed the site's primary total where extra contacts were scanned.
 
-Orchestrator check on merged main with `tools/playtest/tour.mjs` (which presses "Finish
-dive" as soon as both primaries are found, so it does not measure full routes): Titanic,
-Bismarck and Kama'ehuakanaloa end on the debrief; **Hunga does not** (2 of 3, caught on the
-slope at 246 s).
+| site                 | finds/total | first reveal s | end s | anti-stuck fired |
+| -------------------- | ----------- | -------------- | ----- | ---------------- |
+| axial-seamount-ashes | 6/5         | 7              | 107   | yes              |
+| beebe-vent-field     | 5/4         | 12             | 95    | no               |
+| bismarck             | 5/5         | 6              | 117   | no               |
+| blake-plateau-corals | 5/4         | 12             | 95    | no               |
+| challenger-deep      | 4/4         | 13             | 126   | no               |
+| endurance            | 4/4         | 20             | 64    | no               |
+| great-blue-hole      | 3/3         | 9              | 78    | no               |
+| hudson-canyon        | 4/4         | 7              | 96    | no               |
+| hunga-tonga-caldera  | 3/3         | 8              | 183   | yes              |
+| kamaehuakanaloa      | 4/4         | 7              | 92    | no               |
+| lost-city            | 4/4         | 7              | 107   | yes              |
+| monterey-canyon      | 3/3         | 16             | 76    | no               |
+| titanic              | 8/6         | 12             | 170   | no               |
+
+The script's anti-stuck rule (climb and back off when not moving) is something a real
+player does not have. Where it fired, guidance alternated between "Get closer to scan" and
+"SEABED CLOSE · HOLD Space": Hunga on the steep rim at 390 to 450 m, Lost City on the long
+transit to Poseidon (49 to 81 s), Axial on one tight vent approach (61 s). Same family as
+Blue Hole by touch ("SEABED CLOSE · RISE" at 26 m, 1 of 3 finds). Seven sites finish in
+under 100 s.
 
 ## Backlog, in order
 
-1. **Measure full routes.** Give `tools/playtest/tour.mjs` the steering F-endings described
-   (current marker, then edge arrow, then left/right text; ignore scanned markers) and an
-   option not to press "Finish dive". Then run `.cache/sprint/tour-all.sh` over all 13 sites
-   and replace the table above. Small scripted job: Composer or Codex.
+1. **Measure full routes.** Done (S1): `tools/playtest/tour-all.sh`, table above.
 2. **Hunga** must be finishable by the plain script; fix the route or the slope behaviour.
 3. **Close-range circling** costs 20 to 35 s per find: the turning circle at survey speed is
    too wide. Tighten turning at low speed (`src/sub/Submarine.ts`,
