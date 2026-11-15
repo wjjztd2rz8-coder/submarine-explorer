@@ -70,7 +70,11 @@ const read = () =>
     const mk =
       markers.find(
         (m) => vis(m) && m.classList.contains('is-current') && !m.classList.contains('is-scanned'),
-      ) || markers.find((m) => vis(m) && !m.classList.contains('is-scanned'));
+      ) ||
+      markers.find(
+        (m) =>
+          vis(m) && !m.classList.contains('is-scanned') && !m.classList.contains('is-secondary'),
+      );
     let mx = null;
     let my = null;
     if (mk) {

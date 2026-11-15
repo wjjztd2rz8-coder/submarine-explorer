@@ -226,7 +226,11 @@ const read = () =>
     const mk =
       markers.find(
         (m) => vis(m) && m.classList.contains('is-current') && !m.classList.contains('is-scanned'),
-      ) || markers.find((m) => vis(m) && !m.classList.contains('is-scanned'));
+      ) ||
+      markers.find(
+        (m) =>
+          vis(m) && !m.classList.contains('is-scanned') && !m.classList.contains('is-secondary'),
+      );
     const mr = mk?.getBoundingClientRect();
     const edge = document.querySelector('.d-scan-edge');
     const edgeAngle = vis(edge) ? parseFloat(edge.style.getPropertyValue('--direction')) : NaN;
