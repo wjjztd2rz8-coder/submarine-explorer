@@ -61,14 +61,14 @@ export function createRevealSystem(): GameSystem {
           if (poi) queue.enqueue(poi);
         }),
       );
-      cleanup.add(
-        ctx.bus.on('mission:restart', () => {
-          queue.reset();
-          card.hide();
-          ctx.rig.endReveal();
-          returning = false;
-        }),
-      );
+      const clearReveal = (): void => {
+        queue.reset();
+        card.hide();
+        ctx.rig.endReveal();
+        returning = false;
+      };
+      cleanup.add(ctx.bus.on('mission:restart', clearReveal));
+      cleanup.add(ctx.bus.on('mission:ended', clearReveal));
       // Capture phase prevents a dismissing key from also pausing or moving the boat.
       const dismiss = (event: Event): void => {
         if (!queue.current || event.type !== 'keydown') return;
