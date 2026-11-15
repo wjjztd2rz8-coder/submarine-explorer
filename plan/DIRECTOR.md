@@ -42,18 +42,44 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
     HUD hidden behind briefing; `.hud-finish` clear of `.hud-bar` (Composer);
     S12 "Unknown contacts: 0 of 0" line and wording, catalogue-only globe pins (Codex medium);
     S13 reveal close-ups that show sand instead of the subject (Gemini; framing data only).
-- **22:50 state.** Everything accepted is merged and PUSHED as `b9191bda` (plus plan
-  commits): S3b, S9, S10, S11, S4b, S12, S14, S15, S16, S17, S18, S19. Gate on that commit,
-  quiet machine: content, prettier, py, attribution, typecheck, build all pass; unit suite
-  207 files, 4,860 tests pass; full-route plays all end on the debrief: Titanic 6/6 113 s,
-  Hunga 3/3 93 s, Lost City 4/4 58, 58, 71 s, Blue Hole 4/3 57 s. Confirm CI and the
-  deploy with `gh run list --branch main --limit 3`.
-- Blue Hole by touch in the gate: 2 scans (35.6 s to the second), no debrief recorded; the
-  gate's arguments may have stopped it at two scans. S4b measured 3/3, debrief, 117 s.
-  Re-check by touch after the next merge.
-- **In flight:** S20 (Composer): the scripted player still needs its anti-stuck rule at Lost
-  City (every run: stops dead for about 15 s some 160 m short of IMAX Tower, probably a
-  tower prop) and Hunga (twice). Fix so a plain player gets through with the rule disabled.
+- **01:30 Sunday state.** `main` pushed as `844edb4a` after a full gate: content, prettier,
+  py, typecheck, build pass; unit suite 207 files, 4,861 tests; all 13 sites end on the
+  debrief for a plain keyboard player with the script's anti-stuck rule OFF, no page
+  errors:
+
+  | site                 | debrief s | site                | debrief s |
+  | -------------------- | --------- | ------------------- | --------- |
+  | axial-seamount-ashes | 54        | hudson-canyon       | 62        |
+  | beebe-vent-field     | 61        | hunga-tonga-caldera | 79        |
+  | bismarck             | 83        | kamaehuakanaloa     | 63        |
+  | blake-plateau-corals | 65        | lost-city           | 47        |
+  | challenger-deep      | 91        | monterey-canyon     | 56        |
+  | endurance            | 47        | titanic             | 113       |
+  | great-blue-hole      | 57        |                     |           |
+
+  Confirm CI (the 22:50 push `b9191bda` failed CI on the title-screen e2e audit, fixed by
+  S21) and the deploy with `gh run list --branch main --limit 3`. Live was still
+  `b17ec3a0` at 01:30.
+
+- **In this push:** S3b, S9, S10, S11, S4b, S12, S14, S15, S16, S17, S18, S19, S20, S21,
+  S13b (reveal framing: C-rated reveals about 23 of 64 to 0; 23 still B for lack of art:
+  Titanic shoes, hull piece and plaque; Challenger Deep basin and walls; Hunga floor and
+  flank; Blue Hole drop-offs).
+- **Props, read before touching `src/world/props/Wiring.ts` or the cue in `hud.ts`:** S20's
+  slide threw on every contact frame (detached `getForward`); once it ran, its upward slide
+  launched the sub up the Blue Hole wall to the surface; a sideways-only nudge pinned the
+  sub on Hunga's wall. What ships: NO slide; cue "Blocked ahead · go up ↑" on head-on prop
+  contact at any target elevation, on a blocked sightline only when the target is level
+  or above, never within 12 m of the surface; the cue replaces the depth cue. Any change
+  here must replay great-blue-hole, lost-city and hunga-tonga-caldera with
+  `TOUR_NO_ANTISTUCK=1 TOUR_NO_FINISH=1`. The local gate must run these plays: the unit
+  suite was green through three broken versions.
+- **In flight:** S22 (Opus medium): every site finishable by touch at 844x390 and four at
+  390x844; rewrites `tools/playtest/touch-drive.mjs` as a full-dive phone player. Blue
+  Hole by touch recorded 2 scans and no debrief twice with the old script.
+- **Next:** merge S22, gate, push; owner phone test Sunday morning; nothing else queued.
+  Candidates if time remains: art for the 23 B-rated reveals is out of scope; a last
+  Sonnet copy pass on HUD wording; delete finished worktrees.
 - **Reveal framing:** S13 (Gemini) died when Cursor's Other Models pool hit 0% (resets Nov
   24). Its unreviewed work is committed as WIP on `t3/improve-landmark-reveals`
   (`fe6c8a69`). A scheduled wake at 23:33 launches S13b on Sonnet to review and finish it.
