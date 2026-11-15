@@ -197,6 +197,29 @@
   .debrief-secondary {
     justify-content: flex-start;
   }
+  .debrief-finds {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    overflow: visible;
+    margin: 12px 0;
+    padding-bottom: 0;
+  }
+  .debrief-find {
+    flex: unset;
+    width: auto;
+    min-width: 0;
+    min-height: 0;
+  }
+  .debrief-find-name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+  }
 }
 /* Landscape phones: keep every debrief choice on screen without scrolling. */
 @media (max-height: 480px) {

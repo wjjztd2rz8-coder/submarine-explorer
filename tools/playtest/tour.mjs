@@ -204,10 +204,16 @@ while (el() < +MAX) {
       lastReveal = s.reveal;
       reveals.push({ poi: s.reveal, at: +el().toFixed(0), text: s.revealText });
       console.log(`[${el().toFixed(0)}s] REVEAL ${s.reveal}: ${s.revealText}`);
-      await page.waitForTimeout(2600);
+      await page.waitForTimeout(2200);
       await shot(`reveal-${s.reveal}`);
     }
-    await page.waitForTimeout(400);
+    await page.evaluate(() => {
+      const btn = [...document.querySelectorAll('.discovery-reveal button')].find(
+        (b) => b.textContent?.trim() === 'Continue',
+      );
+      btn?.click();
+    });
+    await page.waitForTimeout(200);
     continue;
   }
   if (!noFinish && s.primariesComplete) {

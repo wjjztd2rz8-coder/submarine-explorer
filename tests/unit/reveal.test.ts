@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { Sphere, Vector3 } from 'three';
-import { RevealQueue, revealExcerpt, revealFrame } from '../../src/game/Reveal.js';
+import {
+  REVEAL_AUTO_DISMISS_S,
+  RevealQueue,
+  revealExcerpt,
+  revealFrame,
+  revealStillSubjectYFallback,
+} from '../../src/game/Reveal.js';
 import { parsePois } from '../../src/game/Pois.js';
 import type { PlacedPoi } from '../../src/game/Pois.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
@@ -20,6 +26,10 @@ const poi = (id: string, kind: PlacedPoi['kind'] = 'wreck'): PlacedPoi => ({
 });
 
 describe('discovery reveal', () => {
+  it('keeps the reveal readable until the player continues', () => {
+    expect(REVEAL_AUTO_DISMISS_S).toBe(13);
+    expect(revealStillSubjectYFallback()).toBeCloseTo(0.381, 2);
+  });
   it('takes complete sentences within the reading budget', () => {
     expect(revealExcerpt('First fact. Second fact! Third fact.')).toBe('First fact. Second fact!');
     expect(revealExcerpt('First fact. ' + 'long '.repeat(80))).toBe('First fact.');
