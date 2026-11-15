@@ -44,11 +44,7 @@
         "elevation_deg": 8,
         "azimuth_deg": 152,
         "sweep_deg": 16,
-        "target_offset": [
-          0,
-          -12,
-          0
-        ]
+        "target_offset": [0, -12, 0]
       }
     },
     {
@@ -74,11 +70,7 @@
         "elevation_deg": 9,
         "azimuth_deg": 115,
         "sweep_deg": 16,
-        "target_offset": [
-          3.8,
-          -0.5,
-          2.5
-        ]
+        "target_offset": [3.8, -0.5, 2.5]
       }
     },
     {
@@ -104,11 +96,7 @@
         "elevation_deg": 9,
         "azimuth_deg": 212,
         "sweep_deg": 16,
-        "target_offset": [
-          103,
-          -12.5,
-          -120
-        ]
+        "target_offset": [103, -12.5, -120]
       }
     }
   ]

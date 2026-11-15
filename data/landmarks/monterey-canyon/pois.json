@@ -25,11 +25,7 @@
         "elevation_deg": 12,
         "azimuth_deg": 168,
         "sweep_deg": 12,
-        "target_offset": [
-          -17369,
-          -708,
-          1625
-        ]
+        "target_offset": [-17369, -708, 1625]
       }
     },
     {
@@ -55,11 +51,7 @@
         "elevation_deg": 11,
         "azimuth_deg": 356,
         "sweep_deg": 12,
-        "target_offset": [
-          -14461,
-          -478,
-          1277
-        ]
+        "target_offset": [-14461, -478, 1277]
       }
     },
     {
@@ -85,11 +77,7 @@
         "elevation_deg": 9,
         "azimuth_deg": 332,
         "sweep_deg": 12,
-        "target_offset": [
-          110,
-          96,
-          -240
-        ]
+        "target_offset": [110, 96, -240]
       }
     },
     {
@@ -115,11 +103,7 @@
         "elevation_deg": 11,
         "azimuth_deg": 158,
         "sweep_deg": 12,
-        "target_offset": [
-          -20,
-          106,
-          -340
-        ]
+        "target_offset": [-20, 106, -340]
       }
     },
     {
@@ -135,20 +119,14 @@
       "guide_entry": "canyon-wall",
       "confidence": "medium",
       "reconstruction": false,
-      "sources": [
-        "https://www.mbari.org/know-your-ocean/monterey-canyon/"
-      ],
+      "sources": ["https://www.mbari.org/know-your-ocean/monterey-canyon/"],
       "note": "Real GMRT terrain: 748 m deep, about 645 m (and 267 m of grid relief) north of the axis-1000m POI at the same longitude, on the canyon's steep north wall. No specific coordinate is published for a 'wall'; this point was located by sampling terrain perpendicular to the traced axis.",
       "reveal": {
         "distance_m": 112,
         "elevation_deg": 9,
         "azimuth_deg": 348,
         "sweep_deg": 14,
-        "target_offset": [
-          0,
-          8,
-          28
-        ]
+        "target_offset": [0, 8, 28]
       }
     },
     {
@@ -164,20 +142,14 @@
       "guide_entry": "mars-node",
       "confidence": "high",
       "reconstruction": true,
-      "sources": [
-        "https://www.mbari.org/technology/monterey-accelerated-research-system-mars/"
-      ],
+      "sources": ["https://www.mbari.org/technology/monterey-accelerated-research-system-mars/"],
       "note": "Published position 36 deg 42.7481'N, 122 deg 11.2139'W, depth 891 m (MBARI). GMRT seabed here is about 888 m, within 3 m of the published depth. The scan marker follows the detailed seabed rather than a rounded depth that sits slightly below it. The real trawl-resistant frame (about 3.7 x 4.6 m at the base, 1.2 m tall) is not modelled in detail; the placed prop is a simplified marker.",
       "reveal": {
         "distance_m": 21,
         "elevation_deg": 18,
         "azimuth_deg": 320,
         "sweep_deg": 18,
-        "target_offset": [
-          0,
-          -2,
-          -2
-        ]
+        "target_offset": [0, -2, -2]
       }
     }
   ]

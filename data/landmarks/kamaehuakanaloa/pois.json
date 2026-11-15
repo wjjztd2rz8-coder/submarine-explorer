@@ -25,11 +25,7 @@
         "distance_m": 27,
         "elevation_deg": 8,
         "azimuth_deg": 280,
-        "target_offset": [
-          4,
-          -2.5,
-          3
-        ]
+        "target_offset": [4, -2.5, 3]
       }
     },
     {
@@ -55,11 +51,7 @@
         "distance_m": 19,
         "elevation_deg": 8,
         "azimuth_deg": 290,
-        "target_offset": [
-          0,
-          -2,
-          0
-        ]
+        "target_offset": [0, -2, 0]
       }
     },
     {
@@ -86,11 +78,7 @@
         "elevation_deg": 25,
         "azimuth_deg": 165,
         "sweep_deg": 16,
-        "target_offset": [
-          -240.1,
-          -44,
-          -371.8
-        ]
+        "target_offset": [-240.1, -44, -371.8]
       }
     },
     {
@@ -116,11 +104,7 @@
         "elevation_deg": 12,
         "azimuth_deg": 315,
         "sweep_deg": 16,
-        "target_offset": [
-          -80.7,
-          -29,
-          -52
-        ]
+        "target_offset": [-80.7, -29, -52]
       }
     }
   ]

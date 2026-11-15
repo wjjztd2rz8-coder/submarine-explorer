@@ -25,11 +25,7 @@
         "elevation_deg": 11,
         "azimuth_deg": 32,
         "sweep_deg": 14,
-        "target_offset": [
-          4,
-          -12.5,
-          2
-        ]
+        "target_offset": [4, -12.5, 2]
       }
     },
     {
@@ -45,20 +41,14 @@
       "guide_entry": "eastern-floor",
       "confidence": "high",
       "reconstruction": false,
-      "sources": [
-        "https://www.gmrt.org/"
-      ],
+      "sources": ["https://www.gmrt.org/"],
       "note": "Real GMRT terrain: 10920.5 m deep at the centre of row 460, column 452 (zero-based) in data/tiles/challenger-deep/heightmap.bin. This second floor scan lies about 350 m north-east of the Leggo bait-station site (moved 2026-11 from 817 m north so the dive is a short route). The shipped GMRT grid reads about 10,920 m here. It is a terrain survey point chosen for this dive, not the position of another lander deployment. No prop or staged encounter is added.",
       "reveal": {
         "distance_m": 72,
         "elevation_deg": 11,
         "azimuth_deg": 138,
         "sweep_deg": 14,
-        "target_offset": [
-          -278,
-          -9,
-          203
-        ]
+        "target_offset": [-278, -9, 203]
       }
     },
     {
@@ -84,11 +74,7 @@
         "elevation_deg": 12,
         "azimuth_deg": 338,
         "sweep_deg": 16,
-        "target_offset": [
-          0,
-          -14,
-          22
-        ]
+        "target_offset": [0, -14, 22]
       }
     },
     {
@@ -114,11 +100,7 @@
         "elevation_deg": 12,
         "azimuth_deg": 20,
         "sweep_deg": 14,
-        "target_offset": [
-          17025,
-          938,
-          -4220
-        ]
+        "target_offset": [17025, 938, -4220]
       }
     },
     {
@@ -144,11 +126,7 @@
         "elevation_deg": 11,
         "azimuth_deg": 312,
         "sweep_deg": 14,
-        "target_offset": [
-          7421,
-          716,
-          -4842
-        ]
+        "target_offset": [7421, 716, -4842]
       }
     },
     {
@@ -174,11 +152,7 @@
         "elevation_deg": 11,
         "azimuth_deg": 18,
         "sweep_deg": 14,
-        "target_offset": [
-          -949,
-          928,
-          -3585
-        ]
+        "target_offset": [-949, 928, -3585]
       }
     },
     {
@@ -204,11 +178,7 @@
         "elevation_deg": 11,
         "azimuth_deg": 295,
         "sweep_deg": 14,
-        "target_offset": [
-          -592,
-          -9.5,
-          274
-        ]
+        "target_offset": [-592, -9.5, 274]
       }
     }
   ]
