@@ -199,6 +199,14 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   390x664 start (clean) and debrief (on-topic fact; finds grid shows 2 uncaptioned
   thumbnails, rest hidden): S44 (Codex) on that. S40's other items not taken: "Also in
   range · N to switch" stays (owner asked for switching); front page empty space.
+- **13:15 Sunday. PUSHED `8fe01e40`** with S44 (debrief finds as a captioned two-column
+  list on short portrait; orchestrator checked the 390x664 capture). Wrap-up done early:
+  all scheduled tasks deleted; every worktree removed (branches kept; unmerged and
+  superseded: `t3/hunga-tonga-finishable-route`, `t3/survey-speed-turning-radius`,
+  `codex/124-*`, `codex/131-*`). Nothing in flight. **Remaining backlog: the owner's
+  second test of the live build** (MacBook hitching at Low/Medium; phone scan targeting
+  and reveal drag); act on it with the same gate (`tools/playtest/gate.sh`). Known and
+  accepted: Monterey canyon-axis reveal and Titanic "missing piece" thumbnail have no art.
 - **Lesson:** look at one capture before merging any layout change. S30's report and
   measurements were clean while its portrait screenshot showed tiles stacked on top of
   each other; it had measured horizontal clipping only.
@@ -208,7 +216,7 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   reveals rated B for lack of art; dives are short for a script that steers well (44 to
   115 s by keyboard). Unverified wildlife placements: a Bolinopsis comb jelly at
   Endurance; Graneledone in Hudson's 300 to 588 m band.
-- **Wrap-up still to do (Monday buffer):** final State here; `list_scheduled_tasks` and
+- **Wrap-up (done 13:15 Sunday, see above; kept for history):** final State here; `list_scheduled_tasks` and
   delete any left; remove finished worktrees under `~/.t3/worktrees/submarine-explorer/`
   and the stale `~/subexp-wt/124-*`, `131-*` (unmerged on purpose: S2
   `t3/hunga-tonga-finishable-route`, S3 `t3/survey-speed-turning-radius`, S13's WIP
