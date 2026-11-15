@@ -223,6 +223,23 @@ it('wires Journal through the action map', () => {
   expect(input.touchEdge).toHaveBeenCalledOnce();
 });
 
+it('couples stick thrust to pitch only while ballast is flooding', () => {
+  const { input, create } = setup(true);
+  const touch = create();
+  touch.update(true, false);
+  const stick = (touch.root as unknown as Element).children[0]!;
+  const slider = (touch.root as unknown as Element).children[1]!;
+  const pointer = (type: string, pointerId: number, clientX = 0, clientY = 0) =>
+    Object.assign(new Event(type), { pointerId, pointerType: 'touch', clientX, clientY });
+  stick.dispatchEvent(pointer('pointerdown', 1, 60, -50));
+  expect(input.touchAxes.pitch).toBe(0);
+  slider.dispatchEvent(pointer('pointerdown', 3, 0, 150));
+  stick.dispatchEvent(pointer('pointermove', 1, 60, -50));
+  expect(input.touchAxes.pitch).toBeLessThan(-0.2);
+  slider.dispatchEvent(pointer('pointerup', 3, 0, 0));
+  expect(input.touchAxes.pitch).toBe(0);
+});
+
 it.each(['resize', 'orientationchange'])(
   'releases held axes, buttons and camera gestures on %s',
   (event) => {
@@ -248,7 +265,7 @@ it.each(['resize', 'orientationchange'])(
     expect(input.touchLook).toHaveBeenCalledWith(10, 5);
     vi.mocked(input.touchLook).mockClear();
     win.dispatchEvent(new Event(event));
-    expect(input.touchAxes).toEqual({ throttle: 0, yaw: 0, ballast: 0 });
+    expect(input.touchAxes).toEqual({ throttle: 0, yaw: 0, pitch: 0, ballast: 0 });
     expect(input.touchHeld.size).toBe(0);
     stick.dispatchEvent(pointer('pointermove', 1, 60, -40));
     slider.dispatchEvent(pointer('pointermove', 3, 0, 160));

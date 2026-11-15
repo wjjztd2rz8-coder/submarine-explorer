@@ -259,6 +259,9 @@ export class TouchControls {
       const a = stickAxes(dx, dy, max);
       this.input.touchAxes.throttle = a.throttle;
       this.input.touchAxes.yaw = a.yaw;
+      const flood = this.input.touchAxes.ballast < -0.2;
+      this.input.touchAxes.pitch =
+        flood && Math.abs(a.throttle) > 0.15 ? Math.max(-1, Math.min(1, -a.throttle * 0.55)) : 0;
     };
     base.addEventListener('pointerdown', (e) => {
       if (this.stickPointer !== null) return;
@@ -293,6 +296,7 @@ export class TouchControls {
     this.stickBase.classList.remove('is-held');
     this.input.touchAxes.throttle = 0;
     this.input.touchAxes.yaw = 0;
+    this.input.touchAxes.pitch = 0;
   }
 
   // -------------------------------------------------------------- slider
@@ -306,6 +310,7 @@ export class TouchControls {
       const half = this.sliderThumb.offsetHeight / 2;
       this.sliderThumb.style.top = `${clamped * (r.height - 2 * half) + half}px`;
       this.input.touchAxes.ballast = sliderAxis(t);
+      if (this.input.touchAxes.ballast >= -0.2) this.input.touchAxes.pitch = 0;
     };
     track.addEventListener('pointerdown', (e) => {
       if (this.sliderPointer !== null) return;
@@ -336,6 +341,7 @@ export class TouchControls {
     this.sliderThumb.style.top = '';
     this.sliderTrack.classList.remove('is-held');
     this.input.touchAxes.ballast = 0;
+    this.input.touchAxes.pitch = 0;
   }
 
   // ------------------------------------------------------------- buttons

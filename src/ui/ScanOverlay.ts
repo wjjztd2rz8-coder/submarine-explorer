@@ -31,7 +31,8 @@ export interface ScanOverlayKeys {
   sink?: string;
 }
 
-const isTouch = (): boolean => document.documentElement.classList.contains('is-touch');
+const isTouch = (): boolean =>
+  typeof document !== 'undefined' && document.documentElement.classList.contains('is-touch');
 
 /** Plain directions shared by touch, keyboard and controller guidance. */
 export const turnCue = (turn: number): string =>

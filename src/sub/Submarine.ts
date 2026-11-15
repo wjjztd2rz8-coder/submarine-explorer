@@ -381,7 +381,7 @@ export class Submarine {
     // floorFor), and the surface ceiling never pushes the hull into rock.
     const ground = this.terrain.sampleHeight(this.position.x, this.position.z);
     const floor = this.floorFor(ground);
-    this.resolveTerrain(floor);
+    this.resolveTerrain(floor, cmd.ballast);
     // Never breach the surface: the conning tower stops at sea level -- unless
     // the water is too shallow to float the hull at all, then it sits aground.
     const ceiling = Math.max(-c.hullRadius, floor);
@@ -435,7 +435,7 @@ export class Submarine {
   }
 
   /** Push the hull out of the seabed and bleed speed if it hit. */
-  private resolveTerrain(floor: number): void {
+  private resolveTerrain(floor: number, ballast: number): void {
     const c = this.config;
     if (this.position.y >= floor) return;
 
@@ -451,7 +451,14 @@ export class Submarine {
     // speed: grazing a wall at 6 m/s is not the same as flying into it.
     const closing = into < 0 ? -into : 0;
     if (into < 0) this.velocity.addScaledVector(n, -into);
-    this.velocity.multiplyScalar(1 - c.collisionSpeedPenalty);
+    const sinking = ballast < -0.25 || this.ballastCmd < -0.25;
+    const penalty =
+      sinking && n.y < 0.96 && penetration < c.seabedClearance * 1.25
+        ? c.collisionSpeedPenalty * 0.4
+        : c.collisionSpeedPenalty;
+    // A resting/sliding contact is a constraint, not a new impact every tick.
+    // Repeated damping erased ballast acceleration on steep slopes.
+    if (closing > 1) this.velocity.multiplyScalar(1 - penalty);
     this.touchedBottom = true;
     this.impactSpeed = Math.max(this.impactSpeed, closing);
     const spike = clamp(closing / Math.max(1e-6, c.impactStressSpeed), 0, 1);

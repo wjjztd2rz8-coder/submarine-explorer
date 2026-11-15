@@ -489,10 +489,10 @@ freshTest.describe('mission progression and Home Journal', () => {
       const banner = page.locator('.obj-banner');
       await expect(banner).toBeVisible({ timeout: 30_000 });
       await expect(banner.locator('.obj-banner-title')).toHaveText(
-        `${secondaryCount} unknown contacts remain on sonar.`,
+        `${secondaryCount} bonus sonar contacts remain on sonar.`,
       );
       await expect(banner.locator('.obj-banner-detail')).toHaveText(
-        `${primaryCount} of ${objectiveCount} objectives. ${secondaryCount} unknown contacts remain on sonar.`,
+        `${primaryCount} of ${objectiveCount} objectives. ${secondaryCount} bonus sonar contacts remain on sonar.`,
       );
       await expect(banner.locator('button')).toHaveText(['Keep exploring', 'Surface and debrief']);
       // The banner is the one completion presentation: it carries the stars earned so far.

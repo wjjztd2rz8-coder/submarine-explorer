@@ -1,3 +1,9 @@
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
+import { Mission } from '../../src/game/Mission.js';
+import { parsePois, placePois } from '../../src/game/Pois.js';
+import type { TileMeta } from '../../src/util/types.js';
+import { loadGlobeCatalog } from '../../src/ui/GlobeModel.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
@@ -14,7 +20,7 @@ import { resolveEffective } from '../../src/game/EffectiveSettings.js';
 import { Input } from '../../src/core/Input.js';
 import { TOUCH_SEEN_KEY } from '../../src/core/Touch.js';
 import { Briefing } from '../../src/ui/Briefing.js';
-import { Debrief } from '../../src/ui/Debrief.js';
+import { Debrief, debriefModel } from '../../src/ui/Debrief.js';
 import { Journal } from '../../src/ui/Journal.js';
 import { ControlsCard } from '../../src/ui/ControlsCard.js';
 import { Home } from '../../src/ui/Home.js';
@@ -2445,6 +2451,108 @@ describe('overlay policies across the app', () => {
     expect(surface).toHaveBeenCalledOnce();
   });
 
+  it.each(['titanic', 'monterey-canyon'])(
+    '%s uses the actual route bonus total in briefing, HUD and debrief',
+    (id) => {
+      const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
+      const def = parseMission(json(`data/landmarks/${id}/mission.json`), id)!;
+      const meta = json(`data/tiles/${id}/meta.json`) as TileMeta;
+      const pois = placePois(
+        parsePois(json(`data/landmarks/${id}/pois.json`)),
+        meta,
+        { sampleHeight: () => -100 },
+        DEFAULT_CONFIG.scan,
+        id,
+      );
+      const mission = new Mission({ def, bus: new EventBus() });
+      mission.resolve(pois.map((p) => p.id));
+      mission.setContacts(pois, () => false);
+      const objectives = mission.objectives;
+      const contacts = objectives.filter((o) => !o.primary && o.resolved);
+      expect(contacts).toHaveLength(id === 'titanic' ? 4 : 0);
+      const briefing = new Briefing({ onBegin: vi.fn() });
+      const panel = new ObjectivesPanel();
+      cleanup.push(() => {
+        briefing.dispose();
+        panel.dispose();
+        mission.dispose();
+      });
+      briefing.show({
+        kicker: '',
+        title: id,
+        summary: '',
+        meta: [],
+        facts: [],
+        hazards: [],
+        objectives,
+      });
+      if (!contacts.length) expect(briefing.root.querySelector('.briefing-contacts')).toBeNull();
+      // Async resolution can add contacts to a briefing that started with none.
+      briefing.setContactProgress(0, contacts.length);
+      panel.setObjectives(objectives);
+      for (const found of [0, contacts.length]) {
+        briefing.setContactProgress(found, contacts.length);
+        panel.setObjectives(objectives.map((o) => ({ ...o, complete: !o.primary && found > 0 })));
+        const progress = debriefModel({
+          elapsedS: 0,
+          distanceM: 0,
+          maxDepthM: 0,
+          newEntries: [],
+          discoveries: pois.map((p) => ({ poiId: p.id, name: p.name })),
+          objectives: {
+            completed: mission.primaryCounts().total,
+            total: mission.primaryCounts().total,
+          },
+          finds: { found: found + mission.primaryCounts().total, total: mission.counts().total },
+        }).progress;
+        const expected = contacts.length
+          ? `Bonus sonar contacts: ${found} of ${contacts.length} found`
+          : null;
+        expect(briefing.root.querySelector('.briefing-contacts')?.textContent ?? null).toBe(
+          expected,
+        );
+        expect(panel.root.querySelector('.obj-contacts')?.textContent ?? null).toBe(expected);
+        expect(progress).toBe(expected);
+      }
+      briefing.setContactProgress(0, 0);
+      expect(briefing.root.querySelector('.briefing-contacts')).toBeNull();
+    },
+  );
+
+  it.each([true, false])(
+    'picker (%s embedded) has exactly the 13 playable buttons',
+    async (embedded) => {
+      const proto = Globe.prototype as unknown as { initGl(): void; resize(): void };
+      vi.spyOn(proto, 'initGl').mockImplementation(() => {});
+      vi.spyOn(proto, 'resize').mockImplementation(() => {});
+      const catalog = loadGlobeCatalog(landmarkIndex.landmarks, async (url) => ({
+        ok: true,
+        text: async () => readFileSync(String(url).replace(/^\//, ''), 'utf8'),
+      }));
+      const globe = new Globe({
+        config: DEFAULT_CONFIG.globe,
+        tileIds: landmarkIndex.landmarks,
+        embedded,
+        catalog,
+      });
+      cleanup.push(() => globe.dispose());
+      const loaded = await globe.catalog;
+      expect(loaded.sites.filter((s) => s.state === 'catalogue').length).toBeGreaterThan(0);
+      const pins = globe.root.querySelectorAll<HTMLButtonElement>('.globe-pin');
+      expect(pins).toHaveLength(13);
+      expect([...pins].map((pin) => pin.dataset.landmark).sort()).toEqual(
+        [...landmarkIndex.landmarks].sort(),
+      );
+      expect(
+        [...pins].every((pin) => pin.tagName === 'BUTTON' && pin.dataset.state !== 'catalogue'),
+      ).toBe(true);
+      const sync = globe as unknown as { syncHitSize(): number };
+      expect(sync.syncHitSize()).toBeGreaterThanOrEqual(40);
+      document.documentElement.classList.add('is-touch');
+      expect(sync.syncHitSize()).toBeGreaterThanOrEqual(40);
+    },
+  );
+
   it('shows named primaries and one contact count through completion', () => {
     const panel = new ObjectivesPanel();
     cleanup.push(() => panel.dispose());
@@ -2463,10 +2571,14 @@ describe('overlay policies across the app', () => {
       'a',
       'b',
     ]);
-    expect(root.querySelector('.obj-contacts')!.textContent).toBe('Unknown contacts: 0 of 1 found');
+    expect(root.querySelector('.obj-contacts')!.textContent).toBe(
+      'Bonus sonar contacts: 0 of 1 found',
+    );
     panel.setObjectives(objectives.map((o) => ({ ...o, complete: true })));
     expect(root.querySelectorAll('.obj-item')).toHaveLength(2);
-    expect(root.querySelector('.obj-contacts')!.textContent).toBe('Unknown contacts: 1 of 1 found');
+    expect(root.querySelector('.obj-contacts')!.textContent).toBe(
+      'Bonus sonar contacts: 1 of 1 found',
+    );
     expect(root.querySelector('.obj-optional')).toBeNull();
   });
 

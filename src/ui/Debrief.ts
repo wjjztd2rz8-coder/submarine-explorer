@@ -9,6 +9,7 @@ import { nextSiteAfter, siteFinds, tourJournal } from '../game/Tour.js';
 import type { DiscoveryReader, JournalSite } from '../game/JournalData.js';
 import { PhotoStore, type Photo } from '../game/PhotoStore.js';
 import { el } from './dom.js';
+import { contactProgress } from './contactProgress.js';
 
 import { Progress, type DiveRating } from '../game/Progress.js';
 import { missionUrl } from './MissionSelect.js';
@@ -93,9 +94,17 @@ export function debriefModel(
         ? sentence.slice(0, 197).trimEnd() + '…'
         : sentence
       : null,
-    progress: counts
-      ? `Found ${counts.found} of ${counts.total} at ${stats.landmarkName ?? site?.name ?? 'this site'}`
-      : null,
+    progress:
+      stats.finds && stats.objectives
+        ? counts!.total > stats.objectives.total
+          ? contactProgress(
+              counts!.found - stats.objectives.completed,
+              counts!.total - stats.objectives.total,
+            )
+          : null
+        : counts
+          ? `Found ${counts.found} of ${counts.total} at ${stats.landmarkName ?? site?.name ?? 'this site'}`
+          : null,
   };
 }
 
