@@ -33,8 +33,21 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   - S3b where the seconds go at each find (Opus medium, item 3): the turning circle was
     not the cause (S3 branch `t3/survey-speed-turning-radius`, 9.6 m to 7.8 m, no change
     in reveal times, unmerged; S3b decides whether to include it).
-  - S8 first-time player review, phone and desktop (Gemini 4 Carbon): read-only; its
-    ranked problems become the next backlog.
+  - From S8's first-time player review (Gemini, 20:15; debriefs reached at all three
+    viewports; best moment Lost City's Poseidon tower), launched 20:25:
+    S9 teach `C` to descend, Ctrl+W notice never over a reveal or debrief (Composer);
+    S10 debrief thumbnails blank on portrait (`canvasThumbnail` gets no `subjectY`), finds
+    grid, completion banner stays, reveal gets Continue and about 12 s (Composer);
+    S11 front page to one start, one site choice and one More; briefing to about 70 words;
+    HUD hidden behind briefing; `.hud-finish` clear of `.hud-bar` (Composer);
+    S12 "Unknown contacts: 0 of 0" line and wording, catalogue-only globe pins (Codex medium);
+    S13 reveal close-ups that show sand instead of the subject (Gemini; framing data only).
+- **Live at 20:06:** `b17ec3a0` deployed (CI green): facts, phone Finish dive, tutorial
+  labels, README.
+- **Held from S8, waiting for S3b:** hide the "✓" world pills once scanned (crowd the sub);
+  Titanic's 600 m bow-to-stern transit is 40 to 50 s of flat sand (faster cruise when far
+  from every contact, or a closer start). S8 judged short dives with good finds as the
+  best part, so removing dead time ranks above lengthening short dives.
 - **Owner, 19:30:** work decisions are the orchestrator's. The owner cannot monitor after
   end of day Sunday 2026-11-15; Fable access and limits end end of day Monday 2026-11-16;
   nothing may keep spending after that. Use every provider on every parallelizable task
