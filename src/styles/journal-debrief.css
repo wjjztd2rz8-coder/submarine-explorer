@@ -82,3 +82,87 @@
   border-color: var(--b1-cyan);
   color: var(--b1-cyan);
 }
+
+/* Short portrait phones: keep names beside photos while the fact and actions stay put.
+   Qualify with .debrief because flow.css supplies the later, shared card layouts. */
+@media (max-width: 480px) and (orientation: portrait) and (max-height: 760px) {
+  .debrief .debrief-panel {
+    padding: 12px 14px;
+  }
+
+  .debrief .debrief-rating {
+    margin: 4px 0;
+    padding: 4px 0;
+  }
+
+  .debrief .debrief-finds {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(50px, max-content);
+    align-content: start;
+    gap: 6px;
+    min-height: 0;
+    max-height: 230px;
+    margin: 6px 0;
+    padding-bottom: 12px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    /* The trailing padding lets the last caption scroll fully above the fade. */
+    -webkit-mask-image: linear-gradient(#000 calc(100% - 12px), transparent);
+    mask-image: linear-gradient(#000 calc(100% - 12px), transparent);
+  }
+
+  .debrief .debrief-find {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    align-items: center;
+    flex: none;
+    min-width: 0;
+    min-height: 50px;
+    max-width: none;
+    box-sizing: border-box;
+  }
+
+  .debrief .debrief-thumb {
+    width: 48px;
+    height: 48px;
+    aspect-ratio: auto;
+  }
+
+  .debrief .debrief-find-name {
+    min-width: 0;
+    padding: 4px 6px;
+    font-size: 12px;
+    line-height: 1.25;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .debrief .debrief-find-text {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    padding: 0;
+  }
+
+  .debrief .debrief-find-kind {
+    padding: 0 6px 4px;
+    font-size: 10px;
+  }
+
+  .debrief .debrief-fact,
+  .debrief .debrief-cause {
+    margin: 4px 0;
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  .debrief .debrief-actions {
+    margin-top: 6px;
+    padding-top: 8px;
+    gap: 6px;
+  }
+
+  .debrief .debrief-navigation.has-hook {
+    gap: 8px;
+  }
+}
