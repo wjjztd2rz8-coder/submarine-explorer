@@ -95,8 +95,12 @@ export const hudSystem: GameSystem = {
         scanView.phase === 'idle' &&
         !scanView.objectiveInRange &&
         approachBlockedByProp(ctx, scanView);
+      // Climbing only helps when the target is level with the sub or above it. On a vertical
+      // dive the target is below and "go up" would send the player to the surface.
+      const targetNotBelow = scanView.objectiveVertDeg > -5;
       const obstacle =
-        (blockedApproach && (pc!.headOn || pc!.contactNormal.y < 0.85)) || pathBlocked
+        targetNotBelow &&
+        ((blockedApproach && (pc!.headOn || pc!.contactNormal.y < 0.85)) || pathBlocked)
           ? 'Blocked ahead · go up ↑'
           : null;
       ctx.discovery.overlay.setApproachObstacle(obstacle);

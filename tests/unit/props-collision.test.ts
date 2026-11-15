@@ -261,7 +261,7 @@ describe('Props.collide + PropContact', () => {
     expect(p.z).toBeLessThanOrEqual(z - 10 - 8 + 1e-6);
   });
 
-  it('deflects head-on thrust along the prop surface instead of zeroing out', async () => {
+  it('flags head-on thrust into a prop without moving the hull along it', async () => {
     const props = await hullProps();
     const bus = new EventBus();
     const contact = new PropContact(props, bus, cfg, 8);
@@ -276,9 +276,11 @@ describe('Props.collide + PropContact', () => {
         return out.set(Math.sin(this.yaw), 0, -Math.cos(this.yaw));
       },
     };
-    const start = body.position.clone();
-    for (let i = 0; i < 120; i++) contact.resolve(body, 1 / 60, 1);
-    expect(body.velocity.length() + body.position.distanceTo(start)).toBeGreaterThan(2);
+    let touched = false;
+    for (let i = 0; i < 120; i++) touched = contact.resolve(body, 1 / 60, 1) || touched;
+    expect(touched).toBe(true);
+    // No injected slide: the hull is only pushed out of the prop, never launched along it.
+    expect(body.velocity.length()).toBeLessThan(0.5);
   });
 
   it('damps into-surface velocity and emits sub:collided once per contact', async () => {

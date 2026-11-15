@@ -88,17 +88,18 @@ export class PropContact {
         this.cooldown = this.cfg.collisionEventCooldownS;
         this.bus.emit('sub:collided', { depth: body.position.y, speed });
       }
-      this.deflectAlongSurface(body, throttle, dt);
+      this.deflectAlongSurface(body, throttle);
     }
     this.touching = hit;
     return hit;
   }
 
   /**
-   * When thrust pushes into a prop, add tangential slide so the hull can pass
-   * around or over instead of stopping dead against the push-out.
+   * Classifies a contact as head-on when thrust pushes straight into a prop, so guidance can
+   * tell the player to climb. It does not move the hull: an injected slide sent the sub up the
+   * Blue Hole's wall to the surface, and the cue alone gets a player past towers and walls.
    */
-  private deflectAlongSurface(body: CollidingBody, throttle: number, dt: number): void {
+  private deflectAlongSurface(body: CollidingBody, throttle: number): void {
     if (!body.getForward || throttle <= 0.05) return;
     const fwd = body.getForward(this.forward);
     const into = fwd.dot(this.normal);
@@ -123,12 +124,5 @@ export class PropContact {
     } else {
       this.headOn = into > 0.65;
     }
-    if (this.slide.lengthSq() < 1e-8) return;
-    this.slide.normalize();
-    const slideSpeed = Math.min(10, Math.max(3.5, body.velocity.length() + 2.5)) * throttle * 0.9;
-    body.velocity.addScaledVector(this.slide, slideSpeed);
-    body.position.addScaledVector(this.slide, slideSpeed * dt * 0.65);
-    this.props.collide(body.position, this.radius, this.normal);
-    this.contactNormal.copy(this.normal);
   }
 }
