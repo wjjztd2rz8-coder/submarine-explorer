@@ -160,7 +160,7 @@ export interface GameContext extends BootContext {
   /** Authored opening placement restarts an unlearned movement anchor. */
   reanchorFirstMove?(): void;
   keyboard: { lock(): Promise<void>; unlock(): void };
-  pointerLook: { updateHint(): void };
+  pointerLook: { updateHint(): void; syncCtrlTip?(frozen: boolean): void };
   settingsScreen: SettingsScreen;
   /** Device layout card. */
   controlsCard: ControlsCard;

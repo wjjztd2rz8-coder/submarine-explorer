@@ -767,7 +767,7 @@ describe('Input action map', () => {
       expect(a.keys.length).toBeGreaterThan(0);
     }
     expect(input.primaryKeyLabel('thrustForward')).toBe('W');
-    expect(input.primaryKeyLabel('ballastFlood')).toBe('Ctrl');
+    expect(input.primaryKeyLabel('ballastFlood')).toBe('C');
   });
 
   it('maps keys to normalised axes', () => {
@@ -1035,7 +1035,7 @@ describe('v1 binding migration', () => {
     expect(input.getAction('thrustForward')?.keys).toEqual(['KeyI']);
     expect(input.getAction('toggleLights')?.keys).toEqual([]);
     expect(input.getAction('toggleJournal')?.keys).toEqual(['KeyH']);
-    expect(input.getAction('ballastFlood')?.keys).toEqual(['ControlLeft', 'ControlRight', 'KeyC']);
+    expect(input.getAction('ballastFlood')?.keys).toEqual(['KeyC', 'ControlLeft', 'ControlRight']);
     expect(input.getAction('scan')?.keys).toEqual(['KeyG']);
     expect(JSON.parse(store.getItem(BINDINGS_STORAGE_KEY)!).version).toBe(3);
     expect(store.getItem(LEGACY_BINDINGS_STORAGE_KEY)).not.toBeNull();

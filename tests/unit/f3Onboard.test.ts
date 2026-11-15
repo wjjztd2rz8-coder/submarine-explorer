@@ -291,7 +291,7 @@ describe('tutorial progression', () => {
       move: 'W',
       turn: 'A or D',
       rise: 'Space',
-      sink: 'Ctrl',
+      sink: 'C',
       scan: 'F',
     };
     for (const step of TUTORIAL_STEPS)
