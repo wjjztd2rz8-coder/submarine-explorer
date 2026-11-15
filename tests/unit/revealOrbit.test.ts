@@ -132,6 +132,26 @@ describe('reveal look-around', () => {
     expect(r.revealUserControl).toBe(false);
   });
 
+  it('keeps the player orbit and relative zoom when the reveal viewport is refitted', () => {
+    const r = rig();
+    settle(r, 1);
+    r.revealOrbit(0.5, 0.1);
+    r.revealZoom(1.5);
+    settle(r);
+    const before = spherical(r);
+    r.reframeReveal({ distance: 60, minDistance: 36, maxDistance: 150, screen: { x: -0.3, y: 0 } });
+    settle(r);
+    expect(r.revealUserControl).toBe(true);
+    const after = spherical(r);
+    expect(after.azimuth).toBeCloseTo(before.azimuth, 3);
+    expect(after.elevation).toBeCloseTo(before.elevation, 3);
+    expect(after.distance).toBeCloseTo(before.distance * 2, 2);
+    r.camera.updateMatrixWorld();
+    const projected = target.clone().project(r.camera);
+    expect(projected.x).toBeCloseTo(-0.3, 4);
+    expect(projected.y).toBeCloseTo(0, 4);
+  });
+
   it('aims so a point lands exactly at a screen position', () => {
     const cam = new PerspectiveCamera(62, 0.5, 0.1, 1000);
     cam.position.set(10, 5, -20);

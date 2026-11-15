@@ -50,7 +50,7 @@ async function setup() {
     clientWidth: 1280,
     clientHeight: 720,
     setPointerCapture: vi.fn(),
-    hasPointerCapture: () => false,
+    hasPointerCapture: (): boolean => false,
     releasePointerCapture: vi.fn(),
   });
   const ctx = {
@@ -273,6 +273,73 @@ it('ignores pointers that start on the card', async () => {
     window.dispatchEvent(pointer('pointermove', { pointerId: 3, clientX: 60, clientY: 500 }));
     frame(0.1);
     expect(ctx.rig.revealOrbit).not.toHaveBeenCalled();
+  } finally {
+    system.dispose!();
+  }
+});
+
+it('leaves Enter available to the pause menu over an active reveal', async () => {
+  const { ctx, system, scan, frame } = await setup();
+  try {
+    scan('a');
+    frame(4);
+    ctx.app.state = 'pause';
+    const enter = Object.assign(new Event('keydown', { cancelable: true }), { key: 'Enter' });
+    window.dispatchEvent(enter);
+    expect(enter.defaultPrevented).toBe(false);
+    frame(0.25, true);
+    expect(ctx.rig.endReveal).not.toHaveBeenCalled();
+    ctx.app.state = 'dive';
+    frame();
+    expect(ctx.discovery.reveal!.active).toBe(true);
+  } finally {
+    system.dispose!();
+  }
+});
+
+it('releases a captured reveal drag on window blur so auto-close can resume', async () => {
+  const { ctx, system, scan, frame, canvas } = await setup();
+  canvas.hasPointerCapture = () => true;
+  try {
+    scan('a');
+    frame(4);
+    const down = pointer('pointerdown', { pointerId: 9, clientX: 10, clientY: 10 });
+    canvas.dispatchEvent(down);
+    window.dispatchEvent(pointer('pointermove', { pointerId: 9, clientX: 60, clientY: 10 }));
+    frame(0.1);
+    window.dispatchEvent(new Event('blur'));
+    expect(canvas.releasePointerCapture).toHaveBeenCalledWith(9);
+    frame(0.25);
+    expect(ctx.rig.revealRelease).toHaveBeenCalledWith(0, 0);
+    for (let i = 0; i < 80; i++) frame(0.25);
+    expect(ctx.rig.endReveal).toHaveBeenCalledOnce();
+    expect(ctx.discovery.reveal!.active).toBe(false);
+  } finally {
+    system.dispose!();
+  }
+});
+
+it('refits an open reveal across portrait and landscape without opening another card', async () => {
+  const { ctx, system, scan, frame, canvas } = await setup();
+  const reframeReveal = vi.fn();
+  Object.assign(ctx.rig, { reframeReveal });
+  try {
+    scan('a');
+    frame(4);
+    Object.assign(canvas, { clientWidth: 844, clientHeight: 390 });
+    ctx.rig.camera.aspect = 844 / 390;
+    frame();
+    expect(reframeReveal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ screen: { x: expect.closeTo(-0.3), y: 0 } }),
+    );
+    Object.assign(canvas, { clientWidth: 390, clientHeight: 844 });
+    ctx.rig.camera.aspect = 390 / 844;
+    frame();
+    expect(reframeReveal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ screen: { x: 0, y: expect.closeTo(0.34) } }),
+    );
+    expect(ctx.rig.beginReveal).toHaveBeenCalledOnce();
+    expect(card.show).toHaveBeenCalledOnce();
   } finally {
     system.dispose!();
   }

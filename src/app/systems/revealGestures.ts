@@ -57,6 +57,12 @@ export class RevealGestures {
     on<PointerEvent>(window, 'pointerup', (e) => this.up(e));
     on<PointerEvent>(window, 'pointercancel', (e) => this.up(e));
     on<WheelEvent>(canvas, 'wheel', (e) => this.wheel(e), { passive: false });
+    on(window, 'blur', () => {
+      const held = this.dragging;
+      this.reset();
+      // Focus can leave without delivering pointerup; stop the camera's held drag too.
+      if (held) this.release = { vAzimuth: 0, vElevation: 0 };
+    });
   }
 
   /** A finger or button is down on the view. */

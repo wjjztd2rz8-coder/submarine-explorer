@@ -424,6 +424,28 @@ describe('MissionRouter completion timing', () => {
     expect(router.debriefOpen).toBe(true);
   });
 
+  it('applies the start pose once when Begin is triggered repeatedly while loading', async () => {
+    router.dispose();
+    let loaded!: () => void;
+    const ready = new Promise<void>((resolve) => {
+      loaded = resolve;
+    });
+    const applyStart = vi.fn();
+    router = new MissionRouter({ ...options, startReady: ready, applyStart });
+    router.begin();
+    router.begin();
+    loaded();
+    await ready;
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(applyStart).toHaveBeenCalledOnce();
+    expect(router.mission.diving).toBe(true);
+    router.begin();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(applyStart).toHaveBeenCalledOnce();
+  });
+
   it('a reload that skips the briefing freezes until content and the start pose are ready', async () => {
     router.dispose();
     let loaded!: () => void;
