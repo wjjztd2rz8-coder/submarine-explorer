@@ -46,7 +46,7 @@ it('covers the shipped catalogue and counts only its fixed Journal finds', async
     }
   });
   expect(new Set(sites.map((s) => s.id))).toEqual(new Set(TOUR_ORDER));
-  expect(sites.reduce((n, s) => n + siteFinds(s, { isDiscovered: () => false }).total, 0)).toBe(64);
+  expect(sites.reduce((n, s) => n + siteFinds(s, { isDiscovered: () => false }).total, 0)).toBe(66);
 });
 
 it.each(TOUR_ORDER)('never routes the debrief back into the same site: %s', (current) => {
