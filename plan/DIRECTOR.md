@@ -176,6 +176,16 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   `t3/fix-scan-target-card-1` merged onto main in `~/subexp-wt/s33c-gate`, no units).
   In flight: S37 play-loop correctness sweep (Codex GPT-6.1 Sol high; may not edit the
   S33c files), S38 Titanic dead transit, site data only (OpenCode Big Pickle, trial).
+- **11:20 Sunday.** gate19 on main (S34+S32+S36a+S36b) green: 13 keyboard + 6 touch on
+  the debrief at usual times, units 4,913 pass. S33c first gate looked like a regression
+  (Kamaʻehuakanaloa 1/4, Axial 151 s) but the cause was the playtest scripts steering at
+  any visible marker when the objective's was off screen; fixed (`is-secondary` excluded
+  in `tour.mjs` and `touch-drive.mjs`). Re-gate: all 13 within live times, finds equal
+  totals (no stray scans), Titanic 111 s. Merged into main: S33c, S37 (4 reveal/start
+  lifecycle fixes), S38 (OpenCode Big Pickle: two Titanic debris finds, longest gap 29 to
+  21 s, debrief 125 s) + S38b (Codex: debris card text sourced, caveats removed). Final
+  gate `.cache/sprint/gate20` running; push on green. OpenCode note: `variant` option
+  "high" is rejected for big-pickle; launch it with no options.
 - **Lesson:** look at one capture before merging any layout change. S30's report and
   measurements were clean while its portrait screenshot showed tiles stacked on top of
   each other; it had measured horizontal clipping only.
