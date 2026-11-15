@@ -120,3 +120,27 @@ it.each(['pause', 'hidden', 'journal'] as const)(
     }
   },
 );
+
+it('shows the current mission count on a replay instead of all saved primary finds', async () => {
+  const { ctx, system, scan, frame } = await setup();
+  try {
+    Object.assign(ctx, {
+      missionRouter: {
+        frozen: false,
+        mission: {
+          objectives: [
+            { poiId: 'a', resolved: true, complete: true },
+            { poiId: 'b', resolved: true, complete: false },
+          ],
+          counts: () => ({ completed: 1, total: 2 }),
+        },
+      },
+    });
+    // Both POIs were discovered on an earlier dive; only a was scanned this time.
+    scan('a');
+    frame();
+    expect(card.show).toHaveBeenCalledWith('a', 'a', '', 1, 2, 'Site');
+  } finally {
+    system.dispose!();
+  }
+});
