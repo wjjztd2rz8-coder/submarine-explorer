@@ -59,15 +59,20 @@ export const hudSystem: GameSystem = {
   frame: {
     'hud.draw': (f, ctx) => {
       const { hud, discovery, sub, guidance, missionRouter, config } = ctx;
+      const scanView = discovery.scanner.view;
+      const vertObjective =
+        scanView.objectiveId !== null && Math.abs(scanView.objectiveVertDeg) > 5;
       hud.update(f.sub, {
         // Any unscanned contact in range (animals too) or scan under way: its prompt or result
         // card must not lose the slot to the static altitude warning.
         // A contact already scanned has no prompt left to protect, and a hull resting on
         // a slope it cannot climb needs the rise cue whatever is in range.
+        // A deeper mission objective still needs sink/approach cues on ledges (Blue Hole).
         nearScanTarget:
-          discovery.scanner.view.phase !== 'idle' ||
-          (discovery.scanner.view.nearestInRange &&
-            !discovery.scanner.view.nearestScanned &&
+          scanView.phase !== 'idle' ||
+          vertObjective ||
+          (scanView.nearestInRange &&
+            !scanView.nearestScanned &&
             f.sub.altitude > config.submarine.hullRadius + config.submarine.seabedClearance + 1),
         dt: f.dt,
         riseCue: riseCue(ctx),
