@@ -43,9 +43,9 @@
       "sources": ["https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"],
       "note": "Game scan contact on the reconstructed lower floor of the Great Blue Hole. The hole's reported depth is about 125 m, but this marker is not a surveyed feature location.",
       "reveal": {
-        "distance_m": 44,
-        "elevation_deg": 6,
-        "azimuth_deg": 82,
+        "distance_m": 70,
+        "elevation_deg": 10,
+        "azimuth_deg": 262,
         "sweep_deg": 14
       }
     },

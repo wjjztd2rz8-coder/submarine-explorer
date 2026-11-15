@@ -41,9 +41,9 @@
       "sources": ["https://www.gmrt.org/"],
       "note": "Real GMRT terrain: 292.9 m deep at the centre of row 306, column 267 (zero-based) in data/tiles/hunga-tonga-caldera/heightmap.bin. This terrain survey is about 660 m east-northeast of the volcanic rim-slope scan. The pre-2022 GMRT grid reads about 293 m here, compared with about 469 m at the rim-slope point. The nearby pair samples the volcanic flank beyond the shallow central basin. This point was chosen from the survey grid for the dive; it is not a separately named volcanic feature. Continue east to the optional shallow basin-floor scan to compare that earlier landscape. No prop or staged encounter is added.",
       "reveal": {
-        "distance_m": 88,
-        "elevation_deg": 9,
-        "azimuth_deg": 288,
+        "distance_m": 110,
+        "elevation_deg": 8,
+        "azimuth_deg": 108,
         "sweep_deg": 15
       }
     },

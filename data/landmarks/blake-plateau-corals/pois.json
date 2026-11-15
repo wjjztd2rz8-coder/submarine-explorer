@@ -30,8 +30,8 @@
     {
       "id": "blake-coral-thicket",
       "name": "Desmophyllum pertusum thicket",
-      "lat": 30.1613,
-      "lon": -79.7893,
+      "lat": 30.16062,
+      "lon": -79.78939,
       "snap_to_seabed": true,
       "radius_m": 100,
       "kind": "biology",
@@ -46,8 +46,8 @@
       ],
       "note": "The mound terrain here is real (this tile), but the coral colonies themselves are placed reconstructions -- this game's terrain resolution cannot show individual coral heads. Desmophyllum pertusum is documented as the dominant reef-building species across the wider Blake Plateau province (Sowers et al. 2024, NOAA); its presence at this exact point is inferred from that province-wide finding, not a site-specific survey record, hence medium rather than high confidence.",
       "reveal": {
-        "distance_m": 40,
-        "elevation_deg": 16,
+        "distance_m": 45,
+        "elevation_deg": 18,
         "azimuth_deg": 195
       }
     },
