@@ -55,6 +55,14 @@ interface DiveSettingsOptions {
   onStartChange?: (choice: MissionStartPosition) => void;
 }
 
+/** One or two sentences for the card body (full summary stays under About this site). */
+export function briefingIntroText(summary: string, title: string): string {
+  const source = summary.trim() || title.trim();
+  const first = source.split(/(?<=[.!?])\s+/)[0]?.trim() ?? source;
+  const clipped = first.length > 160 ? `${first.slice(0, 157).trimEnd()}…` : first;
+  return `${clipped} Follow the contacts and scan what you find.`;
+}
+
 /** The lines in order, without blanks or repeats (case and spacing ignored). */
 function unique(items: readonly string[]): string[] {
   const seen = new Set<string>();
@@ -163,26 +171,17 @@ export class Briefing {
       : (c.startPosition ?? 'near-site');
 
     const head = el('div', 'briefing-head');
-    head.append(el('div', 'briefing-kicker', c.kicker), el('h1', 'briefing-title', c.title));
-    if (c.meta.length) {
-      const meta = el('div', 'briefing-meta');
-      for (const [label, value] of c.meta) {
-        const cell = el('div', 'briefing-meta-cell');
-        cell.append(el('span', 'briefing-label', label), el('span', 'briefing-value', value));
-        meta.append(cell);
-      }
-      head.append(meta);
-    }
+    head.append(el('h1', 'briefing-title', c.title));
+    head.append(el('p', 'briefing-intro', briefingIntroText(c.summary, c.title)));
     p.append(head);
     const obj = el('section', 'briefing-section is-objectives');
-    obj.append(el('h2', 'briefing-section-title', 'OBJECTIVES'));
     const ol = el('ul', 'briefing-objectives');
     for (const o of c.objectives.filter((o) => o.primary)) {
-      const li = el('li', o.primary ? 'is-primary' : 'is-secondary');
+      const li = el('li', 'is-primary is-sr-only');
       li.append(
         el('span', 'briefing-box', '☐'),
         el('span', 'briefing-obj-title', o.title),
-        el('span', 'briefing-obj-tag', o.primary ? 'PRIMARY' : 'OPTIONAL'),
+        el('span', 'briefing-obj-tag', 'PRIMARY'),
       );
       ol.append(li);
     }
@@ -190,15 +189,13 @@ export class Briefing {
     ol.append(el('li', 'briefing-contacts', `Unknown contacts: 0 of ${contacts.length} found`));
     obj.append(ol);
     p.append(obj);
-    // The memorial note stays on the card; everything else about the site is
-    // one collapsed disclosure, each fact and hazard listed once.
-    if (c.memorialNote) p.append(el('p', 'briefing-memorial', c.memorialNote));
     const facts = unique(c.facts);
     const hazards = unique(c.hazards).filter((h) => !facts.includes(h));
     if (c.summary || facts.length || hazards.length) {
       const more = el('details', 'briefing-site-more');
       more.append(el('summary', undefined, 'About this site'));
       const extra = el('div', 'briefing-site-extra');
+      if (c.memorialNote) extra.append(el('p', 'briefing-memorial', c.memorialNote));
       if (c.summary && c.summary !== c.memorialNote)
         extra.append(el('p', 'briefing-summary', c.summary));
       const list = (title: string, items: string[], cls: string): void => {
@@ -249,6 +246,8 @@ export class Briefing {
     this.modeSelector = null;
     const section = el('section', 'briefing-dive');
     section.setAttribute('aria-label', 'Dive settings');
+    const details = el('details', 'briefing-dive-more');
+    details.append(el('summary', undefined, 'Dive settings'));
     const row = el('div', 'briefing-dive-row');
     if (this.dive) {
       this.modeSelector = new ModeSelector(
@@ -258,8 +257,17 @@ export class Briefing {
         this.dive.choices,
       );
       row.append(this.modeSelector.root);
-    }
-    if (!this.modeSelector) {
+      const label = el('label', 'briefing-start-option');
+      const input = el('input');
+      input.type = 'checkbox';
+      input.setAttribute('role', 'switch');
+      input.checked = this.choice === 'surface';
+      input.addEventListener('change', () => {
+        this.choice = input.checked ? 'surface' : 'near-site';
+      });
+      label.append(input, el('span', undefined, 'Start at surface'));
+      row.append(label);
+    } else {
       const label = el('label', 'briefing-start-option');
       const input = el('input');
       input.type = 'checkbox';
@@ -271,8 +279,8 @@ export class Briefing {
       label.append(input, el('span', undefined, 'Start at surface'));
       row.append(label);
     }
-    section.append(row);
-
+    details.append(row);
+    section.append(details);
     slot.replaceChildren(section);
   }
 

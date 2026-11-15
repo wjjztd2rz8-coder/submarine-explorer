@@ -170,9 +170,10 @@ test.describe('B3 mission flow', () => {
     );
     await expect(page.locator('.briefing-section.is-hazards li')).not.toHaveCount(0);
     await expect(page.locator('.briefing-section.is-hazards li:visible')).toHaveCount(0);
-    await expect(page.locator('.briefing-memorial')).toBeVisible();
+    await expect(page.locator('.briefing-memorial')).toHaveCount(0);
     await expect(page.locator('.briefing-controls')).toHaveCount(0);
     await briefing.getByText('About this site', { exact: true }).click();
+    await expect(page.locator('.briefing-memorial')).toBeVisible();
     await expect(page.locator('.briefing-section.is-hazards li').first()).toBeVisible();
     await expect(briefing.getByRole('button', { name: 'View controls' })).toHaveCount(0);
     await briefing.getByText('About this site', { exact: true }).click();

@@ -72,6 +72,8 @@ export class Home {
   private readonly dailyCard: HTMLButtonElement;
   private readonly diveSitesButton: HTMLButtonElement;
   private readonly menu: HTMLElement;
+  private readonly moreButton: HTMLButtonElement;
+  private readonly morePanel: HTMLElement;
   private readonly panel: HTMLElement;
   private readonly freeDiveButton: HTMLButtonElement;
   private readonly sceneCaption: HTMLSpanElement;
@@ -123,6 +125,7 @@ export class Home {
     const desc = document.createElement('p');
     desc.className = 'home-desc';
     desc.textContent = 'Real terrain, simple controls, discoveries worth finding.';
+    copy.className = 'home-copy is-compact';
     copy.append(kicker, brand, sub, desc);
 
     const body = document.createElement('div');
@@ -131,36 +134,83 @@ export class Home {
     menu.className = 'home-menu';
     menu.setAttribute('aria-label', 'Main menu');
     this.menu = menu;
-    const entry = (label: string, act: () => void): HTMLButtonElement => {
+    const entry = (
+      label: string,
+      act: () => void,
+      parent: HTMLElement = menu,
+    ): HTMLButtonElement => {
       const button = document.createElement('button');
       button.type = 'button';
       button.textContent = label;
       button.addEventListener('click', act);
-      menu.append(button);
+      parent.append(button);
       return button;
     };
-    // DOM order is the Tab order: Dive, Dive sites, Free dive, Daily dive,
-    // mode, Journal, Your sub, Settings, Controls.
+    // Top level: one primary dive, site picker, and a More tray for everything else.
     this.diveButton = entry('Dive', () => (this.tourDive ?? actions.dive)());
     this.diveButton.className = 'home-primary';
+    this.diveSitesButton = entry('Dive sites', () => this.showSites(false, this.diveSitesButton));
+    this.morePanel = document.createElement('div');
+    this.morePanel.className = 'home-more';
+    this.morePanel.hidden = true;
+    this.morePanel.id = 'home-more-panel';
+    this.moreButton = entry('More', () => this.toggleMore());
+    this.moreButton.className = 'home-more-toggle';
+    this.moreButton.setAttribute('aria-expanded', 'false');
+    this.moreButton.setAttribute('aria-controls', 'home-more-panel');
     this.tourProgress = document.createElement('p');
     this.tourProgress.className = 'home-tour-progress';
-    menu.append(this.tourProgress);
-    this.diveSitesButton = entry('Dive sites', () => this.showSites(false, this.diveSitesButton));
-    this.freeDiveButton = entry('Free dive', () => this.showSites(true, this.freeDiveButton));
+    this.morePanel.append(this.tourProgress);
+    this.freeDiveButton = entry(
+      'Free dive',
+      () => {
+        this.setMoreOpen(false);
+        this.showSites(true, this.freeDiveButton);
+      },
+      this.morePanel,
+    );
     this.dailyCard = document.createElement('button');
     this.dailyCard.type = 'button';
     this.dailyCard.className = 'daily-card';
     this.dailyCard.hidden = true;
-    menu.append(this.dailyCard);
+    this.morePanel.append(this.dailyCard);
     this.modeSelector = gameplay
       ? new ModeSelector('is-home', gameplay, undefined, undefined, true)
       : null;
-    if (this.modeSelector) menu.append(this.modeSelector.root);
-    entry('Journal', actions.journal);
-    entry('Your sub', actions.subScreen);
-    entry('Settings', actions.settings);
-    entry('Controls', actions.controls);
+    if (this.modeSelector) this.morePanel.append(this.modeSelector.root);
+    entry(
+      'Journal',
+      () => {
+        this.setMoreOpen(false);
+        actions.journal();
+      },
+      this.morePanel,
+    );
+    entry(
+      'Your sub',
+      () => {
+        this.setMoreOpen(false);
+        actions.subScreen();
+      },
+      this.morePanel,
+    );
+    entry(
+      'Settings',
+      () => {
+        this.setMoreOpen(false);
+        actions.settings();
+      },
+      this.morePanel,
+    );
+    entry(
+      'Controls',
+      () => {
+        this.setMoreOpen(false);
+        actions.controls();
+      },
+      this.morePanel,
+    );
+    menu.append(this.morePanel);
 
     const notes = document.createElement('div');
     notes.className = 'home-notes';
@@ -229,7 +279,8 @@ export class Home {
     this.trap = new FocusTrap(this.root, {
       onEscape: () => {
         document.exitPointerLock?.();
-        if (this.sitesOpen) this.closeSites();
+        if (this.moreOpen) this.setMoreOpen(false);
+        else if (this.sitesOpen) this.closeSites();
       },
     });
     this.panel = panel;
@@ -245,6 +296,23 @@ export class Home {
 
   get sitesOpen(): boolean {
     return !this.sites.hidden;
+  }
+
+  get moreOpen(): boolean {
+    return !this.morePanel.hidden;
+  }
+
+  private toggleMore(): void {
+    this.setMoreOpen(!this.moreOpen);
+  }
+
+  private setMoreOpen(open: boolean): void {
+    if (this.morePanel.hidden === !open) return;
+    this.morePanel.hidden = !open;
+    this.moreButton.setAttribute('aria-expanded', String(open));
+    this.root.classList.toggle('has-more', open);
+    if (open) this.morePanel.querySelector<HTMLButtonElement>('button:not([hidden])')?.focus();
+    else this.moreButton.focus();
   }
 
   /**
@@ -291,6 +359,7 @@ export class Home {
 
   hide(): void {
     this.cancelSheetSwipe();
+    this.setMoreOpen(false);
     if (!this.isOpen) return;
     this.trap.hide();
   }
@@ -332,6 +401,7 @@ export class Home {
 
   showSites(freeDive: boolean, origin?: HTMLButtonElement): void {
     this.cancelSheetSwipe();
+    this.setMoreOpen(false);
     this.sitesOrigin = origin ?? (freeDive ? this.freeDiveButton : this.diveSitesButton);
     this.sites.hidden = false;
     this.setSheetOpen(false);

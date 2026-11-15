@@ -30,6 +30,32 @@
   display: none;
 }
 
+body:has(.briefing:not([hidden])) .hud-regions {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.briefing-intro {
+  margin: 4px 0 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.briefing-objectives .is-sr-only {
+  display: none;
+}
+
+.briefing-dive-more > summary {
+  display: list-item;
+  width: fit-content;
+  min-height: 44px;
+  padding: 8px 0;
+  color: var(--b3-cyan);
+  cursor: pointer;
+  font-size: 13px;
+}
+
 .briefing-panel {
   width: min(1000px, 95vw);
   max-height: 94vh;

@@ -411,7 +411,31 @@ body:has(.debrief:not([hidden])) .d-scan-waypoints {
   }
 }
 
-/* "Finish dive": stays in the HUD bar once the primaries are done, so ending is always one tap. */
+/* "Finish dive": pinned clear of the bar, scan and touch stick once primaries are done. */
+.hud-bar > .hud-finish {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  max-width: min(340px, calc(100vw - 48px));
+}
+@media (orientation: portrait) {
+  html.is-touch .hud-bar > .hud-finish {
+    left: calc(108px + env(safe-area-inset-left, 0px));
+    right: auto;
+    transform: none;
+    max-width: calc(100vw - 116px - env(safe-area-inset-right, 0px));
+  }
+}
+@media (orientation: landscape) and (max-height: 460px) {
+  html.is-touch .hud-bar > .hud-finish {
+    left: auto;
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    transform: none;
+    max-width: min(200px, 42vw);
+  }
+}
 .hud-finish {
   pointer-events: auto;
   flex-shrink: 0;
