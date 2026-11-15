@@ -99,9 +99,8 @@ export class PropContact {
    * around or over instead of stopping dead against the push-out.
    */
   private deflectAlongSurface(body: CollidingBody, throttle: number, dt: number): void {
-    const getForward = body.getForward;
-    if (!getForward || throttle <= 0.05) return;
-    const fwd = getForward(this.forward);
+    if (!body.getForward || throttle <= 0.05) return;
+    const fwd = body.getForward(this.forward);
     const into = fwd.dot(this.normal);
     const horiz = Math.hypot(body.velocity.x, body.velocity.z);
     if (into < 0.2 && horiz > 2) return;

@@ -267,11 +267,13 @@ describe('Props.collide + PropContact', () => {
     const contact = new PropContact(props, bus, cfg, 8);
     const { x, z } = latLonToWorld(meta, 41.73, -49.95);
     const yaw = Math.PI;
+    // getForward reads `this`, as Submarine's does: calling it detached must not be possible.
     const body = {
+      yaw,
       position: v(x + 8, -3790, z - 16),
       velocity: v(0, 0, 0),
       getForward(out = new THREE.Vector3()) {
-        return out.set(Math.sin(yaw), 0, -Math.cos(yaw));
+        return out.set(Math.sin(this.yaw), 0, -Math.cos(this.yaw));
       },
     };
     const start = body.position.clone();

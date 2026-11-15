@@ -409,7 +409,10 @@ export class ScanOverlay {
             : [
                 this.approachObstacle,
                 Math.abs(turn) >= 10 ? turnCue(turn) : null,
-                depthCue(view.objectiveDistance, view.objectiveVertDeg, keys),
+                // A blocked path asks for a climb; a simultaneous "Go down" would contradict it.
+                this.approachObstacle
+                  ? null
+                  : depthCue(view.objectiveDistance, view.objectiveVertDeg, keys),
                 Math.abs(turn) >= 10 ||
                 depthCue(view.objectiveDistance, view.objectiveVertDeg, keys) ||
                 this.approachObstacle

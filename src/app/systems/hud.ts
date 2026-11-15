@@ -97,7 +97,7 @@ export const hudSystem: GameSystem = {
         approachBlockedByProp(ctx, scanView);
       const obstacle =
         (blockedApproach && (pc!.headOn || pc!.contactNormal.y < 0.85)) || pathBlocked
-          ? 'Go up ↑ to clear the tower'
+          ? 'Blocked ahead · go up ↑'
           : null;
       ctx.discovery.overlay.setApproachObstacle(obstacle);
       hud.update(f.sub, {
