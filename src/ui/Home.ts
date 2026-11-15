@@ -45,6 +45,7 @@ interface HomeActions {
 }
 
 const SCENE_FALLBACK = 'Expedition preview';
+export const HOME_INTRO = 'Dive to thirteen real ocean sites and scan what you find.';
 /** Decorative inline Bathyline mark (public/bathyline-mark.svg geometry; currentColor outline). */
 function brandMark(): HTMLElement {
   const box = document.createElement('span');
@@ -124,7 +125,7 @@ export class Home {
     sub.textContent = APP_TAGLINE;
     const desc = document.createElement('p');
     desc.className = 'home-desc';
-    desc.textContent = 'Real terrain, simple controls, discoveries worth finding.';
+    desc.textContent = HOME_INTRO;
     copy.className = 'home-copy is-compact';
     copy.append(kicker, brand, sub, desc);
 

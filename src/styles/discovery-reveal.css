@@ -80,7 +80,50 @@ body.is-revealing .photo-mode {
     padding: 18px;
   }
 }
-@media (max-height: 450px) {
+@media (max-height: 500px) and (min-aspect-ratio: 1/1) {
+  .discovery-reveal {
+    align-items: stretch;
+    justify-content: flex-end;
+    padding: 0 max(0px, env(safe-area-inset-right)) 0 max(0px, env(safe-area-inset-left));
+  }
+  .discovery-reveal-panel {
+    width: 30%;
+    max-width: 30%;
+    height: 100%;
+    max-height: 100dvh;
+    margin: 0;
+    border-radius: 12px 0 0 12px;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    overflow: hidden;
+    padding: 12px 14px max(12px, env(safe-area-inset-bottom));
+    box-sizing: border-box;
+  }
+  .discovery-reveal h2 {
+    font-size: clamp(17px, 3.6vw, 21px);
+    margin: 4px 0;
+    line-height: 1.2;
+  }
+  .discovery-reveal p {
+    font-size: 13px;
+    margin: 4px 0 8px;
+    line-height: 1.35;
+    overflow-y: auto;
+    min-height: 0;
+    overscroll-behavior: contain;
+  }
+  .discovery-reveal-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 4px;
+  }
+  .discovery-reveal button {
+    min-width: max(44px, 40%);
+    flex: 1 1 auto;
+    min-height: 44px;
+  }
+}
+@media (max-height: 450px) and (not (min-aspect-ratio: 1/1)) {
   .discovery-reveal {
     align-items: center;
     padding: 8px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));
