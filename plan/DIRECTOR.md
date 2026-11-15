@@ -19,7 +19,12 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   15:38 with the reveal framing and F-endings merges; check that its CI went green and the
   deploy ran (`gh run list --branch main --limit 4`).
 - Full unit suite green locally on `5048bfab` (202 files, 4,781 tests).
-- All delegates have reported and are merged. Nothing is in flight.
+- **In flight since 18:40 CST** (T3 delegates, each in its own worktree, none merged yet):
+  S1 full-route tour measurement (Composer, item 1), S3 tighter turning (Composer, item 3),
+  S4 touch layout and Blue Hole by touch (Composer, item 4), S6 tutorial steps and README
+  (Composer, item 6), S5 facts (Sonnet medium, item 5; runs the full unit suite itself).
+  Item 2 (Hunga) waits for S1's table. After merging the batch: one full unit run in the
+  background, build, one played site, push.
 - Touch scanning works (the 0-scan result was a script bug, fixed). Lost City by touch: two
   scans in 15 s. Blue Hole by touch: first find only, second never reached (unproven).
 
