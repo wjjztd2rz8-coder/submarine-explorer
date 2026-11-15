@@ -33,6 +33,9 @@ export function createRevealSystem(): GameSystem {
   let subject: Object3D | null = null;
   let clearRect: RevealViewRect | null = null;
   let frameScale = 1;
+  let frameWidth = 0;
+  let frameHeight = 0;
+  let refit: ((opening?: boolean) => void) | null = null;
   let captured = false;
   let finishing = false;
   let returning = false;
@@ -41,13 +44,17 @@ export function createRevealSystem(): GameSystem {
   let probeConsumed = false;
   let card: DiscoveryCard;
   const stillTarget = new Vector3();
-  const skip = (): void => {
-    if (elapsed >= REVEAL_MIN_CONTINUE_S && queue.current && !returning) finishing = true;
-  };
+  let interrupted = false;
   return {
     name: 'reveal',
     dispose: () => cleanup.dispose(),
     init(ctx) {
+      const canInteract = (): boolean =>
+        ctx.app.state === 'dive' && !document.hidden && !interrupted;
+      const skip = (): void => {
+        if (canInteract() && elapsed >= REVEAL_MIN_CONTINUE_S && queue.current && !returning)
+          finishing = true;
+      };
       const controller = {
         get active() {
           return queue.active;
@@ -91,7 +98,7 @@ export function createRevealSystem(): GameSystem {
       ctx.discovery.reveal = controller;
       ctx.expose({ reveal: controller });
       card = new DiscoveryCard(skip, () => {
-        if (elapsed >= REVEAL_MIN_CONTINUE_S) {
+        if (canInteract() && elapsed >= REVEAL_MIN_CONTINUE_S) {
           readMore = true;
           skip();
         }
@@ -122,12 +129,13 @@ export function createRevealSystem(): GameSystem {
         gestures?.reset();
         ctx.rig.endReveal();
         returning = false;
+        refit = null;
       };
       cleanup.add(ctx.bus.on('mission:restart', clearReveal));
       cleanup.add(ctx.bus.on('mission:ended', clearReveal));
       // Capture phase prevents a dismissing key from also pausing or moving the boat.
       const dismiss = (event: Event): void => {
-        if (!queue.current || event.type !== 'keydown') return;
+        if (!queue.current || !canInteract() || event.type !== 'keydown') return;
         const key = (event as KeyboardEvent).key;
         if (key !== ' ' && key !== 'Enter') return;
         if ((event.target as Element | null)?.closest?.('.discovery-reveal button')) return;
@@ -146,6 +154,7 @@ export function createRevealSystem(): GameSystem {
     },
     frame: {
       'gate.shell': (f, ctx) => {
+        interrupted = f.blocked;
         if (ready && ctx.app.state === 'dive' && !ctx.missionRouter?.frozen) {
           const probe = ctx.params.get('reveal');
           if (probe && !probeConsumed) {
@@ -198,28 +207,35 @@ export function createRevealSystem(): GameSystem {
                 ctx.discovery.siteName,
               );
               subject = prop?.root ?? null;
-              const canvas = ctx.canvas;
-              // Frame for what the card leaves clear, measured now that it is laid out.
-              const width = canvas.clientWidth || window.innerWidth;
-              const height = canvas.clientHeight || window.innerHeight;
-              const bounds = canvas.getBoundingClientRect?.();
-              clearRect = (bounds && card.clearRect?.(bounds)) ?? revealVisibleRect(width, height);
-              const frame = revealFrame(
-                poi,
-                ctx.sub.position,
-                ctx.rig.camera.fov,
-                ctx.rig.camera.aspect,
-                prop?.sphere,
-                {
-                  width,
-                  height,
-                  baseFovDeg: ctx.config.camera.fovDeg,
-                  rect: clearRect,
-                  box: subject ? new Box3().setFromObject(subject) : undefined,
-                },
-              );
-              frameScale = frame.scale;
-              ctx.rig.beginReveal(frame);
+              refit = (opening = false): void => {
+                const canvas = ctx.canvas;
+                // Frame for what the card leaves clear, measured now that it is laid out.
+                const width = canvas.clientWidth || window.innerWidth;
+                const height = canvas.clientHeight || window.innerHeight;
+                const bounds = canvas.getBoundingClientRect?.();
+                clearRect =
+                  (bounds && card.clearRect?.(bounds)) ?? revealVisibleRect(width, height);
+                const frame = revealFrame(
+                  poi,
+                  ctx.sub.position,
+                  ctx.rig.camera.fov,
+                  ctx.rig.camera.aspect,
+                  prop?.sphere,
+                  {
+                    width,
+                    height,
+                    baseFovDeg: ctx.config.camera.fovDeg,
+                    rect: clearRect,
+                    box: subject ? new Box3().setFromObject(subject) : undefined,
+                  },
+                );
+                frameScale = frame.scale;
+                frameWidth = width;
+                frameHeight = height;
+                if (opening) ctx.rig.beginReveal(frame);
+                else ctx.rig.reframeReveal(frame);
+              };
+              refit(true);
               if (!lookHintShown) {
                 lookHintShown = true;
                 card.showHint();
@@ -229,6 +245,12 @@ export function createRevealSystem(): GameSystem {
         }
         if (!queue.active) return;
         if (queue.current) {
+          if (
+            !returning &&
+            ((ctx.canvas.clientWidth || window.innerWidth) !== frameWidth ||
+              (ctx.canvas.clientHeight || window.innerHeight) !== frameHeight)
+          )
+            refit?.();
           if (!f.blocked) {
             elapsed += f.dt;
             gestures?.tick(f.dt);
@@ -253,6 +275,7 @@ export function createRevealSystem(): GameSystem {
           if (returning && !ctx.rig.revealReturning) {
             const poi = queue.current;
             queue.current = null;
+            refit = null;
             gestures?.reset();
             card.hide();
             if (readMore) ctx.journal.open(entryIdForPoi(poi, ctx.discovery.entries));

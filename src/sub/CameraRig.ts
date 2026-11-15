@@ -169,6 +169,27 @@ export class CameraRig {
     };
   }
 
+  /** Refit the current shot after resize without restarting its sweep or player orbit. */
+  reframeReveal(
+    frame: Pick<RevealShot, 'screen' | 'distance' | 'minDistance' | 'maxDistance'>,
+  ): void {
+    const shot = this.revealShot;
+    if (!shot || shot.returning) return;
+    const ratio = frame.distance / shot.distance;
+    shot.screen = frame.screen;
+    shot.distance = frame.distance;
+    shot.minDistance = frame.minDistance;
+    shot.maxDistance = frame.maxDistance;
+    if (shot.user) {
+      shot.user.distance = clamp(shot.user.distance * ratio, frame.minDistance, frame.maxDistance);
+      shot.user.goalDistance = clamp(
+        shot.user.goalDistance * ratio,
+        frame.minDistance,
+        frame.maxDistance,
+      );
+    }
+  }
+
   endReveal(): void {
     const shot = this.revealShot;
     if (!shot) return;

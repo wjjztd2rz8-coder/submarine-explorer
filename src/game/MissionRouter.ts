@@ -395,7 +395,7 @@ export class MissionRouter {
       ? Promise.all([this.opts.discovery.ready, this.opts.startReady])
       : this.opts.discovery.ready;
     void ready.then(() => {
-      if (this.disposed) return;
+      if (this.disposed || this.mission.state !== 'briefing') return;
       this.opts.applyStart?.(choice ?? this.opts.defaultStartPosition ?? 'near-site');
       this.briefing?.hide();
       this.showPanel();
