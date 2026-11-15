@@ -191,6 +191,14 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   8/8 in 124 s; units 4,937 after S39's three count updates. In flight: S40 first-time
   player review (Sonnet) on this build. Next: owner's second test of the live build
   (laptop hitching at Low/Medium, scan targeting, reveal drag); act on S40.
+- **12:50 Sunday. PUSHED `60c2eecd`:** S40 Sonnet first-time review acted on: S41 debrief
+  "Did you know?" from the site's own landmark facts + 14 px CTA gap; S42 touch contact
+  markers ("?" only, no overlaps, clear of controls, objective 1.4x); S43 four reveals
+  reframed (Blue Hole stalactites good; Monterey canyon axis still weak, no art). Gate21:
+  13 keyboard + 6 touch on the debrief, units 4,944 pass. Orchestrator looked at Titanic
+  390x664 start (clean) and debrief (on-topic fact; finds grid shows 2 uncaptioned
+  thumbnails, rest hidden): S44 (Codex) on that. S40's other items not taken: "Also in
+  range · N to switch" stays (owner asked for switching); front page empty space.
 - **Lesson:** look at one capture before merging any layout change. S30's report and
   measurements were clean while its portrait screenshot showed tiles stacked on top of
   each other; it had measured horizontal clipping only.
