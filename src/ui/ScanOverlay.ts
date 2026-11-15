@@ -17,6 +17,7 @@ import type { GuidanceMessage } from '../game/Guidance.js';
 import type { ScanView } from '../game/Scanner.js';
 import { hudRegions } from './hudRegions.js';
 import { GuidanceSlot } from './GuidanceSlot.js';
+import { touchControlRects } from './TouchControlRects.js';
 import { reticleClearOfControls } from './ScanReticleLayout.js';
 
 export interface ScreenPoint {
@@ -331,16 +332,7 @@ export class ScanOverlay {
   }
 
   private updateReticle(view: ScanView, screen: ScreenPoint | null): void {
-    const controls =
-      screen && isTouch()
-        ? Array.from(
-            document.querySelectorAll<HTMLElement>(
-              '.tc-stick, .tc-slider, .tc-buttons, .tc-btn-pause',
-            ),
-          )
-            .filter((el) => el.checkVisibility())
-            .map((el) => el.getBoundingClientRect())
-        : [];
+    const controls = screen && isTouch() ? touchControlRects() : [];
     if (
       screen &&
       view.nearestId !== null &&
@@ -350,7 +342,7 @@ export class ScanOverlay {
       this.reticle.hidden = false;
       this.reticle.style.transform = `translate(${screen.x.toFixed(1)}px, ${screen.y.toFixed(1)}px)`;
       this.reticle.classList.toggle('is-locked', view.phase === 'scanning');
-      this.reticle.classList.toggle('is-ready', view.promptId !== null);
+      this.reticle.classList.toggle('is-ready', view.candidateId !== null);
       this.reticle.classList.toggle('is-scanned', view.nearestScanned);
     } else {
       this.reticle.hidden = true;
