@@ -4,12 +4,25 @@
 // Env: LABEL=name for the output file prefix.
 import { spawnSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
-const [OUT = '.cache/s34/ft', SITE = 'titanic', MAX = '120', THROTTLE = '4', URL = 'http://127.0.0.1:4971/'] =
-  process.argv.slice(2);
+const [
+  OUT = '.cache/s34/ft',
+  SITE = 'titanic',
+  MAX = '120',
+  THROTTLE = '4',
+  URL = 'http://127.0.0.1:4971/',
+] = process.argv.slice(2);
 mkdirSync(OUT, { recursive: true });
 const r = spawnSync(
   process.execPath,
-  ['tools/playtest/tour.mjs', OUT, SITE, MAX, '1280', '720', URL],
+  [
+    'tools/playtest/tour.mjs',
+    OUT,
+    SITE,
+    MAX,
+    process.env.FT_W ?? '1280',
+    process.env.FT_H ?? '720',
+    URL,
+  ],
   {
     stdio: 'inherit',
     env: {

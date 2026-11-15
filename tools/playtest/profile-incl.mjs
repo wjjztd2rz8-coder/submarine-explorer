@@ -6,7 +6,8 @@ const profile = JSON.parse(readFileSync(pf, 'utf8'));
 const nodes = new Map(profile.nodes.map((n) => [n.id, n]));
 const parent = new Map();
 for (const n of profile.nodes) for (const c of n.children ?? []) parent.set(c, n.id);
-const nm = (n) => `${n.callFrame.functionName || '(anon)'} ${n.callFrame.url.split('/').pop()}:${n.callFrame.lineNumber + 1}`;
+const nm = (n) =>
+  `${n.callFrame.functionName || '(anon)'} ${n.callFrame.url.split('/').pop()}:${n.callFrame.lineNumber + 1}`;
 const incl = new Map();
 const callers = new Map();
 let total = 0;
@@ -23,12 +24,16 @@ for (let i = 0; i < profile.samples.length; i++) {
       incl.set(k, (incl.get(k) ?? 0) + dt);
       seen.add(k);
     }
-    if (callersOf && nodes.get(id).callFrame.functionName === callersOf && !callers.has(i)) callers.set(i, [dt, nm(nodes.get(parent.get(id)) ?? nodes.get(id))]);
+    if (callersOf && nodes.get(id).callFrame.functionName === callersOf && !callers.has(i))
+      callers.set(i, [dt, nm(nodes.get(parent.get(id)) ?? nodes.get(id))]);
     id = parent.get(id);
   }
 }
 console.log('busy ms', total.toFixed(0));
-for (const [k, v] of [...incl].sort((a, b) => b[1] - a[1]).slice(0, 400)) console.log(`${v.toFixed(0).padStart(6)} ms ${((100 * v) / total).toFixed(1).padStart(5)}%  ${k}`);
+for (const [k, v] of [...incl].sort((a, b) => b[1] - a[1]).slice(0, 400))
+  console.log(
+    `${v.toFixed(0).padStart(6)} ms ${((100 * v) / total).toFixed(1).padStart(5)}%  ${k}`,
+  );
 if (callersOf) {
   const c = new Map();
   for (const [dt, who] of callers.values()) c.set(who, (c.get(who) ?? 0) + dt);

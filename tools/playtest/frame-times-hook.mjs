@@ -23,15 +23,24 @@ const INIT = () => {
           const sp = w.__game?.sub?.velocity?.length?.() ?? 0;
           if (c) (T.cam ??= []).push([t0, c.x, c.y, c.z, sp]);
         } catch {}
-        if (performance.memory && T.frames.length % 5 === 0) (T.heap ??= []).push([t0, performance.memory.usedJSHeapSize]);
+        if (performance.memory && T.frames.length % 5 === 0)
+          (T.heap ??= []).push([t0, performance.memory.usedJSHeapSize]);
         const g = w.__game;
         try {
           if (g?.scene) {
             let lights = 0;
-            g.scene.traverseVisible((o) => { if (o.isLight) (lights++, (T.ln = (T.ln ?? []).concat([o.name || o.type]))); });
-            const names = (T.ln ?? []).join(","); T.ln = [];
-            const key = names + ` fog=${!!g.scene.fog} lights=${lights} env=${!!g.scene.environment} bg=${!!g.scene.background}`;
-            if (key !== T.sceneKey) { T.sceneKey = key; mark('SCENE ' + key); }
+            g.scene.traverseVisible((o) => {
+              if (o.isLight) (lights++, (T.ln = (T.ln ?? []).concat([o.name || o.type])));
+            });
+            const names = (T.ln ?? []).join(',');
+            T.ln = [];
+            const key =
+              names +
+              ` fog=${!!g.scene.fog} lights=${lights} env=${!!g.scene.environment} bg=${!!g.scene.background}`;
+            if (key !== T.sceneKey) {
+              T.sceneKey = key;
+              mark('SCENE ' + key);
+            }
           }
         } catch {}
         try {
@@ -65,7 +74,17 @@ const INIT = () => {
   wrap(HTMLCanvasElement.prototype, 'toDataURL', 'toDataURL');
   wrap(HTMLCanvasElement.prototype, 'toBlob', 'toBlob');
   wrap(WebGL2RenderingContext.prototype, 'readPixels', 'readPixels');
-  for (const k of ['linkProgram', 'getProgramParameter', 'getProgramInfoLog', 'texImage2D', 'texSubImage2D', 'texImage3D', 'bufferData', 'generateMipmap', 'compressedTexImage2D'])
+  for (const k of [
+    'linkProgram',
+    'getProgramParameter',
+    'getProgramInfoLog',
+    'texImage2D',
+    'texSubImage2D',
+    'texImage3D',
+    'bufferData',
+    'generateMipmap',
+    'compressedTexImage2D',
+  ])
     wrap(WebGL2RenderingContext.prototype, k, k);
   // Count programs linked (first draw of a new material variant): every one is a stall.
   {
@@ -136,7 +155,11 @@ export default async ({ page, site }) => {
     await cdp.send('Profiler.start');
     if (process.env.FT_HEAP) {
       await cdp.send('HeapProfiler.enable');
-      await cdp.send('HeapProfiler.startSampling', { samplingInterval: 4096, includeObjectsCollectedByMajorGC: true, includeObjectsCollectedByMinorGC: true });
+      await cdp.send('HeapProfiler.startSampling', {
+        samplingInterval: 4096,
+        includeObjectsCollectedByMajorGC: true,
+        includeObjectsCollectedByMinorGC: true,
+      });
     }
     const now = await page.evaluate(() => performance.now());
     startProfile.at = now;
@@ -148,7 +171,8 @@ export default async ({ page, site }) => {
     });
   };
   page.on('console', (m) => {
-    if (!started && /\[main\] ready/.test(m.text())) setTimeout(() => startProfile().catch(() => {}), 6500);
+    if (!started && /\[main\] ready/.test(m.text()))
+      setTimeout(() => startProfile().catch(() => {}), 6500);
   });
   return {
     async finish() {
@@ -165,7 +189,10 @@ export default async ({ page, site }) => {
         walk(hp.head);
         const tot = [...by.values()].reduce((a, b) => a + b, 0);
         console.log(`allocation samples (total ${(tot / 1e6).toFixed(0)} MB):`);
-        for (const [k, v] of [...by].sort((a, b) => b[1] - a[1]).slice(0, 22)) console.log(`  ${(v / 1e6).toFixed(1).padStart(6)} MB ${((100 * v) / tot).toFixed(1).padStart(5)}% ${k}`);
+        for (const [k, v] of [...by].sort((a, b) => b[1] - a[1]).slice(0, 22))
+          console.log(
+            `  ${(v / 1e6).toFixed(1).padStart(6)} MB ${((100 * v) / tot).toFixed(1).padStart(5)}% ${k}`,
+          );
       }
       const ft = await page.evaluate(() => window.__ft);
       const uptime = await page.evaluate(() => performance.now());
@@ -191,7 +218,9 @@ function report(profile, ft, site, label, out) {
     `gap ms    p50=${pct(gaps, 50).toFixed(1)} p95=${pct(gaps, 95).toFixed(1)} p99=${pct(gaps, 99).toFixed(1)}`,
   );
   const mult = frames.filter((f) => f.script > Math.max(3 * med, 20)).length;
-  console.log(`frames script>50ms: ${spikes.length}; >max(3x median,20ms): ${mult}; longtasks: ${ft.long.length}`);
+  console.log(
+    `frames script>50ms: ${spikes.length}; >max(3x median,20ms): ${mult}; longtasks: ${ft.long.length}`,
+  );
   // Map profile time (µs, monotonic) to page performance.now via start offset.
   const nodes = new Map(profile.nodes.map((n) => [n.id, n]));
   const self = new Map();
@@ -223,39 +252,77 @@ function report(profile, ft, site, label, out) {
     [...m]
       .sort((a, b) => b[1] - a[1])
       .slice(0, n)
-      .map(([k, v]) => `  ${v.toFixed(0).padStart(6)} ms ${((100 * v) / tot).toFixed(1).padStart(5)}%  ${k}`)
+      .map(
+        ([k, v]) =>
+          `  ${v.toFixed(0).padStart(6)} ms ${((100 * v) / tot).toFixed(1).padStart(5)}%  ${k}`,
+      )
       .join('\n');
   console.log(`top self time (total ${all.toFixed(0)} ms):\n${top(self, all)}`);
-  console.log(`top self time in spike frames (total ${spikeAll.toFixed(0)} ms):\n${top(inSpike, spikeAll || 1)}`);
+  console.log(
+    `top self time in spike frames (total ${spikeAll.toFixed(0)} ms):\n${top(inSpike, spikeAll || 1)}`,
+  );
   if (ft.heap?.length) {
-    let alloc = 0, drops = 0, dropBytes = 0;
+    let alloc = 0,
+      drops = 0,
+      dropBytes = 0;
     for (let i = 1; i < ft.heap.length; i++) {
       const d = ft.heap[i][1] - ft.heap[i - 1][1];
-      if (d > 0) alloc += d; else if (d < -1e6) { drops++; dropBytes -= d; }
+      if (d > 0) alloc += d;
+      else if (d < -1e6) {
+        drops++;
+        dropBytes -= d;
+      }
     }
     const secs = (ft.heap.at(-1)[0] - ft.heap[0][0]) / 1000;
-    console.log(`heap: growth+ ${(alloc / 1e6 / secs).toFixed(1)} MB/s, GC drops >1MB: ${drops} (${(drops / secs).toFixed(2)}/s, avg ${(dropBytes / 1e6 / Math.max(1, drops)).toFixed(1)} MB), end ${(ft.heap.at(-1)[1] / 1e6).toFixed(0)} MB`);
+    console.log(
+      `heap: growth+ ${(alloc / 1e6 / secs).toFixed(1)} MB/s, GC drops >1MB: ${drops} (${(drops / secs).toFixed(2)}/s, avg ${(dropBytes / 1e6 / Math.max(1, drops)).toFixed(1)} MB), end ${(ft.heap.at(-1)[1] / 1e6).toFixed(0)} MB`,
+    );
   }
   if (ft.cam?.length > 50) {
     // Judder: frame-to-frame camera travel while cruising, relative to the steady-state travel.
     const steps = [];
     for (let i = 1; i < ft.cam.length; i++) {
-      const a = ft.cam[i - 1], b = ft.cam[i];
-      if (b[4] > 4 && b[0] - a[0] < 40) steps.push(Math.hypot(b[1] - a[1], b[2] - a[2], b[3] - a[3]) / ((b[0] - a[0]) / 16.667));
+      const a = ft.cam[i - 1],
+        b = ft.cam[i];
+      if (b[4] > 4 && b[0] - a[0] < 40)
+        steps.push(Math.hypot(b[1] - a[1], b[2] - a[2], b[3] - a[3]) / ((b[0] - a[0]) / 16.667));
     }
     const m = pct(steps, 50);
     const dev = steps.map((x) => Math.abs(x - m) / (m || 1));
-    console.log(`camera travel per 16.7ms while cruising: n=${steps.length} median=${m.toFixed(3)} m; relative deviation p50=${pct(dev, 50).toFixed(3)} p95=${pct(dev, 95).toFixed(3)} p99=${pct(dev, 99).toFixed(3)}; zero-travel frames ${steps.filter((x) => x < 0.01 * m).length}`);
+    console.log(
+      `camera travel per 16.7ms while cruising: n=${steps.length} median=${m.toFixed(3)} m; relative deviation p50=${pct(dev, 50).toFixed(3)} p95=${pct(dev, 95).toFixed(3)} p99=${pct(dev, 99).toFixed(3)}; zero-travel frames ${steps.filter((x) => x < 0.01 * m).length}`,
+    );
   }
   console.log('worst frames:');
   for (const f of [...frames].sort((a, b) => b.script - a.script).slice(0, 8)) {
-    const near = ft.events.filter((e) => e.t >= f.t - 700 && e.t <= f.t + f.script + 200).map((e) => `${e.name}${e.dur ? '=' + e.dur.toFixed(0) : ''}@${(e.t - f.t).toFixed(0)}`);
-    console.log(`  t=${(f.t - ft.profileStart).toFixed(0)}ms script=${f.script.toFixed(0)} gap=${f.gap.toFixed(0)} ${near.join(' ')}`);
+    const near = ft.events
+      .filter((e) => e.t >= f.t - 700 && e.t <= f.t + f.script + 200)
+      .map((e) => `${e.name}${e.dur ? '=' + e.dur.toFixed(0) : ''}@${(e.t - f.t).toFixed(0)}`);
+    console.log(
+      `  t=${(f.t - ft.profileStart).toFixed(0)}ms script=${f.script.toFixed(0)} gap=${f.gap.toFixed(0)} ${near.join(' ')}`,
+    );
   }
-  const progs = ft.events.filter((e) => e.name === 'PROGRAM').map((e) => ((e.t - ft.profileStart) / 1000).toFixed(0) + 's ' + e.shader);
+  const progs = ft.events
+    .filter((e) => e.name === 'PROGRAM')
+    .map((e) => ((e.t - ft.profileStart) / 1000).toFixed(0) + 's ' + e.shader);
   console.log(`programs linked during profile: ${progs.length} \n  ${progs.join('\n  ')}`);
   const sums = {};
-  for (const e of ft.events) if (e.dur) (sums[e.name] ??= { n: 0, ms: 0, max: 0 }), (sums[e.name].n++, (sums[e.name].ms += e.dur), (sums[e.name].max = Math.max(sums[e.name].max, e.dur)));
+  for (const e of ft.events)
+    if (e.dur)
+      ((sums[e.name] ??= { n: 0, ms: 0, max: 0 }),
+        (sums[e.name].n++,
+        (sums[e.name].ms += e.dur),
+        (sums[e.name].max = Math.max(sums[e.name].max, e.dur))));
   console.log('GL/canvas calls >2ms:', JSON.stringify(sums));
-  console.log('events:', ft.events.filter((e) => !e.dur || e.dur > 5).slice(0, 40).map((e) => `${e.name}${e.dur ? '=' + e.dur.toFixed(0) + 'ms' : ''}@${((e.t - ft.profileStart) / 1000).toFixed(0)}s`).join(' '));
+  console.log(
+    'events:',
+    ft.events
+      .filter((e) => !e.dur || e.dur > 5)
+      .slice(0, 40)
+      .map(
+        (e) =>
+          `${e.name}${e.dur ? '=' + e.dur.toFixed(0) + 'ms' : ''}@${((e.t - ft.profileStart) / 1000).toFixed(0)}s`,
+      )
+      .join(' '),
+  );
 }

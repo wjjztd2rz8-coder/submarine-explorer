@@ -19,10 +19,17 @@ const browser = await chromium.launch({
     '--disable-vulkan-surface',
   ],
 });
-const page = await (await browser.newContext({ viewport: { width: +W, height: +H }, deviceScaleFactor: +(process.env.TOUR_DSF ?? 1) })).newPage();
+const page = await (
+  await browser.newContext({
+    viewport: { width: +W, height: +H },
+    deviceScaleFactor: +(process.env.TOUR_DSF ?? 1),
+  })
+).newPage();
 // TOUR_HOOK=<module>: default export async ({ page, browser, site }) => ({ finish }) for profiling.
 const hook = process.env.TOUR_HOOK
-  ? await (await import(new URL(process.env.TOUR_HOOK, `file://${process.cwd()}/`).href)).default({
+  ? await (
+      await import(new URL(process.env.TOUR_HOOK, `file://${process.cwd()}/`).href)
+    ).default({
       page,
       browser,
       site: tag,

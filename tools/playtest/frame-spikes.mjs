@@ -16,7 +16,10 @@ for (let i = 0; i < profile.samples.length; i++) {
   t += profile.timeDeltas[i];
   times.push(t / 1000 - off);
 }
-const worst = ft.frames.filter((f) => f.gap < 1000 && f.script >= +MIN).sort((a, b) => b.script - a.script).slice(0, +N);
+const worst = ft.frames
+  .filter((f) => f.gap < 1000 && f.script >= +MIN)
+  .sort((a, b) => b.script - a.script)
+  .slice(0, +N);
 for (const f of worst) {
   const self = new Map();
   const incl = new Map();
@@ -36,7 +39,16 @@ for (const f of worst) {
       id = parent.get(id);
     }
   }
-  const top = (m, n) => [...m].sort((a, b) => b[1] - a[1]).slice(0, n).map(([k, v]) => `${v.toFixed(0)}ms ${k}`).join('\n      ');
-  const near = ft.events.filter((e) => e.t >= f.t - 700 && e.t <= f.t + f.script + 200).map((e) => `${e.name}@${(e.t - f.t).toFixed(0)}`);
-  console.log(`\n# frame t=${((f.t - ft.profileStart) / 1000).toFixed(1)}s script=${f.script.toFixed(0)}ms ${near.join(' ')}\n  incl:\n      ${top(incl, 14)}\n  self:\n      ${top(self, 6)}`);
+  const top = (m, n) =>
+    [...m]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, n)
+      .map(([k, v]) => `${v.toFixed(0)}ms ${k}`)
+      .join('\n      ');
+  const near = ft.events
+    .filter((e) => e.t >= f.t - 700 && e.t <= f.t + f.script + 200)
+    .map((e) => `${e.name}@${(e.t - f.t).toFixed(0)}`);
+  console.log(
+    `\n# frame t=${((f.t - ft.profileStart) / 1000).toFixed(1)}s script=${f.script.toFixed(0)}ms ${near.join(' ')}\n  incl:\n      ${top(incl, 14)}\n  self:\n      ${top(self, 6)}`,
+  );
 }
