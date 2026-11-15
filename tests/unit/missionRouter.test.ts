@@ -625,6 +625,11 @@ describe('MissionRouter completion timing', () => {
     },
   );
 
+  it('uses a one-line Finish dive label in the HUD bar', () => {
+    expect(router.finishButton.className).toBe('hud-finish');
+    expect(router.finishButton.textContent).toBe('Finish dive');
+  });
+
   it('keeps Finish dive on screen once the primaries are done, and it opens the debrief', () => {
     const finish = router.finishButton as unknown as Element;
     advance(router, 1);
