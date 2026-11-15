@@ -189,11 +189,15 @@ while (el() < +MAX) {
     debriefAt = debriefAt ?? done;
     break;
   }
-  if (!noFinish && s.primariesComplete && s.completionBanner) {
-    const surfaceNow = page.getByRole('button', { name: /Surface and debrief/ });
-    if (await surfaceNow.count()) {
-      await releaseAll();
-      await surfaceNow.first().click({ force: true });
+  if (s.completionBanner) {
+    await releaseAll();
+    anchorPos = null;
+    anchorT = el();
+    const label = noFinish ? 'Keep exploring' : 'Surface and debrief';
+    const bannerBtn = page.getByRole('button', { name: new RegExp(`^${label}$`) });
+    if (await bannerBtn.count()) {
+      console.log(`[${el().toFixed(0)}s] BANNER ${label}`);
+      await bannerBtn.first().click({ force: true });
       await page.waitForTimeout(400);
       continue;
     }
@@ -236,7 +240,13 @@ while (el() < +MAX) {
 
   const now = el();
   const st = steer(s);
-  if (!(st.scanningText || st.holdScan) && s.px !== null && s.pz !== null) {
+  if (
+    !s.completionBanner &&
+    !s.reveal &&
+    !(st.scanningText || st.holdScan) &&
+    s.px !== null &&
+    s.pz !== null
+  ) {
     if (anchorPos === null) {
       anchorPos = { x: s.px, z: s.pz };
       anchorT = now;
