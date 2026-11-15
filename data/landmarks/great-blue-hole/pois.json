@@ -46,8 +46,7 @@
         "distance_m": 44,
         "elevation_deg": 6,
         "azimuth_deg": 82,
-        "sweep_deg": 14,
-        "target_offset": [-190, 38.5, 110]
+        "sweep_deg": 14
       }
     },
     {
@@ -96,8 +95,7 @@
         "distance_m": 54,
         "elevation_deg": 5,
         "azimuth_deg": 218,
-        "sweep_deg": 14,
-        "target_offset": [-4298, 110.5, 61.5]
+        "sweep_deg": 14
       }
     },
     {
@@ -119,8 +117,7 @@
         "distance_m": 58,
         "elevation_deg": 6,
         "azimuth_deg": 72,
-        "sweep_deg": 14,
-        "target_offset": [6264, 127, -33]
+        "sweep_deg": 14
       }
     }
   ]

@@ -24,8 +24,7 @@
         "distance_m": 140,
         "elevation_deg": 12,
         "azimuth_deg": 168,
-        "sweep_deg": 12,
-        "target_offset": [-17369, -708, 1625]
+        "sweep_deg": 12
       }
     },
     {
@@ -50,8 +49,7 @@
         "distance_m": 135,
         "elevation_deg": 11,
         "azimuth_deg": 356,
-        "sweep_deg": 12,
-        "target_offset": [-14461, -478, 1277]
+        "sweep_deg": 12
       }
     },
     {
@@ -76,8 +74,7 @@
         "distance_m": 118,
         "elevation_deg": 9,
         "azimuth_deg": 332,
-        "sweep_deg": 12,
-        "target_offset": [110, 96, -240]
+        "sweep_deg": 12
       }
     },
     {
@@ -102,8 +99,7 @@
         "distance_m": 230,
         "elevation_deg": 35,
         "azimuth_deg": 158,
-        "sweep_deg": 12,
-        "target_offset": [-20, 60, -340]
+        "sweep_deg": 12
       }
     },
     {
