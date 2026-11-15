@@ -146,13 +146,13 @@ it('renders wildlife as a text tile and a framed landmark as a photo card', () =
     const panel = (debrief.root as unknown as Element).children[0];
     expect(panel.children[0].children[1].textContent).toBe('You found 2 of 2');
     const tiles = panel.children.find((e) => e.className === 'debrief-finds')!.children;
-    expect(tiles[0].className).toContain('debrief-find-text');
-    expect(tiles[0].children.map((e) => e.textContent)).toEqual(['White sea anemone', 'Wildlife']);
-    expect(tiles[0].children.some((e) => e.className === 'debrief-thumb')).toBe(false);
-    expect(tiles[1].children[0].className).toBe('debrief-thumb');
-    expect((tiles[1].children[0] as unknown as HTMLImageElement).src).toBe(
+    expect(tiles[0].children[0].className).toBe('debrief-thumb');
+    expect((tiles[0].children[0] as unknown as HTMLImageElement).src).toBe(
       'data:image/jpeg;base64,YQ==',
     );
+    expect(tiles[1].className).toContain('debrief-find-text');
+    expect(tiles[1].children.map((e) => e.textContent)).toEqual(['White sea anemone', 'Wildlife']);
+    expect(tiles[1].children.some((e) => e.className === 'debrief-thumb')).toBe(false);
   } finally {
     debrief.dispose();
   }

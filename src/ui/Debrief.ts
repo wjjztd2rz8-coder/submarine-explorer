@@ -73,7 +73,13 @@ export function debriefModel(
             : undefined,
     };
   });
-  const scanned = new Set(finds.map((d) => d.poiId));
+  const tileRank = (kind: (typeof finds)[number]['kind']) =>
+    kind === 'Landmark' ? 0 : kind === 'Wildlife' ? 1 : 2;
+  const orderedFinds = finds
+    .map((find, index) => ({ find, index }))
+    .sort((a, b) => tileRank(a.find.kind) - tileRank(b.find.kind) || a.index - b.index)
+    .map(({ find }) => find);
+  const scanned = new Set(orderedFinds.map((d) => d.poiId));
   const attachedToScan = (entry: NonNullable<typeof site>['entries'][number]) =>
     entry.poiIds.some((id) => scanned.has(id)) ||
     (entry.kind === 'life' && scanned.has(`life:${entry.id}`));
@@ -93,7 +99,7 @@ export function debriefModel(
   const counts = stats.finds ?? (site && store ? siteFinds(site, store) : null);
   return {
     title: counts ? `You found ${counts.found} of ${counts.total}` : 'Dive ended',
-    finds,
+    finds: orderedFinds,
     fact: fact ?? null,
     progress: counts
       ? counts.found === counts.total
