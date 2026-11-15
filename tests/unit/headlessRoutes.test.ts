@@ -1,7 +1,6 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { expect, it } from 'vitest';
-import { Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
 import { defaultSettings } from '../../src/core/Save.js';
 import { EventBus } from '../../src/core/EventBus.js';
@@ -134,15 +133,16 @@ for (const site of json('data/landmarks/index.json').landmarks as string[]) {
                 : cue
                   ? Math.sign(target.position.y - sub.position.y)
                   : 0;
-            // Late players stop at a hull-sized marker standoff; a seabed marker itself
-            // cannot be occupied by a submarine. Both policies stop thrust while scanning.
+            // Late players reach the marker within 40 horizontal metres (well inside
+            // the 100–120 m scan envelope); terrain keeps the hull above seabed markers.
+            // Both policies stop thrust while scanning.
             scanStarted ||=
               view.candidateId === target.id &&
               (policy === 'plain' ||
                 Math.hypot(
                   target.position.x - sub.position.x,
                   target.position.z - sub.position.z,
-                ) <= 20);
+                ) <= 40);
             const delta = target.position.clone().sub(sub.position);
             const error = wrap(Math.atan2(delta.x, -delta.z) - sub.yaw);
             sub.setSurveyDistance(scanner.nearestUnscannedFixedDistance(sub.position));
@@ -193,8 +193,15 @@ for (const site of json('data/landmarks/index.json').landmarks as string[]) {
           expect
             .soft(completed, `${policy} ${target.id}: ${JSON.stringify(rows.at(-1))}`)
             .toBe(true);
+          expect
+            .soft(minClearance, `${policy} ${target.id}: hull stays above terrain`)
+            .toBeGreaterThanOrEqual(base.submarine.seabedClearance - 0.05);
+          expect.soft(sub.hullBreached, `${policy} ${target.id}: no emergency ascent`).toBe(false);
           if (!completed) break; // Later legs cannot be measured from an invented start.
         }
+        expect
+          .soft(scanner.view.completed, `${policy}: every routed find scanned`)
+          .toBe(mission.objectives.length);
       }
     } finally {
       mkdirSync('.cache/headless-routes', { recursive: true });

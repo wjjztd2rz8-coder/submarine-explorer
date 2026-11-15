@@ -456,7 +456,9 @@ export class Submarine {
       sinking && n.y < 0.96 && penetration < c.seabedClearance * 1.25
         ? c.collisionSpeedPenalty * 0.4
         : c.collisionSpeedPenalty;
-    this.velocity.multiplyScalar(1 - penalty);
+    // A resting/sliding contact is a constraint, not a new impact every tick.
+    // Repeated damping erased ballast acceleration on steep slopes.
+    if (closing > 1) this.velocity.multiplyScalar(1 - penalty);
     this.touchedBottom = true;
     this.impactSpeed = Math.max(this.impactSpeed, closing);
     const spike = clamp(closing / Math.max(1e-6, c.impactStressSpeed), 0, 1);
