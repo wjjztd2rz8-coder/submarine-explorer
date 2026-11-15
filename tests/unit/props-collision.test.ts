@@ -261,7 +261,7 @@ describe('Props.collide + PropContact', () => {
     expect(p.z).toBeLessThanOrEqual(z - 10 - 8 + 1e-6);
   });
 
-  it('flags head-on thrust into a prop without moving the hull along it', async () => {
+  it('slides the hull sideways along a prop it thrusts into, without lifting or speeding it', async () => {
     const props = await hullProps();
     const bus = new EventBus();
     const contact = new PropContact(props, bus, cfg, 8);
@@ -276,10 +276,13 @@ describe('Props.collide + PropContact', () => {
         return out.set(Math.sin(this.yaw), 0, -Math.cos(this.yaw));
       },
     };
+    const start = body.position.clone();
     let touched = false;
     for (let i = 0; i < 120; i++) touched = contact.resolve(body, 1 / 60, 1) || touched;
     expect(touched).toBe(true);
-    // No injected slide: the hull is only pushed out of the prop, never launched along it.
+    // Two seconds of thrust into the hull: metres of sideways progress, no climb, no added speed.
+    expect(Math.hypot(body.position.x - start.x, body.position.z - start.z)).toBeGreaterThan(2);
+    expect(Math.abs(body.position.y - start.y)).toBeLessThan(1);
     expect(body.velocity.length()).toBeLessThan(0.5);
   });
 

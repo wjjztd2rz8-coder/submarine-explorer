@@ -49,6 +49,9 @@ interface CollidingBody {
   getForward?(out?: THREE.Vector3): THREE.Vector3;
 }
 
+/** Sideways speed of the hull along a prop it is thrusting into, at full throttle. */
+const PROP_SLIDE_MPS = 5;
+
 /**
  * Applies prop collision to the submarine once per frame, after the physics
  * steps: push-out, damp the into-surface velocity, and raise `sub:collided`
@@ -58,7 +61,6 @@ export class PropContact {
   private readonly normal = new THREE.Vector3();
   private readonly forward = new THREE.Vector3();
   private readonly slide = new THREE.Vector3();
-  private readonly up = new THREE.Vector3(0, 1, 0);
   private cooldown = 0;
   /** True while touching a prop; for tests and the debug readout. */
   touching = false;
@@ -88,41 +90,35 @@ export class PropContact {
         this.cooldown = this.cfg.collisionEventCooldownS;
         this.bus.emit('sub:collided', { depth: body.position.y, speed });
       }
-      this.deflectAlongSurface(body, throttle);
+      this.deflectAlongSurface(body, throttle, dt);
     }
     this.touching = hit;
     return hit;
   }
 
   /**
-   * Classifies a contact as head-on when thrust pushes straight into a prop, so guidance can
-   * tell the player to climb. It does not move the hull: an injected slide sent the sub up the
-   * Blue Hole's wall to the surface, and the cue alone gets a player past towers and walls.
+   * When thrust pushes into a prop, nudge the hull sideways along its surface so it works its
+   * way around a tower instead of stopping dead against the push-out. The nudge is horizontal
+   * and adds no velocity: an earlier version that also pushed upward and accumulated speed
+   * launched the sub up the Blue Hole's wall to the surface. Also flags head-on contact so
+   * guidance can tell the player to climb.
    */
-  private deflectAlongSurface(body: CollidingBody, throttle: number): void {
+  private deflectAlongSurface(body: CollidingBody, throttle: number, dt: number): void {
     if (!body.getForward || throttle <= 0.05) return;
     const fwd = body.getForward(this.forward);
-    const into = fwd.dot(this.normal);
-    const horiz = Math.hypot(body.velocity.x, body.velocity.z);
-    if (into < 0.2 && horiz > 2) return;
-    this.slide.copy(fwd).addScaledVector(this.normal, -into);
-    if (this.slide.lengthSq() < 0.04) {
-      const nxz = new THREE.Vector3(this.normal.x, 0, this.normal.z);
-      if (nxz.lengthSq() > 1e-6) {
-        nxz.normalize();
-        this.slide.crossVectors(this.up, nxz);
-        if (this.slide.dot(fwd) < 0) this.slide.negate();
-      } else {
-        this.slide.set(1, 0, 0);
-      }
-      if (this.normal.y < 0.92) {
-        const lateral = this.slide.clone();
-        this.slide.set(0, 1, 0);
-        if (lateral.lengthSq() > 1e-6) this.slide.addScaledVector(lateral.normalize(), 0.35);
-      }
-      this.headOn = true;
-    } else {
-      this.headOn = into > 0.65;
+    const into = -fwd.dot(this.normal); // 1 = thrusting straight into the surface
+    this.headOn = into > 0.65;
+    if (into < 0.2) return;
+    // Horizontal tangent of the surface, on the side the nose already leans toward.
+    this.slide.copy(fwd).addScaledVector(this.normal, into);
+    this.slide.y = 0;
+    if (this.slide.lengthSq() < 0.01) {
+      this.slide.set(this.normal.z, 0, -this.normal.x);
+      if (this.slide.lengthSq() < 1e-6) return; // flat top or underside: nothing to go around
     }
+    this.slide.normalize();
+    body.position.addScaledVector(this.slide, PROP_SLIDE_MPS * throttle * into * dt);
+    this.props.collide(body.position, this.radius, this.normal);
+    this.contactNormal.copy(this.normal);
   }
 }
