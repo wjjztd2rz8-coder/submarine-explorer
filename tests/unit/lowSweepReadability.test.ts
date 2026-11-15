@@ -420,6 +420,11 @@ for (const site of atmosphereSites) {
         ].map((depth) => {
           const sample = sampleAtmosphere(water, depth);
           expect(ctx.atmosphere.update(depth, new Vector3(), 0)).toEqual(sample);
+          if (tier !== 'low' && depth <= water.causticsEndM) {
+            const caustics = ctx.atmosphere.caustics!;
+            expect(ctx.scene.getObjectByName('caustics')).toBe(caustics);
+            expect(caustics.intensity).toBe(0);
+          }
           return [
             depth,
             sample.band,
