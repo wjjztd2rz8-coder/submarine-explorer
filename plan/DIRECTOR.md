@@ -90,30 +90,28 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   Blue Hole 58, Bismarck 83, Titanic 113 s by keyboard. The rim-wall reveal still frames
   the wall and its vents (orchestrator looked at one capture). Confirm CI and deploy with
   `gh run list --branch main --limit 3`.
-- **04:25 Sunday: second first-time review (S24, Sonnet) and its fixes.** S24 reached a
-  debrief on every dive at 390x844, 844x390 and 1280x720, saw no console errors, no stall
-  over 1.5 s, and measured rotation mid-dive, mid-reveal and on the debrief as clean. Best
-  moment again Lost City's Poseidon tower. In flight from its ranked list:
-  - S26 (Codex): debrief first line "You found 4 of 6", no stars; "Bonus sonar contacts"
-    becomes "N extra things to find" / "Extra finds: 2 of 4"; "Did you know?" never
-    repeats a fact shown in the dive; wildlife finds get a text tile, not a blank photo.
-    Runs the full unit suite.
-  - S27 (Codex): cue hysteresis and a minimum hold (the card flipped Turn around / Turn
-    left / Get closer within 2 s); other unscanned contacts' tags secondary.
-  - S28 (Composer): one sentence on the front page saying what the game is; Dive sites and
-    More as an even pair; reveal card docks aside at 844x390.
-  - S29 (Sonnet): each find's fact is about that find (Blue Hole "Eastern stalactite
-    gallery" shows an expeditions fact); all 13 sites reviewed.
-  - S25 (Codex): wildlife names (Paramuricea is not bubblegum coral; an Atlantic comb
-    jelly name at Pacific sites), then every animal's name and range against sources.
-    Not acted on: Challenger Deep reveals show blurred seabed (no art); 20 to 30 s between
-    finds at Titanic; speed shown in knots.
-- **After they land:** merge, one gate (static, build, keyboard 13 with
-  `TOUR_NO_ANTISTUCK=1 TOUR_NO_FINISH=1`, touch 6 with `TOUCH_FULL=1`, units), push. The
-  playtest scripts read the objective card, the current marker and `.debrief`: S26 and S27
-  were told to keep those; if a scripted dive breaks, look there first.
-- Known and accepted: 23 reveals rated B for lack of art; dives are short for a script
-  that steers well (44 to 113 s).
+- **06:00 Sunday state.** LIVE: the second-review batch (CI green, deployed about 05:10):
+  S25 wildlife names, S26 plain debrief ("You found 6 of 6", no stars, "Extra finds",
+  fresh "Did you know?", text tiles for finds without a close-up), S27 cue hysteresis and
+  secondary contact tags, S28 front-page sentence and landscape reveal rail, S29 facts
+  matched to their cards (two of its rewrites reverted by the orchestrator: Hunga flank
+  and Hudson flank keep their livelier facts). PUSHED 06:00: `7c0f8614` with S30 + S30b,
+  the debrief finds list as a grid, landmarks with photos first; confirm CI and deploy
+  with `gh run list --branch main --limit 3`.
+- Gate on `7c0f8614`: static checks, build, unit suite 207 files / 4,880 tests pass;
+  keyboard Lost City 44 s, Blue Hole 58 s, Hunga 71 s, Titanic 115 s; touch Lost City
+  46 s (844x390), Blue Hole 66 s (390x844); all end on the debrief, no page errors. The
+  gate before it (13 sites by keyboard, 7 touch dives incl. Titanic from the front page
+  in portrait) was also clean.
+- **Lesson:** look at one capture before merging any layout change. S30's report and
+  measurements were clean while its portrait screenshot showed tiles stacked on top of
+  each other; it had measured horizontal clipping only.
+- **Nothing in flight. The backlog is the owner's phone test** (Sunday): act on what they
+  say. S24's items not acted on: Challenger Deep reveals show blurred seabed (no art);
+  20 to 30 s between finds at Titanic; speed shown in knots. Known and accepted: 23
+  reveals rated B for lack of art; dives are short for a script that steers well (44 to
+  115 s by keyboard). Unverified wildlife placements: a Bolinopsis comb jelly at
+  Endurance; Graneledone in Hudson's 300 to 588 m band.
 - **Wrap-up still to do (Monday buffer):** final State here; `list_scheduled_tasks` and
   delete any left; remove finished worktrees under `~/.t3/worktrees/submarine-explorer/`
   and the stale `~/subexp-wt/124-*`, `131-*` (unmerged on purpose: S2
