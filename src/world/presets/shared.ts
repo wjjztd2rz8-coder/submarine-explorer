@@ -119,6 +119,25 @@ export function makePoints(
   return points;
 }
 
+/** Both vent and seamount presets cap their authored glow count at three. */
+export const GLOW_LIGHT_POOL_SIZE = 3;
+const glowPools = new WeakMap<THREE.Scene, THREE.PointLight[]>();
+
+/** Reserve before the first render, just as Atmosphere reserves its dark caustics light. */
+export function reserveGlowLights(scene: THREE.Scene): readonly THREE.PointLight[] {
+  let pool = glowPools.get(scene);
+  if (!pool) {
+    pool = Array.from({ length: GLOW_LIGHT_POOL_SIZE }, (_, i) => {
+      const light = new THREE.PointLight(0xffffff, 0, 0, 2);
+      light.name = `presetGlow${i}`;
+      scene.add(light);
+      return light;
+    });
+    glowPools.set(scene, pool);
+  }
+  return pool;
+}
+
 /**
  * Warm "thermal glow" lights (art-direction §6: below ~200 m light comes from
  * the sub or an active vent). Decay 2 keeps them local; no bloom anywhere.
@@ -128,19 +147,22 @@ export class GlowLights {
   private readonly base: number[] = [];
 
   constructor(
-    private readonly scene: THREE.Scene,
+    scene: THREE.Scene,
     positions: readonly THREE.Vector3[],
     color: number,
     intensity: number,
     distance: number,
   ) {
-    positions.forEach((p, i) => {
-      const light = new THREE.PointLight(color, intensity, distance, 2);
+    const pool = reserveGlowLights(scene);
+    positions.slice(0, GLOW_LIGHT_POOL_SIZE).forEach((p, i) => {
+      const light = pool[i]!;
+      light.color.setHex(color);
+      light.intensity = intensity;
+      light.distance = distance;
       light.position.copy(p);
       light.name = `presetGlow${i}`;
       this.lights.push(light);
       this.base.push(intensity);
-      scene.add(light);
     });
   }
 
@@ -155,10 +177,10 @@ export class GlowLights {
 
   dispose(): void {
     for (const l of this.lights) {
-      this.scene.remove(l);
-      l.dispose();
+      l.intensity = 0;
     }
     this.lights.length = 0;
+    this.base.length = 0;
   }
 }
 

@@ -276,7 +276,7 @@ describe('vent plume variety', () => {
 function glowLights(scene: Scene): PointLight[] {
   return scene.children.filter(
     (object): object is PointLight =>
-      object instanceof PointLight && object.name.startsWith('presetGlow'),
+      object instanceof PointLight && object.name.startsWith('presetGlow') && object.intensity > 0,
   );
 }
 
@@ -414,7 +414,7 @@ describe('vent haze and glow budgets', () => {
     }
   });
 
-  it('disposes each glow once and recreates without stale lights or compounded offsets', () => {
+  it('reuses reserved glows without stale intensity or compounded offsets', () => {
     const params = Object.freeze({ glowDropM: 12, glowStandoffM: 6, glowLights: 3 });
     const { scene, preset, context } = enter(params);
     const top = context.pois[0]!.position.clone();
@@ -423,9 +423,10 @@ describe('vent haze and glow budgets', () => {
     const dispose = vi.spyOn(first, 'dispose');
     preset.exit();
     preset.exit();
-    expect(dispose).toHaveBeenCalledTimes(1);
-    expect(first.parent).toBeNull();
-    expect(scene.children).toHaveLength(0);
+    expect(dispose).not.toHaveBeenCalled();
+    expect(first.parent).toBe(scene);
+    expect(first.intensity).toBe(0);
+    expect(scene.children.filter((o) => !(o instanceof PointLight))).toHaveLength(0);
     first.position.set(100, 200, 300);
     for (const next of [
       context,
@@ -442,14 +443,14 @@ describe('vent haze and glow budgets', () => {
       expect(lights).toHaveLength(count);
       expect(preset.stats.lights).toBe(count);
       if (count) {
-        expect(lights[0]).not.toBe(first);
+        if (next.scene === scene) expect(lights[0]).toBe(first);
         expect(lights[0]!.position).toEqual(expected);
       }
       const disposals = lights.map((light) => vi.spyOn(light, 'dispose'));
       preset.exit();
-      expect(disposals.every((spy) => spy.mock.calls.length === 1)).toBe(true);
-      expect(next.scene.children).toHaveLength(0);
-      expect(scene.children).toHaveLength(0);
+      expect(disposals.every((spy) => spy.mock.calls.length === 0)).toBe(true);
+      expect(next.scene.children.filter((o) => !(o instanceof PointLight))).toHaveLength(0);
+      expect(scene.children.filter((o) => !(o instanceof PointLight))).toHaveLength(0);
       expect(preset.stats).toEqual({ draws: 0, particles: 0, lights: 0 });
     }
     expect(context.pois[0]!.position).toEqual(top);
@@ -463,7 +464,7 @@ describe('vent haze and glow budgets', () => {
       expect(scene.children.filter((object) => object instanceof Points)).toHaveLength(2);
       expect(scene.getObjectByName('ventHaze')).toBeUndefined();
       preset.exit();
-      expect(scene.children).toHaveLength(0);
+      expect(scene.children.filter((o) => !(o instanceof PointLight))).toHaveLength(0);
     }
   });
 
@@ -487,12 +488,12 @@ describe('vent haze and glow budgets', () => {
     expect(haze.geometry.getAttribute('position').count).toBe(3);
     expect(haze.material).toMatchObject({ uniforms: { uStrength: { value: 0.5 } } });
     // Flank glow: lights sit beside the stacks, below their tops, so the crust ledges catch them.
-    const lights = scene.children.filter((o) => o.name.startsWith('presetGlow'));
+    const lights = glowLights(scene);
     expect(lights.length).toBeGreaterThan(0);
     expect(lights.length).toBeLessThanOrEqual(3);
     expect(preset.stats.lights).toBe(lights.length);
     preset.exit();
-    expect(scene.children).toHaveLength(0);
+    expect(scene.children.filter((o) => !(o instanceof PointLight))).toHaveLength(0);
   });
 
   it('keeps carbonate flow free of warm haze even if explicitly enabled', () => {
@@ -656,7 +657,7 @@ describe('optional reef backdrop', () => {
               preset.exit();
               expect(disposals.every((spy) => spy.mock.calls.length === 1)).toBe(true);
               expect(objects.every((object) => object.parent === null)).toBe(true);
-              expect(scene.children).toHaveLength(0);
+              expect(scene.children.filter((o) => !(o instanceof PointLight))).toHaveLength(0);
               expect(preset.stats).toEqual({ draws: 0, particles: 0, lights: 0 });
             }
           }

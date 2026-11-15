@@ -11,6 +11,7 @@ import { EventBus } from '../core/EventBus.js';
 import { qualityPixelRatio, readDeviceCaps, resolveQuality } from '../core/Quality.js';
 import { Save } from '../core/Save.js';
 import { chooseTileId, resolveMissionRoute } from '../game/MissionRouter.js';
+import { reserveGlowLights } from '../world/presets/shared.js';
 import { TileLoader } from '../world/TileLoader.js';
 import { makeExposer, type AppState, type BootContext } from './context.js';
 import { resolveEffective } from '../game/EffectiveSettings.js';
@@ -115,6 +116,7 @@ export async function boot(): Promise<BootContext | null> {
   renderer.toneMappingExposure = 1.0;
 
   const scene = new THREE.Scene();
+  reserveGlowLights(scene);
 
   return {
     params,

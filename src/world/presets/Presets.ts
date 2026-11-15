@@ -36,7 +36,7 @@ import { DefaultPreset } from './DefaultPreset.js';
 import { capVector, currentCouplingDelta, vectorToBearing } from './maths.js';
 import { ReefPreset } from './ReefPreset.js';
 import { SeamountPreset } from './SeamountPreset.js';
-import type { ParticleLook } from './shared.js';
+import { reserveGlowLights, type ParticleLook } from './shared.js';
 import { TrenchPreset } from './TrenchPreset.js';
 import type {
   EnvPreset,
@@ -327,6 +327,7 @@ export class PresetSystem {
   private currentMode: CurrentMode;
 
   constructor(private readonly o: PresetSystemOptions) {
+    reserveGlowLights(o.scene);
     const pc = o.config.presets;
     this.currentMode = o.currentMode;
     this.visuals = o.tier !== 'low' && pc.tierParticleScale[o.tier] > 0;
