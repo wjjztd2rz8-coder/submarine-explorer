@@ -195,7 +195,7 @@ test('an animal can be scanned: banner, Journal wildlife entry, persistence', as
   // The newly scanned animal opens directly, replacing the previous site's article.
   await page.keyboard.press('j');
   await expect(page.locator('.jr-title')).toHaveText('Lobate comb jelly');
-  await expect(page.locator('.jr-latin i')).toHaveText('Bolinopsis infundibulum');
+  await expect(page.locator('.jr-latin i')).toHaveText('Bolinopsis sp.');
   await expect(page.locator('.jr-sources a').first()).toHaveAttribute('href', /^https:\/\//);
   await page.screenshot({ path: `${shots}/e2e-journal-wildlife.png` });
   const state = await page.evaluate(() => {

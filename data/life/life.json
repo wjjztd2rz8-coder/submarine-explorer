@@ -255,15 +255,15 @@
       "sourceUrl": "https://www.mbari.org/animal/deep-sea-crown-jelly/"
     },
     "comb-jelly": {
-      "text": "A lobate comb jelly. Eight rows of beating plates move it through the water and split the light into a rainbow shimmer. In the dark, many comb jellies also flash blue-green light when bumped. Northeastern Pacific Bolinopsis are B. microptera; the Atlantic B. infundibulum is a distinct species.",
+      "text": "A lobate comb jelly in the genus Bolinopsis. Eight rows of beating plates move it through the water and split light into a rainbow shimmer. Its broad feeding lobes help collect tiny plankton. Different Bolinopsis species live in tropical, temperate and polar seas; northeastern Pacific animals include B. microptera.",
       "fact": "Comb jellies move with eight rows of beating plates that split light into a rainbow shimmer.",
       "facts": {
         "Length": "Up to about 15 cm",
         "Habitat": "Open water, surface to over 1,000 m",
         "Diet": "Plankton"
       },
-      "sourceTitle": "Smithsonian Ocean — Jellyfish and Comb Jellies",
-      "sourceUrl": "https://ocean.si.edu/ocean-life/invertebrates/jellyfish-and-comb-jellies"
+      "sourceTitle": "Johnson et al. 2022 — Speciation of pelagic zooplankton: Bolinopsis species",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/36276958/"
     },
     "beebe-shrimp": {
       "text": "Rimicaris hybisae swarm the Beebe black smokers at roughly 4,960 m on the Mid-Cayman Rise. Microbes associated with their mouthparts and gill chamber contribute chemosynthetic food; their diet also includes carbon from photosynthesis. Their dorsal eye detects light without forming images and may sense faint vent light or bioluminescence.",
@@ -277,15 +277,15 @@
       "sourceUrl": "https://www.sciencedirect.com/science/article/abs/pii/S0967063715000357"
     },
     "hawaii-shrimp": {
-      "text": "A small vent shrimp described from Kamaʻehuakanaloa (formerly Lōʻihi) seamount, where it swarms around warm, mineral-rich vents near the summit.",
+      "text": "Rimicaris loihi is a small vent shrimp described from Kamaʻehuakanaloa (formerly Lōʻihi) seamount, where it gathers around warm, mineral-rich vents near the summit. It was originally described under the name Opaepele loihi.",
       "fact": "This small shrimp swarms around warm, mineral-rich vents near the summit of Kama'ehuakanaloa.",
       "facts": {
         "Length": "2 to 4 cm",
         "Depth": "Around 1,000 m",
         "Habitat": "Warm vents on a young volcano"
       },
-      "sourceTitle": "Williams & Dobbs 1995 — Opaepele loihi from Loihi hydrothermal vents",
-      "sourceUrl": "https://research.nhm.org/pdfs/12236/12236.pdf"
+      "sourceTitle": "WoRMS — Rimicaris loihi (formerly Opaepele loihi)",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?id=378101&p=taxdetails"
     },
     "hadal-amphipod": {
       "text": "A scavenging amphipod of the deepest trenches. It swarms to food that falls from above, and its digestive enzymes can break down wood and plant material that has sunk into the trench.",
@@ -384,7 +384,7 @@
       "sourceUrl": "https://ask.ifas.ufl.edu/publication/FA210"
     },
     "golden-coral": {
-      "text": "Chrysogorgia is a group of branching deep-sea corals with a metallic sheen to their central skeleton. Polyps grow along the branches and capture food from the water. Colony shapes vary among species, from fans and bottlebrushes to bushy forms.",
+      "text": "Chrysogorgia is a genus of branching deep-sea corals with a metallic sheen to their central skeleton. Different species occur in the Pacific and Atlantic, including corals growing on the Titanic. Polyps along their branches capture food from the water. Colony shapes vary among species, from fans and bottlebrushes to bushy forms.",
       "fact": "Chrysogorgia golden corals grow branches in spirals, fans or tree-like crowns, depending on the species.",
       "facts": {
         "Group": "Chrysogorgia, golden gorgonian corals",
@@ -394,14 +394,14 @@
       "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3377635/"
     },
     "deep-coral": {
-      "text": "Paramuricea corals form branching, fan-shaped colonies on hard ground in deep water. Their polyps catch food carried by currents. NOAA surveys show purple Paramuricea alongside other corals on rocky ledges in the northwest Atlantic.",
+      "text": "A deep-sea sea fan in the genus Paramuricea. These corals form branching, fan-shaped colonies on hard ground in deep water. Their polyps catch food carried by currents. NOAA surveys record Paramuricea on canyon walls and rocky outcrops in the northwest Atlantic, including the Hudson Canyon region.",
       "fact": "Paramuricea corals form branching fans on rocky seabeds, where their polyps catch food carried by the current.",
       "facts": {
         "Group": "Paramuricea, a genus of octocorals",
         "Habitat": "Hard ground and rocky ledges"
       },
-      "sourceTitle": "NOAA Fisheries — Paramuricea and bubblegum coral are distinct",
-      "sourceUrl": "https://www.fisheries.noaa.gov/science-blog/near-and-dear-setting-new-records-exploring-deepwater-communities"
+      "sourceTitle": "NOAA — Deep coral ecosystems in the northeastern United States",
+      "sourceUrl": "https://www.aoml.noaa.gov/ftp/od/library/deep%20ocean-packer.pdf"
     },
     "sea-pen": {
       "text": "A sea pen is a colony of polyps shaped like a quill pen. Its stalk is anchored in soft sediment, and the feeding polyps cluster at the top and catch plankton drifting by.",
