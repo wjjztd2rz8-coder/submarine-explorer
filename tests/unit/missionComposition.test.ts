@@ -361,7 +361,8 @@ const fixedOpeningWidthFloors: Record<string, number> = {
   bismarck: 0.6,
   endurance: 0.3,
   'great-blue-hole': 0.21,
-  'hunga-tonga-caldera': 0.33,
+  // The tuff wall was cut from 150 m to 120 m wide so the guided line to the next find clears its end (0.245 measured at 1600×900).
+  'hunga-tonga-caldera': 0.24,
   'lost-city': 0.38,
   // Centring the marker shows the ledge more end-on (0.195 measured); the 0.19 floor still stops it shrinking.
   'monterey-canyon': 0.19,
