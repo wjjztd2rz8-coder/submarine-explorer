@@ -435,7 +435,11 @@ export class MissionRouter {
     _headingDeg: number,
     hull?: MissionHullState,
   ): void {
-    if (this.opts.discovery.reveal?.active) return;
+    if (this.opts.discovery.reveal?.active) {
+      if (this.panel.bannerOpen) this.queueBanner('primary');
+      this.finishButton.hidden = true;
+      return;
+    }
     this.mission.update(dt);
     if (this.blow && hull && !hull.emergencyBlow) this.onBlowComplete();
     this.updateBanner(dt);

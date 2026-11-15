@@ -61,14 +61,14 @@ export function createRevealSystem(): GameSystem {
           if (poi) queue.enqueue(poi);
         }),
       );
-      cleanup.add(
-        ctx.bus.on('mission:restart', () => {
-          queue.reset();
-          card.hide();
-          ctx.rig.endReveal();
-          returning = false;
-        }),
-      );
+      const clearReveal = (): void => {
+        queue.reset();
+        card.hide();
+        ctx.rig.endReveal();
+        returning = false;
+      };
+      cleanup.add(ctx.bus.on('mission:restart', clearReveal));
+      cleanup.add(ctx.bus.on('mission:ended', clearReveal));
       // Capture phase prevents a dismissing key from also pausing or moving the boat.
       const dismiss = (event: Event): void => {
         if (!queue.current || event.type !== 'keydown') return;
@@ -135,18 +135,15 @@ export function createRevealSystem(): GameSystem {
                 (e) => e.id === entryIdForPoi(poi, ctx.discovery.entries),
               );
               // A mission's tally is its counted route, the same "N of N" as its debrief.
-              const counted = ctx.missionRouter?.mission.objectives
-                .filter((o) => o.resolved)
-                .map((o) => o.poiId);
-              const tally = counted
-                ? ctx.discovery.pois.filter((p) => counted.includes(p.id))
-                : ctx.discovery.pois;
+              const counts = ctx.missionRouter?.mission.counts();
+              const tally = ctx.discovery.pois;
               card.show(
                 poi.id,
                 poi.name,
                 entry?.fact ?? revealExcerpt(entry?.paragraphs.join(' ') ?? ''),
-                tally.filter((p) => ctx.discovery.store.isDiscovered(p.landmarkId, p.id)).length,
-                tally.length,
+                counts?.completed ??
+                  tally.filter((p) => ctx.discovery.store.isDiscovered(p.landmarkId, p.id)).length,
+                counts?.total ?? tally.length,
                 ctx.discovery.siteName,
               );
             }
@@ -154,7 +151,7 @@ export function createRevealSystem(): GameSystem {
         }
         if (!queue.active) return;
         if (queue.current) {
-          elapsed += f.dt;
+          if (!f.blocked) elapsed += f.dt;
           if (elapsed >= REVEAL_AUTO_DISMISS_S) finishing = true;
           if (finishing && captured && !returning) {
             ctx.rig.endReveal();
