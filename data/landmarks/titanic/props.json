@@ -81,11 +81,41 @@
       "note": "A strip of plating and frames thickest at the bow's torn end and thinning away to the south, toward the stern. This one trail also replaces the evenly scattered cluster beside the bow. Debris lies all around both sections (Wikipedia 'Wreck of the Titanic', 'Debris fields'); the strip's position and contents are an estimate, not a survey of particular objects."
     },
     {
+      "id": "debris-coal",
+      "model": "procedural:debris",
+      "wreck": "titanic-trail",
+      "lat": 41.7313,
+      "lon": -49.9464,
+      "snap_to_seabed": true,
+      "heading_deg": 215,
+      "scale": 1,
+      "dimensions_m": [60, 26, 1.5],
+      "lod_distance_m": 600,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "Representative coal-and-ceramics scatter beside the bow's south-west debris trail. The 2010 survey plotted scatters of coal and ceramics (NOAA), but this 60 m strip and its contents are an estimate, not a surveyed footprint; it sits where the route crosses the field between the sections."
+    },
+    {
+      "id": "debris-missing-piece",
+      "model": "procedural:debris",
+      "wreck": "titanic-field",
+      "lat": 41.7285,
+      "lon": -49.9473,
+      "snap_to_seabed": true,
+      "heading_deg": 190,
+      "scale": 1,
+      "dimensions_m": [90, 60, 2],
+      "lod_distance_m": 600,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "Representative scatter around the marker for the area where NOAA describes the roughly 70 ft 'missing piece' of Titanic's bottom. Its exact position is unpublished; this 90 m cluster and its contents are an estimate, placed in the debris field between the bow and stern."
+    },
+    {
       "id": "debris-stern",
       "model": "procedural:debris",
       "wreck": "titanic-stern-field",
       "lat": 41.7252,
-      "lon": -49.9497,
+      "lon": -49.949,
       "snap_to_seabed": true,
       "heading_deg": 0,
       "scale": 1,
@@ -93,7 +123,7 @@
       "lod_distance_m": 600,
       "collision": "none",
       "reconstruction": true,
-      "note": "Stern-side debris (hull plating broken from the stern, where the 'Big Piece' lay before it was raised in 1998). Radius 80 m is an estimate; position approximate, ~175 m south-west of the stern, along the stern's south-west debris trail (Wikipedia 'Wreck of the Titanic', section 'Debris fields', citing Ballard 1987, p. 207)."
+      "note": "Stern-side debris (hull plating broken from the stern, where the 'Big Piece' lay before it was raised in 1998). Radius 80 m is an estimate; position approximate, ~145 m south-west of the stern, along the stern's south-west debris trail (Wikipedia 'Wreck of the Titanic', section 'Debris fields', citing Ballard 1987, p. 207)."
     }
   ]
 }
