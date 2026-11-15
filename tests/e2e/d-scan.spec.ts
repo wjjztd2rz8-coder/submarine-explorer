@@ -249,8 +249,8 @@ for (const layout of [
           name: v.objectiveName,
           inRange: v.objectiveInRange,
           hint:
-            Math.abs(turn) >= 10
-              ? `${Math.abs(turn) > 90 ? 'Turn around' : `Turn ${turn >= 0 ? 'right' : 'left'}`} · ${v.objectiveDistance.toFixed(0)} m`
+            Math.abs(turn) > 15
+              ? `${Math.abs(turn) > 120 ? 'Turn around' : `Turn ${turn >= 0 ? 'right' : 'left'}`} · ${v.objectiveDistance.toFixed(0)} m`
               : near,
         };
       });

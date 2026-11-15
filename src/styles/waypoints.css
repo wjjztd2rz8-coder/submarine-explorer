@@ -74,3 +74,10 @@ body[data-app-state='pause'] .d-scan-waypoints {
   font-weight: 600;
   white-space: nowrap;
 }
+
+/* Keep other contacts behind the one objective the player is following. */
+.d-scan-world-marker.is-secondary {
+  opacity: 0.45;
+  font-size: clamp(10px, calc(11px * var(--ui-scale)), 14px);
+  font-weight: 400;
+}
