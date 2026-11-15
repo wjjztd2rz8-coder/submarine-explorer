@@ -168,6 +168,14 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   required. Codex 53% (resets 08:50), 61% of the week.
 - **Next:** merge S36a, re-run units, push S34 + S32. Then S36b and S33c: merge, gate
   with full plays, push.
+- **10:30 Sunday state (orchestrator now Opus 5.5 in a new thread; Fable is out until
+  Nov 19, Cursor until Nov 24).** Local `main` (not pushed) = S34 + S32 + S36b (merged by
+  the last thread at 08:31) + S36a (merged 10:25) + `tools/playtest/gate.sh` (one-command
+  gate: static, build, 13 keyboard + 6 touch dives, units; writes `SUMMARY.txt`). Gates
+  running: `.cache/sprint/gate19` (main) and `.cache/sprint/gate-s33c` (S33c branch
+  `t3/fix-scan-target-card-1` merged onto main in `~/subexp-wt/s33c-gate`, no units).
+  In flight: S37 play-loop correctness sweep (Codex GPT-6.1 Sol high; may not edit the
+  S33c files), S38 Titanic dead transit, site data only (OpenCode Big Pickle, trial).
 - **Lesson:** look at one capture before merging any layout change. S30's report and
   measurements were clean while its portrait screenshot showed tiles stacked on top of
   each other; it had measured horizontal clipping only.
