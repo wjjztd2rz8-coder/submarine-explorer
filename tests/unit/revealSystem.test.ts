@@ -14,11 +14,13 @@ vi.mock('../../src/ui/DiscoveryCard.js', () => ({
     dispose = card.dispose;
   },
 }));
-vi.mock('../../src/ui/PhotoMode.js', () => ({ canvasThumbnail: () => null }));
+const thumbnail = vi.hoisted(() => vi.fn((): string | null => null));
+vi.mock('../../src/ui/PhotoMode.js', () => ({ canvasThumbnail: thumbnail }));
 
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.clearAllMocks();
+  thumbnail.mockReturnValue(null);
 });
 
 async function setup() {
@@ -140,6 +142,28 @@ it('shows the current mission count on a replay instead of all saved primary fin
     scan('a');
     frame();
     expect(card.show).toHaveBeenCalledWith('a', 'a', '', 1, 2, 'Site');
+  } finally {
+    system.dispose!();
+  }
+});
+
+it.each([false, true])('captures only authored close-up reveals (framed=%s)', async (framed) => {
+  const { ctx, system, scan, frame } = await setup();
+  const save = vi.fn(() => ({ saved: false }));
+  Object.assign(ctx, { photos: { save }, contentLandmark: 'site', journal: { refresh: vi.fn() } });
+  if (framed) ctx.discovery.pois[0].def.reveal = { distance_m: 15 };
+  thumbnail.mockReturnValue('data:image/jpeg;base64,YQ==');
+  try {
+    scan('a');
+    frame(4);
+    if (framed) {
+      expect(save).toHaveBeenCalledWith(
+        expect.objectContaining({ poiId: 'a', framedReveal: true }),
+      );
+    } else {
+      expect(thumbnail).not.toHaveBeenCalled();
+      expect(save).not.toHaveBeenCalled();
+    }
   } finally {
     system.dispose!();
   }

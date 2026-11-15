@@ -197,7 +197,9 @@ for (const id of missionIds) {
     await banner.locator('button', { hasText: 'Surface and debrief' }).click();
     await expect(page.locator('.mission-debrief')).toBeVisible();
 
-    await expect(page.locator('.mission-debrief .debrief-title')).toHaveText('Dive complete');
+    await expect(page.locator('.mission-debrief .debrief-title')).toHaveText(
+      /You found \d+ of \d+/,
+    );
     const state = await page.evaluate(
       () => (window.__game as { mission: { state: string } }).mission.state,
     );

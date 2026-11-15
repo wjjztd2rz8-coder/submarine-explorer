@@ -177,7 +177,7 @@ test('discoveries unlock Your sub cosmetics; photo bonus and best stars survive 
   await page.locator('.pause-surface').click();
   const debrief = page.locator('.mission-debrief');
   await expect(debrief).toBeVisible();
-  await expect(debrief.locator('.debrief-stars')).toHaveAttribute('aria-label', '3 of 3 stars');
+  await expect(debrief.locator('.debrief-stars')).toHaveCount(0);
   await expect(debrief).not.toContainText('research points');
   await shot(page, 'debrief');
   const more = debrief.locator('.debrief-more-toggle');

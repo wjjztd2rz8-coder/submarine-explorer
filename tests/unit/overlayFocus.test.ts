@@ -2531,14 +2531,16 @@ describe('overlay policies across the app', () => {
           },
           finds: { found: found + mission.primaryCounts().total, total: mission.counts().total },
         }).progress;
-        const expected = contacts.length
-          ? `Bonus sonar contacts: ${found} of ${contacts.length} found`
-          : null;
+        const expected = contacts.length ? `Extra finds: ${found} of ${contacts.length}` : null;
         expect(briefing.root.querySelector('.briefing-contacts')?.textContent ?? null).toBe(
-          expected,
+          contacts.length ? (found ? expected : `${contacts.length} extra things to find`) : null,
         );
         expect(panel.root.querySelector('.obj-contacts')?.textContent ?? null).toBe(expected);
-        expect(progress).toBe(expected);
+        expect(progress).toBe(
+          found === contacts.length
+            ? 'You found everything here'
+            : `${contacts.length - found} more to find here`,
+        );
       }
       briefing.setContactProgress(0, 0);
       expect(briefing.root.querySelector('.briefing-contacts')).toBeNull();
@@ -2597,14 +2599,10 @@ describe('overlay policies across the app', () => {
       'a',
       'b',
     ]);
-    expect(root.querySelector('.obj-contacts')!.textContent).toBe(
-      'Bonus sonar contacts: 0 of 1 found',
-    );
+    expect(root.querySelector('.obj-contacts')!.textContent).toBe('Extra finds: 0 of 1');
     panel.setObjectives(objectives.map((o) => ({ ...o, complete: true })));
     expect(root.querySelectorAll('.obj-item')).toHaveLength(2);
-    expect(root.querySelector('.obj-contacts')!.textContent).toBe(
-      'Bonus sonar contacts: 1 of 1 found',
-    );
+    expect(root.querySelector('.obj-contacts')!.textContent).toBe('Extra finds: 1 of 1');
     expect(root.querySelector('.obj-optional')).toBeNull();
   });
 

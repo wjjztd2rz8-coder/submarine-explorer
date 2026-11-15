@@ -509,3 +509,13 @@ html.is-touch .hud-finish {
     animation: none;
   }
 }
+
+.debrief-find-text {
+  padding: 8px 0;
+  box-sizing: border-box;
+}
+.debrief-find-kind {
+  padding: 0 8px 6px;
+  font-size: 11px;
+  opacity: 0.7;
+}
