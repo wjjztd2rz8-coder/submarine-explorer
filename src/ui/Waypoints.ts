@@ -87,6 +87,7 @@ export class Waypoints {
   private readonly markers = new Map<string, HTMLDivElement>();
   private readonly projection = new Vector3();
   private pois: readonly PlacedPoi[] = [];
+  private readonly poisById = new Map<string, PlacedPoi>();
   private visualHints = true;
   private layoutAt = -Infinity;
   private layoutWidth = 0;
@@ -139,7 +140,9 @@ export class Waypoints {
   }
   setPois(pois: readonly PlacedPoi[]): void {
     this.pois = pois;
+    this.poisById.clear();
     for (const poi of pois) {
+      if (!this.poisById.has(poi.id)) this.poisById.set(poi.id, poi);
       this.addMarker(poi);
     }
   }
@@ -197,7 +200,7 @@ export class Waypoints {
       distance: number;
       current: boolean;
     }> = [];
-    const current = objective ? this.pois.find((p) => p.id === objective.poiId) : null;
+    const current = objective ? this.poisById.get(objective.poiId) : null;
     const targets: readonly ScanTarget[] = [
       ...this.pois,
       ...this.scanner.getSupplementalTargets(),
@@ -212,7 +215,7 @@ export class Waypoints {
     }
     for (const poi of targets) {
       this.addMarker(poi);
-      const placed = this.pois.find((p) => p.id === poi.id);
+      const placed = this.poisById.get(poi.id);
       const state = placed
         ? this.state(placed)
         : {
