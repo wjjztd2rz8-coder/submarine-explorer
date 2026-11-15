@@ -103,6 +103,12 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   46 s (844x390), Blue Hole 66 s (390x844); all end on the debrief, no page errors. The
   gate before it (13 sites by keyboard, 7 touch dives incl. Titanic from the front page
   in portrait) was also clean.
+- **06:40 Sunday.** PUSHED `d27d3d6e` with S31: a one-line hook for each of the 13 sites
+  (`SITE_HOOKS` in `src/game/Tour.ts`, built only from each site's guide) shown above the
+  debrief's "Next dive" button. Gate: static checks, build, unit suite 207 files / 4,882
+  tests; Titanic and Lost City by keyboard (114 s, 44 s) and by touch (118 s at 844x390,
+  42 s at 390x844), all on the debrief. In landscape the hook costs the finds grid about
+  25 px: the longest four-line tile name clips slightly (accepted).
 - **Lesson:** look at one capture before merging any layout change. S30's report and
   measurements were clean while its portrait screenshot showed tiles stacked on top of
   each other; it had measured horizontal clipping only.
