@@ -464,7 +464,10 @@ export class Scanner {
         candidate = null;
     }
     const beam = candidate;
-    const prompt = beam && (beam.id === v.objectiveId || beam.id === this.manualId) ? beam : null;
+    const prompt =
+      this.enabled && beam && (beam.id === v.objectiveId || beam.id === this.manualId)
+        ? beam
+        : null;
     // Hint geometry follows the beam when eligible; prompt policy remains independent.
     if (beam) {
       nearest = beam;

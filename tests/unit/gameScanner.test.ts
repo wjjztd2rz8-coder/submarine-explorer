@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus, type GameEvents } from '../../src/core/EventBus.js';
 import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { defaultSettings } from '../../src/core/Save.js';
 import { Scanner, type ScanTarget } from '../../src/game/Scanner.js';
 import { AnchoredEvents, type EventContact } from '../../src/game/Events.js';
 import { Life } from '../../src/world/life/Life.js';
@@ -1157,11 +1159,7 @@ describe('held objective range recovery', () => {
       const objective = target({ id: 'floor', radius: 120, scanSeconds: 4 });
       const { scanner } = setup([objective]);
       scanner.setConfig({
-        ...cfg,
-        radiusFloorM: 100,
-        radiusCeilM: 120,
-        levelCone: true,
-        lockConeExtraDeg: DEFAULT_CONFIG.scan.lockConeExtraDeg,
+        ...resolveEffective(defaultSettings(DEFAULT_CONFIG), 'arcade', null).scan,
       });
       scanner.setObjective(objective.id);
       if (withFish)
@@ -1199,5 +1197,9 @@ describe('held objective range recovery', () => {
     scanner.update(DT, AT, NORTH, true);
     expect(scanner.view.promptId).toBe('bow');
     expect(scanner.view.activeId).toBe('bow');
+    scanner.enabled = false;
+    scanner.update(DT, AT, NORTH, true);
+    expect(scanner.view.promptId).toBeNull();
+    expect(scanner.isScanning).toBe(false);
   });
 });

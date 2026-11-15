@@ -285,7 +285,7 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
         tick(0.5);
         expect(scanner.view.activeId).toBe(id);
         expect(scanner.view.candidateId).toBe(id);
-        expect(scanner.view.promptId).toBe(id);
+        expect(scanner.view.promptId).toBe(id === 'objective' ? id : null);
         expect(card.children[1].textContent).toBe(id);
         expect(scanner.view.progress).toBe(0.25);
         expect(overlay.slot.kind).toBe('scan');
@@ -744,6 +744,7 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     nearestDistance: 275,
     nearestTurnDeg: -108,
     candidateId: null,
+    promptId: null,
     objectiveId: 'stern',
     objectiveName: 'Stern section',
     objectiveDistance: 692,
@@ -794,6 +795,7 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     expect(hint.textContent).toBe('Hold SCAN');
     // No objective: nearest-contact guidance as before.
     view.candidateId = null;
+    view.promptId = null;
     view.objectiveId = null;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(name.textContent).toBe('Debris field');
@@ -835,6 +837,7 @@ it('the standing objective yields to its ready scan and a completion card, then 
     expect(overlay.slot.kind).toBe('scan');
     view.nearestInRange = false;
     view.candidateId = null;
+    view.promptId = null;
     overlay.update(view, keys, null, 0);
     expect(overlay.slot.kind).toBe('objective');
     overlay.showComplete('Stern section', true, keys);
