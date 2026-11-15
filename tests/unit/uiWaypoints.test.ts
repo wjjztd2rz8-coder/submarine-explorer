@@ -168,6 +168,16 @@ describe('waypoint objective state', () => {
     expect(second.classList.contains('is-secondary')).toBe(true);
   });
 
+  it('keeps a previously discovered contact visible when it is armed again this dive', () => {
+    const f = fixture();
+    f.view.setContactState(() => ({ primary: true, found: true }));
+    f.scanner.setObjective('a');
+    f.scanner.update(0, f.position, new Vector3(0, 0, -1), false);
+    f.draw();
+    expect(f.marker('a').hidden).toBe(false);
+    expect(f.marker('a').classList.contains('is-armed')).toBe(true);
+  });
+
   function fixture() {
     const pois: PlacedPoi[] = [
       { id: 'a', name: 'First contact', position: new Vector3(0, -110, -40) },

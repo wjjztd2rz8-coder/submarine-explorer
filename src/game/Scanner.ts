@@ -599,6 +599,7 @@ export class Scanner {
     if (this.isScanned(t.landmarkId, t.id)) return;
     this.scannedThisDive.add(`${t.landmarkId}/${t.id}`);
     this.savedProgress.delete(t.id);
+    v.candidateIds = v.candidateIds?.filter((id) => id !== t.id);
     if (this.manualId === t.id) this.manualId = null;
     const firstTime = this.recorder ? this.recorder.record(t.landmarkId, t.id).firstTime : true;
     v.completed = this.scannedThisDive.size;

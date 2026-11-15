@@ -150,8 +150,9 @@ export class Waypoints {
           };
       const label = placed ? contactLabel(placed, state) : poi.name;
       const scannable = this.scanner.view.candidateIds?.includes(poi.id) ?? false;
-      const scanned = state.found;
-      const unknown = !state.primary && !scanned;
+      // A Journal discovery can be scanned again on a new dive. Keep its armed marker visible.
+      const scanned = state.found && !scannable;
+      const unknown = !state.primary && !state.found;
       const distance = _position.distanceTo(poi.position);
       const nearby = distance <= CONTACT_CONFIG.worldMarkerRangeM;
       const isCurrent = poi === current && this.visualHints && !scanned;

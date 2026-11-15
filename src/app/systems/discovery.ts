@@ -71,7 +71,8 @@ export const discoverySystem: GameSystem = {
         f.sampled.toggleGuide
           ? { ...f.state, toggleGuide: true }
           : f.state;
-      ctx.discovery.overlay.setCycleKey(ctx.input.primaryKeyLabel('cycleScanTarget'));
+      if (ctx.input && ctx.discovery.overlay)
+        ctx.discovery.overlay.setCycleKey(ctx.input.primaryKeyLabel('cycleScanTarget'));
       if (
         input.cycleScanTarget &&
         !f.frozen &&
