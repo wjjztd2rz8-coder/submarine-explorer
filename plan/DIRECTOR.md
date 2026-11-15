@@ -207,6 +207,15 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   second test of the live build** (MacBook hitching at Low/Medium; phone scan targeting
   and reveal drag); act on it with the same gate (`tools/playtest/gate.sh`). Known and
   accepted: Monterey canyon-axis reveal and Titanic "missing piece" thumbnail have no art.
+- **Owner test 2 (14:00 Sunday), their words condensed:** hitching "seems fixed", still
+  some on item-heavy levels (Monterey), more optimization welcome but not overboard; the
+  side thruster on top of the hull should be at the back; some scans orbit the wrong item
+  (Hunga "?" contact over ash revealed a vent cluster by a rock wall); phone drag "feels
+  great". "Try not to add too much more to the backlog." Routing: Codex optimizes, Claude
+  (Sonnet/Opus) does visuals and reviews Codex work before merge. In flight: S45 Codex
+  optimization sweep; S46 Sonnet reveal target vs POI audit (Hunga + all sites); S47
+  Sonnet side thruster to the stern (`src/vehicles/hulls.ts`). Then: Sonnet review +
+  frame-time measurement of S45, one gate, push. That is the whole remaining backlog.
 - **Lesson:** look at one capture before merging any layout change. S30's report and
   measurements were clean while its portrait screenshot showed tiles stacked on top of
   each other; it had measured horizontal clipping only.
