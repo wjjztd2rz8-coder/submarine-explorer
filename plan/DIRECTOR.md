@@ -144,6 +144,30 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
     `Input.ts`, self-levelling in `Submarine.ts`.
     When they land: merge, apply any fixes S34 could only report, gate (static, build,
     keyboard 13, touch 6, units), look at one reveal capture at 844x390, push.
+- **08:35 Sunday state.** LIVE: `9aa0b46d` (S35 touch pitch: nose levels on release,
+  capped at 17 degrees; CI green). Local `main`, NOT pushed, holds S34 (interpolated draw
+  pose for 120 Hz, sliced sonar relief, caustics light kept at 0; tools
+  `frame-times.mjs`, `judder.mjs`) and S32 (reveal drag-to-look, pinch/wheel zoom, distance
+  fits the area the card leaves; `100dvh`). Gate on that: all 13 keyboard dives and six
+  touch dives (three at 390x664) end on the debrief; UNIT SUITE RED, 33 failures in
+  `lowSweepReadability.test.ts` (28 snapshots) and `uiSonar.test.ts` (5), both from S34.
+- **In flight, all Codex (no browser):** S36a makes those two files green (unblocks the
+  push); S36b desktop resolution per preset (low 1.0, medium 1.5, high 2; touch
+  unchanged; Retina desktop defaults to medium), small thumbnail readback, constant light
+  count, cached reticle rects; S33c scan targeting, third attempt, from WIP branch
+  `t3/fix-scan-target-card` (`a12dcc48`).
+- **Scan targeting history:** S33 (Codex, no browser) made every fish in range a
+  `SCAN TARGET` prompt that replaced the objective guidance: Titanic 113 to 176 s with 12
+  scans, Monterey and Kamaʻehuakanaloa never finished. Dropped from main before pushing.
+  S33b (Composer) died at Cursor's limit. S33c's brief spells out the card rules. It MUST
+  be played before merging: all 13 by keyboard within about 15% of live times and no more
+  scans than live (Titanic 6 or 7).
+- **Limits 08:30:** Cursor Models 0% and Other Models 0% (both reset Nov 24): no Composer,
+  no Gemini. Claude 16% of the 5-hour window (resets 09:50), 31% of the week; the owner
+  flagged Claude falling fast, so Claude delegates only where a browser or eyes are
+  required. Codex 53% (resets 08:50), 61% of the week.
+- **Next:** merge S36a, re-run units, push S34 + S32. Then S36b and S33c: merge, gate
+  with full plays, push.
 - **Lesson:** look at one capture before merging any layout change. S30's report and
   measurements were clean while its portrait screenshot showed tiles stacked on top of
   each other; it had measured horizontal clipping only.
