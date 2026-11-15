@@ -1,6 +1,7 @@
 import { contactLabel } from '../game/Contacts.js';
 /** Mission checklist, progress tally and completion choices. Target guidance lives in the guidance slot. */
 
+import { contactProgress } from './contactProgress.js';
 import { hudRegions } from './hudRegions.js';
 import { nextScanObjective, type ObjectiveStatus } from '../game/Mission.js';
 
@@ -180,14 +181,18 @@ export class ObjectivesPanel {
         );
         return row;
       }),
-      el(
-        'div',
-        'obj-contacts',
-        `Unknown contacts: ${contacts.filter((o) => o.complete).length} of ${contacts.length} found`,
-      ),
+      ...(contacts.length
+        ? [
+            el(
+              'div',
+              'obj-contacts',
+              contactProgress(contacts.filter((o) => o.complete).length, contacts.length),
+            ),
+          ]
+        : []),
     );
     if (this.banner && primaries.every((o) => o.complete)) {
-      this.bannerTitle.textContent = `${contacts.filter((o) => !o.complete).length} unknown contacts remain on sonar.`;
+      this.bannerTitle.textContent = `${contacts.filter((o) => !o.complete).length} bonus sonar contacts remain on sonar.`;
     }
   }
 

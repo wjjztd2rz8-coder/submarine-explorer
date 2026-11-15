@@ -122,8 +122,8 @@ test.describe('globe pins', () => {
         );
       });
     expect(off).toBeLessThan(1);
-    const speck = page.locator('.globe.is-embedded .globe-pin.is-catalogue').first();
-    await expect(speck).toHaveCSS('pointer-events', 'none');
+    const speck = page.locator('.globe.is-embedded .globe-pin.is-catalogue');
+    await expect(speck).toHaveCount(0);
   });
 
   test('a numbered cluster zooms in until its members separate', async ({ page }) => {
