@@ -169,7 +169,7 @@ export class Briefing {
       row = el('li', 'briefing-contacts');
       this.root.querySelector('.briefing-objectives')?.append(row);
     }
-    row.textContent = contactProgress(found, total);
+    row.textContent = found ? contactProgress(found, total) : `${total} extra things to find`;
   }
 
   show(c: BriefingContent): void {
@@ -196,7 +196,7 @@ export class Briefing {
     }
     const contacts = c.objectives.filter((o) => !o.primary);
     if (contacts.length)
-      ol.append(el('li', 'briefing-contacts', contactProgress(0, contacts.length)));
+      ol.append(el('li', 'briefing-contacts', `${contacts.length} extra things to find`));
     obj.append(ol);
     p.append(obj);
     const facts = unique(c.facts);

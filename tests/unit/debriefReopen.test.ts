@@ -61,8 +61,10 @@ it('lists this dive and keeps next destination primary when reopened', () => {
         poiId: String(i),
         name: `Target ${i}`,
       }));
-      debrief.show(stats, actions);
+      debrief.show(stats, actions, { stars: 1, best: 1, points: 0 });
       const panel = (debrief.root as unknown as Element).children[0];
+      expect(panel.children[0].children[1].className).toBe('debrief-title');
+      expect(JSON.stringify(panel.children)).not.toContain('debrief-stars');
       const finds = panel.children.find((e) => e.className === 'debrief-finds')!;
       expect(finds.children).toHaveLength(count || 1);
       const row = panel.children.find((e) => e.className === 'debrief-actions')!;
@@ -83,6 +85,74 @@ it('lists this dive and keeps next destination primary when reopened', () => {
       expect(panel.scrollTop).toBe(0);
       debrief.hide();
     }
+  } finally {
+    debrief.dispose();
+  }
+});
+
+it('renders wildlife as a text tile and a framed landmark as a photo card', () => {
+  const body = new Element();
+  vi.stubGlobal('HTMLElement', Element);
+  vi.stubGlobal('window', new EventTarget());
+  vi.stubGlobal('document', { body, activeElement: body, createElement: () => new Element() });
+  const debrief = new Debrief({
+    context: { siteId: 'site', primaryIds: [], store: { isDiscovered: () => false } },
+  });
+  Object.assign(debrief, { sites: [{ id: 'site', entries: [{ kind: 'poi', poiIds: ['bow'] }] }] });
+  vi.stubGlobal('localStorage', {
+    getItem: () =>
+      JSON.stringify({
+        version: 1,
+        photos: [
+          {
+            id: 'photo',
+            siteId: 'site',
+            siteName: 'Site',
+            poiId: 'bow',
+            poiName: 'Bow',
+            image: 'data:image/jpeg;base64,YQ==',
+            framedReveal: true,
+            at: '2026-01-01',
+            depthM: 1,
+          },
+          {
+            id: 'animal',
+            siteId: 'site',
+            siteName: 'Site',
+            poiId: 'life:anemone',
+            poiName: 'White sea anemone',
+            image: 'data:image/jpeg;base64,YQ==',
+            at: '2026-01-01',
+            depthM: 1,
+          },
+        ],
+      }),
+  });
+  try {
+    debrief.show(
+      {
+        elapsedS: 1,
+        distanceM: 0,
+        maxDepthM: 1,
+        newEntries: [],
+        discoveries: [
+          { poiId: 'life:anemone', name: 'White sea anemone' },
+          { poiId: 'bow', name: 'Bow' },
+        ],
+        finds: { found: 2, total: 2 },
+      },
+      [{ id: 'next-dive', label: 'Next dive', run() {} }],
+    );
+    const panel = (debrief.root as unknown as Element).children[0];
+    expect(panel.children[0].children[1].textContent).toBe('You found 2 of 2');
+    const tiles = panel.children.find((e) => e.className === 'debrief-finds')!.children;
+    expect(tiles[0].className).toContain('debrief-find-text');
+    expect(tiles[0].children.map((e) => e.textContent)).toEqual(['White sea anemone', 'Wildlife']);
+    expect(tiles[0].children.some((e) => e.className === 'debrief-thumb')).toBe(false);
+    expect(tiles[1].children[0].className).toBe('debrief-thumb');
+    expect((tiles[1].children[0] as unknown as HTMLImageElement).src).toBe(
+      'data:image/jpeg;base64,YQ==',
+    );
   } finally {
     debrief.dispose();
   }

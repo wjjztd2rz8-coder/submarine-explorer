@@ -489,17 +489,14 @@ freshTest.describe('mission progression and Home Journal', () => {
       const banner = page.locator('.obj-banner');
       await expect(banner).toBeVisible({ timeout: 30_000 });
       await expect(banner.locator('.obj-banner-title')).toHaveText(
-        `${secondaryCount} bonus sonar contacts remain on sonar.`,
+        `${secondaryCount} more to find here`,
       );
       await expect(banner.locator('.obj-banner-detail')).toHaveText(
-        `${primaryCount} of ${objectiveCount} objectives. ${secondaryCount} bonus sonar contacts remain on sonar.`,
+        `${secondaryCount} more to find here`,
       );
       await expect(banner.locator('button')).toHaveText(['Keep exploring', 'Surface and debrief']);
-      // The banner is the one completion presentation: it carries the stars earned so far.
-      await expect(banner.locator('.obj-banner-stars')).toHaveAttribute(
-        'aria-label',
-        /^[0-3] of 3 stars$/,
-      );
+      // Completion is presented without stars.
+      await expect(banner.locator('.obj-banner-stars')).toHaveCount(0);
       await expect(page.locator('.mission-debrief')).toHaveCount(0);
       await shot(page, 'primaries-complete-banner');
 
@@ -541,7 +538,7 @@ freshTest.describe('mission progression and Home Journal', () => {
         completed: 3,
         total: objectiveCount,
       });
-      await expect(debrief.locator('.debrief-title')).toHaveText('Primaries complete');
+      await expect(debrief.locator('.debrief-title')).toHaveText(/You found \d+ of \d+/);
       await expect(debrief.locator('.debrief-next')).toHaveText(
         'Next: Finish the optional objectives.',
       );
@@ -618,7 +615,7 @@ freshTest.describe('mission progression and Home Journal', () => {
       // Surfacing before the primaries is an honest "Dive ended".
       await surfaceFromPause(page);
       const debrief = page.locator('.mission-debrief');
-      await expect(debrief.locator('.debrief-title')).toHaveText('Dive summary');
+      await expect(debrief.locator('.debrief-title')).toHaveText(/You found \d+ of \d+/);
       await expect(debrief.locator('.debrief-highlight')).toHaveText('Scanned Bow section.');
       await expect(debrief.locator('.debrief-next')).toHaveText('Next: Scan the stern.');
       // One filled primary; at most two quiet links visible, the rest under More.
@@ -926,7 +923,7 @@ freshTest.describe('scan persistence and fixture debrief', () => {
       await loadDive(page, '/?tile=titanic&landmark=_test&debrief=1');
       const debrief = page.locator('.debrief');
       await expect(debrief).toBeVisible({ timeout: 15_000 });
-      await expect(page.locator('.debrief-title')).toHaveText('Dive debrief');
+      await expect(page.locator('.debrief-title')).toHaveText(/You found \d+ of \d+/);
       await expect(debrief.locator('[data-field="discoveries"]')).toHaveCount(0);
       await expect(debrief.locator('.debrief-highlight')).toHaveText(
         'The site is waiting for your first scan.',
@@ -1321,10 +1318,7 @@ freshTest.describe('summary, disclosures and provenance', () => {
             await expect(debrief.locator('.debrief-highlight')).toHaveCount(1);
             await expect(debrief.locator('.debrief-next')).toHaveCount(1);
             await expect(debrief.locator('.debrief-rating')).not.toContainText('research points');
-            await expect(debrief.locator('.debrief-stars')).toHaveAttribute(
-              'aria-label',
-              /[0-3] of 3 stars/,
-            );
+            await expect(debrief.locator('.debrief-stars')).toHaveCount(0);
             await expect(debrief.locator('.debrief-section.is-samples')).toHaveCount(0);
 
             await shot(`round-${round}-debrief`);
@@ -1956,7 +1950,7 @@ freshTest.describe('Home to scan and return journey', () => {
           await act(page.locator('.pause-surface'), touch);
           const debrief = page.locator('.mission-debrief');
           await expect(debrief).toBeVisible();
-          await expect(debrief.locator('.debrief-title')).toHaveText('Dive summary');
+          await expect(debrief.locator('.debrief-title')).toHaveText(/You found \d+ of \d+/);
           await expect(debrief.locator('[data-field="discoveries"]')).toHaveCount(0);
           await shot('09-debrief-unscanned');
           await act(debrief.locator('[data-action="journal"]'), touch);

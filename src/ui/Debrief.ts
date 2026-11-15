@@ -9,7 +9,7 @@ import { nextSiteAfter, siteFinds, tourJournal } from '../game/Tour.js';
 import type { DiscoveryReader, JournalSite } from '../game/JournalData.js';
 import { PhotoStore, type Photo } from '../game/PhotoStore.js';
 import { el } from './dom.js';
-import { contactProgress } from './contactProgress.js';
+import { revealExcerpt } from '../game/Reveal.js';
 
 import { Progress, type DiveRating } from '../game/Progress.js';
 import { missionUrl } from './MissionSelect.js';
@@ -45,7 +45,7 @@ export function debriefModel(
   site?: JournalSite,
   store?: DiscoveryReader,
   photos: readonly Photo[] = [],
-  primaryIds: readonly string[] = [],
+  _primaryIds: readonly string[] = [],
 ) {
   const finds = [
     ...new Map(
@@ -59,52 +59,47 @@ export function debriefModel(
         (e.kind === 'poi' || e.kind === 'life') &&
         (e.kind === 'life' ? `life:${e.id}` === d.poiId : e.poiIds.includes(d.poiId)),
     );
-    const image =
-      photos.find((p) => p.siteId === site?.id && p.poiId === d.poiId)?.image ??
-      entry?.guide?.image?.url;
+    const image = photos.find(
+      (p) => p.siteId === site?.id && p.poiId === d.poiId && p.framedReveal === true,
+    )?.image;
     return {
       ...d,
       image,
-      text:
-        entry?.guide?.fact ??
-        entry?.life?.info.fact ??
-        entry?.guide?.paragraphs[0] ??
-        entry?.life?.info.text,
-      whole: Boolean(entry?.guide?.fact ?? entry?.life?.info.fact),
+      kind:
+        entry?.kind === 'life' || d.poiId.startsWith('life:')
+          ? 'Wildlife'
+          : entry?.kind === 'poi'
+            ? 'Landmark'
+            : undefined,
     };
   });
-  const factFind = [...finds]
-    .sort((a, b) => Number(primaryIds.includes(b.poiId)) - Number(primaryIds.includes(a.poiId)))
-    .find((d) => d.text);
-  const fact = factFind?.text;
-  // Authored facts are shown whole; older paragraph text is cut to its first sentence.
-  const sentence = factFind?.whole ? fact : fact?.match(/^.*?[.!?](?=\s|$)|^.+$/s)?.[0];
+  const scanned = new Set(finds.map((d) => d.poiId));
+  const attachedToScan = (entry: NonNullable<typeof site>['entries'][number]) =>
+    entry.poiIds.some((id) => scanned.has(id)) ||
+    (entry.kind === 'life' && scanned.has(`life:${entry.id}`));
+  const entryFact = (entry: NonNullable<typeof site>['entries'][number]) =>
+    entry.guide?.fact ??
+    entry.life?.info.fact ??
+    revealExcerpt(entry.guide?.paragraphs.join(' ') ?? entry.life?.info.text ?? '');
+  const normalise = (text: string) => text.trim().replace(/\s+/g, ' ').toLowerCase();
+  const seen = new Set((site?.entries ?? []).filter(attachedToScan).map(entryFact).map(normalise));
+  const candidates = (site?.entries ?? []).filter((entry) => !attachedToScan(entry));
+  const ordered = [
+    ...candidates.filter((entry) => entry.kind === 'poi' || entry.kind === 'life'),
+    ...candidates.filter((entry) => entry.guide && entry.kind !== 'poi' && entry.kind !== 'life'),
+  ];
+  const fact = ordered.map(entryFact).find((text) => text.trim() && !seen.has(normalise(text)));
   // A mission counts its own route; a free dive counts the site's Journal finds.
   const counts = stats.finds ?? (site && store ? siteFinds(site, store) : null);
   return {
-    title:
-      stats.objectives &&
-      stats.objectives.total > 0 &&
-      stats.objectives.completed === stats.objectives.total
-        ? 'Dive complete'
-        : 'Dive ended',
+    title: counts ? `You found ${counts.found} of ${counts.total}` : 'Dive ended',
     finds,
-    fact: sentence
-      ? sentence.length > 200
-        ? sentence.slice(0, 197).trimEnd() + '…'
-        : sentence
+    fact: fact ?? null,
+    progress: counts
+      ? counts.found === counts.total
+        ? 'You found everything here'
+        : `${counts.total - counts.found} more to find here`
       : null,
-    progress:
-      stats.finds && stats.objectives
-        ? counts!.total > stats.objectives.total
-          ? contactProgress(
-              counts!.found - stats.objectives.completed,
-              counts!.total - stats.objectives.total,
-            )
-          : null
-        : counts
-          ? `Found ${counts.found} of ${counts.total} at ${stats.landmarkName ?? site?.name ?? 'this site'}`
-          : null,
   };
 }
 
@@ -197,16 +192,8 @@ export class Debrief {
     p.append(head);
 
     const score = el('div', 'debrief-rating debrief-score');
-    if (rating) {
-      const stars = el(
-        'span',
-        'debrief-stars',
-        '★'.repeat(rating.stars) + '☆'.repeat(3 - rating.stars),
-      );
-      stars.setAttribute('aria-label', `${rating.stars} of 3 stars`);
-      score.append(stars);
-    }
     if (model.progress) score.append(el('span', 'debrief-found', model.progress));
+    p.append(score);
     const finds = el('div', 'debrief-finds');
     finds.setAttribute('aria-label', 'Scanned this dive');
     for (const find of model.finds) {
@@ -218,11 +205,15 @@ export class Debrief {
         tile.append(img);
       }
       tile.append(el('span', 'debrief-find-name', find.name));
+      if (!find.image) {
+        tile.className += ' debrief-find-text';
+        if (find.kind) tile.append(el('span', 'debrief-find-kind', find.kind));
+      }
       finds.append(tile);
     }
     if (!model.finds.length)
       finds.append(el('p', 'debrief-empty', 'No scans this dive. There is more to discover.'));
-    p.append(finds, score);
+    p.append(finds);
     if (stats.subtitle) p.append(el('p', 'debrief-cause', stats.subtitle));
     if (model.fact) p.append(el('p', 'debrief-fact', `Did you know? ${model.fact}`));
 

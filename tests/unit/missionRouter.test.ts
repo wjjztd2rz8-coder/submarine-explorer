@@ -497,18 +497,16 @@ describe('MissionRouter completion timing', () => {
     expect(current()).toBe('primary');
     scan('primary');
     expect(router.mission.objectives[0].complete).toBe(true);
-    expect(control(router.panel.root, 'obj-contacts').textContent).toBe(
-      'Bonus sonar contacts: 0 of 1 found',
-    );
+    expect(control(router.panel.root, 'obj-contacts').textContent).toBe('Extra finds: 0 of 1');
     scan('optional');
     expect(control(router.panel.root, 'obj-progress').textContent).toContain('all complete');
   });
 
   it.each([
-    { optional: false, completed: false, heading: 'Dive ended' },
-    { optional: false, completed: true, heading: 'Dive complete' },
-    { optional: true, completed: false, heading: 'Dive ended' },
-    { optional: true, completed: true, heading: 'Dive complete' },
+    { optional: false, completed: false, heading: 'You found 0 of 1' },
+    { optional: false, completed: true, heading: 'You found 1 of 1' },
+    { optional: true, completed: false, heading: 'You found 0 of 2' },
+    { optional: true, completed: true, heading: 'You found 1 of 2' },
   ])(
     'debrief primary progress with optional=$optional and completed=$completed survives reopening',
     async ({ optional, completed, heading }) => {
@@ -727,7 +725,7 @@ describe('MissionRouter completion timing', () => {
         advance(router, 3);
         expect(title()).toBe('Primary objectives complete');
         expect(control(router.panel.root, 'obj-banner-detail').textContent).toBe(
-          '1 bonus sonar contact remains on sonar.',
+          '1 more to find here',
         );
         advance(router, 1);
         expect(router.panel.bannerOpen).toBe(true);

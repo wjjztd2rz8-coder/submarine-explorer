@@ -67,7 +67,6 @@ export class ObjectivesPanel {
   private readonly bannerEl: HTMLDivElement;
   private readonly bannerTitle: HTMLElement;
   private readonly bannerDetail: HTMLElement;
-  private readonly bannerStars: HTMLElement;
   private banner: CompletionBanner | null = null;
   private readonly cache = new Map<string, string>();
 
@@ -86,12 +85,11 @@ export class ObjectivesPanel {
     this.bannerEl.setAttribute('role', 'status');
     this.bannerEl.hidden = true;
     this.bannerTitle = el('strong', 'obj-banner-title');
-    this.bannerStars = el('span', 'obj-banner-stars');
     this.bannerDetail = el('span', 'obj-banner-detail');
     const text = el('div', 'obj-banner-text');
-    // Stars share the summary line so the banner does not grow taller on phones.
+    // Keep the summary compact on phones.
     const summary = el('div', 'obj-banner-summary');
-    summary.append(this.bannerStars, this.bannerDetail);
+    summary.append(this.bannerDetail);
     text.append(this.bannerTitle, summary);
     const actions = el('div', 'obj-banner-actions');
     const keep = el('button', 'obj-banner-btn is-keep', 'Keep exploring');
@@ -138,15 +136,10 @@ export class ObjectivesPanel {
     this.bannerEl.hidden = false;
   }
 
-  /** Refresh the live rating without reopening the banner or extending its lifetime. */
+  /** Retained for callers that still compute the saved rating. */
   setBannerStars(stars?: number): void {
-    const key = String(stars);
-    if (this.cache.get('banner-stars') === key) return;
-    this.cache.set('banner-stars', key);
-    this.bannerStars.hidden = stars === undefined;
-    const count = stars ?? 0;
-    this.bannerStars.textContent = '★'.repeat(count) + '☆'.repeat(3 - count);
-    this.bannerStars.setAttribute('aria-label', `${count} of 3 stars`);
+    // Ratings remain in saves, but are no longer part of a dive result.
+    void stars;
   }
 
   hideBanner(): void {
@@ -192,7 +185,7 @@ export class ObjectivesPanel {
         : []),
     );
     if (this.banner && primaries.every((o) => o.complete)) {
-      this.bannerTitle.textContent = `${contacts.filter((o) => !o.complete).length} bonus sonar contacts remain on sonar.`;
+      this.bannerTitle.textContent = `${contacts.filter((o) => !o.complete).length} more to find here`;
     }
   }
 

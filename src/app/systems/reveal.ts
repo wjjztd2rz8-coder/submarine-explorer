@@ -172,6 +172,7 @@ export function createRevealSystem(): GameSystem {
         const poi = queue.current;
         if (!poi || captured || (elapsed < REVEAL_STILL_CAPTURE_S && !finishing)) return;
         captured = true;
+        if (!poi.def.reveal) return;
         stillTarget.copy(poi.position);
         const subjectY = revealStillSubjectY(ctx.rig.camera, stillTarget);
         const image = canvasThumbnail(
@@ -185,6 +186,7 @@ export function createRevealSystem(): GameSystem {
         const result = ctx.photos.save({
           id: `reveal-${Date.now().toString(36)}-${poi.id}`,
           image,
+          framedReveal: true,
           siteId: ctx.contentLandmark,
           siteName: ctx.discovery.siteName,
           poiId: poi.id,

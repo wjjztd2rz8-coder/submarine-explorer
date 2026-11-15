@@ -7,6 +7,8 @@ export const PHOTO_LIMIT = 24;
 export interface Photo {
   id: string;
   image: string;
+  /** Captured from an authored close-up reveal; older frame grabs lack this flag. */
+  framedReveal?: boolean;
   siteId: string;
   siteName: string;
   poiId: string | null;

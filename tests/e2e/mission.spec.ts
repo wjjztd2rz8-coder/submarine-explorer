@@ -166,7 +166,7 @@ test.describe('B3 mission flow', () => {
     await expect(page.locator('.briefing-title')).toHaveText('Titanic dive');
     await expect(page.locator('.briefing-objectives li.is-primary')).toHaveCount(primaryCount);
     await expect(page.locator('.briefing-contacts')).toHaveText(
-      `Bonus sonar contacts: 0 of ${secondaryCount} found`,
+      `${secondaryCount} extra things to find`,
     );
     await expect(page.locator('.briefing-section.is-hazards li')).not.toHaveCount(0);
     await expect(page.locator('.briefing-section.is-hazards li:visible')).toHaveCount(0);
@@ -349,7 +349,7 @@ test.describe('B3 mission flow', () => {
     expect(m.state).toBe('primaries-complete');
     expect(m.emitted.at(-1)).toBe('mission:primaryComplete');
     // The dive goes on: the next target is optional, and a banner offers the choice.
-    await expect(panel.locator('.obj-contacts')).toHaveText(/Bonus sonar contacts: 0 of \d+ found/);
+    await expect(panel.locator('.obj-contacts')).toHaveText(/Extra finds: 0 of \d+/);
     const banner = panel.locator('.obj-banner');
     await expect(banner).toBeVisible({ timeout: 10_000 });
     const debrief = page.locator('.mission-debrief');
@@ -361,7 +361,7 @@ test.describe('B3 mission flow', () => {
     expect(m.state).toBe('debrief');
     expect(m.emitted.slice(-2)).toEqual(['mission:complete', 'mission:ended']);
     expect(m.durationS).toBeGreaterThan(3);
-    await expect(debrief.locator('.debrief-title')).toHaveText('Primaries complete');
+    await expect(debrief.locator('.debrief-title')).toHaveText(/You found \d+ of \d+/);
     await expect(debrief.locator('.debrief-kicker')).toHaveText('RMS TITANIC');
     // Unscanned optional targets must not dilute completed primary progress.
     await expect(debrief.locator('[data-field="objectives"]')).toHaveText(
@@ -497,7 +497,7 @@ test.describe('fix S: mission failure, framing and modals', () => {
     await expect(debrief).toBeVisible();
     await expect(alert).toBeHidden();
     await expect(debrief).toHaveClass(/is-aborted/);
-    await expect(debrief.locator('.debrief-title')).toHaveText('Dive aborted');
+    await expect(debrief.locator('.debrief-title')).toHaveText(/You found \d+ of \d+/);
     await expect(debrief.locator('.debrief-highlight')).toContainText('Hull failure at');
     // No Keep exploring after an abort: the dive is over.
     await expect(debrief.locator('.debrief-btn')).toHaveText([
