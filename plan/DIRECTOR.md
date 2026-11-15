@@ -42,20 +42,18 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
     HUD hidden behind briefing; `.hud-finish` clear of `.hud-bar` (Composer);
     S12 "Unknown contacts: 0 of 0" line and wording, catalogue-only globe pins (Codex medium);
     S13 reveal close-ups that show sand instead of the subject (Gemini; framing data only).
-- **22:05 state.** Local `main` holds everything accepted and is NOT pushed (live is still
-  `b17ec3a0`): S3b close-range scan, S9 teach `C`, S10 debrief and reveal reading time, S11
-  first visit, S4b Blue Hole by touch, S12 bonus contacts wording and 13 playable pins, S15
-  tour answers the banner, S16 headless route check plus the sustained-contact collision
-  damping fix (the root cause of the seabed stalls; 106 of 106 legs pass), S14 faster
-  transit and scanned labels hidden, S17 Read more text checked (15 wrong claims fixed),
-  S18 six lifecycle bugs.
-- **Blocking the push:** the batch 2 unit run failed for real in `overlayFocus.test.ts`
-  (about 22 tests) and `dailySystem.test.ts` (home More tray, focus return). S19 (Codex
-  medium, branch `t3/fix-unit-test-suite`) is fixing it. Then: merge S19, one gate on main
-  (content, prettier, py, typecheck, build, full-route plays of titanic, lost-city and
-  hunga, full unit suite; re-run timed-out files alone), push.
-- **Open:** Lost City's IMAX Tower leg failed in about half the browser runs before S16's
-  fix and is not covered by the simulation (props). Re-measure three times after the push.
+- **22:50 state.** Everything accepted is merged and PUSHED as `b9191bda` (plus plan
+  commits): S3b, S9, S10, S11, S4b, S12, S14, S15, S16, S17, S18, S19. Gate on that commit,
+  quiet machine: content, prettier, py, attribution, typecheck, build all pass; unit suite
+  207 files, 4,860 tests pass; full-route plays all end on the debrief: Titanic 6/6 113 s,
+  Hunga 3/3 93 s, Lost City 4/4 58, 58, 71 s, Blue Hole 4/3 57 s. Confirm CI and the
+  deploy with `gh run list --branch main --limit 3`.
+- Blue Hole by touch in the gate: 2 scans (35.6 s to the second), no debrief recorded; the
+  gate's arguments may have stopped it at two scans. S4b measured 3/3, debrief, 117 s.
+  Re-check by touch after the next merge.
+- **In flight:** S20 (Composer): the scripted player still needs its anti-stuck rule at Lost
+  City (every run: stops dead for about 15 s some 160 m short of IMAX Tower, probably a
+  tower prop) and Hunga (twice). Fix so a plain player gets through with the rule disabled.
 - **Reveal framing:** S13 (Gemini) died when Cursor's Other Models pool hit 0% (resets Nov
   24). Its unreviewed work is committed as WIP on `t3/improve-landmark-reveals`
   (`fe6c8a69`). A scheduled wake at 23:33 launches S13b on Sonnet to review and finish it.
