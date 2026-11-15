@@ -216,6 +216,15 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   optimization sweep; S46 Sonnet reveal target vs POI audit (Hunga + all sites); S47
   Sonnet side thruster to the stern (`src/vehicles/hulls.ts`). Then: Sonnet review +
   frame-time measurement of S45, one gate, push. That is the whole remaining backlog.
+- **16:00 Sunday. LIVE `110dac7d`** (S45 Codex optimization sweep, reviewed by S48 Sonnet:
+  no correctness issues, frame times neutral, Codex's large "before" numbers were taken
+  under load; S46 32 stale reveal offsets removed + `revealTargets.test.ts`; S47 Petrel
+  side thruster at the stern). **PUSHED `1d0b2175`:** S49 (Blake coral thicket marker on
+  its mound; five terrain reveals pulled back to show context; Titanic Big Piece shows the
+  debris scatter since the piece was raised in 1998). Gate24: 13 keyboard + 6 touch on
+  the debrief at usual times, units 5,013. Nothing in flight; no scheduled tasks;
+  worktrees are only the delegates' finished ones. Backlog empty unless the owner reports
+  more. Monday: remove finished worktrees, final State line.
 - **Lesson:** look at one capture before merging any layout change. S30's report and
   measurements were clean while its portrait screenshot showed tiles stacked on top of
   each other; it had measured horizontal clipping only.
