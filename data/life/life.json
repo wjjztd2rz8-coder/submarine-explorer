@@ -2,10 +2,10 @@
   "version": 1,
   "species": {
     "blackfin-chromis": {
-      "text": "A small damselfish of Indo-Pacific reefs. Shoals hover above coral heads and snatch plankton from the passing current, darting into the branches when a predator comes close.",
+      "text": "A small damselfish of Indo-Pacific reefs. Groups gather along exposed outer reef slopes and rocky inshore reefs, feeding on zooplankton, especially tiny crustaceans called copepods.",
       "fact": "These little damselfish gather in groups along outer reef slopes and feed on drifting zooplankton.",
       "facts": {
-        "Length": "6 to 8 cm",
+        "Length": "Up to about 6 cm",
         "Habitat": "Coral reef, shallow water",
         "Diet": "Plankton"
       },
@@ -13,22 +13,22 @@
       "sourceUrl": "https://www.fishbase.se/summary/Pycnochromis-vanderbilti.html"
     },
     "rainbow-wrasse": {
-      "text": "A fast, bright wrasse of Indo-Pacific reefs. Groups cruise along the reef edge in the current, picking zooplankton out of the water, and change colour and sex as they age.",
+      "text": "A fast, bright wrasse of Indo-Pacific reefs. Adults gather above shallow reefs and reef flats, picking zooplankton out of the water. Young fish stay closer to the reef, and their colours differ from those of adult males.",
       "fact": "Rainbow wrasse gather over shallow reefs to catch tiny drifting crustaceans, and spawn above the reef at dusk.",
       "facts": {
         "Length": "Up to about 16 cm",
         "Habitat": "Reef edges and slopes",
         "Diet": "Zooplankton"
       },
-      "sourceTitle": "FishBase: Thalassoma amblycephalum",
-      "sourceUrl": "https://www.fishbase.se/summary/Thalassoma-amblycephalum.html"
+      "sourceTitle": "Australian Museum — Bluehead wrasse (Thalassoma amblycephalum)",
+      "sourceUrl": "https://australian.museum/learn/animals/fishes/bluehead-wrasse-thalassoma-amblycephalum/"
     },
     "blue-tang": {
       "text": "A surgeonfish of Caribbean reefs. Adults are a deep blue; the young are bright yellow. Schools sweep over the reef grazing algae, and a sharp scalpel-like spine at the base of the tail defends each fish.",
       "fact": "Young blue tangs are bright yellow; adults turn deep blue. A sharp spine at the base of the tail helps defend them.",
       "facts": {
-        "Length": "Up to about 35 cm",
-        "Habitat": "Reefs and rubble, 1 to 40 m",
+        "Length": "Usually about 30 cm; recorded to 37 cm",
+        "Habitat": "Reefs, grassy and rocky areas, 2 to 40 m",
         "Diet": "Algae"
       },
       "sourceTitle": "Florida Museum — Blue Tang",
@@ -38,8 +38,8 @@
       "text": "A daytime reef schooler that spreads out over seagrass at night to feed on small crustaceans and worms. The name comes from the grunting sound it makes by grinding its throat teeth together.",
       "fact": "French grunts get their name from the grunting sound they make by grinding their throat teeth together.",
       "facts": {
-        "Length": "Up to about 25 cm",
-        "Habitat": "Reefs and seagrass, 1 to 40 m",
+        "Length": "Up to about 30 cm; commonly about 17 cm",
+        "Habitat": "Reefs and seagrass, shallow water to 60 m",
         "Diet": "Small invertebrates"
       },
       "sourceTitle": "Florida Museum — French Grunt",
@@ -49,12 +49,12 @@
       "text": "A parrotfish of Caribbean reefs. It scrapes algae off dead coral with a fused beak of teeth and excretes the ground rock as fine white sand, one of the sources of reef beaches.",
       "fact": "Parrotfish scrape algae off dead coral and excrete the ground rock as fine white sand, one source of reef beaches.",
       "facts": {
-        "Length": "Up to about 50 cm",
-        "Habitat": "Coral reef, 1 to 45 m",
+        "Length": "Up to 64 cm total length",
+        "Habitat": "Coral reefs, 3 to 50 m",
         "Diet": "Algae"
       },
-      "sourceTitle": "Florida Museum — Stoplight Parrotfish",
-      "sourceUrl": "https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/stoplight-parrotfish/"
+      "sourceTitle": "NOAA Fisheries — St. Thomas/St. John Fishery Management Plan, stoplight parrotfish",
+      "sourceUrl": "https://media.fisheries.noaa.gov/dam-migration/carib_fmp_st_thomasst_john.pdf"
     },
     "pacific-hake": {
       "text": "A slender silver hake that schools over the continental shelf and slope of the northeast Pacific. It rises toward the surface at night to feed on krill and small fish, and spawns off California.",
@@ -71,7 +71,7 @@
       "text": "A schooling hake of the northwest Atlantic shelf and canyon edges. By day it holds near the bottom; at night it rises into midwater to chase shrimp and small fish.",
       "fact": "Silver hake hold near the bottom by day, then rise into midwater at night to chase shrimp and small fish.",
       "facts": {
-        "Length": "30 to 60 cm common",
+        "Length": "Up to about 76 cm; males commonly about 37 cm",
         "Depth": "Roughly 60 to 450 m",
         "Diet": "Shrimp and small fish"
       },
@@ -101,22 +101,22 @@
       "sourceUrl": "https://www.fisheries.noaa.gov/species/wreckfish"
     },
     "rattail": {
-      "text": "Grenadiers, or rattails, are deep-sea fish with a big head and a long tail that tapers to a point, which they hold above the bottom while they swim head-down hunting for food. The genus Coryphaenoides is found from the upper slope to the abyssal plains.",
+      "text": "Grenadiers, or rattails, are deep-sea fish with a big head and a long tail that tapers to a point. Large eyes, a keen sense of smell and sensitive chin barbels help them find prey and carrion above the dark seabed. The genus Coryphaenoides occurs on continental slopes and abyssal plains.",
       "fact": "Rattail fish get their name from a body that tapers into a long, thin tail. They also go by the name grenadier.",
       "facts": {
         "Length": "30 cm to over 1 m, depending on species",
-        "Depth": "Roughly 200 to 5,000 m",
+        "Depth": "200 to 4,000 m (MBARI genus profile)",
         "Diet": "Crustaceans, fish and carrion"
       },
       "sourceTitle": "MBARI — Rattail fish",
       "sourceUrl": "https://www.mbari.org/animal/rattail-fish/"
     },
     "blob-sculpin": {
-      "text": "A deep Pacific sculpin whose soft, watery flesh is only a little denser than seawater, so it can rest on the bottom with almost no muscle. One was recorded at 1,541 m at the ASHES vent field.",
+      "text": "A large, soft-bodied fish of the deep North Pacific. MBARI has observed blob sculpins resting beside nests of pink eggs on rocky outcrops. The fish guard their eggs, keeping watch over patches of seabed that serve as deep-sea nurseries.",
       "fact": "Blob sculpins guard nests of pink eggs on the deep seabed, a rare glimpse of parental care in deep-sea fish.",
       "facts": {
-        "Length": "15 to 30 cm",
-        "Depth": "Roughly 1,000 to 2,800 m",
+        "Length": "Commonly about 60 cm (MBARI)",
+        "Depth": "Deep North Pacific seabed",
         "Habitat": "Soft seabed and lava"
       },
       "sourceTitle": "MBARI — Nurseries in the deep sea",
@@ -126,19 +126,19 @@
       "text": "A cutthroat eel is named for the slit-like gill openings low on its throat. It cruises slowly over slopes and volcano flanks, scavenging and picking up small prey.",
       "fact": "The cutthroat eel is named for the slit-like gill openings low on its throat.",
       "facts": {
-        "Length": "30 to 60 cm",
-        "Depth": "547 to 1,689 m (recorded at Kamaʻehuakanaloa)",
+        "Length": "Up to about 111 cm",
+        "Depth": "900 to 3,000 m (species account)",
         "Diet": "Small animals and carrion"
       },
-      "sourceTitle": "DFO Canada — Fishes of the Atlantic Coast, cutthroat eel gill openings",
-      "sourceUrl": "https://waves-vagues.dfo-mpo.gc.ca/library-bibliotheque/9973.pdf"
+      "sourceTitle": "Academia Sinica Taiwan Fish Database — Synaphobranchus brevidorsalis",
+      "sourceUrl": "https://fishdb.sinica.edu.tw/eng/species.php?id=383553"
     },
     "mariana-snailfish": {
       "text": "The Mariana snailfish is one of the deepest-living fishes known. It has a scale-free, tadpole-like body and swims in small groups over the trench walls, feeding on amphipods and other small crustaceans.",
       "fact": "The Mariana snailfish is one of the deepest-living fishes known, with a scale-free, tadpole-like body.",
       "facts": {
-        "Length": "About 20 to 30 cm",
-        "Depth": "About 6,200 to 8,000 m",
+        "Length": "Up to 22.6 cm standard length (excluding tail fin)",
+        "Depth": "Usually about 7,000 to 8,000 m",
         "Habitat": "Mariana Trench slopes"
       },
       "sourceTitle": "FishBase: Pseudoliparis swirei",
@@ -284,7 +284,7 @@
         "Depth": "Around 1,000 m",
         "Habitat": "Warm vents on a young volcano"
       },
-      "sourceTitle": "Williams & Dobbs 1995 \u2014 Opaepele loihi from Loihi hydrothermal vents",
+      "sourceTitle": "Williams & Dobbs 1995 — Opaepele loihi from Loihi hydrothermal vents",
       "sourceUrl": "https://research.nhm.org/pdfs/12236/12236.pdf"
     },
     "hadal-amphipod": {
@@ -313,9 +313,8 @@
       "text": "A large abyssal brittle star. Brittle stars move by whipping their slender arms in a rowing motion, unlike sea stars that glide on tube feet, and they drop an arm to escape a predator.",
       "fact": "Brittle stars row along on their slender arms, and drop an arm to escape a predator.",
       "facts": {
-        "Span": "10 to 20 cm",
-        "Depth": "About 3,600 to 3,800 m",
-        "Habitat": "Abyssal plain and wreck debris"
+        "Movement": "Arms row across the seabed",
+        "Habitat": "Deep seabed"
       },
       "sourceTitle": "University of Texas Marine Science Institute — Brittle Stars",
       "sourceUrl": "https://utmsi.utexas.edu/science-and-the-sea/radio-program/brittle-stars/"
@@ -328,27 +327,26 @@
         "Depth": "About 4,000 to 5,500 m",
         "Diet": "Sediment and settled food"
       },
-      "sourceTitle": "Swimming in Psychropotes \u2014 Marine Biodiversity",
+      "sourceTitle": "Swimming in Psychropotes — Marine Biodiversity",
       "sourceUrl": "https://link.springer.com/article/10.1007/s12526-025-01618-w"
     },
     "amperima": {
       "text": "A small pink sea cucumber of the abyssal north Atlantic. In the Porcupine Abyssal Plain study it became hundreds of times more common after 1996, a population boom that followed changes in the food supply from the surface.",
       "fact": "After 1996, Amperima sea cucumbers became hundreds of times more abundant at a study site on the Porcupine Abyssal Plain.",
       "facts": {
-        "Length": "5 to 15 cm",
+        "Length": "About 2 to 3.5 cm",
         "Depth": "About 4,800 m",
         "Habitat": "Abyssal mud"
       },
-      "sourceTitle": "Billett et al. 2010 — The Amperima Event revisited",
-      "sourceUrl": "https://www.sciencedirect.com/science/article/pii/S0967064509000186"
+      "sourceTitle": "Uthicke et al. 2009 — A boom–bust phylum? (Amperima size and population changes)",
+      "sourceUrl": "https://esajournals.onlinelibrary.wiley.com/doi/10.1890/07-2136.1"
     },
     "squat-lobster": {
       "text": "Munidopsis is a deep-sea genus of squat lobsters with a pale, often ghost-white body and long, spiny legs. Species live on mud, wood, bones and near vents, picking at whatever organic material they find.",
       "fact": "Some Munidopsis squat lobsters have entirely white bodies and legs, a striking sight on the dark seabed.",
       "facts": {
-        "Length": "5 to 10 cm",
-        "Depth": "About 2,400 to 5,100 m",
-        "Habitat": "Seabed, wrecks, vents"
+        "Group": "Munidopsis, a genus with many species",
+        "Habitat": "Deep seabed, including wood falls and vents"
       },
       "sourceTitle": "New records of Munidopsis from deep waters off Taiwan",
       "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10280391/"
@@ -357,18 +355,17 @@
       "text": "A tubeworm of the Juan de Fuca vents. It has no mouth or gut as an adult: bacteria in its body turn sulfide from the vent fluid into food, and the red plume at the top is full of the blood pigment that carries sulfide and oxygen.",
       "fact": "An adult tubeworm has no mouth or gut: bacteria inside its body turn vent sulfide into food.",
       "facts": {
-        "Length": "0.2 to 1 m",
+        "Length": "Can reach about 1 m",
         "Depth": "About 1,550 m",
         "Habitat": "Warm vent flow, Axial Seamount"
       },
-      "sourceTitle": "NOAA PMEL \u2014 Axial tubeworms and their bacterial food source",
+      "sourceTitle": "NOAA PMEL — Axial tubeworms and their bacterial food source",
       "sourceUrl": "https://pmel.noaa.gov/eoi/nemo1998/logbook/cal091398/index.html"
     },
     "cold-water-coral": {
-      "text": "A reef-building coral that needs no sunlight. Its branching white skeletons form thickets and, over thousands of years, mounds that shelter fish, crabs and sponges. It grows from about 40 m to over 3,000 m.",
+      "text": "A reef-building coral that needs no sunlight. Its naturally white branches form dense thickets on the Blake Plateau. Over thousands of years, coral skeletons and trapped sediment build mounds that provide habitat for fish and other invertebrates.",
       "fact": "Cold-water coral needs no sunlight, and over thousands of years its skeletons build mounds that shelter fish, crabs and sponges.",
       "facts": {
-        "Colony size": "0.3 to 2 m",
         "Depth": "Roughly 500 to 1,000 m here",
         "Diet": "Plankton and marine snow"
       },
@@ -376,10 +373,9 @@
       "sourceUrl": "https://oceanexplorer.noaa.gov/news/million-mounds-news/"
     },
     "brain-coral": {
-      "text": "A reef-building coral of the Caribbean. Its rounded colony has a pattern of winding ridges and valleys like a brain, and it grows only a few millimetres a year, so a large dome can be several centuries old.",
+      "text": "A reef-building coral of the Caribbean. Its rounded colony has winding ridges and valleys like a brain. Many small polyps share the growing skeleton, building a large dome over many years.",
       "fact": "A large brain coral dome can be several centuries old, because it grows only a few millimetres a year.",
       "facts": {
-        "Colony size": "0.3 to 1 m",
         "Depth": "Roughly 1 to 40 m",
         "Habitat": "Caribbean reefs"
       },
@@ -387,23 +383,21 @@
       "sourceUrl": "https://oceanservice.noaa.gov/facts/brain-coral.html"
     },
     "golden-coral": {
-      "text": "A golden coral has a slender stem with polyps arranged in a spiral along its length, and it can live for centuries. Colonies grow up from the seabed to catch food drifting past in the current.",
+      "text": "Chrysogorgia is a group of branching deep-sea corals with a metallic sheen to their central skeleton. Polyps grow along the branches and capture food from the water. Colony shapes vary among species, from fans and bottlebrushes to bushy forms.",
       "fact": "Chrysogorgia golden corals grow branches in spirals, fans or tree-like crowns, depending on the species.",
       "facts": {
-        "Colony height": "0.2 to 1 m",
-        "Depth": "About 1,000 to 4,000 m",
-        "Habitat": "Hard seabed and rock"
+        "Group": "Chrysogorgia, golden gorgonian corals",
+        "Diet": "Suspended food captured by polyps"
       },
-      "sourceTitle": "Xu et al. 2020 — Morphology of Chrysogorgia",
-      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/32257645/"
+      "sourceTitle": "Pante et al. 2012 — Deep-Sea Origin and In-Situ Diversification of Chrysogorgiid Octocorals",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3377635/"
     },
     "deep-coral": {
-      "text": "Bubblegum corals of the genus Paramuricea form branching, fan-shaped colonies in orange, pink or lilac on hard ledges in submarine canyons, where they trap passing food and shelter small animals.",
+      "text": "Paramuricea corals form branching, fan-shaped colonies on hard ground in deep water. Their polyps catch food carried by currents. NOAA surveys show purple Paramuricea alongside other corals on rocky ledges in the northwest Atlantic.",
       "fact": "Paramuricea corals form branching fans on rocky seabeds, where their polyps catch food carried by the current.",
       "facts": {
-        "Colony height": "0.3 to 1 m",
-        "Depth": "About 350 to 1,800 m",
-        "Habitat": "Canyon walls and ledges"
+        "Group": "Paramuricea, a genus of octocorals",
+        "Habitat": "Hard ground and rocky ledges"
       },
       "sourceTitle": "NOAA Fisheries — Paramuricea and bubblegum coral are distinct",
       "sourceUrl": "https://www.fisheries.noaa.gov/science-blog/near-and-dear-setting-new-records-exploring-deepwater-communities"
@@ -412,7 +406,6 @@
       "text": "A sea pen is a colony of polyps shaped like a quill pen. Its stalk is anchored in soft sediment, and the feeding polyps cluster at the top and catch plankton drifting by.",
       "fact": "A sea pen is a colony of polyps anchored in soft sediment by a fleshy stalk. Its feeding polyps catch food from passing water.",
       "facts": {
-        "Height": "0.5 to 1.5 m",
         "Depth": "375 to 1,192 m in the retained OBIS sample",
         "Habitat": "Muddy canyon floors"
       },
@@ -423,9 +416,8 @@
       "text": "A sea anemone of the deep: a soft muscular column with a crown of stinging tentacles that catch drifting animals. It attaches to rock, wreckage or bones and can slowly change position.",
       "fact": "A deep-sea anemone anchors itself with an adhesive foot and catches prey with stinging tentacles.",
       "facts": {
-        "Height": "5 to 15 cm",
-        "Depth": "About 800 to 5,000 m",
-        "Habitat": "Hard surfaces"
+        "Tentacles": "Armed with stinging cells",
+        "Habitat": "Attached to seabed surfaces"
       },
       "sourceTitle": "OOI — Deep-Sea Anemone",
       "sourceUrl": "https://interactiveoceans.washington.edu/04/2023/deep-sea-anemone/"
@@ -434,9 +426,8 @@
       "text": "A stalked crinoid. It anchors to the bottom and holds up a crown of feathery arms to filter food from the current. Crinoids are an ancient group that has lived in the sea for more than 450 million years.",
       "fact": "Sea lilies are an ancient group that has lived in the sea for more than 450 million years.",
       "facts": {
-        "Crown size": "10 to 30 cm",
-        "Depth": "About 800 to 4,000 m",
-        "Habitat": "Hard seabed"
+        "Feeding": "Feathery arms catch suspended food",
+        "Group": "Stalked crinoids"
       },
       "sourceTitle": "British Geological Survey — Crinoids",
       "sourceUrl": "https://www.bgs.ac.uk/discovering-geology/fossils-and-geological-time/crinoids/"
@@ -445,19 +436,18 @@
       "text": "A glass sponge builds its skeleton out of glassy silica needles. It filters bacteria and organic particles from the water, and some deep-sea glass sponges are thought to live for thousands of years.",
       "fact": "Glass sponges build their skeletons from glassy silica needles, and some may live for thousands of years.",
       "facts": {
-        "Height": "10 to 40 cm",
-        "Depth": "About 800 to 5,000 m",
-        "Habitat": "Hard seabed"
+        "Skeleton": "Silica spicules",
+        "Diet": "Bacteria and suspended organic particles"
       },
       "sourceTitle": "NOAA — What is a glass sponge?",
       "sourceUrl": "https://oceanservice.noaa.gov/facts/glass-sponge.html"
     },
     "deepwater-octopus": {
-      "text": "A warty octopus of continental slopes and canyon walls. It crawls on its arms across mud and rock, and also swims by pulsing its arm web, searching for crustaceans and worms.",
+      "text": "A warty octopus of the North Atlantic. Raised clusters of pale knobs cover its skin, and each arm has a single row of suckers. It lives on the deep continental slope and has no ink sac.",
       "fact": "This deep-sea octopus wears a coat of warty bumps across its head and body.",
       "facts": {
-        "Length": "20 to 50 cm",
-        "Depth": "About 300 to 3,200 m",
+        "Length": "Up to about 50 cm total length (FAO)",
+        "Depth": "850 to 2,300 m (FAO species account)",
         "Habitat": "Slope and canyon floor"
       },
       "sourceTitle": "FAO — Cephalopods of the World, Graneledone verrucosa",
@@ -468,11 +458,11 @@
       "fact": "A dumbo octopus swims by flapping ear-like fins and hovers above the seabed.",
       "facts": {
         "Length": "20 to 40 cm",
-        "Depth": "About 1,000 to 5,000 m",
+        "Depth": "Deep sea; a sighting near 7,000 m is confirmed",
         "Diet": "Worms, small crustaceans"
       },
-      "sourceTitle": "National Oceanography Centre — Deep-Sea Creatures",
-      "sourceUrl": "https://www.noc.ac.uk/discover-the-ocean/life-in-the-ocean/deep-sea-creatures"
+      "sourceTitle": "Natural History Museum — Dumbo octopuses",
+      "sourceUrl": "https://www.nhm.ac.uk/discover/what-is-a-dumbo-octopus.html"
     },
     "vampire-squid": {
       "text": "Neither a squid nor a vampire. It lives in the oxygen-poor midwater, drifts on its fins and sheds glowing mucus from its arm tips instead of ink. It feeds on marine snow it collects with long, sticky filaments.",
@@ -514,50 +504,95 @@
         {
           "species": "wreckfish",
           "weight": 1.0,
-          "depth": [300, 1100],
-          "group": [1, 2],
+          "depth": [
+            300,
+            1100
+          ],
+          "group": [
+            1,
+            2
+          ],
           "star": true
         },
         {
           "species": "cold-water-coral",
           "weight": 21,
-          "depth": [500, 1000],
-          "group": [2, 8]
+          "depth": [
+            500,
+            1000
+          ],
+          "group": [
+            2,
+            8
+          ]
         },
         {
           "species": "anemone",
           "weight": 21,
-          "depth": [600, 5000],
-          "group": [1, 6]
+          "depth": [
+            600,
+            5000
+          ],
+          "group": [
+            1,
+            6
+          ]
         },
         {
           "species": "rattail",
           "weight": 1.2,
-          "depth": [400, 4500],
-          "group": [1, 2]
+          "depth": [
+            400,
+            4500
+          ],
+          "group": [
+            1,
+            2
+          ]
         },
         {
           "species": "comb-jelly",
           "weight": 1.5,
-          "depth": [8, 1200],
-          "group": [1, 3]
+          "depth": [
+            8,
+            1200
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "atolla",
           "weight": 1.5,
-          "depth": [350, 4000],
-          "group": [1, 3]
+          "depth": [
+            350,
+            4000
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "blue-shark",
           "weight": 0.6,
-          "depth": [5, 350],
-          "group": [1, 1]
+          "depth": [
+            5,
+            350
+          ],
+          "group": [
+            1,
+            1
+          ]
         }
       ],
       "rare": {
         "species": "sixgill-shark",
-        "depth": [200, 1200],
+        "depth": [
+          200,
+          1200
+        ],
         "chancePerMin": 0.12,
         "cooldownS": 480,
         "pass": "level"
@@ -568,50 +603,95 @@
         {
           "species": "tubeworm",
           "weight": 28,
-          "depth": [1400, 1700],
-          "group": [3, 13],
+          "depth": [
+            1400,
+            1700
+          ],
+          "group": [
+            3,
+            13
+          ],
           "star": true
         },
         {
           "species": "blob-sculpin",
           "weight": 1.2,
-          "depth": [1000, 2800],
-          "group": [1, 2]
+          "depth": [
+            1000,
+            2800
+          ],
+          "group": [
+            1,
+            2
+          ]
         },
         {
           "species": "rattail",
           "weight": 1.0,
-          "depth": [400, 4500],
-          "group": [1, 2]
+          "depth": [
+            400,
+            4500
+          ],
+          "group": [
+            1,
+            2
+          ]
         },
         {
           "species": "anemone",
           "weight": 14,
-          "depth": [1000, 3000],
-          "group": [1, 5]
+          "depth": [
+            1000,
+            3000
+          ],
+          "group": [
+            1,
+            5
+          ]
         },
         {
           "species": "comb-jelly",
           "weight": 1.5,
-          "depth": [8, 1200],
-          "group": [1, 3]
+          "depth": [
+            8,
+            1200
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "atolla",
           "weight": 2,
-          "depth": [350, 4000],
-          "group": [1, 3]
+          "depth": [
+            350,
+            4000
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "blue-shark",
           "weight": 0.5,
-          "depth": [5, 350],
-          "group": [1, 1]
+          "depth": [
+            5,
+            350
+          ],
+          "group": [
+            1,
+            1
+          ]
         }
       ],
       "rare": {
         "species": "giant-squid",
-        "depth": [300, 1400],
+        "depth": [
+          300,
+          1400
+        ],
         "chancePerMin": 0.1,
         "cooldownS": 600,
         "pass": "level"
@@ -622,48 +702,90 @@
         {
           "species": "beebe-shrimp",
           "weight": 3,
-          "depth": [4600, 5100],
-          "group": [30, 70],
+          "depth": [
+            4600,
+            5100
+          ],
+          "group": [
+            30,
+            70
+          ],
           "star": true
         },
         {
           "species": "anemone",
           "weight": 21,
-          "depth": [4600, 5100],
-          "group": [2, 10]
+          "depth": [
+            4600,
+            5100
+          ],
+          "group": [
+            2,
+            10
+          ]
         },
         {
           "species": "squat-lobster",
           "weight": 21,
-          "depth": [2400, 5100],
-          "group": [1, 5]
+          "depth": [
+            2400,
+            5100
+          ],
+          "group": [
+            1,
+            5
+          ]
         },
         {
           "species": "comb-jelly",
           "weight": 1.2,
-          "depth": [8, 1200],
-          "group": [1, 3]
+          "depth": [
+            8,
+            1200
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "atolla",
           "weight": 2,
-          "depth": [350, 4000],
-          "group": [1, 3]
+          "depth": [
+            350,
+            4000
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "blue-shark",
           "weight": 0.5,
-          "depth": [5, 350],
-          "group": [1, 1]
+          "depth": [
+            5,
+            350
+          ],
+          "group": [
+            1,
+            1
+          ]
         }
       ],
       "rare": {
         "species": "beebe-shrimp",
-        "depth": [4600, 5100],
+        "depth": [
+          4600,
+          5100
+        ],
         "chancePerMin": 0.15,
         "cooldownS": 420,
         "pass": "level",
-        "group": [110, 160]
+        "group": [
+          110,
+          160
+        ]
       }
     },
     "challenger-deep": {
@@ -671,42 +793,78 @@
         {
           "species": "hadal-amphipod",
           "weight": 4,
-          "depth": [8000, 11000],
-          "group": [8, 18],
+          "depth": [
+            8000,
+            11000
+          ],
+          "group": [
+            8,
+            18
+          ],
           "star": true
         },
         {
           "species": "mariana-snailfish",
           "weight": 2,
-          "depth": [6800, 8200],
-          "group": [1, 3]
+          "depth": [
+            6800,
+            8200
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "comb-jelly",
           "weight": 1.0,
-          "depth": [8, 1200],
-          "group": [1, 3]
+          "depth": [
+            8,
+            1200
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "atolla",
           "weight": 1.5,
-          "depth": [350, 4000],
-          "group": [1, 3]
+          "depth": [
+            350,
+            4000
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "blue-shark",
           "weight": 0.4,
-          "depth": [5, 350],
-          "group": [1, 1]
+          "depth": [
+            5,
+            350
+          ],
+          "group": [
+            1,
+            1
+          ]
         }
       ],
       "rare": {
         "species": "hadal-amphipod",
-        "depth": [9500, 11000],
+        "depth": [
+          9500,
+          11000
+        ],
         "chancePerMin": 0.15,
         "cooldownS": 420,
         "pass": "level",
-        "group": [70, 110]
+        "group": [
+          70,
+          110
+        ]
       }
     },
     "kamaehuakanaloa": {
@@ -714,50 +872,95 @@
         {
           "species": "hawaii-shrimp",
           "weight": 3,
-          "depth": [900, 1250],
-          "group": [20, 50],
+          "depth": [
+            900,
+            1250
+          ],
+          "group": [
+            20,
+            50
+          ],
           "star": true
         },
         {
           "species": "cutthroat-eel",
           "weight": 1.5,
-          "depth": [500, 1800],
-          "group": [1, 2]
+          "depth": [
+            500,
+            1800
+          ],
+          "group": [
+            1,
+            2
+          ]
         },
         {
           "species": "golden-coral",
           "weight": 21,
-          "depth": [1000, 2000],
-          "group": [1, 5]
+          "depth": [
+            1000,
+            2000
+          ],
+          "group": [
+            1,
+            5
+          ]
         },
         {
           "species": "rattail",
           "weight": 0.8,
-          "depth": [400, 4500],
-          "group": [1, 2]
+          "depth": [
+            400,
+            4500
+          ],
+          "group": [
+            1,
+            2
+          ]
         },
         {
           "species": "comb-jelly",
           "weight": 1.5,
-          "depth": [8, 1200],
-          "group": [1, 3]
+          "depth": [
+            8,
+            1200
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "atolla",
           "weight": 2,
-          "depth": [350, 4000],
-          "group": [1, 3]
+          "depth": [
+            350,
+            4000
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "blue-shark",
           "weight": 0.5,
-          "depth": [5, 350],
-          "group": [1, 1]
+          "depth": [
+            5,
+            350
+          ],
+          "group": [
+            1,
+            1
+          ]
         }
       ],
       "rare": {
         "species": "sperm-whale",
-        "depth": [30, 1200],
+        "depth": [
+          30,
+          1200
+        ],
         "chancePerMin": 0.1,
         "cooldownS": 600,
         "pass": "overhead"
@@ -768,32 +971,59 @@
         {
           "species": "blackfin-chromis",
           "weight": 4,
-          "depth": [1, 30],
-          "group": [18, 40],
+          "depth": [
+            1,
+            30
+          ],
+          "group": [
+            18,
+            40
+          ],
           "star": true
         },
         {
           "species": "rainbow-wrasse",
           "weight": 3,
-          "depth": [1, 30],
-          "group": [6, 14]
+          "depth": [
+            1,
+            30
+          ],
+          "group": [
+            6,
+            14
+          ]
         },
         {
           "species": "comb-jelly",
           "weight": 1.0,
-          "depth": [8, 1200],
-          "group": [1, 3]
+          "depth": [
+            8,
+            1200
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "atolla",
           "weight": 0.8,
-          "depth": [350, 4000],
-          "group": [1, 3]
+          "depth": [
+            350,
+            4000
+          ],
+          "group": [
+            1,
+            3
+          ]
         }
       ],
       "rare": {
         "species": "humpback-whale",
-        "depth": [3, 120],
+        "depth": [
+          3,
+          120
+        ],
         "chancePerMin": 0.2,
         "cooldownS": 420,
         "pass": "overhead"
@@ -804,69 +1034,132 @@
         {
           "species": "pacific-hake",
           "weight": 2.5,
-          "depth": [150, 900],
-          "group": [10, 18],
+          "depth": [
+            150,
+            900
+          ],
+          "group": [
+            10,
+            18
+          ],
           "star": true
         },
         {
           "species": "sablefish",
           "weight": 1.5,
-          "depth": [200, 2800],
-          "group": [2, 4],
+          "depth": [
+            200,
+            2800
+          ],
+          "group": [
+            2,
+            4
+          ],
           "star": true
         },
         {
           "species": "nanomia",
           "weight": 4,
-          "depth": [100, 800],
-          "group": [3, 8]
+          "depth": [
+            100,
+            800
+          ],
+          "group": [
+            3,
+            8
+          ]
         },
         {
           "species": "sea-pen",
           "weight": 14,
-          "depth": [350, 3700],
-          "group": [1, 5]
+          "depth": [
+            350,
+            3700
+          ],
+          "group": [
+            1,
+            5
+          ]
         },
         {
           "species": "sun-star",
           "weight": 14,
-          "depth": [150, 1050],
-          "group": [1, 5]
+          "depth": [
+            150,
+            1050
+          ],
+          "group": [
+            1,
+            5
+          ]
         },
         {
           "species": "sea-lion",
           "weight": 0.7,
-          "depth": [1, 80],
-          "group": [1, 2]
+          "depth": [
+            1,
+            80
+          ],
+          "group": [
+            1,
+            2
+          ]
         },
         {
           "species": "vampire-squid",
           "weight": 1,
-          "depth": [500, 1500],
-          "group": [1, 1]
+          "depth": [
+            500,
+            1500
+          ],
+          "group": [
+            1,
+            1
+          ]
         },
         {
           "species": "comb-jelly",
           "weight": 2,
-          "depth": [8, 1200],
-          "group": [1, 3]
+          "depth": [
+            8,
+            1200
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "atolla",
           "weight": 1.5,
-          "depth": [350, 4000],
-          "group": [1, 3]
+          "depth": [
+            350,
+            4000
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "rattail",
           "weight": 1.0,
-          "depth": [400, 4500],
-          "group": [1, 2]
+          "depth": [
+            400,
+            4500
+          ],
+          "group": [
+            1,
+            2
+          ]
         }
       ],
       "rare": {
         "species": "humpback-whale",
-        "depth": [5, 120],
+        "depth": [
+          5,
+          120
+        ],
         "chancePerMin": 0.12,
         "cooldownS": 480,
         "pass": "overhead"
@@ -877,51 +1170,96 @@
         {
           "species": "silver-hake",
           "weight": 2.5,
-          "depth": [64, 450],
-          "group": [12, 28]
+          "depth": [
+            64,
+            450
+          ],
+          "group": [
+            12,
+            28
+          ]
         },
         {
           "species": "blue-shark",
           "weight": 0.8,
-          "depth": [5, 350],
-          "group": [1, 1]
+          "depth": [
+            5,
+            350
+          ],
+          "group": [
+            1,
+            1
+          ]
         },
         {
           "species": "deep-coral",
           "weight": 21,
-          "depth": [350, 1800],
-          "group": [2, 8],
+          "depth": [
+            350,
+            1800
+          ],
+          "group": [
+            2,
+            8
+          ],
           "star": true
         },
         {
           "species": "deepwater-octopus",
           "weight": 1.2,
-          "depth": [300, 1700],
-          "group": [1, 1],
+          "depth": [
+            300,
+            1700
+          ],
+          "group": [
+            1,
+            1
+          ],
           "star": true
         },
         {
           "species": "comb-jelly",
           "weight": 2,
-          "depth": [8, 1200],
-          "group": [1, 3]
+          "depth": [
+            8,
+            1200
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "atolla",
           "weight": 1,
-          "depth": [350, 4000],
-          "group": [1, 3]
+          "depth": [
+            350,
+            4000
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "rattail",
           "weight": 1.0,
-          "depth": [400, 4500],
-          "group": [1, 2]
+          "depth": [
+            400,
+            4500
+          ],
+          "group": [
+            1,
+            2
+          ]
         }
       ],
       "rare": {
         "species": "sperm-whale",
-        "depth": [30, 1200],
+        "depth": [
+          30,
+          1200
+        ],
         "chancePerMin": 0.12,
         "cooldownS": 480,
         "pass": "overhead"
@@ -932,56 +1270,107 @@
         {
           "species": "cold-water-coral",
           "weight": 35,
-          "depth": [500, 1000],
-          "group": [3, 11],
+          "depth": [
+            500,
+            1000
+          ],
+          "group": [
+            3,
+            11
+          ],
           "star": true
         },
         {
           "species": "anemone",
           "weight": 14,
-          "depth": [500, 1000],
-          "group": [1, 5]
+          "depth": [
+            500,
+            1000
+          ],
+          "group": [
+            1,
+            5
+          ]
         },
         {
           "species": "sea-lily",
           "weight": 10.5,
-          "depth": [600, 1000],
-          "group": [1, 3]
+          "depth": [
+            600,
+            1000
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "wreckfish",
           "weight": 1,
-          "depth": [250, 1200],
-          "group": [1, 2]
+          "depth": [
+            250,
+            1200
+          ],
+          "group": [
+            1,
+            2
+          ]
         },
         {
           "species": "rattail",
           "weight": 1.2,
-          "depth": [400, 4500],
-          "group": [1, 2]
+          "depth": [
+            400,
+            4500
+          ],
+          "group": [
+            1,
+            2
+          ]
         },
         {
           "species": "blue-shark",
           "weight": 0.8,
-          "depth": [5, 350],
-          "group": [1, 1]
+          "depth": [
+            5,
+            350
+          ],
+          "group": [
+            1,
+            1
+          ]
         },
         {
           "species": "comb-jelly",
           "weight": 1.5,
-          "depth": [8, 1200],
-          "group": [1, 3]
+          "depth": [
+            8,
+            1200
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "atolla",
           "weight": 1,
-          "depth": [350, 4000],
-          "group": [1, 3]
+          "depth": [
+            350,
+            4000
+          ],
+          "group": [
+            1,
+            3
+          ]
         }
       ],
       "rare": {
         "species": "sixgill-shark",
-        "depth": [200, 1200],
+        "depth": [
+          200,
+          1200
+        ],
         "chancePerMin": 0.12,
         "cooldownS": 480,
         "pass": "level"
@@ -992,51 +1381,96 @@
         {
           "species": "blue-tang",
           "weight": 2,
-          "depth": [1, 40],
-          "group": [6, 11]
+          "depth": [
+            1,
+            40
+          ],
+          "group": [
+            6,
+            11
+          ]
         },
         {
           "species": "french-grunt",
           "weight": 3,
-          "depth": [1, 40],
-          "group": [9, 16]
+          "depth": [
+            1,
+            40
+          ],
+          "group": [
+            9,
+            16
+          ]
         },
         {
           "species": "stoplight-parrotfish",
           "weight": 2,
-          "depth": [1, 45],
-          "group": [3, 8]
+          "depth": [
+            1,
+            45
+          ],
+          "group": [
+            3,
+            8
+          ]
         },
         {
           "species": "nassau-grouper",
           "weight": 1.2,
-          "depth": [3, 60],
-          "group": [1, 2]
+          "depth": [
+            3,
+            60
+          ],
+          "group": [
+            1,
+            2
+          ]
         },
         {
           "species": "reef-shark",
           "weight": 1,
-          "depth": [2, 60],
-          "group": [1, 1],
+          "depth": [
+            2,
+            60
+          ],
+          "group": [
+            1,
+            1
+          ],
           "star": true
         },
         {
           "species": "brain-coral",
           "weight": 35,
-          "depth": [1, 40],
-          "group": [1, 5],
+          "depth": [
+            1,
+            40
+          ],
+          "group": [
+            1,
+            5
+          ],
           "star": true
         },
         {
           "species": "comb-jelly",
           "weight": 1,
-          "depth": [8, 40],
-          "group": [1, 3]
+          "depth": [
+            8,
+            40
+          ],
+          "group": [
+            1,
+            3
+          ]
         }
       ],
       "rare": {
         "species": "whale-shark",
-        "depth": [2, 120],
+        "depth": [
+          2,
+          120
+        ],
         "chancePerMin": 0.1,
         "cooldownS": 600,
         "pass": "level"
@@ -1047,51 +1481,96 @@
         {
           "species": "golden-coral",
           "weight": 14,
-          "depth": [1000, 4000],
-          "group": [1, 5],
+          "depth": [
+            1000,
+            4000
+          ],
+          "group": [
+            1,
+            5
+          ],
           "star": true
         },
         {
           "species": "brittle-star",
           "weight": 28,
-          "depth": [3400, 4900],
-          "group": [2, 10],
+          "depth": [
+            3400,
+            4900
+          ],
+          "group": [
+            2,
+            10
+          ],
           "star": true
         },
         {
           "species": "rattail",
           "weight": 1.5,
-          "depth": [400, 4500],
-          "group": [1, 2]
+          "depth": [
+            400,
+            4500
+          ],
+          "group": [
+            1,
+            2
+          ]
         },
         {
           "species": "anemone",
           "weight": 14,
-          "depth": [500, 5100],
-          "group": [1, 5]
+          "depth": [
+            500,
+            5100
+          ],
+          "group": [
+            1,
+            5
+          ]
         },
         {
           "species": "atolla",
           "weight": 2,
-          "depth": [350, 4000],
-          "group": [1, 3]
+          "depth": [
+            350,
+            4000
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "comb-jelly",
           "weight": 1.0,
-          "depth": [8, 1200],
-          "group": [1, 3]
+          "depth": [
+            8,
+            1200
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "blue-shark",
           "weight": 0.6,
-          "depth": [5, 350],
-          "group": [1, 1]
+          "depth": [
+            5,
+            350
+          ],
+          "group": [
+            1,
+            1
+          ]
         }
       ],
       "rare": {
         "species": "dumbo-octopus",
-        "depth": [1000, 5200],
+        "depth": [
+          1000,
+          5200
+        ],
         "chancePerMin": 0.1,
         "cooldownS": 600,
         "pass": "level"
@@ -1102,50 +1581,95 @@
         {
           "species": "long-tailed-cucumber",
           "weight": 21,
-          "depth": [3500, 5600],
-          "group": [1, 5],
+          "depth": [
+            3500,
+            5600
+          ],
+          "group": [
+            1,
+            5
+          ],
           "star": true
         },
         {
           "species": "amperima",
           "weight": 28,
-          "depth": [3500, 5600],
-          "group": [2, 10]
+          "depth": [
+            3500,
+            5600
+          ],
+          "group": [
+            2,
+            10
+          ]
         },
         {
           "species": "brittle-star",
           "weight": 21,
-          "depth": [3400, 4900],
-          "group": [2, 8]
+          "depth": [
+            3400,
+            4900
+          ],
+          "group": [
+            2,
+            8
+          ]
         },
         {
           "species": "rattail",
           "weight": 1,
-          "depth": [400, 4500],
-          "group": [1, 2]
+          "depth": [
+            400,
+            4500
+          ],
+          "group": [
+            1,
+            2
+          ]
         },
         {
           "species": "atolla",
           "weight": 2,
-          "depth": [350, 4000],
-          "group": [1, 3]
+          "depth": [
+            350,
+            4000
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "comb-jelly",
           "weight": 1.0,
-          "depth": [8, 1200],
-          "group": [1, 3]
+          "depth": [
+            8,
+            1200
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "blue-shark",
           "weight": 0.5,
-          "depth": [5, 350],
-          "group": [1, 1]
+          "depth": [
+            5,
+            350
+          ],
+          "group": [
+            1,
+            1
+          ]
         }
       ],
       "rare": {
         "species": "dumbo-octopus",
-        "depth": [1000, 5200],
+        "depth": [
+          1000,
+          5200
+        ],
         "chancePerMin": 0.1,
         "cooldownS": 600,
         "pass": "level"
@@ -1156,51 +1680,96 @@
         {
           "species": "anemone",
           "weight": 21,
-          "depth": [2500, 3500],
-          "group": [1, 6],
+          "depth": [
+            2500,
+            3500
+          ],
+          "group": [
+            1,
+            6
+          ],
           "star": true
         },
         {
           "species": "sea-lily",
           "weight": 14,
-          "depth": [800, 4000],
-          "group": [1, 5],
+          "depth": [
+            800,
+            4000
+          ],
+          "group": [
+            1,
+            5
+          ],
           "star": true
         },
         {
           "species": "glass-sponge",
           "weight": 14,
-          "depth": [2500, 3500],
-          "group": [1, 5]
+          "depth": [
+            2500,
+            3500
+          ],
+          "group": [
+            1,
+            5
+          ]
         },
         {
           "species": "squat-lobster",
           "weight": 14,
-          "depth": [2400, 5100],
-          "group": [1, 5]
+          "depth": [
+            2400,
+            5100
+          ],
+          "group": [
+            1,
+            5
+          ]
         },
         {
           "species": "rattail",
           "weight": 1,
-          "depth": [400, 4500],
-          "group": [1, 2]
+          "depth": [
+            400,
+            4500
+          ],
+          "group": [
+            1,
+            2
+          ]
         },
         {
           "species": "atolla",
           "weight": 2,
-          "depth": [350, 4000],
-          "group": [1, 3]
+          "depth": [
+            350,
+            4000
+          ],
+          "group": [
+            1,
+            3
+          ]
         },
         {
           "species": "comb-jelly",
           "weight": 1.0,
-          "depth": [8, 1200],
-          "group": [1, 3]
+          "depth": [
+            8,
+            1200
+          ],
+          "group": [
+            1,
+            3
+          ]
         }
       ],
       "rare": {
         "species": "weddell-seal",
-        "depth": [5, 600],
+        "depth": [
+          5,
+          600
+        ],
         "chancePerMin": 0.14,
         "cooldownS": 420,
         "pass": "level"
