@@ -46,6 +46,7 @@ export function atSpawnPose(
 interface CollidingBody {
   readonly position: THREE.Vector3;
   readonly velocity: THREE.Vector3;
+  getForward?(out?: THREE.Vector3): THREE.Vector3;
 }
 
 /**
@@ -55,9 +56,16 @@ interface CollidingBody {
  */
 export class PropContact {
   private readonly normal = new THREE.Vector3();
+  private readonly forward = new THREE.Vector3();
+  private readonly slide = new THREE.Vector3();
+  private readonly up = new THREE.Vector3(0, 1, 0);
   private cooldown = 0;
   /** True while touching a prop; for tests and the debug readout. */
   touching = false;
+  /** True when driving forward into the current prop contact normal. */
+  headOn = false;
+  /** Last push normal from collide(); for guidance and tests. */
+  readonly contactNormal = new THREE.Vector3();
 
   constructor(
     private readonly props: Props,
@@ -66,9 +74,11 @@ export class PropContact {
     private readonly radius: number,
   ) {}
 
-  resolve(body: CollidingBody, dt: number): boolean {
+  resolve(body: CollidingBody, dt: number, throttle = 0): boolean {
     this.cooldown = Math.max(0, this.cooldown - dt);
+    this.headOn = false;
     const hit = this.props.collide(body.position, this.radius, this.normal);
+    this.contactNormal.copy(this.normal);
     if (hit) {
       const speed = body.velocity.length();
       const into = body.velocity.dot(this.normal);
@@ -78,8 +88,48 @@ export class PropContact {
         this.cooldown = this.cfg.collisionEventCooldownS;
         this.bus.emit('sub:collided', { depth: body.position.y, speed });
       }
+      this.deflectAlongSurface(body, throttle, dt);
     }
     this.touching = hit;
     return hit;
+  }
+
+  /**
+   * When thrust pushes into a prop, add tangential slide so the hull can pass
+   * around or over instead of stopping dead against the push-out.
+   */
+  private deflectAlongSurface(body: CollidingBody, throttle: number, dt: number): void {
+    const getForward = body.getForward;
+    if (!getForward || throttle <= 0.05) return;
+    const fwd = getForward(this.forward);
+    const into = fwd.dot(this.normal);
+    const horiz = Math.hypot(body.velocity.x, body.velocity.z);
+    if (into < 0.2 && horiz > 2) return;
+    this.slide.copy(fwd).addScaledVector(this.normal, -into);
+    if (this.slide.lengthSq() < 0.04) {
+      const nxz = new THREE.Vector3(this.normal.x, 0, this.normal.z);
+      if (nxz.lengthSq() > 1e-6) {
+        nxz.normalize();
+        this.slide.crossVectors(this.up, nxz);
+        if (this.slide.dot(fwd) < 0) this.slide.negate();
+      } else {
+        this.slide.set(1, 0, 0);
+      }
+      if (this.normal.y < 0.92) {
+        const lateral = this.slide.clone();
+        this.slide.set(0, 1, 0);
+        if (lateral.lengthSq() > 1e-6) this.slide.addScaledVector(lateral.normalize(), 0.35);
+      }
+      this.headOn = true;
+    } else {
+      this.headOn = into > 0.65;
+    }
+    if (this.slide.lengthSq() < 1e-8) return;
+    this.slide.normalize();
+    const slideSpeed = Math.min(10, Math.max(3.5, body.velocity.length() + 2.5)) * throttle * 0.9;
+    body.velocity.addScaledVector(this.slide, slideSpeed);
+    body.position.addScaledVector(this.slide, slideSpeed * dt * 0.65);
+    this.props.collide(body.position, this.radius, this.normal);
+    this.contactNormal.copy(this.normal);
   }
 }

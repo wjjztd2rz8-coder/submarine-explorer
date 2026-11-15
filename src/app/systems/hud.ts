@@ -4,13 +4,33 @@
  * `hud.draw`.
  */
 
+import * as THREE from 'three';
 import { HUD } from '../../ui/HUD.js';
-import { hudRegions } from '../../ui/hudRegions.js';
+import type { ScanView } from '../../game/Scanner.js';
 import type { GameContext } from '../context.js';
+import { hudRegions } from '../../ui/hudRegions.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
+
+const pathProbe = new THREE.Vector3();
+const pathNormal = new THREE.Vector3();
+
+/** True when a prop box blocks the straight line toward the mission objective. */
+function approachBlockedByProp(ctx: GameContext, view: ScanView): boolean {
+  const { props, sub } = ctx;
+  const id = view.objectiveId;
+  if (!props || id == null) return false;
+  const target = ctx.discovery.scanner.getTargets().find((t) => t.id === id);
+  if (!target) return false;
+  const r = ctx.effective.submarine.hullRadius;
+  for (let step = 1; step <= 12; step++) {
+    pathProbe.copy(sub.position).lerp(target.position, step / 12);
+    if (props.collide(pathProbe, r, pathNormal) && Math.abs(pathNormal.y) < 0.85) return true;
+  }
+  return false;
+}
 
 /** How to rise, in the active input device's words. */
 function riseCue(ctx: GameContext): string {
@@ -62,6 +82,24 @@ export const hudSystem: GameSystem = {
       const scanView = discovery.scanner.view;
       const vertObjective =
         scanView.objectiveId !== null && Math.abs(scanView.objectiveVertDeg) > 5;
+      const pc = ctx.propContact;
+      const blockedApproach =
+        pc?.touching &&
+        f.state.throttle > 0.05 &&
+        scanView.objectiveId != null &&
+        scanView.phase === 'idle' &&
+        !scanView.objectiveInRange;
+      const pathBlocked =
+        f.state.throttle > 0.05 &&
+        scanView.objectiveId != null &&
+        scanView.phase === 'idle' &&
+        !scanView.objectiveInRange &&
+        approachBlockedByProp(ctx, scanView);
+      const obstacle =
+        (blockedApproach && (pc!.headOn || pc!.contactNormal.y < 0.85)) || pathBlocked
+          ? 'Go up ↑ to clear the tower'
+          : null;
+      ctx.discovery.overlay.setApproachObstacle(obstacle);
       hud.update(f.sub, {
         // Any unscanned contact in range (animals too) or scan under way: its prompt or result
         // card must not lose the slot to the static altitude warning.
