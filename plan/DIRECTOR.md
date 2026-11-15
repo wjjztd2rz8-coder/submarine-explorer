@@ -131,6 +131,17 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
     then fixes for long frames. Suspects: the per-frame prop ray-probe in `hud.ts`, the
     synchronous canvas readback for thumbnails, bursts of tile loading at 2x transit,
     per-frame DOM writes. It may not edit files S32 and S33 own; it reports those instead.
+    - Owner follow-up (07:10): the laptop is an M4 MacBook, so S34 was steered to test 120 Hz
+      frame pacing, the Retina-size canvas, shader compilation on first draw, GC and
+      WebKit. The phone was in PORTRAIT (landscape "looks nice" but is not the default: the
+      URL bar eats it), so S32 was steered to make portrait the priority and to test at a
+      Safari-like visible viewport (about 390x664) as well as 390x844.
+  - S35 (Sonnet medium), new owner bug: the touch depth slider pitches the nose down and it
+    never returns ("goofy when pointed directly at the floor", and going up felt slow).
+    Cap pitch at 15 to 20 degrees, self-level on release, slider up levels at once, climb
+    rate independent of attitude; Blue Hole, Monterey, Challenger and Lost City must still
+    finish by touch. Owns the pitch and slider parts of `TouchControls.ts`, touch pitch in
+    `Input.ts`, self-levelling in `Submarine.ts`.
     When they land: merge, apply any fixes S34 could only report, gate (static, build,
     keyboard 13, touch 6, units), look at one reveal capture at 844x390, push.
 - **Lesson:** look at one capture before merging any layout change. S30's report and
