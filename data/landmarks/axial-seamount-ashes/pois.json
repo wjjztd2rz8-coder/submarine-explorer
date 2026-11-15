@@ -95,8 +95,8 @@
       ],
       "note": "Real GMRT terrain, about 1,508 m deep and about 130 m west of Mushroom, on the lower part of the rise from ~1,540 m at the vents to ~1,416 m some 300 m west, a slope consistent with the caldera's western boundary fault -- OOI states ASHES sits 'near the base of the western caldera wall' and 'about 130 m east of the caldera boundary fault'. Moved 2026-11 from the top of the rise (the +300 m point, 1,416 m) so the dive does not have to climb 125 m. The exact fault trace itself is not resolved at this tile's ~43-61 m cell size, so this POI marks the rising wall terrain rather than a specific scarp line.",
       "reveal": {
-        "distance_m": 78,
-        "elevation_deg": 7,
+        "distance_m": 110,
+        "elevation_deg": 14,
         "azimuth_deg": 76,
         "sweep_deg": 14
       }

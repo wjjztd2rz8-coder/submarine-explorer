@@ -167,8 +167,8 @@
       "sources": ["https://rmstitanicinc.com/titanic-artifacts/"],
       "note": "Approximate marker in the stern-side debris area. RMS Titanic Inc. reports recovery of the hull section in 1998; it is no longer on the seabed. This coordinate does not establish its historical resting place.",
       "reveal": {
-        "distance_m": 16,
-        "elevation_deg": 23,
+        "distance_m": 45,
+        "elevation_deg": 35,
         "azimuth_deg": 215,
         "sweep_deg": 16
       }

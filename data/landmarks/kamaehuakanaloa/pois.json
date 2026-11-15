@@ -99,8 +99,8 @@
       ],
       "note": "GMRT terrain at about 1,275 m, between the Hiolo North and Hiolo South vent markers, which published cruises place inside Pele's Pit. Added 2026-11 as a route stop. This tile's ~58x61 m grid does not resolve the pit's ~600 m rim, so this marks the pit's floor around the vents, not a traced crater outline.",
       "reveal": {
-        "distance_m": 36,
-        "elevation_deg": 12,
+        "distance_m": 90,
+        "elevation_deg": 30,
         "azimuth_deg": 315,
         "sweep_deg": 16
       }
