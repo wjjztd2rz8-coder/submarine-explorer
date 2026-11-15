@@ -658,6 +658,44 @@ describe('Scanner', () => {
     expect(scanner.view.phase).toBe('scanning');
   });
 
+  it('counts hovering over a target as on top of it, however high above', () => {
+    // 40 m up and 8 m to the side: steeply below the level nose, outside closeRangeM in 3D.
+    const { scanner } = setup([target({ position: new Vector3(8, -140, 0) })]);
+    scanner.update(DT, AT, EAST.clone().negate(), true);
+    expect(scanner.view.phase).toBe('scanning');
+  });
+
+  it('a level cone needs only the heading toward a target far below', () => {
+    // 60 m ahead and 60 m down: 45 deg below the nose, beyond the 30 deg 3D cone.
+    const pos = new Vector3(0, -160, -60);
+    const plain = setup([target({ position: pos })]).scanner;
+    plain.update(DT, AT, NORTH, true);
+    expect(plain.view.phase).toBe('idle');
+    const level = setup([target({ position: pos })]).scanner;
+    level.setConfig({ ...cfg, levelCone: true });
+    level.update(DT, AT, NORTH, true);
+    expect(level.view.phase).toBe('scanning');
+    // Heading still matters: pointing away is not facing.
+    const away = setup([target({ position: pos })]).scanner;
+    away.setConfig({ ...cfg, levelCone: true });
+    away.update(DT, AT, EAST, true);
+    expect(away.view.phase).toBe('idle');
+  });
+
+  it('a scan in progress keeps its lock through a slightly wider cone', () => {
+    const off = (deg: number) =>
+      new Vector3(Math.sin((deg * Math.PI) / 180), 0, -Math.cos((deg * Math.PI) / 180));
+    // 40 deg off: outside the 30 deg cone, inside the 30 + 20 deg lock cone.
+    const { scanner } = setup();
+    scanner.update(DT, AT, off(40), true);
+    expect(scanner.view.phase).toBe('idle');
+    run(scanner, 0.5, AT, NORTH, true);
+    run(scanner, 0.5, AT, off(40), true);
+    expect(scanner.view.phase).toBe('scanning');
+    scanner.update(DT, AT, off(60), true);
+    expect(scanner.view.phase).toBe('interrupted');
+  });
+
   it('aborts with "released" and decays, then resumes where it left off', () => {
     const { scanner, log } = setup();
     run(scanner, 1, AT, NORTH, true);
@@ -994,4 +1032,12 @@ describe('Scanner objective priority over passing contacts', () => {
     expect(scanner.view.phase).toBe('scanning');
     expect(scanner.view.activeId).toBe(objective.id);
   });
+});
+
+it('Arcade faces by heading only; Realistic keeps the 3D cone', async () => {
+  const { resolveEffective } = await import('../../src/game/EffectiveSettings.js');
+  const { Save } = await import('../../src/core/Save.js');
+  const settings = new Save({ config: DEFAULT_CONFIG, storage: null }).get();
+  expect(resolveEffective(settings, 'arcade', null).scan.levelCone).toBe(true);
+  expect(resolveEffective(settings, 'realistic', null).scan.levelCone).toBe(false);
 });

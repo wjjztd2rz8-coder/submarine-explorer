@@ -766,6 +766,11 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
     expect(name.textContent).toBe('Stern section');
+    // Steeply below but facing away: turning is the one thing left, not a depth change.
+    Object.assign(view, { objectiveVertDeg: -60, objectiveTurnDeg: 120 });
+    overlay.update(view, { scan: 'G', guide: 'J', rise: 'Space', sink: 'Ctrl' }, null, 0);
+    expect(hint.textContent).toBe('Turn around to face the marker');
+    Object.assign(view, { objectiveVertDeg: -20, objectiveTurnDeg: 40 });
     view.objectiveInRange = false;
     f.controls.setTouchMode(true);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);

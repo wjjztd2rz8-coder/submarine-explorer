@@ -381,7 +381,9 @@ export class ScanOverlay {
       // it into the beam, a depth change can. Touch keeps its slider wording.
       const inRange = (): string => {
         const vert = view.objectiveVertDeg;
-        if (Math.abs(vert) < 35) return guide(turn, vert, 'PITCH TOWARD TARGET');
+        // Far off the heading, turning is the one thing left whatever the depth.
+        if (Math.abs(vert) < 35 || Math.abs(turn) >= 35)
+          return guide(turn, vert, 'PITCH TOWARD TARGET');
         if (touch) return guide(0, vert, 'PITCH TOWARD TARGET');
         return (
           depthCue(view.objectiveDistance, vert, keys) ?? guide(turn, vert, 'PITCH TOWARD TARGET')

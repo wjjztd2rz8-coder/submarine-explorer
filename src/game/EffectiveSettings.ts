@@ -54,6 +54,8 @@ export function resolveEffective(
       ...base.scan,
       coneHalfAngleDeg:
         preset === 'realistic' ? base.scan.coneHalfAngleDeg : base.scan.arcadeConeHalfAngleDeg,
+      // Arcade boats stay level (touch has no pitch): only the heading has to face the target.
+      levelCone: preset !== 'realistic',
       radiusFloorM: preset === 'realistic' ? 0 : 100,
       ...(preset === 'realistic' ? {} : { radiusCeilM: 120 }),
       hintRangeFactor:
