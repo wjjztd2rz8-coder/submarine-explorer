@@ -64,7 +64,7 @@ export const INVERTEBRATES: SpeciesDef[] = [
   def({
     id: 'comb-jelly',
     common: 'Lobate comb jelly',
-    scientific: 'Bolinopsis infundibulum',
+    scientific: 'Bolinopsis sp.',
     group: 'Jellies',
     archetype: 'drifter',
     model: 'comb',
@@ -100,7 +100,7 @@ export const INVERTEBRATES: SpeciesDef[] = [
   def({
     id: 'hawaii-shrimp',
     common: 'Hawaiʻi vent shrimp',
-    scientific: 'Opaepele loihi',
+    scientific: 'Rimicaris loihi',
     group: 'Crustaceans',
     archetype: 'swarm',
     model: 'shrimp',
@@ -249,7 +249,7 @@ export const INVERTEBRATES: SpeciesDef[] = [
   def({
     id: 'golden-coral',
     common: 'Golden coral',
-    scientific: 'Chrysogorgia geniculata',
+    scientific: 'Chrysogorgia sp.',
     group: 'Corals',
     archetype: 'sessile',
     model: 'gorgonian',
@@ -263,7 +263,7 @@ export const INVERTEBRATES: SpeciesDef[] = [
   }),
   def({
     id: 'deep-coral',
-    common: 'Bubblegum coral',
+    common: 'Deep-sea sea fan',
     scientific: 'Paramuricea sp.',
     group: 'Corals',
     archetype: 'sessile',
