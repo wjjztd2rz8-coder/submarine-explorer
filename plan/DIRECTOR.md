@@ -65,21 +65,31 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   S13b (reveal framing: C-rated reveals about 23 of 64 to 0; 23 still B for lack of art:
   Titanic shoes, hull piece and plaque; Challenger Deep basin and walls; Hunga floor and
   flank; Blue Hole drop-offs).
-- **Props, read before touching `src/world/props/Wiring.ts` or the cue in `hud.ts`:** S20's
-  slide threw on every contact frame (detached `getForward`); once it ran, its upward slide
-  launched the sub up the Blue Hole wall to the surface; a sideways-only nudge pinned the
-  sub on Hunga's wall. What ships: NO slide; cue "Blocked ahead · go up ↑" on head-on prop
-  contact at any target elevation, on a blocked sightline only when the target is level
-  or above, never within 12 m of the surface; the cue replaces the depth cue. Any change
-  here must replay great-blue-hole, lost-city and hunga-tonga-caldera with
-  `TOUR_NO_ANTISTUCK=1 TOUR_NO_FINISH=1`. The local gate must run these plays: the unit
-  suite was green through three broken versions.
-- **In flight:** S22 (Opus medium): every site finishable by touch at 844x390 and four at
-  390x844; rewrites `tools/playtest/touch-drive.mjs` as a full-dive phone player. Blue
-  Hole by touch recorded 2 scans and no debrief twice with the old script.
-- **Next:** merge S22, gate, push; owner phone test Sunday morning; nothing else queued.
-  Candidates if time remains: art for the 23 B-rated reveals is out of scope; a last
-  Sonnet copy pass on HUD wording; delete finished worktrees.
+- **02:40 Sunday state.** LIVE: `844edb4a` (CI green, deployed about 01:45). PUSHED at
+  02:40: `1dd16218` with S22 (touch); confirm CI and deploy with
+  `gh run list --branch main --limit 3`. Gate on it, quiet machine: static checks,
+  typecheck, build pass; unit suite 207 files, 4,864 tests; all 13 sites end on the debrief
+  by keyboard with anti-stuck off; six touch dives end on the debrief with all finds
+  (844x390: Blue Hole 62 s, Hunga 76 s, Lost City 45 s, Titanic 118 s; 390x844: Blue Hole
+  66 s, Monterey 69 s). S22 itself measured all 13 by touch at 844x390.
+- **Props, read before touching `src/world/props/Wiring.ts` or the cue in `hud.ts`:** what
+  ships is S22's version (touch-measured on 13 sites): a slide along props with the sign
+  of "forward into the wall" fixed, `escapePocket` (after a second of thrust with no
+  headway the hull is carried up and out, or straight back out under a ceiling), and
+  `approachBlockedByProp` ignoring the last 25% of scan range so the target's own prop
+  does not count as a blocker (the real cause of Blue Hole's endless "Blocked ahead").
+  It replaced the orchestrator's cue-only version (three attempts, each fixed one site and
+  broke another; the unit suite was green through all of them). Any change here must
+  replay great-blue-hole, lost-city and hunga-tonga-caldera by keyboard
+  (`TOUR_NO_ANTISTUCK=1 TOUR_NO_FINISH=1`) AND by touch (`TOUCH_FULL=1`), in the gate.
+- **Open, in flight:** S23 (Sonnet): Hunga by keyboard is slow and erratic (94 to 254 s;
+  the gate run sat 215 s under the overhanging `caldera-tuff-wall` with "Blocked ahead ·
+  go up ↑"). Fix in Hunga's data (no overhang in the wall's collision, or reroute), not
+  in `Wiring.ts`.
+- **Next:** merge S23, gate (keyboard 13 + touch 6 + units), push. Owner phone test Sunday
+  morning; act on it. Then final State here, delete scheduled tasks, remove finished
+  worktrees. Limits 02:40: Claude 48% (resets 04:30), Codex 91%, Cursor Models 16%,
+  Other Models 0%.
 - **Reveal framing:** S13 (Gemini) died when Cursor's Other Models pool hit 0% (resets Nov
   24). Its unreviewed work is committed as WIP on `t3/improve-landmark-reveals`
   (`fe6c8a69`). A scheduled wake at 23:33 launches S13b on Sonnet to review and finish it.
