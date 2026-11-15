@@ -26,6 +26,15 @@ const INIT = () => {
         if (performance.memory && T.frames.length % 5 === 0) (T.heap ??= []).push([t0, performance.memory.usedJSHeapSize]);
         const g = w.__game;
         try {
+          if (g?.scene) {
+            let lights = 0;
+            g.scene.traverseVisible((o) => { if (o.isLight) (lights++, (T.ln = (T.ln ?? []).concat([o.name || o.type]))); });
+            const names = (T.ln ?? []).join(","); T.ln = [];
+            const key = names + ` fog=${!!g.scene.fog} lights=${lights} env=${!!g.scene.environment} bg=${!!g.scene.background}`;
+            if (key !== T.sceneKey) { T.sceneKey = key; mark('SCENE ' + key); }
+          }
+        } catch {}
+        try {
           const n = g?.scanner?.scannedThisDive?.size ?? 0;
           if (n !== T.finds) {
             T.finds = n;

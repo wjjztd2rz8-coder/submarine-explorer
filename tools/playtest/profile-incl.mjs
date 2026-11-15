@@ -28,7 +28,7 @@ for (let i = 0; i < profile.samples.length; i++) {
   }
 }
 console.log('busy ms', total.toFixed(0));
-for (const [k, v] of [...incl].sort((a, b) => b[1] - a[1]).slice(0, 45)) console.log(`${v.toFixed(0).padStart(6)} ms ${((100 * v) / total).toFixed(1).padStart(5)}%  ${k}`);
+for (const [k, v] of [...incl].sort((a, b) => b[1] - a[1]).slice(0, 400)) console.log(`${v.toFixed(0).padStart(6)} ms ${((100 * v) / total).toFixed(1).padStart(5)}%  ${k}`);
 if (callersOf) {
   const c = new Map();
   for (const [dt, who] of callers.values()) c.set(who, (c.get(who) ?? 0) + dt);
