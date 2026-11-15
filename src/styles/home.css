@@ -46,9 +46,14 @@
 }
 .home-copy.is-compact .home-kicker,
 .home-copy.is-compact .home-tagline,
-.home-copy.is-compact .home-desc,
 .home-body .home-notes {
   display: none;
+}
+.home-copy.is-compact .home-desc {
+  margin: 6px 0 0;
+  color: var(--home-muted);
+  font-size: 15px;
+  line-height: 1.45;
 }
 @media (max-width: 360px) {
   .home-screen {
@@ -205,11 +210,14 @@
   margin: -6px;
 }
 .home-menu > .home-more-toggle {
-  justify-self: end;
   min-height: 44px;
   padding: 8px 14px;
   font-size: 14px;
   font-weight: 500;
+  text-align: center;
+}
+.home-menu > button:not(.home-primary):not(.daily-card):not(.home-more-toggle) {
+  text-align: center;
 }
 .home-more {
   grid-column: 1 / -1;

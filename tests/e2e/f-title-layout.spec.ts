@@ -33,7 +33,7 @@ test('home copy, semantic order and first focus', async ({ page }) => {
   await expect(page.locator('.home-screen h1')).toHaveText('Bathyline');
   await expect(page.locator('.home-tagline')).toHaveText('Explore the real deep.');
   await expect(page.locator('.home-desc')).toHaveText(
-    'Real terrain, simple controls, discoveries worth finding.',
+    'Dive to thirteen real ocean sites and scan what you find.',
   );
   await expect(page.locator('.home-notes')).toContainText('Play in your browser');
   await expect(page.locator('.home-notes')).toContainText('Touch, keyboard or controller');
