@@ -82,14 +82,26 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   broke another; the unit suite was green through all of them). Any change here must
   replay great-blue-hole, lost-city and hunga-tonga-caldera by keyboard
   (`TOUR_NO_ANTISTUCK=1 TOUR_NO_FINISH=1`) AND by touch (`TOUCH_FULL=1`), in the gate.
-- **Open, in flight:** S23 (Sonnet): Hunga by keyboard is slow and erratic (94 to 254 s;
-  the gate run sat 215 s under the overhanging `caldera-tuff-wall` with "Blocked ahead ·
-  go up ↑"). Fix in Hunga's data (no overhang in the wall's collision, or reroute), not
-  in `Wiring.ts`.
-- **Next:** merge S23, gate (keyboard 13 + touch 6 + units), push. Owner phone test Sunday
-  morning; act on it. Then final State here, delete scheduled tasks, remove finished
-  worktrees. Limits 02:40: Claude 48% (resets 04:30), Codex 91%, Cursor Models 16%,
-  Other Models 0%.
+- **03:45 Sunday state.** LIVE since about 03:00: `1dd16218` (touch build, CI green).
+  PUSHED 03:45: `dd833e5b` with S23: Hunga's `caldera-tuff-wall` is 120 m wide (was 150)
+  and sits 45 m south and 10 m east, so the guided line from the first find clears it.
+  Gate: static checks, build, unit suite 207 files / 4,864 tests pass; Hunga by keyboard
+  71 and 72 s (was 94 to 254 s), by touch 73 s (844x390) and 75 s (390x844); Lost City 44,
+  Blue Hole 58, Bismarck 83, Titanic 113 s by keyboard. The rim-wall reveal still frames
+  the wall and its vents (orchestrator looked at one capture). Confirm CI and deploy with
+  `gh run list --branch main --limit 3`.
+- **Nothing in flight. Backlog is empty apart from the owner phone test** (Sunday): act on
+  what they say. Known and accepted: 23 reveals rated B for lack of art (Titanic shoes,
+  hull piece, plaque; Challenger Deep basin and walls; Hunga floor and flank; Blue Hole
+  drop-offs); dives are short for a script that steers well (44 to 113 s); the catalogue
+  pairs "Bubblegum coral" with Paramuricea and uses an Atlantic comb jelly name for Pacific
+  animals (S17, outside its files); resize and orientation change mid-dive were never
+  tested in a browser.
+- **Wrap-up still to do (Monday buffer):** final State here; `list_scheduled_tasks` and
+  delete any left; remove finished worktrees under `~/.t3/worktrees/submarine-explorer/`
+  and the stale `~/subexp-wt/124-*`, `131-*` (unmerged on purpose: S2
+  `t3/hunga-tonga-finishable-route`, S3 `t3/survey-speed-turning-radius`, S13's WIP
+  `t3/improve-landmark-reveals`; all superseded).
 - **Reveal framing:** S13 (Gemini) died when Cursor's Other Models pool hit 0% (resets Nov
   24). Its unreviewed work is committed as WIP on `t3/improve-landmark-reveals`
   (`fe6c8a69`). A scheduled wake at 23:33 launches S13b on Sonnet to review and finish it.
