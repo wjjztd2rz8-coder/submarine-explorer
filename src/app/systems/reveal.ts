@@ -154,7 +154,7 @@ export function createRevealSystem(): GameSystem {
         }
         if (!queue.active) return;
         if (queue.current) {
-          elapsed += f.dt;
+          if (!f.blocked) elapsed += f.dt;
           if (elapsed >= REVEAL_AUTO_DISMISS_S) finishing = true;
           if (finishing && captured && !returning) {
             ctx.rig.endReveal();

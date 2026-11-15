@@ -95,3 +95,28 @@ it.each([false, true])(
     }
   },
 );
+
+it.each(['pause', 'hidden', 'journal'] as const)(
+  'preserves the reveal reading time while interrupted by %s',
+  async (interruption) => {
+    const { ctx, system, scan, frame } = await setup();
+    try {
+      scan('a');
+      frame(0.25);
+      frame(3);
+      vi.mocked(ctx.rig.endReveal).mockClear();
+      if (interruption === 'pause') ctx.app.state = 'pause';
+      if (interruption === 'hidden') Object.assign(document, { hidden: true });
+      for (let i = 0; i < 60; i++) frame(0.25, true);
+      expect(ctx.rig.endReveal).not.toHaveBeenCalled();
+      expect(ctx.discovery.reveal!.active).toBe(true);
+      ctx.app.state = 'dive';
+      Object.assign(document, { hidden: false });
+      for (let i = 0; i < 40; i++) frame();
+      expect(ctx.rig.endReveal).toHaveBeenCalledOnce();
+      expect(ctx.discovery.reveal!.active).toBe(false);
+    } finally {
+      system.dispose!();
+    }
+  },
+);
