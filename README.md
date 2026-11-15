@@ -1,508 +1,70 @@
 # Bathyline
 
-_Explore the real deep._ Bathyline is a cinematic ocean exploration game for the
-browser: real terrain, simple controls, discoveries worth finding. Pilot a
-research submarine over **real ocean-floor bathymetry** from the
-[GMRT](https://www.gmrt.org) Global Multi-Resolution Topography synthesis,
-exploring wrecks, marine life and geological wonders on keyboard, controller or touch.
-The repository, package and deployment URLs retain `submarine-explorer`.
+Browser game: pilot a research sub over real seafloor bathymetry from
+[GMRT](https://www.gmrt.org), scan famous sites, and read short field-guide facts.
+Play on desktop or phone (keyboard, gamepad, or touch).
+
+**Live build:** https://wjjztd2rz8-coder.github.io/submarine-explorer/
 
 ## Playing it
 
-The game requires WebGL2, including on Low quality. The installed Three.js renderer
-does not support WebGL1; quality tiers reduce rendering cost within WebGL2.
+You need a browser with WebGL2.
 
-The home screen's backdrop is a fixed title scene: a research submarine beside a
-Monterey Canyon crop built from the checked-in GMRT tile, with the globe kept for
-the Dive sites / Free dive picker (see [`docs/title-scene.md`](docs/title-scene.md)).
-Home type is self-hosted DM Sans and Source Serif 4 (SIL OFL 1.1; notices in
-`public/fonts/` and `ATTRIBUTION.md`).
+**Home** offers **Dive** (continues a guided tour from your last progress), **Dive
+sites**, **Free dive**, **Journal**, **Settings**, and **Controls**. The tour has
+thirteen real missions in a fixed order (Titanic first for new players). Each site
+uses a GMRT heightmap tile and its own mission pack under `data/landmarks/`.
 
-The identity lives in `public/brand/`: light/dark SVG marks, simplified 16 px
-marks and portable wordmarks with outlined Source Serif 4 lettering. “Dark”
-variants sit on navy backgrounds; “light” variants sit on pale backgrounds.
-The title imports the same mark geometry as the PWA and social card, and runtime
-copy uses `src/core/Brand.ts`. Rebuild wordmarks with
-`python3 tools/make_brand_wordmarks.py`; rebuild PWA/Apple icons with
-`node tools/make_icons.mjs` (or `--native` for Linux sandboxes).
+A dive starts with a short briefing, then a few minutes of piloting. Sonar lists
+**contacts** along the route; follow them to landmarks, move in range, and hold
+**scan** on a glowing target. A finished scan opens a close-up **reveal** with one
+real fact from the guide data. Progress and Journal entries persist in the browser.
 
-The 1200×630 social preview in `public/share/bathyline-og-1200x630.png` uses the
-Bathyline mark, local brand fonts and original bathymetric contours. Regenerate
-its PNG from authored SVG with `node tools/make_share_image.mjs` using the Playwright
-Chromium installation already required for e2e (`npx playwright install chromium`).
-Linux sandboxes that block Chromium can use `node tools/make_share_image.mjs --native`
-with existing Python 3, librsvg, Cairo, HarfBuzz and libwoff2dec system libraries; no extra npm
-or pip packages are required. Renderer versions can change PNG antialiasing.
-The HTML social metadata uses the absolute GitHub Pages image URL under
-`https://wjjztd2rz8-coder.github.io/submarine-explorer/`; update it if the deployment
-host or project base changes.
+When you surface or finish the route, a **debrief** summarizes the dive and names the
+next tour site. **Esc** opens pause (Resume, objectives, Journal, Settings, data
+credits, quit). Menus freeze the simulation.
 
-`npm run dev` and open the printed `localhost` URL. The **home screen** opens
-first with the globe from the dive-site picker behind a menu: one primary
-**Dive** button (a first run opens the Titanic briefing; afterwards it
-continues your last mission), then **Dive sites**, **Free dive**, **Journal**,
-**Settings** and **Controls**. The Arcade / Realistic / Custom mode selector is
-visible above the menu. Picking a site opens a briefing with Dive settings
-(mode, and an **Advanced** disclosure, collapsed by default, with start position
-and more options); its preview matches the actual spawn.
-
-While diving, **Esc** opens the pause menu: Resume, Objectives (the full list
-with hints), Journal, Settings, Controls (How to play on touch),
-Data credits and Quit to home. Choose another site from Home (Quit to home).
-Opening the pause menu, Settings, the globe or a briefing card freezes the
-simulation — nothing drains, moves or times out while a menu is open.
-Deep-linking with `?mission=`, `?tile=` or `?skipBriefing=1` skips the home
-screen and starts a dive directly (see URL parameters).
-
-### Modes: Arcade, Realistic, Custom
-
-Home, the mission briefing and Settings → Gameplay offer Arcade and Realistic.
-Advanced has four switches; editing one enters Custom and keeps the speed,
-lights and sensors of the last selected preset. Selecting a preset resets the
-four switches together.
-
-| Setting                  | Arcade (default)                      | Realistic                                  | Custom                              |
-| ------------------------ | ------------------------------------- | ------------------------------------------ | ----------------------------------- |
-| Speed, including descent | Fast: ~14.9 m/s cruise; 8 m/s descent | Research: ~1.2 m/s cruise; 0.5 m/s descent | Inherits the last selected preset   |
-| Lights / sensors         | Enhanced lights / extended sensors    | Realistic lights / sensors                 | Inherits the last selected preset   |
-| Battery / oxygen         | Off                                   | On                                         | Switch                              |
-| Currents                 | Off                                   | Full sampled strength                      | Switch: off / full sampled strength |
-| Visual waypoints         | On                                    | Off                                        | Switch                              |
-| Start at surface         | Off (near site)                       | Off (near site)                            | Switch                              |
-
-Sonar markers are always available. Dives start at 1×; **T** and **D-pad Up**
-still cycle 1×/2×/3×. Speed and descent use simulated time: 2×/3× plays the
-same motion faster without changing the vehicle's top speed. Display,
-accessibility and UI-scale settings are independent of the gameplay mode.
-
-Every pilot starts with the full equipment kit. Hulls fit the dive's depth in every
-mode: Class A through 1,000 m (including Blue Hole), B through 6,500 m, and C
-through 11,000 m. Every site is open from the first dive.
-
-The Journal front page's **Cosmetics** picker selects sub paint, lamp trims, hull
-decals and photo frames. Unique scans of points of interest, wildlife and finds unlock them;
-repeat discoveries do not count twice. Sub choices apply when the next dive's sub
-is built; photo frames are baked into new captures. Low quality retains its
-existing omission of hull decals. Samples and secrets appear together as Journal
-**Finds**; event sightings remain in the Journal and debrief without reward
-checklists. Mission stars and Daily streaks remain records of completed dives.
-
-Progress saves migrate in place to schema v2. Past RP, including spent purchases,
-grants cosmetics; previously earned paint and lamp choices are retained. Discovery
-keys (`sample:` and `secret:`), best ratings, Daily records and saved photos stay
-intact. Legacy research values remain archived in the save and have no gameplay
-effect.
+Gameplay modes (Arcade, Realistic, Custom), URL parameters, and the full control map
+are documented in-game under **Controls** and in `docs/` for developers.
 
 ## Dive sites
 
-Thirteen GMRT tiles (one per Tier-2 landmark, tile id = landmark id) plus a
-synthetic stand-in ship in `data/tiles/`. Full table with bboxes, cell sizes,
-file sizes, multibeam coverage and caveats: [`docs/tiles-inventory.md`](docs/tiles-inventory.md).
-
-| Tile                   | Site                                    | Grid      | Depth range m  |
-| ---------------------- | --------------------------------------- | --------- | -------------- |
-| `titanic`              | RMS Titanic wreck, North Atlantic       | 548×546   | -3978 … -3339  |
-| `challenger-deep`      | Challenger Deep, Mariana Trench         | 911×911   | -10931 … -5936 |
-| `lost-city`            | Lost City hydrothermal field            | 367×310   | -5002 … -724   |
-| `monterey-canyon`      | Monterey Canyon, California             | 820×638   | -2333 … +265   |
-| `endurance`            | Endurance wreck, Weddell Sea            | 1202×545  | -3096 … -2915  |
-| `axial-seamount-ashes` | Axial Seamount / ASHES vent field       | 1050×727  | -2853 … -1392  |
-| `hudson-canyon`        | Hudson Canyon (shelf break, upper)      | 1093×910  | -1683 … -68    |
-| `kamaehuakanaloa`      | Kamaʻehuakanaloa (Lōʻihi) Seamount      | 580×547   | -5027 … -975   |
-| `beebe-vent-field`     | Beebe vent field, Cayman Trough         | 579×546   | -6575 … -2087  |
-| `great-blue-hole`      | Great Blue Hole (hole below grid res.)  | 574×547   | -3643 … +98    |
-| `bismarck`             | Bismarck wreck site                     | 825×547   | -5009 … -3813  |
-| `hunga-tonga-caldera`  | Hunga Tonga–Hunga Haʻapai (pre-2022)    | 586×546   | -1951 … +82    |
-| `blake-plateau-corals` | Blake Plateau coral mounds              | 1202×1201 | -960 … -580    |
-| `demo-synthetic`       | synthetic, not a landmark (offline use) | 384×384   | -4367 … -3072  |
-
-Cells are ~40–60 m (22 m E-W on `endurance`). `great-blue-hole` and
-`hunga-tonga-caldera` do not show the feature they are named for; see the
-inventory. All 13 landmark sites have a full mission (`data/landmarks/index.json`);
-`demo-synthetic` is a tile-only offline stand-in with no mission. Try
-`?mission=titanic` or choose **Dive sites** on Home to pick any of the 13.
+Thirteen landmark missions (see `data/landmarks/index.json`): Great Blue Hole, Hunga
+Tonga caldera, Blake Plateau corals, Lost City, Kamaʻehuakanaloa, Axial Seamount,
+Hudson Canyon, Monterey Canyon, Endurance, Titanic, Bismarck, Beebe vent field, and
+Challenger Deep. Tile details: [`docs/tiles-inventory.md`](docs/tiles-inventory.md).
 
 ## Setup
 
-Requires Node 22.12+ (vitest 5) and Python 3.9+ (standard library only — no
-numpy, no GDAL).
+Node 22.12+ and Python 3.9+ (stdlib only for tile tools).
 
 ```bash
 npm install
-npx playwright install chromium     # only needed for the e2e tests
-npm run dev                          # http://localhost:5173
+npm run dev    # http://localhost:5173
 ```
 
-The float32 heightmaps and `heightmap16.bin` variants are in the repo; the
-`.gz`/`.br` copies and the raw download cache (`.cache/gmrt-raw/`) are
-gitignored. To regenerate tiles:
+For e2e tests: `npx playwright install chromium`.
 
-```bash
-python3 tools/fetch_all.py --skip-existing     # every Tier-2 landmark missing a tile
-python3 tools/compress_tiles.py --quant16      # .gz (+ .br if brotli is on PATH) and heightmap16.bin
-```
-
-If GMRT is unreachable, generate a stand-in so the engine still runs:
-
-```bash
-python3 tools/make_synthetic_tile.py --id demo-synthetic --cols 384 --rows 384
-```
+Heightmaps are checked in; regenerate with `python3 tools/fetch_all.py` and
+`python3 tools/compress_tiles.py` (see `tools/`).
 
 ## Commands
 
-| Command                           | What it does                                                                                    |
-| --------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `npm run dev`                     | Vite dev server with HMR on :5173                                                               |
-| `npm run build`                   | type-check (`tsc --noEmit`) then production build to `dist/`                                    |
-| `npm run preview`                 | serve `dist/` on :4173                                                                          |
-| `npm test`                        | vitest unit tests (`tests/unit/`)                                                               |
-| `npm run test:watch`              | vitest in watch mode                                                                            |
-| `npm run test:py`                 | Python unit tests (`tools/tests/`: parser, fetch_all, compress, props)                          |
-| `npm run test:e2e`                | Playwright suite (`tests/e2e/`); needs a build first                                            |
-| `npm run typecheck`               | type-check only                                                                                 |
-| `npm run format` / `format:check` | prettier over the whole repo (see CONTRIBUTING-AGENTS.md before use)                            |
-| `npm run check:attribution`       | fails if a `public/assets/`/`public/audio/` file has no `ATTRIBUTION.md` row                    |
-| `npm run check:content`           | strict validation of all 13 mission packs                                                       |
-| `npm run test:e2e:base`           | separate project-base build and browser check at `/submarine-explorer/`                         |
-| `npm run ci`                      | Python/content checks, build, unit/browser tests, project-base test, attribution and formatting |
+| Command             | What it does                        |
+| ------------------- | ----------------------------------- |
+| `npm run dev`       | Vite dev server                     |
+| `npm run build`     | Typecheck and production build      |
+| `npm run preview`   | Serve `dist/`                       |
+| `npm test`          | Vitest unit tests                   |
+| `npm run typecheck` | TypeScript only                     |
+| `npm run test:e2e`  | Playwright (needs a build first)    |
+| `npm run ci`        | Full gate script (`tools/gates.sh`) |
 
-Content validators (not npm scripts; run directly with `python3`):
+## Licence and data credits
 
-| Command                                                 | What it does                                                                                      |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `tools/validate_landmark.py <id>... [--all] [--strict]` | checks a landmark's pois/guide/mission/props/species against the contracts and the tile's terrain |
-| `tools/validate_props.py <props.json> --tile <id>`      | props.json schema, bbox, GLB size, attribution                                                    |
-| `tools/check_attribution.py`                            | every asset under `public/assets/`/`public/audio/` has an `ATTRIBUTION.md` row                    |
+Code: [MIT](LICENSE). Game content: [LICENSE-CONTENT.md](LICENSE-CONTENT.md). Asset
+and model credits: [ATTRIBUTION.md](ATTRIBUTION.md).
 
-`tools/resume.sh [--headless]` restarts an agent orchestration session from
-`plan/RESUME-PROMPT.md` after a usage-limit reset (see `CONTRIBUTING-AGENTS.md`).
-
-e2e environment variables (`playwright.config.ts`, `tests/e2e/smoke.spec.ts`):
-
-| Variable     | Default | Effect                                                               |
-| ------------ | ------- | -------------------------------------------------------------------- |
-| `PW_PORT`    | `4173`  | port `vite preview` is started on and the tests browse to            |
-| `PW_OUTDIR`  | `dist`  | build directory `vite preview` serves                                |
-| `SMOKE_TILE` | —       | smoke-test only this tile instead of `titanic` and `monterey-canyon` |
-
-When several people or agents run e2e in one checkout, give each its own
-output and port so nobody serves a stale bundle:
-
-```bash
-npm run build -- --outDir dist-mine
-PW_PORT=4190 PW_OUTDIR=dist-mine npm run test:e2e
-```
-
-The suite boots the built game, waits for `window.__gameReady`, asserts there
-were no console errors, and writes screenshots to `tests/e2e/screenshots/`.
-
-### Deploying
-
-The site is a static build. `.github/workflows/ci.yml` runs every check above on
-pushes and pull requests to `main` (`npm run ci` runs the same steps locally),
-and `.github/workflows/deploy.yml` publishes `dist/` to GitHub Pages after CI
-passes on `main`. Set `VITE_BASE=/<repo>/` when building for a sub-path.
-`npm run check:attribution` fails when a file under `public/assets/` or
-`public/audio/` has no row in `ATTRIBUTION.md`. See
-[`docs/deploy.md`](docs/deploy.md) for enabling Pages, custom domains, caching
-and licences ([`LICENSE`](LICENSE), [`LICENSE-CONTENT.md`](LICENSE-CONTENT.md)).
-
-## Controls
-
-Defaults from `defaultActions()` in `src/core/Input.ts`. Keys are rebindable
-from Settings -> Controls (`Input.rebind`, saved to `localStorage` key
-`subexplorer.bindings.v3`); a gamepad takes over automatically whenever a
-stick or button is deflected, but its buttons are not rebindable yet.
-
-| Key                         | Action                                                                                                          | Gamepad (standard mapping) |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| `W` / `S` (or up / down)    | ahead / astern                                                                                                  | left stick                 |
-| `A` / `D` (or left / right) | yaw to port / starboard                                                                                         | left stick                 |
-| `R` / `F`                   | pitch nose up / down                                                                                            | right stick                |
-| `Space`                     | rise (blow ballast)                                                                                             | A / cross                  |
-| `Ctrl` or `C`               | sink (flood ballast); `C` is a full alias                                                                       | B / circle                 |
-| `G` (hold)                  | scan the target in range; "Already logged" once it's scanned this dive                                          | right bumper               |
-| `L`                         | headlights                                                                                                      | X                          |
-| `M`                         | sonar map; its buttons, `+`/`-`, or the wheel zoom it (250 m / 500 m / 1 km / 2 km / whole tile) while expanded | Back / view                |
-| `X`                         | reset camera to default chase view                                                                              | D-pad down                 |
-| `Q`                         | camera view (chase / first-person)                                                                              | Y                          |
-| `T`                         | sim speed 1x / 2x / 3x (a HUD badge shows it whenever it isn't 1x)                                              | D-pad up                   |
-| `J`                         | Journal (site, POI and species entries, plus your photo gallery)                                                | D-pad left                 |
-| `P`                         | photo mode (free-orbit camera, hidden HUD)                                                                      | Start                      |
-| `Enter`                     | capture a photo in photo mode; `Space` and the Capture button also work                                         | left bumper                |
-| `Esc`                       | pause menu; closes the top-most open dialog first                                                               | --                         |
-| mouse drag                  | free look; camera keeps its world angle as the boat turns                                                       | --                         |
-| mouse wheel                 | zoom the chase camera (35–180 m) unless sonar is expanded                                                       | --                         |
-| double-click game view      | reset camera to default chase view                                                                              | --                         |
-
-Pointer look is optional via **Enable pointer look** in Settings → Controls; pressing it closes Settings and locks the dive view. Menus release the pointer; losing lock during a dive opens pause. The chase camera follows yaw by default, not pitch; after free look, its world angle stays fixed until reset.
-
-Settings and the globe no longer have dedicated hotkeys (the old `O` and
-`N`) -- open them from the home screen or the `Esc` pause menu instead.
-
-## URL parameters
-
-| Param                     | Effect                                                                                                               |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `?tile=<id>`              | tile from `data/tiles/index.json`; default `Config.defaultTileId` (`titanic`), else the first indexed tile           |
-| `?tier=low\|medium\|high` | graphics tier (terrain subdiv/LOD, post pass, snow, caustics). See `docs/terrain.md`, `docs/atmosphere.md`           |
-| `?depth=<m>`              | spawn at that depth (clamped 40 m above the seabed); with `?at=`, the depth for that spawn                           |
-| `?debugTerrain=1`         | log chunks, LOD counts, depth band, draw calls, fps and prop LOD counts once a second                                |
-| `?mission=<id>`           | play `data/landmarks/<id>/mission.json`; implies its tile and content folder (`docs/missions.md`)                    |
-| `?skipBriefing=1`         | with `?mission=`: start without the briefing card                                                                    |
-| `?landmark=<id>`          | content folder (`data/landmarks/<id>/`) for POIs, guide and props; default the tile id (`_test` is the test fixture) |
-| `?poi=<poiId>`            | spawn 80 m from that POI, facing it, at its depth (`docs/discovery.md`)                                              |
-| `?at=lat,lon[,heading]`   | spawn at a coordinate, facing `heading` degrees (default north) (`docs/props.md`)                                    |
-| `?debrief=1`              | open the debrief 3 s after boot                                                                                      |
-| `?debugProps=1`           | prop placement tool: select, nudge, rotate, copy JSON (`docs/props.md`)                                              |
-| `?globe=1`                | open the globe dive-site picker at boot; the globe pauses piloting                                                   |
-| `?preset=<name>`          | override the environment preset for visual checks; see `docs/presets.md`                                             |
-
-Examples: `/?mission=titanic`, `/?tile=titanic&landmark=_test&poi=test-bow`
-(then hold `G`), `/?tile=titanic&depth=3790&at=41.7290,-49.9500,0`.
-
-## Dives and objectives
-
-A mission's briefing offers a start position under **Advanced**: **near-site** (default) puts you
-150–300 m from the first primary objective (Titanic: 220 m), at a safe height
-above the seabed, facing it with lights on. Mission scan radii leave an approach
-even with Extended sensors. Follow the waypoint and sonar contact to the target.
-**Surface start** descends from the surface instead, for the full descent.
-The briefing previews whichever start you choose and begins there without a teleport.
-Realistic mode still defaults to near-site; surface start is opt-in either way
-(`plan/PHASE-D-CONTRACTS.md` §3).
-
-Every objective carries a plain-language hint saying what it is and roughly
-where (bearing, feature or depth). With **Visual waypoints** on (Arcade default,
-off in Realistic after the opening approach, toggle in Custom) the current objective also gets a
-world-space waypoint marker, an off-screen edge arrow with distance and depth
-difference, and an "in range" cue. Once you scan a target it is marked scanned
-in the world, on the sonar (when Sonar markers is on) and in the objective tracker for the rest of that
-dive; scanning it again just says "Already logged — see Journal" — nothing is
-lost, since the discovery itself is already in your Journal.
-
-Dives start with objectives fresh every time, including "Dive again" — your
-Journal discoveries persist, but objectives never arrive pre-completed. When
-every primary objective is done, a banner shows your stars and offers **Keep exploring**
-(the primary action: the dive continues, secondaries remain open) or **Surface and debrief**.
-Nothing forces a debrief while you still want to explore. The debrief reports
-X of Y objectives completed and offers Keep exploring, Dive again (fresh
-objectives, same mission), Dive sites, Home and Journal.
-
-## Journal and photos
-
-**Journal** (`J`, or from the home/pause menu) is a Civilopedia-style
-catalogue built from `landmarks.json`, `guide.json`, `pois.json` and
-`species.json`: one entry per site, per POI and per surveyed species. A site
-unlocks the moment you scan any of its POIs; a POI entry unlocks when you scan
-it; a species entry unlocks only when a scanned POI or guide entry names it
-(species without that documented link stay spoiler-only). A "show undiscovered
-entries" toggle lets you preview what you haven't found yet. Discoveries persist
-across reloads (`subexplorer.discoveries.v1`); the per-dive "already scanned"
-state that blocks re-scanning is separate and always resets on a new dive.
-
-**Photo mode** (`P`) swings a free-orbit camera around your sub and hides the HUD. `Enter`, `Space` or the visible
-**Capture** button captures a JPEG thumbnail (≤ 640 px wide) captioned with whichever site or POI is in
-frame, and saves it into the Journal's photo gallery
-(`subexplorer.photos.v1`, the newest 24 kept, oldest dropped with a notice
-when it's full). The gallery can download a single JPEG or all photos as a ZIP.
-
-## Battery, oxygen and currents
-
-Two optional realism systems, off by default in Arcade and on by default in
-Realistic (independently switchable in Custom):
-
-- **Battery and oxygen** (`docs/power.md`) drain with elapsed time, thrust,
-  ballast, lights and sensors. Realistic near-site dives start with reserves
-  reduced for the descent skipped by the spawn; surface starts begin full. Low levels warn clearly; running out locks
-  manual control and forces a safe automatic emergency ascent rather than a
-  fail screen. Tuning is anchored to WHOI's published Alvin endurance figures,
-  not a literal life-support simulation.
-- **Currents** (`docs/currents.md`) are an offline per-site vector field
-  sampled once from an archived HYCOM ocean-model snapshot and checked into
-  the repo — the game never calls out to a live ocean-data service. The
-  gameplay switch is off or full sampled strength (Arcade is off, Realistic is on).
-  Daily Strong currents uses its own multiplier. Marine snow drifts
-  with the current.
-
-## Hull depth
-
-When selected, the HUD gauge compares current depth with the fitted hull's
-**rated** operating depth.
-Settings → Accessibility → Hull warning selects gauge, vignette or both (both
-by default); the vignette begins beyond the rating, with no screen shake.
-The simulated **crush** threshold is separately set 10% deeper than each rating
-and triggers an emergency ascent. Classes A, B and C are rated to 1,000 m,
-6,500 m and 11,000 m respectively; Challenger Deep uses the full-ocean-depth
-Class C. The margin is game tuning, not a certification claim.
-
-## Honesty note
-
-The seafloor you fly over is real, measured bathymetry (see Dive sites,
-above) — nothing about the terrain itself is invented. Wrecks, vent chimneys
-and other placed props are **recreations**: procedural or CC0/CC-BY models
-positioned at real, cited coordinates, and every field-guide and Journal
-entry that describes one says so along with its sources. Waypoints, hints,
-the Journal's spoiler toggle and photo captions are UI conveniences layered on
-top of that data; none of them change a survey value.
-
-## Architecture overview
-
-```
-tools/                 Python pipeline (stdlib only)
-  fetch_tile.py          one GMRT bbox -> data/tiles/<id>/
-  fetch_all.py           every Tier-2 landmark: plan bbox, pick resolution, cache, ETOPO fallback
-  compress_tiles.py      heightmap*.bin.gz/.br + optional 16-bit heightmap16.bin
-  validate_props.py      props.json checker (schema, bbox, GLB size, attribution)
-  inspect_tile.py        stats + ASCII depth map
-  make_synthetic_tile.py offline stand-in tile
-  esri_ascii.py, tile_writer.py, tests/
-data/                  served at /data via the public/data symlink
-  tiles/<id>/            meta.json, heightmap.bin, heightmap16.bin; tiles/index.json
-  landmarks.json         landmark catalogue (markers, names, depths)
-  landmarks/index.json   content folders that have a mission.json
-  landmarks/<id>/        mission.json, pois.json, guide.json, props.json, sources.md
-public/assets/         GLB models (models/) and Draco decoders (decoders/draco/)
-src/
-  core/        Time (fixed 60 Hz), Input (action map), EventBus, Config (all tunables)
-  world/       TileLoader, Terrain* (chunks, detail noise, material, LOD), Water, Landmarks,
-               Props + PropLoader (placed props, LOD/impostors, collision)
-  world/props/ Procedural builders, Collision, PlacementDebug, Wiring (?at=, sub push-out)
-  render/      Atmosphere (depth bands, fog, lights), Headlights, MarineSnow, caustics
-  game/        Pois, Guide, Scanner, DiscoveryStore, Objectives, Discovery, Mission, MissionRouter, ContentPath
-  audio/       WebAudio graph, ambient beds, sensor and vehicle cues
-  sub/         Submarine (physics), SubMesh (placeholder hull), CameraRig
-  ui/          HUD, Sonar, MissionSelect, ScanOverlay, FieldGuide, Debrief, Briefing, ObjectivesPanel
-  shaders/     underwater post pass, terrain GLSL
-  util/        geo.ts (lat/lon <-> world metres), types.ts (data contracts)
-tests/
-  unit/        vitest
-  e2e/         Playwright specs + screenshots/
-```
-
-Module diagram, frame loop, events and performance budget:
-[`docs/architecture.md`](docs/architecture.md). Tile format contract:
-[`docs/tile-format.md`](docs/tile-format.md). Per-landmark content schemas:
-[`plan/PHASE-B-CONTRACTS.md`](plan/PHASE-B-CONTRACTS.md) §2.
-
-## Conventions
-
-**World space.** `+X` east, `+Z` **south**, `+Y` up. Sea level is `y = 0`, so all
-seabed elevations are negative metres. The origin is the tile centre. `+Z = south`
-means a top-down view is a conventional north-up map, and the heightmap's row
-order (row 0 = north) needs no flipping. All conversion lives in `src/util/geo.ts`.
-
-**Depths in content files** (`data/landmarks.json`, `data/landmarks/<id>/*.json`)
-are **positive** magnitudes (`depth_m: 3800`); the engine uses `y = -depth_m`.
-
-**Units.** SI everywhere in code: metres, seconds, radians. The HUD converts to
-knots and degrees for display only.
-
-**Fixed-step physics.** `Submarine.step()` is only ever called with `dt = 1/60`;
-sim speed runs more whole steps per frame rather than a bigger `dt`. Anything
-visual uses the real frame delta.
-
-**Config.** Every tunable number lives in `src/core/Config.ts`. Do not scatter
-magic numbers through modules.
-
-**Static data.** `public/data` is a symlink to `../data`, so Vite serves the
-pipeline's output at `/data/...` in dev and copies it into `dist/` on build.
-The pipeline never needs to know the web app exists.
-
-**Types.** TypeScript strict mode, ES modules, `.js` extensions on relative
-imports (required by `verbatimModuleSyntax`).
-
-## How to add a tile
-
-1. Pick a bounding box. Aim for roughly 500–1500 columns; at GMRT's `high`
-   resolution (~61 m/node) that is about 0.3–0.8 degrees per side.
-2. Fetch it:
-   ```bash
-   python3 tools/fetch_tile.py --id my-site \
-       --north 12.5 --south 12.2 --east -60.1 --west -60.4 --resolution high
-   ```
-   Options: `--resolution low|med|high|max`, `--layer topo|topo-mask`,
-   `--out data/tiles`, `--force` (bypass the 4M-cell guard), `--timeout`.
-   The script probes GMRT's metadata endpoint first and automatically drops to a
-   coarser resolution if the grid is too large or the request fails.
-3. If the site is already in `data/landmarks.json`, take the bbox from there
-   (`--from-landmarks data/landmarks.json --id my-site`), or add the id to
-   `TIER2` in `tools/fetch_all.py` and run `python3 tools/fetch_all.py --only my-site`
-   to get its bbox planning, caching and fallback.
-4. Optionally `python3 tools/compress_tiles.py --only my-site --quant16`.
-5. Sanity-check it — this prints the stats and an ASCII depth map:
-   ```bash
-   python3 tools/inspect_tile.py my-site
-   ```
-6. `data/tiles/index.json` is rewritten automatically and the tile shows up in
-   the in-game DIVE SITES list. Open it with `http://localhost:5173/?tile=my-site`.
-
-## How to add a landmark marker
-
-Add an entry to `data/landmarks.json`. Anything with a numeric `lat` and `lon`
-inside the current tile's bbox is placed automatically; everything else is
-optional:
-
-```json
-{
-  "landmarks": [
-    {
-      "id": "rms-titanic",
-      "name": "RMS Titanic",
-      "lat": 41.7325,
-      "lon": -49.9469,
-      "depth_m": 3800,
-      "description": "Bow section, split from the stern by ~600 m."
-    }
-  ]
-}
-```
-
-- `name` (or `id`) becomes the on-screen label.
-- `depth_m` (positive magnitude) pins the marker at that depth; omit it and the
-  marker sits on the seabed, sampled from the heightmap.
-- Markers also appear as blips on the sonar minimap.
-
-`Landmarks.ts` also accepts a bare array, an id-keyed object, or a GeoJSON
-`FeatureCollection`, and treats a missing file as "no landmarks" rather than an
-error.
-
-## How to add a landmark mission
-
-A mission is a content folder `data/landmarks/<id>/` where `<id>` is the
-landmark id (and, by default, the tile id). Schemas are authoritative in
-[`plan/PHASE-B-CONTRACTS.md`](plan/PHASE-B-CONTRACTS.md) §2; `data/landmarks/titanic/`
-is the worked example. Every file is optional to the engine — a missing one
-means "none", never a boot error.
-
-1. Make sure the tile exists (`data/tiles/<id>/`, see above).
-2. `pois.json` — scan targets: `lat`/`lon`, `depth_m` or `snap_to_seabed`,
-   `radius_m`, `kind`, `primary`, `guide_entry`, `reconstruction`, `sources`
-   (`docs/discovery.md`).
-3. `guide.json` — field-guide entries keyed by the POIs' `guide_entry`:
-   paragraphs, facts, optional image (must get an `ATTRIBUTION.md` row), sources,
-   `confidence`, optional `memorial_note`.
-4. `props.json` — placed props: `procedural:hull-block|debris|chimney` or a GLB
-   under `/assets/models/` (`docs/props.md`). Check it:
-   ```bash
-   python3 tools/validate_props.py data/landmarks/<id>/props.json --tile <id>
-   ```
-5. `mission.json` — tile, title, `hull_class`, surface `spawn`, briefing,
-   `scan` objectives (at least one `primary`), `"completion": "all_primary"`
-   (`docs/missions.md`).
-6. `sources.md` — human-readable citations for every fact.
-7. Append `<id>` to `data/landmarks/index.json` so the MISSIONS list shows it.
-
-Try it with `/?mission=<id>`, or `/?tile=<id>&poi=<poiId>` to jump to a POI.
-
-## Attribution
-
-During a dive, open the pause menu and choose **Data credits** to see the full
-tile credit (the dive HUD no longer carries a chip). GMRT credits include
-source, DOI and licence links; Escape steps back to the pause menu.
-
-Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis.
-Ryan, W.B.F., et al. (2009), _Global Multi-Resolution Topography synthesis_,
-Geochem. Geophys. Geosyst., 10, Q03014,
-[doi:10.1029/2008GC002332](https://doi.org/10.1029/2008GC002332).
-3D models, decoders and other assets: [`ATTRIBUTION.md`](ATTRIBUTION.md).
+Bathymetry: Global Multi-Resolution Topography (GMRT) synthesis —
+[Ryan et al. (2009)](https://doi.org/10.1029/2008GC002332). In-game **Data credits**
+lists the tile source for each dive.

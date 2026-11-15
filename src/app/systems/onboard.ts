@@ -6,7 +6,7 @@
 import type { InputDevice } from '../../ui/ControlsCard.js';
 import { HINT_TEXT, HintEngine, creatureHintAllowed, hullHintAllowed } from '../../game/Hints.js';
 import type { HintLabels } from '../../game/Hints.js';
-import { TUTORIAL_STEPS, Tutorial, depthCardWaits, tutorialText } from '../../game/Tutorial.js';
+import { Tutorial, depthCardWaits, tutorialStepKicker, tutorialText } from '../../game/Tutorial.js';
 import type { TutorialKeys } from '../../game/Tutorial.js';
 import { TutorialSave } from '../../game/TutorialSave.js';
 import type { GuidanceKind } from '../../game/Guidance.js';
@@ -199,7 +199,7 @@ export function createOnboardSystem(): GameSystem {
                     ? 'SCAN INTERRUPTED'
                     : device === 'touch'
                       ? ''
-                      : `STEP ${tutorial.index + 1} OF ${TUTORIAL_STEPS.length}`,
+                      : tutorialStepKicker(step.id, targetGapM),
                 text: tutorialText(
                   step.id,
                   device,

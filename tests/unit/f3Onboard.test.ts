@@ -7,7 +7,14 @@ import {
   hullHintAllowed,
   type HintContext,
 } from '../../src/game/Hints.js';
-import { TUTORIAL_STEPS, Tutorial, depthCardWaits, tutorialText } from '../../src/game/Tutorial.js';
+import {
+  DEPTH_SKIP_M,
+  TUTORIAL_STEPS,
+  Tutorial,
+  depthCardWaits,
+  tutorialStepKicker,
+  tutorialText,
+} from '../../src/game/Tutorial.js';
 import { ONBOARD_STORAGE_KEY, TutorialSave, migrateOnboard } from '../../src/game/TutorialSave.js';
 import { controlGroups } from '../../src/ui/ControlsCard.js';
 import type { SettingsStorage } from '../../src/core/Save.js';
@@ -152,6 +159,13 @@ describe('tutorial progression', () => {
     expect(t.step?.id).toBe('move');
     hold(t, { yaw: -1 }, 10); // past 0.5 s
     expect(t.step?.id).toBe('depth');
+  });
+  it('step kickers count only shown steps when depth is skipped', () => {
+    expect(tutorialStepKicker('move', DEPTH_SKIP_M)).toBe('STEP 1 OF 2');
+    expect(tutorialStepKicker('scan', DEPTH_SKIP_M)).toBe('STEP 2 OF 2');
+    expect(tutorialStepKicker('move', DEPTH_SKIP_M + 1)).toBe('STEP 1 OF 3');
+    expect(tutorialStepKicker('depth', DEPTH_SKIP_M)).toBe('STEP 2 OF 3');
+    expect(tutorialStepKicker('scan', DEPTH_SKIP_M + 1)).toBe('STEP 3 OF 3');
   });
   it('skips depth step when target is within 30 m of the sub (mission openings start 22 m above)', () => {
     const near = new Tutorial();

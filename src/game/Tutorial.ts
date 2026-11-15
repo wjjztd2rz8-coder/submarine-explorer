@@ -22,6 +22,32 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
   { id: 'scan', title: 'Scan a target' },
 ];
 
+/**
+ * Steps the player will see this dive. The depth step is omitted when the next
+ * scan target is already close in depth (same rule as {@link Tutorial.update}).
+ */
+export function tutorialStepsShown(
+  targetGapM: number | undefined,
+  currentStepId?: TutorialStepId,
+): readonly TutorialStep[] {
+  const skipDepth =
+    currentStepId !== 'depth' &&
+    targetGapM !== undefined &&
+    targetGapM <= DEPTH_SKIP_M;
+  if (skipDepth) return TUTORIAL_STEPS.filter((s) => s.id !== 'depth');
+  return TUTORIAL_STEPS;
+}
+
+/** Desktop step card kicker; numbers count only steps that are shown. */
+export function tutorialStepKicker(
+  stepId: TutorialStepId,
+  targetGapM?: number,
+): string {
+  const shown = tutorialStepsShown(targetGapM, stepId);
+  const current = shown.findIndex((s) => s.id === stepId) + 1;
+  return `STEP ${current} OF ${shown.length}`;
+}
+
 /** Seconds of held input before a movement step counts as done. */
 const MOVE_HOLD_S = 0.8;
 const TURN_HOLD_S = 0.5;
