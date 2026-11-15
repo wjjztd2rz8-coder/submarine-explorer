@@ -27,6 +27,7 @@ import {
   type DynamicResolutionConfig,
   type GraphicsTier,
   type GraphicsTierSetting,
+  type QualityConfig,
 } from './Config.js';
 
 /** Everything the tier heuristics look at. All fields are plain data. */
@@ -64,6 +65,22 @@ const OLD_INTEL_RE = /intel.*\bhd graphics\b|intel\(r\) hd\b|gma/i;
 const FLAGSHIP_MOBILE_RE =
   /adreno.*\b(7\d\d|8\d\d)\b|immortalis|mali-g7\d\d|mali-g(77|78)\b|apple gpu|apple a1[5-9]/i;
 
+/** The same handheld classification used by tier detection, including desktop-UA iPads. */
+export const isHandheld = (caps: DeviceCaps): boolean => caps.mobileUa || caps.touchPrimary;
+
+/** Renderer ceiling; dynamic resolution starts here and cannot exceed it. */
+export function qualityPixelRatio(
+  tier: GraphicsTier,
+  caps: DeviceCaps,
+  config: QualityConfig,
+): number {
+  const preset = config.tiers[tier];
+  return Math.min(
+    caps.devicePixelRatio,
+    isHandheld(caps) ? preset.touchMaxPixelRatio : preset.maxPixelRatio,
+  );
+}
+
 /** Pick a tier for a device. Pure; see the module header for the rules. */
 export function detectTier(caps: DeviceCaps): TierDecision {
   const gpu = `${caps.vendor} ${caps.renderer}`.trim();
@@ -74,7 +91,7 @@ export function detectTier(caps: DeviceCaps): TierDecision {
     return { tier: 'low', reason: 'few cores or little memory' };
 
   const shortSide = Math.min(caps.screenW, caps.screenH);
-  const handheld = caps.mobileUa || caps.touchPrimary;
+  const handheld = isHandheld(caps);
   if (handheld && shortSide < 600) {
     const strong =
       FLAGSHIP_MOBILE_RE.test(gpu) &&
@@ -90,7 +107,10 @@ export function detectTier(caps: DeviceCaps): TierDecision {
     return weak ? { tier: 'low', reason: 'small tablet' } : { tier: 'medium', reason: 'tablet' };
   }
 
-  if (DISCRETE_RE.test(gpu)) return { tier: 'high', reason: 'discrete GPU' };
+  if (DISCRETE_RE.test(gpu))
+    return caps.devicePixelRatio >= 2
+      ? { tier: 'medium', reason: 'high-density desktop display' }
+      : { tier: 'high', reason: 'discrete GPU' };
   if (OLD_INTEL_RE.test(gpu)) return { tier: 'low', reason: 'older integrated GPU' };
   if (gpu === '') return { tier: 'medium', reason: 'unknown GPU' };
   return { tier: 'medium', reason: 'integrated or unrecognised GPU' };

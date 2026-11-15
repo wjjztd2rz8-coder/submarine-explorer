@@ -21,6 +21,8 @@ export type GraphicsTierSetting = GraphicsTier | 'auto';
 export interface QualityTier {
   /** Upper bound on `renderer.setPixelRatio` (the device ratio is used below it). */
   maxPixelRatio: number;
+  /** Preserve the handheld rendering resolution independently of desktop presets. */
+  touchMaxPixelRatio: number;
 }
 
 /**
@@ -56,9 +58,9 @@ export interface QualityConfig {
 
 export const DEFAULT_QUALITY: QualityConfig = {
   tiers: {
-    low: { maxPixelRatio: 2 },
-    medium: { maxPixelRatio: 2 },
-    high: { maxPixelRatio: 2 },
+    low: { maxPixelRatio: 1, touchMaxPixelRatio: 2 },
+    medium: { maxPixelRatio: 1.5, touchMaxPixelRatio: 2 },
+    high: { maxPixelRatio: 2, touchMaxPixelRatio: 2 },
   },
   dynamicResolution: {
     budgetMs: 1000 / 55,
