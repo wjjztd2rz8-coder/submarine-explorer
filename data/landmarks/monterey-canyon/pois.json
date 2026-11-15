@@ -99,11 +99,11 @@
       ],
       "note": "GMRT terrain on the traced inner canyon floor, about 355 m south of the north-wall marker at the same longitude. No source publishes a coordinate for this specific axis point.",
       "reveal": {
-        "distance_m": 128,
-        "elevation_deg": 11,
+        "distance_m": 230,
+        "elevation_deg": 35,
         "azimuth_deg": 158,
         "sweep_deg": 12,
-        "target_offset": [-20, 106, -340]
+        "target_offset": [-20, 60, -340]
       }
     },
     {

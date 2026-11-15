@@ -94,11 +94,11 @@
       "sources": ["https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"],
       "note": "Game scan marker at a commonly reported wreck-section position. The source grid gives the local seabed depth, while WHOI describes about 600 m between the sections. Marker geometry and placement do not constitute a georeferenced wreck survey.",
       "reveal": {
-        "distance_m": 64,
-        "elevation_deg": 13,
-        "azimuth_deg": 135,
+        "distance_m": 58,
+        "elevation_deg": 14,
+        "azimuth_deg": 40,
         "sweep_deg": 16,
-        "target_offset": [0, -3.5, -6]
+        "target_offset": [6, -3, -36]
       }
     },
     {

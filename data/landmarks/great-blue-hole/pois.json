@@ -70,11 +70,11 @@
       ],
       "note": "Game scan contact at the authored karst-grotto-east prop on the south-eastern ledge. Position and gallery geometry are a reconstruction, not a surveyed gallery location.",
       "reveal": {
-        "distance_m": 33,
-        "elevation_deg": 5,
+        "distance_m": 20,
+        "elevation_deg": 2,
         "azimuth_deg": 204,
         "sweep_deg": 14,
-        "target_offset": [-5, 11.5, -5]
+        "target_offset": [-5, 14, -5]
       }
     },
     {
