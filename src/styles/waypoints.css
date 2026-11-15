@@ -81,3 +81,24 @@ body[data-app-state='pause'] .d-scan-waypoints {
   font-size: clamp(10px, calc(11px * var(--ui-scale)), 14px);
   font-weight: 400;
 }
+
+/* The armed contact keeps its secondary role but gains a clear beam outline. */
+.d-scan-world-marker.is-scannable {
+  box-sizing: border-box;
+  min-width: 40px;
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+.d-scan-world-marker.is-armed {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 8px;
+  opacity: 1;
+}
+.d-scan-world-marker[hidden] {
+  display: none;
+}

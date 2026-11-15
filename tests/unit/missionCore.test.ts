@@ -733,3 +733,16 @@ it.each(
   expect(mission.emitted.at(-1)?.payload).toMatchObject({ completed: total, total });
   mission.dispose();
 });
+
+it('wildlife completion neither consumes nor resets mission objectives', () => {
+  const bus = new EventBus();
+  const mission = new Mission({ def: def(), bus });
+  mission.resolve(['poi-a', 'poi-b', 'poi-c']);
+  mission.start('site');
+  bus.emit('scan:complete', { poiId: 'poi-a', landmarkId: 'site', firstTime: true });
+  const before = mission.objectives.map((o) => ({ ...o }));
+  bus.emit('scan:complete', { poiId: 'life:fish', landmarkId: 'site', firstTime: true });
+  expect(mission.objectives).toEqual(before);
+  expect(nextScanObjective(mission.objectives)?.poiId).toBe('poi-b');
+  mission.dispose();
+});

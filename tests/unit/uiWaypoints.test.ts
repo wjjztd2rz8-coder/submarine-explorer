@@ -149,6 +149,25 @@ describe('waypoint objective state', () => {
     vi.unstubAllGlobals();
   });
 
+  it('arms the candidate and selects a scannable marker by tap', () => {
+    const f = fixture();
+    f.pois[1].position.set(5, -100, -40);
+    f.scanner.setObjective('a');
+    f.scanner.update(0, new Vector3(0, -100, 0), new Vector3(0, 0, -1), false);
+    f.draw();
+    const markers = (f.view.root as unknown as Element).children;
+    const first = markers.find((m) => m.dataset.poi === 'a')!;
+    const second = markers.find((m) => m.dataset.poi === 'b')!;
+    expect(first.classList.contains('is-armed')).toBe(true);
+    expect(second.classList.contains('is-scannable')).toBe(true);
+    second.dispatchEvent(new Event('click', { cancelable: true }));
+    f.scanner.update(0, new Vector3(0, -100, 0), new Vector3(0, 0, -1), false);
+    f.draw();
+    expect(f.scanner.view.candidateId).toBe('b');
+    expect(second.classList.contains('is-armed')).toBe(true);
+    expect(second.classList.contains('is-secondary')).toBe(true);
+  });
+
   function fixture() {
     const pois: PlacedPoi[] = [
       { id: 'a', name: 'First contact', position: new Vector3(0, -110, -40) },

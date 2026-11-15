@@ -48,6 +48,7 @@ export interface InputState {
    * hand-built InputState literals (tests, Submarine's locked input) still type.
    */
   toggleGuide?: boolean;
+  cycleScanTarget?: boolean;
 }
 
 /** One rebindable thing the player can do. */
@@ -74,6 +75,7 @@ export type ActionId =
   | 'resetCamera'
   | 'toggleSonar'
   | 'toggleLights'
+  | 'cycleScanTarget'
   | 'scan'
   | 'cycleSimSpeed'
   | 'togglePhotoMode'
@@ -142,6 +144,7 @@ export function defaultActions(): ActionBinding[] {
       pad: 'B / circle',
     },
     { id: 'toggleLights', label: 'Headlights', category: 'Systems', keys: ['KeyL'], pad: 'X' },
+    { id: 'cycleScanTarget', label: 'Next scan target', category: 'Systems', keys: ['KeyN'] },
     { id: 'scan', label: 'Scan (hold)', category: 'Systems', keys: ['KeyG'], pad: 'Right bumper' },
     {
       id: 'cycleSimSpeed',
@@ -701,6 +704,7 @@ export class Input {
       if (this.edgeArmed.has('cycleSimSpeed')) s.cycleSimSpeed = true;
       if (this.edgeArmed.has('togglePhotoMode')) s.togglePhotoMode = true;
       if (this.edgeArmed.has('capturePhoto')) s.capturePhoto = true;
+      if (this.edgeArmed.has('cycleScanTarget')) s.cycleScanTarget = true;
       if (this.edgeArmed.has('toggleJournal')) s.toggleGuide = true;
       this.edgeArmed.clear();
     }
@@ -779,6 +783,7 @@ export class Input {
     s.togglePhotoMode = false;
     s.capturePhoto = false;
     s.toggleGuide = false;
+    s.cycleScanTarget = false;
   }
 }
 

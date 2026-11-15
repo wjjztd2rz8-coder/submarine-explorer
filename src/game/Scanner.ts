@@ -2,7 +2,7 @@
  * The scan beam.
  *
  * While the scan control is held, the scanner locks the best candidate POI --
- * the mission objective if eligible, otherwise the nearest eligible contact --
+ * the mission objective if eligible, otherwise the most central eligible mission contact --
  * and accumulates progress over that POI's `scanSeconds`. Releasing the
  * control, drifting out of range or turning away interrupts the scan: one
  * `scan:aborted` is emitted and the progress *decays* rather than resetting,
@@ -86,6 +86,8 @@ export interface ScanView {
   progress: number;
   /** Best scannable POI right now (in range AND facing), if any. */
   candidateId: string | null;
+  /** Scannable contacts in objective, mission, incidental order. */
+  candidateIds?: readonly string[];
   /** Unscanned contacts in scan range, then logged POIs in range, then remote hints. */
   nearestId: string | null;
   nearestName: string;
@@ -200,6 +202,23 @@ export class Scanner {
   setObjective(poiId: string | null | (() => string | null)): void {
     this.objectiveSource = poiId;
   }
+  private manualId: string | null = null;
+  private cycleRequested = false;
+  private holdAge = 0;
+  private wasHeld = false;
+  private readonly savedProgress = new Map<string, number>();
+
+  /** Apply at the next geometry update, before the beam starts. */
+  cycleCandidate(): void {
+    if (this.enabled) this.cycleRequested = true;
+  }
+
+  selectCandidate(id: string): boolean {
+    if (!this.enabled || !this.view.candidateIds?.includes(id)) return false;
+    this.manualId = id;
+    return true;
+  }
+
   private sinceProgressEmit = Infinity;
   private cosCone: number;
   private cosLockCone: number;
@@ -298,6 +317,12 @@ export class Scanner {
   resetDive(): void {
     this.rejected = null;
     this.scannedThisDive.clear();
+    this.manualId = null;
+    this.cycleRequested = false;
+    this.savedProgress.clear();
+    this.wasHeld = false;
+    this.holdAge = 0;
+    this.view.candidateIds = [];
     this.clearActive();
     this.view.completed = 0;
     this.view.lastCompleteId = null;
@@ -320,11 +345,17 @@ export class Scanner {
       if (v.phase === 'idle') v.lastAbort = null;
     }
 
+    if (!held || !this.wasHeld) this.holdAge = 0;
+    this.wasHeld = held;
     this.updateObjective(position, forward);
 
     // Nearest target (for hints) and best scannable candidate.
     let candidate: ScanTarget | null = null;
-    let candidateDist = Infinity;
+    const eligible: { target: ScanTarget; geometry: Geometry; rank: number }[] = [];
+    const collect = (target: ScanTarget, geometry: Geometry, rank: number): void => {
+      if (geometry.inRange && geometry.facing && target.arrivalRadiusM === undefined)
+        eligible.push({ target, geometry, rank: target.id === v.objectiveId ? 0 : rank });
+    };
     let nearest: ScanTarget | null = null;
     let nearestGeo: Geometry | null = null;
     let scannedNearest: ScanTarget | null = null;
@@ -340,14 +371,7 @@ export class Scanner {
         }
         continue;
       }
-      if (
-        g.inRange &&
-        g.facing &&
-        (t.id === v.objectiveId || (candidate?.id !== v.objectiveId && g.distance < candidateDist))
-      ) {
-        candidate = t;
-        candidateDist = g.distance;
-      }
+      collect(t, g, 1);
       const hintRange = resolveScanRadius(t.radius, this.config) * this.config.hintRangeFactor;
       if (
         g.distance <= hintRange &&
@@ -368,15 +392,7 @@ export class Scanner {
         nearest = t;
         nearestGeo = g;
       }
-      if (
-        t.arrivalRadiusM === undefined &&
-        g.facing &&
-        candidate?.id !== v.objectiveId &&
-        g.distance < candidateDist
-      ) {
-        candidate = t;
-        candidateDist = g.distance;
-      }
+      collect(t, g, 2);
     }
     // A remote hint must not hide a logged contact where the pilot is still
     // hovering. Nearby unscanned fixed contacts retain priority over both.
@@ -386,7 +402,6 @@ export class Scanner {
     }
     // Moving targets (animals): considered only where no POI already claims the
     // hint or the candidate, and only hinted once they are in range.
-    const poiCandidate = candidate;
     const poiNearest = nearest;
     for (const t of this.extra) {
       const g = this.geometry(t, position, forward);
@@ -397,40 +412,58 @@ export class Scanner {
         nearest = t;
         nearestGeo = g;
       }
-      if (!poiCandidate && g.inRange && g.facing && g.distance < candidateDist) {
-        candidate = t;
-        candidateDist = g.distance;
-      }
+      collect(t, g, 2);
     }
-    // Caller-owned live lists can drop the active object without a setter call.
-    // Match the setters' silent clear instead of retaining progress on a removed contact.
     if (this.active && !activeGeo) this.clearActive();
-    // The marked objective outranks incidental contacts (wildlife, samples): an
-    // eligible one takes the beam even mid-hold, otherwise a drifting school
-    // pins the reticle with a string of partial scans. A scan of a fixed POI
-    // keeps its lock while scanning, so retargeting guidance never swaps it
-    // away mid-hold. After interruption, the marked objective wins a new hold.
-    const activeIsObjective = this.active?.id === v.objectiveId;
-    const activeIsFixed = this.active !== null && this.targets.includes(this.active);
-    if (
-      this.active &&
-      activeGeo?.inRange &&
-      activeGeo.facing &&
-      ((activeIsFixed && v.phase === 'scanning') || candidate?.id !== v.objectiveId) &&
-      !this.isScanned(this.active.landmarkId, this.active.id)
-    ) {
+    eligible.sort(
+      (a, b) =>
+        a.rank - b.rank ||
+        a.geometry.angleDeg - b.geometry.angleDeg ||
+        a.geometry.distance - b.geometry.distance ||
+        a.target.id.localeCompare(b.target.id),
+    );
+    v.candidateIds = eligible.map((entry) => entry.target.id);
+    const manual = [...this.targets, ...this.supplemental, ...this.extra].find(
+      (t) =>
+        t.id === this.manualId &&
+        !this.isScanned(t.landmarkId, t.id) &&
+        this.geometry(t, position, forward).inRange,
+    );
+    if (!manual) this.manualId = null;
+    candidate =
+      eligible.find((e) => e.target.id === this.manualId)?.target ??
+      (this.manualId ? null : (eligible[0]?.target ?? null));
+    if (this.cycleRequested && eligible.length > 1) {
+      const index = eligible.findIndex((e) => e.target === candidate);
+      candidate = eligible[(index + 1) % eligible.length]!.target;
+      this.manualId = candidate.id;
+    }
+    this.cycleRequested = false;
+    // Every running beam retains its lock, including wildlife and samples.
+    if (this.active && v.phase === 'scanning' && activeGeo?.inRange && activeGeo.facing) {
       candidate = this.active;
     } else if (
-      activeIsObjective &&
+      this.active?.id === v.objectiveId &&
       v.progress > 0 &&
       activeGeo?.inRange &&
       candidate &&
-      candidate !== this.active
+      candidate !== this.active &&
+      !this.manualId
     ) {
-      // A scan of the objective in progress is not handed to a contact that
-      // drifts into the cone while the beam is momentarily off it.
       candidate = null;
+    } else if (held && !this.manualId && candidate?.id !== v.objectiveId) {
+      const objective = this.targets.find((t) => t.id === v.objectiveId);
+      if (objective) {
+        const g = this.geometry(objective, position, forward);
+        const near =
+          -position.y >= (objective.minDepthM ?? 0) &&
+          g.distance <= resolveScanRadius(objective.radius, this.config) * 1.2 &&
+          (g.facing || g.angleDeg <= this.config.coneHalfAngleDeg + 10);
+        if (near && this.holdAge < 1) candidate = null;
+      }
     }
+    if (held) this.holdAge += dt;
+
     // One shared selection: whatever Scan will scan is also what the card,
     // reticle and prompt name, even if a nearer off-axis contact exists.
     if (candidate && nearest !== candidate) {
@@ -463,7 +496,10 @@ export class Scanner {
             reason: activeGeo?.inRange ? 'facing' : 'range',
           });
         }
+        if (this.active) this.savedProgress.set(this.active.id, v.progress);
         this.clearActive();
+        v.progress = this.savedProgress.get(candidate.id) ?? 0;
+        this.savedProgress.delete(candidate.id);
         this.active = candidate;
         v.activeDistance = position.distanceTo(candidate.position);
       }
@@ -552,6 +588,9 @@ export class Scanner {
   /** Drop any scan in progress without emitting (e.g. after a teleport). */
   cancel(): void {
     this.rejected = null;
+    this.manualId = null;
+    this.cycleRequested = false;
+    this.savedProgress.clear();
     this.clearActive();
   }
 
@@ -559,6 +598,8 @@ export class Scanner {
     const v = this.view;
     if (this.isScanned(t.landmarkId, t.id)) return;
     this.scannedThisDive.add(`${t.landmarkId}/${t.id}`);
+    this.savedProgress.delete(t.id);
+    if (this.manualId === t.id) this.manualId = null;
     const firstTime = this.recorder ? this.recorder.record(t.landmarkId, t.id).firstTime : true;
     v.completed = this.scannedThisDive.size;
     v.lastCompleteId = t.id;
@@ -593,13 +634,14 @@ export class Scanner {
       const fl = Math.hypot(f.x, f.y, f.z) || 1;
       cos = (dx * f.x + dy * f.y + dz * f.z) / (distance * fl);
     }
-    const angleDeg = (Math.acos(Math.max(-1, Math.min(1, cos))) * 180) / Math.PI;
+
     const horizontal = Math.hypot(dx, dz);
     let coneCos = cos;
     if (this.config.levelCone && horizontal > 1e-6) {
       const fh = Math.hypot(f.x, f.z) || 1;
       coneCos = (dx * f.x + dz * f.z) / (horizontal * fh);
     }
+    const angleDeg = (Math.acos(Math.max(-1, Math.min(1, coneCos))) * 180) / Math.PI;
     // Over the target counts as on top of it even when clearance keeps the boat
     // well above: no heading puts it "ahead", and a player told to turn just circles.
     // A scan in progress holds its lock through a wider cone, so passing works.

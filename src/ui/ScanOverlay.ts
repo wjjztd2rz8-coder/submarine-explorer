@@ -79,6 +79,10 @@ export class ScanOverlay {
   readonly slot: GuidanceSlot;
   private readonly reticle: HTMLDivElement;
   private suppressed = false;
+  private cycleKey = 'N';
+  setCycleKey(key: string): void {
+    this.cycleKey = key;
+  }
   /** Result content and lifetime; starting another scan ends its ready-contact priority. */
   private complete: {
     title: string;
@@ -433,7 +437,12 @@ export class ScanOverlay {
     };
     const objectiveReady = view.objectiveId === view.candidateId;
     // Keep the range instruction in the same slot as the ready-to-scan prompt.
-    if (view.objectiveId != null && view.objectiveName && !objectiveReady) {
+    if (
+      view.objectiveId != null &&
+      view.objectiveName &&
+      !objectiveReady &&
+      view.candidateId === null
+    ) {
       const turn = this.turnAngle('objective');
       const near =
         view.objectiveDistance <= view.objectiveRadius
@@ -506,7 +515,9 @@ export class ScanOverlay {
           kicker: 'SCAN TARGET',
           text: view.nearestName,
           ready: true,
-          detail: touch ? 'Hold SCAN' : `Hold ${keys.scan}`,
+          detail: touch
+            ? 'Hold SCAN'
+            : `Hold ${keys.scan}${(view.candidateIds?.length ?? 0) > 1 ? ` · ${this.cycleKey} next` : ''}`,
           tone: 'cyan',
           ring: { progress: 0, label: dist },
         },
