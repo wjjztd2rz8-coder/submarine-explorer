@@ -343,17 +343,28 @@ function sonarInputFixture(metadataOnly = false) {
   const context = recorder.document.createElement('canvas').getContext('2d');
   if (metadataOnly) {
     // Consume calls without recording paths, text, images or pixels.
-    for (const name of ['beginPath', 'moveTo', 'lineTo', 'stroke', 'fillText', 'drawImage'])
+    for (const name of [
+      'beginPath',
+      'moveTo',
+      'lineTo',
+      'stroke',
+      'fillText',
+      'drawImage',
+      'setLineDash',
+    ])
       Object.assign(context!, { [name]: () => {} });
-    Object.assign(context!, { strokeRect: () => {} });
+    Object.assign(context!, {
+      strokeRect: () => {},
+      createRadialGradient: () => ({ addColorStop: () => {} }),
+    });
   }
   const win = new SonarElement('WINDOW');
   const body = new SonarElement('BODY');
   win.append(body);
   let canvases = 0;
   const createElement = (tag: string) => {
-    // The metadata fixture has no backing relief context; update still owns
-    // contact admission and descriptions, with no raster work or terrain mesh.
+    // The initial backing canvas has no metadata-only context. Relief jobs
+    // create fresh canvases and sample the flat survey stub below, without a mesh.
     const backing = tag === 'canvas' && ++canvases === 2;
     return Object.assign(new SonarElement(tag.toUpperCase()), {
       getContext: () => (metadataOnly && backing ? null : context),
@@ -369,7 +380,18 @@ function sonarInputFixture(metadataOnly = false) {
     createElement,
   });
   const sonar = new Sonar(
-    { widthM: 2000, depthM: 3000, meta: { id: 'input-fixture', cols: 2, rows: 2 } } as Terrain,
+    {
+      widthM: 2000,
+      depthM: 3000,
+      meta: {
+        id: 'input-fixture',
+        cols: 2,
+        rows: 2,
+        cellsize_m_x: 2000,
+        cellsize_m_y: 3000,
+      },
+      sampleDataHeight: () => -100,
+    } as unknown as Terrain,
     [],
     { parent: body as unknown as HTMLElement },
   );
