@@ -261,9 +261,7 @@ export class TouchControls {
       this.input.touchAxes.yaw = a.yaw;
       const flood = this.input.touchAxes.ballast < -0.2;
       this.input.touchAxes.pitch =
-        flood && Math.abs(a.throttle) > 0.15
-          ? Math.max(-1, Math.min(1, -a.throttle * 0.55))
-          : 0;
+        flood && Math.abs(a.throttle) > 0.15 ? Math.max(-1, Math.min(1, -a.throttle * 0.55)) : 0;
     };
     base.addEventListener('pointerdown', (e) => {
       if (this.stickPointer !== null) return;
