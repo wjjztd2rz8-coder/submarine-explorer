@@ -178,38 +178,12 @@ export class Home {
       ? new ModeSelector('is-home', gameplay, undefined, undefined, true)
       : null;
     if (this.modeSelector) this.morePanel.append(this.modeSelector.root);
-    entry(
-      'Journal',
-      () => {
-        this.setMoreOpen(false);
-        actions.journal();
-      },
-      this.morePanel,
-    );
-    entry(
-      'Your sub',
-      () => {
-        this.setMoreOpen(false);
-        actions.subScreen();
-      },
-      this.morePanel,
-    );
-    entry(
-      'Settings',
-      () => {
-        this.setMoreOpen(false);
-        actions.settings();
-      },
-      this.morePanel,
-    );
-    entry(
-      'Controls',
-      () => {
-        this.setMoreOpen(false);
-        actions.controls();
-      },
-      this.morePanel,
-    );
+    // Keep the tray available beneath child overlays so their focus trap can
+    // return to the control that opened them when they close.
+    entry('Journal', actions.journal, this.morePanel);
+    entry('Your sub', actions.subScreen, this.morePanel);
+    entry('Settings', actions.settings, this.morePanel);
+    entry('Controls', actions.controls, this.morePanel);
     menu.append(this.morePanel);
 
     const notes = document.createElement('div');
@@ -457,6 +431,7 @@ export class Home {
     this.menu.hidden = false;
     this.root.classList.remove('has-sites');
     this.root.dispatchEvent(new Event('home:sites'));
+    if (this.sitesOrigin === this.freeDiveButton) this.setMoreOpen(true);
     (this.sitesOrigin ?? this.diveSitesButton).focus();
     this.sitesOrigin = null;
   }
