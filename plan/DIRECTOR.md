@@ -186,6 +186,11 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   21 s, debrief 125 s) + S38b (Codex: debris card text sourced, caveats removed). Final
   gate `.cache/sprint/gate20` running; push on green. OpenCode note: `variant` option
   "high" is rejected for big-pickle; launch it with no options.
+- **11:35 Sunday: LIVE is `50d94d88`** (CI green, deployed 11:33): S34, S32, S36a,
+  S36b, S33c, S37, S38+S38b, S39. Gate20: 13 keyboard + 6 touch on the debrief, Titanic
+  8/8 in 124 s; units 4,937 after S39's three count updates. In flight: S40 first-time
+  player review (Sonnet) on this build. Next: owner's second test of the live build
+  (laptop hitching at Low/Medium, scan targeting, reveal drag); act on S40.
 - **Lesson:** look at one capture before merging any layout change. S30's report and
   measurements were clean while its portrait screenshot showed tiles stacked on top of
   each other; it had measured horizontal clipping only.
