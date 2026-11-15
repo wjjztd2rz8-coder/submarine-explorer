@@ -69,11 +69,10 @@
       ],
       "note": "Marks the historical question, not a single surveyed feature: whether British shellfire and torpedoes, or the crew's own scuttling charges, caused the final sinking. kbismarck.com's survey notes describe the hull as in surprisingly good condition given the battering it took, with the stern the most heavily damaged section. Illustrative placement near the hull; moved 2026-09 with the hull to the sourced wreck position (see sources.md).",
       "reveal": {
-        "distance_m": 72,
-        "elevation_deg": 15,
-        "azimuth_deg": 156,
-        "sweep_deg": 16,
-        "target_offset": [-38, -5.5, 98]
+        "distance_m": 105,
+        "elevation_deg": 18,
+        "azimuth_deg": 345,
+        "target_offset": [-20, -3, 45]
       }
     },
     {
@@ -92,11 +91,11 @@
       "sources": ["https://en.wikipedia.org/wiki/German_battleship_Bismarck"],
       "note": "Restored 2026-11. A respectful marker near the hull, not a surveyed structure or a prop. Of Bismarck's crew of 2,221, only around 114 were rescued; roughly 2,100 died. This game has no salvage, collection or loot of any kind at any site.",
       "reveal": {
-        "distance_m": 56,
-        "elevation_deg": 12,
-        "azimuth_deg": 62,
-        "sweep_deg": 16,
-        "target_offset": [14, -3.5, -48]
+        "distance_m": 80,
+        "elevation_deg": 14,
+        "azimuth_deg": 108,
+        "sweep_deg": 12,
+        "target_offset": [-23, -2, -49]
       }
     },
     {

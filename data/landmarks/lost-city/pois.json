@@ -22,11 +22,10 @@
       ],
       "note": "The older catalog pin (30.1167, -42.1167) landed on the south wall at 1,332 m. The catalog now uses the published Beehive outlet reference (Aquino et al. 2022, Table 1). This authored tower marker samples seabed at about 801 m; its 775 m scan depth sits partway up the model. It is not an exact surveyed Poseidon footprint.",
       "reveal": {
-        "distance_m": 112,
-        "elevation_deg": 6,
-        "azimuth_deg": 48,
-        "sweep_deg": 16,
-        "target_offset": [0, 17, 0]
+        "distance_m": 155,
+        "elevation_deg": 4,
+        "azimuth_deg": 325,
+        "target_offset": [0, 16, 0]
       }
     },
     {
