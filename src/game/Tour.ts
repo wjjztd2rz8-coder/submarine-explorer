@@ -18,6 +18,36 @@ export const TOUR_ORDER = [
   'blake-plateau-corals',
   'hunga-tonga-caldera',
 ] as const;
+/** One plain line per site: what you will see, so the next dive has a reason. Claims come from each site's guide. */
+export const SITE_HOOKS: Record<(typeof TOUR_ORDER)[number], string> = {
+  titanic: 'Two halves of a liner lie about 600 m apart, the bow still hung with rust icicles.',
+  'lost-city': 'White stone towers, one about 60 m tall, grown from seawater reacting with rock.',
+  'great-blue-hole':
+    'A round blue sinkhole 320 m wide, hung with stalactites from when it was dry cave.',
+  'beebe-vent-field':
+    'Black smokers near 5,000 m down, hotter than 400 °C, swarmed by shrimp with an eye on their back.',
+  'monterey-canyon':
+    'A canyon that starts just off a beach, where underwater avalanches have reached 7.2 m/s.',
+  endurance:
+    "Shackleton's ship lies upright in the dark, her wheel still standing and her name still readable.",
+  kamaehuakanaloa:
+    'Rust-coloured bacterial mats around vents on the floor of a 600 m pit in a young volcano.',
+  'hudson-canyon':
+    "The old Hudson River's path running out under the Atlantic, its rocky walls hung with corals.",
+  'challenger-deep':
+    'Three dark basins in a row, more than 10,900 m down, where amphipods scavenge the floor.',
+  bismarck:
+    "A battleship lying upright on a volcano's slope, her gun turrets scattered down the hillside.",
+  'axial-seamount-ashes':
+    "Black smokers at the foot of a volcano's caldera wall, crowded with tube worms and palm worms.",
+  'blake-plateau-corals':
+    'White coral mounds tens of metres tall, tens of thousands of them, fed by the Gulf Stream.',
+  'hunga-tonga-caldera':
+    'A caldera surveyed before the 2022 eruption, its two islands still joined by a shallow saddle.',
+};
+export function siteHook(id: string | undefined): string | null {
+  return (id && (SITE_HOOKS as Record<string, string>)[id]) || null;
+}
 export type TourProgress =
   | (Pick<Progress, 'rating'> & Partial<Pick<Progress, 'snapshot'>>)
   | (Pick<ProgressRecord, 'ratings'> & Partial<Pick<ProgressRecord, 'awarded'>>);
