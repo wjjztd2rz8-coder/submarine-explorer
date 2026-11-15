@@ -73,6 +73,7 @@ export function createPointerSystem(): GameSystem {
         ctx.globe.isOpen ||
         ctx.discovery.guide.isOpen ||
         ctx.discovery.debrief.isOpen ||
+        (ctx.discovery.reveal?.active ?? false) ||
         (ctx.missionRouter?.frozen ?? false) ||
         (ctx.missionRouter?.debriefOpen ?? false) ||
         ctx.photoMode.active;

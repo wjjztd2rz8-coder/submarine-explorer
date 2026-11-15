@@ -3130,6 +3130,40 @@ describe('overlay host teardown', () => {
     },
   );
 
+  it('releasing pointer lock for a discovery reveal does not open Pause over the card', () => {
+    const doc = Object.assign(new EventTarget(), document, { pointerLockElement: null });
+    vi.stubGlobal('document', doc);
+    vi.stubGlobal('navigator', {});
+    const canvas = html(element('CANVAS')) as HTMLCanvasElement;
+    const input = new Input({ storage: null });
+    input.setPointerLookPreference(true);
+    input.setMouseLook(true);
+    const ctx = {
+      canvas,
+      input,
+      bus: new EventBus(),
+      app: { state: 'dive' },
+      pause: { isOpen: false },
+      settingsScreen: { isOpen: false },
+      globe: { isOpen: false },
+      discovery: {
+        guide: { isOpen: false },
+        debrief: { isOpen: false },
+        reveal: { active: true },
+      },
+      photoMode: { active: false },
+      setAppState: vi.fn(),
+    } as unknown as GameContext;
+    const pointer = createPointerSystem();
+    cleanup.push(() => pointer.dispose?.());
+    pointer.init!(ctx);
+    // createRevealSystem intentionally releases the pointer lock after starting its card.
+    doc.dispatchEvent(new Event('pointerlockchange'));
+    expect(ctx.setAppState).not.toHaveBeenCalled();
+    pointer.frame!['gate.pointer']!({ frozen: true } as FrameState, ctx);
+    expect(body.querySelector('.d3-pointer-look-hint')!.hidden).toBe(true);
+  });
+
   it.each(['settled', 'keyboard', 'pointer'] as const)(
     'pointer teardown releases controls, DOM and pending locks (%s)',
     async (pending) => {
