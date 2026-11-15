@@ -171,7 +171,7 @@ export class Waypoints {
           !onscreen ||
           (!scannable && (unknown ? !(nearby || isCurrent) || !this.visualHints : !isCurrent));
         marker.classList.toggle('is-scannable', scannable);
-        marker.classList.toggle('is-armed', this.scanner.view.candidateId === poi.id);
+        marker.classList.toggle('is-armed', this.scanner.view.promptId === poi.id);
         marker.classList.toggle('is-scanned', scanned);
         marker.classList.toggle('is-current', isCurrent);
         marker.classList.toggle('is-secondary', secondary);

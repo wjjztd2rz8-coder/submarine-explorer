@@ -86,8 +86,12 @@ export interface ScanView {
   progress: number;
   /** Best scannable POI right now (in range AND facing), if any. */
   candidateId: string | null;
+  /** The SCAN TARGET prompt, when hold would start that contact immediately. */
+  promptId: string | null;
   /** Scannable contacts in objective, mission, incidental order. */
   candidateIds?: readonly string[];
+  /** Display names for scannable contacts in candidateIds order. */
+  candidateNames?: Readonly<Record<string, string>>;
   /** Unscanned contacts in scan range, then logged POIs in range, then remote hints. */
   nearestId: string | null;
   nearestName: string;
@@ -150,6 +154,7 @@ export class Scanner {
     activeDistance: Infinity,
     progress: 0,
     candidateId: null,
+    promptId: null,
     nearestId: null,
     nearestName: '',
     nearestDistance: Infinity,
@@ -329,6 +334,7 @@ export class Scanner {
     this.view.lastCompleteFirstTime = false;
     this.view.lastCompleteSideFind = false;
     this.view.candidateId = null;
+    this.view.promptId = null;
     this.view.nearestId = null;
     this.view.nearestScanned = false;
   }
@@ -423,6 +429,9 @@ export class Scanner {
         a.target.id.localeCompare(b.target.id),
     );
     v.candidateIds = eligible.map((entry) => entry.target.id);
+    v.candidateNames = Object.fromEntries(
+      eligible.map((entry) => [entry.target.id, entry.target.name]),
+    );
     const manual = [...this.targets, ...this.supplemental, ...this.extra].find(
       (t) =>
         t.id === this.manualId &&
@@ -430,9 +439,13 @@ export class Scanner {
         this.geometry(t, position, forward).inRange,
     );
     if (!manual) this.manualId = null;
+    const auto =
+      eligible.find((e) => e.target.id === v.objectiveId)?.target ??
+      eligible[0]?.target ??
+      null;
     candidate =
       eligible.find((e) => e.target.id === this.manualId)?.target ??
-      (this.manualId ? null : (eligible[0]?.target ?? null));
+      (this.manualId ? null : auto);
     if (this.cycleRequested && eligible.length > 1) {
       const index = eligible.findIndex((e) => e.target === candidate);
       candidate = eligible[(index + 1) % eligible.length]!.target;
@@ -442,15 +455,22 @@ export class Scanner {
     // Every running beam retains its lock, including wildlife and samples.
     if (this.active && v.phase === 'scanning' && activeGeo?.inRange && activeGeo.facing) {
       candidate = this.active;
-    } else if (
-      this.active?.id === v.objectiveId &&
-      v.progress > 0 &&
-      activeGeo?.inRange &&
-      candidate &&
-      candidate !== this.active &&
-      !this.manualId
-    ) {
-      candidate = null;
+    } else if (held && this.active && v.phase === 'interrupted') {
+      if (
+        activeGeo?.inRange &&
+        activeGeo.facing &&
+        (this.active.id === v.objectiveId ||
+          this.manualId === this.active.id ||
+          !eligible.some((e) => e.target.id === v.objectiveId))
+      ) {
+        candidate = this.active;
+      } else if (
+        eligible.some((e) => e.target.id === v.objectiveId) &&
+        this.active.id !== v.objectiveId &&
+        !this.manualId
+      ) {
+        candidate = auto;
+      }
     } else if (held && !this.manualId && candidate?.id !== v.objectiveId) {
       const objective = this.targets.find((t) => t.id === v.objectiveId);
       if (objective) {
@@ -464,14 +484,15 @@ export class Scanner {
     }
     if (held) this.holdAge += dt;
 
-    // One shared selection: whatever Scan will scan is also what the card,
-    // reticle and prompt name, even if a nearer off-axis contact exists.
-    if (candidate && nearest !== candidate) {
-      nearest = candidate;
-      nearestGeo = this.geometry(candidate, position, forward);
-    }
+    const beam = candidate;
+    const objectiveEligible = eligible.find((e) => e.target.id === v.objectiveId);
+    let prompt: ScanTarget | null = null;
+    if (manual) prompt = manual;
+    else if (objectiveEligible) prompt = objectiveEligible.target;
+    else if (v.objectiveId == null) prompt = eligible[0]?.target ?? null;
 
-    v.candidateId = candidate?.id ?? null;
+    v.candidateId = beam?.id ?? null;
+    v.promptId = prompt?.id ?? null;
     v.nearestId = nearest?.id ?? null;
     v.nearestName = nearest?.name ?? '';
     v.nearestArrivalRadiusM = nearest?.arrivalRadiusM;
@@ -486,9 +507,9 @@ export class Scanner {
 
     v.activeDistance = activeGeo?.distance ?? Infinity;
 
-    if (held && candidate) {
+    if (held && beam) {
       this.rejected = null;
-      if (this.active !== candidate) {
+      if (this.active !== beam) {
         // Switching to a different target abandons the old one outright.
         if (this.active && v.phase === 'scanning') {
           this.bus.emit('scan:aborted', {
@@ -498,28 +519,28 @@ export class Scanner {
         }
         if (this.active) this.savedProgress.set(this.active.id, v.progress);
         this.clearActive();
-        v.progress = this.savedProgress.get(candidate.id) ?? 0;
-        this.savedProgress.delete(candidate.id);
-        this.active = candidate;
-        v.activeDistance = position.distanceTo(candidate.position);
+        v.progress = this.savedProgress.get(beam.id) ?? 0;
+        this.savedProgress.delete(beam.id);
+        this.active = beam;
+        v.activeDistance = position.distanceTo(beam.position);
       }
       if (v.phase !== 'scanning') {
         v.phase = 'scanning';
-        v.activeId = candidate.id;
-        v.activeName = candidate.name;
+        v.activeId = beam.id;
+        v.activeName = beam.name;
         v.lastAbort = null;
         this.sinceProgressEmit = Infinity; // report the (resumed) progress at once
-        this.bus.emit('scan:started', { poiId: candidate.id });
+        this.bus.emit('scan:started', { poiId: beam.id });
       }
-      v.progress = Math.min(1, v.progress + dt / Math.max(1e-3, candidate.scanSeconds));
+      v.progress = Math.min(1, v.progress + dt / Math.max(1e-3, beam.scanSeconds));
       this.sinceProgressEmit += dt;
       if (v.progress >= 1) {
-        this.complete(candidate);
+        this.complete(beam);
         // Completion listeners advance the mission synchronously. Refresh before drawing.
         this.updateObjective(position, forward);
       } else if (this.sinceProgressEmit >= 1 / this.config.progressEventHz) {
         this.sinceProgressEmit = 0;
-        this.bus.emit('scan:progress', { poiId: candidate.id, progress: v.progress });
+        this.bus.emit('scan:progress', { poiId: beam.id, progress: v.progress });
       }
       return;
     }

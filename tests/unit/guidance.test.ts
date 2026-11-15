@@ -537,10 +537,10 @@ describe('guidance slot', () => {
       scanner.update(0, position, forward, false);
       overlay.update(scanner.view, keys, null, 0);
       const card = texts(overlay.slot);
-      expect(scanner.view.candidateId).toBe('memorial');
-      expect(card.name).toBe('Memorial');
-      expect(card.kind).toBe('scan');
-      expect(card.detail).toBe(touch ? 'Hold SCAN' : 'Hold G');
+      expect(scanner.view.promptId).toBeNull();
+      expect(card.name).toBe('Stern');
+      expect(card.kind).toBe('objective');
+      expect(card.detail).toMatch(/Turn .* · 300 m/);
       // On touch a New Journal entry card keeps the direction to the objective; elsewhere it keeps its own line.
       overlay.showComplete('Memorial', true, keys);
       if (touch) expect(texts(overlay.slot).detail).toContain('Stern');
@@ -559,7 +559,7 @@ describe('guidance slot', () => {
     'refreshes contact choice without clearing the slot (touch=%s)',
     (touch) => {
       const f = contactGuidance(touch);
-      expect(f.step()).toMatchObject({ name: 'Memorial', kicker: 'SCAN TARGET' });
+      expect(f.step()).toMatchObject({ name: 'Stern', kicker: 'OBJECTIVE' });
       f.scanner.setObjective('memorial');
       expect(f.step()).toMatchObject({
         name: 'Memorial',
@@ -586,7 +586,7 @@ describe('guidance slot', () => {
         detail: 'Turn left · 1044 m',
       });
       f.position.set(0, 0, 0);
-      expect(f.step()).toMatchObject({ name: 'Memorial', kicker: 'SCAN TARGET' });
+      expect(f.step()).toMatchObject({ name: 'Stern', kicker: 'OBJECTIVE' });
       // Removing both sources must withdraw guidance without a manual overlay clear.
       f.scanner.setTargets([]);
       expect(f.step().hidden).toBe(true);
@@ -634,7 +634,7 @@ describe('guidance slot', () => {
         detail: 'Turn left · 1044 m',
       });
       f.position.set(0, 0, 0);
-      expect(f.step()).toMatchObject({ name: 'Memorial', kicker: 'SCAN TARGET' });
+      expect(f.step()).toMatchObject({ name: 'Stern', kicker: 'OBJECTIVE' });
       f.step(0.2, true);
       f.scanner.setTargets([]);
       expect(f.step().hidden).toBe(true);
@@ -873,7 +873,7 @@ describe('guidance slot', () => {
       );
       expect(texts(f.overlay.slot).kicker).toBe('SCAN INTERRUPTED');
       f.scanner.cancel();
-      expect(f.step()).toMatchObject({ name: 'Memorial', kicker: 'SCAN TARGET' });
+      expect(f.step()).toMatchObject({ name: 'Stern', kicker: 'OBJECTIVE' });
       f.scanner.setTargets([]);
       expect(f.step().hidden).toBe(true);
       f.overlay.dispose();
