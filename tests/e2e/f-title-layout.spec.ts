@@ -1,6 +1,7 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from './helpers/unlocked.js';
+import { homeSiteEntry, openHomeMore } from './helpers/home.js';
 
 const env =
   (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
@@ -22,7 +23,7 @@ async function boot(page: Page): Promise<void> {
   await expect(page.locator('.home-screen')).toBeVisible();
   // Catalogue loading makes the Daily card appear after the first game frame.
   // Wait for it before counting/indexing buttons and scrolling their centres.
-  await expect(page.locator('.home-menu .daily-card')).toBeVisible();
+  await expect(page.locator('.home-more .daily-card')).not.toHaveAttribute('hidden', '');
 }
 
 test('home copy, semantic order and first focus', async ({ page }) => {
@@ -41,15 +42,20 @@ test('home copy, semantic order and first focus', async ({ page }) => {
   );
   await expect(page.locator('.home-scene-caveat')).toHaveCount(0);
   // One primary action: Daily stays a secondary row, not a second mint card.
-  const daily = await page.locator('.home-menu > .daily-card').evaluate((el) => {
+  await openHomeMore(page);
+  const daily = await page.locator('.home-more .daily-card').evaluate((el) => {
     const css = getComputedStyle(el);
     const primary = getComputedStyle(document.querySelector('.home-menu > .home-primary')!);
     return css.backgroundColor !== primary.backgroundColor;
   });
   expect(daily).toBe(true);
   await expect(page.locator('.home-copy')).not.toContainText(/illustrative|reconstructed/i);
-  const order = await page
-    .locator('.home-menu > button:not(.daily-card), .home-menu > .mode-selector')
+  const top = await page
+    .locator('.home-menu > button:not(.home-more-toggle)')
+    .evaluateAll((els) => els.map((e) => (e.textContent ?? '').replace(/^Dive: .*/, 'Dive')));
+  expect(top).toEqual(['Dive', 'Dive sites']);
+  const tray = await page
+    .locator('.home-more > button:not(.daily-card), .home-more > .mode-selector')
     .evaluateAll((els) =>
       els.map((e) =>
         e.classList.contains('mode-selector')
@@ -57,36 +63,26 @@ test('home copy, semantic order and first focus', async ({ page }) => {
           : (e.textContent ?? '').replace(/^Dive: .*/, 'Dive'),
       ),
     );
-  // The primary reads "Dive: <site>" (or plain "Dive" while the catalogue loads); normalised above.
-  expect(order).toEqual([
-    'Dive',
-    'Dive sites',
-    'Free dive',
-    'MODE',
-    'Journal',
-    'Your sub',
-    'Settings',
-    'Controls',
-  ]);
+  expect(tray).toEqual(['Free dive', 'MODE', 'Journal', 'Your sub', 'Settings', 'Controls']);
   // Fresh save: the single Dive button takes first focus.
   await expect(page.getByRole('button', { name: /^(Dive|Continue)(:|$)/ })).toBeFocused();
 });
 
 test('both selector entry buttons restore focus on Back and Escape', async ({ page }) => {
   await boot(page);
-  const menu = page.locator('.home-menu');
   for (const [name, via] of [
     ['Dive sites', 'back'],
     ['Free dive', 'back'],
     ['Dive sites', 'escape'],
     ['Free dive', 'escape'],
   ] as const) {
-    await menu.getByRole('button', { name, exact: true }).click();
+    const origin = await homeSiteEntry(page, name);
+    await origin.click();
     await expect(page.locator('.home-sites')).toBeVisible();
     if (via === 'back') await page.getByRole('button', { name: 'Back to menu' }).click();
     else await page.keyboard.press('Escape');
     await expect(page.locator('.home-sites')).toBeHidden();
-    await expect(menu.getByRole('button', { name, exact: true })).toBeFocused();
+    await expect(origin).toBeFocused();
   }
 });
 
@@ -97,7 +93,8 @@ for (const viewport of VIEWPORTS) {
     await boot(page);
     // The async Daily row changes the menu height; include it in every layout
     // and hit-target assertion rather than racing its first timer refresh.
-    await expect(page.locator('.home-menu > .daily-card')).toBeVisible();
+    await openHomeMore(page);
+    await expect(page.locator('.home-more .daily-card')).toBeVisible();
     const size = `${viewport.width}x${viewport.height}`;
     await page.screenshot({ path: `${shots}/home-${size}.png` });
 
@@ -151,7 +148,7 @@ for (const viewport of VIEWPORTS) {
     }
 
     // Touch targets and reachability of every action, including the last.
-    const buttons = page.locator('.home-menu button:visible');
+    const buttons = page.locator('.home-menu button:visible, .home-more button:visible');
     const n = await buttons.count();
     for (let i = 0; i < n; i++) {
       const b = buttons.nth(i);

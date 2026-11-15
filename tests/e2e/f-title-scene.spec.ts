@@ -1,6 +1,7 @@
 import type { WebGLRenderer } from 'three';
 import { expect, test, type Page } from './helpers/unlocked.js';
 import { waitForFrames } from './helpers/frames.js';
+import { homeSiteEntry, homeTrayButton, openHomeMore } from './helpers/home.js';
 
 type TitleStats = {
   active: boolean;
@@ -125,7 +126,7 @@ for (const name of ['Dive sites', 'Free dive'] as const) {
     test(`${name} hands off to the globe; ${exit} restores title and focus`, async ({ page }) => {
       await boot(page);
       await presented(page);
-      const origin = page.locator('.home-menu').getByRole('button', { name, exact: true });
+      const origin = await homeSiteEntry(page, name);
       await origin.click();
       await expect(page.locator('.home-sites h2')).toHaveText(name);
       await expect(page.locator('.globe.is-embedded')).toBeVisible();
@@ -163,7 +164,8 @@ for (const name of ['Dive sites', 'Free dive'] as const) {
 
 test('Free dive launches a tile route and leaves the title inactive', async ({ page }) => {
   await boot(page);
-  await page.locator('.home-menu').getByRole('button', { name: 'Free dive', exact: true }).click();
+  await openHomeMore(page);
+  await homeTrayButton(page, 'Free dive').click();
   await Promise.all([
     page.waitForURL(/[?&]tile=titanic\b/),
     page.locator('.home-sites [data-tile="titanic"]').click(),
@@ -226,10 +228,8 @@ for (const preference of ['OS', 'saved'] as const) {
     expect(await pose(), 'title camera and vehicle transforms stay static').toEqual(staticPose);
     if (preference === 'OS') await page.emulateMedia({ reducedMotion: 'no-preference' });
     else {
-      await page
-        .locator('.home-menu')
-        .getByRole('button', { name: 'Settings', exact: true })
-        .click();
+      await openHomeMore(page);
+      await homeTrayButton(page, 'Settings').click();
       await page
         .getByLabel('Reduce motion (no banking, particles or flashes)', { exact: true })
         .uncheck();
@@ -253,7 +253,8 @@ for (const touch of [false, true]) {
         ['Journal', '.journal', 'Journal'],
         ['Controls', '.controls-card', touch ? 'How to play' : 'Controls guide'],
       ]) {
-        const opener = page.locator('.home-menu').getByRole('button', { name, exact: true });
+        await openHomeMore(page);
+        const opener = homeTrayButton(page, name);
         await opener.focus();
         if (touch) await opener.tap();
         else await opener.click();
@@ -397,20 +398,23 @@ for (const viewport of [
         await presented(page);
         if (releaseCatalogue) {
           await expect.poll(() => catalogueRequests).toBeGreaterThan(0);
-          await expect(page.locator('.home-menu > .daily-card')).toBeHidden();
+          await expect(page.locator('.home-more .daily-card')).toHaveAttribute('hidden', '');
         }
       } finally {
         releaseCatalogue?.();
       }
       // Daily is inserted after catalogue loading and a timer refresh. Wait for
       // the complete menu before taking a locator snapshot or scrolling actions.
-      await expect(page.locator('.home-menu > .daily-card')).toBeVisible();
+      await openHomeMore(page);
+      await expect(page.locator('.home-more .daily-card')).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,
       );
       await expectMobileRegions(page, viewport);
       await page.screenshot({ path: testInfo.outputPath('home-mobile.png') });
-      for (const button of await page.locator('.home-menu button:visible').all()) {
+      for (const button of await page
+        .locator('.home-menu button:visible, .home-more button:visible')
+        .all()) {
         await button.scrollIntoViewIfNeeded();
         // Check both scrolling strategies as each action comes into view.
         await expectMobileRegions(page, viewport);

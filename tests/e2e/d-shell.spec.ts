@@ -111,7 +111,8 @@ test('returning Home and selecting another site keeps one HUD and touch control 
   await page.keyboard.up('w');
   await expect(page.locator('.home-screen')).toBeVisible();
   await expect(page.locator('.tc-root')).toBeHidden();
-  await page.locator('.home-menu').getByRole('button', { name: 'Free dive', exact: true }).click();
+  await page.locator('.home-more-toggle').click();
+  await page.locator('.home-more').getByRole('button', { name: 'Free dive', exact: true }).click();
   await Promise.all([
     page.waitForURL(/[?&]tile=blake-plateau-corals\b/),
     page.locator('.home-sites [data-tile="blake-plateau-corals"]').click(),

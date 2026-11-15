@@ -1,6 +1,22 @@
 import { expect, type Page } from '@playwright/test';
 import { clockFramesUntil } from './clock.js';
 
+export async function openHomeMore(page: Page): Promise<void> {
+  const toggle = page.locator('.home-more-toggle');
+  if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+  await expect(page.locator('.home-more')).toBeVisible();
+}
+
+export function homeTrayButton(page: Page, name: string | RegExp) {
+  return page.locator('.home-more').getByRole('button', { name });
+}
+
+export async function homeSiteEntry(page: Page, name: 'Dive sites' | 'Free dive') {
+  if (name === 'Free dive') await openHomeMore(page);
+  const root = name === 'Free dive' ? page.locator('.home-more') : page.locator('.home-menu');
+  return root.getByRole('button', { name, exact: true });
+}
+
 /** Home presents the shell/title without loading discovery, props or a vehicle. */
 export async function homeReady(page: Page, pausedClock = false): Promise<void> {
   const ready = () => window.__gameReady === true && window.__game?.appState === 'home';

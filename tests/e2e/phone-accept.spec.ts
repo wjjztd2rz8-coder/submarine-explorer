@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page, type TestInfo } from '@playwright/test';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
-import { homeReady, openSiteList } from './helpers/home.js';
+import { homeReady, homeTrayButton, openHomeMore, openSiteList } from './helpers/home.js';
 import { expectHudClear, expectObjectiveGuidance } from './helpers/phoneHud.js';
 
 import type { Submarine } from '../../src/sub/Submarine.js';
@@ -585,9 +585,8 @@ for (const viewport of [
       );
       await page.goto('/?tier=low&touch=1');
       await homeReady(page, true);
-      const opener = page
-        .locator('.home-menu')
-        .getByRole('button', { name: 'Your sub', exact: true });
+      await openHomeMore(page);
+      const opener = homeTrayButton(page, 'Your sub');
       await reachable(opener);
       await opener.tap();
       const sub = page.getByRole('dialog', { name: 'Your sub', exact: true });

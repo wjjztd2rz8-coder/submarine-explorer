@@ -1,5 +1,6 @@
 import { expect, test } from './helpers/unlocked.js';
 import { titleAudit } from './helpers/titleAudit.js';
+import { openHomeMore } from './helpers/home.js';
 
 titleAudit();
 
@@ -10,12 +11,17 @@ test.describe('title touch navigation', () => {
   }) => {
     await page.goto('/?tier=low', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.__gameReady === true);
-    await expect(page.locator('.daily-card')).toBeVisible();
-    await page.locator('.home-menu').getByRole('button', { name: 'Free dive', exact: true }).tap();
+    await expect
+      .poll(async () => {
+        await openHomeMore(page);
+        return page.locator('.home-more .daily-card').isVisible();
+      })
+      .toBe(true);
+    await page.locator('.home-more').getByRole('button', { name: 'Free dive', exact: true }).tap();
     await expect(page.locator('.home-sites')).toBeVisible();
     await page.getByRole('button', { name: 'Back to menu' }).tap();
     await expect(
-      page.locator('.home-menu').getByRole('button', { name: 'Free dive', exact: true }),
+      page.locator('.home-more').getByRole('button', { name: 'Free dive', exact: true }),
     ).toBeFocused();
     await page.locator('.home-menu').getByRole('button', { name: 'Dive sites', exact: true }).tap();
     await expect

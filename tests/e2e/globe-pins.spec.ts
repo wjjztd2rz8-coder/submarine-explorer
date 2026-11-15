@@ -1,5 +1,5 @@
 import { expect, test, type Page } from './helpers/unlocked.js';
-import { swipeSiteList } from './helpers/home.js';
+import { homeSiteEntry, swipeSiteList } from './helpers/home.js';
 
 /**
  * Globe pins (docs/globe.md): every pin is drawn at its projected location (no
@@ -188,14 +188,14 @@ test.describe('globe pins', () => {
 test.describe('globe pins on touch', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
 
-  for (const name of ['Dive sites', 'Free dive']) {
+  for (const name of ['Dive sites', 'Free dive'] as const) {
     test(`${name} sheet keeps keyboard control after swiping and Escape restores its opener`, async ({
       page,
     }) => {
       // Regression: a completed swipe used to disable subsequent keyboard clicks on the grab.
       await page.goto('/?tier=low', { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => window.__gameReady === true);
-      const origin = page.locator('.home-menu').getByRole('button', { name, exact: true });
+      const origin = await homeSiteEntry(page, name);
       await origin.click();
       const sheet = page.locator('.home-sites');
       const back = sheet.getByRole('button', { name: 'Back to menu' });
