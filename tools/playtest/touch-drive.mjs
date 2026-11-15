@@ -242,8 +242,7 @@ const needsSink = (st) =>
   /dive deeper|sink toward/.test(st.guidance) ||
   vertCue(st) < -5 ||
   (st.scans >= 1 && st.depth !== null && st.depth < 44 && st.objectiveId !== null);
-const needsRise = (st) =>
-  /rise toward|go up/.test(st.guidance) || vertCue(st) > 10;
+const needsRise = (st) => /rise toward|go up/.test(st.guidance) || vertCue(st) > 10;
 
 /** Map HUD guidance + scanner angles to the depth slider (n>0 rise, n<0 sink). */
 const pickVertical = (st) => {
@@ -299,7 +298,9 @@ while ((Date.now() - t0) / 1000 < MAX_S && !finished) {
   if (st.primaryComplete && (st.completionBanner || elapsed > 60)) {
     await releaseAll();
     try {
-      const surfaced = await page.evaluate(() => window.__game?.missionRouter?.endDive?.() ?? false);
+      const surfaced = await page.evaluate(
+        () => window.__game?.missionRouter?.endDive?.() ?? false,
+      );
       if (surfaced) {
         finished = true;
         debriefSeen = true;
@@ -413,7 +414,10 @@ if (primaryDone) {
   const ended = await page.evaluate(() => window.__game?.missionRouter?.endDive?.() ?? false);
   await page.waitForTimeout(ended ? 2500 : 800);
   if (!(await page.evaluate(() => !!document.querySelector('.mission-debrief:not([hidden])')))) {
-    await page.locator('.tc-btn-pause').tap().catch(() => {});
+    await page
+      .locator('.tc-btn-pause')
+      .tap()
+      .catch(() => {});
     await page.waitForTimeout(300);
     const pauseSurf = page
       .locator('.pause-menu')
