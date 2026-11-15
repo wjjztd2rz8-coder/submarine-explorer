@@ -371,6 +371,37 @@ describe('Props.placeAll', () => {
     warn.mockRestore();
   });
 
+  it('keeps static prop matrices current after placement and editor replacement', async () => {
+    const props = new Props(meta, slope, cfg);
+    await props.placeAll({ props: [{ ...base, depth_m: 3800, dimensions_m: [20, 10, 10] }] }, 't');
+    const p = props.placed[0]!;
+    const scene = new THREE.Scene();
+    scene.add(props.group);
+    const check = () => {
+      p.root.traverse((object) => {
+        expect(object.matrixAutoUpdate).toBe(false);
+        const expected = new THREE.Matrix4().compose(
+          object.position,
+          object.quaternion,
+          object.scale,
+        );
+        expect(object.matrix.equals(expected)).toBe(true);
+      });
+      scene.updateMatrixWorld(true);
+      expect(
+        new THREE.Vector3().setFromMatrixPosition(p.root.matrixWorld).distanceTo(p.root.position),
+      ).toBeLessThan(1e-8);
+    };
+    check();
+    const original = p.root.matrixWorld.clone();
+    p.def.headingDeg += 35;
+    p.def.yOffsetM += 12;
+    await props.replace(p);
+    check();
+    expect(p.root.matrixWorld.equals(original)).toBe(false);
+    props.dispose();
+  });
+
   it('switches full / impostor / hidden by camera distance', async () => {
     const props = new Props(meta, slope, cfg);
     await props.placeAll(
