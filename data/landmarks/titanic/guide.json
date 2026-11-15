@@ -292,6 +292,90 @@
       "confidence": "low"
     },
     {
+      "id": "missing-piece",
+      "title": "The \"missing piece\"",
+      "fact": "A roughly 70 ft (21 m) section of Titanic's bottom survived in the debris field and is the source of most of the scattered wreckage.",
+      "paragraphs": [
+        "When Titanic broke apart, a section of the ship between the bow and stern disintegrated. Expeditions found two large sections of the bottom of the hull with the keel, including one roughly 70 ft (21 m) long that the survey team called \"the missing piece\".",
+        "That section held the galleys, pantries, wine stores, the silverware locker, a handful of cabins, the ship's hospital, coal bunkers, the verandah café and part of the first-class dining room. The 2010 mapping showed that this less-than-10-percent fragment is the source for almost everything scattered on the site.",
+        "The debris crossed here is real, but its exact position is not published. This scan marks a representative point between the two hull sections."
+      ],
+      "facts": [
+        {
+          "label": "Length",
+          "value": "about 70 ft (21 m)"
+        },
+        {
+          "label": "Survey",
+          "value": "2010 (RMS Titanic Inc., WHOI, Waitt Institute)"
+        },
+        {
+          "label": "Compartments",
+          "value": "galleys, pantries, wine stores, hospital"
+        },
+        {
+          "label": "Position confidence",
+          "value": "low (representative point)"
+        }
+      ],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "2010 Expedition Results — NOAA Maritime Heritage Program",
+          "url": "https://sanctuaries.noaa.gov/maritime/titanic/expedition_results.html"
+        },
+        {
+          "title": "Wreck of the Titanic — Wikipedia (Debris fields)",
+          "url": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
+        },
+        {
+          "title": "The Quest to Map Titanic — WHOI Oceanus Vol. 49 No. 2 (2012)",
+          "url": "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
+        }
+      ],
+      "confidence": "low"
+    },
+    {
+      "id": "debris-coal",
+      "title": "Coal and ceramics",
+      "fact": "Scatters of coal and ceramics lie where currents sorted the lighter debris as Titanic broke apart and sank.",
+      "paragraphs": [
+        "Titanic carried thousands of tonnes of coal for her boilers, and tons of it spilled from ruptured bunkers when the ship broke apart. The 2010 survey plotted distinct scatters of coal and ceramics — plates, cups and saucers — across the site.",
+        "Ocean currents sorted the lighter objects into patterns on the seabed. Bottles, silverware, suitcases and shoes were documented too, and pairs of shoes still mark where people came to rest.",
+        "The debris crossed here is real, but this marker is a representative point in the debris field, not a surveyed find spot."
+      ],
+      "facts": [
+        {
+          "label": "Surveyed",
+          "value": "2010 (REMUS 6000 AUVs and ROV)"
+        },
+        {
+          "label": "Coal",
+          "value": "tons spilled from ruptured bunkers"
+        },
+        {
+          "label": "Ceramics",
+          "value": "plates, cups and saucers"
+        },
+        {
+          "label": "Position confidence",
+          "value": "low (representative point)"
+        }
+      ],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "2010 Expedition Results — NOAA Maritime Heritage Program",
+          "url": "https://sanctuaries.noaa.gov/maritime/titanic/expedition_results.html"
+        },
+        {
+          "title": "Wreck of the Titanic — Wikipedia (Debris fields)",
+          "url": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
+        }
+      ],
+      "confidence": "low"
+    },
+    {
       "id": "big-piece",
       "title": "Where the \"Big Piece\" lay",
       "fact": "A roughly 15-tonne section of Titanic’s hull was raised in 1998, then divided into the Big Piece and Little Piece for safe handling.",
