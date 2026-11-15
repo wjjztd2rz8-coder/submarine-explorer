@@ -760,29 +760,29 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     overlay.update(view, { scan: 'G', guide: 'J', rise: 'Space', sink: 'C' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
     expect(name.textContent).toBe('Stern section');
-    expect(hint.textContent).toBe('Turn right · Go down ↓ 237 m (hold C) · 692 m');
+    expect(hint.textContent).toBe('Go down ↓ 237 m (hold C) · 692 m');
     // In scan range the card changes to an aim cue for the same target.
     view.objectiveInRange = true;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
     expect(name.textContent).toBe('Stern section');
-    // Steeply below but facing away: turning is the one thing left, not a depth change.
+    // A steep depth cue pre-empts a held turn, even while facing away.
     Object.assign(view, { objectiveVertDeg: -60, objectiveTurnDeg: 120 });
     overlay.update(view, { scan: 'G', guide: 'J', rise: 'Space', sink: 'Ctrl' }, null, 0);
-    expect(hint.textContent).toBe('Turn around to face the marker');
+    expect(hint.textContent).toBe('Go down ↓ 599 m (hold Ctrl)');
     Object.assign(view, { objectiveVertDeg: -20, objectiveTurnDeg: 40 });
     view.objectiveInRange = false;
     f.controls.setTouchMode(true);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
     expect(name.textContent).toBe('Stern section');
-    expect(hint.textContent).toBe('Turn right · Go down ↓ 237 m · 692 m');
+    expect(hint.textContent).toBe('Go down ↓ 237 m · 692 m');
     view.objectiveTurnDeg = 3;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(hint.textContent).toBe('Go down ↓ 237 m · 692 m');
     view.objectiveInRange = true;
     f.controls.setTouchMode(true);
-    overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
+    overlay.update(view, { scan: 'G', guide: 'J' }, null, 1.2);
     expect(hint.textContent).toBe('SINK TOWARD TARGET');
     // A scannable side contact must not replace the primary's name or direction.
     view.candidateId = 'debris';
@@ -795,7 +795,7 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     view.objectiveId = null;
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(name.textContent).toBe('Debris field');
-    expect(hint.textContent).toBe('Turn around to face the marker');
+    expect(hint.textContent).toBe('Turn toward the marker · left ←');
   } finally {
     overlay.dispose();
     f.controls.dispose();

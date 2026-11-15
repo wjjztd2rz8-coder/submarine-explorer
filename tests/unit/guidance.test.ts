@@ -207,10 +207,10 @@ describe('guidance slot', () => {
       expect(scanner.view.candidateId).toBeNull();
       expect(scanner.view.phase).toBe('idle');
       forward.set(1, 0, 0);
-      expect(step().detail).toContain('Turn');
+      expect(step(1.2).detail).toContain('Turn');
       forward.set(0, 0, -1);
       position.y = -60;
-      expect(step().detail).toBe('RISE TOWARD TARGET');
+      expect(step(1.2).detail).toBe('RISE TOWARD TARGET');
       overlay.slot.offer('event', 'discovery', msg('Sighting'));
       expect(texts(overlay.slot).name).toBe('Sighting');
       overlay.slot.offer('warning', 'urgent', msg('SEABED PROXIMITY'));
@@ -271,6 +271,93 @@ describe('guidance slot', () => {
       overlay.dispose();
     },
   );
+
+  it.each([false, true])('holds steering words with live distance (touch=%s)', (touch) => {
+    const f = contactGuidance(touch);
+    const view = {
+      ...f.scanner.view,
+      objectiveId: 'stern',
+      objectiveName: 'Stern',
+      objectiveDistance: 300,
+      objectiveRadius: 20,
+      objectiveInRange: false,
+      objectiveVertDeg: 0,
+      objectiveTurnDeg: 16,
+      candidateId: null,
+    };
+    const draw = (turn: number, dt: number, distance = view.objectiveDistance) => {
+      Object.assign(view, { objectiveTurnDeg: turn, objectiveDistance: distance });
+      f.overlay.update(view, f.keys, null, dt);
+      return texts(f.overlay.slot).detail;
+    };
+    expect(draw(16, 0)).toBe('Turn right · 300 m');
+    for (const turn of [9, 11, 8, 12, 9, 11]) expect(draw(turn, 0.3)).toBe('Turn right · 300 m');
+    expect(draw(5, 0.1)).toBe('Get closer to scan · 300 m');
+    expect(draw(11, 0.1)).toBe('Get closer to scan · 300 m');
+    expect(draw(125, 1.2)).toBe('Turn around · 300 m');
+    expect(draw(80, 0.5, 290)).toBe('Turn around · 290 m');
+    expect(draw(-40, 0.69, 280)).toBe('Turn around · 280 m');
+    expect(draw(-40, 0.02, 279)).toBe('Turn left · 279 m');
+    expect(draw(4, 0.5, 270)).toBe('Turn left · 270 m');
+    expect(draw(4, 0.71, 260)).toBe('Get closer to scan · 260 m');
+    f.overlay.dispose();
+  });
+
+  it('uses a separate around band and resets steering on a new objective', () => {
+    const f = contactGuidance(false);
+    const view = {
+      ...f.scanner.view,
+      objectiveId: 'stern',
+      objectiveName: 'Stern',
+      objectiveDistance: 300,
+      objectiveRadius: 20,
+      objectiveInRange: false,
+      objectiveVertDeg: 0,
+      objectiveTurnDeg: 121,
+      candidateId: null,
+    };
+    const draw = (turn: number, dt = 1.3) => {
+      view.objectiveTurnDeg = turn;
+      f.overlay.update(view, f.keys, null, dt);
+      return texts(f.overlay.slot).detail;
+    };
+    expect(draw(121)).toBe('Turn around · 300 m');
+    for (const turn of [119, 100, 91]) expect(draw(turn)).toBe('Turn around · 300 m');
+    expect(draw(89)).toBe('Turn right · 300 m');
+    expect(draw(119)).toBe('Turn right · 300 m');
+    expect(draw(0)).toBe('Get closer to scan · 300 m');
+    expect(draw(30, 0.1)).toBe('Get closer to scan · 300 m');
+    expect(draw(30, 1.2)).toBe('Turn right · 300 m');
+    view.objectiveId = 'new-objective';
+    expect(draw(-30, 0)).toBe('Turn left · 300 m');
+    f.overlay.clear();
+    expect(draw(0, 0)).toBe('Get closer to scan · 300 m');
+    f.overlay.dispose();
+  });
+
+  it.each([false, true])('lets urgent guidance pre-empt a new turn (touch=%s)', (touch) => {
+    const f = contactGuidance(touch);
+    f.step();
+    f.overlay.setApproachObstacle('Blocked ahead · go up ↑');
+    expect(f.step(0.01).detail).toBe('Blocked ahead · go up ↑ · 300 m');
+    f.overlay.setApproachObstacle(null);
+    f.targets[1].position.set(-200, 200, 0);
+    f.overlay.update(
+      { ...f.scanner.view, objectiveDistance: 300, objectiveVertDeg: 45 },
+      { ...f.keys, rise: 'Space' },
+      null,
+      0.01,
+    );
+    expect(texts(f.overlay.slot).detail).toBe(
+      `Go up ↑ 212 m${touch ? '' : ' (hold Space)'} · 300 m`,
+    );
+    f.overlay.slot.offer('warning', 'urgent', msg('SEABED PROXIMITY'));
+    expect(texts(f.overlay.slot).name).toBe('SEABED PROXIMITY');
+    f.overlay.slot.offer('warning', 'urgent', null);
+    f.targets[1].position.set(0, 0, -15);
+    expect(f.step(0.01).detail).toBe(touch ? 'Hold SCAN' : 'Hold G');
+    f.overlay.dispose();
+  });
 
   it('shows the winner, withdraws it and falls back to the next offer', () => {
     const slot = new GuidanceSlot();
@@ -541,7 +628,7 @@ describe('guidance slot', () => {
         detail: 'Stern · Turn left',
       });
       f.forward.set(-1, 0, 0);
-      expect(f.step(0.2).detail).toBe('Stern · 300 m AHEAD');
+      expect(f.step(1.2).detail).toBe('Stern · 300 m AHEAD');
       f.scanner.setObjective('memorial');
       expect(f.step(0.2).detail).toBe(firstTime ? 'OPEN JOURNAL' : 'LOGGED · JOURNAL');
       f.scanner.setObjective('stern');
@@ -550,7 +637,7 @@ describe('guidance slot', () => {
       expect(f.step(0.2).detail).toBe(firstTime ? 'OPEN JOURNAL' : 'LOGGED · JOURNAL');
       // Updating a result must not renew its priority or lifetime.
       f.scanner.setTargets([]);
-      expect(f.step(DEFAULT_CONFIG.scan.completeBannerSeconds - 0.9)).toMatchObject({
+      expect(f.step(DEFAULT_CONFIG.scan.completeBannerSeconds - 1.9)).toMatchObject({
         name: 'Whale',
         hidden: false,
       });

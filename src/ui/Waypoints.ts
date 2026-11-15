@@ -4,6 +4,8 @@ import { Vector3, type Camera } from 'three';
 import type { PlacedPoi } from '../game/Pois.js';
 import type { Scanner } from '../game/Scanner.js';
 
+const SECONDARY_DISTANCE_M = 200;
+
 type Rect = Pick<DOMRect, 'left' | 'top' | 'right' | 'bottom'>;
 
 /** Keep the offscreen arrow nearest its projection, clear of the composed HUD. */
@@ -118,6 +120,7 @@ export class Waypoints {
       const distance = _position.distanceTo(poi.position);
       const nearby = distance <= CONTACT_CONFIG.worldMarkerRangeM;
       const isCurrent = poi === current && this.visualHints && !scanned;
+      const secondary = Boolean(current) && poi !== current && !scanned;
       const projected = this.projection.copy(poi.position).project(camera);
       const onscreen =
         projected.z > -1 &&
@@ -133,8 +136,11 @@ export class Waypoints {
           (unknown ? !(nearby || isCurrent) || !this.visualHints : !isCurrent);
         marker.classList.toggle('is-scanned', scanned);
         marker.classList.toggle('is-current', isCurrent);
+        marker.classList.toggle('is-secondary', secondary);
         marker.textContent = unknown
-          ? `? · ${Math.round(distance)} m`
+          ? secondary && distance > SECONDARY_DISTANCE_M
+            ? '?'
+            : `? · ${Math.round(distance)} m`
           : scanned
             ? `✓ ${contactLabel(poi, state)}`
             : '◇';

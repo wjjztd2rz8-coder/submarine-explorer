@@ -243,6 +243,34 @@ describe('waypoint objective state', () => {
     expect(f.marker('a').title).toBe('First contact');
   });
 
+  it('dims other contacts and shows their distance only within 200 m or as the objective', () => {
+    const f = fixture();
+    f.view.setContactState(() => ({ primary: false, found: false }));
+    f.pois[0].position.set(0, -100, -478);
+    f.pois[1].position.set(0, -100, -517);
+    f.draw();
+    expect(f.marker('a').textContent).toBe('? · 478 m');
+    expect(f.marker('a').classList.contains('is-secondary')).toBe(false);
+    expect(f.marker('b')).toMatchObject({ hidden: false, textContent: '?' });
+    expect(f.marker('b').classList.contains('is-secondary')).toBe(true);
+    f.pois[1].position.z = -200;
+    f.draw();
+    expect(f.marker('b').textContent).toBe('? · 200 m');
+    f.pois[1].position.z = -201;
+    f.draw();
+    expect(f.marker('b').textContent).toBe('?');
+    f.draw(f.mission.objectives[1]);
+    expect(f.marker('b').classList.contains('is-secondary')).toBe(false);
+    expect(f.marker('b').textContent).toBe('? · 201 m');
+    f.draw(null);
+    expect(f.marker('a').classList.contains('is-secondary')).toBe(false);
+    expect(f.marker('a').textContent).toBe('? · 478 m');
+    f.view.setContactState(() => ({ primary: false, found: true }));
+    f.draw();
+    expect(f.marker('a').hidden).toBe(true);
+    expect(f.marker('b').hidden).toBe(true);
+  });
+
   it('hands the current cue from a completed scan to the next objective, then removes it', () => {
     const f = fixture();
     f.draw();

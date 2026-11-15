@@ -34,6 +34,23 @@ export interface ScanOverlayKeys {
 const isTouch = (): boolean =>
   typeof document !== 'undefined' && document.documentElement.classList.contains('is-touch');
 
+/** Steering bands and reading time, shared by objective and contact guidance. */
+export const CUE_CONFIG = {
+  turnOnDeg: 15,
+  turnOffDeg: 6,
+  aroundOnDeg: 120,
+  aroundOffDeg: 90,
+  holdSeconds: 1.2,
+};
+
+type Turn = 'left' | 'right' | 'around' | null;
+interface HeldTurn {
+  id: string | null;
+  cue: Turn;
+  age: number;
+  initialized: boolean;
+}
+
 /** Plain directions shared by touch, keyboard and controller guidance. */
 export const turnCue = (turn: number): string =>
   Math.abs(turn) > 90 ? 'Turn around' : `Turn ${turn >= 0 ? 'right' : 'left'}`;
@@ -78,6 +95,38 @@ export class ScanOverlay {
   /** One-line cue when a prop blocks the straight approach (from the HUD). */
   private approachObstacle: string | null = null;
 
+  private readonly turns: Record<'objective' | 'nearest', HeldTurn> = {
+    objective: { id: null, cue: null, age: 0, initialized: false },
+    nearest: { id: null, cue: null, age: 0, initialized: false },
+  };
+
+  /** Hold only the steering words; range, input bindings and urgent offers stay live. */
+  private updateTurn(
+    source: 'objective' | 'nearest',
+    id: string | null,
+    turn: number,
+    dt: number,
+  ): void {
+    const held = this.turns[source];
+    if (held.id !== id) Object.assign(held, { id, cue: null, age: 0, initialized: false });
+    held.age += Math.max(0, dt);
+    const angle = Math.abs(turn);
+    const around =
+      angle > (held.cue === 'around' ? CUE_CONFIG.aroundOffDeg : CUE_CONFIG.aroundOnDeg);
+    const turning = angle > (held.cue ? CUE_CONFIG.turnOffDeg : CUE_CONFIG.turnOnDeg);
+    const next: Turn = !id || !turning ? null : around ? 'around' : turn >= 0 ? 'right' : 'left';
+    if (!held.initialized || (next !== held.cue && held.age >= CUE_CONFIG.holdSeconds)) {
+      held.cue = next;
+      held.initialized = true;
+      held.age = 0;
+    }
+  }
+
+  private turnAngle(source: 'objective' | 'nearest'): number | null {
+    const cue = this.turns[source].cue;
+    return cue === null ? null : cue === 'around' ? 180 : cue === 'right' ? 45 : -45;
+  }
+
   constructor(
     private readonly config: Pick<
       ScanConfig,
@@ -118,6 +167,8 @@ export class ScanOverlay {
     this.cue = null;
     this.openObjective = null;
     this.approachObstacle = null;
+    for (const held of Object.values(this.turns))
+      Object.assign(held, { id: null, cue: null, age: 0, initialized: false });
     this.slot.clear();
   }
 
@@ -217,6 +268,8 @@ export class ScanOverlay {
     };
     this.slot.tick(dt);
     if (this.suppressed) return;
+    this.updateTurn('objective', view.objectiveId, view.objectiveTurnDeg, dt);
+    this.updateTurn('nearest', view.nearestId, view.nearestTurnDeg, dt);
     this.updateReticle(view, screen);
     this.cue = this.objectiveCue(view, keys);
     this.openObjective =
@@ -290,9 +343,9 @@ export class ScanOverlay {
       return this.complete?.sideFind
         ? `${view.objectiveName} · ${isTouch() ? 'Hold SCAN' : `Hold ${keys.scan}`}`
         : null;
-    const turn = view.objectiveTurnDeg;
+    const turn = this.turnAngle('objective');
     const how =
-      Math.abs(turn) >= 10
+      turn !== null
         ? turnCue(turn)
         : view.objectiveInRange
           ? view.objectiveVertDeg >= 0
@@ -370,18 +423,18 @@ export class ScanOverlay {
 
     // Guide the pilot towards a scannable pose. The scan prompt follows the
     // candidate; where-to-go guidance follows the mission objective.
-    const guide = (turn: number, vert: number, fallback: string): string => {
-      if (Math.abs(turn) >= 10) {
+    const guide = (turn: number | null, vert: number, fallback: string): string => {
+      if (turn !== null) {
         return facingCue(turn);
       }
       // Touch has no pitch control: the ballast slider is the vertical aid.
       if (touch) return vert >= 0 ? 'RISE TOWARD TARGET' : 'SINK TOWARD TARGET';
-      return fallback === 'PITCH TOWARD TARGET' ? facingCue(turn) : fallback;
+      return fallback === 'PITCH TOWARD TARGET' ? facingCue(0) : fallback;
     };
     const objectiveReady = view.objectiveId === view.candidateId;
     // Keep the range instruction in the same slot as the ready-to-scan prompt.
     if (view.objectiveId != null && view.objectiveName && !objectiveReady) {
-      const turn = view.objectiveTurnDeg;
+      const turn = this.turnAngle('objective');
       const near =
         view.objectiveDistance <= view.objectiveRadius
           ? 'DIVE DEEPER'
@@ -390,10 +443,9 @@ export class ScanOverlay {
       // it into the beam, a depth change can. Touch keeps its slider wording.
       const inRange = (): string => {
         const vert = view.objectiveVertDeg;
-        // Far off the heading, turning is the one thing left whatever the depth.
-        if (Math.abs(vert) < 35 || Math.abs(turn) >= 35)
-          return guide(turn, vert, 'PITCH TOWARD TARGET');
-        if (touch) return guide(0, vert, 'PITCH TOWARD TARGET');
+        // A steep target needs ballast before steering, even during the turn hold.
+        if (Math.abs(vert) < 35) return guide(turn, vert, 'PITCH TOWARD TARGET');
+        if (touch) return guide(null, vert, 'PITCH TOWARD TARGET');
         return (
           depthCue(view.objectiveDistance, vert, keys) ?? guide(turn, vert, 'PITCH TOWARD TARGET')
         );
@@ -413,9 +465,9 @@ export class ScanOverlay {
                 const obstacle = this.approachObstacle;
                 return [
                   obstacle,
-                  Math.abs(turn) >= 10 ? turnCue(turn) : null,
                   obstacle ? null : depth,
-                  Math.abs(turn) >= 10 || depth || obstacle
+                  !obstacle && !depth && turn !== null ? turnCue(turn) : null,
+                  turn !== null || depth || obstacle
                     ? `${view.objectiveDistance.toFixed(0)} m`
                     : near,
                 ];
@@ -434,8 +486,8 @@ export class ScanOverlay {
           kicker: 'OPTIONAL CONTACT',
           text: view.nearestName,
           detail:
-            Math.abs(view.nearestTurnDeg) >= 10
-              ? guide(view.nearestTurnDeg, view.nearestVertDeg, approach)
+            this.turnAngle('nearest') !== null
+              ? guide(this.turnAngle('nearest'), view.nearestVertDeg, approach)
               : Math.abs(view.nearestVertDeg) >= 10
                 ? view.nearestVertDeg >= 0
                   ? 'RISE TOWARD TARGET'
@@ -478,7 +530,7 @@ export class ScanOverlay {
         scan: {
           kicker: 'SCAN TARGET',
           text: view.nearestName,
-          detail: guide(view.nearestTurnDeg, view.nearestVertDeg, 'PITCH TOWARD TARGET'),
+          detail: guide(this.turnAngle('nearest'), view.nearestVertDeg, 'PITCH TOWARD TARGET'),
           tone: 'amber',
           ring: { progress: 0, label: dist },
           soft: view.nearestScanned,
