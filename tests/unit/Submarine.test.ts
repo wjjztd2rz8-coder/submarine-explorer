@@ -184,6 +184,21 @@ describe('Submarine terrain collision', () => {
     expect(sub.getState().touchedBottom).toBe(true);
   });
 
+  it('bleeds less speed on a slope when ballast commands a descent', () => {
+    const slope = 0.5;
+    const sub = new Submarine(cfg, slopedSeabed(-3000, slope));
+    sub.reset(0, -3000 + cfg.hullRadius + cfg.seabedClearance - 2, 0);
+    sub.velocity.set(0, -2, 1);
+    const steep = sub.velocity.length();
+    run(sub, input({ ballast: -1 }), 1);
+    const afterSteep = sub.velocity.length();
+    const sub2 = new Submarine(cfg, flatSeabed(-3000));
+    sub2.reset(0, -3000 + cfg.hullRadius + cfg.seabedClearance - 2, 0);
+    sub2.velocity.set(0, -2, 0);
+    run(sub2, input({ ballast: -1 }), 1);
+    expect(afterSteep / steep).toBeGreaterThan(sub2.velocity.length() / 2 - 0.05);
+  });
+
   it('applies a speed penalty on impact', () => {
     const seabed = -3000;
     const sub = new Submarine(cfg, flatSeabed(seabed));
