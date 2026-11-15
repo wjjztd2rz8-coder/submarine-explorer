@@ -10,13 +10,12 @@
         "The Lost City Hydrothermal Field sits near the southern summit of the Atlantis Massif, an oceanic core complex of exposed mantle and lower-crust rocks near 30°N on the Mid-Atlantic Ridge. Seawater reacting with olivine-rich mantle rock through serpentinization releases heat and hydrogen and creates alkaline, methane-rich fluids. Cooling of the lithosphere also supplies heat; the system does not require a shallow magma chamber.",
         "The field was found on 4 December 2000 during an Argo II camera survey from the research vessel Atlantis. Gretchen Früh-Green and Barbara John were leading the camera watch when the white deposits appeared. Donna Blackman was the expedition's chief scientist, with Deborah Kelley and Jeffrey Karson as co-principal investigators. Kelley and Karson visited in DSV Alvin with pilot Patrick Hickey on 5 December. The carbonate towers rise as much as 60 m above the seabed.",
         "The fluid emerges clear and alkaline, depositing calcium carbonate and brucite when it meets seawater. Kelley’s 2005 account reported about 40–91 °C; later measurements at the Beehive outlet reached 96–116 °C.",
-        "NOAA's 2005 expedition described a field covering about 60,000 square metres.",
-        "The species tables preserve an OBIS snapshot from 23 September 2026."
+        "NOAA's 2005 expedition described a field covering about 60,000 square metres. The species tables preserve an OBIS snapshot from 23 September 2026."
       ],
       "facts": [
         {
           "label": "Depth range",
-          "value": "750-900 m"
+          "value": "about 740–900 m; Beehive outlet 743 m (2018)"
         },
         {
           "label": "Discovered",
@@ -180,13 +179,13 @@
       "title": "IMAX Tower",
       "fact": "IMAX has ledges that trap hot vent water underneath them; clear fluid spills over their lips like an upside-down waterfall.",
       "paragraphs": [
-        "IMAX is a parasitic chimney and flange on Poseidon's north face, built as warm, alkaline vent fluid mixed with seawater and deposited carbonate minerals. A 2005 expedition account described the chimney as about 8 m tall; a later detailed geologic survey described a roughly 30 m multipronged structure. The reason for the difference between these published heights remains unresolved.",
-        "Look northwest of Poseidon for the IMAX scan marker."
+        "IMAX is a chimney and ledge on Poseidon's north face. Clear vent fluid collects beneath the ledge, then spills past its edge and rises through colder seawater. Minerals left behind by the mixing fluids help the ledge grow outward.",
+        "Kelley’s 2005 account describes the IMAX chimney as about 8 m tall. Look northwest of Poseidon for the IMAX scan marker."
       ],
       "facts": [
         {
-          "label": "Published heights",
-          "value": "about 8 m (Kelley 2005); roughly 30 m (Denny 2016)"
+          "label": "Chimney height (Kelley 2005)",
+          "value": "about 8 m"
         }
       ],
       "reconstruction": true,
@@ -209,7 +208,7 @@
       "paragraphs": [
         "Lost City's chimney biofilms contain archaea and bacteria that draw energy from vent chemistry, including hydrogen and methane, rather than directly from sunlight. Methanosarcinales-related archaea dominate the hot, oxygen-poor interiors of active chimneys. Exterior biofilms grow where vent fluid mixes with seawater, which supplies oxygen and sulfate.",
         "Most of the invertebrates associated with the chimneys are small, often less than a centimetre long. Snails, bivalves, worms and small crustaceans inhabit the structures, alongside microbial biofilms. The dense beds of large tubeworms, mussels and clams familiar from many black-smoker fields are absent.",
-        "The OBIS export for this area is dominated by bacteria and archaea, including Rhodobacteraceae and Methanosarcinaceae. Its retained records identify taxa at ranks ranging from kingdom to genus, rather than individual microbial species, and report no collection depths. Attribution of this entire export to a single 2003 survey remains unverified."
+        "The species table for this dive includes bacteria and archaea, including Rhodobacteraceae and Methanosarcinaceae. Its retained records identify groups at ranks ranging from kingdom to genus and report no collection depths."
       ],
       "facts": [
         {
