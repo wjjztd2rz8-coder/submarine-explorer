@@ -136,6 +136,12 @@ class Element extends EventTarget {
   setAttribute(name: string, value: string) {
     this.attributes[name] = value;
   }
+  getAttribute(name: string) {
+    return this.attributes[name] ?? null;
+  }
+  checkVisibility() {
+    return !this.hidden;
+  }
   remove() {
     if (this.parentElement)
       this.parentElement.children = this.parentElement.children.filter((child) => child !== this);
@@ -153,7 +159,10 @@ describe('waypoint objective state', () => {
       createElementNS: () => new Element(),
       querySelectorAll: () => [],
     });
-    vi.stubGlobal('window', { innerWidth: 800, innerHeight: 600 });
+    vi.stubGlobal(
+      'window',
+      Object.assign(new EventTarget(), { innerWidth: 800, innerHeight: 600 }),
+    );
     vi.stubGlobal('getComputedStyle', () => ({ getPropertyValue: () => '8px' }));
   });
   afterEach(() => {
@@ -318,7 +327,7 @@ describe('waypoint objective state', () => {
     f.draw();
     expect(f.marker('a').textContent).toBe('? · 478 m');
     expect(f.marker('a').classList.contains('is-secondary')).toBe(false);
-    expect(f.marker('b')).toMatchObject({ hidden: false, textContent: '?' });
+    expect(f.marker('b')).toMatchObject({ hidden: true, textContent: '?' });
     expect(f.marker('b').classList.contains('is-secondary')).toBe(true);
     f.pois[1].position.z = -200;
     f.draw();
@@ -336,6 +345,101 @@ describe('waypoint objective state', () => {
     f.draw();
     expect(f.marker('a').hidden).toBe(true);
     expect(f.marker('b').hidden).toBe(true);
+  });
+
+  function touchPortrait() {
+    document.documentElement.classList.toggle('is-touch', true);
+    window.innerWidth = 390;
+    window.innerHeight = 664;
+  }
+
+  it('uses bare unknown symbols on touch, retaining objective distances and marker hooks', () => {
+    touchPortrait();
+    const f = fixture();
+    f.view.setContactState(() => ({ primary: false, found: false }));
+    f.draw();
+    expect(f.marker('a').textContent).toMatch(/^\? · \d+ m$/);
+    expect(f.marker('b').textContent).toBe('?');
+    expect(f.marker('b').hidden).toBe(false);
+    expect(f.marker('b').dataset.poi).toBe('b');
+    expect(f.marker('b').classList.contains('is-secondary')).toBe(true);
+    expect(f.marker('b').classList.contains('is-unknown')).toBe(true);
+    f.draw(null);
+    expect(f.marker('a').textContent).toBe('?');
+    expect(f.marker('b').textContent).toBe('?');
+  });
+
+  it.each([false, true])(
+    'keeps the nearer overlapping contact regardless of POI order (touch: %s)',
+    (touch) => {
+      if (touch) touchPortrait();
+      const f = fixture();
+      f.view.setContactState(() => ({ primary: false, found: false }));
+      f.pois[0].position.set(0, -100, -100);
+      f.pois[1].position.set(0, -100, -33);
+      f.draw(null);
+      expect(f.marker('a').hidden).toBe(true);
+      expect(f.marker('b').hidden).toBe(false);
+      f.pois[0].position.z = -20;
+      f.draw(null);
+      expect(f.marker('a').hidden).toBe(false);
+      expect(f.marker('b').hidden).toBe(true);
+      // Moving apart restores the previously occluded contact.
+      f.pois[1].position.y = -90;
+      f.draw(null);
+      expect(f.marker('b').hidden).toBe(false);
+    },
+  );
+
+  it('gives the objective priority over closer contacts, including when it is last', () => {
+    touchPortrait();
+    const f = fixture();
+    f.view.setContactState(() => ({ primary: false, found: false }));
+    f.pois[0].position.set(0, -100, -33);
+    f.pois[1].position.set(0, -100, -100);
+    f.draw(f.mission.objectives[1]);
+    expect(f.marker('a').hidden).toBe(true);
+    expect(f.marker('b').hidden).toBe(false);
+    expect(f.marker('b').classList.contains('is-current')).toBe(true);
+  });
+
+  it('hides contacts partially intersecting cached touch controls, but preserves the objective', () => {
+    touchPortrait();
+    const f = fixture();
+    f.view.setContactState(() => ({ primary: false, found: false }));
+    f.pois[0].position.set(0, -100, -33);
+    f.pois[1].position.set(0, -100, -34);
+    const control = new Element();
+    control.className = 'tc-buttons';
+    const reads = vi.spyOn(control, 'getBoundingClientRect').mockReturnValue({
+      left: 215,
+      right: 300,
+      top: 320,
+      bottom: 400,
+      width: 85,
+      height: 80,
+    } as DOMRect);
+    const markerReads = vi.spyOn(Element.prototype, 'getBoundingClientRect');
+    const query = vi
+      .spyOn(document, 'querySelectorAll')
+      .mockReturnValue([control] as unknown as NodeListOf<HTMLElement>);
+    f.draw(null);
+    expect(f.marker('a').hidden).toBe(true);
+    expect(f.marker('b').hidden).toBe(true);
+    f.draw(null);
+    expect(reads).toHaveBeenCalledTimes(1);
+    expect(markerReads).not.toHaveBeenCalled();
+    f.draw();
+    expect(f.marker('a').hidden).toBe(false);
+    expect(f.marker('b').hidden).toBe(true);
+    // Desktop markers keep their distance and ignore touch controls.
+    document.documentElement.classList.toggle('is-touch', false);
+    f.draw(null);
+    expect(f.marker('a').hidden).toBe(false);
+    expect(f.marker('a').textContent).toBe('? · 33 m');
+    query.mockRestore();
+    reads.mockRestore();
+    markerReads.mockRestore();
   });
 
   it('hands the current cue from a completed scan to the next objective, then removes it', () => {
