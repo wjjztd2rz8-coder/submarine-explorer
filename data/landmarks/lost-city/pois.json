@@ -75,8 +75,7 @@
         "distance_m": 38,
         "elevation_deg": 5,
         "azimuth_deg": 22,
-        "sweep_deg": 14,
-        "target_offset": [51.3, 13.5, 100.6]
+        "sweep_deg": 14
       }
     },
     {

@@ -48,8 +48,7 @@
       "reveal": {
         "distance_m": 40,
         "elevation_deg": 16,
-        "azimuth_deg": 195,
-        "target_offset": [-8.7, 31.5, 75.7]
+        "azimuth_deg": 195
       }
     },
     {
@@ -74,8 +73,7 @@
         "distance_m": 44,
         "elevation_deg": 15,
         "azimuth_deg": 228,
-        "sweep_deg": 16,
-        "target_offset": [142.7, 38.5, -159.2]
+        "sweep_deg": 16
       }
     },
     {
@@ -97,8 +95,7 @@
         "distance_m": 64,
         "elevation_deg": 16,
         "azimuth_deg": 318,
-        "sweep_deg": 14,
-        "target_offset": [78, 32, 118]
+        "sweep_deg": 14
       }
     }
   ]
