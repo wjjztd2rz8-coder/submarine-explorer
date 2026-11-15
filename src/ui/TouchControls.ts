@@ -28,6 +28,11 @@ import {
   stickAxes,
 } from '../core/Touch.js';
 
+/** The visible card is the sole source of an offered touch scan. */
+export function scanControlReady(): boolean {
+  return !!document.querySelector?.('.guidance-slot[data-scan-ready="true"]');
+}
+
 interface TouchControlsOptions {
   input: Input;
   canvas: HTMLElement;
@@ -176,7 +181,7 @@ export class TouchControls {
       if (!show) this.releaseAll();
       else this.maybeShowRotateHint();
     }
-    this.scanButton.classList.toggle('is-ready', show && scanReady);
+    this.scanButton.classList.toggle('is-ready', show && scanReady && scanControlReady());
     if (show) this.root.classList.toggle('tc-sonar-open', this.opts.sonar.expanded);
   }
 

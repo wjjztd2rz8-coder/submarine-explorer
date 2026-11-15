@@ -88,6 +88,7 @@ it('a held scan on the first resolved mission frame locks the objective before n
     mission.resolve([]);
     runner.frame(frame);
     expect(scanner.view.candidateId).toBe('debris');
+    expect(scanner.view.promptId).toBeNull();
     mission.resolve(['bow', 'debris']);
     mission.start('site');
     frame.state = { ...frame.state, scan: true };
@@ -96,7 +97,28 @@ it('a held scan on the first resolved mission frame locks the objective before n
     expect(scanner.view.activeId).toBe('bow');
     expect(scanner.view.nearestId).toBe('bow');
     expect(scanner.view.objectiveId).toBe('bow');
+    expect(scanner.view.promptId).toBe('bow');
+    frame.state = { ...frame.state, scan: false };
     runner.frame(frame);
+    scanner.setExtraTargets([
+      {
+        id: 'life:fish',
+        name: 'Fish',
+        landmarkId: 'site',
+        position: new Vector3(0, 0, -10),
+        radius: 30,
+        scanSeconds: 1,
+      },
+    ]);
+    scanner.getTargets()[0].position.z = -160;
+    runner.frame(frame);
+    expect(scanner.view.promptId).toBeNull();
+    frame.state = { ...frame.state, scan: true };
+    runner.frame(frame);
+    expect(scanner.view.phase).not.toBe('scanning');
+    scanner.getTargets()[0].position.z = -111;
+    runner.frame(frame);
+    expect(scanner.view.promptId).toBe('bow');
     expect(scanner.view.activeId).toBe('bow');
   } finally {
     mission.dispose();
@@ -230,6 +252,7 @@ it('guides optional objectives after primary completion and scans leftover conta
     guide();
     expect(scanner.view.objectiveId).toBeNull();
     expect(scanner.view.candidateId).toBe('debris');
+    expect(scanner.view.promptId).toBeNull();
     expect(scanner.view.nearestId).toBe('debris');
     expect(view.update.mock.lastCall?.[2]).toBeNull();
     scanner.update(1, position, forward, true);

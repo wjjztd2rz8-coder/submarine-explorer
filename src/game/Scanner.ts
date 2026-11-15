@@ -209,8 +209,6 @@ export class Scanner {
   }
   private manualId: string | null = null;
   private cycleRequested = false;
-  private holdAge = 0;
-  private wasHeld = false;
   private readonly savedProgress = new Map<string, number>();
 
   /** Apply at the next geometry update, before the beam starts. */
@@ -325,8 +323,6 @@ export class Scanner {
     this.manualId = null;
     this.cycleRequested = false;
     this.savedProgress.clear();
-    this.wasHeld = false;
-    this.holdAge = 0;
     this.view.candidateIds = [];
     this.clearActive();
     this.view.completed = 0;
@@ -351,8 +347,6 @@ export class Scanner {
       if (v.phase === 'idle') v.lastAbort = null;
     }
 
-    if (!held || !this.wasHeld) this.holdAge = 0;
-    this.wasHeld = held;
     this.updateObjective(position, forward);
 
     // Nearest target (for hints) and best scannable candidate.
@@ -440,38 +434,20 @@ export class Scanner {
     );
     if (!manual) this.manualId = null;
     const auto =
-      eligible.find((e) => e.target.id === v.objectiveId)?.target ??
-      eligible[0]?.target ??
-      null;
+      eligible.find((e) => e.target.id === v.objectiveId)?.target ?? eligible[0]?.target ?? null;
     candidate =
-      eligible.find((e) => e.target.id === this.manualId)?.target ??
-      (this.manualId ? null : auto);
-    if (this.cycleRequested && eligible.length > 1) {
+      eligible.find((e) => e.target.id === this.manualId)?.target ?? (this.manualId ? null : auto);
+    if (this.cycleRequested && eligible.length > 0) {
       const index = eligible.findIndex((e) => e.target === candidate);
       candidate = eligible[(index + 1) % eligible.length]!.target;
       this.manualId = candidate.id;
     }
     this.cycleRequested = false;
-    // Every running beam retains its lock, including wildlife and samples.
+    // A running beam keeps its lock. An interrupted beam re-enters through the
+    // same eligibility calculation as a fresh hold; no stale lock can veto it.
     if (this.active && v.phase === 'scanning' && activeGeo?.inRange && activeGeo.facing) {
       candidate = this.active;
-    } else if (held && this.active && v.phase === 'interrupted') {
-      if (
-        activeGeo?.inRange &&
-        activeGeo.facing &&
-        (this.active.id === v.objectiveId ||
-          this.manualId === this.active.id ||
-          !eligible.some((e) => e.target.id === v.objectiveId))
-      ) {
-        candidate = this.active;
-      } else if (
-        eligible.some((e) => e.target.id === v.objectiveId) &&
-        this.active.id !== v.objectiveId &&
-        !this.manualId
-      ) {
-        candidate = auto;
-      }
-    } else if (held && !this.manualId && candidate?.id !== v.objectiveId) {
+    } else if (!this.manualId && candidate?.id !== v.objectiveId) {
       const objective = this.targets.find((t) => t.id === v.objectiveId);
       if (objective) {
         const g = this.geometry(objective, position, forward);
@@ -479,17 +455,21 @@ export class Scanner {
           -position.y >= (objective.minDepthM ?? 0) &&
           g.distance <= resolveScanRadius(objective.radius, this.config) * 1.2 &&
           (g.facing || g.angleDeg <= this.config.coneHalfAngleDeg + 10);
-        if (near && this.holdAge < 1) candidate = null;
+        // Alignment never times out into an incidental scan. A held control
+        // starts the objective on the first eligible frame, even after a drop.
+        if (near) candidate = null;
       }
+      // Briefly losing an objective's cone must not hand its partial scan to fish.
+      if (this.active?.id === v.objectiveId && activeGeo?.inRange && v.progress > 0)
+        candidate = null;
     }
-    if (held) this.holdAge += dt;
-
     const beam = candidate;
-    const objectiveEligible = eligible.find((e) => e.target.id === v.objectiveId);
-    let prompt: ScanTarget | null = null;
-    if (manual) prompt = manual;
-    else if (objectiveEligible) prompt = objectiveEligible.target;
-    else if (v.objectiveId == null) prompt = eligible[0]?.target ?? null;
+    const prompt = beam && (beam.id === v.objectiveId || beam.id === this.manualId) ? beam : null;
+    // Hint geometry follows the beam when eligible; prompt policy remains independent.
+    if (beam) {
+      nearest = beam;
+      nearestGeo = this.geometry(beam, position, forward);
+    }
 
     v.candidateId = beam?.id ?? null;
     v.promptId = prompt?.id ?? null;
@@ -631,6 +611,7 @@ export class Scanner {
     this.bus.emit('scan:complete', { poiId: t.id, landmarkId: t.landmarkId, firstTime });
     this.clearActive();
     v.candidateId = null;
+    v.promptId = null;
   }
 
   private clearActive(): void {

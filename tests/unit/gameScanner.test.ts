@@ -1081,7 +1081,7 @@ describe('ordered scan choices', () => {
     expect(scanner.view.candidateId).toBe('off');
   });
   it.each(['range', 'cone'] as const)(
-    'waits up to a second for a nearly eligible objective (%s)',
+    'never falls back to wildlife while an objective stays nearly eligible (%s)',
     (kind) => {
       const objective = angled('objective', kind === 'cone' ? 36 : 0, kind === 'range' ? 165 : 100);
       const fish = angled('fish', 0, 30);
@@ -1092,8 +1092,8 @@ describe('ordered scan choices', () => {
       expect(scanner.view.activeId).toBeNull();
       scanner.update(0.5, AT, NORTH, true);
       expect(scanner.view.activeId).toBeNull();
-      scanner.update(0.1, AT, NORTH, true);
-      expect(scanner.view.activeId).toBe('fish');
+      scanner.update(10, AT, NORTH, true);
+      expect(scanner.view.activeId).toBeNull();
     },
   );
   it('takes the objective during the alignment wait as soon as it becomes eligible', () => {
@@ -1147,5 +1147,57 @@ describe('ordered scan choices', () => {
     scanner.update(0, AT, NORTH, false);
     scanner.update(0, AT, NORTH, true);
     expect(scanner.view.progress).toBeCloseTo(0.25);
+  });
+});
+
+describe('held objective range recovery', () => {
+  it.each([false, true])(
+    'completes Monterey approach from 120 through 111 m (fish=%s)',
+    (withFish) => {
+      const objective = target({ id: 'floor', radius: 120, scanSeconds: 4 });
+      const { scanner } = setup([objective]);
+      scanner.setConfig({
+        ...cfg,
+        radiusFloorM: 100,
+        radiusCeilM: 120,
+        levelCone: true,
+        lockConeExtraDeg: DEFAULT_CONFIG.scan.lockConeExtraDeg,
+      });
+      scanner.setObjective(objective.id);
+      if (withFish)
+        scanner.setExtraTargets([target({ id: 'life:fish', position: new Vector3(0, -100, -10) })]);
+      const position = new Vector3(0, -100, 20);
+      scanner.update(0.76, position, NORTH, true);
+      expect(scanner.view.progress).toBeCloseTo(0.19);
+      position.z = 21; // leave keep range while still holding
+      scanner.update(DT, position, NORTH, true);
+      expect(scanner.view.phase).toBe('interrupted');
+      position.z = 11;
+      scanner.update(DT, position, NORTH, true);
+      expect(scanner.view.phase).toBe('scanning');
+      expect(scanner.view.activeId).toBe(objective.id);
+      for (let i = 0; i < 240; i++) {
+        position.z -= 5 * DT;
+        scanner.update(DT, position, NORTH, true);
+        if (scanner.view.promptId)
+          expect(scanner.view.activeId ?? scanner.view.lastCompleteId).toBe(scanner.view.promptId);
+        if (scanner.isScanned('lm', objective.id)) break;
+      }
+      expect(scanner.isScanned('lm', objective.id)).toBe(true);
+      expect(scanner.isScanned('lm', 'life:fish')).toBe(false);
+    },
+  );
+  it('prompts only for an immediately eligible deliberate selection', () => {
+    const { scanner } = setup();
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.promptId).toBeNull();
+    scanner.cycleCandidate();
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.promptId).toBe('bow');
+    scanner.update(0, AT, EAST, false);
+    expect(scanner.view.promptId).toBeNull();
+    scanner.update(DT, AT, NORTH, true);
+    expect(scanner.view.promptId).toBe('bow');
+    expect(scanner.view.activeId).toBe('bow');
   });
 });

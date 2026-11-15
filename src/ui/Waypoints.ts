@@ -57,6 +57,38 @@ export class Waypoints {
   private readonly projection = new Vector3();
   private pois: readonly PlacedPoi[] = [];
   private visualHints = true;
+  private layoutAt = -Infinity;
+  private layoutWidth = 0;
+  private layoutHeight = 0;
+  private layout: {
+    size: { width: number; height: number };
+    gap: number;
+    occupied: Rect[];
+  } | null = null;
+
+  private toggle(marker: HTMLElement, name: string, on: boolean): void {
+    if (marker.classList.contains(name) !== on) marker.classList.toggle(name, on);
+  }
+  private hide(marker: HTMLElement, hidden: boolean): void {
+    if (marker.hidden !== hidden) marker.hidden = hidden;
+  }
+  private text(marker: HTMLElement, text: string): void {
+    if (marker.textContent !== text) marker.textContent = text;
+  }
+  private labels = new WeakMap<HTMLElement, string>();
+  private label(marker: HTMLElement, label: string): void {
+    if (this.labels.get(marker) === label) return;
+    this.labels.set(marker, label);
+    marker.title = label;
+    marker.setAttribute('aria-label', label);
+  }
+  private position(marker: HTMLElement, x: number, y: number): void {
+    const left = `${Math.round(x)}px`;
+    const top = `${Math.round(y)}px`;
+    if (marker.style.left !== left) marker.style.left = left;
+    if (marker.style.top !== top) marker.style.top = top;
+  }
+  private direction = '';
 
   constructor(
     private readonly scanner: Scanner,
@@ -166,61 +198,86 @@ export class Waypoints {
       const marker = this.markers.get(poi.id);
       if (marker) {
         // Other unknown contacts appear in range; the current target is always marked.
-        marker.hidden =
+        this.hide(
+          marker,
           scanned ||
-          !onscreen ||
-          (!scannable && (unknown ? !(nearby || isCurrent) || !this.visualHints : !isCurrent));
-        marker.classList.toggle('is-scannable', scannable);
-        marker.classList.toggle('is-armed', this.scanner.view.promptId === poi.id);
-        marker.classList.toggle('is-scanned', scanned);
-        marker.classList.toggle('is-current', isCurrent);
-        marker.classList.toggle('is-secondary', secondary);
-        marker.textContent = unknown
-          ? secondary && distance > SECONDARY_DISTANCE_M
-            ? '?'
-            : `? · ${Math.round(distance)} m`
-          : scanned
-            ? `✓ ${label}`
-            : '◇';
-        marker.title = label;
-        marker.setAttribute('aria-label', label);
-        marker.classList.toggle('is-unknown', unknown);
+            !onscreen ||
+            (!scannable && (unknown ? !(nearby || isCurrent) || !this.visualHints : !isCurrent)),
+        );
+        this.toggle(marker, 'is-scannable', scannable);
+        this.toggle(marker, 'is-armed', this.scanner.view.candidateId === poi.id);
+        this.toggle(marker, 'is-scanned', scanned);
+        this.toggle(marker, 'is-current', isCurrent);
+        this.toggle(marker, 'is-secondary', secondary);
+        this.text(
+          marker,
+          unknown
+            ? secondary && distance > SECONDARY_DISTANCE_M
+              ? '?'
+              : `? · ${Math.round(distance)} m`
+            : scanned
+              ? `✓ ${label}`
+              : '◇',
+        );
+        this.label(marker, label);
+        this.toggle(marker, 'is-unknown', unknown);
         if (!marker.hidden) {
-          marker.style.left = `${((projected.x + 1) / 2) * width}px`;
-          marker.style.top = `${((1 - projected.y) / 2) * height}px`;
+          this.position(marker, ((projected.x + 1) / 2) * width, ((1 - projected.y) / 2) * height);
         }
       }
     }
     if (!current || !this.visualHints) {
-      this.edge.hidden = true;
+      this.hide(this.edge, true);
       return;
     }
     const state = this.state(current);
-    this.edge.textContent =
+    this.text(
+      this.edge,
       !state.primary && !state.found
         ? `? · ${Math.round(_position.distanceTo(current.position))} m`
-        : '';
-    this.edge.setAttribute('aria-label', contactLabel(current, state));
+        : '',
+    );
+    this.label(this.edge, contactLabel(current, state));
     const point = this.projection.copy(current.position).project(camera);
     const onscreen =
       point.z > -1 && point.z < 1 && Math.abs(point.x) < 0.9 && Math.abs(point.y) < 0.85;
-    this.edge.hidden = onscreen;
-    if (onscreen) return;
+    if (onscreen) {
+      this.hide(this.edge, true);
+      return;
+    }
     const behind = point.z > 1;
     const x = behind ? -point.x : point.x;
     const y = behind ? -point.y : point.y;
     const angle = Math.atan2(-y, x);
-    this.edge.style.setProperty('--direction', `${angle}rad`);
-    const size = this.edge.getBoundingClientRect();
-    const gap = parseFloat(getComputedStyle(this.root).getPropertyValue('--hud-gap')) || 0;
-    const occupied = Array.from(
-      document.querySelectorAll<HTMLElement>(
-        '.sonar, .objectives-panel, .hud-readouts, .guidance-slot, .hud-bar, ' +
-          '.tc-stick, .tc-slider, .tc-buttons, .scan-reticle',
-      ),
-    )
-      .filter((el) => el.checkVisibility({ checkVisibilityCSS: true }))
-      .map((el) => el.getBoundingClientRect());
+    const direction = `${angle}rad`;
+    if (this.direction !== direction) {
+      this.direction = direction;
+      this.edge.style.setProperty('--direction', direction);
+    }
+    const now = performance.now();
+    if (
+      !this.layout ||
+      now - this.layoutAt >= 250 ||
+      width !== this.layoutWidth ||
+      height !== this.layoutHeight
+    ) {
+      this.hide(this.edge, false);
+      const size = this.edge.getBoundingClientRect();
+      const gap = parseFloat(getComputedStyle(this.root).getPropertyValue('--hud-gap')) || 0;
+      const occupied = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          '.sonar, .objectives-panel, .hud-readouts, .guidance-slot, .hud-bar, ' +
+            '.tc-stick, .tc-slider, .tc-buttons, .scan-reticle',
+        ),
+      )
+        .filter((el) => el.checkVisibility({ checkVisibilityCSS: true }))
+        .map((el) => el.getBoundingClientRect());
+      this.layout = { size, gap, occupied };
+      this.layoutAt = now;
+      this.layoutWidth = width;
+      this.layoutHeight = height;
+    }
+    const { size, gap, occupied } = this.layout;
     const placement = clampWaypointLabel(
       {
         x: ((x + 1) / 2) * width - size.width / 2,
@@ -232,10 +289,9 @@ export class Waypoints {
       gap,
     );
     // A full-screen map may leave no room; its navigation already owns the stage.
-    this.edge.hidden = placement === null;
+    this.hide(this.edge, placement === null);
     if (placement) {
-      this.edge.style.left = `${placement.x}px`;
-      this.edge.style.top = `${placement.y}px`;
+      this.position(this.edge, placement.x, placement.y);
     }
   }
 

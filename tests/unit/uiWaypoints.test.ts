@@ -86,8 +86,20 @@ class Element extends EventTarget {
   children: Element[] = [];
   parentElement: Element | null = null;
   className = '';
-  hidden = false;
-  textContent = '';
+  private hiddenValue = false;
+  get hidden() {
+    return this.hiddenValue;
+  }
+  set hidden(value: boolean) {
+    this.hiddenValue = value;
+  }
+  private textValue = '';
+  get textContent() {
+    return this.textValue;
+  }
+  set textContent(value: string) {
+    this.textValue = value;
+  }
   title = '';
   dataset: Record<string, string> = {};
   attributes: Record<string, string> = {};
@@ -147,6 +159,32 @@ describe('waypoint objective state', () => {
   afterEach(() => {
     for (const dispose of cleanup.splice(0).reverse()) dispose();
     vi.unstubAllGlobals();
+  });
+
+  it('does no DOM write or layout read on an unchanged offscreen frame; refreshes at 4 Hz and resize', () => {
+    const f = fixture();
+    f.pois[0].position.z = 40;
+    const now = vi.spyOn(performance, 'now').mockReturnValue(1000);
+    f.draw();
+    const writes = [...(f.view.root as unknown as Element).children].flatMap((el) => [
+      vi.spyOn(el, 'setAttribute'),
+      vi.spyOn(el.classList, 'toggle'),
+      vi.spyOn(el.style, 'setProperty'),
+      vi.spyOn(el, 'textContent', 'set'),
+      vi.spyOn(el, 'hidden', 'set'),
+    ]);
+    const reads = vi.spyOn(Element.prototype, 'getBoundingClientRect');
+    f.draw();
+    for (const spy of writes) expect(spy).not.toHaveBeenCalled();
+    expect(reads).not.toHaveBeenCalled();
+    now.mockReturnValue(1250);
+    f.draw();
+    expect(reads).toHaveBeenCalledTimes(1);
+    reads.mockClear();
+    window.innerWidth = 810;
+    f.draw();
+    expect(reads).toHaveBeenCalledTimes(1);
+    vi.restoreAllMocks();
   });
 
   it('arms the candidate and selects a scannable marker by tap', () => {
