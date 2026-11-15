@@ -23,6 +23,9 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   `.cache/sprint/gate2/`): S6 tutorial step labels and README; S5 and S5b facts (no repeats,
   one card per point of interest, test `guideFactsDistinct`); S4 one-line Finish dive on
   phones. Blue Hole by keyboard on this build: 3 finds, 91 s.
+- S7 (Codex) checked all 138 facts against sources: 85 correct, 29 reworded, 4 wrong and
+  fixed, 20 unverifiable and rewritten. Merged and pushed as `b17ec3a0` at 21:00; confirm
+  CI and the deploy with `gh run list --branch main --limit 3`.
 - **In flight** (T3 delegates, own worktrees):
   - S4b Blue Hole second find by touch (Composer): touch player sticks at 26 m with
     "SEABED CLOSE · RISE"; owns touch and vertical-motion code in `src/sub/**`.
@@ -30,8 +33,6 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
   - S3b where the seconds go at each find (Opus medium, item 3): the turning circle was
     not the cause (S3 branch `t3/survey-speed-turning-radius`, 9.6 m to 7.8 m, no change
     in reveal times, unmerged; S3b decides whether to include it).
-  - S7 fact check against sources (Codex GPT-6.1 Sol high): no fact has been checked
-    against an outside source yet; also rewrites Hudson `north-wall`.
   - S8 first-time player review, phone and desktop (Gemini 4 Carbon): read-only; its
     ranked problems become the next backlog.
 - **Owner, 19:30:** work decisions are the orchestrator's. The owner cannot monitor after
@@ -152,7 +153,11 @@ These rules exist so that does not repeat.
   for one merge.
 - **Deploy early.** Nothing was pushed in the first 80 minutes. A real person playing is the
   check that six weeks of screenshot reviews never had.
-- **Merge gate:** typecheck, unit tests, build, and a played session. e2e specs are not a
+- **Merge gate:** `npm run check:content`, `npx prettier --check .`, `npm run test:py`,
+  typecheck, unit tests, build, and a played session. CI's static job (`tools/gates.sh
+--phase checks`) fails on content WARNINGS and on formatting: the 20:41 push went red on
+  a 247-character guide entry, two one-paragraph entries and three unformatted files.
+  Every delegate brief must end with the content check and prettier. e2e specs are not a
   gate; update a text-coupled spec only when it is a one-line change, otherwise delete it.
 - **No** progress notes, review logs, percent-to-1.0 estimates, golden captures or CHANGELOG
   entries. Git history is the record.
