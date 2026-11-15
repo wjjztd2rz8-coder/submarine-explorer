@@ -63,6 +63,7 @@ const read = () =>
       guide: (document.querySelector('.guidance-slot')?.innerText ?? '')
         .replace(/\s+/g, ' ')
         .trim(),
+      completionBanner: document.querySelector('.obj-banner')?.hidden === false,
     };
   });
 const held = new Set();
@@ -125,6 +126,17 @@ while (el() < +MAX) {
     console.log('FIND', JSON.stringify(f));
     cur = { reveal: 0, transit: 0, close: 0, ready: 0, scan: 0, minScanDist: Infinity };
   }
+  if (s.completionBanner) {
+    await release();
+    stuckSince = null;
+    const surface = page.getByRole('button', { name: /Surface and debrief/ });
+    if (await surface.count()) {
+      console.log(`[${t.toFixed(0)}s] BANNER Surface and debrief`);
+      await surface.first().click({ force: true });
+      await page.waitForTimeout(400);
+      continue;
+    }
+  }
   if (s.primaries) {
     await release();
     const ended = await page.evaluate(() => window.__game?.missionRouter?.endDive?.() ?? false);
@@ -155,7 +167,8 @@ while (el() < +MAX) {
     };
   }
   // A player pinned against a slope climbs over it rather than waiting.
-  if (s.speed < 1 && s.phase === 'idle' && !s.ready) stuckSince ??= t;
+  if (s.completionBanner || s.reveal) stuckSince = null;
+  else if (s.speed < 1 && s.phase === 'idle' && !s.ready) stuckSince ??= t;
   else stuckSince = null;
   if (stuckSince !== null && t - stuckSince > 1.5) ((climbUntil = t + 3), (stuckSince = null));
   if (t < climbUntil) ((steer.up = true), (steer.down = false));
