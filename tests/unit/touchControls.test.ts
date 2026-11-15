@@ -180,11 +180,15 @@ it('still follows mouse and keyboard input after restoring saved touch detection
 it('highlights Scan only while touch controls are shown and a target is scannable', () => {
   const { create } = setup(true);
   const touch = create();
+  document.querySelector = () => document.body;
   const scan = (touch.root as unknown as Element).children[2]!.children[0]!;
   touch.update(true, false, false);
   expect(scan.classList.contains('is-ready')).toBe(false);
   touch.update(true, false, true);
   expect(scan.classList.contains('is-ready')).toBe(true);
+  document.querySelector = () => null;
+  touch.update(true, false, true);
+  expect(scan.classList.contains('is-ready')).toBe(false);
   touch.update(false, false, true);
   expect(scan.classList.contains('is-ready')).toBe(false);
 });

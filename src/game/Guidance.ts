@@ -37,6 +37,8 @@ export interface GuidanceMessage {
   text: string;
   /** Optional second line, e.g. "Hold SCAN". */
   detail?: string;
+  /** Optional incidental contact, separate from the objective cue. */
+  secondary?: string;
   tone: GuidanceTone;
   /** A progress ring with a short label (percent or range). */
   ring?: { progress: number; label: string };

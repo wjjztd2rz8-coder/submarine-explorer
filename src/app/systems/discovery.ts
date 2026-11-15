@@ -71,6 +71,17 @@ export const discoverySystem: GameSystem = {
         f.sampled.toggleGuide
           ? { ...f.state, toggleGuide: true }
           : f.state;
+      if (ctx.input && ctx.discovery.overlay)
+        ctx.discovery.overlay.setCycleKey(ctx.input.primaryKeyLabel('cycleScanTarget'));
+      if (
+        input.cycleScanTarget &&
+        !f.frozen &&
+        !f.blocked &&
+        ctx.app.state === 'dive' &&
+        !ctx.missionRouter?.debriefOpen &&
+        !ctx.discovery.guide.isOpen
+      )
+        ctx.discovery.scanner.cycleCandidate();
       ctx.discovery.update(
         f.steps * f.fixedDt,
         f.dt,

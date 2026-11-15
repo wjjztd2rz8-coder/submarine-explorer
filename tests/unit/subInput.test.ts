@@ -668,9 +668,8 @@ describe('Input action map', () => {
     expect(input.actions.filter((a) => a.keys.includes('KeyQ')).map((a) => a.id)).toEqual([
       'toggleCamera',
     ]);
-    expect(input.actions.some((a) => a.keys.includes('KeyN') || a.keys.includes('Tab'))).toBe(
-      false,
-    );
+    expect(input.getAction('cycleScanTarget')?.keys).toEqual(['KeyN']);
+    expect(input.actions.some((a) => a.keys.includes('Tab'))).toBe(false);
     input.injectKey('KeyN', true);
     input.injectKey('Tab', true);
     input.injectKey('ShiftLeft', true);
@@ -1108,4 +1107,15 @@ describe('v2 binding migration', () => {
     expect(JSON.parse(store.getItem(BINDINGS_STORAGE_KEY)!).version).toBe(3);
     expect(store.getItem(PREVIOUS_BINDINGS_STORAGE_KEY)).not.toBeNull();
   });
+});
+
+it('cycles scan targets with N as an edge without taking Q or Tab', () => {
+  const input = makeInput();
+  expect(input.primaryKeyLabel('cycleScanTarget')).toBe('N');
+  input.injectKey('KeyN', true);
+  expect(input.sample().cycleScanTarget).toBe(true);
+  input.endFrame();
+  expect(input.sample().cycleScanTarget).toBe(false);
+  expect(input.primaryKeyLabel('toggleCamera')).toBe('Q');
+  expect(defaultActions().some((action) => action.keys.includes('Tab'))).toBe(false);
 });

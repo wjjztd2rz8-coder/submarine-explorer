@@ -1523,7 +1523,13 @@ describe('overlay policies across the app', () => {
       discovery: {
         ready: Promise.resolve(),
         pois: [],
-        scanner: { setConfig: vi.fn(), setObjective: vi.fn() },
+        scanner: {
+          setConfig: vi.fn(),
+          setObjective: vi.fn(),
+          getSupplementalTargets: () => [],
+          getExtraTargets: () => [],
+          view: { candidateIds: [], candidateId: null },
+        },
       },
       sonar: { setScanState: vi.fn(), setPois: vi.fn(), setSensorRange: vi.fn() },
       sub: { setConfig: vi.fn() },

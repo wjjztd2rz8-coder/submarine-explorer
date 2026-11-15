@@ -6,6 +6,7 @@ import {
   type GuidanceMessage,
   type GuidanceOffer,
 } from '../../src/game/Guidance.js';
+import { scanControlReady } from '../../src/ui/TouchControls.js';
 import { ScanOverlay } from '../../src/ui/ScanOverlay.js';
 import { Scanner } from '../../src/game/Scanner.js';
 import { Discovery } from '../../src/game/Discovery.js';
@@ -109,6 +110,10 @@ describe('guidance slot', () => {
       createElement: () => new FakeElement(),
       createElementNS: () => new FakeElement(),
       querySelectorAll: () => [],
+      querySelector: () =>
+        (document.body as unknown as FakeElement).children.find(
+          (el) => el.className === 'guidance-slot' && el.dataset.scanReady === 'true',
+        ) ?? null,
     });
   });
   afterEach(() => vi.unstubAllGlobals());
@@ -163,6 +168,64 @@ describe('guidance slot', () => {
     };
     return { scanner, overlay, targets, position, forward, keys, step };
   };
+
+  it.each([false, true])(
+    'preserves objective depth guidance and exposes no scripted scan signals for an unselected fish (touch=%s)',
+    (touch) => {
+      const { scanner, overlay, step } = contactGuidance(touch);
+      scanner.setTargets([target('deep', 'Hiolo South vent site', 0, -158, -65, 120)]);
+      scanner.setObjective('deep');
+      step(1.2);
+      const baseline = texts(overlay.slot);
+      scanner.setExtraTargets([target('life:fish', 'White sea anemone', 0, 0, -10, 30)]);
+      const card = step(1.2);
+      expect(card).toEqual(baseline);
+      expect(card.kicker).toBe('OBJECTIVE');
+      expect(card.detail).toContain('Go down ↓ 158 m');
+      expect(scanControlReady()).toBe(false);
+      const messages = (
+        overlay as unknown as {
+          messages: (
+            v: typeof scanner.view,
+            k: { scan: string; guide: string },
+          ) => { objective: GuidanceMessage };
+        }
+      ).messages(scanner.view, { scan: 'G', guide: 'J' });
+      expect(messages.objective.secondary).toBe('Also in range: White sea anemone');
+      expect(JSON.stringify(messages)).not.toMatch(/scan target|hold g|hold scan|HOLD/i);
+      expect(scanner.view.promptId).toBeNull();
+      scanner.selectCandidate('life:fish');
+      expect(step().kicker).toBe('SCAN TARGET');
+      expect(scanControlReady()).toBe(true);
+      expect(step().name).toBe('White sea anemone');
+      overlay.dispose();
+    },
+  );
+
+  it.each([false, true])(
+    'names the chosen candidate and only offers a desktop switch hint for multiple choices (touch=%s)',
+    (touch) => {
+      const { scanner, overlay, step } = contactGuidance(touch);
+      scanner.setObjective(null);
+      scanner.setTargets([
+        target('a', 'First', 0, 0, -30, 100),
+        target('b', 'Second', 5, 0, -40, 100),
+      ]);
+      scanner.setObjective('a');
+      expect(step()).toMatchObject({
+        name: 'First',
+        detail: touch ? 'Hold SCAN' : 'Hold G · N next',
+      });
+      scanner.selectCandidate('b');
+      expect(step()).toMatchObject({
+        name: 'Second',
+        detail: touch ? 'Hold SCAN' : 'Hold G · N next',
+      });
+      scanner.setTargets([target('a', 'First', 0, 0, -30, 100)]);
+      expect(step()).toMatchObject({ name: 'First', detail: touch ? 'Hold SCAN' : 'Hold G' });
+      overlay.dispose();
+    },
+  );
 
   it.each([false, true])(
     'keeps side-find guidance on the objective through approach and scan readiness (touch=%s)',
@@ -232,6 +295,7 @@ describe('guidance slot', () => {
       const scanner = new Scanner({ ...DEFAULT_CONFIG.scan, radiusFloorM: 100 }, new EventBus());
       const overlay = new ScanOverlay(DEFAULT_CONFIG.scan, document.body);
       scanner.setTargets([target('bow', 'Bow', 0, 0, -217, 30)]);
+      scanner.setObjective('bow');
       const position = new Vector3();
       const forward = new Vector3(0, 0, -1);
       const keys = { scan: 'G', guide: 'J' };
@@ -256,7 +320,7 @@ describe('guidance slot', () => {
       scanner.update(0, position, forward, true);
       overlay.update(scanner.view, keys, null, 0);
       expect(texts(overlay.slot)).toMatchObject({
-        kicker: 'SCAN INTERRUPTED',
+        kicker: 'OBJECTIVE',
         detail: 'Get closer to scan · 217 m',
       });
       // An interrupted scan still names its held target beyond the remote hint range.
@@ -337,6 +401,7 @@ describe('guidance slot', () => {
 
   it.each([false, true])('lets urgent guidance pre-empt a new turn (touch=%s)', (touch) => {
     const f = contactGuidance(touch);
+    f.targets[0].position.z = 300; // Isolate approach cues from ready scan candidates.
     f.step();
     f.overlay.setApproachObstacle('Blocked ahead · go up ↑');
     expect(f.step(0.01).detail).toBe('Blocked ahead · go up ↑ · 300 m');
@@ -464,6 +529,7 @@ describe('guidance slot', () => {
     const position = new Vector3();
     const forward = new Vector3(0, 0, -1);
     const keys = { scan: 'G', guide: 'J' };
+    scanner.setObjective('bow');
     scanner.update(0, position, forward, false);
     overlay.update(scanner.view, keys, null, 0);
     overlay.slot.offer('event', 'discovery', msg('Whale passing'));
@@ -512,10 +578,10 @@ describe('guidance slot', () => {
       scanner.update(0, position, forward, false);
       overlay.update(scanner.view, keys, null, 0);
       const card = texts(overlay.slot);
-      expect(scanner.view.candidateId).toBe('memorial');
+      expect(scanner.view.promptId).toBeNull();
       expect(card.name).toBe('Stern');
       expect(card.kind).toBe('objective');
-      expect(card.detail).toBe('Turn left · 300 m');
+      expect(card.detail).toMatch(/Turn .* · 300 m/);
       // On touch a New Journal entry card keeps the direction to the objective; elsewhere it keeps its own line.
       overlay.showComplete('Memorial', true, keys);
       if (touch) expect(texts(overlay.slot).detail).toContain('Stern');
@@ -542,16 +608,16 @@ describe('guidance slot', () => {
         detail: touch ? 'Hold SCAN' : 'Hold G',
       });
       f.scanner.setObjective(null);
-      expect(f.step().kicker).toBe('SCAN TARGET');
+      expect(f.step().kicker).toBe('CONTACT');
       f.scanner.setObjective('stern');
       f.keys.scan = 'X';
-      expect(f.step().detail).toBe('Turn left · 300 m');
+      expect(f.step()).toMatchObject({ name: 'Stern', kicker: 'OBJECTIVE' });
       // The objective wins when it becomes eligible, even beside a nearer contact.
       f.targets[1].position.set(0, 0, -15);
       expect(f.step()).toMatchObject({
         name: 'Stern',
         kicker: 'SCAN TARGET',
-        detail: touch ? 'Hold SCAN' : 'Hold X',
+        detail: touch ? 'Hold SCAN' : 'Hold X · N next',
       });
       f.targets[1].position.set(-300, 0, 0);
       f.position.set(0, 0, 1000);
@@ -580,6 +646,7 @@ describe('guidance slot', () => {
     (touch) => {
       const f = contactGuidance(touch);
       f.step();
+      f.scanner.selectCandidate('memorial');
       f.overlay.showComplete('Whale', true, f.keys);
       expect(f.step().name).toBe('Whale');
       expect(f.step(0.2, true)).toMatchObject({
@@ -597,6 +664,7 @@ describe('guidance slot', () => {
       f.overlay.slot.offer('warning', 'urgent', null);
       expect(texts(f.overlay.slot).kicker).toBe('SCAN INTERRUPTED');
       // Keep the three-second grace guard by making the primary ready to scan.
+      f.targets[0].position.z = 1000; // release the deliberate side selection
       f.targets[1].position.set(0, 0, -15);
       expect(f.step(0.6).name).toBe('Whale');
       expect(f.step(2.2)).toMatchObject({ name: 'Stern', kicker: 'SCAN TARGET' });
@@ -712,6 +780,7 @@ describe('guidance slot', () => {
     'steers vertically toward an in-range objective beside an optional contact (height=%s)',
     (height) => {
       const f = contactGuidance(true);
+      f.targets[0].position.z = 300; // No ready incidental contact hides the approach cue.
       f.targets[1].position.set(0, height, -30);
       f.targets[1].radius = 60;
       expect(f.step()).toMatchObject({
@@ -835,6 +904,7 @@ describe('guidance slot', () => {
     (touch) => {
       const f = contactGuidance(touch);
       f.step();
+      f.scanner.selectCandidate('memorial');
       f.overlay.showComplete('Whale', true, f.keys);
       f.step(0.2, true);
       expect(f.step(0).kicker).toBe('SCAN INTERRUPTED');

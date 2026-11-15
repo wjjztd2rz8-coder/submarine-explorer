@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus, type GameEvents } from '../../src/core/EventBus.js';
 import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { defaultSettings } from '../../src/core/Save.js';
 import { Scanner, type ScanTarget } from '../../src/game/Scanner.js';
 import { AnchoredEvents, type EventContact } from '../../src/game/Events.js';
 import { Life } from '../../src/world/life/Life.js';
@@ -336,7 +338,7 @@ describe('Scanner', () => {
       scanner.setExtraTargets([animal]);
       scanner.setConfig({ ...cfg, radiusFloorM: 100 });
 
-      for (const [index, contact] of [objective, sample, animal].entries()) {
+      for (const [index, contact] of [objective, animal, sample].entries()) {
         scanner.update(0, AT, NORTH, false);
         expect(scanner.view.candidateId).toBe(contact.id);
         expect(scanner.view.nearestDistance).toBe(distance);
@@ -365,7 +367,7 @@ describe('Scanner', () => {
       expect(scanner.view.candidateId).toBeNull();
       expect(store.keys()).toHaveLength(3);
       expect(log.filter(([name]) => name === 'scan:complete')).toEqual(
-        [objective, sample, animal].map((contact) => [
+        [objective, animal, sample].map((contact) => [
           'scan:complete',
           { poiId: contact.id, landmarkId: 'lm', firstTime: true },
         ]),
@@ -448,7 +450,7 @@ describe('Scanner', () => {
   );
 
   it.each(['range', 'facing', 'logged'] as const)(
-    'falls back to an eligible sample when the objective is unavailable through %s',
+    'falls back to the closer incidental fish when the objective is unavailable through %s',
     (reason) => {
       const objective = target({
         id: 'objective',
@@ -459,17 +461,18 @@ describe('Scanner', () => {
       const { scanner, log } = setup([objective]);
       scanner.setObjective(objective.id);
       scanner.setSupplementalTargets([sample]);
-      scanner.setExtraTargets([target({ id: 'life:fish', position: new Vector3(0, -100, -20) })]);
+      const fish = target({ id: 'life:fish', position: new Vector3(0, -100, -20) });
+      scanner.setExtraTargets([fish]);
       if (reason === 'logged') scanner.scannedThisDive.add('lm/objective');
       scanner.update(DT, AT, NORTH, true);
-      expect(scanner.view.candidateId).toBe(sample.id);
-      expect(scanner.view.nearestId).toBe(sample.id);
-      expect(scanner.view.activeId).toBe(sample.id);
+      expect(scanner.view.candidateId).toBe(fish.id);
+      expect(scanner.view.nearestId).toBe(fish.id);
+      expect(scanner.view.activeId).toBe(fish.id);
       expect(scanner.view.objectiveId).toBe(reason === 'logged' ? null : objective.id);
-      expect(log[0]).toEqual(['scan:started', { poiId: sample.id }]);
-      scanner.update(sample.scanSeconds, AT, NORTH, true);
+      expect(log[0]).toEqual(['scan:started', { poiId: fish.id }]);
+      scanner.update(fish.scanSeconds, AT, NORTH, true);
       expect(log.filter(([name]) => name === 'scan:complete')).toEqual([
-        ['scan:complete', { poiId: sample.id, landmarkId: 'lm', firstTime: true }],
+        ['scan:complete', { poiId: fish.id, landmarkId: 'lm', firstTime: true }],
       ]);
     },
   );
@@ -853,15 +856,15 @@ describe('Scanner objective priority over passing contacts', () => {
       marked = next.id;
       next.position.set(0, -100, -80);
       scanner.update(0.2, AT, NORTH, true);
-      const retained = pool === 'fixed' ? contact : next;
+      const retained = contact;
       expect(scanner.view.objectiveId).toBe(next.id);
       expect(scanner.view.candidateId).toBe(retained.id);
       expect(scanner.view.nearestId).toBe(retained.id);
       expect(scanner.view.activeId).toBe(retained.id);
-      expect(scanner.view.progress).toBeCloseTo(pool === 'fixed' ? 0.3 : 0.1);
+      expect(scanner.view.progress).toBeCloseTo(0.3);
       scanner.update(2, AT, NORTH, true);
-      expect(scanner.view.lastCompleteSideFind).toBe(pool === 'fixed');
-      expect(scanner.view.objectiveId).toBe(pool === 'fixed' ? next.id : null);
+      expect(scanner.view.lastCompleteSideFind).toBe(true);
+      expect(scanner.view.objectiveId).toBe(next.id);
       expect(store.keys()).toEqual([`lm/${retained.id}`]);
     },
   );
@@ -1040,4 +1043,163 @@ it('Arcade faces by heading only; Realistic keeps the 3D cone', async () => {
   const settings = new Save({ config: DEFAULT_CONFIG, storage: null }).get();
   expect(resolveEffective(settings, 'arcade', null).scan.levelCone).toBe(true);
   expect(resolveEffective(settings, 'realistic', null).scan.levelCone).toBe(false);
+});
+
+describe('ordered scan choices', () => {
+  const angled = (id: string, degrees: number, distance = 80) =>
+    target({
+      id,
+      name: id,
+      position: new Vector3(
+        Math.sin((degrees * Math.PI) / 180) * distance,
+        -100,
+        -Math.cos((degrees * Math.PI) / 180) * distance,
+      ),
+    });
+  it('orders objective, mission contacts, then wildlife by effective heading and distance', () => {
+    const objective = angled('objective', 25, 120);
+    const edge = angled('edge', 20, 30);
+    const centre = angled('centre', 0, 90);
+    const fish = angled('fish', 0, 20);
+    const { scanner } = setup([edge, centre, objective]);
+    scanner.setExtraTargets([fish]);
+    scanner.setObjective(objective.id);
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.candidateIds).toEqual(['objective', 'centre', 'edge', 'fish']);
+    expect(scanner.view.candidateId).toBe('objective');
+    scanner.setObjective(null);
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.candidateId).toBe('centre');
+  });
+  it('uses Arcade heading rather than pitch for centrality and respects radius caps', () => {
+    const high = target({ id: 'high', position: new Vector3(0, -40, -60), radius: 1 });
+    const off = angled('off', 10, 50);
+    const { scanner } = setup([high, off]);
+    scanner.setConfig({ ...cfg, levelCone: true, radiusFloorM: 100, radiusCeilM: 120 });
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.candidateId).toBe('high');
+    high.position.z = -121;
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.candidateId).toBe('off');
+  });
+  it.each(['range', 'cone'] as const)(
+    'never falls back to wildlife while an objective stays nearly eligible (%s)',
+    (kind) => {
+      const objective = angled('objective', kind === 'cone' ? 36 : 0, kind === 'range' ? 165 : 100);
+      const fish = angled('fish', 0, 30);
+      const { scanner } = setup([objective]);
+      scanner.setObjective(objective.id);
+      scanner.setExtraTargets([fish]);
+      scanner.update(0.5, AT, NORTH, true);
+      expect(scanner.view.activeId).toBeNull();
+      scanner.update(0.5, AT, NORTH, true);
+      expect(scanner.view.activeId).toBeNull();
+      scanner.update(10, AT, NORTH, true);
+      expect(scanner.view.activeId).toBeNull();
+    },
+  );
+  it('takes the objective during the alignment wait as soon as it becomes eligible', () => {
+    const objective = angled('objective', 35);
+    const { scanner } = setup([objective]);
+    scanner.setObjective(objective.id);
+    scanner.setExtraTargets([angled('fish', 0, 30)]);
+    scanner.update(0.5, AT, NORTH, true);
+    objective.position.copy(angled('aligned', 25).position);
+    scanner.update(0.1, AT, NORTH, true);
+    expect(scanner.view.activeId).toBe('objective');
+  });
+  it('cycles in priority order and holds a manual choice across turns until range loss or completion', () => {
+    const objective = angled('objective', 0);
+    const fish = angled('fish', 20, 40);
+    const { scanner } = setup([objective]);
+    scanner.setObjective(objective.id);
+    scanner.setExtraTargets([fish]);
+    scanner.update(0, AT, NORTH, false);
+    scanner.cycleCandidate();
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.candidateId).toBe('fish');
+    scanner.update(0, AT, new Vector3(-0.5, 0, -0.866), false);
+    expect(scanner.view.candidateId).toBeNull();
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.candidateId).toBe('fish');
+    scanner.cycleCandidate();
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.candidateId).toBe('objective');
+    expect(scanner.selectCandidate('fish')).toBe(true);
+    fish.position.z = -500;
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.candidateId).toBe('objective');
+    fish.position.copy(angled('fish', 20, 40).position);
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.selectCandidate('fish')).toBe(true);
+    scanner.update(2, AT, NORTH, true);
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.candidateId).toBe('objective');
+  });
+  it('preserves partial objective progress across a manually selected wildlife scan', () => {
+    const { scanner } = setup();
+    scanner.setObjective('bow');
+    scanner.setExtraTargets([angled('fish', 0, 30)]);
+    scanner.update(0.5, AT, NORTH, true);
+    scanner.update(0, AT, NORTH, false);
+    scanner.selectCandidate('fish');
+    scanner.update(2, AT, NORTH, true);
+    expect(scanner.view.objectiveId).toBe('bow');
+    expect(scanner.isScanned('lm', 'bow')).toBe(false);
+    scanner.update(0, AT, NORTH, false);
+    scanner.update(0, AT, NORTH, true);
+    expect(scanner.view.progress).toBeCloseTo(0.25);
+  });
+});
+
+describe('held objective range recovery', () => {
+  it.each([false, true])(
+    'completes Monterey approach from 120 through 111 m (fish=%s)',
+    (withFish) => {
+      const objective = target({ id: 'floor', radius: 120, scanSeconds: 4 });
+      const { scanner } = setup([objective]);
+      scanner.setConfig({
+        ...resolveEffective(defaultSettings(DEFAULT_CONFIG), 'arcade', null).scan,
+      });
+      scanner.setObjective(objective.id);
+      if (withFish)
+        scanner.setExtraTargets([target({ id: 'life:fish', position: new Vector3(0, -100, -10) })]);
+      const position = new Vector3(0, -100, 20);
+      scanner.update(0.76, position, NORTH, true);
+      expect(scanner.view.progress).toBeCloseTo(0.19);
+      position.z = 21; // leave keep range while still holding
+      scanner.update(DT, position, NORTH, true);
+      expect(scanner.view.phase).toBe('interrupted');
+      position.z = 11;
+      scanner.update(DT, position, NORTH, true);
+      expect(scanner.view.phase).toBe('scanning');
+      expect(scanner.view.activeId).toBe(objective.id);
+      for (let i = 0; i < 240; i++) {
+        position.z -= 5 * DT;
+        scanner.update(DT, position, NORTH, true);
+        if (scanner.view.promptId)
+          expect(scanner.view.activeId ?? scanner.view.lastCompleteId).toBe(scanner.view.promptId);
+        if (scanner.isScanned('lm', objective.id)) break;
+      }
+      expect(scanner.isScanned('lm', objective.id)).toBe(true);
+      expect(scanner.isScanned('lm', 'life:fish')).toBe(false);
+    },
+  );
+  it('prompts only for an immediately eligible deliberate selection', () => {
+    const { scanner } = setup();
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.promptId).toBeNull();
+    scanner.cycleCandidate();
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.promptId).toBe('bow');
+    scanner.update(0, AT, EAST, false);
+    expect(scanner.view.promptId).toBeNull();
+    scanner.update(DT, AT, NORTH, true);
+    expect(scanner.view.promptId).toBe('bow');
+    expect(scanner.view.activeId).toBe('bow');
+    scanner.enabled = false;
+    scanner.update(DT, AT, NORTH, true);
+    expect(scanner.view.promptId).toBeNull();
+    expect(scanner.isScanning).toBe(false);
+  });
 });

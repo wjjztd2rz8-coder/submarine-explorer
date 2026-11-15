@@ -29,6 +29,7 @@ export class GuidanceSlot {
   private readonly kicker: HTMLElement;
   private readonly name: HTMLElement;
   private readonly detail: HTMLElement;
+  private readonly secondary: HTMLElement;
   private readonly skip: HTMLButtonElement;
   private readonly ringArc: SVGCircleElement;
   private readonly ringText: SVGTextElement;
@@ -81,7 +82,8 @@ export class GuidanceSlot {
     this.name = el('div', 'guidance-name');
     this.detail = el('div', 'guidance-hint');
     this.text = el('div', 'guidance-text');
-    this.text.append(this.kicker, this.name, this.detail);
+    this.secondary = el('div', 'guidance-secondary');
+    this.text.append(this.kicker, this.name, this.detail, this.secondary);
 
     this.skip = el('button', 'guidance-skip', 'Skip');
     this.skip.type = 'button';
@@ -197,6 +199,7 @@ export class GuidanceSlot {
     );
     const shown = this.shown;
     this.root.hidden = !shown;
+    this.root.dataset.scanReady = String(!!shown?.message.ready);
     if (!shown) return;
     const { kind, message: m } = shown;
     this.root.dataset.kind = kind;
@@ -207,6 +210,8 @@ export class GuidanceSlot {
     this.write(this.name, 'name', m.text);
     this.write(this.detail, 'detail', m.detail ?? '');
     this.detail.hidden = !m.detail;
+    this.write(this.secondary, 'secondary', m.secondary ?? '');
+    this.secondary.hidden = !m.secondary;
     this.ring.style.display = m.ring ? '' : 'none';
     if (m.ring) {
       const p = Math.max(0, Math.min(1, m.ring.progress));

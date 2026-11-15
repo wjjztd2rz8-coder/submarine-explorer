@@ -86,8 +86,20 @@ class Element extends EventTarget {
   children: Element[] = [];
   parentElement: Element | null = null;
   className = '';
-  hidden = false;
-  textContent = '';
+  private hiddenValue = false;
+  get hidden() {
+    return this.hiddenValue;
+  }
+  set hidden(value: boolean) {
+    this.hiddenValue = value;
+  }
+  private textValue = '';
+  get textContent() {
+    return this.textValue;
+  }
+  set textContent(value: string) {
+    this.textValue = value;
+  }
   title = '';
   dataset: Record<string, string> = {};
   attributes: Record<string, string> = {};
@@ -147,6 +159,61 @@ describe('waypoint objective state', () => {
   afterEach(() => {
     for (const dispose of cleanup.splice(0).reverse()) dispose();
     vi.unstubAllGlobals();
+  });
+
+  it('does no DOM write or layout read on an unchanged offscreen frame; refreshes at 4 Hz and resize', () => {
+    const f = fixture();
+    f.pois[0].position.z = 40;
+    const now = vi.spyOn(performance, 'now').mockReturnValue(1000);
+    f.draw();
+    const writes = [...(f.view.root as unknown as Element).children].flatMap((el) => [
+      vi.spyOn(el, 'setAttribute'),
+      vi.spyOn(el.classList, 'toggle'),
+      vi.spyOn(el.style, 'setProperty'),
+      vi.spyOn(el, 'textContent', 'set'),
+      vi.spyOn(el, 'hidden', 'set'),
+    ]);
+    const reads = vi.spyOn(Element.prototype, 'getBoundingClientRect');
+    f.draw();
+    for (const spy of writes) expect(spy).not.toHaveBeenCalled();
+    expect(reads).not.toHaveBeenCalled();
+    now.mockReturnValue(1250);
+    f.draw();
+    expect(reads).toHaveBeenCalledTimes(1);
+    reads.mockClear();
+    window.innerWidth = 810;
+    f.draw();
+    expect(reads).toHaveBeenCalledTimes(1);
+    vi.restoreAllMocks();
+  });
+
+  it('arms the candidate and selects a scannable marker by tap', () => {
+    const f = fixture();
+    f.pois[1].position.set(5, -100, -40);
+    f.scanner.setObjective('a');
+    f.scanner.update(0, new Vector3(0, -100, 0), new Vector3(0, 0, -1), false);
+    f.draw();
+    const markers = (f.view.root as unknown as Element).children;
+    const first = markers.find((m) => m.dataset.poi === 'a')!;
+    const second = markers.find((m) => m.dataset.poi === 'b')!;
+    expect(first.classList.contains('is-armed')).toBe(true);
+    expect(second.classList.contains('is-scannable')).toBe(true);
+    second.dispatchEvent(new Event('click', { cancelable: true }));
+    f.scanner.update(0, new Vector3(0, -100, 0), new Vector3(0, 0, -1), false);
+    f.draw();
+    expect(f.scanner.view.candidateId).toBe('b');
+    expect(second.classList.contains('is-armed')).toBe(true);
+    expect(second.classList.contains('is-secondary')).toBe(true);
+  });
+
+  it('keeps a previously discovered contact visible when it is armed again this dive', () => {
+    const f = fixture();
+    f.view.setContactState(() => ({ primary: true, found: true }));
+    f.scanner.setObjective('a');
+    f.scanner.update(0, f.position, new Vector3(0, 0, -1), false);
+    f.draw();
+    expect(f.marker('a').hidden).toBe(false);
+    expect(f.marker('a').classList.contains('is-armed')).toBe(true);
   });
 
   function fixture() {

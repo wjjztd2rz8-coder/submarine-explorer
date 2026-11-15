@@ -80,6 +80,10 @@ export class ScanOverlay {
   readonly slot: GuidanceSlot;
   private readonly reticle: HTMLDivElement;
   private suppressed = false;
+  private cycleKey = 'N';
+  setCycleKey(key: string): void {
+    this.cycleKey = key;
+  }
   /** Result content and lifetime; starting another scan ends its ready-contact priority. */
   private complete: {
     title: string;
@@ -93,6 +97,8 @@ export class ScanOverlay {
   private cue: string | null = null;
   /** The outstanding objective, so a side-find result can say it is still open. */
   private openObjective: { name: string; ready: boolean } | null = null;
+  /** Labeled contact names refreshed each frame for secondary guidance lines. */
+  private labeled = new Map<string, string>();
   /** One-line cue when a prop blocks the straight approach (from the HUD). */
   private approachObstacle: string | null = null;
 
@@ -267,6 +273,26 @@ export class ScanOverlay {
       nearestName: label(view.nearestId, view.nearestName),
       objectiveName: label(view.objectiveId, view.objectiveName),
     };
+    this.labeled.clear();
+    for (const id of [
+      view.activeId,
+      view.nearestId,
+      view.objectiveId,
+      view.promptId,
+      ...(view.candidateIds ?? []),
+    ]) {
+      if (id)
+        this.labeled.set(
+          id,
+          id === view.activeId
+            ? view.activeName
+            : id === view.nearestId
+              ? view.nearestName
+              : id === view.objectiveId
+                ? view.objectiveName
+                : label(id, view.candidateNames?.[id] ?? id),
+        );
+    }
     this.slot.tick(dt);
     if (this.suppressed) return;
     this.updateTurn('objective', view.objectiveId, view.objectiveTurnDeg, dt);
@@ -275,7 +301,7 @@ export class ScanOverlay {
     this.cue = this.objectiveCue(view, keys);
     this.openObjective =
       view.objectiveId != null && view.objectiveName && view.objectiveId !== view.lastCompleteId
-        ? { name: view.objectiveName, ready: view.objectiveId === view.candidateId }
+        ? { name: view.objectiveName, ready: view.objectiveId === view.promptId }
         : null;
     if (this.complete) {
       this.complete.left -= dt;
@@ -302,11 +328,7 @@ export class ScanOverlay {
     // way (or an interrupted one) takes the slot back at once.
     const resultHolds = this.complete?.holdsReady && view.phase === 'idle';
     this.slot.offer('scan', 'scan', scan && resultHolds ? { ...scan, soft: true } : scan);
-    this.slot.offer(
-      'objective',
-      view.objectiveInRange && view.candidateId === null ? 'scan' : 'objective',
-      objective ? { ...objective, soft: true } : null,
-    );
+    this.slot.offer('objective', 'objective', objective);
   }
 
   private updateReticle(view: ScanView, screen: ScreenPoint | null): void {
@@ -331,7 +353,7 @@ export class ScanOverlay {
   private objectiveCue(view: ScanView, keys: ScanOverlayKeys): string | null {
     if (view.objectiveId == null || !view.objectiveName || view.objectiveId === view.lastCompleteId)
       return null;
-    if (view.objectiveId === view.candidateId)
+    if (view.objectiveId === view.promptId)
       return this.complete?.sideFind
         ? `${view.objectiveName} · ${isTouch() ? 'Hold SCAN' : `Hold ${keys.scan}`}`
         : null;
@@ -347,6 +369,14 @@ export class ScanOverlay {
             ? 'DIVE DEEPER'
             : `${view.objectiveDistance.toFixed(0)} m AHEAD`;
     return `${view.objectiveName} · ${how}`;
+  }
+
+  private candidateName(view: ScanView, id: string): string {
+    return (
+      this.labeled.get(id) ??
+      view.candidateNames?.[id] ??
+      (id === view.nearestId ? view.nearestName : id)
+    );
   }
 
   /** What the scan beam and the objective each have to say right now. */
@@ -391,7 +421,7 @@ export class ScanOverlay {
         },
       };
     }
-    if (view.phase === 'interrupted') {
+    if (view.phase === 'interrupted' && (view.promptId !== null || view.objectiveId === null)) {
       const activeDist = Number.isFinite(view.activeDistance)
         ? `${view.activeDistance.toFixed(0)} m`
         : dist;
@@ -423,9 +453,17 @@ export class ScanOverlay {
       if (touch) return vert >= 0 ? 'RISE TOWARD TARGET' : 'SINK TOWARD TARGET';
       return fallback === 'PITCH TOWARD TARGET' ? facingCue(0) : fallback;
     };
-    const objectiveReady = view.objectiveId === view.candidateId;
+    const objectiveReady = view.objectiveId === view.promptId;
+    const alsoInRange = (): string | null => {
+      if (view.objectiveId == null || objectiveReady) return null;
+      const extra = view.candidateIds?.find((id) => id !== view.objectiveId);
+      if (!extra) return null;
+      const switchHint =
+        !touch && (view.candidateIds?.length ?? 0) > 1 ? ` · ${this.cycleKey} to switch` : '';
+      return `Also in range: ${this.candidateName(view, extra)}${switchHint}`;
+    };
     // Keep the range instruction in the same slot as the ready-to-scan prompt.
-    if (view.objectiveId != null && view.objectiveName && !objectiveReady) {
+    if (view.objectiveId != null && view.objectiveName && view.promptId === null) {
       const turn = this.turnAngle('objective');
       const near =
         view.objectiveDistance <= view.objectiveRadius
@@ -442,30 +480,28 @@ export class ScanOverlay {
           depthCue(view.objectiveDistance, vert, keys) ?? guide(turn, vert, 'PITCH TOWARD TARGET')
         );
       };
+      const approachDetail = view.objectiveInRange
+        ? inRange()
+        : (() => {
+            const depth = depthCue(view.objectiveDistance, view.objectiveVertDeg, keys);
+            const obstacle = this.approachObstacle;
+            return [
+              obstacle,
+              obstacle ? null : depth,
+              !obstacle && !depth && turn !== null ? turnCue(turn) : null,
+              turn !== null || depth || obstacle ? `${view.objectiveDistance.toFixed(0)} m` : near,
+            ];
+          })()
+            .filter(Boolean)
+            .join(' · ');
+      const extra = alsoInRange();
       return {
         scan: null,
         objective: {
           kicker: 'OBJECTIVE',
           text: view.objectiveName,
-          // Keep the approach distance alongside plain steering directions.
-          detail: view.objectiveInRange
-            ? inRange()
-            : (() => {
-                const depth = depthCue(view.objectiveDistance, view.objectiveVertDeg, keys);
-                // A blocked path asks for a climb. It replaces the depth cue: the two together
-                // read "go up · go down". The HUD decides when the climb cue applies.
-                const obstacle = this.approachObstacle;
-                return [
-                  obstacle,
-                  obstacle ? null : depth,
-                  !obstacle && !depth && turn !== null ? turnCue(turn) : null,
-                  turn !== null || depth || obstacle
-                    ? `${view.objectiveDistance.toFixed(0)} m`
-                    : near,
-                ];
-              })()
-                .filter(Boolean)
-                .join(' · '),
+          detail: approachDetail,
+          secondary: extra ?? undefined,
           tone: view.objectiveInRange ? 'amber' : 'dim',
           ring: { progress: 0, label: `${view.objectiveDistance.toFixed(0)} m` },
         },
@@ -492,24 +528,32 @@ export class ScanOverlay {
         objective: null,
       };
     }
-    if (view.candidateId !== null) {
+    if (view.promptId !== null) {
+      const name = this.candidateName(view, view.promptId);
+      const multi =
+        !touch && (view.candidateIds?.length ?? 0) > 1 ? ` · ${this.cycleKey} next` : '';
       return {
         scan: {
           kicker: 'SCAN TARGET',
-          text: view.nearestName,
+          text: name,
           ready: true,
-          detail: touch ? 'Hold SCAN' : `Hold ${keys.scan}`,
+          detail: touch ? 'Hold SCAN' : `Hold ${keys.scan}${multi}`,
           tone: 'cyan',
           ring: { progress: 0, label: dist },
         },
         objective: null,
       };
     }
-    if (hasTarget && !view.nearestInRange && view.nearestDistance > view.nearestRadius) {
+    if (
+      hasTarget &&
+      !view.nearestInRange &&
+      view.nearestDistance > view.nearestRadius &&
+      view.objectiveId == null
+    ) {
       return {
         scan: null,
         objective: {
-          kicker: 'SCAN TARGET',
+          kicker: 'OBJECTIVE',
           text: view.nearestName,
           detail: `Get closer to scan · ${dist}`,
           tone: 'dim',
@@ -517,17 +561,17 @@ export class ScanOverlay {
         },
       };
     }
-    if (inContact) {
+    if (inContact && view.objectiveId == null) {
       return {
-        scan: {
-          kicker: 'SCAN TARGET',
+        scan: null,
+        objective: {
+          kicker: 'CONTACT',
           text: view.nearestName,
           detail: guide(this.turnAngle('nearest'), view.nearestVertDeg, 'PITCH TOWARD TARGET'),
           tone: 'amber',
           ring: { progress: 0, label: dist },
           soft: view.nearestScanned,
         },
-        objective: null,
       };
     }
     return none;
