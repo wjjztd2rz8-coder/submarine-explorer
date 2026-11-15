@@ -62,8 +62,11 @@ export class PropContact {
   private cooldown = 0;
   /** Where the hull was when it last made headway while pressed against props. */
   private readonly pinFrom = new THREE.Vector3();
-  /** Seconds of thrust against props without 1.5 m of headway. */
+  /** Seconds of thrust near props without 1.5 m of headway. */
   private pinnedS = 0;
+  /** Seconds since the last prop contact, and that contact's push normal. */
+  private sinceHitS = Infinity;
+  private readonly lastHitNormal = new THREE.Vector3();
   /** True while touching a prop; for tests and the debug readout. */
   touching = false;
   /** True when driving forward into the current prop contact normal. */
@@ -84,6 +87,8 @@ export class PropContact {
     const hit = this.props.collide(body.position, this.radius, this.normal);
     this.contactNormal.copy(this.normal);
     if (hit) {
+      this.sinceHitS = 0;
+      this.lastHitNormal.copy(this.normal);
       const speed = body.velocity.length();
       const into = body.velocity.dot(this.normal);
       if (into < 0)
@@ -93,21 +98,22 @@ export class PropContact {
         this.bus.emit('sub:collided', { depth: body.position.y, speed });
       }
       this.deflectAlongSurface(body, throttle, dt);
-      this.escapePocket(body, throttle, dt);
     } else {
-      this.pinnedS = 0;
+      this.sinceHitS += dt;
     }
+    this.escapePocket(body, throttle, dt);
     this.touching = hit;
     return hit;
   }
 
   /**
    * Thrust into a pocket between prop boxes can balance the push-outs exactly, so the
-   * hull hangs in place whatever the pilot does. After a second without headway, lift it
-   * out along the contact normal (straight back out under a ceiling).
+   * hull hangs in place whatever the pilot does; a ledge over a slope can do the same with
+   * contact flickering on and off. After a second without headway within 2 s of a prop
+   * contact, lift the hull out along that contact (straight back out under a ceiling).
    */
   private escapePocket(body: CollidingBody, throttle: number, dt: number): void {
-    if (throttle <= 0.05) {
+    if (throttle <= 0.05 || this.sinceHitS > 2) {
       this.pinnedS = 0;
       return;
     }
@@ -118,17 +124,20 @@ export class PropContact {
     }
     this.pinnedS += dt;
     if (this.pinnedS < 1) return;
-    this.slide.set(this.normal.x, 0, this.normal.z);
+    const n = this.lastHitNormal;
+    this.slide.set(n.x, 0, n.z);
     if (this.slide.lengthSq() > 1e-6) this.slide.normalize().multiplyScalar(0.5);
-    if (this.normal.y > -0.3) this.slide.y = 1;
+    if (n.y > -0.3) this.slide.y = 1;
     if (this.slide.lengthSq() < 1e-6) return;
     this.slide.normalize();
     // Carry the hull out at 3 m/s: clear of a typical 5 m box rib in a couple of seconds.
     const along = body.velocity.dot(this.slide);
     if (along < 3) body.velocity.addScaledVector(this.slide, 3 - along);
     body.position.addScaledVector(this.slide, 3 * dt);
-    this.props.collide(body.position, this.radius, this.normal);
-    this.contactNormal.copy(this.normal);
+    if (this.props.collide(body.position, this.radius, this.normal)) {
+      this.lastHitNormal.copy(this.normal);
+      this.contactNormal.copy(this.normal);
+    }
   }
 
   /**
