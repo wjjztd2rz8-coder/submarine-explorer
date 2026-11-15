@@ -2,7 +2,7 @@ import { contactLabel, CONTACT_CONFIG, type ContactState } from '../game/Contact
 /** DOM guidance for POIs. Positions are projected from the real world; this never changes survey data. */
 import { Vector3, type Camera } from 'three';
 import type { PlacedPoi } from '../game/Pois.js';
-import type { Scanner } from '../game/Scanner.js';
+import type { ScanTarget, Scanner } from '../game/Scanner.js';
 
 const SECONDARY_DISTANCE_M = 200;
 
@@ -77,13 +77,27 @@ export class Waypoints {
   setPois(pois: readonly PlacedPoi[]): void {
     this.pois = pois;
     for (const poi of pois) {
-      const marker = document.createElement('div');
-      marker.className = 'd-scan-world-marker';
-      marker.dataset.poi = poi.id;
-      marker.setAttribute('aria-label', contactLabel(poi, this.state(poi)));
-      this.root.appendChild(marker);
-      this.markers.set(poi.id, marker);
+      this.addMarker(poi);
     }
+  }
+
+  private addMarker(target: ScanTarget): void {
+    if (this.markers.has(target.id)) return;
+    const marker = document.createElement('div');
+    marker.className = 'd-scan-world-marker';
+    marker.dataset.poi = target.id;
+    marker.addEventListener('pointerdown', (event) => {
+      if (!this.scanner.view.candidateIds?.includes(target.id)) return;
+      event.stopPropagation();
+    });
+    marker.addEventListener('click', (event) => {
+      if (this.scanner.selectCandidate(target.id)) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+    });
+    this.root.appendChild(marker);
+    this.markers.set(target.id, marker);
   }
 
   setVisualHints(enabled: boolean): void {
@@ -113,10 +127,32 @@ export class Waypoints {
     const width = window.innerWidth;
     const height = window.innerHeight;
     const current = objective ? this.pois.find((p) => p.id === objective.poiId) : null;
-    for (const poi of this.pois) {
-      const state = this.state(poi);
-      const scanned = state.found;
-      const unknown = !state.primary && !scanned;
+    const targets: readonly ScanTarget[] = [
+      ...this.pois,
+      ...this.scanner.getSupplementalTargets(),
+      ...this.scanner.getExtraTargets(),
+    ];
+    const liveIds = new Set(targets.map((t) => t.id));
+    for (const [id, marker] of this.markers) {
+      if (!liveIds.has(id)) {
+        marker.remove();
+        this.markers.delete(id);
+      }
+    }
+    for (const poi of targets) {
+      this.addMarker(poi);
+      const placed = this.pois.find((p) => p.id === poi.id);
+      const state = placed
+        ? this.state(placed)
+        : {
+            primary: false,
+            found: this.scanner.isScanned(poi.landmarkId, poi.id),
+          };
+      const label = placed ? contactLabel(placed, state) : poi.name;
+      const scannable = this.scanner.view.candidateIds?.includes(poi.id) ?? false;
+      // A Journal discovery can be scanned again on a new dive. Keep its armed marker visible.
+      const scanned = state.found && !scannable;
+      const unknown = !state.primary && !state.found;
       const distance = _position.distanceTo(poi.position);
       const nearby = distance <= CONTACT_CONFIG.worldMarkerRangeM;
       const isCurrent = poi === current && this.visualHints && !scanned;
@@ -133,7 +169,9 @@ export class Waypoints {
         marker.hidden =
           scanned ||
           !onscreen ||
-          (unknown ? !(nearby || isCurrent) || !this.visualHints : !isCurrent);
+          (!scannable && (unknown ? !(nearby || isCurrent) || !this.visualHints : !isCurrent));
+        marker.classList.toggle('is-scannable', scannable);
+        marker.classList.toggle('is-armed', this.scanner.view.promptId === poi.id);
         marker.classList.toggle('is-scanned', scanned);
         marker.classList.toggle('is-current', isCurrent);
         marker.classList.toggle('is-secondary', secondary);
@@ -142,10 +180,10 @@ export class Waypoints {
             ? '?'
             : `? · ${Math.round(distance)} m`
           : scanned
-            ? `✓ ${contactLabel(poi, state)}`
+            ? `✓ ${label}`
             : '◇';
-        marker.title = contactLabel(poi, state);
-        marker.setAttribute('aria-label', contactLabel(poi, state));
+        marker.title = label;
+        marker.setAttribute('aria-label', label);
         marker.classList.toggle('is-unknown', unknown);
         if (!marker.hidden) {
           marker.style.left = `${((projected.x + 1) / 2) * width}px`;

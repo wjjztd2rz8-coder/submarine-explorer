@@ -165,6 +165,30 @@ describe('guidance slot', () => {
   };
 
   it.each([false, true])(
+    'names the chosen candidate and only offers a desktop switch hint for multiple choices (touch=%s)',
+    (touch) => {
+      const { scanner, overlay, step } = contactGuidance(touch);
+      scanner.setObjective(null);
+      scanner.setTargets([
+        target('a', 'First', 0, 0, -30, 100),
+        target('b', 'Second', 5, 0, -40, 100),
+      ]);
+      expect(step()).toMatchObject({
+        name: 'First',
+        detail: touch ? 'Hold SCAN' : 'Hold G · N next',
+      });
+      scanner.selectCandidate('b');
+      expect(step()).toMatchObject({
+        name: 'Second',
+        detail: touch ? 'Hold SCAN' : 'Hold G · N next',
+      });
+      scanner.setTargets([target('a', 'First', 0, 0, -30, 100)]);
+      expect(step()).toMatchObject({ name: 'First', detail: touch ? 'Hold SCAN' : 'Hold G' });
+      overlay.dispose();
+    },
+  );
+
+  it.each([false, true])(
     'keeps side-find guidance on the objective through approach and scan readiness (touch=%s)',
     (touch) => {
       const { scanner, targets, overlay, keys, step } = contactGuidance(touch);
@@ -337,6 +361,7 @@ describe('guidance slot', () => {
 
   it.each([false, true])('lets urgent guidance pre-empt a new turn (touch=%s)', (touch) => {
     const f = contactGuidance(touch);
+    f.targets[0].position.z = 300; // Isolate approach cues from ready scan candidates.
     f.step();
     f.overlay.setApproachObstacle('Blocked ahead · go up ↑');
     expect(f.step(0.01).detail).toBe('Blocked ahead · go up ↑ · 300 m');
@@ -512,10 +537,10 @@ describe('guidance slot', () => {
       scanner.update(0, position, forward, false);
       overlay.update(scanner.view, keys, null, 0);
       const card = texts(overlay.slot);
-      expect(scanner.view.candidateId).toBe('memorial');
+      expect(scanner.view.promptId).toBeNull();
       expect(card.name).toBe('Stern');
       expect(card.kind).toBe('objective');
-      expect(card.detail).toBe('Turn left · 300 m');
+      expect(card.detail).toMatch(/Turn .* · 300 m/);
       // On touch a New Journal entry card keeps the direction to the objective; elsewhere it keeps its own line.
       overlay.showComplete('Memorial', true, keys);
       if (touch) expect(texts(overlay.slot).detail).toContain('Stern');
@@ -545,13 +570,13 @@ describe('guidance slot', () => {
       expect(f.step().kicker).toBe('SCAN TARGET');
       f.scanner.setObjective('stern');
       f.keys.scan = 'X';
-      expect(f.step().detail).toBe('Turn left · 300 m');
+      expect(f.step().detail).toBe(touch ? 'Hold SCAN' : 'Hold X');
       // The objective wins when it becomes eligible, even beside a nearer contact.
       f.targets[1].position.set(0, 0, -15);
       expect(f.step()).toMatchObject({
         name: 'Stern',
         kicker: 'SCAN TARGET',
-        detail: touch ? 'Hold SCAN' : 'Hold X',
+        detail: touch ? 'Hold SCAN' : 'Hold X · N next',
       });
       f.targets[1].position.set(-300, 0, 0);
       f.position.set(0, 0, 1000);
@@ -712,6 +737,7 @@ describe('guidance slot', () => {
     'steers vertically toward an in-range objective beside an optional contact (height=%s)',
     (height) => {
       const f = contactGuidance(true);
+      f.targets[0].position.z = 300; // No ready incidental contact hides the approach cue.
       f.targets[1].position.set(0, height, -30);
       f.targets[1].radius = 60;
       expect(f.step()).toMatchObject({

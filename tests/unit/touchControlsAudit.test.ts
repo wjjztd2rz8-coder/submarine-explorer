@@ -281,11 +281,11 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
       if (device === 'touch') pointer(f.scan, 'pointerdown', 1);
       else if (device === 'keyboard') input.injectKey('KeyG', true);
       else buttons[5] = { value: 1, pressed: true };
-      for (const id of ['objective', 'sample:rock', 'life:fish']) {
+      for (const id of ['objective', 'life:fish', 'sample:rock']) {
         tick(0.5);
         expect(scanner.view.activeId).toBe(id);
         expect(scanner.view.candidateId).toBe(id);
-        expect(scanner.view.nearestId).toBe(id);
+        expect(scanner.view.promptId).toBe(id);
         expect(card.children[1].textContent).toBe(id);
         expect(scanner.view.progress).toBe(0.25);
         expect(overlay.slot.kind).toBe('scan');
@@ -298,7 +298,7 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
       expect(scanner.view.objectiveId).toBeNull();
       expect(card.children[0].textContent).not.toBe('OBJECTIVE');
       expect(complete.mock.calls).toEqual(
-        ['objective', 'sample:rock', 'life:fish'].map((poiId) => [
+        ['objective', 'life:fish', 'sample:rock'].map((poiId) => [
           { poiId, landmarkId: 'site', firstTime: true },
         ]),
       );
@@ -784,12 +784,14 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     f.controls.setTouchMode(true);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 1.2);
     expect(hint.textContent).toBe('SINK TOWARD TARGET');
-    // A scannable side contact must not replace the primary's name or direction.
+    // A ready scan prompt must name the candidate it will take.
+    view.objectiveId = null;
+    view.promptId = 'debris';
     view.candidateId = 'debris';
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
-    expect(kicker.textContent).toBe('OBJECTIVE');
-    expect(name.textContent).toBe('Stern section');
-    expect(hint.textContent).toBe('SINK TOWARD TARGET');
+    expect(kicker.textContent).toBe('SCAN TARGET');
+    expect(name.textContent).toBe('Debris field');
+    expect(hint.textContent).toBe('Hold SCAN');
     // No objective: nearest-contact guidance as before.
     view.candidateId = null;
     view.objectiveId = null;
@@ -827,6 +829,7 @@ it('the standing objective yields to its ready scan and a completion card, then 
       nearestInRange: true,
       nearestDistance: 5,
       candidateId: 'stern',
+      promptId: 'stern',
     });
     overlay.update(view, keys, null, 0);
     expect(overlay.slot.kind).toBe('scan');
@@ -890,9 +893,11 @@ it.each(['keyboard', 'touch'] as const)(
       nearestInRange: true,
       nearestDistance: 5,
       candidateId: 'bow',
+      promptId: null,
       objectiveId: 'stern',
       objectiveName: 'Stern section',
       objectiveDistance: 692,
+      candidateIds: ['bow'],
     });
     const name = (overlay.slot.root as unknown as TouchElement).children[1].children[1];
     try {
@@ -928,8 +933,13 @@ it.each(['keyboard', 'touch'] as const)(
       overlay.update(view, keys, null, 0);
       expect(overlay.slot.kind).toBe('objective');
       expect(name.textContent).toBe('Stern section');
+      view.promptId = 'bow';
+      overlay.update(view, keys, null, 0);
+      expect(overlay.slot.kind).toBe('scan');
+      expect(name.textContent).toBe('Bow');
       view.nearestInRange = false;
       view.candidateId = null;
+      view.promptId = null;
       overlay.update(view, keys, null, 0);
       expect(overlay.slot.kind).toBe('objective');
       expect(name.textContent).toBe('Stern section');
