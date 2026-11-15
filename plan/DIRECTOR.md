@@ -33,9 +33,21 @@ close, one real fact per discovery, and a clear lead into the next site. Thirtee
     in reveal times, unmerged; S3b decides whether to include it).
   - S7 fact check against sources (Codex GPT-6.1 Sol high): no fact has been checked
     against an outside source yet; also rewrites Hudson `north-wall`.
-- Owner 19:25: Codex has reset and a reset is spare; use every provider's allowance
-  where it is efficient. Codex cannot play, so it gets source-checked content and
-  test-verifiable code.
+  - S8 first-time player review, phone and desktop (Gemini 4 Carbon): read-only; its
+    ranked problems become the next backlog.
+- **Owner, 19:30:** work decisions are the orchestrator's. The owner cannot monitor after
+  end of day Sunday 2026-11-15; Fable access and limits end end of day Monday 2026-11-16;
+  nothing may keep spending after that. Use every provider on every parallelizable task
+  now, except: hold a provider's allowance for a foreseeable task that needs it, and hold
+  a task that will be done better with results still in flight.
+- **Held on purpose:** richer short dives (six sites play in under 100 s) waits for S1's
+  full-route table and S8's review; a final correctness sweep of the play loop on Codex
+  (reveal, endings, saves, orientation change mid-dive) waits until S3b and S4b land.
+  Codex cannot play, so it gets source-checked content and test-verifiable code.
+- **Timeline:** tonight, deploy batch 1, land and deploy the second wave. Sunday morning,
+  owner phone test on the live build; Sunday, act on it, short-dive pass, Codex sweep,
+  final deploy by evening. Monday is buffer only: final State here, delete scheduled
+  tasks, leave nothing running.
 - Touch scanning works (the 0-scan result was a script bug, fixed). Lost City by touch: two
   scans in 15 s. Blue Hole by touch: first find only, second never reached (unproven).
 
