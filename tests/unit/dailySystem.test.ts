@@ -121,10 +121,11 @@ it('keeps the downloaded deep Daily accessible across mode changes and releases 
     controls: vi.fn(),
   });
   const root = ctx.home.root as unknown as HomeElement;
-  // root > panel > body > menu (F-TITLE-D structure).
-  const card = root.children[0].children[1].children[0].children.find(
-    (el) => el.className === 'daily-card',
-  )!;
+  const descendants = (el: HomeElement): HomeElement[] =>
+    el.children.flatMap((child) => [child, ...descendants(child)]);
+  // Daily now lives in More; availability must survive mode changes there too.
+  const tray = descendants(root).find((el) => el.className === 'home-more')!;
+  const card = descendants(tray).find((el) => el.className === 'daily-card')!;
   try {
     system.start?.(ctx);
     expect(card.hidden).toBe(false);

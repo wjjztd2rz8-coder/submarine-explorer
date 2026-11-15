@@ -303,6 +303,14 @@ function press(code: string, extra: Partial<KeyboardEvent> = {}): KeyboardEvent 
 }
 const active = () => document.activeElement as unknown as Element;
 
+function openHomeMore(home: Home): void {
+  if (!home.moreOpen)
+    (home.root as unknown as Element)
+      .querySelector('.home-more-toggle')!
+      .dispatchEvent(new Event('click'));
+  expect(home.moreOpen).toBe(true);
+}
+
 it('compact shell site rows keep catalog, Tab and activation order while retaining reward labels', async () => {
   // Guard row omissions/reordering and lost summaries or progress after compacting the picker.
   const docs = import.meta.glob('../../data/landmarks/*/mission.json', {
@@ -1260,6 +1268,7 @@ describe('overlay policies across the app', () => {
       cleanup.push(() => runner.dispose());
       runner.init([shellSystem, journalSystem, shellKeysSystem]);
       ctx.setAppState(source);
+      if (source === 'home') openHomeMore(ctx.home);
       const menu = source === 'home' ? ctx.home : ctx.pause;
       const opener =
         source === 'dive'
@@ -1356,6 +1365,7 @@ describe('overlay policies across the app', () => {
     });
     cleanup.push(() => home.dispose());
     home.show();
+    openHomeMore(home);
     const opener = (home.root as unknown as Element)
       .querySelectorAll('button')
       .find((button) => button.textContent === 'Settings')!;
@@ -2383,6 +2393,22 @@ describe('overlay policies across the app', () => {
     press('Escape');
     expect(home.sitesOpen).toBe(false);
     expect(active()).toBe(sites);
+    openHomeMore(home);
+    const freeDive = root
+      .querySelectorAll('button')
+      .find((button) => button.textContent === 'Free dive')!;
+    freeDive.focus();
+    freeDive.dispatchEvent(new Event('click'));
+    expect(home.sitesOpen).toBe(true);
+    expect(home.moreOpen).toBe(false);
+    press('Escape');
+    expect(home.sitesOpen).toBe(false);
+    expect(home.moreOpen).toBe(true);
+    expect(active()).toBe(freeDive);
+    expect(active().closest('[hidden]')).toBeNull();
+    press('Escape');
+    expect(home.moreOpen).toBe(false);
+    expect(active()).toBe(root.querySelector('.home-more-toggle'));
     home.hide();
     const pause = pauseMenu();
     pause.open();
@@ -2644,20 +2670,31 @@ describe('overlay policies across the app', () => {
         close = () => ui.setActive(false);
       }
       open();
-      const controls = (root as unknown as Element)
-        .querySelectorAll()
-        .filter((el) => el.tabIndex >= 0 && !el.closest('[hidden], [inert]'));
-      expect(controls.length).toBeGreaterThan(0);
-      const visited = new Set<Element>();
-      for (let i = 0; i < controls.length; i++) {
+      // Dive settings is a native details disclosure: its summary is reachable
+      // while closed, and its controls join the tab order only when expanded.
+      for (const expanded of kind === 'Briefing' ? [false, true] : [false]) {
+        if (kind === 'Briefing')
+          (root as unknown as Element).querySelector('.briefing-dive-more')!.open = expanded;
+        const controls = (root as unknown as Element)
+          .querySelectorAll()
+          .filter(
+            (el) =>
+              el.tabIndex >= 0 &&
+              !el.closest('[hidden], [inert]') &&
+              (el.tagName === 'SUMMARY' || !el.closest('details:not([open])')),
+          );
+        expect(controls.length).toBeGreaterThan(0);
+        const visited = new Set<Element>();
+        for (let i = 0; i < controls.length; i++) {
+          press('Tab');
+          visited.add(active());
+        }
+        expect(visited).toEqual(new Set(controls));
+        const last = active();
         press('Tab');
-        visited.add(active());
+        press('Tab', { shiftKey: true });
+        expect(active()).toBe(last);
       }
-      expect(visited).toEqual(new Set(controls));
-      const last = active();
-      press('Tab');
-      press('Tab', { shiftKey: true });
-      expect(active()).toBe(last);
       close();
       expect(active()).toBe(opener);
     },
@@ -2702,6 +2739,7 @@ describe('overlay host teardown', () => {
       cleanup.push(() => runner.dispose());
       runner.init([shellSystem, shellKeysSystem]);
       ctx.setAppState('home');
+      openHomeMore(ctx.home);
       const opener = (ctx.home.root as unknown as Element)
         .querySelectorAll('button')
         .find((button) => button.textContent === 'Your sub')!;
@@ -2808,6 +2846,7 @@ describe('overlay host teardown', () => {
     const guide = journal();
     const card = new ControlsCard({ key: () => 'G', initialDevice: 'gamepad' });
     cleanup.push(() => card.dispose());
+    openHomeMore(home);
     const opener = (home.root as unknown as Element)
       .querySelectorAll('button')
       .find((button) => button.textContent === 'Controls')!;
@@ -2922,6 +2961,7 @@ describe('overlay host teardown', () => {
       }
       ctx.setAppState(source);
       expect(ctx.controlsCard.device).toBe(device);
+      if (source === 'home') openHomeMore(ctx.home);
       const opener = ((source === 'home' ? ctx.home : ctx.pause).root as unknown as Element)
         .querySelectorAll('button')
         .find(
@@ -3013,6 +3053,7 @@ describe('overlay host teardown', () => {
         previousControls?.dispose?.();
         expect(ctx.home.isOpen).toBe(true);
         for (let cycle = 0; cycle < 3; cycle++) {
+          openHomeMore(ctx.home);
           const opener = (ctx.home.root as unknown as Element)
             .querySelectorAll('button')
             .find((button) => button.textContent === 'Controls')!;
@@ -3081,6 +3122,7 @@ describe('overlay host teardown', () => {
       const ctx = {
         canvas,
         input,
+        bus: new EventBus(),
         app: { state: 'dive' },
         pause: { isOpen: false },
         settingsScreen: { isOpen: false },
@@ -3193,6 +3235,7 @@ describe('overlay host teardown', () => {
       const ctx = {
         canvas,
         input,
+        bus: new EventBus(),
         app: { state: 'dive' },
         pause: { isOpen: false },
         settingsScreen: { isOpen: false },
@@ -3958,10 +4001,12 @@ it.each(['home', 'pause'] as const)(
     ctx.setAppState(source);
     let screen!: SubScreen;
     const open = vi.spyOn(SubScreen.prototype, 'open');
+    if (source === 'home') openHomeMore(ctx.home);
     const opener = ((source === 'home' ? ctx.home : ctx.pause).root as unknown as Element)
       .querySelectorAll('button')
       .find((button) => button.textContent === 'Your sub')!;
     const show = () => {
+      if (source === 'home') openHomeMore(ctx.home);
       opener.focus();
       opener.dispatchEvent(new Event('click'));
       screen = open.mock.instances.at(-1)! as SubScreen;
