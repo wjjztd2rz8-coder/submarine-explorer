@@ -18,6 +18,11 @@ const INIT = () => {
         const t1 = performance.now();
         if (prevStart !== null) T.frames.push({ t: t0, gap: t0 - prevStart, script: t1 - t0 });
         prevStart = t0;
+        try {
+          const c = w.__game?.rig?.camera?.position;
+          const sp = w.__game?.sub?.velocity?.length?.() ?? 0;
+          if (c) (T.cam ??= []).push([t0, c.x, c.y, c.z, sp]);
+        } catch {}
         if (performance.memory && T.frames.length % 5 === 0) (T.heap ??= []).push([t0, performance.memory.usedJSHeapSize]);
         const g = w.__game;
         try {
@@ -221,6 +226,17 @@ function report(profile, ft, site, label, out) {
     }
     const secs = (ft.heap.at(-1)[0] - ft.heap[0][0]) / 1000;
     console.log(`heap: growth+ ${(alloc / 1e6 / secs).toFixed(1)} MB/s, GC drops >1MB: ${drops} (${(drops / secs).toFixed(2)}/s, avg ${(dropBytes / 1e6 / Math.max(1, drops)).toFixed(1)} MB), end ${(ft.heap.at(-1)[1] / 1e6).toFixed(0)} MB`);
+  }
+  if (ft.cam?.length > 50) {
+    // Judder: frame-to-frame camera travel while cruising, relative to the steady-state travel.
+    const steps = [];
+    for (let i = 1; i < ft.cam.length; i++) {
+      const a = ft.cam[i - 1], b = ft.cam[i];
+      if (b[4] > 4 && b[0] - a[0] < 40) steps.push(Math.hypot(b[1] - a[1], b[2] - a[2], b[3] - a[3]) / ((b[0] - a[0]) / 16.667));
+    }
+    const m = pct(steps, 50);
+    const dev = steps.map((x) => Math.abs(x - m) / (m || 1));
+    console.log(`camera travel per 16.7ms while cruising: n=${steps.length} median=${m.toFixed(3)} m; relative deviation p50=${pct(dev, 50).toFixed(3)} p95=${pct(dev, 95).toFixed(3)} p99=${pct(dev, 99).toFixed(3)}; zero-travel frames ${steps.filter((x) => x < 0.01 * m).length}`);
   }
   console.log('worst frames:');
   for (const f of [...frames].sort((a, b) => b.script - a.script).slice(0, 8)) {

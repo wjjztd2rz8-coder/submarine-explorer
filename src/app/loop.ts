@@ -89,6 +89,7 @@ export function startLoop(ctx: GameContext, runner: SystemRunner): () => void {
     f.sampled = ctx.input.sample();
     f.realSteps = time.tick(nowMs);
     f.dt = time.frameDelta;
+    f.alpha = time.alpha;
     f.fixedDt = time.fixedDelta;
     f.elapsed = time.elapsed;
     f.shellFrozen = false;

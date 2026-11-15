@@ -98,6 +98,12 @@ export interface FrameState {
   steps: number;
   /** gate.input: mission clock / dive time delta (0 when frozen or resuming). */
   clockDt: number;
+  /** Fraction (0..1) of a fixed step the clock holds beyond the steps run this frame. */
+  alpha?: number;
+  /** pose: the boat's pose interpolated between the last two physics steps, for drawing. */
+  renderPosition?: THREE.Vector3;
+  renderYaw?: number;
+  renderPitch?: number;
   /** First frame after a shell/visibility transition or a frozen frame: no catch-up. */
   resumeFrame: boolean;
   /** events: the sub's state after this frame's physics. */
