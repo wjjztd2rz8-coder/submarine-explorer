@@ -1,9 +1,18 @@
-import { RevealQueue, revealExcerpt, revealFrame } from '../../game/Reveal.js';
+import {
+  REVEAL_AUTO_DISMISS_S,
+  REVEAL_MIN_CONTINUE_S,
+  REVEAL_STILL_CAPTURE_S,
+  RevealQueue,
+  revealExcerpt,
+  revealFrame,
+  revealStillSubjectY,
+} from '../../game/Reveal.js';
 import { entryIdForPoi } from '../../game/Guide.js';
 import { DiscoveryCard } from '../../ui/DiscoveryCard.js';
 import { canvasThumbnail } from '../../ui/PhotoMode.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
+import { Vector3 } from 'three';
 
 export function createRevealSystem(): GameSystem {
   const cleanup = new Disposables();
@@ -16,8 +25,9 @@ export function createRevealSystem(): GameSystem {
   let ready = false;
   let probeConsumed = false;
   let card: DiscoveryCard;
+  const stillTarget = new Vector3();
   const skip = (): void => {
-    if (elapsed >= 1 && queue.current && !returning) finishing = true;
+    if (elapsed >= REVEAL_MIN_CONTINUE_S && queue.current && !returning) finishing = true;
   };
   return {
     name: 'reveal',
@@ -32,7 +42,7 @@ export function createRevealSystem(): GameSystem {
       ctx.discovery.reveal = controller;
       ctx.expose({ reveal: controller });
       card = new DiscoveryCard(skip, () => {
-        if (elapsed >= 1) {
+        if (elapsed >= REVEAL_MIN_CONTINUE_S) {
           readMore = true;
           skip();
         }
@@ -61,18 +71,15 @@ export function createRevealSystem(): GameSystem {
       );
       // Capture phase prevents a dismissing key from also pausing or moving the boat.
       const dismiss = (event: Event): void => {
-        if (!queue.current) return;
-        if (
-          event.type !== 'keydown' &&
-          (event.target as Element | null)?.closest?.('.discovery-reveal button')
-        )
-          return;
+        if (!queue.current || event.type !== 'keydown') return;
+        const key = (event as KeyboardEvent).key;
+        if (key !== ' ' && key !== 'Enter') return;
+        if ((event.target as Element | null)?.closest?.('.discovery-reveal button')) return;
         event.preventDefault();
         event.stopImmediatePropagation();
         skip();
       };
-      for (const name of ['keydown', 'pointerdown', 'click', 'touchstart', 'wheel'])
-        cleanup.listen(window, name, dismiss, { capture: true, passive: false });
+      cleanup.listen(window, 'keydown', dismiss, { capture: true, passive: false });
       let disposed = false;
       cleanup.add(() => {
         disposed = true;
@@ -148,7 +155,7 @@ export function createRevealSystem(): GameSystem {
         if (!queue.active) return;
         if (queue.current) {
           elapsed += f.dt;
-          if (elapsed >= 6) finishing = true;
+          if (elapsed >= REVEAL_AUTO_DISMISS_S) finishing = true;
           if (finishing && captured && !returning) {
             ctx.rig.endReveal();
             returning = true;
@@ -166,13 +173,16 @@ export function createRevealSystem(): GameSystem {
       },
       'render.capture': (_f, ctx) => {
         const poi = queue.current;
-        if (!poi || captured || (elapsed < 3 && !finishing)) return;
+        if (!poi || captured || (elapsed < REVEAL_STILL_CAPTURE_S && !finishing)) return;
         captured = true;
+        stillTarget.copy(poi.position);
+        const subjectY = revealStillSubjectY(ctx.rig.camera, stillTarget);
         const image = canvasThumbnail(
           ctx.renderer.domElement,
           undefined,
           undefined,
           ctx.progress.cosmetics.frame,
+          subjectY,
         );
         if (!image) return;
         const result = ctx.photos.save({

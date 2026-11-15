@@ -312,7 +312,6 @@ export class MissionRouter {
   /** Real seconds until the pending completion banner shows; null when none is pending. */
   private bannerDelay: number | null = null;
   /** Real seconds until an open banner applies its default (Keep exploring). */
-  private bannerLeft = 0;
   private pendingBanner: 'primary' | 'all' | null = null;
   private allAnnounced = false;
   private disposed = false;
@@ -499,8 +498,6 @@ export class MissionRouter {
     }
     if (!this.panel.bannerOpen) return;
     this.panel.setBannerStars(this.opts.stars?.());
-    this.bannerLeft -= dt;
-    if (this.bannerLeft <= 0) this.keepExploring();
   }
 
   private showBanner(kind: 'primary' | 'all'): void {
@@ -511,7 +508,6 @@ export class MissionRouter {
     }
     const { completed, total } = this.mission.counts();
     const left = total - completed;
-    this.bannerLeft = Math.max(1, this.opts.config.mission.completionBannerS);
     this.panel.showBanner({
       stars: this.opts.stars?.(),
       title: 'Primary objectives complete',

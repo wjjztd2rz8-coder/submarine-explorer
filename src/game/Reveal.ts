@@ -1,4 +1,4 @@
-import { MathUtils, Sphere, Vector3 } from 'three';
+import { Camera, MathUtils, Sphere, Vector3 } from 'three';
 import type { PlacedPoi } from './Pois.js';
 
 /** Two complete sentences, within the card's reading budget. */
@@ -18,6 +18,26 @@ export function revealExcerpt(text: string, max = 220, sentences = 2): string {
 
 /** Share of the half-frame height by which the subject is raised above centre. */
 const REVEAL_CARD_SHARE = 0.34;
+
+/** Seconds after the card appears before the reveal auto-continues. */
+export const REVEAL_AUTO_DISMISS_S = 13;
+/** Earliest moment the player may continue (camera has started the sweep). */
+export const REVEAL_MIN_CONTINUE_S = 1;
+/** Seconds into the reveal before a journal still is captured. */
+export const REVEAL_STILL_CAPTURE_S = 3;
+
+/** Normalized canvas Y (0 top, 1 bottom) for a reveal still when projection is unavailable. */
+export function revealStillSubjectYFallback(): number {
+  return 0.5 - REVEAL_CARD_SHARE * 0.35;
+}
+
+/** Where the framed subject sits in the canvas for a 4:3 thumbnail crop. */
+export function revealStillSubjectY(camera: Camera, target: Vector3): number {
+  camera.updateMatrixWorld();
+  const v = target.clone().project(camera);
+  if (v.z >= 1) return revealStillSubjectYFallback();
+  return (1 - v.y) / 2;
+}
 
 export function revealFrame(
   poi: PlacedPoi,

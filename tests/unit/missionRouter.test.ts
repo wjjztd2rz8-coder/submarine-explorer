@@ -714,8 +714,9 @@ describe('MissionRouter completion timing', () => {
         expect(control(router.panel.root, 'obj-banner-detail').textContent).toBe(
           '1 unknown contact remains on sonar.',
         );
-        advance(router, phase === 'open' ? 1 : 20);
-        expect(router.panel.bannerOpen).toBe(phase === 'open');
+        advance(router, 1);
+        expect(router.panel.bannerOpen).toBe(true);
+        if (phase === 'dismissed') click(control(router.panel.root, 'is-keep'));
       }
       scan('optional');
       expect(router.panel.bannerOpen).toBe(false);
