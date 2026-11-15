@@ -20,12 +20,8 @@ test.describe('phone portrait', () => {
     await expect(briefing.locator('.briefing-hint')).toBeHidden();
     await expect(briefing.locator('.briefing-site-more > summary')).toHaveText('About this site');
     await expect(briefing.locator('.briefing-begin')).toBeInViewport({ ratio: 1 });
-    for (const objective of await briefing.locator('.briefing-objectives li').all())
-      await expect(objective).toBeInViewport({ ratio: 1 });
-    // One short mode line, and no hull-rating hazard repeating the meta row.
-    expect(
-      await briefing.locator('.mode-desc').evaluate((el) => el.getBoundingClientRect().height),
-    ).toBeLessThan(24);
+    await expect(briefing.locator('.briefing-contacts')).toBeInViewport({ ratio: 1 });
+    await expect(briefing.locator('.mode-desc')).toBeHidden();
     await briefing.locator('.briefing-site-more > summary').tap();
     await expect(briefing.locator('.is-hazards li')).not.toHaveCount(0);
     await expect(briefing.locator('.is-hazards')).not.toContainText(/rated to|Class [ABC]/);

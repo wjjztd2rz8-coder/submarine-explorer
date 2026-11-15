@@ -190,44 +190,16 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await expect(page.locator('.home-screen')).toBeVisible();
   // Preserve all actions and the title menu’s DOM/Tab order, including Daily and mode.
   const existingActions = page.locator('.home-menu > button:not(.daily-card)');
-  await expect(existingActions).toHaveCount(7);
-  await expect(existingActions).toHaveText([
-    /^(Dive|Continue)(:|$)/,
-    'Dive sites',
-    'Free dive',
-    'Journal',
-    'Your sub',
-    'Settings',
-    'Controls',
-  ]);
-  expect(
-    await page
-      .locator('.home-menu > *')
-      .evaluateAll((elements) =>
-        elements.map((element) =>
-          element.classList.contains('daily-card')
-            ? 'Daily dive'
-            : element.classList.contains('mode-selector')
-              ? 'Mode'
-              : element.textContent?.replace(/^Dive: .*/, 'Dive'),
-        ),
-      ),
-  ).toEqual([
-    'Dive',
-    'Dive sites',
-    'Free dive',
-    'Daily dive',
-    'Mode',
-    'Journal',
-    'Your sub',
-    'Settings',
-    'Controls',
-  ]);
+  await expect(existingActions).toHaveCount(3);
+  await expect(existingActions).toHaveText([/^(Dive|Continue)(:|$)/, 'Dive sites', 'More']);
+  await page.locator('.home-more-toggle').click();
+  const more = page.locator('.home-more');
+  await expect(more).toBeVisible();
+  await expect(more.getByRole('button', { name: 'Free dive', exact: true })).toBeVisible();
+  await expect(more.getByRole('button', { name: 'Journal', exact: true })).toBeVisible();
   await expect(page.locator('.home-menu .daily-card')).toHaveCount(1);
   await expect(page.locator('.home-menu .mode-advanced-toggle')).toHaveCount(1);
-  // Seven actions, Daily and Advanced; modes are native radios, not buttons.
-  await expect(page.locator('.home-menu button')).toHaveCount(9);
-  const mode = page.locator('.home-menu').getByRole('radiogroup', { name: 'Game mode' });
+  const mode = page.locator('.home-more').getByRole('radiogroup', { name: 'Game mode' });
   await expect(mode.getByRole('radio')).toHaveCount(2);
   await expect(mode.getByRole('radio', { name: 'Arcade' })).toBeChecked();
   await expect(mode.getByRole('radio', { name: 'Realistic' })).toBeVisible();

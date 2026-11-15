@@ -40,7 +40,14 @@
 .home-screen[hidden],
 .home-sites[hidden],
 .home-menu[hidden],
-.home-menu .daily-card[hidden] {
+.home-menu .daily-card[hidden],
+.home-more[hidden] {
+  display: none;
+}
+.home-copy.is-compact .home-kicker,
+.home-copy.is-compact .home-tagline,
+.home-copy.is-compact .home-desc,
+.home-body .home-notes {
   display: none;
 }
 @media (max-width: 360px) {
@@ -196,6 +203,24 @@
   gap: 8px;
   padding: 6px;
   margin: -6px;
+}
+.home-menu > .home-more-toggle {
+  justify-self: end;
+  min-height: 44px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.home-more {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid var(--home-line);
+}
+.home-screen.has-more .home-more-toggle {
+  border-color: var(--home-mint);
 }
 @media (max-width: 359px) {
   .home-menu {
