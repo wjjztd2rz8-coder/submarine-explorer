@@ -259,9 +259,7 @@ export class TouchControls {
       const a = stickAxes(dx, dy, max);
       this.input.touchAxes.throttle = a.throttle;
       this.input.touchAxes.yaw = a.yaw;
-      const flood = this.input.touchAxes.ballast < -0.2;
-      this.input.touchAxes.pitch =
-        flood && Math.abs(a.throttle) > 0.15 ? Math.max(-1, Math.min(1, -a.throttle * 0.55)) : 0;
+      this.updatePitchAim();
     };
     base.addEventListener('pointerdown', (e) => {
       if (this.stickPointer !== null) return;
@@ -296,7 +294,19 @@ export class TouchControls {
     this.stickBase.classList.remove('is-held');
     this.input.touchAxes.throttle = 0;
     this.input.touchAxes.yaw = 0;
-    this.input.touchAxes.pitch = 0;
+    this.updatePitchAim();
+  }
+
+  /**
+   * Touch pitch is an attitude the sub steers to: nose down only while the slider is held down
+   * and the stick pushes ahead, slightly nose up while it is held up, level otherwise.
+   */
+  private updatePitchAim(): void {
+    const t = this.input.touchAxes;
+    if (this.sliderPointer !== null && t.ballast < -0.2)
+      t.pitch = Math.abs(t.throttle) > 0.15 ? Math.max(-1, Math.min(1, -t.throttle)) : 0;
+    else if (this.sliderPointer !== null && t.ballast > 0.2) t.pitch = t.ballast;
+    else t.pitch = 0;
   }
 
   // -------------------------------------------------------------- slider
@@ -310,7 +320,7 @@ export class TouchControls {
       const half = this.sliderThumb.offsetHeight / 2;
       this.sliderThumb.style.top = `${clamped * (r.height - 2 * half) + half}px`;
       this.input.touchAxes.ballast = sliderAxis(t);
-      if (this.input.touchAxes.ballast >= -0.2) this.input.touchAxes.pitch = 0;
+      this.updatePitchAim();
     };
     track.addEventListener('pointerdown', (e) => {
       if (this.sliderPointer !== null) return;
@@ -341,7 +351,7 @@ export class TouchControls {
     this.sliderThumb.style.top = '';
     this.sliderTrack.classList.remove('is-held');
     this.input.touchAxes.ballast = 0;
-    this.input.touchAxes.pitch = 0;
+    this.updatePitchAim();
   }
 
   // ------------------------------------------------------------- buttons

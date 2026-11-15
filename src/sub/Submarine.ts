@@ -89,6 +89,7 @@ const LOCKED_INPUT: InputState = Object.freeze({
   throttle: 0,
   yaw: 0,
   pitch: 0,
+  pitchAim: null,
   ballast: 0,
   lookDx: 0,
   lookDy: 0,
@@ -318,7 +319,14 @@ export class Submarine {
     // restores the Phase A behaviour.
     const turnScale = this.turnScale();
     const yawTarget = clamp(cmd.yaw, -1, 1) * c.yawRate * turnScale;
-    const pitchTarget = clamp(cmd.pitch, -1, 1) * c.pitchRate * turnScale;
+    let pitchTarget = clamp(cmd.pitch, -1, 1) * c.pitchRate * turnScale;
+    if (cmd.pitchAim != null) {
+      // Touch: steer to an attitude (so releasing levels the boat) instead of integrating a rate.
+      const aim = clamp(cmd.pitchAim, -1, 1);
+      const want = aim < 0 ? aim * c.touchPitchDown : aim * c.touchPitchUp;
+      const maxRate = c.touchPitchRate * turnScale;
+      pitchTarget = clamp((want - this.pitch) * c.touchPitchGain, -maxRate, maxRate);
+    }
     const kYaw = Math.abs(yawTarget) > 1e-6 ? c.yawAccel : c.yawDamping;
     const kPitch = Math.abs(pitchTarget) > 1e-6 ? c.pitchAccel : c.pitchDamping;
     this.yawRate += (yawTarget - this.yawRate) * Math.min(1, kYaw * dt);
