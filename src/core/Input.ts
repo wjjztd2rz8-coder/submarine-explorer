@@ -25,6 +25,12 @@ export interface InputState {
   throttle: number;
   yaw: number;
   pitch: number;
+  /**
+   * Touch only: a target attitude in -1 (nose down, to the sub's touch limit) .. +1 (nose up).
+   * Unlike `pitch` (a rate that leaves the attitude where it was) the sub steers to it, so
+   * 0 means level. null for keyboard and gamepad, which fly pitch by rate.
+   */
+  pitchAim?: number | null;
   ballast: number;
   /** Camera drag or pointer-lock delta since the previous frame, in pixels. */
   lookDx: number;
@@ -248,6 +254,7 @@ export class Input {
     throttle: 0,
     yaw: 0,
     pitch: 0,
+    pitchAim: null,
     ballast: 0,
     lookDx: 0,
     lookDy: 0,
@@ -689,7 +696,9 @@ export class Input {
     const ta = this.touchAxes;
     if (ta.throttle) s.throttle = ta.throttle;
     if (ta.yaw) s.yaw = ta.yaw;
-    if (ta.pitch) s.pitch = ta.pitch;
+    // Touch pitch is an attitude to hold, not a rate: 0 here means "level".
+    s.pitchAim = this.touchActive ? ta.pitch : null;
+    if (!this.touchActive && ta.pitch) s.pitch = ta.pitch;
     if (ta.ballast) s.ballast = ta.ballast;
     if (this.touchHeld.has('scan')) s.scan = true;
 
@@ -734,7 +743,10 @@ export class Input {
         const pitch = applyDeadZone(-ry);
         if (yaw) s.yaw = yaw;
         if (throttle) s.throttle = throttle;
-        if (pitch) s.pitch = pitch;
+        if (pitch) {
+          s.pitch = pitch;
+          s.pitchAim = null;
+        }
         const up = pad.buttons[0]?.value ?? 0; // A / cross
         const down = pad.buttons[1]?.value ?? 0; // B / circle
         const ballast = applyDeadZone(up - down);

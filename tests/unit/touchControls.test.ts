@@ -320,3 +320,52 @@ it('shared DOM construction preserves literal text and optional versus required 
   });
   expect(created).toHaveLength(5);
 });
+
+it('touch pitch: nose down only while the slider is held down, up while it is held up, level otherwise', () => {
+  const { input, create } = setup(true);
+  const touch = create();
+  touch.update(true, false);
+  const stick = (touch.root as unknown as Element).children[0]!;
+  const slider = (touch.root as unknown as Element).children[1]!;
+  const pointer = (type: string, pointerId: number, clientX = 0, clientY = 0) =>
+    Object.assign(new Event(type), { pointerId, pointerType: 'touch', clientX, clientY });
+  stick.dispatchEvent(pointer('pointerdown', 1, 60, -50));
+  slider.dispatchEvent(pointer('pointerdown', 3, 0, 150));
+  expect(input.touchAxes.pitch).toBeLessThan(-0.2);
+  // Pushing the slider up levels the nose at once and asks for a slight nose up.
+  slider.dispatchEvent(pointer('pointermove', 3, 0, 5));
+  expect(input.touchAxes.pitch).toBeGreaterThan(0);
+  expect(input.touchAxes.pitch).toBeLessThanOrEqual(1);
+  // Back through the neutral band: level.
+  slider.dispatchEvent(pointer('pointermove', 3, 0, 80));
+  expect(input.touchAxes.pitch).toBe(0);
+  slider.dispatchEvent(pointer('pointermove', 3, 0, 150));
+  expect(input.touchAxes.pitch).toBeLessThan(-0.2);
+  slider.dispatchEvent(pointer('pointerup', 3, 0, 0));
+  expect(input.touchAxes.pitch).toBe(0);
+});
+
+it.each(['pointercancel', 'lostpointercapture'])(
+  '%s on the slider or stick clears the pitch input',
+  (end) => {
+    const { input, create } = setup(true);
+    const touch = create();
+    touch.update(true, false);
+    const stick = (touch.root as unknown as Element).children[0]!;
+    const slider = (touch.root as unknown as Element).children[1]!;
+    const pointer = (type: string, pointerId: number, clientX = 0, clientY = 0) =>
+      Object.assign(new Event(type), { pointerId, pointerType: 'touch', clientX, clientY });
+    stick.dispatchEvent(pointer('pointerdown', 1, 60, -50));
+    slider.dispatchEvent(pointer('pointerdown', 3, 0, 150));
+    expect(input.touchAxes.pitch).not.toBe(0);
+    slider.dispatchEvent(pointer(end, 3));
+    expect(input.touchAxes.pitch).toBe(0);
+    expect(input.touchAxes.ballast).toBe(0);
+    slider.dispatchEvent(pointer('pointerdown', 4, 0, 150));
+    stick.dispatchEvent(pointer('pointermove', 1, 60, -50));
+    expect(input.touchAxes.pitch).not.toBe(0);
+    stick.dispatchEvent(pointer(end, 1));
+    expect(input.touchAxes.pitch).toBe(0);
+    expect(input.touchAxes.throttle).toBe(0);
+  },
+);

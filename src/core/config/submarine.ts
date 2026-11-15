@@ -70,6 +70,14 @@ export interface SubmarineConfig {
   yawAccel: number;
   yawDamping: number;
   pitchAccel: number;
+  /** Touch pitch is an attitude: max nose-down (rad) with the depth slider fully down. */
+  touchPitchDown: number;
+  /** Touch: max nose-up (rad) with the depth slider fully up. */
+  touchPitchUp: number;
+  /** Touch: fastest pitch rate while steering to the attitude (rad/s). */
+  touchPitchRate: number;
+  /** Touch: attitude error (rad) -> pitch rate (1/s); ~1/gain is the levelling time constant. */
+  touchPitchGain: number;
   pitchDamping: number;
   /** Peak visual-only bank angle when turning hard at cruise speed (radians). */
   maxBankAngle: number;
@@ -191,6 +199,10 @@ export const DEFAULT_SUBMARINE: SubmarineConfig = {
   yawAccel: 2.8,
   yawDamping: 2.8,
   pitchAccel: 3.2,
+  touchPitchDown: (17 * Math.PI) / 180,
+  touchPitchUp: (10 * Math.PI) / 180,
+  touchPitchRate: 0.6,
+  touchPitchGain: 4,
   pitchDamping: 3.2,
   maxBankAngle: 0.42, // ~24 deg
   bankHalfLife: 0.35,
