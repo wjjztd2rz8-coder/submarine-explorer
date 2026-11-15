@@ -60,6 +60,10 @@ export class PropContact {
   private readonly slide = new THREE.Vector3();
   private readonly up = new THREE.Vector3(0, 1, 0);
   private cooldown = 0;
+  /** Where the hull was when it last made headway while pressed against props. */
+  private readonly pinFrom = new THREE.Vector3();
+  /** Seconds of thrust against props without 1.5 m of headway. */
+  private pinnedS = 0;
   /** True while touching a prop; for tests and the debug readout. */
   touching = false;
   /** True when driving forward into the current prop contact normal. */
@@ -89,9 +93,42 @@ export class PropContact {
         this.bus.emit('sub:collided', { depth: body.position.y, speed });
       }
       this.deflectAlongSurface(body, throttle, dt);
+      this.escapePocket(body, throttle, dt);
+    } else {
+      this.pinnedS = 0;
     }
     this.touching = hit;
     return hit;
+  }
+
+  /**
+   * Thrust into a pocket between prop boxes can balance the push-outs exactly, so the
+   * hull hangs in place whatever the pilot does. After a second without headway, lift it
+   * out along the contact normal (straight back out under a ceiling).
+   */
+  private escapePocket(body: CollidingBody, throttle: number, dt: number): void {
+    if (throttle <= 0.05) {
+      this.pinnedS = 0;
+      return;
+    }
+    if (this.pinnedS === 0 || body.position.distanceToSquared(this.pinFrom) > 1.5 * 1.5) {
+      this.pinFrom.copy(body.position);
+      this.pinnedS = dt;
+      return;
+    }
+    this.pinnedS += dt;
+    if (this.pinnedS < 1) return;
+    this.slide.set(this.normal.x, 0, this.normal.z);
+    if (this.slide.lengthSq() > 1e-6) this.slide.normalize().multiplyScalar(0.5);
+    if (this.normal.y > -0.3) this.slide.y = 1;
+    if (this.slide.lengthSq() < 1e-6) return;
+    this.slide.normalize();
+    // Carry the hull out at 3 m/s: clear of a typical 5 m box rib in a couple of seconds.
+    const along = body.velocity.dot(this.slide);
+    if (along < 3) body.velocity.addScaledVector(this.slide, 3 - along);
+    body.position.addScaledVector(this.slide, 3 * dt);
+    this.props.collide(body.position, this.radius, this.normal);
+    this.contactNormal.copy(this.normal);
   }
 
   /**
