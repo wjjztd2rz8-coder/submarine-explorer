@@ -248,6 +248,13 @@ it('takes the journal still from the authored framing before the first drag move
     expect(ctx.rig.revealSettle).toHaveBeenCalled();
     expect(ctx.rig.revealOrbit).not.toHaveBeenCalled();
     expect(save).toHaveBeenCalledOnce();
+    expect(thumbnail).toHaveBeenLastCalledWith(
+      ctx.renderer.domElement,
+      480,
+      undefined,
+      ctx.progress.cosmetics.frame,
+      expect.any(Number),
+    );
     frame(0.05);
     expect(ctx.rig.revealOrbit).toHaveBeenCalledOnce();
   } finally {
