@@ -262,7 +262,7 @@ describe('waypoint objective state', () => {
     f.draw(f.mission.objectives[0]);
     expect(f.currentIds()).toEqual([]);
     expect(f.marker('a')).toMatchObject({
-      hidden: false,
+      hidden: true,
       textContent: '✓ First contact',
       title: 'First contact',
     });
@@ -272,6 +272,7 @@ describe('waypoint objective state', () => {
     f.draw();
     expect(f.currentIds()).toEqual(['b']);
     expect(f.marker('a').classList.contains('is-scanned')).toBe(true);
+    expect(f.marker('a').hidden).toBe(true);
     expect(f.marker('b')).toMatchObject({
       hidden: false,
       textContent: '◇',
@@ -288,7 +289,7 @@ describe('waypoint objective state', () => {
     expect(f.currentIds()).toEqual([]);
     expect(f.edge.hidden).toBe(true);
     for (const poi of f.pois) {
-      expect(f.marker(poi.id)).toMatchObject({ hidden: false, textContent: `✓ ${poi.name}` });
+      expect(f.marker(poi.id)).toMatchObject({ hidden: true, textContent: `✓ ${poi.name}` });
       expect(f.marker(poi.id).classList.contains('is-scanned')).toBe(true);
     }
   });
@@ -303,14 +304,14 @@ describe('waypoint objective state', () => {
     expect(f.currentIds()).toEqual([]);
     expect(f.edge.hidden).toBe(true);
     expect(f.marker('b').hidden).toBe(true);
-    expect(f.marker('a')).toMatchObject({ hidden: false, textContent: '✓ First contact' });
+    expect(f.marker('a')).toMatchObject({ hidden: true, textContent: '✓ First contact' });
     expect(f.marker('a').classList.contains('is-scanned')).toBe(true);
 
     f.view.setVisualHints(true);
     f.draw();
     expect(f.currentIds()).toEqual(['b']);
     expect(f.marker('b')).toMatchObject({ hidden: false, textContent: '◇' });
-    expect(f.marker('a')).toMatchObject({ hidden: false, textContent: '✓ First contact' });
+    expect(f.marker('a')).toMatchObject({ hidden: true, textContent: '✓ First contact' });
     expect(f.marker('a').classList.contains('is-scanned')).toBe(true);
     expect(f.edge.hidden).toBe(true);
   });

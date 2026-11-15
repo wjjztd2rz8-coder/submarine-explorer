@@ -113,7 +113,7 @@ test('scanned contacts stay marked and cannot be rescanned until a new dive', as
       ),
     )
     .toMatchObject({ icon: '✓', scanned: true, visible: true });
-  await expect(page.locator('.d-scan-world-marker[data-poi="test-bow"]')).toHaveClass(/is-scanned/);
+  await expect(page.locator('.d-scan-world-marker[data-poi="test-bow"]')).toBeHidden();
   await screenshot(page, 'scanned-marker');
   await screenshot(page, 'scanned');
   await page.waitForFunction(
