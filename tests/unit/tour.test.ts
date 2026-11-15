@@ -56,3 +56,24 @@ it.each(TOUR_ORDER)('never routes the debrief back into the same site: %s', (cur
   expect(TOUR_ORDER).toContain(next);
   expect(next).not.toBe(current);
 });
+
+const guides = import.meta.glob<{ entries: { fact?: string }[] }>(
+  '../../data/landmarks/*/guide.json',
+  { eager: true, import: 'default' },
+);
+it('gives every site a short plain hook that is not a card fact', async () => {
+  const { SITE_HOOKS, siteHook } = await import('../../src/game/Tour.js');
+  const banned = /[?!]|did you know|discover|explore|journey|secrets|wonders|illustrative/i;
+  for (const id of TOUR_ORDER) {
+    const hook = siteHook(id)!;
+    expect(hook, id).toBeTruthy();
+    expect(hook.length, id).toBeLessThanOrEqual(100);
+    expect(hook.endsWith('.'), id).toBe(true);
+    expect(banned.test(hook), id).toBe(false);
+    const guide = guides[`../../data/landmarks/${id}/guide.json`];
+    const facts = guide.entries.map((e: { fact?: string }) => e.fact);
+    expect(facts, id).not.toContain(hook);
+  }
+  expect(Object.keys(SITE_HOOKS).sort()).toEqual([...TOUR_ORDER].sort());
+  expect(siteHook('nowhere')).toBeNull();
+});

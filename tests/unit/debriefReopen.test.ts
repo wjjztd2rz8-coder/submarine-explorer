@@ -1,6 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { Debrief, type DebriefAction } from '../../src/ui/Debrief.js';
 import type { DebriefStats } from '../../src/game/Objectives.js';
+import { siteHook } from '../../src/game/Tour.js';
 
 /** Minimal DOM for the summary's show/hide lifecycle; layout is checked in Playwright. */
 class Element extends EventTarget {
@@ -153,6 +154,47 @@ it('renders wildlife as a text tile and a framed landmark as a photo card', () =
     expect(tiles[1].className).toContain('debrief-find-text');
     expect(tiles[1].children.map((e) => e.textContent)).toEqual(['White sea anemone', 'Wildlife']);
     expect(tiles[1].children.some((e) => e.className === 'debrief-thumb')).toBe(false);
+  } finally {
+    debrief.dispose();
+  }
+});
+
+it('shows the next site hook with the next-dive button, and none for the chooser', () => {
+  const body = new Element();
+  vi.stubGlobal('HTMLElement', Element);
+  vi.stubGlobal('window', new EventTarget());
+  vi.stubGlobal('document', { body, activeElement: body, createElement: () => new Element() });
+  const debrief = new Debrief();
+  const stats: DebriefStats = {
+    elapsedS: 1,
+    distanceM: 0,
+    maxDepthM: 1,
+    discoveries: [],
+    newEntries: [],
+  };
+  const navigation = () => {
+    const panel = (debrief.root as unknown as Element).children[0];
+    return panel.children.find((e) => e.className === 'debrief-actions')!.children[0];
+  };
+  try {
+    debrief.show(stats, [
+      {
+        id: 'next-dive',
+        siteId: 'lost-city',
+        label: 'Next dive: Lost City',
+        primary: true,
+        run() {},
+      },
+    ]);
+    expect(navigation().children.map((e) => e.className)).toEqual([
+      'debrief-hook',
+      'debrief-btn is-primary',
+    ]);
+    expect(navigation().children[0].textContent).toBe(siteHook('lost-city'));
+    debrief.show(stats, [
+      { id: 'dive-sites', label: 'Choose a dive site', primary: true, run() {} },
+    ]);
+    expect(navigation().children.map((e) => e.className)).toEqual(['debrief-btn is-primary']);
   } finally {
     debrief.dispose();
   }

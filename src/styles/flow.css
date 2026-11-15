@@ -538,7 +538,8 @@ html.is-touch .hud-finish {
   html.is-touch .hud-finish {
     padding-inline: 8px;
     font-size: clamp(11px, calc(11px * var(--ui-scale)), 14px);
-    letter-spacing: 0.02em;
+    letter-spacing: 0;
+    font-size: 13px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -555,4 +556,61 @@ html.is-touch .hud-finish {
   padding: 0 8px 6px;
   font-size: 11px;
   opacity: 0.7;
+}
+
+/* One line that says why the next dive is worth taking, read together with its button. */
+.debrief-navigation.has-hook {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 6px;
+}
+.debrief-hook {
+  margin: 0;
+  line-height: 1.35;
+  color: var(--b1-cyan);
+}
+.debrief-navigation.has-hook .debrief-btn.is-primary {
+  flex: 0 0 auto;
+}
+@media (max-height: 480px) {
+  .debrief-hook {
+    font-size: 13px;
+    line-height: 1.25;
+  }
+  /* Make room for the hook line: tighter spacing around it, never a hidden button. */
+  .debrief-panel:has(.has-hook) {
+    padding-block: 6px;
+  }
+  .debrief-panel:has(.has-hook) .debrief-rating {
+    margin: 2px 0;
+    padding: 3px 0;
+  }
+  .debrief-panel:has(.has-hook) .debrief-fact {
+    margin: 2px 0;
+    font-size: 12px;
+  }
+  .debrief-actions:has(.has-hook) {
+    flex-wrap: wrap;
+    gap: 2px 16px;
+  }
+  .debrief-navigation.has-hook {
+    display: contents;
+  }
+  .debrief-navigation.has-hook .debrief-hook {
+    flex: 0 0 100%;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+  .debrief-navigation.has-hook .debrief-btn.is-primary {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-inline: 8px;
+    letter-spacing: 0;
+    font-size: 13px;
+  }
+  .debrief-actions:has(.has-hook) .debrief-secondary {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+  }
 }

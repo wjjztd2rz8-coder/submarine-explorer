@@ -5,7 +5,7 @@
  * `?debrief=1` opens the free-dive variant for screenshots.
  */
 
-import { nextSiteAfter, siteFinds, tourJournal } from '../game/Tour.js';
+import { nextSiteAfter, siteFinds, siteHook, tourJournal } from '../game/Tour.js';
 import type { DiscoveryReader, JournalSite } from '../game/JournalData.js';
 import { PhotoStore, type Photo } from '../game/PhotoStore.js';
 import { el } from './dom.js';
@@ -290,6 +290,11 @@ export class Debrief {
       return b;
     };
     const primaryButton = primary ? mk(primary, 'debrief-btn is-primary') : null;
+    const hook = primary?.id === 'next-dive' ? siteHook(primary.siteId) : null;
+    if (hook) {
+      navigation.className += ' has-hook';
+      navigation.append(el('p', 'debrief-hook', hook));
+    }
     if (primaryButton) navigation.append(primaryButton);
     for (const a of quiet) if (a) secondary.append(mk(a, 'debrief-btn'));
     for (const a of rest) if (!quiet.includes(a)) moreBox.append(mk(a, 'debrief-btn'));
