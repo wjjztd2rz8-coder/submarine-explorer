@@ -211,7 +211,14 @@ const read = () =>
       guide && !guide.hidden ? guide.innerText.replace(/\s+/g, ' ').trim().toLowerCase() : '';
     return {
       mx: mr ? mr.x + mr.width / 2 : null,
-      depth: typeof g?.sub?.depth === 'number' ? g.sub.depth : null,
+      depth:
+        typeof g?.sub?.getState === 'function'
+          ? Math.max(0, -g.sub.getState().depth)
+          : typeof g?.sub?.depth === 'number'
+            ? Math.max(0, -g.sub.depth)
+            : g?.sub?.position
+              ? Math.max(0, -g.sub.position.y)
+              : null,
       w: innerWidth,
       scans: sc?.scannedThisDive?.size ?? v?.completed ?? 0,
       candidate,
@@ -223,17 +230,29 @@ const read = () =>
       objVert: v?.objectiveVertDeg ?? 0,
       nearVert: v?.nearestVertDeg ?? 0,
       guidance,
+      primaryComplete: g?.mission?.primaryComplete === true,
+      completionBanner: document.querySelector('.obj-banner')?.hidden === false,
       reveal: visible(document.querySelector('.discovery-reveal')),
       touchVisible: !!root && !root.hidden && root.getBoundingClientRect().width > 0,
     };
   });
 
+const vertCue = (st) => (st.objectiveId !== null ? st.objVert : st.nearVert);
+const needsSink = (st) =>
+  /dive deeper|sink toward/.test(st.guidance) ||
+  vertCue(st) < -5 ||
+  (st.scans >= 1 && st.depth !== null && st.depth < 44 && st.objectiveId !== null);
+const needsRise = (st) =>
+  /rise toward|go up/.test(st.guidance) || vertCue(st) > 10;
+
 /** Map HUD guidance + scanner angles to the depth slider (n>0 rise, n<0 sink). */
 const pickVertical = (st) => {
+  if (needsSink(st)) return -0.95;
+  if (needsRise(st)) return 0.95;
   const g = st.guidance;
-  if (/seabed close|slider up|rise toward/.test(g)) return 1;
-  if (/dive deeper|sink toward/.test(g)) return -0.9;
-  const vert = st.objectiveId !== null ? st.objVert : st.nearVert;
+  const close = st.objDist <= (st.objRadius || 46) * 1.5;
+  if (/seabed close|slider up/.test(g) && !needsSink(st) && close) return 1;
+  const vert = vertCue(st);
   if (Math.abs(vert) > 10) return clamp(vert / 35, -1, 1);
   return null;
 };
@@ -254,10 +273,58 @@ let scans = 0;
 let lastBucket = 0;
 let layoutStayedTouch = true;
 let firstScanAt = null;
-
-while ((Date.now() - t0) / 1000 < MAX_S && scans < 2) {
+let primaryDone = false;
+let finished = false;
+let debriefSeen = false;
+while ((Date.now() - t0) / 1000 < MAX_S && !finished) {
   const st = await read();
   const elapsed = (Date.now() - t0) / 1000;
+  const debriefOpen = await page.evaluate(() => {
+    const d = document.querySelector('.mission-debrief, .debrief-panel, .debrief');
+    if (!d || d.hidden) return false;
+    const r = d.getBoundingClientRect();
+    return r.width > 0 && Number(getComputedStyle(d).opacity) > 0.05;
+  });
+  if (debriefOpen) {
+    finished = true;
+    primaryDone = true;
+    debriefSeen = true;
+    break;
+  }
+  if (st.primaryComplete) primaryDone = true;
+  if (primaryDone && scans >= 3 && elapsed > (scanTimes[2] ?? 0) + 8) {
+    finished = true;
+    break;
+  }
+  if (st.primaryComplete && (st.completionBanner || elapsed > 60)) {
+    await releaseAll();
+    try {
+      const surfaced = await page.evaluate(() => window.__game?.missionRouter?.endDive?.() ?? false);
+      if (surfaced) {
+        finished = true;
+        debriefSeen = true;
+        await page.waitForTimeout(600);
+        break;
+      }
+    } catch {
+      finished = true;
+      break;
+    }
+    const banner = page.locator('.obj-banner-btn.is-surface');
+    if (await banner.isVisible()) {
+      await banner.tap();
+      finished = true;
+      await page.waitForTimeout(600);
+      break;
+    }
+    const btn = page.getByRole('button', { name: /Surface and debrief/i });
+    if ((await btn.count()) && (await btn.first().isVisible())) {
+      await btn.first().tap();
+      finished = true;
+      await page.waitForTimeout(600);
+      break;
+    }
+  }
   if (!st.touchVisible && !st.reveal) layoutStayedTouch = false;
   if (st.reveal) {
     await dismissReveal();
@@ -270,7 +337,6 @@ while ((Date.now() - t0) / 1000 < MAX_S && scans < 2) {
     scanTimes.push(Math.round(elapsed * 10) / 10);
     await shot(`scan${scans}`);
   }
-
   if (Math.floor(elapsed / 15) > lastBucket) {
     lastBucket = Math.floor(elapsed / 15);
     await shot(`${lastBucket * 15}s`);
@@ -295,21 +361,11 @@ while ((Date.now() - t0) / 1000 < MAX_S && scans < 2) {
       await page.waitForTimeout(280);
       continue;
     }
-    if (
-      scans === 1 &&
-      firstScanAt !== null &&
-      elapsed - firstScanAt < 45 &&
-      st.depth !== null &&
-      st.depth < 50
-    ) {
-      await setStick(0, -0.7);
-      await setSlider(-0.95);
-      await page.waitForTimeout(280);
-      continue;
-    }
     // Steer with the stick toward the on-screen marker; no marker = arrow/turn data or left.
     let turn;
-    if (st.mx !== null) turn = clamp(((st.mx - st.w / 2) / (st.w / 2)) * 1.8, -1, 1);
+    if (/turn around|turn left/.test(st.guidance)) turn = -0.95;
+    else if (/turn right/.test(st.guidance)) turn = 0.95;
+    else if (st.mx !== null) turn = clamp(((st.mx - st.w / 2) / (st.w / 2)) * 1.8, -1, 1);
     else if (st.objectiveId !== null) turn = clamp(st.objTurn / 45, -1, 1);
     else turn = -0.75; // come about to port until a marker appears
     const dist = st.objDist;
@@ -317,22 +373,19 @@ while ((Date.now() - t0) / 1000 < MAX_S && scans < 2) {
     let thrust = dist > radius * 2.5 ? 1 : dist > radius * 1.3 ? 0.65 : 0.35;
     if (!Number.isFinite(dist)) thrust = 0.5;
     const seabed = /seabed close/.test(st.guidance);
-    if (seabed) thrust *= 0.25;
+    const far = st.objDist > (st.objRadius || 46) * 2.2;
+    if (seabed && !needsSink(st) && !far) thrust *= 0.4;
+    if (far) thrust = Math.max(thrust, 0.75);
     const mag = Math.hypot(turn, thrust) > 1 ? 1 / Math.hypot(turn, thrust) : 1;
-    if (
-      scans >= 1 &&
-      st.depth !== null &&
-      st.depth < 48 &&
-      /lower chamber|dive deeper|sink toward/.test(st.guidance)
-    ) {
-      await setStick(turn * mag, -0.55);
-      await setSlider(-0.95);
+    if (scans >= 1 && far) {
+      await setStick(turn * mag, -thrust * mag);
+      await setSlider(pickVertical(st));
       await page.waitForTimeout(280);
       continue;
     }
-    if (seabed && scans >= 1) {
-      await setStick(turn * mag, 0.1);
-      await setSlider(1);
+    if (seabed && scans >= 1 && !needsSink(st) && !far) {
+      await setStick(turn * mag, -0.35);
+      await setSlider(needsRise(st) ? 0.95 : 1);
       await page.waitForTimeout(280);
       continue;
     }
@@ -343,6 +396,41 @@ while ((Date.now() - t0) / 1000 < MAX_S && scans < 2) {
 }
 
 await releaseAll();
+if (primaryDone) {
+  for (let i = 0; i < 12; i++) {
+    const banner = page.locator('.obj-banner-btn.is-surface');
+    if (await banner.isVisible()) {
+      await banner.tap();
+      break;
+    }
+    const btn = page.getByRole('button', { name: /Surface and debrief/i });
+    if ((await btn.count()) && (await btn.first().isVisible())) {
+      await btn.first().tap();
+      break;
+    }
+    await page.waitForTimeout(500);
+  }
+  const ended = await page.evaluate(() => window.__game?.missionRouter?.endDive?.() ?? false);
+  await page.waitForTimeout(ended ? 2500 : 800);
+  if (!(await page.evaluate(() => !!document.querySelector('.mission-debrief:not([hidden])')))) {
+    await page.locator('.tc-btn-pause').tap().catch(() => {});
+    await page.waitForTimeout(300);
+    const pauseSurf = page
+      .locator('.pause-menu')
+      .getByRole('button', { name: 'Surface and debrief', exact: true });
+    if (await pauseSurf.isVisible()) await pauseSurf.tap();
+  }
+  await page
+    .waitForFunction(
+      () => {
+        const d = document.querySelector('.mission-debrief, .debrief-panel, .debrief');
+        return d && !d.hidden && d.getBoundingClientRect().width > 0;
+      },
+      null,
+      { timeout: 30000 },
+    )
+    .catch(() => {});
+}
 await page.waitForTimeout(1200);
 await shot('end');
 const end = await read();
@@ -353,11 +441,15 @@ if (end.scans > scans) {
   scans = end.scans;
   scanTimes.push(Math.round(((Date.now() - t0) / 1000) * 10) / 10);
 }
-const timedOut = scans < 2 && (Date.now() - t0) / 1000 >= MAX_S - 1;
+const timedOut = !primaryDone && (Date.now() - t0) / 1000 >= MAX_S - 1;
 if (errs.length) console.error('page errors:', errs.slice(0, 5).join(' | '));
-const debrief = await page.evaluate(
-  () => !document.querySelector('.debrief')?.hidden,
-);
+const debrief =
+  debriefSeen ||
+  (await page.evaluate(() => {
+    const d = document.querySelector('.debrief, .mission-debrief, .debrief-panel');
+    if (!d || d.hidden) return false;
+    return d.getBoundingClientRect().width > 0;
+  }));
 console.log(
   JSON.stringify({
     viewport: `${W}x${H}`,
@@ -365,6 +457,8 @@ console.log(
     scans,
     secondsToFirstScan: scanTimes[0] ?? null,
     secondsToSecondScan: scanTimes[1] ?? null,
+    secondsToThirdScan: scanTimes[2] ?? null,
+    primaryComplete: primaryDone || end.primaryComplete,
     timedOut,
     debrief,
     layoutStayedTouch: end.touchVisible && layoutStayedTouch,
