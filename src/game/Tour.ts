@@ -35,7 +35,7 @@ export function nextSiteAfter(siteId: string, progress: TourProgress): string | 
   const start = TOUR_ORDER.findIndex((id) => id === siteId);
   for (let offset = 1; offset <= TOUR_ORDER.length; offset++) {
     const id = TOUR_ORDER[(start + offset) % TOUR_ORDER.length];
-    if (!siteComplete(id, progress)) return id;
+    if (id !== siteId && !siteComplete(id, progress)) return id;
   }
   return null;
 }

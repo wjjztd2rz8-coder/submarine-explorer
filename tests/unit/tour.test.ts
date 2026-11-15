@@ -19,12 +19,12 @@ it('skips completed primaries, wraps and handles an unknown starting site', () =
   expect(nextSiteAfter('hunga-tonga-caldera', progress)).toBe('lost-city');
   expect(nextSiteAfter('missing', progress)).toBe('lost-city');
 });
-it('returns the current site only after a full circuit, and null for a completed tour', () => {
+it('offers the site chooser when only the current site is unfinished', () => {
   const ratings = Object.fromEntries(TOUR_ORDER.map((id) => [id, 1]));
   expect(nextSite({ ratings })).toBeNull();
   expect(nextSiteAfter('titanic', { ratings })).toBeNull();
   ratings.titanic = 0;
-  expect(nextSiteAfter('titanic', { ratings })).toBe('titanic');
+  expect(nextSiteAfter('titanic', { ratings })).toBeNull();
 });
 
 it('recognizes primaries earned before surfacing and ignores daily ratings', () => {
@@ -47,4 +47,12 @@ it('covers the shipped catalogue and counts only its fixed Journal finds', async
   });
   expect(new Set(sites.map((s) => s.id))).toEqual(new Set(TOUR_ORDER));
   expect(sites.reduce((n, s) => n + siteFinds(s, { isDiscovered: () => false }).total, 0)).toBe(64);
+});
+
+it.each(TOUR_ORDER)('never routes the debrief back into the same site: %s', (current) => {
+  const ratings = Object.fromEntries(TOUR_ORDER.map((id) => [id, id === current ? 0 : 1]));
+  expect(nextSiteAfter(current, { ratings })).toBeNull();
+  const next = nextSiteAfter(current, { ratings: {} });
+  expect(TOUR_ORDER).toContain(next);
+  expect(next).not.toBe(current);
 });
