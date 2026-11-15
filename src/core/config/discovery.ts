@@ -41,8 +41,17 @@ export interface ScanConfig {
    */
   coneHalfAngleDeg: number;
   arcadeConeHalfAngleDeg: number;
-  /** Inside this 3D distance (m) the facing test is waived: you are on top of it. */
+  /**
+   * Inside this distance (m) the facing test is waived: you are on top of it.
+   * Measured in 3D and, separately, horizontally, so hovering over a wreck the
+   * seabed clearance keeps you above still counts as being on top of it.
+   */
   closeRangeM: number;
+  /**
+   * Extra half-angle (deg) a scan in progress keeps its lock through, so a loose
+   * pass or a turn that drifts slightly off the target does not drop the beam.
+   */
+  lockConeExtraDeg: number;
   /** Progress fraction (0..1) lost per second while a scan is interrupted. */
   decayPerSecond: number;
   /** Upper bound on `scan:progress` emissions per second. */
@@ -90,6 +99,7 @@ export const DEFAULT_SCAN: ScanConfig = {
   coneHalfAngleDeg: 35,
   arcadeConeHalfAngleDeg: 45,
   closeRangeM: 25,
+  lockConeExtraDeg: 20,
   decayPerSecond: 0.35, // a full ring drains in ~3 s, so a brief wobble is forgiven
   progressEventHz: 10,
   hintRangeFactor: 3,

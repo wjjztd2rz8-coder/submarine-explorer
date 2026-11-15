@@ -50,7 +50,17 @@ interface ScanEmitter {
 export type ScannerConfig = Pick<
   ScanConfig,
   'coneHalfAngleDeg' | 'closeRangeM' | 'decayPerSecond' | 'progressEventHz' | 'hintRangeFactor'
-> & { radiusFloorM?: number; radiusCeilM?: number };
+> & {
+  radiusFloorM?: number;
+  radiusCeilM?: number;
+  /** Extra half-angle a scan in progress keeps its lock through (ScanConfig). */
+  lockConeExtraDeg?: number;
+  /**
+   * Facing compares heading only, ignoring pitch and height (Arcade): a level
+   * boat pointed at a wreck below it is facing it.
+   */
+  levelCone?: boolean;
+};
 
 /** Apply the mode floor after sensor scaling and any mission approach cap. */
 export function resolveScanRadius(
@@ -192,11 +202,20 @@ export class Scanner {
   }
   private sinceProgressEmit = Infinity;
   private cosCone: number;
+  private cosLockCone: number;
   private rejected: string | null = null;
 
   setConfig(config: ScannerConfig): void {
     this.config = config;
-    this.cosCone = Math.cos((config.coneHalfAngleDeg * Math.PI) / 180);
+    [this.cosCone, this.cosLockCone] = Scanner.cones(config);
+  }
+
+  private static cones(config: ScannerConfig): [number, number] {
+    const rad = (deg: number): number => (Math.min(180, deg) * Math.PI) / 180;
+    return [
+      Math.cos(rad(config.coneHalfAngleDeg)),
+      Math.cos(rad(config.coneHalfAngleDeg + (config.lockConeExtraDeg ?? 0))),
+    ];
   }
 
   constructor(
@@ -204,7 +223,7 @@ export class Scanner {
     private readonly bus: ScanEmitter,
     private readonly recorder: DiscoveryRecorder | null = null,
   ) {
-    this.cosCone = Math.cos((config.coneHalfAngleDeg * Math.PI) / 180);
+    [this.cosCone, this.cosLockCone] = Scanner.cones(config);
   }
 
   setTargets(targets: ScanTarget[]): void {
@@ -575,7 +594,20 @@ export class Scanner {
       cos = (dx * f.x + dy * f.y + dz * f.z) / (distance * fl);
     }
     const angleDeg = (Math.acos(Math.max(-1, Math.min(1, cos))) * 180) / Math.PI;
-    const facing = distance <= this.config.closeRangeM || cos >= this.cosCone;
+    const horizontal = Math.hypot(dx, dz);
+    let coneCos = cos;
+    if (this.config.levelCone && horizontal > 1e-6) {
+      const fh = Math.hypot(f.x, f.z) || 1;
+      coneCos = (dx * f.x + dz * f.z) / (horizontal * fh);
+    }
+    // Over the target counts as on top of it even when clearance keeps the boat
+    // well above: no heading puts it "ahead", and a player told to turn just circles.
+    // A scan in progress holds its lock through a wider cone, so passing works.
+    const facing =
+      distance <= this.config.closeRangeM ||
+      horizontal <= this.config.closeRangeM ||
+      coneCos >=
+        (t === this.active && this.view.phase === 'scanning' ? this.cosLockCone : this.cosCone);
     // Horizontal turn: +Y-up cross product sign, flipped because +Z is south,
     // so a clockwise (starboard) turn seen from above is positive.
     const hf = Math.atan2(f.x, -f.z);
