@@ -21,9 +21,11 @@
       ],
       "note": "Real GMRT terrain, 2.5 km offshore of Moss Landing harbour on a bearing of 260 degrees, seabed 44 m. No source gives an exact head coordinate; this point marks where the terrain trace (this session, tools/inspect_tile.py + a bilinear sampler) first shows the canyon's steep-walled incision beginning, close to shore as the sources describe.",
       "reveal": {
-        "distance_m": 75,
-        "elevation_deg": 22,
-        "azimuth_deg": 75
+        "distance_m": 140,
+        "elevation_deg": 12,
+        "azimuth_deg": 168,
+        "sweep_deg": 12,
+        "target_offset": [-17369, -708, 1625]
       }
     },
     {
@@ -45,9 +47,11 @@
       ],
       "note": "GMRT terrain, about 265 m deep and 2.85 km in a straight line from the canyon-head marker. Located by sampling the grid toward the canyon axis; this scan point does not establish the regional shelf-break position.",
       "reveal": {
-        "distance_m": 80,
-        "elevation_deg": 22,
-        "azimuth_deg": 250
+        "distance_m": 135,
+        "elevation_deg": 11,
+        "azimuth_deg": 356,
+        "sweep_deg": 12,
+        "target_offset": [-14461, -478, 1277]
       }
     },
     {
@@ -67,7 +71,14 @@
         "https://www.mbari.org/know-your-ocean/monterey-canyon/",
         "https://www.gmrt.org/"
       ],
-      "note": "GMRT terrain on the inner bend between the north-wall and canyon-floor survey points."
+      "note": "GMRT terrain on the inner bend between the north-wall and canyon-floor survey points.",
+      "reveal": {
+        "distance_m": 118,
+        "elevation_deg": 9,
+        "azimuth_deg": 332,
+        "sweep_deg": 12,
+        "target_offset": [110, 96, -240]
+      }
     },
     {
       "id": "monterey-canyon-axis",
@@ -86,7 +97,14 @@
         "https://www.mbari.org/know-your-ocean/monterey-canyon/",
         "https://www.gmrt.org/"
       ],
-      "note": "GMRT terrain on the traced inner canyon floor, about 355 m south of the north-wall marker at the same longitude. No source publishes a coordinate for this specific axis point."
+      "note": "GMRT terrain on the traced inner canyon floor, about 355 m south of the north-wall marker at the same longitude. No source publishes a coordinate for this specific axis point.",
+      "reveal": {
+        "distance_m": 128,
+        "elevation_deg": 11,
+        "azimuth_deg": 158,
+        "sweep_deg": 12,
+        "target_offset": [-20, 106, -340]
+      }
     },
     {
       "id": "monterey-canyon-wall",
@@ -104,11 +122,11 @@
       "sources": ["https://www.mbari.org/know-your-ocean/monterey-canyon/"],
       "note": "Real GMRT terrain: 748 m deep, about 645 m (and 267 m of grid relief) north of the axis-1000m POI at the same longitude, on the canyon's steep north wall. No specific coordinate is published for a 'wall'; this point was located by sampling terrain perpendicular to the traced axis.",
       "reveal": {
-        "distance_m": 102,
-        "elevation_deg": 26,
-        "azimuth_deg": 345,
-        "sweep_deg": 15,
-        "target_offset": [0, 3, 25]
+        "distance_m": 112,
+        "elevation_deg": 9,
+        "azimuth_deg": 348,
+        "sweep_deg": 14,
+        "target_offset": [0, 8, 28]
       }
     },
     {
@@ -127,10 +145,11 @@
       "sources": ["https://www.mbari.org/technology/monterey-accelerated-research-system-mars/"],
       "note": "Published position 36 deg 42.7481'N, 122 deg 11.2139'W, depth 891 m (MBARI). GMRT seabed here is about 888 m, within 3 m of the published depth. The scan marker follows the detailed seabed rather than a rounded depth that sits slightly below it. The real trawl-resistant frame (about 3.7 x 4.6 m at the base, 1.2 m tall) is not modelled in detail; the placed prop is a simplified marker.",
       "reveal": {
-        "distance_m": 26,
-        "elevation_deg": 20,
+        "distance_m": 21,
+        "elevation_deg": 18,
         "azimuth_deg": 320,
-        "target_offset": [0, -2.5, 0]
+        "sweep_deg": 18,
+        "target_offset": [0, -2, -2]
       }
     }
   ]

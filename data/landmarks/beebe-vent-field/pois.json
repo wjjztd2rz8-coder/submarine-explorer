@@ -40,10 +40,11 @@
       ],
       "note": "Real GMRT terrain, -4,979.2 m, ~57 m from the main vent POI, inside the same real vent complex where Nye et al. (2012) described Rimicaris hybisae swarming by the thousand around Beebe's chimneys. `reconstruction: true` because no published survey gives exact individual-shrimp or swarm-density coordinates to place -- the swarm's real presence at this vent field is sourced, its precise mapped position here is not.",
       "reveal": {
-        "distance_m": 24,
-        "elevation_deg": 15,
-        "azimuth_deg": 215,
-        "target_offset": [-46, -6, -16]
+        "distance_m": 22,
+        "elevation_deg": 8,
+        "azimuth_deg": 152,
+        "sweep_deg": 16,
+        "target_offset": [0, -12, 0]
       }
     },
     {
@@ -65,10 +66,11 @@
       ],
       "note": "Real GMRT terrain, -4,957.1 m, about 346 m southwest of the main vent POI. Webber et al. (2015) describe at least six sulfide mounds; this marker is an authored local target, not the surveyed coordinate of a specific mound.",
       "reveal": {
-        "distance_m": 20,
-        "elevation_deg": 10,
-        "azimuth_deg": 285,
-        "target_offset": [-5.3, 1, 27.8]
+        "distance_m": 18,
+        "elevation_deg": 9,
+        "azimuth_deg": 115,
+        "sweep_deg": 16,
+        "target_offset": [3.8, -0.5, 2.5]
       }
     },
     {
@@ -88,7 +90,14 @@
         "https://www.nature.com/articles/ncomms1636",
         "https://www.pnas.org/doi/full/10.1073/pnas.1009205107"
       ],
-      "note": "Real GMRT terrain, about 4,983 m, between the main vents and the western sulfide mound. Connelly et al. (2012) place the Beebe field on the ultraslow Mid-Cayman Spreading Centre, so this marker stands for the spreading-centre seafloor the vents rise from. Its placement is an authored route stop (added 2026-11), not a mapped fault or plate-boundary line; the Journal's axial-valley depth reference lies about 13 km away."
+      "note": "Real GMRT terrain, about 4,983 m, between the main vents and the western sulfide mound. Connelly et al. (2012) place the Beebe field on the ultraslow Mid-Cayman Spreading Centre, so this marker stands for the spreading-centre seafloor the vents rise from. Its placement is an authored route stop (added 2026-11), not a mapped fault or plate-boundary line; the Journal's axial-valley depth reference lies about 13 km away.",
+      "reveal": {
+        "distance_m": 24,
+        "elevation_deg": 9,
+        "azimuth_deg": 212,
+        "sweep_deg": 16,
+        "target_offset": [103, -12.5, -120]
+      }
     }
   ]
 }

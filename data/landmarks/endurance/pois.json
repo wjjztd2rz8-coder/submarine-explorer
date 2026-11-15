@@ -98,10 +98,11 @@
       ],
       "note": "FMHT's survey team (Mensun Bound) found the masts down and the funnel toppled, with damage concentrated around the poop and waist; History.com's photo set shows the ship appears to have struck the seabed bow/keel-first. No coordinates are published for the fallen rigging itself; placed forward of the hull centre, illustrative position.",
       "reveal": {
-        "distance_m": 26,
-        "elevation_deg": 20,
-        "azimuth_deg": 200,
-        "target_offset": [2, -6, 16]
+        "distance_m": 25,
+        "elevation_deg": 17,
+        "azimuth_deg": 195,
+        "sweep_deg": 14,
+        "target_offset": [-6, -1.2, 5.5]
       }
     }
   ]
