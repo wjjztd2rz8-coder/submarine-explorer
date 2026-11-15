@@ -75,6 +75,8 @@ export class ScanOverlay {
   private cue: string | null = null;
   /** The outstanding objective, so a side-find result can say it is still open. */
   private openObjective: { name: string; ready: boolean } | null = null;
+  /** One-line cue when a prop blocks the straight approach (from the HUD). */
+  private approachObstacle: string | null = null;
 
   constructor(
     private readonly config: Pick<
@@ -115,7 +117,13 @@ export class ScanOverlay {
     this.complete = null;
     this.cue = null;
     this.openObjective = null;
+    this.approachObstacle = null;
     this.slot.clear();
+  }
+
+  /** Shown once on the objective line while thrusting into a blocking prop. */
+  setApproachObstacle(detail: string | null): void {
+    this.approachObstacle = detail;
   }
 
   /**
@@ -399,10 +407,12 @@ export class ScanOverlay {
           detail: view.objectiveInRange
             ? inRange()
             : [
+                this.approachObstacle,
                 Math.abs(turn) >= 10 ? turnCue(turn) : null,
                 depthCue(view.objectiveDistance, view.objectiveVertDeg, keys),
                 Math.abs(turn) >= 10 ||
-                depthCue(view.objectiveDistance, view.objectiveVertDeg, keys)
+                depthCue(view.objectiveDistance, view.objectiveVertDeg, keys) ||
+                this.approachObstacle
                   ? `${view.objectiveDistance.toFixed(0)} m`
                   : near,
               ]

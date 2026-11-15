@@ -6,6 +6,7 @@ const { chromium } = require('@playwright/test');
 
 const raw = process.argv.slice(2);
 const noFinish = process.env.TOUR_NO_FINISH === '1' || raw.includes('--no-finish');
+const noAntiStuck = process.env.TOUR_NO_ANTISTUCK === '1';
 const argv = raw.filter((a) => a !== '--no-finish');
 const [OUT, SITE = '', MAX = '240', W = '1280', H = '720', BASE = 'http://127.0.0.1:4787/'] = argv;
 const tag = SITE || 'first';
@@ -250,7 +251,7 @@ while (el() < +MAX) {
     if (anchorPos === null) {
       anchorPos = { x: s.px, z: s.pz };
       anchorT = now;
-    } else if (now - anchorT >= 8) {
+    } else if (!noAntiStuck && now - anchorT >= 8) {
       const moved = Math.hypot(s.px - anchorPos.x, s.pz - anchorPos.z);
       if (moved < 6) {
         antiStuckFired = true;

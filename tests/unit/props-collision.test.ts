@@ -261,6 +261,24 @@ describe('Props.collide + PropContact', () => {
     expect(p.z).toBeLessThanOrEqual(z - 10 - 8 + 1e-6);
   });
 
+  it('deflects head-on thrust along the prop surface instead of zeroing out', async () => {
+    const props = await hullProps();
+    const bus = new EventBus();
+    const contact = new PropContact(props, bus, cfg, 8);
+    const { x, z } = latLonToWorld(meta, 41.73, -49.95);
+    const yaw = Math.PI;
+    const body = {
+      position: v(x + 8, -3790, z - 16),
+      velocity: v(0, 0, 0),
+      getForward(out = new THREE.Vector3()) {
+        return out.set(Math.sin(yaw), 0, -Math.cos(yaw));
+      },
+    };
+    const start = body.position.clone();
+    for (let i = 0; i < 120; i++) contact.resolve(body, 1 / 60, 1);
+    expect(body.velocity.length() + body.position.distanceTo(start)).toBeGreaterThan(2);
+  });
+
   it('damps into-surface velocity and emits sub:collided once per contact', async () => {
     const props = await hullProps();
     const bus = new EventBus();
