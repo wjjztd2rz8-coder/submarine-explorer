@@ -409,6 +409,21 @@ describe('MissionRouter completion timing', () => {
     vi.unstubAllGlobals();
   });
 
+  it('suspends an open completion banner and Finish dive while a reveal is active', () => {
+    scan('primary');
+    advance(router, DEFAULT_CONFIG.mission.completeDelayS + 1);
+    expect(router.panel.bannerOpen).toBe(true);
+    options.discovery.reveal = { active: true };
+    frame(router);
+    expect(router.panel.bannerOpen).toBe(false);
+    expect(router.finishButton.hidden).toBe(true);
+    options.discovery.reveal = { active: false };
+    advance(router, DEFAULT_CONFIG.mission.completeDelayS + 1);
+    expect(router.panel.bannerOpen).toBe(true);
+    expect(router.endDive()).toBe(true);
+    expect(router.debriefOpen).toBe(true);
+  });
+
   it('a reload that skips the briefing freezes until content and the start pose are ready', async () => {
     router.dispose();
     let loaded!: () => void;
