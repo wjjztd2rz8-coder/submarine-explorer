@@ -1,8 +1,160 @@
-// Phone-size captures + debrief via pause menu after first scan.
+// Phone layout audit: Finish dive line height, discovery reveal, mission debrief.
+// Usage: node tools/playtest/phone-flow.mjs <outDir> <width> <height> [baseUrl]
 import { createRequire } from 'node:module';
-const require = createRequire('/home/vijay/submarine-explorer/package.json');
+import { mkdirSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
+const require = createRequire(join(repoRoot, 'package.json'));
 const { chromium } = require('@playwright/test');
-const [OUT, W, H, tag] = [process.argv[2], +process.argv[3], +process.argv[4], process.argv[5]];
+
+const [OUT, wArg, hArg, baseArg] = process.argv.slice(2);
+const W = +wArg;
+const H = +hArg;
+const BASE = (baseArg ?? 'http://127.0.0.1:4904/').replace(/\/?$/, '/');
+if (!OUT || !(W > 0) || !(H > 0)) {
+  console.error('usage: node phone-flow.mjs <outDir> <width> <height> [baseUrl]');
+  process.exit(2);
+}
+mkdirSync(OUT, { recursive: true });
+
+const ctxOpts = {
+  viewport: { width: W, height: H },
+  hasTouch: true,
+  isMobile: true,
+  deviceScaleFactor: 3,
+  userAgent:
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+};
+
+const overlap = (a, b) =>
+  a &&
+  b &&
+  a.x < b.x + b.width &&
+  b.x < a.x + a.width &&
+  a.y < b.y + b.height &&
+  b.y < a.y + a.height;
+
+async function auditOverlay(page, rootSel) {
+  return page.evaluate(
+    ({ rootSel, vw, vh }) => {
+      const root = document.querySelector(rootSel);
+      if (!root || root.hidden) return { ok: false, issues: ['missing root'] };
+      const issues = [];
+      const check = (el, label) => {
+        if (!el || el.hidden) return;
+        const r = el.getBoundingClientRect();
+        if (r.width < 1 && r.height < 1) return;
+        const isBtn =
+          el.tagName === 'BUTTON' || el.classList.contains('debrief-btn') || el.closest('button');
+        if (isBtn && (r.width < 40 || r.height < 40)) {
+          issues.push(`${label}: button ${r.width.toFixed(1)}x${r.height.toFixed(1)}`);
+        }
+        if (r.left < -1 || r.top < -1 || r.right > vw + 1 || r.bottom > vh + 1) {
+          issues.push(`${label}: outside viewport`);
+        }
+        const textLike = ['P', 'H1', 'H2', 'H3', 'SPAN', 'DIV'].includes(el.tagName);
+        if (textLike && el.scrollWidth > el.clientWidth + 1) {
+          issues.push(`${label}: text overflow ${el.scrollWidth - el.clientWidth}px`);
+        }
+      };
+      const panel = root.querySelector('.discovery-reveal-panel,.debrief-panel') ?? root;
+      check(panel, 'panel');
+      for (const el of panel.querySelectorAll('button,h1,h2,h3,p,.debrief-kicker,.debrief-title')) {
+        check(el, el.tagName);
+      }
+      const docScroll = document.documentElement.scrollWidth > window.innerWidth + 1;
+      if (docScroll) issues.push('page horizontal scroll');
+      return { ok: issues.length === 0, issues };
+    },
+    { rootSel, vw: W, vh: H },
+  );
+}
+
+async function measureFinish(page) {
+  await page.goto(`${BASE}?mission=monterey-canyon&skipBriefing=1&touch=1`, {
+    waitUntil: 'domcontentloaded',
+    timeout: 60000,
+  });
+  await page.waitForFunction(() => window.__gameReady === true, null, { timeout: 60000 });
+  await page.waitForTimeout(1500);
+  for (const id of [
+    'monterey-canyon-wall',
+    'monterey-canyon-inner-bend',
+    'monterey-canyon-axis',
+  ]) {
+    await page.evaluate((poiId) => window.__game.bus.emit('scan:complete', { poiId }), id);
+    await page.waitForTimeout(150);
+  }
+  await page.waitForTimeout(4500);
+  const keep = page.getByRole('button', { name: /keep exploring/i });
+  if (await keep.count()) await keep.first().tap();
+  await page.locator('.hud-finish').waitFor({ state: 'visible', timeout: 15000 });
+  return page.evaluate(() => {
+    const el = document.querySelector('.hud-finish');
+    const cs = getComputedStyle(el);
+    const r = el.getBoundingClientRect();
+    const lh = parseFloat(cs.lineHeight) || 1;
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const textLineRects = range.getClientRects().length;
+    const scan = document.querySelector('.tc-btn-scan')?.getBoundingClientRect();
+    const stick = document.querySelector('.tc-stick')?.getBoundingClientRect();
+    const oneLine = cs.whiteSpace === 'nowrap' && textLineRects <= 1;
+    return {
+      height: r.height,
+      lineHeight: lh,
+      textLineRects,
+      oneLine,
+      whiteSpace: cs.whiteSpace,
+      overlapScan:
+        scan &&
+        r.x < scan.x + scan.width &&
+        scan.x < r.x + r.width &&
+        r.y < scan.y + scan.height &&
+        scan.y < r.y + r.height,
+      overlapStick:
+        stick &&
+        r.x < stick.x + stick.width &&
+        stick.x < r.x + r.width &&
+        r.y < stick.y + stick.height &&
+        stick.y < r.y + r.height,
+    };
+  });
+}
+
+async function openReveal(page, site, poi) {
+  await page.goto(
+    `${BASE}?mission=${encodeURIComponent(site)}&skipBriefing=1&touch=1&reveal=${encodeURIComponent(poi)}`,
+    { waitUntil: 'domcontentloaded', timeout: 60000 },
+  );
+  await page.locator('.discovery-reveal').waitFor({ state: 'visible', timeout: 60000 });
+  await page.waitForTimeout(1500);
+  return auditOverlay(page, '.discovery-reveal');
+}
+
+async function openDebrief(page, site) {
+  await page.goto(
+    `${BASE}?mission=${encodeURIComponent(site)}&skipBriefing=1&touch=1&debrief=1`,
+    { waitUntil: 'domcontentloaded', timeout: 60000 },
+  );
+  await page.locator('.debrief').waitFor({ state: 'visible', timeout: 60000 });
+  await page.waitForTimeout(2500);
+  const audit = await auditOverlay(page, '.debrief');
+  const next = await page.evaluate(() => {
+    const btn = [...document.querySelectorAll('.debrief-btn')].find((b) =>
+      /next dive/i.test(b.textContent ?? ''),
+    );
+    const r = btn?.getBoundingClientRect();
+    return {
+      reachable: !!r && r.left >= 0 && r.right <= innerWidth && r.width >= 40 && r.height >= 40,
+      width: r?.width ?? 0,
+    };
+  });
+  return { ...audit, nextSite: next };
+}
+
 const browser = await chromium.launch({
   args: [
     '--ignore-gpu-blocklist',
@@ -11,109 +163,24 @@ const browser = await chromium.launch({
     '--disable-vulkan-surface',
   ],
 });
-const ctx = await browser.newContext({
-  viewport: { width: W, height: H },
-  hasTouch: true,
-  isMobile: true,
-  deviceScaleFactor: 2,
-  userAgent:
-    'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
-});
+const ctx = await browser.newContext(ctxOpts);
 const page = await ctx.newPage();
-let n = 0;
-const shot = async (name) => {
-  n++;
-  await page.screenshot({ path: `${OUT}/${tag}-${String(n).padStart(2, '0')}-${name}.png` });
+
+const finish = await measureFinish(page);
+const revealA = await openReveal(page, 'monterey-canyon', 'monterey-canyon-wall');
+const revealB = await openReveal(page, 'great-blue-hole', 'great-blue-hole-stalactites');
+const debrief = await openDebrief(page, 'monterey-canyon');
+
+const report = {
+  viewport: `${W}x${H}`,
+  finish,
+  reveals: { 'monterey-canyon': revealA, 'great-blue-hole': revealB },
+  debrief,
 };
-const allText = () =>
-  page.evaluate(() => document.body.innerText.replace(/\s+/g, ' ').slice(0, 1500));
-await page.goto('http://127.0.0.1:4787/');
-await page.waitForTimeout(3500);
-await shot('home');
-await page.getByRole('button', { name: /^Dive:/ }).tap();
-await page.waitForTimeout(3000);
-await shot('briefing');
-await page.getByRole('button', { name: /Begin dive/ }).tap();
-await page.waitForTimeout(3000);
-await shot('start');
-console.log('START:', await allText());
-// drive with keys (bot), to first scan
-const held = new Set();
-const hold = async (k, on) => {
-  if (on && !held.has(k)) {
-    await page.keyboard.down(k);
-    held.add(k);
-  } else if (!on && held.has(k)) {
-    await page.keyboard.up(k);
-    held.delete(k);
-  }
-};
-const t0 = Date.now();
-let scans = 0;
-let prevNew = false;
-while ((Date.now() - t0) / 1000 < 90 && scans < 2) {
-  const s = await page.evaluate(() => {
-    const mk =
-      document.querySelector('.d-scan-world-marker.is-current') ||
-      document.querySelector('.d-scan-world-marker');
-    const r = mk && mk.getBoundingClientRect();
-    const ok = r && r.width > 0 && getComputedStyle(mk).visibility !== 'hidden';
-    return {
-      mx: ok ? r.x + r.width / 2 : null,
-      w: innerWidth,
-      all: document.body.innerText.replace(/\s+/g, ' ').toLowerCase(),
-    };
-  });
-  const isNew = /new journal entry/.test(s.all);
-  if (isNew && !prevNew) {
-    scans++;
-    await shot(`scan${scans}-done`);
-    console.log(
-      'scan',
-      scans,
-      'at',
-      ((Date.now() - t0) / 1000).toFixed(0),
-      '|',
-      s.all.slice(0, 400),
-    );
-  }
-  prevNew = isNew;
-  if (/scanning/.test(s.all) && n < 6) await shot('scanning');
-  const c = s.w / 2;
-  let port = false,
-    stbd = false;
-  if (s.mx !== null) {
-    port = s.mx < c - 60;
-    stbd = s.mx > c + 60;
-  } else port = true;
-  const scan =
-    /scan target|scanning|hold g|hold scan/.test(s.all) &&
-    !/get closer/.test(s.all) &&
-    s.mx !== null &&
-    Math.abs(s.mx - c) < 140;
-  await hold('a', port);
-  await hold('d', stbd);
-  await hold('g', scan);
-  await hold('w', !scan);
-  await page.waitForTimeout(350);
-}
-for (const k of [...held]) await page.keyboard.up(k);
-await page.waitForTimeout(2500);
-await shot('after-primaries');
-console.log('AFTER:', await allText());
-const sd = page.getByRole('button', { name: /Surface and debrief/ });
-if ((await sd.count()) && (await sd.first().isVisible())) {
-  await sd.first().tap();
-  await page.waitForTimeout(4000);
-  await shot('debrief-a');
-  await page.waitForTimeout(7000);
-  await shot('debrief-b');
-  console.log('DEBRIEF:', await allText());
-} else console.log('NO SURFACE BUTTON');
-const jb = page.getByRole('button', { name: /journal/i });
-if ((await jb.count()) && (await jb.first().isVisible())) {
-  await jb.first().tap();
-  await page.waitForTimeout(3000);
-  await shot('journal');
-}
+console.log(JSON.stringify(report, null, 2));
 await browser.close();
+process.exit(
+  finish.oneLine && !finish.overlapScan && !finish.overlapStick && revealA.ok && revealB.ok && debrief.ok
+    ? 0
+    : 1,
+);

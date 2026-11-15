@@ -1,18 +1,20 @@
 // Phone playtest: reach and scan a target using ONLY real touch input (CDP).
-// Usage: node tools/playtest/touch-drive.mjs <outDir> <width> <height> [siteId] [baseUrl]
+// Usage: node tools/playtest/touch-drive.mjs <outDir> <width> <height> [siteId] [baseUrl] [maxSeconds]
 import { createRequire } from 'node:module';
 import { mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const require = createRequire('/home/vijay/submarine-explorer/package.json');
+const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
+const require = createRequire(join(repoRoot, 'package.json'));
 const { chromium } = require('@playwright/test');
 
-const [outDir, wArg, hArg, siteArg, baseArg] = process.argv.slice(2);
+const [outDir, wArg, hArg, siteArg, baseArg, maxArg] = process.argv.slice(2);
 const W = Number(wArg);
 const H = Number(hArg);
 const SITE = siteArg ?? '';
 const BASE = baseArg ?? 'http://127.0.0.1:4791/';
-const MAX_S = 150;
+const MAX_S = Number(maxArg) > 0 ? Number(maxArg) : 240;
 if (!outDir || !(W > 0) || !(H > 0)) {
   console.error('usage: node touch-drive.mjs <outDir> <width> <height> [siteId] [baseUrl]');
   process.exit(2);
@@ -34,6 +36,19 @@ const ctx = await browser.newContext({
   deviceScaleFactor: 2,
   userAgent:
     'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+});
+await ctx.addInitScript(() => {
+  localStorage.setItem(
+    'subexplorer.progress.v1',
+    JSON.stringify({
+      version: 1,
+      points: 0,
+      lifetime: 900,
+      awarded: [],
+      upgrades: {},
+      ratings: {},
+    }),
+  );
 });
 const page = await ctx.newPage();
 const errs = [];
@@ -81,7 +96,10 @@ const releaseAll = async () => {
 };
 
 // ---- open the game ----------------------------------------------------------
-await page.goto(SITE ? new URL(`?mission=${encodeURIComponent(SITE)}`, BASE).href : BASE);
+const missionUrl = SITE
+  ? new URL(`?mission=${encodeURIComponent(SITE)}&skipBriefing=1&touch=1`, BASE).href
+  : new URL(`?touch=1`, BASE).href;
+await page.goto(missionUrl);
 await page.waitForFunction(() => window.__gameReady || window.__gameError, null, {
   timeout: 60000,
 });
@@ -89,12 +107,7 @@ if (await page.evaluate(() => !!window.__gameError))
   throw new Error(String(await page.evaluate(() => window.__gameError)));
 await page.waitForTimeout(1200);
 
-if (SITE) {
-  await page
-    .getByRole('button', { name: /Begin dive/ })
-    .first()
-    .tap();
-} else {
+if (!SITE) {
   await page
     .getByRole('button', { name: /^Dive(:|$)/ })
     .first()
@@ -110,7 +123,14 @@ if (SITE) {
 }
 await page.waitForFunction(() => window.__game?.scanner, null, { timeout: 60000 });
 await page.locator('.tc-root').waitFor({ state: 'visible', timeout: 20000 });
-await page.waitForTimeout(1500);
+for (let i = 0; i < 4; i++) {
+  const skip = page.getByRole('button', { name: 'Skip', exact: true });
+  if (await skip.isVisible()) {
+    await skip.tap();
+    await page.waitForTimeout(500);
+  }
+}
+await page.waitForTimeout(1000);
 
 // Control geometry, refreshed once the touch layout has settled.
 const geometry = await page.evaluate(() => {
@@ -186,8 +206,12 @@ const read = () =>
     const root = document.querySelector('.tc-root');
     const candidate = v?.candidateId ?? null;
     const fixed = [...(sc?.getTargets?.() ?? []), ...(sc?.getSupplementalTargets?.() ?? [])];
+    const guide = document.querySelector('.guidance-slot');
+    const guidance =
+      guide && !guide.hidden ? guide.innerText.replace(/\s+/g, ' ').trim().toLowerCase() : '';
     return {
       mx: mr ? mr.x + mr.width / 2 : null,
+      depth: typeof g?.sub?.depth === 'number' ? g.sub.depth : null,
       w: innerWidth,
       scans: sc?.scannedThisDive?.size ?? v?.completed ?? 0,
       candidate,
@@ -198,10 +222,21 @@ const read = () =>
       objTurn: v?.objectiveTurnDeg ?? 0,
       objVert: v?.objectiveVertDeg ?? 0,
       nearVert: v?.nearestVertDeg ?? 0,
+      guidance,
       reveal: visible(document.querySelector('.discovery-reveal')),
       touchVisible: !!root && !root.hidden && root.getBoundingClientRect().width > 0,
     };
   });
+
+/** Map HUD guidance + scanner angles to the depth slider (n>0 rise, n<0 sink). */
+const pickVertical = (st) => {
+  const g = st.guidance;
+  if (/seabed close|slider up|rise toward/.test(g)) return 1;
+  if (/dive deeper|sink toward/.test(g)) return -0.9;
+  const vert = st.objectiveId !== null ? st.objVert : st.nearVert;
+  if (Math.abs(vert) > 10) return clamp(vert / 35, -1, 1);
+  return null;
+};
 
 const dismissReveal = async () => {
   await releaseAll();
@@ -218,6 +253,7 @@ const scanTimes = [];
 let scans = 0;
 let lastBucket = 0;
 let layoutStayedTouch = true;
+let firstScanAt = null;
 
 while ((Date.now() - t0) / 1000 < MAX_S && scans < 2) {
   const st = await read();
@@ -230,6 +266,7 @@ while ((Date.now() - t0) / 1000 < MAX_S && scans < 2) {
 
   if (st.scans > scans) {
     scans = st.scans;
+    if (firstScanAt === null) firstScanAt = elapsed;
     scanTimes.push(Math.round(elapsed * 10) / 10);
     await shot(`scan${scans}`);
   }
@@ -252,6 +289,24 @@ while ((Date.now() - t0) / 1000 < MAX_S && scans < 2) {
     if (!points.has(1)) await holdScan(true);
   } else {
     await holdScan(false);
+    if (scans === 0 && elapsed < 15) {
+      await setStick(0, -0.75);
+      await setSlider(-0.85);
+      await page.waitForTimeout(280);
+      continue;
+    }
+    if (
+      scans === 1 &&
+      firstScanAt !== null &&
+      elapsed - firstScanAt < 45 &&
+      st.depth !== null &&
+      st.depth < 50
+    ) {
+      await setStick(0, -0.7);
+      await setSlider(-0.95);
+      await page.waitForTimeout(280);
+      continue;
+    }
     // Steer with the stick toward the on-screen marker; no marker = arrow/turn data or left.
     let turn;
     if (st.mx !== null) turn = clamp(((st.mx - st.w / 2) / (st.w / 2)) * 1.8, -1, 1);
@@ -261,10 +316,28 @@ while ((Date.now() - t0) / 1000 < MAX_S && scans < 2) {
     const radius = st.objRadius || 40;
     let thrust = dist > radius * 2.5 ? 1 : dist > radius * 1.3 ? 0.65 : 0.35;
     if (!Number.isFinite(dist)) thrust = 0.5;
+    const seabed = /seabed close/.test(st.guidance);
+    if (seabed) thrust *= 0.25;
     const mag = Math.hypot(turn, thrust) > 1 ? 1 / Math.hypot(turn, thrust) : 1;
+    if (
+      scans >= 1 &&
+      st.depth !== null &&
+      st.depth < 48 &&
+      /lower chamber|dive deeper|sink toward/.test(st.guidance)
+    ) {
+      await setStick(turn * mag, -0.55);
+      await setSlider(-0.95);
+      await page.waitForTimeout(280);
+      continue;
+    }
+    if (seabed && scans >= 1) {
+      await setStick(turn * mag, 0.1);
+      await setSlider(1);
+      await page.waitForTimeout(280);
+      continue;
+    }
     await setStick(turn * mag, -thrust * mag);
-    const vert = st.objectiveId !== null ? st.objVert : st.nearVert;
-    await setSlider(Math.abs(vert) > 10 ? clamp(vert / 35, -1, 1) : null);
+    await setSlider(pickVertical(st));
   }
   await page.waitForTimeout(280);
 }
@@ -282,6 +355,9 @@ if (end.scans > scans) {
 }
 const timedOut = scans < 2 && (Date.now() - t0) / 1000 >= MAX_S - 1;
 if (errs.length) console.error('page errors:', errs.slice(0, 5).join(' | '));
+const debrief = await page.evaluate(
+  () => !document.querySelector('.debrief')?.hidden,
+);
 console.log(
   JSON.stringify({
     viewport: `${W}x${H}`,
@@ -290,6 +366,7 @@ console.log(
     secondsToFirstScan: scanTimes[0] ?? null,
     secondsToSecondScan: scanTimes[1] ?? null,
     timedOut,
+    debrief,
     layoutStayedTouch: end.touchVisible && layoutStayedTouch,
   }),
 );
